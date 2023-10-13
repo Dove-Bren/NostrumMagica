@@ -5,79 +5,101 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiFunction;
+
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
-import net.minecraft.block.BlockFire;
+import net.minecraft.block.FireBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.init.Biomes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.biome.BiomeProviderSingle;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.biome.provider.SingleBiomeProvider;
+import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.event.entity.living.EnderTeleportEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.ExplosionEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ModDimension;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class NostrumEmptyDimension {
 	
-	private static final String DIMENSION_NAME = "NostrumSorceryDim";
-	private static final String DIMENSION_SUFFIX = "_" + DIMENSION_NAME;
-	private static DimensionType DIMENSION_TYPE;
+	public static final String TYPE_ID = "NostrumSorceryDim";
+	//private static final String DIMENSION_SUFFIX = "_" + DIMENSION_NAME;
+	//private static DimensionType DIMENSION_TYPE;
 	
 	public static final int SPAWN_Y = 128;
 	
 	private static final String DIMENSION_ENTRY_TEMPLATE = "sorcery_lobby";
 	private static final String DIMENSION_WHOLE_TEMPLATE = "sorcery_dungeon";
 	
-	public static boolean register(int dim, String identifier) {
-		if (DimensionManager.isDimensionRegistered(dim)) {
-			return false;
+//	public static boolean register(int dim, String identifier) {
+//		if (DimensionManager.isDimensionRegistered(dim)) {
+//			return false;
+//		}
+//		
+//		if (DIMENSION_TYPE == null) {
+//			DIMENSION_TYPE = DimensionType.register(DIMENSION_NAME, DIMENSION_SUFFIX, dim, EmptyDimensionProvider.class, false);
+//		}
+//		
+//		DimensionManager.registerDimension(dim, DIMENSION_TYPE);
+//		new DimensionListener(dim); // TODO leaving these around will grow and grow listeners as saves are loaded...
+//		return true;
+//	}
+	
+	public static class EmptyDimensionFactory extends ModDimension {
+
+		@Override
+		public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
+			return EmptyDimension::new;
 		}
 		
-		if (DIMENSION_TYPE == null) {
-			DIMENSION_TYPE = DimensionType.register(DIMENSION_NAME, DIMENSION_SUFFIX, dim, EmptyDimensionProvider.class, false);
-		}
-		
-		DimensionManager.registerDimension(dim, DIMENSION_TYPE);
-		new DimensionListener(dim); // TODO leaving these around will grow and grow listeners as saves are loaded...
-		return true;
 	}
 	
-	public static class EmptyDimensionProvider extends WorldProvider {
+	public static class EmptyDimension extends Dimension {
 		
 		protected Vec3d skyColor;
 		protected Vec3d fogColor;
 		
-		public EmptyDimensionProvider() {
-			super();
+		public EmptyDimension(World worldIn, DimensionType typeIn) {
+			super(worldIn, typeIn);
 			
 			this.nether = false;
 			this.skyColor = new Vec3d(.2D, 0D, .2D);
@@ -93,24 +115,19 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		protected void init() {
-			super.init();
-			this.hasSkyLight = false;
-			this.biomeProvider = new BiomeProviderSingle(Biomes.SKY);
-			
-			// Sucky place for this hook but the actual hook is final
-			this.onWorldAttached();
+		public ChunkGenerator<?> createChunkGenerator() {
+			return new ChunkGeneratorEmpty(this.world, new SingleBiomeProvider(new SingleBiomeProviderSettings().setBiome(Biomes.THE_END)), new EmptyGenerationSettings());
 		}
 		
 		@Override
-		public IChunkGenerator createChunkGenerator() {
-			return new ChunkGeneratorEmpty(this.world);
+		public boolean hasSkyLight() {
+			return false;
 		}
 
-		@Override
-		public DimensionType getDimensionType() {
-			return DimensionManager.getProviderType(this.getDimension());
-		}
+//		@Override
+//		public DimensionType getDimensionType() {
+//			return DimensionManager.getProviderType(this.getDimension());
+//		}
 		
 		@Override
 		public boolean canDoRainSnowIce(Chunk chunk) {
@@ -123,8 +140,8 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public int getRespawnDimension(ServerPlayerEntity player) {
-			return this.getDimension();
+		public DimensionType getRespawnDimension(ServerPlayerEntity player) {
+			return this.getType();
 		}
 		
 		@OnlyIn(Dist.CLIENT)
@@ -141,7 +158,7 @@ public class NostrumEmptyDimension {
 		
 		@OnlyIn(Dist.CLIENT)
 		@Override
-		public Vec3d getSkyColor(Entity cameraEntity, float partialTicks) {
+		public Vec3d getSkyColor(BlockPos cameraPos, float partialTicks) {
 			return skyColor;
 		}
 		
@@ -177,11 +194,11 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public void onWorldUpdateEntities() {
+		public void tick() {
 			// Make sure players aren't teleporting.
 			// TODO this even is fired before updating, sadly. That feels incorrect.
 			// Does it act weirdly?
-			for (PlayerEntity player : world.playerEntities) {
+			for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers()) {
 				
 				// Make sure they aren't falling out of the world
 				if (player.posY < 1) {
@@ -203,54 +220,80 @@ public class NostrumEmptyDimension {
 				}
 			}
 		}
+
+		@Override
+		public BlockPos findSpawn(ChunkPos chunkPosIn, boolean checkValid) {
+			return findSpawn(chunkPosIn.getXStart(), chunkPosIn.getZStart(), checkValid);
+		}
+
+		@Override
+		public BlockPos findSpawn(int posX, int posZ, boolean checkValid) {
+			return new BlockPos(posX, SPAWN_Y, posZ);
+		}
+
+		@Override
+		public boolean isSurfaceWorld() {
+			return false;
+		}
 	}
 	
-	public static class ChunkGeneratorEmpty implements IChunkGenerator {
+	protected static class EmptyGenerationSettings extends GenerationSettings {
 		
-		private World world;
+	}
+	
+	public static class ChunkGeneratorEmpty extends ChunkGenerator<EmptyGenerationSettings> {
 		
-		public ChunkGeneratorEmpty(World world) {
+		protected IWorld world;
+		
+		public ChunkGeneratorEmpty(IWorld world, BiomeProvider biomeProvider, EmptyGenerationSettings settings) {
+			super(world, biomeProvider, settings);
 			this.world = world;
 		}
 
 		@Override
-		public Chunk generateChunk(int x, int z) {
-			return new Chunk(world, x, z);
-		}
-
-		@Override
-		public void populate(int x, int z) {
+		public void generateSurface(IChunk chunkIn) {
 			;
 		}
 
 		@Override
-		public boolean generateStructures(Chunk chunkIn, int x, int z) {
-			return false;
+		public void carve(IChunk chunkIn, GenerationStage.Carving carvingSettings) {
+			;
 		}
 
 		@Override
-		public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
+		public int getGroundHeight() {
+			return SPAWN_Y;
+		}
+		
+		@Override
+		public boolean hasStructure(Biome biomeIn, Structure<? extends IFeatureConfig> structureIn) {
+			return false;
+		}
+		
+		@Override
+		public <C extends IFeatureConfig> C getStructureConfig(Biome biomeIn, Structure<C> structureIn) {
 			return null;
 		}
 
 		@Override
-		public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position,
-				boolean findUnexplored) {
+		public List<Biome.SpawnListEntry> getPossibleCreatures(EntityClassification creatureType, BlockPos pos) {
 			return null;
 		}
-
+		
 		@Override
-		public void recreateStructures(Chunk chunkIn, int x, int z) {
-			
+		public void makeBase(IWorld worldIn, IChunk chunkIn) {
+			;
 		}
-
+		
 		@Override
-		public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
-			return false;
+		public int func_222529_a(int p_222529_1_, int p_222529_2_, Heightmap.Type p_222529_3_) {
+			return 0;
 		}
-
 	}
 	
+	// Note: "Teleporter" class not used here. Just conveniently wrapping making portals, finding spawn location,
+	// and placing the entity. The vanilla interface has changed to only use teleporters when leaving a dimension
+	// and doesn't let you replace the teleporter to use.
 	public static class DimensionEntryTeleporter extends Teleporter {
 		
 		private ServerWorld world;
@@ -275,12 +318,12 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
+		public boolean func_222268_a(Entity entityIn, float yaw) { // placeInPortal, placeInExistingPortal
 			if (!(entityIn instanceof PlayerEntity)) {
 				return false;
 			}
 			
-			PlayerEntity player = (PlayerEntity) entityIn;
+			ServerPlayerEntity player = (ServerPlayerEntity) entityIn;
 			
 			if (!portalExists(player)) {
 				this.makePortal(player);
@@ -291,7 +334,7 @@ public class NostrumEmptyDimension {
 			return true;
 		}
 		
-		public static void respawnPlayer(PlayerEntity player) {
+		public static void respawnPlayer(ServerPlayerEntity player) {
 			if (player.world.isRemote) {
 				return;
 			}
@@ -299,14 +342,20 @@ public class NostrumEmptyDimension {
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
 			if (spawn == null) {
 				NostrumMagica.logger.warn("Unable to find player spawning location. Sending to overworld.");
-				player.changeDimension(0);
+				player.changeDimension(DimensionType.OVERWORLD);
 			} else {
 				spawn = spawn.north();
-				player.rotationYaw = Direction.NORTH.getHorizontalAngle();
-				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-				player.getMotion().x = player.getMotion().y = player.getMotion().z = 0;
-				player.fallDistance = 0;
-				player.setSpawnChunk(spawn.up(2), true, ModConfig.config.sorceryDimensionIndex());
+				
+				player.teleport(player.server.getWorld(NostrumDimensions.EmptyDimension),
+						spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5,
+						Direction.NORTH.getHorizontalAngle(),
+						0
+						);
+//				player.rotationYaw = Direction.NORTH.getHorizontalAngle();
+//				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
+//				player.setMotion(Vec3d.ZERO);
+//				player.fallDistance = 0;
+				player.setSpawnPoint(spawn.up(2), true, NostrumDimensions.EmptyDimension);
 				
 				try {
 					Field field = ObfuscationReflectionHelper.findField(ServerPlayerEntity.class, "field_184851_cj"); //"invulnerableDimensionChange");
@@ -323,9 +372,17 @@ public class NostrumEmptyDimension {
 			}
 		}
 		
+//		@Override
+//		public void placeInPortal(Entity entityIn, float yaw) {
+//			super.placeInPortal(entityIn, yaw);
+//		}
+		
 		@Override
-		public void placeInPortal(Entity entityIn, float yaw) {
-			super.placeInPortal(entityIn, yaw);
+		@Nullable
+		public BlockPattern.PortalInfo func_222272_a(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
+			// "GetExistingPortalLocation" that base entity uses to try and move to another dimension.
+			// Our dimension doesn't support non-players going through as we don't have a spot for them, so return NULL.
+			return null;
 		}
 		
 		public boolean portalExists(PlayerEntity player) {
@@ -359,7 +416,7 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public void removeStalePortalLocations(long worldTime) {
+		public void tick(long worldTime) {
 			; // 
 		}
 	}
@@ -375,7 +432,7 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public boolean placeInExistingPortal(Entity entityIn, float yaw) {
+		public boolean func_222268_a(Entity entityIn, float yaw) { // placeInExistingPortal
 			BlockPos pos = null;
 			
 			if (NostrumMagica.getMagicWrapper(entityIn) != null) {
@@ -386,14 +443,14 @@ public class NostrumEmptyDimension {
 			
 			if (pos == null && entityIn instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) entityIn;
-				pos = player.getBedLocation(world.provider.getDimension());
+				pos = player.getBedLocation(world.getDimension().getType());
 			}
 			
 			if (pos == null) {
 				pos = world.getSpawnPoint();
 			}
 			
-			while (pos.getY() < world.provider.getActualHeight() && (!world.isAirBlock(pos) || !world.isAirBlock(pos.up()))) {
+			while (pos.getY() < world.getActualHeight() && (!world.isAirBlock(pos) || !world.isAirBlock(pos.up()))) {
 				pos = pos.up();
 			}
 			
@@ -420,9 +477,17 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public void placeInPortal(Entity entityIn, float yaw) {
-			super.placeInPortal(entityIn, yaw);
+		@Nullable
+		public BlockPattern.PortalInfo func_222272_a(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
+			// We can put items 'back' and default to world spawn...
+			// But nah just ignore them
+			return null;
 		}
+		
+//		@Override
+//		public void placeInPortal(Entity entityIn, float yaw) {
+//			super.placeInPortal(entityIn, yaw);
+//		}
 		
 		@Override
 		public boolean makePortal(Entity entityIn) {
@@ -430,16 +495,16 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public void removeStalePortalLocations(long worldTime) {
+		public void tick(long worldTime) {
 			;
 		}
 	}
 	
 	public static class DimensionListener {
 
-		private int dim;
+		private DimensionType dim;
 		
-		public DimensionListener(int dim) {
+		public DimensionListener(DimensionType dim) {
 			MinecraftForge.EVENT_BUS.register(this);
 			this.dim = dim;
 		}
@@ -453,11 +518,13 @@ public class NostrumEmptyDimension {
 		
 		private Map<UUID, Boolean> teleportingMarker = new HashMap<>();
 		
+		// Hook travel event and change teleporter to our custom once, since
+		// default teleporter looks for nether portals...
 		@SubscribeEvent
 		public void onTeleport(EntityTravelToDimensionEvent event) {
 			if (event.getDimension() == dim) {
 				Entity ent = event.getEntity();
-				Boolean marker = teleportingMarker.get(ent.getPersistentID());
+				Boolean marker = teleportingMarker.get(ent.getUniqueID());
 				if (marker != null && marker){
 					return;
 				}
@@ -467,53 +534,59 @@ public class NostrumEmptyDimension {
 				if (ent instanceof ServerPlayerEntity) {
 					ServerPlayerEntity player = (ServerPlayerEntity) ent;
 					MinecraftServer server = player.getServer();
-					teleportingMarker.put(player.getPersistentID(), true);
-					server.getPlayerList().transferPlayerToDimension(
-							player, dim, new DimensionEntryTeleporter(server.getWorld(dim)));
-					teleportingMarker.put(player.getPersistentID(), false);
+					teleportingMarker.put(player.getUniqueID(), true);
+					DimensionEntryTeleporter.respawnPlayer(player);
+					new DimensionEntryTeleporter(server.getWorld(dim))
+						.func_222268_a(player, 0f);
+//					server.getPlayerList().transferPlayerToDimension(
+//							player, dim, new DimensionEntryTeleporter(server.getWorld(dim)));
+					teleportingMarker.put(player.getUniqueID(), false);
 				}
-			} else if (event.getEntity().dimension == dim && event.getDimension() == 0) {
+			} else if (event.getEntity().dimension == dim && event.getDimension() == DimensionType.OVERWORLD) {
 				// Leaving our dimension to homeworld
 				Entity ent = event.getEntity();
 				
-				Boolean marker = teleportingMarker.get(ent.getPersistentID());
+				Boolean marker = teleportingMarker.get(ent.getUniqueID());
 				if (marker != null && marker){
 					return;
 				}
 				
-				
+				// Can't set the world's teleporter to a return one :/
 				event.setCanceled(true);
 
 				if (ent instanceof ServerPlayerEntity) {
 					ServerPlayerEntity player = (ServerPlayerEntity) ent;
 					MinecraftServer server = player.getServer();
-					teleportingMarker.put(player.getPersistentID(), true);
+					teleportingMarker.put(player.getUniqueID(), true);
 					
-					int toDim = 0;
+					DimensionType toDim = DimensionType.OVERWORLD;
 					if (NostrumMagica.getMagicWrapper(player) != null) {
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 						if (attr.getSorceryPortalPos() != null) {
 							toDim = attr.getSorceryPortalDimension();
 						}
 					}
-					server.getPlayerList().transferPlayerToDimension(
-							player, toDim, new DimensionReturnTeleporter(server.getWorld(toDim)));
-					teleportingMarker.put(player.getPersistentID(), false);
+					
+					new DimensionReturnTeleporter(server.getWorld(toDim))
+						.func_222268_a(player, 0f);
+//					server.getPlayerList().transferPlayerToDimension(
+//							player, toDim, new DimensionReturnTeleporter(server.getWorld(toDim)));
+					teleportingMarker.put(player.getUniqueID(), false);
 				}
 			}
 		}
 		
 		@SubscribeEvent
 		public void onExplosion(ExplosionEvent.Detonate event) {
-			if (event.getWorld().provider.getDimension() == dim && event.getAffectedBlocks() != null) {
+			if (event.getWorld().getDimension().getType() == dim && event.getAffectedBlocks() != null) {
 				event.getAffectedBlocks().clear();;
 			}
 		}
 		
 		@SubscribeEvent
-		public void onBlockPlace(@SuppressWarnings("deprecation") BlockEvent.PlaceEvent event) {
-			if (event.getWorld().provider.getDimension() == dim && (
-					event.getPlacedBlock().getBlock() instanceof BlockFire
+		public void onBlockPlace(EntityPlaceEvent event) {
+			if (event.getWorld().getDimension().getType() == dim && (
+					event.getPlacedBlock().getBlock() instanceof FireBlock
 					|| event.getPlacedBlock().getMaterial() == Material.FIRE
 				)) {
 				event.setCanceled(true);

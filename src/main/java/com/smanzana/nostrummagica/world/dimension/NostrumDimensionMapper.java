@@ -8,7 +8,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
@@ -96,15 +95,6 @@ public class NostrumDimensionMapper extends WorldSavedData {
 		}
 	}
 	
-	private static boolean registered = false;
-	
-	public static void registerDimensions() {
-		if (!registered) {
-			registered = true;
-			NostrumEmptyDimension.register(ModConfig.config.sorceryDimensionIndex(), "SorceryDim");
-		}
-	}
-	
 	public static final int OFFSET_CHUNK_LEN = (5120 / 16);
 	public static final String DATA_NAME = NostrumMagica.MODID + "_dimension_mappings";
 	
@@ -138,7 +128,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
+	public void read(CompoundNBT nbt) {
 		for (String key : nbt.keySet()) {
 			UUID id;
 			
@@ -161,10 +151,10 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT compound) {
+	public CompoundNBT write(CompoundNBT compound) {
 		int count = 0;
 		for (Entry<UUID, NostrumDimensionOffset> row : map.entrySet()) {
-			CompoundNBT tag = row.get().asNBT();
+			CompoundNBT tag = row.getValue().asNBT();
 			compound.put(row.getKey().toString(), tag);
 			count++;
 		}

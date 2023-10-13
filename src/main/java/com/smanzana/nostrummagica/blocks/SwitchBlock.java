@@ -136,7 +136,7 @@ public class SwitchBlock extends Block {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
-				ent.setType(ent.getType() == SwitchBlockTileEntity.SwitchType.ANY ? SwitchBlockTileEntity.SwitchType.MAGIC : SwitchBlockTileEntity.SwitchType.ANY);
+				ent.setType(ent.getSwitchType() == SwitchBlockTileEntity.SwitchType.ANY ? SwitchBlockTileEntity.SwitchType.MAGIC : SwitchBlockTileEntity.SwitchType.ANY);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
 			return true;

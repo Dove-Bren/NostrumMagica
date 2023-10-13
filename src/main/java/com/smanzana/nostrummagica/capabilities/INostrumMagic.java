@@ -18,6 +18,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 
 public interface INostrumMagic {
 
@@ -167,10 +168,10 @@ public interface INostrumMagic {
 	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge();
 	
 	// Sorcery Portal
-	public int getSorceryPortalDimension();
+	public DimensionType getSorceryPortalDimension();
 	public BlockPos getSorceryPortalPos();
 	public void clearSorceryPortal();
-	public void setSorceryPortalLocation(int dimension, BlockPos pos);
+	public void setSorceryPortalLocation(DimensionType dimension, BlockPos pos);
 	
 	// Refresh attributes and rescan for them
 	public void refresh(ServerPlayerEntity player);

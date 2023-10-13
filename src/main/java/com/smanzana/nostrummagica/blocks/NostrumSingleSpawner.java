@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
@@ -130,31 +131,31 @@ public class NostrumSingleSpawner extends ContainerBlock {
 		
 		switch (type) {
 		case GOLEM_EARTH:
-			entity = new EntityGolemEarth(world);
+			entity = new EntityGolemEarth(NostrumEntityTypes.golemEarth, world);
 			break;
 		case GOLEM_ENDER:
-			entity = new EntityGolemEnder(world);
+			entity = new EntityGolemEnder(NostrumEntityTypes.golemEnder, world);
 			break;
 		case GOLEM_FIRE:
-			entity = new EntityGolemFire(world);
+			entity = new EntityGolemFire(NostrumEntityTypes.golemFire, world);
 			break;
 		case GOLEM_ICE:
-			entity = new EntityGolemIce(world);
+			entity = new EntityGolemIce(NostrumEntityTypes.golemIce, world);
 			break;
 		case GOLEM_LIGHTNING:
-			entity = new EntityGolemLightning(world);
+			entity = new EntityGolemLightning(NostrumEntityTypes.golemLightning, world);
 			break;
 		case GOLEM_PHYSICAL:
-			entity = new EntityGolemPhysical(world);
+			entity = new EntityGolemPhysical(NostrumEntityTypes.golemPhysical, world);
 			break;
 		case GOLEM_WIND:
-			entity = new EntityGolemWind(world);
+			entity = new EntityGolemWind(NostrumEntityTypes.golemWind, world);
 			break;
 		case DRAGON_RED:
-			entity = new EntityDragonRed(world);
+			entity = new EntityDragonRed(NostrumEntityTypes.dragonRed, world);
 			break;
 		case PLANT_BOSS:
-			entity = new EntityPlantBoss(world);
+			entity = new EntityPlantBoss(NostrumEntityTypes.plantBoss, world);
 			break;
 		}
 		

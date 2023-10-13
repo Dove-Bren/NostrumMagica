@@ -14,8 +14,9 @@ import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.WispBlockGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -26,7 +27,6 @@ import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
-import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;

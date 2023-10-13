@@ -50,6 +50,7 @@ import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
@@ -865,7 +866,7 @@ public class NostrumMagica {
 				new RRequirementResearch("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
 					public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem) {
-						EntityKoid koid = new EntityKoid(world);
+						EntityKoid koid = new EntityKoid(NostrumEntityTypes.koid, world);
 						koid.setPosition(pos.x, pos.y, pos.z);
 						world.addEntity(koid);
 						koid.setAttackTarget(invoker);

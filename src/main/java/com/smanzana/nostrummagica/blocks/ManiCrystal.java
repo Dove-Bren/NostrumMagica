@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.Block;
@@ -129,7 +130,7 @@ public class ManiCrystal extends Block {
 			} while (!worldIn.isAirBlock(spawnPos) && attempts-- >= 0);
 			
 			if (worldIn.isAirBlock(spawnPos)) {
-				EntityWisp wisp = new EntityWisp(worldIn, pos);
+				EntityWisp wisp = new EntityWisp(NostrumEntityTypes.wisp, worldIn, pos);
 				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
 				worldIn.addEntity(wisp);
 			}
