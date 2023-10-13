@@ -14,15 +14,15 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirectional;
-import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.BlockLadder;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ComparatorBlock;
+import net.minecraft.block.DirectionalBlock;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.LadderBlock;
+import net.minecraft.block.RedstoneDiodeBlock;
+import net.minecraft.block.StairsBlock;
+import net.minecraft.block.WallTorchBlock;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -32,8 +32,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.common.ProgressManager;
-import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 
 /**
  * Contains all the data needed to spawn a room in the world
@@ -43,37 +41,6 @@ import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 public class RoomBlueprint {
 	
 	public static class BlueprintBlock {
-		
-		private static Map<String, Block> BLOCK_CACHE = new HashMap<>();
-		
-		private static Block CHECK_CACHE(String name) {
-			return BLOCK_CACHE.get(name.toLowerCase());
-		}
-		
-		private static void SET_CACHE(String name, Block block) {
-			BLOCK_CACHE.put(name.toLowerCase(), block);
-		}
-		
-		private static Map<Block, Map<Integer, BlockState>> BLOCKSTATE_CACHE = new HashMap<>();
-		
-		private static BlockState CHECK_BLOCKSTATE_CACHE(Block block, Integer meta) {
-			Map<Integer, BlockState> map = BLOCKSTATE_CACHE.get(block);
-			if (map != null) {
-				return map.get(meta);
-			}
-			
-			return null; 
-		}
-		
-		private static void SET_BLOCKSTATE_CACHE(Block block, Integer meta, BlockState state) {
-			Map<Integer, BlockState> map = BLOCKSTATE_CACHE.get(block);
-			if (map == null) {
-				map = new HashMap<>();
-			}
-			
-			map.put(meta, state);
-			BLOCKSTATE_CACHE.put(block, map);
-		}
 		
 		private static Map<BlockState, BlueprintBlock> BLUEPRINT_CACHE = new HashMap<>();
 		
@@ -123,7 +90,7 @@ public class RoomBlueprint {
 				TileEntity te = world.getTileEntity(pos);
 				if (te != null) {
 					this.tileEntityData = new CompoundNBT();
-					te.writeToNBT(this.tileEntityData);
+					te.write(this.tileEntityData);
 				}
 			}
 		}
@@ -136,48 +103,61 @@ public class RoomBlueprint {
 		public static final String NBT_BLOCK_TYPE = "block_type";
 		public static final String NBT_BLOCK_STATE = "block_meta";
 		public static final String NBT_TILE_ENTITY = "te_data";
+		public static final String NBT_BLOCKSTATE_TAG = "blockstate";
 		
-		@SuppressWarnings("deprecation")
 		public static BlueprintBlock fromNBT(byte version, CompoundNBT nbt) {
 			BlockState state = null;
 			CompoundNBT teData = null;
 			switch (version) {
 			case 0:
-				state = Block.getStateById(nbt.getInt(NBT_BLOCK));
-				
-				// Block.getStateById defaults to air. Remove it!
-				if (state != null && state.getBlock() == Blocks.AIR) {
-					state = null;
-				}
-				
-				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
-					teData = nbt.getCompound(NBT_TILE_ENTITY);
-				}
-				break;
+//				state = Block.getStateById(nbt.getInt(NBT_BLOCK));
+//				
+//				// Block.getStateById defaults to air. Remove it!
+//				if (state != null && state.getBlock() == Blocks.AIR) {
+//					state = null;
+//				}
+//				
+//				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
+//					teData = nbt.getCompound(NBT_TILE_ENTITY);
+//				}
+//				break;
+				// was int id for blockstate; deprecated (and not minecraft save portable)
+				throw new RuntimeException("Blueprint block doesn't understand version " + version);
 			case 1:
+				// I don't remember what this version was
 				throw new RuntimeException("Blueprint block doesn't understand version " + version);
 			case 2:
-				String type = nbt.getString(NBT_BLOCK_TYPE);
-				if (!type.isEmpty()) {
-					Block block = CHECK_CACHE(type);
-					if (block == null) {
-						block = Block.getBlockFromName(type);
-						SET_CACHE(type, block);
-					}
-					if (block != null) {
-						Integer meta = nbt.getInt(NBT_BLOCK_STATE);
-						state = CHECK_BLOCKSTATE_CACHE(block, meta);
-						if (state == null) {
-							state = block.getStateFromMeta(meta);
-							SET_BLOCKSTATE_CACHE(block, meta, state);
-						}
-					}
-				}
-				
-				// Prevent air from getting in
-				if (state != null && state.getBlock() == Blocks.AIR) {
-					state = null;
-				}
+				// Was block name + (int) meta saving.
+				// No more meta, so this doesn't work anymore
+//				String type = nbt.getString(NBT_BLOCK_TYPE);
+//				if (!type.isEmpty()) {
+//					Block block = CHECK_CACHE(type);
+//					if (block == null) {
+//						block = Block.getBlockFromName(type);
+//						SET_CACHE(type, block);
+//					}
+//					if (block != null) {
+//						Integer meta = nbt.getInt(NBT_BLOCK_STATE);
+//						state = CHECK_BLOCKSTATE_CACHE(block, meta);
+//						if (state == null) {
+//							state = block.getStateFromMeta(meta);
+//							SET_BLOCKSTATE_CACHE(block, meta, state);
+//						}
+//					}
+//				}
+//				
+//				// Prevent air from getting in
+//				if (state != null && state.getBlock() == Blocks.AIR) {
+//					state = null;
+//				}
+//				
+//				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
+//					teData = nbt.getCompound(NBT_TILE_ENTITY);
+//				}
+//				break;
+				throw new RuntimeException("Blueprint block doesn't understand version " + version);
+			case 3:
+				state = NBTUtil.readBlockState(nbt.getCompound(NBT_BLOCKSTATE_TAG));
 				
 				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
 					teData = nbt.getCompound(NBT_TILE_ENTITY);
@@ -201,10 +181,18 @@ public class RoomBlueprint {
 //				}
 //			}
 			
-			// Version 2
+//			// Version 2
+//			if (state != null) {
+//				tag.putString(NBT_BLOCK_TYPE, state.getBlock().getRegistryName().toString());
+//				tag.putInt(NBT_BLOCK_STATE, state.getBlock().getMetaFromState(state));
+//				if (tileEntityData != null) {
+//					tag.put(NBT_TILE_ENTITY, tileEntityData);
+//				}
+//			}
+			
+			// Version 3
 			if (state != null) {
-				tag.putString(NBT_BLOCK_TYPE, state.getBlock().getRegistryName().toString());
-				tag.putInt(NBT_BLOCK_STATE, state.getBlock().getMetaFromState(state));
+				tag.put(NBT_BLOCKSTATE_TAG, NBTUtil.writeBlockState(state));
 				if (tileEntityData != null) {
 					tag.put(NBT_TILE_ENTITY, tileEntityData);
 				}
@@ -233,22 +221,22 @@ public class RoomBlueprint {
 //				if (facing != null && facing.getOpposite().getHorizontalIndex() != 0) {
 //					
 //					Block block = placeState.getBlock();
-//					if (block instanceof BlockHorizontal) {
-//						Direction cur = placeState.get(BlockHorizontal.FACING);
+//					if (block instanceof HorizontalBlock) {
+//						Direction cur = placeState.get(HorizontalBlock.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.with(BlockHorizontal.FACING, cur);
-//					} else if (block instanceof BlockTorch) {
-//						Direction cur = placeState.get(BlockTorch.FACING);
+//						placeState = placeState.with(HorizontalBlock.FACING, cur);
+//					} else if (block instanceof TorchBlock) {
+//						Direction cur = placeState.get(TorchBlock.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.with(BlockTorch.FACING, cur);
-//					} else if (block instanceof BlockLadder) {
-//						Direction cur = placeState.get(BlockLadder.FACING);
+//						placeState = placeState.with(TorchBlock.FACING, cur);
+//					} else if (block instanceof LadderBlock) {
+//						Direction cur = placeState.get(LadderBlock.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.with(BlockLadder.FACING, cur);
-//					} else if (block instanceof BlockStairs) {
-//						Direction cur = placeState.get(BlockStairs.FACING);
+//						placeState = placeState.with(LadderBlock.FACING, cur);
+//					} else if (block instanceof StairsBlock) {
+//						Direction cur = placeState.get(StairsBlock.FACING);
 //						cur = rotate(cur, facing);
-//						placeState = placeState.with(BlockStairs.FACING, cur);
+//						placeState = placeState.with(StairsBlock.FACING, cur);
 //					}
 //				}
 //				
@@ -268,27 +256,27 @@ public class RoomBlueprint {
 				if (facing != null && facing.getOpposite().getHorizontalIndex() != 0) {
 					
 					Block block = placeState.getBlock();
-					if (block instanceof BlockHorizontal) {
-						Direction cur = placeState.get(BlockHorizontal.FACING);
+					if (block instanceof HorizontalBlock) {
+						Direction cur = placeState.get(HorizontalBlock.HORIZONTAL_FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.with(BlockHorizontal.FACING, cur);
-					} else if (block instanceof BlockTorch) {
-						Direction cur = placeState.get(BlockTorch.FACING);
+						placeState = placeState.with(HorizontalBlock.HORIZONTAL_FACING, cur);
+					} else if (block instanceof WallTorchBlock) {
+						Direction cur = placeState.get(WallTorchBlock.HORIZONTAL_FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.with(BlockTorch.FACING, cur);
-					} else if (block instanceof BlockLadder) {
-						Direction cur = placeState.get(BlockLadder.FACING);
+						placeState = placeState.with(WallTorchBlock.HORIZONTAL_FACING, cur);
+					} else if (block instanceof LadderBlock) {
+						Direction cur = placeState.get(LadderBlock.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.with(BlockLadder.FACING, cur);
-					} else if (block instanceof BlockStairs) {
-						Direction cur = placeState.get(BlockStairs.FACING);
+						placeState = placeState.with(LadderBlock.FACING, cur);
+					} else if (block instanceof StairsBlock) {
+						Direction cur = placeState.get(StairsBlock.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.with(BlockStairs.FACING, cur);
-					} else if (block instanceof BlockDirectional) {
+						placeState = placeState.with(StairsBlock.FACING, cur);
+					} else if (block instanceof DirectionalBlock) {
 						// Only want to rotate horizontally
-						Direction cur = placeState.get(BlockDirectional.FACING);
+						Direction cur = placeState.get(DirectionalBlock.FACING);
 						cur = rotate(cur, facing);
-						placeState = placeState.with(BlockDirectional.FACING, cur);
+						placeState = placeState.with(DirectionalBlock.FACING, cur);
 					}
 				}
 				
@@ -303,30 +291,30 @@ public class RoomBlueprint {
 		}
 		
 		public boolean isDoorIndicator() {
-			return state != null && state.getBlock() instanceof BlockRedstoneRepeater;
+			return state != null && state.getBlock() instanceof RedstoneDiodeBlock;
 		}
 		
 		public boolean isEntry() {
-			return state != null && state.getBlock() instanceof BlockRedstoneComparator;
+			return state != null && state.getBlock() instanceof ComparatorBlock;
 		}
 		
 		public Direction getFacing() {
 			Direction ret = null;
 			Block block = state.getBlock();
-			if (block instanceof BlockHorizontal) {
-				ret = state.get(BlockHorizontal.FACING);
+			if (block instanceof HorizontalBlock) {
+				ret = state.get(HorizontalBlock.HORIZONTAL_FACING);
 				
 				// HACK: Reverse if special enterance block cause they're backwards LOL
-				if (block instanceof BlockRedstoneRepeater || block instanceof BlockRedstoneComparator) {
+				if (block instanceof RedstoneDiodeBlock || block instanceof ComparatorBlock) {
 					ret = ret.getOpposite();
 				}
 				
-			} else if (block instanceof BlockTorch) {
-				ret = state.get(BlockTorch.FACING);
-			} else if (block instanceof BlockLadder) {
-				ret = state.get(BlockLadder.FACING);
-			} else if (block instanceof BlockStairs) {
-				ret = state.get(BlockStairs.FACING);
+			} else if (block instanceof WallTorchBlock) {
+				ret = state.get(WallTorchBlock.HORIZONTAL_FACING);
+			} else if (block instanceof LadderBlock) {
+				ret = state.get(LadderBlock.FACING);
+			} else if (block instanceof StairsBlock) {
+				ret = state.get(StairsBlock.FACING);
 			}
 			return ret;
 		}
@@ -457,7 +445,7 @@ public class RoomBlueprint {
 	protected void refreshPreview() {
 		// Get preview based on 'entry' origin point and blocks around it
 		if (dimensions != null) {
-			BlockPos offset = (entry == null ? BlockPos.ORIGIN : entry.getPos());
+			BlockPos offset = (entry == null ? BlockPos.ZERO : entry.getPos());
 			for (int xOff = -2; xOff <= 2; xOff++)
 			for (int yOff = 0; yOff <= 1; yOff++)
 			for (int zOff = -2; zOff <= 2; zOff++) {
@@ -532,7 +520,8 @@ public class RoomBlueprint {
 	
 	private static final boolean isSecondPassBlock(BlueprintBlock block) {
 		if (block.state != null) {
-			if (!(block.state.isFullBlock() || block.state.isOpaqueCube() || block.state.isNormalCube())) {
+			//if (!(block.state.isFullBlock() || block.state.isOpaqueCube() || block.state.isNormalCube())) {
+			if (!block.state.isSolid()) {
 				return true;
 			}
 		}
@@ -551,13 +540,13 @@ public class RoomBlueprint {
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
-					TileEntity te = TileEntity.create(world, tileEntityData.copy());
+					TileEntity te = TileEntity.create(tileEntityData.copy());
 					if (te == null) {
 						// Before 1.12.2 ids weren't namespaced. Now they are. Check if it's an old Nostrum TE
 						final CompoundNBT copy = tileEntityData.copy();
 						final String newID = NostrumMagica.MODID + ":" + copy.getString("id");
 						copy.putString("id", newID);
-						te = TileEntity.create(world, copy);
+						te = TileEntity.create(copy);
 						if (te != null) {
 							block.fixupOldTEs(newID);
 						}
@@ -575,7 +564,7 @@ public class RoomBlueprint {
 				}
 			} else {
 				world.removeTileEntity(at);
-				world.setBlockToAir(at);
+				world.removeBlock(at, false);
 			}
 		}
 	}
@@ -724,7 +713,7 @@ public class RoomBlueprint {
 				placeBlock(world, secondPos, modDir, block);
 			}
 			
-			world.getChunkFromBlockCoords(cursor).markDirty();
+			world.getChunk(cursor).setModified(true);
 		}
 	}
 	
@@ -917,15 +906,15 @@ public class RoomBlueprint {
 	}
 	
 	private static RoomBlueprint deserializeNBTStyleInternal(CompoundNBT nbt, byte version) {
-		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_DIMS));
+		BlockPos dims = NBTUtil.readBlockPos(nbt.getCompound(NBT_DIMS));
 		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
 		// If we have one of those, allocate the FULL array size instead of the small one
-		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_WHOLE_DIMS));
+		BlockPos masterDims = NBTUtil.readBlockPos(nbt.getCompound(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
 		DungeonExitPoint entry = null;
 		
-		if (dims.distanceSq(0, 0, 0) == 0) {
+		if (dims.distanceSq(0, 0, 0, false) == 0) {
 			return null;
 		} else {
 			ListNBT list = nbt.getList(NBT_BLOCK_LIST, NBT.TAG_COMPOUND);
@@ -935,13 +924,13 @@ public class RoomBlueprint {
 				return null;
 			}
 			
-			ProgressBar bar = null;
-			if (!NostrumMagica.initFinished) {
-				bar = ProgressManager.push("Loading Room", 2);
-				bar.step("Blocks");
-			}
+//			ProgressBar bar = null;
+//			if (!NostrumMagica.initFinished) {
+//				bar = ProgressManager.push("Loading Room", 2);
+//				bar.step("Blocks");
+//			}
 			
-			if (masterDims.distanceSq(0, 0, 0) == 0) {
+			if (masterDims.distanceSq(0, 0, 0, false) == 0) {
 				blocks = new BlueprintBlock[count];
 			} else {
 				blocks = new BlueprintBlock[masterDims.getX() * masterDims.getY() * masterDims.getZ()];
@@ -952,15 +941,15 @@ public class RoomBlueprint {
 				blocks[i] = BlueprintBlock.fromNBT((byte)version, tag);
 			}
 			
-			if (!NostrumMagica.initFinished && bar != null) {
-				bar.step("Doors and Exits");
-			}
+//			if (!NostrumMagica.initFinished && bar != null) {
+//				bar.step("Doors and Exits");
+//			}
 			
 			list = nbt.getList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
 			doors = new HashSet<>();
 			int listCount = list.size();
 			for (int i = 0; i < listCount; i++) {
-				CompoundNBT tag = (CompoundNBT) list.getCompoundTagAt(i);
+				CompoundNBT tag = (CompoundNBT) list.getCompound(i);
 				doors.add(DungeonExitPoint.fromNBT(tag));
 			}
 			
@@ -969,11 +958,11 @@ public class RoomBlueprint {
 			}
 			
 			if (!NostrumMagica.initFinished) {
-				ProgressManager.pop(bar);
+//				ProgressManager.pop(bar);
 			}
 		}
 		
-		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0) == 0 ? dims : masterDims, blocks, doors, entry);
+		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0, false) == 0 ? dims : masterDims, blocks, doors, entry);
 	}
 	
 	private static RoomBlueprint deserializeVersion1(CompoundNBT nbt) {
@@ -984,15 +973,15 @@ public class RoomBlueprint {
 		// Store blocks as int array
 		// Store TileEntities separately since there are likely few of them
 		
-		BlockPos dims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_DIMS));
+		BlockPos dims = NBTUtil.readBlockPos(nbt.getCompound(NBT_DIMS));
 		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
 		// If we have one of those, allocate the FULL array size instead of the small one
-		BlockPos masterDims = NBTUtil.getPosFromTag(nbt.getCompound(NBT_WHOLE_DIMS));
+		BlockPos masterDims = NBTUtil.readBlockPos(nbt.getCompound(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
 		Set<DungeonExitPoint> doors = null;
 		DungeonExitPoint entry = null;
 		
-		if (dims.distanceSq(0, 0, 0) == 0) {
+		if (dims.distanceSq(0, 0, 0, false) == 0) {
 			return null;
 		} else {
 			int[] list = nbt.getIntArray(NBT_BLOCK_LIST);
@@ -1002,13 +991,13 @@ public class RoomBlueprint {
 				return null;
 			}
 			
-			ProgressBar bar = null;
-			if (!NostrumMagica.initFinished) {
-				bar = ProgressManager.push("Loading Room", 2);
-				bar.step("Blocks");
-			}
+//			ProgressBar bar = null;
+//			if (!NostrumMagica.initFinished) {
+//				bar = ProgressManager.push("Loading Room", 2);
+//				bar.step("Blocks");
+//			}
 			
-			if (masterDims.distanceSq(0, 0, 0) == 0) {
+			if (masterDims.distanceSq(0, 0, 0, false) == 0) {
 				blocks = new BlueprintBlock[count];
 			} else {
 				blocks = new BlueprintBlock[masterDims.getX() * masterDims.getY() * masterDims.getZ()];
@@ -1023,7 +1012,7 @@ public class RoomBlueprint {
 				ListNBT entities = nbt.getList(NBT_ENTITIES, NBT.TAG_COMPOUND);
 				int entCount = entities.size();
 				for (int i = 0; i < entCount; i++) {
-					BlueprintSavedTE te = BlueprintSavedTE.fromNBT(entities.getCompoundTagAt(i));
+					BlueprintSavedTE te = BlueprintSavedTE.fromNBT(entities.getCompound(i));
 					
 					// Find offset into data blocks, and then transfer data onto that block
 					blocks[
@@ -1034,16 +1023,16 @@ public class RoomBlueprint {
 				}
 			}
 			
-			if (!NostrumMagica.initFinished && bar != null) {
-				bar.step("Doors and Exits");
-			}
+//			if (!NostrumMagica.initFinished && bar != null) {
+//				bar.step("Doors and Exits");
+//			}
 			
 			ListNBT doorList = nbt.getList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
 			doors = new HashSet<>();
 			
 			int listCount = doorList.size();
 			for (int i = 0; i < listCount; i++) {
-				CompoundNBT tag = doorList.getCompoundTagAt(i);
+				CompoundNBT tag = doorList.getCompound(i);
 				doors.add(DungeonExitPoint.fromNBT(tag));
 			}
 			
@@ -1052,15 +1041,25 @@ public class RoomBlueprint {
 			}
 			
 			if (!NostrumMagica.initFinished) {
-				ProgressManager.pop(bar);
+				//ProgressManager.pop(bar);
 			}
 		}
 		
-		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0) == 0 ? dims : masterDims, blocks, doors, entry);
+		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0, false) == 0 ? dims : masterDims, blocks, doors, entry);
 	}
 	
 	private static RoomBlueprint deserializeVersion3(CompoundNBT nbt) {
 		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 2);
+		
+		if (nbt.contains(NBT_PIECE_OFFSET)) {
+			blueprint.partOffset = nbt.getInt(NBT_PIECE_OFFSET);
+		}
+		
+		return blueprint;
+	}
+	
+	private static RoomBlueprint deserializeVersion4(CompoundNBT nbt) {
+		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 3);
 		
 		if (nbt.contains(NBT_PIECE_OFFSET)) {
 			blueprint.partOffset = nbt.getInt(NBT_PIECE_OFFSET);
@@ -1078,6 +1077,8 @@ public class RoomBlueprint {
 			return deserializeVersion2(nbt);
 		case 2:
 			return deserializeVersion3(nbt);
+		case 3:
+			return deserializeVersion4(nbt);
 		default:
 			NostrumMagica.logger.fatal("Blueprint has version we don't understand");
 			throw new RuntimeException("Could not parse blueprint version " + version);
@@ -1221,7 +1222,58 @@ public class RoomBlueprint {
 		};
 	}
 	
-	// Version 3
+//	// Version 3
+//	protected CompoundNBT toNBTInternal(int startIdx, int count) {
+//		
+//		CompoundNBT nbt = new CompoundNBT();
+//		ListNBT list = new ListNBT();
+//		final int endIdx = Math.min(blocks.length, startIdx + count);
+//		
+//		if (blocks != null) {
+//			for (int i = startIdx; i < endIdx; i++) {
+//				list.add(blocks[i].toNBT());
+//			}
+//		}
+//		
+//		nbt.put(NBT_BLOCK_LIST, list);
+//		{
+//			// If whole struct, just dump dims
+//			if (startIdx == 0 && endIdx == blocks.length) {
+//				nbt.put(NBT_DIMS, NBTUtil.writeBlockPos(dimensions));
+//			} else {
+//				// Else figure out how big it was
+//				final int numBlocks = endIdx - startIdx;
+//				final int base = dimensions.getY() * dimensions.getZ();
+//				nbt.put(NBT_DIMS, NBTUtil.writeBlockPos(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
+//			}
+//		}
+//		if (this.entry != null) {
+//			nbt.put(NBT_ENTRY, entry.toNBT());
+//		}
+//		
+//		// First blueprint (when splitting) has all the extra pieces
+//		if (startIdx == 0) {
+//			if (this.doors != null && !this.doors.isEmpty()) {
+//				list = new ListNBT();
+//				for (DungeonExitPoint door : doors) {
+//					list.add(door.toNBT());
+//				}
+//				nbt.put(NBT_DOOR_LIST, list);
+//			}
+//			
+//			// Master ALSO has the REAL size, so we can allocate all the space up front instead of resizing
+//			nbt.put(NBT_WHOLE_DIMS, NBTUtil.writeBlockPos(dimensions));
+//		} else {
+//			// Others have their row offset recorded
+//			nbt.putInt(NBT_PIECE_OFFSET, startIdx / (dimensions.getY() * dimensions.getZ()));
+//		}
+//		
+//		nbt.putByte(NBT_VERSION, (byte)2);
+//		
+//		return nbt;
+//	}
+	
+	// Version 4
 	protected CompoundNBT toNBTInternal(int startIdx, int count) {
 		
 		CompoundNBT nbt = new CompoundNBT();
@@ -1238,12 +1290,12 @@ public class RoomBlueprint {
 		{
 			// If whole struct, just dump dims
 			if (startIdx == 0 && endIdx == blocks.length) {
-				nbt.put(NBT_DIMS, NBTUtil.createPosTag(dimensions));
+				nbt.put(NBT_DIMS, NBTUtil.writeBlockPos(dimensions));
 			} else {
 				// Else figure out how big it was
 				final int numBlocks = endIdx - startIdx;
 				final int base = dimensions.getY() * dimensions.getZ();
-				nbt.put(NBT_DIMS, NBTUtil.createPosTag(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
+				nbt.put(NBT_DIMS, NBTUtil.writeBlockPos(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
 			}
 		}
 		if (this.entry != null) {
@@ -1261,13 +1313,13 @@ public class RoomBlueprint {
 			}
 			
 			// Master ALSO has the REAL size, so we can allocate all the space up front instead of resizing
-			nbt.put(NBT_WHOLE_DIMS, NBTUtil.createPosTag(dimensions));
+			nbt.put(NBT_WHOLE_DIMS, NBTUtil.writeBlockPos(dimensions));
 		} else {
 			// Others have their row offset recorded
 			nbt.putInt(NBT_PIECE_OFFSET, startIdx / (dimensions.getY() * dimensions.getZ()));
 		}
 		
-		nbt.setByte(NBT_VERSION, (byte)2);
+		nbt.putByte(NBT_VERSION, (byte)3);
 		
 		return nbt;
 	}
