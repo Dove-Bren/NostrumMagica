@@ -3,8 +3,6 @@ package com.smanzana.nostrummagica.client.render;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.smanzana.nostrummagica.items.ICapeProvider;
-import com.smanzana.nostrummagica.items.IElytraProvider;
 
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
@@ -38,21 +36,22 @@ public class LayerCustomElytra<T extends LivingEntity, M extends EntityModel<T>>
 	}
 	
 	public boolean shouldRender(T player) {
-		final boolean flying = player.isElytraFlying();
-		ItemStack cape = LayerAetherCloak.ShouldRender(player);
-		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
-			return false;
-		}
-		
-		for (@Nonnull ItemStack stack : player.getEquipmentAndArmor()) {
-			if (!stack.isEmpty() && stack.getItem() instanceof IElytraProvider) {
-				if (((IElytraProvider) stack.getItem()).shouldRenderElyta(player, stack)) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
+		return false; // TODO eval; not needed with Caelus?
+//		final boolean flying = player.isElytraFlying();
+//		ItemStack cape = LayerAetherCloak.ShouldRender(player);
+//		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape)) {
+//			return false;
+//		}
+//		
+//		for (@Nonnull ItemStack stack : player.getEquipmentAndArmor()) {
+//			if (!stack.isEmpty() && stack.getItem() instanceof IElytraProvider) {
+//				if (((IElytraProvider) stack.getItem()).shouldRenderElyta(player, stack)) {
+//					return true;
+//				}
+//			}
+//		}
+//		
+//		return false;
 	}
 	
 	public void render(T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {

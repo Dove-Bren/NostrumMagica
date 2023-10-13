@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -20,8 +21,10 @@ import net.minecraft.block.PaneBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -35,8 +38,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
+@Mod.EventBusSubscriber
+public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	
 	public static enum HookshotType {
 		WEAK(Rarity.UNCOMMON),
@@ -58,10 +65,16 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	
 	private static final String NBT_HOOK_ID = "hook_uuid";
 	
+	private static final UUID MOD_MAINHAND_ID = UUID.fromString("f558274e-6a19-11ee-8c99-0242ac120002");
+	private static final UUID MOD_OFFHAND_ID = UUID.fromString("f5582a82-6a19-11ee-8c99-0242ac120002");
+	private static final AttributeModifier MAINHAND_ELYTRA_MODIFIER = NostrumElytraWrapper.MakeHasElytraModifier(MOD_MAINHAND_ID);
+	private static final AttributeModifier OFFHAND_ELYTRA_MODIFIER = NostrumElytraWrapper.MakeHasElytraModifier(MOD_OFFHAND_ID);
+	
 	protected final HookshotType type;
 
 	public HookshotItem(HookshotType type) {
 		super(NostrumItems.PropUnstackable().rarity(type.rarity));
+		this.type = type;
 		
 		this.addPropertyOverride(new ResourceLocation("extended"), new IItemPropertyGetter() {
 			@OnlyIn(Dist.CLIENT)
@@ -149,7 +162,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 				}
 			} else {
 				if (!worldIn.isRemote) {
-					if (playerIn.dimension == NostrumDimensions.EmptyDimension)) {
+					if (playerIn.dimension == NostrumDimensions.EmptyDimension) {
 						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"));
 					} else {
 						EntityHookShot hook = new EntityHookShot(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
@@ -247,6 +260,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 		
+		// todo: should be isRemote check?
+		
 		if (IsExtended(stack)) {
 			// Clear extended if we can't find the anchor entity or it's not in our hand anymore
 			if (entityIn instanceof LivingEntity)  {
@@ -279,6 +294,18 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 						ClearHookEntity(worldIn, stack);
 						return;
 					}
+				}
+			}
+			
+			// If still extended, tick attributes and set pose if flying
+			if (IsExtended(stack) && entityIn instanceof ServerPlayerEntity) {
+				ServerPlayerEntity player = (ServerPlayerEntity) entityIn;
+				updateEntityHookshotAttributes(player);
+				
+				// Assumes previous check that we must be in mainhand or offhand to be extended has happened
+				final Hand hand = (itemSlot == 0 ? Hand.OFF_HAND : Hand.MAIN_HAND);
+				if (isPulling(player, hand)) {
+					((ServerPlayerEntity) player).setElytraFlying();
 				}
 			}
 		}
@@ -346,21 +373,70 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraProvider {
 //		return I18n.format(this.getUnlocalizedName() + "_" + GetTypeSuffix(TypeFromMeta(stack.getMetadata())) + ".name", (Object[])null);
 //	}
 
+//	@Override
+//	public boolean isElytraFlying(LivingEntity entityIn, ItemStack stack) {
+//		if (IsExtended(stack)) {
+//			// See if we're being pulled
+//			EntityHookShot anchor = GetHookEntity(entityIn.world, stack);
+//			return anchor != null && anchor.isPulling();
+//		}
+//		
+//		return false;
+//	}
+	
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public boolean isElytraFlying(LivingEntity entityIn, ItemStack stack) {
+	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
+		return false;
+	}
+	
+	@SubscribeEvent
+	public static void onEntityEquipmentChange(LivingEquipmentChangeEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		if ((!event.getFrom().isEmpty() && event.getFrom().getItem() instanceof HookshotItem)
+			|| (!event.getTo().isEmpty() && event.getTo().getItem() instanceof HookshotItem)) {
+			// Changed from or to a hookshot. Regardless, update state.
+			updateEntityHookshotAttributes(event.getEntityLiving());
+		}
+	}
+	
+	private static final boolean isPulling(LivingEntity entity, Hand hand) {
+		ItemStack stack = entity.getHeldItem(hand);
+		if (stack.isEmpty() || !(stack.getItem() instanceof HookshotItem)) {
+			return false;
+		}
+		
 		if (IsExtended(stack)) {
 			// See if we're being pulled
-			EntityHookShot anchor = GetHookEntity(entityIn.world, stack);
+			EntityHookShot anchor = GetHookEntity(entity.world, stack);
 			return anchor != null && anchor.isPulling();
 		}
 		
 		return false;
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
-		return false;
+	private static final void updateEntityHookshotAttributes(LivingEntity entity) {
+		setEntityHookshotAttributes(entity,
+				isPulling(entity, Hand.MAIN_HAND),
+				isPulling(entity, Hand.OFF_HAND)
+				);
+	}
+	
+	private static final void setEntityHookshotAttributes(LivingEntity entity, boolean pullingMainhand, boolean pullingOffhand) {
+		if (pullingMainhand) {
+			NostrumElytraWrapper.AddElytraModifier(entity, MAINHAND_ELYTRA_MODIFIER);
+		} else {
+			NostrumElytraWrapper.RemoveElytraModifier(entity, MAINHAND_ELYTRA_MODIFIER);
+		}
+		
+		if (pullingOffhand) {
+			NostrumElytraWrapper.AddElytraModifier(entity, OFFHAND_ELYTRA_MODIFIER);
+		} else {
+			NostrumElytraWrapper.RemoveElytraModifier(entity, OFFHAND_ELYTRA_MODIFIER);
+		}
 	}
 	
 }

@@ -62,8 +62,6 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosClientProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.integration.enderio.EnderIOClientProxy;
-import com.smanzana.nostrummagica.integration.enderio.EnderIOProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.items.DragonArmor;
@@ -217,7 +215,7 @@ public class NostrumMagica {
 	public final CommonProxy proxy;
 	public final CuriosProxy curios;
 	public final AetheriaProxy aetheria;
-	public final EnderIOProxy enderIO;
+	//public final EnderIOProxy enderIO;
 	public final MusicaProxy musica;
 
 	public static ItemGroup creativeTab;
@@ -239,10 +237,9 @@ public class NostrumMagica {
 		instance = this;
 		
 		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-		//curios = DistExecutor.runForDist(() -> BaublesClientProxy::new, () -> BaublesProxy::new);
 		curios = DistExecutor.runForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
 		aetheria = DistExecutor.runForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
-		enderIO = DistExecutor.runForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
+		//enderIO = DistExecutor.runForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
 		musica = DistExecutor.runForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
 		
 		playerListener = new PlayerListener();
@@ -272,9 +269,9 @@ public class NostrumMagica {
 		if (ModList.get().isLoaded("nostrumaetheria")) {
 			aetheria.enable();
 		}
-		if (ModList.get().isLoaded("enderio") || ModList.get().isLoaded("enderio")) {
-			enderIO.enable();
-		}
+//		if (ModList.get().isLoaded("enderio") || ModList.get().isLoaded("enderio")) {
+//			enderIO.enable();
+//		}
 		if (ModList.get().isLoaded("musica")) {
 			musica.enable();
 		}
@@ -284,7 +281,7 @@ public class NostrumMagica {
 		proxy.preinit();
 		aetheria.preInit();
 		curios.preInit();
-		enderIO.preInit();
+		//enderIO.preInit();
 		musica.preInit();
 
 		RitualRegistry.instance();
@@ -310,7 +307,7 @@ public class NostrumMagica {
 		proxy.init();
 		aetheria.init();
 		curios.init();
-		enderIO.init();
+		//enderIO.init();
 		musica.init();
 	
 		// Used to be two different mod init steps!
@@ -2293,9 +2290,9 @@ public class NostrumMagica {
 		if (aetheria.isEnabled()) {
 			aetheria.reinitResearch();
 		}
-		if (enderIO.isEnabled()) {
-			enderIO.reinitResearch();
-		}
+//		if (enderIO.isEnabled()) {
+//			enderIO.reinitResearch();
+//		}
 
 		for (Function<Integer, Integer> hook : researchReloadHooks) {
 			hook.apply(0);

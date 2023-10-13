@@ -29,9 +29,10 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
-import com.smanzana.nostrummagica.effects.RootedEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate.ArmorState;
@@ -43,7 +44,6 @@ import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.java.games.input.Keyboard;
 import net.minecraft.block.BambooSaplingBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -64,7 +64,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -79,7 +78,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -96,6 +94,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -104,7 +103,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*IElytraProvider, TODO*/ IDragonWingRenderItem, IDyeableArmorItem {
+public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
 	
 	public static enum Type {
 		NOVICE(0),
@@ -178,6 +177,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 	
 	// UUIDs for magic potency modifiers
 	private static final UUID[] ARMOR_MAGICPOT_MODS = new UUID[] {UUID.fromString("85c5a784-4ee6-4e2d-ae1b-dd6d006ab724"), UUID.fromString("12fd1eae-bb2f-4e80-89db-38bef660c664"), UUID.fromString("3eea62eb-b9c1-4859-a4d6-35e2edbd4c49"), UUID.fromString("471dd1cf-9ba1-44ce-bba9-3cf9315d784c")};
+	
+	// UUID and modifiers for turning on elytra flying capability
+	private static final UUID ARMOR_ELYTRA_ID = UUID.fromString("146B0D42-6A18-11EE-8C99-0242AC120002");
+	private static final AttributeModifier ARMOR_ELYTRA_MODIFIER = NostrumElytraWrapper.MakeHasElytraModifier(ARMOR_ELYTRA_ID, true);
+	private static final AttributeModifier ARMOR_NO_ELYTRA_MODIFIER = NostrumElytraWrapper.MakeHasElytraModifier(ARMOR_ELYTRA_ID, false);
 	
 	private static int calcArmor(EquipmentSlotType slot, EMagicElement element, Type type) {
 		
@@ -500,6 +504,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				}
 			}
 		}
+		
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 //	@Override
@@ -1437,18 +1443,24 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				}
 				
 				// Figure out how much this SHOULD be giving
+				// Important to do this even with 0 to remove previous bonuses
 				for (EMagicElement elem : EMagicElement.values()) {
 					final double reduct = (setCount > 0 && armorElem != null)
 							? calcMagicSetReduct(slot, armorElem, setCount, elem)
 							: 0;
-					final double boost = (setCount > 0 && armorElem != null)
-							? calcArmorMagicBoost(slot, armorElem, setCount)
-							: 0;
-						
-					// Important to do this even with 0 to remove previous bonuses
 					attribMap.put(AttributeMagicReduction.instance(elem).getName(), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, AttributeModifier.Operation.ADDITION));
-					attribMap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
 				}
+				final double boost = (setCount > 0 && armorElem != null)
+						? calcArmorMagicBoost(slot, armorElem, setCount)
+						: 0;
+				attribMap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
+				
+				if (slot == EquipmentSlotType.CHEST) {
+					boolean has = (inSlot.getItem() instanceof EnchantedArmor) ? ((EnchantedArmor) inSlot.getItem()).hasElytra(entity) : false;
+					NostrumElytraWrapper.AddElytraModifier(attribMap,
+							 has ? ARMOR_ELYTRA_MODIFIER : ARMOR_NO_ELYTRA_MODIFIER);
+				}
+				
 				
 				// Add captured value to map
 				cacheMap.put(slot, inSlot);
@@ -1655,14 +1667,14 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 //		return ArmorCheckFlying(entity);
 //	}
 	
-//	@OnlyIn(Dist.CLIENT)
-//	@Override
-//	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
-//		return hasElytra(entity)
-//				&& (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND)
-//				&& (!(entity instanceof PlayerEntity) || !(shouldRenderDragonWings(stack, (PlayerEntity) entity)));
-//	}
-//	
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
+		return hasElytra(entity)
+				&& (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND)
+				&& (!(entity instanceof PlayerEntity) || !(shouldRenderDragonWings(stack, (PlayerEntity) entity)));
+	}
+	
 	protected boolean hasElytra(LivingEntity entity) {
 		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST) {
 			// Check if full set is available
@@ -2346,7 +2358,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 		case WIND_TORNADO:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				armor.consumeWindTornado(ent);
-				EntityAreaEffect cloud = new EntityAreaEffect(ent.world, ent.posX, ent.posY, ent.posZ);
+				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, ent.world, ent.posX, ent.posY, ent.posZ);
 				cloud.setOwner(ent);
 				
 				cloud.setHeight(5f);
@@ -2457,10 +2469,10 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, /*I
 				PlayerEntity playerIn = (PlayerEntity) ent;
 				armor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
-				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
+				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
 				if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-					final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop) : mop.getHitVec());
-					EnchantedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, 3);
+					final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
+					EnchantedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, EnchantedWeapon.Type.MASTER);
 				}
 			}
 			break;

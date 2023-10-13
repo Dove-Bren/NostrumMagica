@@ -19,7 +19,6 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
-import com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper;
 import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelSourceWrapper;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -35,7 +34,6 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -45,14 +43,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
-import net.minecraft.item.Items;
 import net.minecraft.item.Rarity;
 import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -62,8 +58,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-//@Optional.Interface(iface="com.smanzana.nostrummagica.integration.enderio.wrappers.IItemOfTravelWrapper",modid="enderio")
-public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor, /*IItemOfTravelWrapper,*/ IRaytraceOverlay {
+public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor, IRaytraceOverlay {
 
 	public static final String ID = "warlock_sword";
 	private static final String NBT_LEVELS = "levels";
@@ -347,25 +342,6 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
 	}
 
-	@Optional.Method(modid="enderio")
-	@Override
-	public void extractInternal(ItemStack item, int power) {
-		item.attemptDamageItem(1, NostrumMagica.rand, null);
-	}
-
-	@Optional.Method(modid="enderio")
-	@Override
-	public int getEnergyStored(ItemStack item) {
-		return 100000;
-	}
-
-	@Optional.Method(modid="enderio")
-	@Override
-	public boolean isActive(PlayerEntity player, ItemStack item) {
-		return player.isSneaking()
-				&& canEnderTravel(item, player);
-	}
-	
 	private static Spell[] MissleSpells = null;
 	
 	private static void InitMissleSpells() {
@@ -422,12 +398,6 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 		return false;
 	}
 
-	@Optional.Method(modid="enderio")
-	@Override
-	public void extractInternal(ItemStack item, IValue<Integer> power) {
-		extractInternal(item, power.get());
-	}
-	
 	protected boolean tryCast(World worldIn, PlayerEntity playerIn, Hand hand, ItemStack stack) {
 		boolean used = false;
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
@@ -435,11 +405,11 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 			// Earlier right-click stuff here
 			if (!worldIn.isRemote) {
 				// We have a target?
-				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn.getPositionVector().addVector(0, playerIn.eyeHeight, 0),
+				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0),
 						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
-								if (ent instanceof ITameableEntity) {
-									if (playerIn.getUniqueID().equals(((ITameableEntity) ent).getOwnerId())) {
+								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getOwner() != null) {
+									if (playerIn.getUniqueID().equals(((ITameableEntity) ent).getOwner().getUniqueID())) {
 										return false; // We own the target entity
 									}
 								}
