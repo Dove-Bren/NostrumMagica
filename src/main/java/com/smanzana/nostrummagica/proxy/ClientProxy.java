@@ -57,6 +57,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierS
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
+import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
@@ -194,19 +195,19 @@ import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
-import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLightningBolt;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
@@ -215,11 +216,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -228,8 +229,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
@@ -241,13 +245,10 @@ import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -1294,6 +1295,11 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
 		; // Do nothing
+	}
+	
+	@Override
+	public void openSpellScreen(Spell spell) {
+		Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
 	}
 	
 	@Override

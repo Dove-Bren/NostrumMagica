@@ -5,18 +5,19 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screen.Screen;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
 public class ScrollScreen extends Screen {
 
@@ -38,6 +39,7 @@ public class ScrollScreen extends Screen {
 	}
 	
 	public ScrollScreen(Spell spellIn) {
+		super(new StringTextComponent("SpellScroll Info Screen"));
 		this.spell = spellIn;
 		this.components = new LinkedList<>();
 		
@@ -83,7 +85,7 @@ public class ScrollScreen extends Screen {
 		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
-		Gui.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		blit(leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		final int nameWidth = this.font.getStringWidth(this.name);
 		this.font.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);

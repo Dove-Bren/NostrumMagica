@@ -1,29 +1,28 @@
 package com.smanzana.nostrummagica.client.gui;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.Button;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -51,13 +50,15 @@ public class ObeliskScreen extends Screen {
 	private List<DestinationButton> listButtons;
 	private boolean drawList;
 	
-	private int mouseClickX;
-	private int mouseClickY;
-	private int mouseClickXOffset; //xoffset at time of click
-	private int mouseClickYOffset; //yoffset at time of click
+	private double mouseClickX;
+	private double mouseClickY;
+	private double mouseClickXOffset; //xoffset at time of click
+	private double mouseClickYOffset; //yoffset at time of click
 	private String errorString;
+	private final Minecraft mc;
 	
 	public ObeliskScreen(NostrumObeliskEntity tileEntity) {
+		super(new StringTextComponent("Obelisk Screen"));
 		this.tileEntity = tileEntity;
 		drawList = ModConfig.config.getObeliskList();
 		
@@ -65,6 +66,7 @@ public class ObeliskScreen extends Screen {
 		this.floatingButtons = new LinkedList<>();
 		this.listButtons = new LinkedList<>();
 		this.scale = 1.0f;
+		mc = Minecraft.getInstance();
 	}
 	
 	private int getScaled(int worldXZ) {
@@ -90,9 +92,8 @@ public class ObeliskScreen extends Screen {
 		float xDiv = this.drawList ? (2f/3f) : .5f;
 		this.xOffset = getScaled(tileEntity.getPos().getX()) - (int) (this.width * (xDiv));
 		this.yOffset = getScaled(tileEntity.getPos().getZ()) - (this.height / 2);
-		int id = 0;
 		
-		this.centralButton = new DestinationButton(id++, 0, 0, tileEntity.getPos(), -1, true, false, "", true);
+		this.centralButton = new DestinationButton(this, 0, 0, tileEntity.getPos(), -1, true, false, "", true);
 		
 		int listY = 0;
 		int index = 0;
@@ -104,8 +105,8 @@ public class ObeliskScreen extends Screen {
 			// null or air blocks when fetching blockstates
 			
 			listButtons.add(
-					new DestinationButton(id++, 10, 50 + (listY++ * 20), target.getPos(), index, false, true, target.getTitle(), valid));
-			DestinationButton button = new DestinationButton(id++, 0, 0, target.getPos(), index, false, false, target.getTitle(), valid);
+					new DestinationButton(this, 10, 50 + (listY++ * 20), target.getPos(), index, false, true, target.getTitle(), valid));
+			DestinationButton button = new DestinationButton(this, 0, 0, target.getPos(), index, false, false, target.getTitle(), valid);
 			floatingButtons.add(button);
 			index++;
 		}
@@ -135,7 +136,7 @@ public class ObeliskScreen extends Screen {
 		double time = (float) ((double) System.currentTimeMillis() / 15000);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
 		
-		Gui.drawScaledCustomSizeModalRect(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		blit(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
@@ -149,25 +150,25 @@ public class ObeliskScreen extends Screen {
 		}
 		
 		// Do buttons
-		centralButton.drawButton(mc, mouseX, mouseY, partialTicks);
+		centralButton.renderButton(mouseX, mouseY, partialTicks);
 		for (DestinationButton butt : floatingButtons) {
-			butt.drawButton(mc, mouseX, mouseY, partialTicks);
+			butt.renderButton(mouseX, mouseY, partialTicks);
 		}
 		
 		if (drawList) {
 			GlStateManager.pushLightingAttributes();
-			drawRect(0, 0, this.width / 3, this.height, 0xFF304060);
+			RenderFuncs.drawRect(0, 0, this.width / 3, this.height, 0xFF304060);
 			GlStateManager.popAttributes();
 			
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			Gui.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			blit(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			Gui.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			blit(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		}
 		
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -177,7 +178,7 @@ public class ObeliskScreen extends Screen {
 		this.font.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
 		
 		for (DestinationButton butt : listButtons) {
-			butt.drawButton(mc, mouseX, mouseY, partialTicks);
+			butt.renderButton(mouseX, mouseY, partialTicks);
 		}
 		
 	}
@@ -187,45 +188,47 @@ public class ObeliskScreen extends Screen {
 		return true;
 	}
 	
-	@Override
-	public void handleMouseInput() throws IOException {
-		int dWheel = Mouse.getDWheel();
-		if (dWheel != 0) {
-			int mx = Mouse.getEventX() * this.width / this.mc.displayWidth;
-	        int my = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
-			handleMouseScroll(dWheel > 0 ? 1 : -1, mx, my);
-		} else
-			super.handleMouseInput();
-	}
+//	@Override
+//	public void handleMouseInput() throws IOException {
+//		int dWheel = Mouse.getDWheel();
+//		if (dWheel != 0) {
+//			int mx = Mouse.getEventX() * this.width / this.mc.displayWidth;
+//	        int my = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+//			handleMouseScroll(dWheel > 0 ? 1 : -1, mx, my);
+//		} else
+//			super.handleMouseInput();
+//	}
 	
-	protected void handleMouseScroll(int dx, int mouseX, int mouseY) {
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double dx) {
 		double diff = .05 * (scale / .5);
 		float oldScale = (scale * (float) zoomScaleFactor);
 		float newScale = (float) Math.max(0.01f, Math.min(scale - dx * diff, 2.0));
 		panWithScroll(oldScale, (newScale * (float) zoomScaleFactor), mouseX, mouseY);
 		this.scale = newScale;
 		updateButtons();
+		return true;
 	}
 	
 	// Change offsets to match new scale, so mouseX and Y are in the same spot
-	private void panWithScroll(float scaleOld, float scaleNew, int mouseX, int mouseY) {
+	private void panWithScroll(float scaleOld, float scaleNew, double mouseX, double mouseY) {
 		float diffOrig = (1f/scaleNew) - (1f/scaleOld);
 		float diff = diffOrig;
 		
 		// X
-		int worldPos = unscale(xOffset + mouseX);
+		int worldPos = unscale((int) (xOffset + mouseX));
 		diff *= worldPos;
 		xOffset = (int) diff + xOffset;
 
 		diff = diffOrig;
 		// Y
-		worldPos = unscale(yOffset + mouseY);
+		worldPos = unscale((int) (yOffset + mouseY));
 		diff *= worldPos;
 		yOffset = (int) diff + yOffset;
 	}
 	
 	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		if (mouseButton == 0) {
 			int left;
 			if (drawList) {
@@ -241,37 +244,45 @@ public class ObeliskScreen extends Screen {
 				for (DestinationButton butt : listButtons) {
 					butt.visible = drawList;
 				}
-				centralButton.playPressSound(this.mc.getSoundHandler());
+				centralButton.playDownSound(this.mc.getSoundHandler());
 				this.updateButtons();
+				return true;
 			} else if (drawList && mouseX < this.width / 3) {
-				;
+				return true;
 			} else {
 				mouseClickX = mouseX;
 				mouseClickY = mouseY;
 				mouseClickXOffset = xOffset;
 				mouseClickYOffset = yOffset;
+				return true;
 			}
 		}
 		
-		super.mouseClicked(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 	
 	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int state) {
-		mouseClickX = -1;
-		mouseClickY = -1;
-	}
-	
-	@Override
-	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
-		if (clickedMouseButton == 0 && mouseClickX > 0 && mouseClickY >= 0) {
-			xOffset = mouseClickXOffset + (mouseClickX - mouseX);
-			yOffset = mouseClickYOffset + (mouseClickY - mouseY);
-			
-			updateButtons();
+	public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_) {
+		if (mouseClickX > 0) {
+			mouseClickX = -1;
+			mouseClickY = -1;
+			return true;
 		}
 		
-		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+		return false;
+	}
+	
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int clickedMouseButton, double idk, double idk2) {
+		if (clickedMouseButton == 0 && mouseClickX > 0 && mouseClickY >= 0) {
+			xOffset = (int) (mouseClickXOffset + (mouseClickX - mouseX));
+			yOffset = (int) (mouseClickYOffset + (mouseClickY - mouseY));
+			
+			updateButtons();
+			return true;
+		}
+		
+		return super.mouseDragged(mouseX, mouseY, clickedMouseButton, idk, idk2);
 	}
 	
 	private void updateButtons() {
@@ -304,8 +315,7 @@ public class ObeliskScreen extends Screen {
 		GlStateManager.popMatrix();
 	}
 	
-	@Override
-	public void actionPerformed(Button button) {
+	protected void onDestinationClicked(Button button) {
 		if (!button.visible)
 			return;
 		
@@ -330,10 +340,12 @@ public class ObeliskScreen extends Screen {
         private final boolean isCenter;
         private final boolean isValid;
 
-        public DestinationButton(int parButtonId, int parPosX, int parPosY, 
+        public DestinationButton(ObeliskScreen screen, int parPosX, int parPosY, 
               BlockPos pos, int index, boolean isCenter, boolean isListed, String title,
               boolean isValid) {
-            super(parButtonId, parPosX, parPosY, 13, 13, "");
+            super(13, 13, parPosX, parPosY, "", (b) -> {
+            	screen.onDestinationClicked(b);
+            });
             this.pos = pos;
             this.obeliskIndex = index;
             this.isListed = isListed;
@@ -364,6 +376,7 @@ public class ObeliskScreen extends Screen {
                 	}
                 }
                 
+                final Minecraft mc = Minecraft.getInstance();
                 float val = isValid ? 1.0f : .6f;
                 GL11.glColor4f(val, 1.0f, val, val);
                 mc.getTextureManager().bindTexture(background);
@@ -374,7 +387,7 @@ public class ObeliskScreen extends Screen {
                 
                 if (!isCenter) {
                 	// Draw the name below
-                	font fonter = mc.font;
+                	FontRenderer fonter = mc.fontRenderer;
                 	int textWidth = fonter.getStringWidth(title);
                 	int buttonWidth = TEXT_ICON_LENGTH;
                 	int color = isValid ? 0xB0B0B0 : 0xB05050;

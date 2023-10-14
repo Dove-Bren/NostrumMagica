@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.blocks;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.MirrorGui;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
@@ -18,7 +18,9 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.fml.DistExecutor;
 
 public class NostrumMirrorBlock extends HorizontalBlock {
 	
@@ -70,10 +72,12 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
-		playerIn.openGui(NostrumMagica.instance,
-				NostrumGui.mirrorID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
-		
+		if (worldIn.isRemote()) {
+			DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> {
+				Minecraft.getInstance().displayGuiScreen(new MirrorGui(player));
+				return 0;
+			});
+		}
 		
 		return true;
 	}

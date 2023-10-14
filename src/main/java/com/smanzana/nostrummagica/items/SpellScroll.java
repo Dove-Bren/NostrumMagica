@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -18,9 +17,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -59,10 +56,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		
 		if (playerIn.isSneaking()) {
 			// Open scroll screen
-			final int spellId = itemStackIn.getTag() == null ? 0 : itemStackIn.getTag().getInt(NBT_SPELL);
-			playerIn.openGui(NostrumMagica.instance,
-					NostrumGui.scrollID, worldIn,
-					spellId, (int) playerIn.posY, (int) playerIn.posZ);
+			final Spell spell = getSpell(itemStackIn);
+			if (spell != null && worldIn.isRemote()) {
+				NostrumMagica.instance.proxy.openSpellScreen(spell);
+			}
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		

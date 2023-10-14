@@ -91,7 +91,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (System.currentTimeMillis() / cycle) % EMagicElement.values().length
 					      ];
 				}
-				SpellComponentIcon.get(element).draw(Minecraft.getInstance().currentScreen, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth);
+				SpellComponentIcon.get(element).draw(mc.currentScreen, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth);
 				str = I18n.format("element.name", new Object[0]);
 				strLen = mc.fontRenderer.getStringWidth(str);
 				mc.fontRenderer.drawString(str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
@@ -108,7 +108,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (System.currentTimeMillis() / cycle) % trigArray.length
 					      ];
 				}
-				SpellComponentIcon.get(trigger).draw(Minecraft.getInstance().currentScreen, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth);
+				SpellComponentIcon.get(trigger).draw(mc.currentScreen, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth);
 				str = I18n.format("trigger.name", new Object[0]);
 				strLen = mc.fontRenderer.getStringWidth(str);
 				mc.fontRenderer.drawString(str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
@@ -125,7 +125,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 					      ];
 				}
-				SpellComponentIcon.get(shape).draw(Minecraft.getInstance().currentScreen, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth);
+				SpellComponentIcon.get(shape).draw(mc.currentScreen, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth);
 				str = I18n.format("shape.name", new Object[0]);
 				strLen = mc.fontRenderer.getStringWidth(str);
 				mc.fontRenderer.drawString(str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);

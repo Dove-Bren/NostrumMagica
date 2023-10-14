@@ -10,9 +10,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
-import com.smanzana.nostrummagica.blocks.ChalkBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -31,6 +30,7 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
@@ -49,10 +49,10 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	public RitualInfoSubScreen(RitualRecipe ritual) {
 		this.ritual = ritual;
 		
-		chalk = ChalkBlock.instance().getDefaultState();
-		candle = Candle.instance().getDefaultState().with(
+		chalk = NostrumBlocks.chalk.getDefaultState();
+		candle = NostrumBlocks.candle.getDefaultState().with(
 				Candle.LIT, true);
-		altar = AltarBlock.instance().getDefaultState();
+		altar = NostrumBlocks.altar.getDefaultState();
 		
 		if (I18n.hasKey("ritual." + ritual.getTitleKey() + ".desc")) {
 			String lines = I18n.format("ritual." + ritual.getTitleKey() + ".desc", new Object[0]);
@@ -226,7 +226,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		GlStateManager.rotatef(20 * angle, 0, 1, 0);
 		GlStateManager.enableBlend();
 		mc.getItemRenderer().renderItem(
-				InfusedGemItem.instance().getGem(ritual.getElement(), 1), TransformType.GROUND);
+				InfusedGemItem.getGem(ritual.getElement(), 1), TransformType.GROUND);
 		GlStateManager.popMatrix();
 
 //	    GL11.glViewport(0, 0, mc.displayWidth, mc.displayHeight);
@@ -312,14 +312,17 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private void drawAltar(Minecraft mc, double x, double y, double z, @Nonnull ItemStack item) {
+	private void drawAltar(Minecraft mc, double x, double y, double z, @Nonnull Ingredient item) {
 		drawBlock(mc, altar, x, y, z);
-		if (!item.isEmpty()) {
+		if (!item.hasNoMatchingItems()) {
+			final ItemStack[] matches = item.getMatchingStacks();
+			final int ingIndex = (int) ((System.currentTimeMillis() / 1000L) % matches.length);
+			
 			GlStateManager.pushMatrix();
 			GlStateManager.enableBlend();
 			GlStateManager.translated(x + .5, y + 1.5, z + .5);
 			mc.getItemRenderer().renderItem(
-					item, TransformType.GROUND);
+					matches[ingIndex], TransformType.GROUND);
 			GlStateManager.popMatrix();
 		}
 	}

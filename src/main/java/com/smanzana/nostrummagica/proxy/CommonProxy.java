@@ -60,6 +60,7 @@ import com.smanzana.nostrummagica.serializers.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -324,6 +325,10 @@ public class CommonProxy {
 		if (!player.world.isRemote()) {
 			this.openContainer(player, PetGUI.PetContainer.Make(pet, player));
 		}
+	}
+	
+	public void openSpellScreen(Spell spell) {
+		; // Nothing on server side
 	}
 
 	public void sendServerConfig(ServerPlayerEntity player) {

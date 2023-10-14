@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -42,7 +42,7 @@ public class SpellIcon {
 		
 		GlStateManager.enableBlend();
 		GlStateManager.enableAlphaTest();
-		Gui.drawScaledCustomSizeModalRect(x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH);
+		AbstractGui.blit(x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH);
 		
 		GL11.glPopMatrix();
 	}

@@ -36,8 +36,8 @@ import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -235,7 +235,7 @@ public class SpellComponentIcon {
 				"textures/models/symbol/" + shape.getShapeKey().toLowerCase() + ".png");
 	}
 	
-	public void draw(Gui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
+	public void draw(AbstractGui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
 		GL11.glPushMatrix();
 
 		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -250,7 +250,7 @@ public class SpellComponentIcon {
 		
 		Minecraft.getInstance().getTextureManager().bindTexture(iconSheet);
 		
-		parent.drawTexturedModalRect(xOffset, yOffset, offsetU, offsetV,
+		parent.blit(xOffset, yOffset, offsetU, offsetV,
 				this.width, this.height);
 		
 		GL11.glPopMatrix();
