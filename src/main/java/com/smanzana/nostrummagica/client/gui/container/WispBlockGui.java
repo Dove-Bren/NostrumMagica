@@ -3,20 +3,23 @@ package com.smanzana.nostrummagica.client.gui.container;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock.WispBlockTileEntity;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -46,6 +49,8 @@ public class WispBlockGui {
 	
 	public static class WispBlockContainer extends AutoContainer {
 		
+		public static final String ID = "wisp_block";
+		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
 		protected PlayerEntity player;
@@ -56,10 +61,10 @@ public class WispBlockGui {
 		protected Slot scrollSlot;
 		protected Slot reagentSlot;
 		
-		public WispBlockContainer(PlayerEntity player, IInventory playerInv, WispBlockTileEntity table, BlockPos pos) {
-			super(table);
-			this.player = player;
-			this.pos = pos;
+		public WispBlockContainer(int windowId, PlayerInventory playerInv, WispBlockTileEntity table) {
+			super(NostrumContainers.WispBlock, windowId, table);
+			this.player = playerInv.player;
+			this.pos = table.getPos();
 			this.table = table;
 			this.scrollSlot = new Slot(table, 0, SCROLL_SLOT_INPUT_HOFFSET, SCROLL_SLOT_INPUT_VOFFSET) {
 				
@@ -113,7 +118,7 @@ public class WispBlockGui {
 //				}
 			};
 			
-			this.addSlotToContainer(scrollSlot);
+			this.addSlot(scrollSlot);
 			
 			this.reagentSlot = new Slot(table, 1, REAGENT_SLOT_INPUT_HOFFSET, REAGENT_SLOT_INPUT_VOFFSET) {
 				
@@ -167,19 +172,24 @@ public class WispBlockGui {
 				
 			};
 			
-			this.addSlotToContainer(reagentSlot);
+			this.addSlot(reagentSlot);
 			
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final WispBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			return new WispBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
 		@Override
@@ -248,12 +258,12 @@ public class WispBlockGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class WispBlockGuiContainer extends AutoGuiContainer {
+	public static class WispBlockGuiContainer extends AutoGuiContainer<WispBlockContainer> {
 
 		private WispBlockContainer container;
 		
-		public WispBlockGuiContainer(WispBlockContainer container) {
-			super(container);
+		public WispBlockGuiContainer(WispBlockContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			this.container = container;
 			
 			this.xSize = GUI_WIDTH;
@@ -340,7 +350,7 @@ public class WispBlockGui {
 					&& mouseX <= horizontalMargin + PROGRESS_GUI_HOFFSET + PROGRESS_WIDTH
 					&& mouseY >= verticalMargin + PROGRESS_GUI_VOFFSET
 					&& mouseY <= verticalMargin + PROGRESS_GUI_VOFFSET + PROGRESS_HEIGHT) {
-				this.drawHoveringText(Lists.newArrayList(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
+				this.renderTooltip(Lists.newArrayList(((int) (container.table.getPartialReagent() * 100.0)) + "%"), mouseX - horizontalMargin, mouseY - verticalMargin);
 			}
 		}
 		

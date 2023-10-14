@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,10 +9,12 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.BlankScroll;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -25,19 +26,23 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.Button;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -93,6 +98,8 @@ public class SpellCreationGui {
 	
 	public static class SpellCreationContainer extends Container {
 		
+		public static final String ID = "spell_creation";
+		
 		// Kept just to report to server which TE is doing crafting
 		protected final BlockPos pos;
 		
@@ -104,20 +111,21 @@ public class SpellCreationGui {
 		protected boolean spellValid; // grammer checks out
 		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
 		protected List<String> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
-		protected StringBuffer name;
+		protected String name;
 		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
 		
-		public SpellCreationContainer(PlayerEntity crafter, IInventory playerInv, SpellTableEntity tableInventory, BlockPos pos) {
+		public SpellCreationContainer(int windowId, PlayerEntity crafter, PlayerInventory playerInv, SpellTableEntity tableInventory) {
+			super(NostrumContainers.SpellCreation, windowId);
 			this.inventory = tableInventory;
 			this.player = crafter;
-			this.pos = pos;
+			this.pos = tableInventory.getPos();
 			
 			spellErrorStrings = new LinkedList<>();
-			this.name = new StringBuffer(NAME_MAX + 1);
+			this.name = "";
 			this.iconIndex = -1;
 			
-			this.addSlotToContainer(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
+			this.addSlot(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				@Override
 				public boolean isItemValid(@Nonnull ItemStack stack) {
 					return (stack.isEmpty()
@@ -156,14 +164,14 @@ public class SpellCreationGui {
 				if (prev != null)
 					prev.setNext(cur);
 				prev = cur;
-				this.addSlotToContainer(prev);
+				this.addSlot(prev);
 			}
 			
 			// Create reagent bag slots
 			for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
 				int x = (i * 18) + REAGENT_BAG_HOFFSET;
 				int y = REAGENT_BAG_VOFFSET;
-				this.addSlotToContainer(new Slot(inventory, i + inventory.getReagentSlotIndex(), x, y) {
+				this.addSlot(new Slot(inventory, i + inventory.getReagentSlotIndex(), x, y) {
 					@Override
 					public int getSlotStackLimit() {
 						return 64;
@@ -188,12 +196,12 @@ public class SpellCreationGui {
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
 			// isValid means there's something that can accept a spell
@@ -229,8 +237,7 @@ public class SpellCreationGui {
 						// Try to add to existing
 						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
 							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
-							if (stack.isEmpty() || stack.getItem() != cur.getItem()
-									|| stack.getMetadata() != cur.getMetadata())
+							if (stack.isEmpty() || stack.getItem() != cur.getItem())
 								continue;
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
 							
@@ -314,6 +321,11 @@ public class SpellCreationGui {
 			}
 			
 			return ItemStack.EMPTY;
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final SpellCreationContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			return new SpellCreationContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
 		@Override
@@ -514,7 +526,7 @@ public class SpellCreationGui {
 			if (stack.isEmpty())
 				continue;
 			
-			if (ReagentItem.findType(stack) == type) {
+			if (ReagentItem.FindType(stack) == type) {
 				if (stack.getCount() > count) {
 					if (take)
 						inventory.decrStackSize(i, count);
@@ -536,23 +548,26 @@ public class SpellCreationGui {
 	private static final int NAME_MAX = 20;
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class SpellGui extends AutoGuiContainer {
+	public static class SpellGui extends AutoGuiContainer<SpellCreationContainer> {
 		
 		private static class SpellIconButton extends Button {
 			
 			private int value;
-			private SpellCreationContainer container;
+			private SpellGui gui;
 			
-			public SpellIconButton(int buttonId, int x, int y, int val, SpellCreationContainer container) {
-				super(buttonId, x, y, "");
+			public SpellIconButton(int x, int y, int val, SpellGui gui) {
+				super(ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, x, y, "", (b) -> {
+					gui.iconButtonClicked(b);
+				});
 				this.value = val;
 				this.width = ICON_BUTTON_LENGTH;
 				this.height = ICON_BUTTON_LENGTH;
-				this.container = container;
+				this.gui = gui;
 			}
 			
 			@Override
 			public void render(int mouseX, int mouseY, float partialTicks) {
+				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
 				mc.getTextureManager().bindTexture(TEXT);
 				if (mouseX >= this.x && mouseY >= this.y
@@ -562,32 +577,39 @@ public class SpellCreationGui {
 				}
 				
 				int x = 0;
-				if (container.iconIndex != this.value)
+				if (gui.container.iconIndex != this.value)
 					x += 20;
 				
-				GlStateManager.color4f(tint, tint, tint);
-				Gui.drawScaledCustomSizeModalRect(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
+				GlStateManager.color3f(tint, tint, tint);
+				blit(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
 						20, 20, this.width, this.height, 256, 256);
 				
-				GlStateManager.color4f(tint, tint, tint);
+				GlStateManager.color3f(tint, tint, tint);
 				SpellIcon.get(this.value).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
 			}
 			
 		}
 
 		private SpellCreationContainer container;
-		private int nameSelectedPos; // -1 for no selection
-		private int counter;
 		private List<SpellIconButton> buttons;
+		private TextFieldWidget nameField;
 		
-		public SpellGui(SpellCreationContainer container) {
-			super(container);
+		public SpellGui(SpellCreationContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			this.container = container;
 			this.xSize = GUI_WIDTH;
 			this.ySize = GUI_HEIGHT;
-			this.nameSelectedPos = -1;
-			counter = 0;
-			buttons = new ArrayList<>(SpellIcon.numIcons);
+			final Minecraft mc = Minecraft.getInstance();
+			this.nameField = new TextFieldWidget(mc.fontRenderer, 0, 0, NAME_WIDTH, NAME_HEIGHT, container.name);
+			this.nameField.setMaxStringLength(NAME_MAX);
+			this.nameField.func_212954_a((s) -> {
+				container.name = s;
+			});
+			this.nameField.setValidator((s) -> {
+				// do this better? If it ends up sucking. Otherwise this is probably fine
+				return s.codePoints().allMatch(SpellCreationGui::isValidChar);
+			});
+			this.buttons = new ArrayList<>(SpellIcon.numIcons);
 		}
 		
 		@Override
@@ -597,23 +619,27 @@ public class SpellCreationGui {
 			super.init();
 			
 			int extraMargin = 3;
-			final int spaceWidth = ((width - xSize) / 2) - (2 * extraMargin); // amount of space to draw in
+			final int horizontalMargin = ((width - xSize) / 2);
 			final int verticalMargin = (height - ySize) / 2;
+			final int spaceWidth = horizontalMargin - (2 * extraMargin); // amount of space to draw in
 			
 			final int perRow = spaceWidth / ICON_BUTTON_LENGTH;
 			extraMargin += (spaceWidth % ICON_BUTTON_LENGTH) / 2; // Center by adding remainder / 2
 			
 			for (int i = 0; i < SpellIcon.numIcons; i++) {
-				SpellIconButton button = new SpellIconButton(i,
+				SpellIconButton button = new SpellIconButton(
 						extraMargin + (i % perRow) * ICON_BUTTON_LENGTH,
 						verticalMargin + (i / perRow) * ICON_BUTTON_LENGTH,
 						i,
-						container);
+						this);
 						//int buttonId, int x, int y, int val, float actual, SpellCreationContainer container
 				
 				this.buttons.add(button);
 				this.addButton(button);
 			}
+			
+			this.nameField.x = horizontalMargin + NAME_HOFFSET;
+			this.nameField.y = verticalMargin + NAME_VOFFSET;
 		}
 		
 		@Override
@@ -644,30 +670,30 @@ public class SpellCreationGui {
 						256, 256);
 				
 				GL11.glPushMatrix();
-				mc.font.drawString(container.name.toString(), 
-						horizontalMargin + NAME_HOFFSET + 2,
-						verticalMargin + NAME_VOFFSET + 2, 
-						0xFF000000);
-				if (nameSelectedPos != -1 && ++counter > 30) {
-					
-					x = horizontalMargin + NAME_HOFFSET + 2;
-					for (int i = 0; i < nameSelectedPos; i++) {
-						x += mc.font.getCharWidth(container.name.charAt(i));
-					}
-					
-					RenderFuncs.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
-							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.font.FONT_HEIGHT,
-							0xFF000000);
-					
-					if (counter > 60)
-						counter = 0;
-				}
+//				mc.fontRenderer.drawString(container.name.toString(), 
+//						horizontalMargin + NAME_HOFFSET + 2,
+//						verticalMargin + NAME_VOFFSET + 2, 
+//						0xFF000000);
+//				if (nameSelectedPos != -1 && ++counter > 30) {
+//					
+//					x = horizontalMargin + NAME_HOFFSET + 2;
+//					for (int i = 0; i < nameSelectedPos; i++) {
+//						x += mc.fontRenderer.getCharWidth(container.name.charAt(i));
+//					}
+//					
+//					RenderFuncs.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
+//							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.fontRenderer.FONT_HEIGHT,
+//							0xFF000000);
+//					
+//					if (counter > 60)
+//						counter = 0;
+//				}
 				
 				if (container.spellValid) {
 					String str = "Spell Cost: " + container.lastManaCost;
 					x = this.width / 2;
-					x -= mc.font.getStringWidth(str) / 2;
-					mc.font.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					x -= mc.fontRenderer.getStringWidth(str) / 2;
+					mc.fontRenderer.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
 				}
 				
 				GL11.glPopMatrix();
@@ -689,7 +715,7 @@ public class SpellCreationGui {
 						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
 						GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 						
-						this.drawHoveringText(container.spellErrorStrings,
+						this.renderTooltip(container.spellErrorStrings,
 								mouseX - horizontalMargin, mouseY - verticalMargin);
 					}
 				}
@@ -702,7 +728,7 @@ public class SpellCreationGui {
 				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
 						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
 					RenderFuncs.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
-					this.drawHoveringText(container.reagentStrings,
+					this.renderTooltip(container.reagentStrings,
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
@@ -723,8 +749,7 @@ public class SpellCreationGui {
 			
 		}
 		
-		@Override
-		protected void actionPerformed(Button buttonIn) {
+		protected void iconButtonClicked(Button buttonIn) {
 			// Only type of button we have are icon buttons
 			SpellIconButton button = (SpellIconButton) buttonIn;
 			
@@ -733,7 +758,7 @@ public class SpellCreationGui {
 		}
 			
 		@Override
-		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 			int guiLeft = (width - xSize) / 2;
 			int guiTop = (height - ySize) / 2;
 			
@@ -741,26 +766,26 @@ public class SpellCreationGui {
 				int left = guiLeft + NAME_HOFFSET;
 				int top = guiTop + NAME_VOFFSET;
 			
-				if (mouseX >= left && mouseX <= left + NAME_WIDTH && 
-					mouseY >= top && mouseY <= top + NAME_HEIGHT) {
-						// clicked in name field
-						if (nameSelectedPos == -1) {
-							nameSelectedPos = container.name.length();
-						} else {
-							int offset = mouseX - left;
-							offset -= 5; // offset of drawn text
-							int index = 0;
-							while (index < container.name.length() && offset >= mc.font.getCharWidth(container.name.charAt(index))) {
-								offset -= mc.font.getCharWidth(container.name.charAt(index));
-								index++;
-							}
-							nameSelectedPos = Math.min(container.name.length(), index + 1);
-						}
-						counter = 0;
-						return;
-				}
-				// implicit else
-				nameSelectedPos = -1;
+//				if (mouseX >= left && mouseX <= left + NAME_WIDTH && 
+//					mouseY >= top && mouseY <= top + NAME_HEIGHT) {
+//						// clicked in name field
+//						if (nameSelectedPos == -1) {
+//							nameSelectedPos = container.name.length();
+//						} else {
+//							int offset = (int) (mouseX - left);
+//							offset -= 5; // offset of drawn text
+//							int index = 0;
+//							while (index < container.name.length() && offset >= mc.fontRenderer.getCharWidth(container.name.charAt(index))) {
+//								offset -= mc.fontRenderer.getCharWidth(container.name.charAt(index));
+//								index++;
+//							}
+//							nameSelectedPos = Math.min(container.name.length(), index + 1);
+//						}
+//						counter = 0;
+//						return true;
+//				}
+//				// implicit else
+//				nameSelectedPos = -1;
 				left = guiLeft + SUBMIT_HOFFSET;
 				top = guiTop + SUBMIT_VOFFSET;
 				
@@ -775,7 +800,7 @@ public class SpellCreationGui {
 									// All of this happens again and is synced back to client
 									// But in the mean, might as well do it here for the
 									// smoothest feel
-									ItemStack scroll = new ItemStack(SpellScroll.instance(), 1);
+									ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 									SpellScroll.setSpell(scroll, spell);
 									container.setScroll(scroll);
 									//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
@@ -785,77 +810,45 @@ public class SpellCreationGui {
 											container.pos,
 											container.iconIndex
 											));
-									container.name.delete(0, container.name.length());
+									container.name = "";
 									container.iconIndex = -1;
 								}
 							} else {
 								// Don't
 							}
-							return;
+							return true;
 					}
 			}
 			
-			nameSelectedPos = -1;
-			super.mouseClicked(mouseX, mouseY, mouseButton);
+			//nameSelectedPos = -1;
+			return super.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 		
-		protected void keyTyped(char typedChar, int keyCode) throws IOException {
-			if (keyCode == 1) {
+		@Override
+		public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+			if (p_keyPressed_1_ == 256) {
 				this.mc.player.closeScreen();
 			}
 
-			if (nameSelectedPos != -1 && isValidKey(keyCode)) {
-				if (keyCode == 203) {
-					nameSelectedPos = Math.max(0, nameSelectedPos - 1);
-				} else if (keyCode == 205) {
-					nameSelectedPos = Math.min(container.name.length(), nameSelectedPos + 1);
-				} else if (keyCode == 199) {
-					nameSelectedPos = 0;
-				} else if (keyCode == 207) {
-					nameSelectedPos = container.name.length();
-				} else if (nameSelectedPos == container.name.length()) {
-					if (keyCode == 14) {
-						if (container.name.length() != 0) {
-							container.name.deleteCharAt(container.name.length() - 1);
-							nameSelectedPos--;
-						}
-						
-					} else if(container.name.length() < NAME_MAX) {
-						// if we dont have too many
-						container.name.append(typedChar);
-						nameSelectedPos++;
-					}
-				} else {
-					// Typed into the middle of the string
-					if (keyCode == 14) {
-						container.name.deleteCharAt(nameSelectedPos);
-						nameSelectedPos--;
-					} else if (container.name.length() < NAME_MAX) {
-						// if backspace or we dont have too many
-						container.name.insert(nameSelectedPos, typedChar);
-						nameSelectedPos++;
-					}
-				}
-				
-				container.validate();
-			} else {
-				super.keyTyped(typedChar, keyCode);
-			}
+			// Copied fromm AnvilScreen
+			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.func_212955_f() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 		}
 	}
 	
-	private static boolean isValidKey(int keyCode) {
-		// utility function for me <3
-		return keyCode == 14 // backspace
-				|| (keyCode >= 2 && keyCode <= 11) // numbers
-				|| (keyCode >= 16 && keyCode <= 27) // qwerty row
-				|| (keyCode >= 30 && keyCode <= 39) // asdf row (+ colon)
-				|| (keyCode >= 44 && keyCode <= 53) // zxcv row
-				|| keyCode == 57 // space
-				|| keyCode == 203 // left arrow
-				|| keyCode == 205 // right arrow
-				|| keyCode == 199 // home
-				|| keyCode == 207; // end
+	private static boolean isValidChar(int codepoint) {
+		return Character.isAlphabetic(codepoint);
+		
+//		// utility function for me <3
+//		return keyCode == 14 // backspace
+//				|| (keyCode >= 2 && keyCode <= 11) // numbers
+//				|| (keyCode >= 16 && keyCode <= 27) // qwerty row
+//				|| (keyCode >= 30 && keyCode <= 39) // asdf row (+ colon)
+//				|| (keyCode >= 44 && keyCode <= 53) // zxcv row
+//				|| keyCode == 57 // space
+//				|| keyCode == 203 // left arrow
+//				|| keyCode == 205 // right arrow
+//				|| keyCode == 199 // home
+//				|| keyCode == 207; // end
 			
 	}
 	

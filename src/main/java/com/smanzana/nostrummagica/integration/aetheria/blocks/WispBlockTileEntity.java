@@ -13,16 +13,16 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class WispBlockTileEntity extends AetherTickingTileEntity implements IInventory {
+public class WispBlockTileEntity extends AetherTickingTileEntity implements IAutoContainerInventory {
 
 	private static final String NBT_INVENTORY = "inventory";
 	private static final String NBT_PARTIAL = "partial";

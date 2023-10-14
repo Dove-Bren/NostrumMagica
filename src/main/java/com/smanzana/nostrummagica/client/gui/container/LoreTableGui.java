@@ -2,20 +2,23 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.tiles.LoreTableEntity;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -39,8 +42,9 @@ public class LoreTableGui {
 	
 	public static class LoreTableContainer extends Container {
 		
+		public static final String ID = "lore_table";
+		
 		// Kept just to report to server which TE is doing crafting
-		protected BlockPos pos;
 		protected PlayerEntity player;
 		
 		// Actual container variables as well as a couple for keeping track
@@ -48,9 +52,9 @@ public class LoreTableGui {
 		protected LoreTableEntity table;
 		protected Slot inputSlot;
 		
-		public LoreTableContainer(PlayerEntity player, IInventory playerInv, LoreTableEntity table, BlockPos pos) {
+		public LoreTableContainer(int windowId, PlayerEntity player, IInventory playerInv, LoreTableEntity table) {
+			super(NostrumContainers.LoreTable, windowId);
 			this.player = player;
-			this.pos = pos;
 			this.table = table;
 			this.inputSlot = new Slot(null, 0, SLOT_INPUT_HOFFSET, SLOT_INPUT_VOFFSET) {
 				
@@ -94,10 +98,6 @@ public class LoreTableGui {
 					return ItemStack.EMPTY;
 				}
 				
-				public boolean isHere(IInventory inv, int slotIn) {
-					return false;
-				}
-				
 				public boolean isSameInventory(Slot other) {
 					return false;
 				}
@@ -109,19 +109,24 @@ public class LoreTableGui {
 				
 			};
 			
-			this.addSlotToContainer(inputSlot);
+			this.addSlot(inputSlot);
 			
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final LoreTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
+			return new LoreTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf));
 		}
 		
 		@Override
@@ -174,12 +179,12 @@ public class LoreTableGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class LoreTableGuiContainer extends AutoGuiContainer {
+	public static class LoreTableGuiContainer extends AutoGuiContainer<LoreTableContainer> {
 
 		private LoreTableContainer container;
 		
-		public LoreTableGuiContainer(LoreTableContainer container) {
-			super(container);
+		public LoreTableGuiContainer(LoreTableContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			this.container = container;
 			
 			this.xSize = GUI_WIDTH;
@@ -197,7 +202,7 @@ public class LoreTableGui {
 			int verticalMargin = (height - ySize) / 2;
 			
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
-			mc.getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
@@ -223,7 +228,7 @@ public class LoreTableGui {
 				u += ((time % 3000) / 1000) * SHINE_LENGTH;
 				float alpha = 1f - .5f * ((float) (time % 1000) / 1000f);
 				
-				mc.getTextureManager().bindTexture(TEXT);
+				Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 				
 				GlStateManager.color4f(0, 1, 1, alpha);
 				GlStateManager.enableBlend();

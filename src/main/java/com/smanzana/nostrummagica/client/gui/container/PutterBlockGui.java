@@ -2,18 +2,22 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,29 +34,38 @@ public class PutterBlockGui {
 	
 	public static class PutterBlockContainer extends Container {
 		
+		public static final String ID = "putter";
+		
 		protected final PutterBlockTileEntity putter;
 		
-		public PutterBlockContainer(IInventory playerInv, PutterBlockTileEntity putter) {
+		public PutterBlockContainer(int windowId, PlayerInventory playerInv, PutterBlockTileEntity putter) {
+			super(NostrumContainers.Putter, windowId);
+			
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
 			// Construct putter inventory
 			IInventory putterInv = putter.getInventory();
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 3; x++) {
-					this.addSlotToContainer(new Slot(putterInv, x + y * 3, PUTTER_INV_HOFFSET + (x * 18), PUTTER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(putterInv, x + y * 3, PUTTER_INV_HOFFSET + (x * 18), PUTTER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			
 			this.putter = putter;
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final PutterBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			return new PutterBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
 		@Override
@@ -102,12 +115,12 @@ public class PutterBlockGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class PutterBlockGuiContainer extends AutoGuiContainer {
+	public static class PutterBlockGuiContainer extends AutoGuiContainer<PutterBlockContainer> {
 
 		//private PutterBlockContainer container;
 		
-		public PutterBlockGuiContainer(PutterBlockContainer container) {
-			super(container);
+		public PutterBlockGuiContainer(PutterBlockContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			//this.container = container;
 			
 			this.xSize = GUI_WIDTH;

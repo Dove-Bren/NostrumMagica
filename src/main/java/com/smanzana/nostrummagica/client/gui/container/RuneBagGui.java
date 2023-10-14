@@ -1,30 +1,31 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.RuneBag.RuneInventory;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.client.config.GuiUtils;
 
 public class RuneBagGui {
 	
@@ -43,6 +44,8 @@ public class RuneBagGui {
 	
 	public static class BagContainer extends Container {
 		
+		public static final String ID = "rune_bag";
+		
 		protected RuneBag bag;
 		protected @Nonnull ItemStack stack;
 		protected RuneInventory inventory;
@@ -50,7 +53,8 @@ public class RuneBagGui {
 		
 		private int bagIDStart;
 		
-		public BagContainer(IInventory playerInv, RuneBag bag, @Nonnull ItemStack stack, int bagPos) {
+		public BagContainer(int windowId, PlayerInventory playerInv, RuneBag bag, @Nonnull ItemStack stack, int bagPos) {
+			super(NostrumContainers.RuneBag, windowId);
 			this.stack = stack;
 			this.inventory = bag.asInventory(stack);
 			this.bag = bag;
@@ -59,12 +63,12 @@ public class RuneBagGui {
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
 			this.bagIDStart = this.inventorySlots.size();
@@ -72,13 +76,23 @@ public class RuneBagGui {
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 9; j++) {
 					
-					this.addSlotToContainer(new Slot(inventory, i * 9 + j, BAG_INV_HOFFSET + j * 18, BAG_INV_VOFFSET + i * 18) {
+					this.addSlot(new Slot(inventory, i * 9 + j, BAG_INV_HOFFSET + j * 18, BAG_INV_VOFFSET + i * 18) {
 						public boolean isItemValid(@Nonnull ItemStack stack) {
 					        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
 					    }
 					});
 				}
 			}
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final BagContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			final int slot = buffer.readVarInt();
+			ItemStack stack = playerInv.getStackInSlot(slot);
+			if (stack.isEmpty() || !(stack.getItem() instanceof RuneBag)) {
+				stack = new ItemStack(NostrumItems.runeBag);
+			}
+			return new BagContainer(windowId, playerInv, (RuneBag) stack.getItem(), stack, slot);
 		}
 		
 		@Override
@@ -152,7 +166,7 @@ public class RuneBagGui {
 			}
 			
 			ItemStack itemstack = ItemStack.EMPTY;
-			InventoryPlayer inventoryplayer = player.inventory;
+			PlayerInventory inventoryplayer = player.inventory;
 
 			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
 					&& slotId >= 0 && !inventoryplayer.getItemStack().isEmpty()) {
@@ -197,7 +211,7 @@ public class RuneBagGui {
 								inventoryplayer.setItemStack(ItemStack.EMPTY);
 							}
 						} else if (slot7.isItemValid(itemstack12)) {
-							if (itemstack9.getItem() == itemstack12.getItem() && itemstack9.getMetadata() == itemstack12.getMetadata() && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
+							if (itemstack9.getItem() == itemstack12.getItem() && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
 								int j2 = dragType == 0 ? itemstack12.getCount() : 1;
 
 								if (j2 > slot7.getItemStackLimit(itemstack12) - itemstack9.getCount()) {
@@ -219,7 +233,7 @@ public class RuneBagGui {
 								slot7.putStack(itemstack12);
 								inventoryplayer.setItemStack(itemstack9);
 							}
-						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && (!itemstack9.getHasSubtypes() || itemstack9.getMetadata() == itemstack12.getMetadata()) && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
+						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
 							int i2 = itemstack9.getCount();
 
 							if (i2 > 0 && i2 + itemstack12.getCount() <= itemstack12.getMaxStackSize()) {
@@ -259,12 +273,12 @@ public class RuneBagGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class BagGui extends AutoGuiContainer {
+	public static class BagGui extends AutoGuiContainer<BagContainer> {
 
 		private BagContainer bag;
 		
-		public BagGui(BagContainer bag) {
-			super(bag);
+		public BagGui(BagContainer bag, PlayerInventory playerIn, ITextComponent name) {
+			super(bag, playerIn, name);
 			this.bag = bag;
 			this.xSize = GUI_WIDTH;
 			this.ySize = GUI_HEIGHT;
@@ -306,7 +320,7 @@ public class RuneBagGui {
 		}
 			
 		@Override
-		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 			int left = (width - xSize) / 2;
 			int top = (height - ySize) / 2;
 			
@@ -322,8 +336,9 @@ public class RuneBagGui {
 					NetworkHandler.sendToServer(
 			    			new RuneBagToggleMessage(bag.bagPos != 40, val));
 					NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
+					return true;
 			} else {
-				super.mouseClicked(mouseX, mouseY, mouseButton);
+				return super.mouseClicked(mouseX, mouseY, mouseButton);
 			}
 		}
 	}

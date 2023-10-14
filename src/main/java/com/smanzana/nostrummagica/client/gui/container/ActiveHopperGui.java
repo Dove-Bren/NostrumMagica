@@ -2,18 +2,23 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,24 +35,33 @@ public class ActiveHopperGui {
 	
 	public static class ActiveHopperContainer extends Container {
 		
+		public static final String ID = "active_hopper";
+		
 		protected final ActiveHopperTileEntity hopper;
 		
-		public ActiveHopperContainer(IInventory playerInv, ActiveHopperTileEntity hopper) {
+		public ActiveHopperContainer(int windowId, IInventory playerInv, ActiveHopperTileEntity hopper) {
+			super(NostrumContainers.ActiveHopper, windowId);
+			
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
+					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
 			}
 			// Construct player hotbar
 			for (int x = 0; x < 9; x++) {
-				this.addSlotToContainer(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
 			// Construct hopper inventory
-			this.addSlotToContainer(new Slot(hopper, 0, PUTTER_INV_HOFFSET, PUTTER_INV_VOFFSET));
+			this.addSlot(new Slot(hopper, 0, PUTTER_INV_HOFFSET, PUTTER_INV_VOFFSET));
 			
 			this.hopper = hopper;
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static ActiveHopperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
+			return new ActiveHopperContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buf));
 		}
 		
 		@Override
@@ -97,10 +111,10 @@ public class ActiveHopperGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class ActiveHopperGuiContainer extends AutoGuiContainer {
+	public static class ActiveHopperGuiContainer extends AutoGuiContainer<ActiveHopperContainer> {
 
-		public ActiveHopperGuiContainer(ActiveHopperContainer container) {
-			super(container);
+		public ActiveHopperGuiContainer(ActiveHopperContainer container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			
 			this.xSize = GUI_WIDTH;
 			this.ySize = GUI_HEIGHT;
@@ -117,7 +131,7 @@ public class ActiveHopperGui {
 			int verticalMargin = (height - ySize) / 2;
 			
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
-			mc.getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
