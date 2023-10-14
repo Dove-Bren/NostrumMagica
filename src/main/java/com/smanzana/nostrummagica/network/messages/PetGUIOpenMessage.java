@@ -3,14 +3,8 @@ package com.smanzana.nostrummagica.network.messages;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIContainer;
 import com.smanzana.nostrummagica.entity.IEntityPet;
-import com.smanzana.nostrummagica.utils.Entities;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -24,31 +18,34 @@ public class PetGUIOpenMessage {
 
 	public static void handle(PetGUIOpenMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Minecraft.getInstance().runAsync(() -> {
-			IEntityPet pet = null;
-			Entity foundEnt = Entities.FindEntity(NostrumMagica.instance.proxy.getPlayer().world, message.petID);
-			
-			if (foundEnt == null || !(foundEnt instanceof IEntityPet)) {
-				return;
-			}
-			
-			pet = (IEntityPet) foundEnt;
-			
-			if (pet != null) {
-				PetContainer<?> container = pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer());
-				container.overrideID(message.id);
-				container.windowId = message.mcID;
-				
-				if (message.numSheets != container.getSheetCount()) {
-					NostrumMagica.logger.error("Sheet count differs on client and server for " + pet);
-					return;
-				}
-				
-				@SuppressWarnings({ "unchecked", "rawtypes" })
-				PetGUIContainer<?> gui = new PetGUIContainer(container, pet.getGUIAdapter());
-				FMLCommonHandler.instance().showGuiScreen(gui);
-			}
-		});
+		
+		int unused; // TODO deprecated and unused now?
+		
+//		Minecraft.getInstance().runAsync(() -> {
+//			IEntityPet pet = null;
+//			Entity foundEnt = Entities.FindEntity(NostrumMagica.instance.proxy.getPlayer().world, message.petID);
+//			
+//			if (foundEnt == null || !(foundEnt instanceof IEntityPet)) {
+//				return;
+//			}
+//			
+//			pet = (IEntityPet) foundEnt;
+//			
+//			if (pet != null) {
+//				PetContainer<?> container = pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer());
+//				container.overrideID(message.id);
+//				container.windowId = message.mcID;
+//				
+//				if (message.numSheets != container.getSheetCount()) {
+//					NostrumMagica.logger.error("Sheet count differs on client and server for " + pet);
+//					return;
+//				}
+//				
+//				@SuppressWarnings({ "unchecked", "rawtypes" })
+//				PetGUIContainer<?> gui = new PetGUIContainer(container, pet.getGUIAdapter());
+//				FMLCommonHandler.instance().showGuiScreen(gui);
+//			}
+//		});
 	}
 
 	private final UUID petID;

@@ -380,6 +380,14 @@
         ]
     },
     
+    "item.bauble.equip":
+    {
+        "sounds":
+        [
+            "minecraft:item.armor.equip_generic"
+        ]
+    },
+    
     "entity.wing.flap":
     {
         "sounds":

@@ -10,18 +10,11 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Direction;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.server.command.EnumArgument;
 
 public class CommandWriteRoom {
 	
@@ -29,13 +22,13 @@ public class CommandWriteRoom {
 		dispatcher.register(
 				Commands.literal("writeroom")
 					.requires(s -> s.hasPermissionLevel(2))
-					.then(Commands.argument("name", StringArgumentType.greedyString())
+					.then(Commands.argument("name", StringArgumentType.greedyString())	
 						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name")))
 						)
 				);
 	}
 	
-	private static final int execute(CommandContext<CommandSource> context, final String name, final Direction facing) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSource> context, final String name) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
 		if (!player.isCreative()) {

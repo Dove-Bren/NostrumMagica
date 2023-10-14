@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.integration.aetheria.blocks;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.WispBlockGui;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 
@@ -74,9 +74,8 @@ public class WispBlock extends Block {
 			}
 		}
 		
-		playerIn.openGui(NostrumMagica.instance,
-				NostrumGui.wispblockID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
+		WispBlockTileEntity te = (WispBlockTileEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(playerIn, WispBlockGui.WispBlockContainer.Make(te));
 		
 		return true;
 	}

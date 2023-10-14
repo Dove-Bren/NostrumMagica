@@ -66,7 +66,8 @@ public enum NostrumMagicaSounds {
 	MUSIC_DUNGEON2_HIGH("music.dungeon2.high", SoundCategory.MUSIC),
 	MUSIC_DUNGEON2_HIGH_ADV("music.dungeon2.high_adv", SoundCategory.MUSIC),
 	MUSIC_DUNGEON2_BATTLE_INTRO("music.dungeon2.battle.intro", SoundCategory.MUSIC),
-	MUSIC_DUNGEON2_BATTLE_LOOP("music.dungeon2.battle.loop", SoundCategory.MUSIC)
+	MUSIC_DUNGEON2_BATTLE_LOOP("music.dungeon2.battle.loop", SoundCategory.MUSIC),
+	BAUBLE_EQUIP("item.bauble.equip", SoundCategory.PLAYERS),
 	;
 	
 	private ResourceLocation resource;

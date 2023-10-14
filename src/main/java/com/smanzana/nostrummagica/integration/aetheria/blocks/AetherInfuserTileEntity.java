@@ -34,7 +34,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -192,7 +191,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 						final double z = (pos.getZ() + .5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - (RADIUS / 2f);
 						world.addParticle(ParticleTypes.MYCELIUM,
 								x, y, z,
-								0, 0, 0, 0);
+								0, 0, 0);
 						
 						int num = (active ? 10 : NostrumMagica.rand.nextFloat() < .05f ? 1 : 0);
 						NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
