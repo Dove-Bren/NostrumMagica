@@ -1,14 +1,25 @@
 package com.smanzana.nostrummagica.utils;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.IContainerProvider;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -29,6 +40,30 @@ public class ContainerUtil {
 	
 	public static final <T extends TileEntity> void PackTE(@Nonnull PacketBuffer buffer, @Nonnull T tileEntity) {
 		buffer.writeBlockPos(tileEntity.getPos());
+	}
+	
+	public static interface IPackedContainerProvider extends INamedContainerProvider {
+		public Consumer<PacketBuffer> getData();
+	}
+
+	public static IPackedContainerProvider MakeProvider(String name, IContainerProvider provider, Consumer<PacketBuffer> dataFunc) {
+		return new IPackedContainerProvider() {
+
+			@Override
+			public Container createMenu(int windowId, PlayerInventory playerInv, PlayerEntity player) {
+				return provider.createMenu(windowId, playerInv, player);
+			}
+
+			@Override
+			public ITextComponent getDisplayName() {
+				return new TranslationTextComponent(NostrumMagica.MODID + ":container." + name + ".name");
+			}
+
+			@Override
+			public Consumer<PacketBuffer> getData() {
+				return dataFunc;
+			}
+		};
 	}
 	
 	public static interface AutoContainerFields extends IIntArray {

@@ -19,12 +19,10 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater.FluidPoisonWaterBlock;
@@ -40,7 +38,6 @@ import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
-import com.smanzana.nostrummagica.network.messages.PetGUIOpenMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
@@ -88,6 +85,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.NostrumOreGenerator;
@@ -101,6 +99,7 @@ import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
@@ -119,6 +118,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -313,21 +313,27 @@ public class CommonProxy {
 		; // Server does nothing
 	}
 	
-	public <T extends IEntityPet> void openPetGUI(PlayerEntity player, T pet) {
-		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
-		ServerPlayerEntity mpPlayer = (ServerPlayerEntity) player;
-		PetContainer<?> container = pet.getGUIContainer(player);
-		mpPlayer.getNextWindowId();
-		mpPlayer.closeContainer();
-        int windowId = mpPlayer.currentWindowId;
-        mpPlayer.openContainer = container;
-        mpPlayer.openContainer.windowId = windowId;
-        mpPlayer.openContainer.addListener(mpPlayer);
-        
-        // Open GUI on client
-        PetGUIOpenMessage message = new PetGUIOpenMessage(pet, windowId, container.getContainerID(), container.getSheetCount());
-        NetworkHandler.sendTo(message, mpPlayer);
+	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
+		if (!player.world.isRemote() && player instanceof ServerPlayerEntity) {
+			NetworkHooks.openGui((ServerPlayerEntity) player, provider, provider.getData());
+		}
 	}
+	
+//	public <T extends IEntityPet> void openPetGUI(PlayerEntity player, T pet) {
+//		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
+//		ServerPlayerEntity mpPlayer = (ServerPlayerEntity) player;
+//		PetContainer<?> container = pet.getGUIContainer(player);
+//		mpPlayer.getNextWindowId();
+//		mpPlayer.closeContainer();
+//        int windowId = mpPlayer.currentWindowId;
+//        mpPlayer.openContainer = container;
+//        mpPlayer.openContainer.windowId = windowId;
+//        mpPlayer.openContainer.addListener(mpPlayer);
+//        
+//        // Open GUI on client
+//        PetGUIOpenMessage message = new PetGUIOpenMessage(pet, windowId, container.getContainerID(), container.getSheetCount());
+//        NetworkHandler.sendTo(message, mpPlayer);
+//	}
 
 	public void sendServerConfig(ServerPlayerEntity player) {
 		ModConfig.channel.sendTo(new ServerConfigMessage(ModConfig.config), player);

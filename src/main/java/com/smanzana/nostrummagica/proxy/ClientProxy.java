@@ -195,6 +195,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -1279,15 +1280,20 @@ public class ClientProxy extends CommonProxy {
 		Minecraft.getInstance().displayGuiScreen(book.getScreen(userdata));
 	}
 	
+//	@Override
+//	public void openPetGUI(PlayerEntity player, IEntityPet pet) {
+//		// Integrated clients still need to open the gui...
+//		//if (!player.world.isRemote) {
+////			DragonContainer container = dragon.getGUIContainer();
+////			DragonGUI gui = new DragonGUI(container);
+////			FMLCommonHandler.instance().showGuiScreen(gui);
+//			super.openPetGUI(player, pet);
+//		//}
+//	}
+	
 	@Override
-	public void openPetGUI(PlayerEntity player, IEntityPet pet) {
-		// Integrated clients still need to open the gui...
-		//if (!player.world.isRemote) {
-//			DragonContainer container = dragon.getGUIContainer();
-//			DragonGUI gui = new DragonGUI(container);
-//			FMLCommonHandler.instance().showGuiScreen(gui);
-			super.openPetGUI(player, pet);
-		//}
+	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
+		; // Do nothing
 	}
 	
 	@Override

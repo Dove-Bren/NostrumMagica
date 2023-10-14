@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -62,6 +63,14 @@ public class ActiveHopperGui {
 		@OnlyIn(Dist.CLIENT)
 		public static ActiveHopperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
 			return new ActiveHopperContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buf));
+		}
+		
+		public static IPackedContainerProvider Make(ActiveHopperTileEntity hopper) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new ActiveHopperContainer(windowId, playerInv, hopper);
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, hopper);
+			});
 		}
 		
 		@Override

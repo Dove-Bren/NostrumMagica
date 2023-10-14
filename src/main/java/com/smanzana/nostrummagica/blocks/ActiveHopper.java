@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
 import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
 
 import net.minecraft.block.Block;
@@ -205,9 +205,8 @@ public class ActiveHopper extends ContainerBlock {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		playerIn.openGui(NostrumMagica.instance,
-				NostrumGui.activeHopperID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
+		ActiveHopperTileEntity te = (ActiveHopperTileEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, ActiveHopperGui.ActiveHopperContainer.Make(te));
 		
 		return true;
 	}
