@@ -3,10 +3,11 @@ package com.smanzana.nostrummagica.items;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -133,8 +134,13 @@ public class RuneBag extends Item implements ILoreTagged {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		playerIn.openGui(NostrumMagica.instance, NostrumGui.runeBagID, worldIn,
-				(int) playerIn.posX, (int) playerIn.posY, (int) playerIn.posZ);
+		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.MAIN_HAND);
+		ItemStack inHand = playerIn.getHeldItemMainhand();
+		if (inHand.isEmpty()) {
+			inHand = playerIn.getHeldItemOffhand();
+			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.OFF_HAND);
+		}
+		NostrumMagica.instance.proxy.openContainer(playerIn, RuneBagGui.BagContainer.Make(pos));
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
     }

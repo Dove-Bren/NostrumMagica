@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -42,9 +42,8 @@ public class ModificationTable extends ContainerBlock {
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
-		playerIn.openGui(NostrumMagica.instance,
-				NostrumGui.modtableID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
+		ModificationTableEntity te = (ModificationTableEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, ModificationTableGui.ModificationTableContainer.Make(te));
 		
 		return true;
 	}

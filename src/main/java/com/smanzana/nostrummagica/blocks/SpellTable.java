@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
 import net.minecraft.block.Block;
@@ -142,7 +142,6 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 		super.eventReceived(state, worldIn, pos, id, param);
@@ -157,9 +156,8 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 			pos = pos.offset(state.get(FACING));
 		}
 		
-		playerIn.openGui(NostrumMagica.instance,
-				NostrumGui.spellTableID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
+		SpellTableEntity te = (SpellTableEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(playerIn, SpellCreationGui.SpellCreationContainer.Make(te));
 		
 		return true;
 	}

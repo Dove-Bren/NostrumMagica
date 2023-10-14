@@ -19,7 +19,6 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
-import com.smanzana.nostrummagica.integration.enderio.wrappers.TravelSourceWrapper;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -372,11 +371,11 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 				// else if nothign else, try client-side enderIO teleport?
 				if (canEnderTravel(stack, playerIn)) {
 					if (worldIn.isRemote) {
-						if (NostrumMagica.instance.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF)) {
-							playerIn.resetCooldown();
-							playerIn.swingArm(hand);
-							return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
-						}
+//						if (NostrumMagica.instance.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF)) {
+//							playerIn.resetCooldown();
+//							playerIn.swingArm(hand);
+//							return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+//						}
 					}
 				}
 			}

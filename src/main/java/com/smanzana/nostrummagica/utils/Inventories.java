@@ -3,11 +3,13 @@ package com.smanzana.nostrummagica.utils;
 import javax.annotation.Nonnull;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.Hand;
 import net.minecraftforge.items.IItemHandler;
 
 public class Inventories {
@@ -204,6 +206,15 @@ public class Inventories {
 		}
 		
 		return true;
+	}
+	
+	public static final int getPlayerHandSlotIndex(PlayerInventory inv, Hand hand) {
+		// Hardcoded stuff
+		if (hand == Hand.MAIN_HAND) {
+			return inv.currentItem;
+		} else {
+			return 40;
+		}
 	}
 	
 	// TODO make a pool of these and implement a 'set' interface to avoid allocating and deallocing these

@@ -33,11 +33,9 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 		MANI_DUST(ID_SUFFIX_MANI_DUST);
 		
 		private String tag;
-		private int meta;
 		
 		private ReagentType(String tag) {
 			this.tag = tag;
-			this.meta = ordinal();
 		}
 		
 		public String getTag() {

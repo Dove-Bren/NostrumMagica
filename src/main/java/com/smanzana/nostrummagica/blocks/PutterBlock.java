@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
 import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
 
 import net.minecraft.block.Block;
@@ -52,9 +52,8 @@ public class PutterBlock extends ContainerBlock {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		player.openGui(NostrumMagica.instance,
-				NostrumGui.putterBlockID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
+		PutterBlockTileEntity te = (PutterBlockTileEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, PutterBlockGui.PutterBlockContainer.Make(te));
 		
 		return true;
 	}
