@@ -1280,16 +1280,16 @@ public class ClientProxy extends CommonProxy {
 		Minecraft.getInstance().displayGuiScreen(book.getScreen(userdata));
 	}
 	
-//	@Override
-//	public void openPetGUI(PlayerEntity player, IEntityPet pet) {
-//		// Integrated clients still need to open the gui...
-//		//if (!player.world.isRemote) {
-////			DragonContainer container = dragon.getGUIContainer();
-////			DragonGUI gui = new DragonGUI(container);
-////			FMLCommonHandler.instance().showGuiScreen(gui);
-//			super.openPetGUI(player, pet);
-//		//}
-//	}
+	@Override
+	public void openPetGUI(PlayerEntity player, IEntityPet pet) {
+		// Integrated clients still need to open the gui...
+		//if (!player.world.isRemote) {
+//			DragonContainer container = dragon.getGUIContainer();
+//			DragonGUI gui = new DragonGUI(container);
+//			FMLCommonHandler.instance().showGuiScreen(gui);
+			super.openPetGUI(player, pet);
+		//}
+	}
 	
 	@Override
 	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {

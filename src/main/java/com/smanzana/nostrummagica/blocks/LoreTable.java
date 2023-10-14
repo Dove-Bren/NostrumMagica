@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.tiles.LoreTableEntity;
 
 import net.minecraft.block.Block;
@@ -42,10 +42,8 @@ public class LoreTable extends ContainerBlock {
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		
-		playerIn.openGui(NostrumMagica.instance,
-				NostrumGui.loretableID, worldIn,
-				pos.getX(), pos.getY(), pos.getZ());
+		LoreTableEntity te = (LoreTableEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(player, LoreTableGui.LoreTableContainer.Make(te));
 		
 		return true;
 	}

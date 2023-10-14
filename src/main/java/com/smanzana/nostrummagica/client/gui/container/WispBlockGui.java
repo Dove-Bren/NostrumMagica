@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -190,6 +191,14 @@ public class WispBlockGui {
 		@OnlyIn(Dist.CLIENT)
 		public static final WispBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new WispBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
+		}
+		
+		public static IPackedContainerProvider Make(WispBlockTileEntity te) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new WispBlockContainer(windowId, playerInv, te);
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, te);
+			});
 		}
 		
 		@Override

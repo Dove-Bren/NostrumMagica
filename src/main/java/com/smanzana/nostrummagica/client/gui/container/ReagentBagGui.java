@@ -11,6 +11,8 @@ import com.smanzana.nostrummagica.items.ReagentBag.ReagentInventory;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -92,6 +94,18 @@ public class ReagentBagGui {
 				stack = new ItemStack(NostrumItems.reagentBag);
 			}
 			return new BagContainer(windowId, playerInv, (ReagentBag) stack.getItem(), stack, slot);
+		}
+		
+		public static final IPackedContainerProvider Make(int slot) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				ItemStack stack = playerInv.getStackInSlot(slot);
+				if (stack.isEmpty() || !(stack.getItem() instanceof ReagentBag)) {
+					stack = new ItemStack(NostrumItems.reagentBag);
+				}
+				return new BagContainer(windowId, playerInv, (ReagentBag) stack.getItem(), stack, slot);
+			}, (buffer) -> {
+				buffer.writeVarInt(slot);
+			});
 		}
 		
 		@Override

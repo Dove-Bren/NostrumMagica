@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.tiles.LoreTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -127,6 +128,14 @@ public class LoreTableGui {
 		@OnlyIn(Dist.CLIENT)
 		public static final LoreTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
 			return new LoreTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf));
+		}
+		
+		public static IPackedContainerProvider Make(LoreTableEntity table) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new LoreTableContainer(windowId, playerInv.player, playerInv, table);
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, table);
+			});
 		}
 		
 		@Override

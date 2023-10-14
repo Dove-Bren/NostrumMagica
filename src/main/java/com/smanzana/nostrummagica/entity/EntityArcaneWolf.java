@@ -13,9 +13,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIStatAdapter;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInfoSheet;
@@ -57,6 +56,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Inventories;
 
 import net.minecraft.entity.Entity;
@@ -1760,13 +1760,13 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public PetContainer<EntityArcaneWolf> getGUIContainer(PlayerEntity player) {
-		return new PetContainer<>(this, player,
+	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player) {
+		return ArrayUtil.MakeArray(
 				new ArcaneWolfInfoSheet(this),
 				new ArcaneWolfBondInfoSheet(this),
 				new ArcaneWolfInventorySheet(this),
 				new ArcaneWolfTrainingSheet(this)
-				);
+		);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -197,6 +198,14 @@ public class ModificationTableGui {
 		@OnlyIn(Dist.CLIENT)
 		public static final ModificationTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
 			return new ModificationTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf), buf.readBlockPos());
+		}
+		
+		public static final IPackedContainerProvider Make(ModificationTableEntity table) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new ModificationTableContainer(windowId, player, playerInv, table, table.getPos());
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, table);
+			});
 		}
 		
 		@Override

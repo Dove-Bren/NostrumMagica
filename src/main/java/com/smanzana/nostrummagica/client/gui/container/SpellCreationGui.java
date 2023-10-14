@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -215,6 +216,41 @@ public class SpellCreationGui {
 			
 		}
 		
+		@OnlyIn(Dist.CLIENT)
+		public static final SpellCreationContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			return new SpellCreationContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buffer));
+		}
+		
+		@Override
+		public boolean canDragIntoSlot(Slot slotIn) {
+			return slotIn.inventory != this.inventory; // It's NOT bag inventory
+		}
+		
+		@Override
+		public boolean canInteractWith(PlayerEntity playerIn) {
+			return true;
+		}
+		
+		public static IPackedContainerProvider Make(SpellTableEntity table) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new SpellCreationContainer(windowId, player, playerInv, table);
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, table);
+			});
+		}
+		
+		@Override
+		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
+			
+			isValid = false;
+			ItemStack stack = this.inventory.getStackInSlot(0);
+			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
+				isValid = true;
+			
+			return ret;
+		}
+		
 		@Override
 		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
 			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
@@ -321,33 +357,6 @@ public class SpellCreationGui {
 			}
 			
 			return ItemStack.EMPTY;
-		}
-		
-		@OnlyIn(Dist.CLIENT)
-		public static final SpellCreationContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
-			return new SpellCreationContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buffer));
-		}
-		
-		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
-			return slotIn.inventory != this.inventory; // It's NOT bag inventory
-		}
-		
-		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
-			return true;
-		}
-		
-		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
-			
-			isValid = false;
-			ItemStack stack = this.inventory.getStackInSlot(0);
-			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
-				isValid = true;
-			
-			return ret;
 		}
 		
 		public void validate() {

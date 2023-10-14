@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -66,6 +67,14 @@ public class PutterBlockGui {
 		@OnlyIn(Dist.CLIENT)
 		public static final PutterBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new PutterBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
+		}
+		
+		public static final IPackedContainerProvider Make(PutterBlockTileEntity putter) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				return new PutterBlockContainer(windowId, playerInv, putter);
+			}, (buffer) -> {
+				ContainerUtil.PackTE(buffer, putter);
+			});
 		}
 		
 		@Override

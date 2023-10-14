@@ -1,13 +1,16 @@
 package com.smanzana.nostrummagica.entity;
 
+import java.util.UUID;
+
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.PetInfo;
 
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 public interface IEntityPet extends ITameableEntity {
@@ -18,7 +21,9 @@ public interface IEntityPet extends ITameableEntity {
 	
 	default public void onStopCommand() { if (this instanceof MobEntity) ((MobEntity) this).setAttackTarget(null); };
 	
-	public PetGUI.PetContainer<? extends IEntityPet> getGUIContainer(PlayerEntity player);
+	public UUID getUniqueID();
+	
+	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player);
 	
 	public PetGUI.PetGUIStatAdapter<? extends IEntityPet> getGUIAdapter();
 	

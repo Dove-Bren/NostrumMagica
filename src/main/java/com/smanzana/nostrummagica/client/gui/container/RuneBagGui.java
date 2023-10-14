@@ -11,6 +11,8 @@ import com.smanzana.nostrummagica.items.RuneBag.RuneInventory;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -93,6 +95,18 @@ public class RuneBagGui {
 				stack = new ItemStack(NostrumItems.runeBag);
 			}
 			return new BagContainer(windowId, playerInv, (RuneBag) stack.getItem(), stack, slot);
+		}
+		
+		public static final IPackedContainerProvider Make(int slot) {
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
+				ItemStack stack = playerInv.getStackInSlot(slot);
+				if (stack.isEmpty() || !(stack.getItem() instanceof RuneBag)) {
+					stack = new ItemStack(NostrumItems.runeBag);
+				}
+				return new BagContainer(windowId, playerInv, (RuneBag) stack.getItem(), stack, slot);
+			}, (buffer) -> {
+				buffer.writeVarInt(slot);
+			});
 		}
 		
 		@Override

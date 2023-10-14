@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.IMagicEntity;
@@ -11,7 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 public interface ITameDragon extends IEntityPet, IRerollablePet, IMagicEntity {
 
 	@Override
-	public PetGUI.PetContainer<? extends ITameDragon> getGUIContainer(PlayerEntity player);
+	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player);
 	
 	@Override
 	public PetGUI.PetGUIStatAdapter<? extends ITameDragon> getGUIAdapter();

@@ -14,12 +14,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIStatAdapter;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonSpellSheet;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -47,6 +48,7 @@ import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
@@ -1655,8 +1657,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 
 	@Override
-	public PetContainer<EntityTameDragonRed> getGUIContainer(PlayerEntity player) {
-		return new PetContainer<>(this, player,
+	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player) {
+		return ArrayUtil.MakeArray(
 				new RedDragonInfoSheet(this),
 				new RedDragonBondInfoSheet(this),
 				new RedDragonInventorySheet(this),

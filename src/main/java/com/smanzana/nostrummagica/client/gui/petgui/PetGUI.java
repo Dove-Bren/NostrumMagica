@@ -20,6 +20,8 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.PetGUIControlMessage;
 import com.smanzana.nostrummagica.network.messages.PetGUISyncMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.ContainerUtil;
+import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -56,14 +58,16 @@ public class PetGUI {
 	
 	private static int lastKey = 0;
 	
-	private static int register(PetContainer<?> container) {
+	private static int takeNextKey() {
+		return lastKey++;
+	}
+	
+	private static void register(PetContainer<?> container, int key) {
 		if (container.player.world.isRemote) {
 			throw new IllegalArgumentException("Can't register on the client!");
 		}
 		
-		int id = lastKey++;
-		containers.put(id, container);
-		return id;
+		containers.put(key, container);
 	}
 	
 	private static void revoke(int id) {
@@ -99,23 +103,22 @@ public class PetGUI {
 		
 		protected List<IPetGUISheet<T>> sheetsAllInternal;
 		
-		protected int id;
+		protected final int id;
 		
 		private int guiOffsetX;
 		private int guiOffsetY;
 		
 		@SafeVarargs
-		public PetContainer(int windowId, T pet, PlayerEntity player, IPetGUISheet<T> ... sheets) {
+		public PetContainer(int windowId, int netID, T pet, PlayerEntity player, IPetGUISheet<T> ... sheets) {
 			super(NostrumContainers.PetGui, windowId);
 			this.pet = pet;
 			this.livingPet= (LivingEntity) pet;
 			this.player = player;
 			this.currentSheet = 0;
 			this.sheetsAllInternal = Lists.newArrayList(sheets);
+			this.id = netID;
 			
-			if (!livingPet.world.isRemote) {
-				this.id = PetGUI.register(this);				
-			} else {
+			if (livingPet.world.isRemote()) {
 				PetGUI.clientContainer = this;
 			}
 		}
@@ -136,9 +139,10 @@ public class PetGUI {
 			
 			pet = (IEntityPet) foundEnt;
 			
-			PetContainer<?> container = pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer());
-			container.overrideID(containerID);
-			//container.windowId = message.mcID;
+			final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			PetContainer<?> container = new PetContainer(windowId, containerID, pet, player, pet.getContainerSheets(player)); 
+					//pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer(), windowId, containerID);
 			
 			if (numSheets != container.getSheetCount()) {
 				NostrumMagica.logger.error("Sheet count differs on client and server for " + pet);
@@ -148,14 +152,30 @@ public class PetGUI {
 			return container;
 		}
 		
-		public void overrideID(int id) {
-			if (!this.player.world.isRemote) {
-				throw new IllegalArgumentException("Can't reset id on the server!");
-			}
-//			revoke(id);
-//			registerAt(this, id);
-			this.id = id;
+		public static <T extends IEntityPet> IPackedContainerProvider Make(T pet, PlayerEntity player) {
+			@SuppressWarnings("unchecked")
+			final IPetGUISheet<T>[] sheets = (IPetGUISheet<T>[]) pet.getContainerSheets(player);
+			final int key = takeNextKey();
+			
+			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, playerIn) -> {
+				final PetContainer<T> container = new PetContainer<T>(windowId, key, pet, playerIn, sheets);
+				PetGUI.register(container, key);
+				return container;
+			}, (buffer) -> {
+				buffer.writeUniqueId(pet.getUniqueID());
+				buffer.writeVarInt(key);
+				buffer.writeVarInt(sheets.length);
+			});
 		}
+		
+//		public void overrideID(int id) {
+//			if (!this.player.world.isRemote) {
+//				throw new IllegalArgumentException("Can't reset id on the server!");
+//			}
+////			revoke(id);
+////			registerAt(this, id);
+//			this.id = id;
+//		}
 		
 		public void setGUIOffets(int x, int y) {
 			this.guiOffsetX = x;

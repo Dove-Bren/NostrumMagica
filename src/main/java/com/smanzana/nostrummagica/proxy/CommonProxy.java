@@ -19,10 +19,12 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
 import com.smanzana.nostrummagica.fluids.FluidPoisonWater.FluidPoisonWaterBlock;
@@ -99,7 +101,6 @@ import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
@@ -319,21 +320,11 @@ public class CommonProxy {
 		}
 	}
 	
-//	public <T extends IEntityPet> void openPetGUI(PlayerEntity player, T pet) {
-//		// This code is largely taken from FMLNetworkHandler's openGui method, but we use our own message to open the GUI on the client
-//		ServerPlayerEntity mpPlayer = (ServerPlayerEntity) player;
-//		PetContainer<?> container = pet.getGUIContainer(player);
-//		mpPlayer.getNextWindowId();
-//		mpPlayer.closeContainer();
-//        int windowId = mpPlayer.currentWindowId;
-//        mpPlayer.openContainer = container;
-//        mpPlayer.openContainer.windowId = windowId;
-//        mpPlayer.openContainer.addListener(mpPlayer);
-//        
-//        // Open GUI on client
-//        PetGUIOpenMessage message = new PetGUIOpenMessage(pet, windowId, container.getContainerID(), container.getSheetCount());
-//        NetworkHandler.sendTo(message, mpPlayer);
-//	}
+	public <T extends IEntityPet> void openPetGUI(PlayerEntity player, T pet) {
+		if (!player.world.isRemote()) {
+			this.openContainer(player, PetGUI.PetContainer.Make(pet, player));
+		}
+	}
 
 	public void sendServerConfig(ServerPlayerEntity player) {
 		ModConfig.channel.sendTo(new ServerConfigMessage(ModConfig.config), player);
