@@ -190,7 +190,7 @@ public class AetherInfuserTileEntity extends AetherTickingTileEntity {
 						final double x = (pos.getX() + .5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - (RADIUS / 2f);
 						final double y = (pos.getY() + 1.5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - 1;
 						final double z = (pos.getZ() + .5 + (NostrumMagica.rand.nextFloat() * RADIUS)) - (RADIUS / 2f);
-						world.addParticle(ParticleTypes.SUSPENDED_DEPTH,
+						world.addParticle(ParticleTypes.MYCELIUM,
 								x, y, z,
 								0, 0, 0, 0);
 						

@@ -17,8 +17,7 @@ import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
@@ -563,9 +562,10 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 			final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 			final Vec3d diff = target.subtract(entity.getPositionVector());
-			entity.getMotion().x = diff.x / 2;
-			entity.getMotion().y = diff.y / 2;
-			entity.getMotion().z = diff.z / 2;
+			entity.setMotion(diff.x / 2,
+					diff.y / 2,
+					diff.z / 2
+					);
 			entity.velocityChanged = true;
 			//entity.posY = 2 + dy;
 			//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
@@ -595,7 +595,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setEffectDelay(0);
 		cloud.setWaddle(direction, 1);
 		
-		cloud.setParticle(ParticleTypes.SUSPENDED);
+		cloud.setParticleData(ParticleTypes.MYCELIUM);
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
@@ -604,13 +604,11 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		});
 		if (hurricaneCount >= 4) {
 			cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
-			cloud.setCustomParticleParam1(10);
+			//cloud.setCustomParticleParam1(10);
 			cloud.setCustomParticleFrequency(.4f);
 		}
 		world.addEntity(cloud);
-		cloud.getMotion().x = direction.x;
-		cloud.getMotion().y = direction.y;
-		cloud.getMotion().z = direction.z;
+		cloud.setMotion(direction);
 	}
 	
 	public static void spawnJumpVortex(World world, PlayerEntity caster, Vec3d at, Type weaponType) {
@@ -629,7 +627,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 			final float minY = .1f;
 			final float maxY = 2f;
 			if (!entity.onGround && entity.getMotion().y > minY && entity.getMotion().y < maxY) {
-				entity.getMotion().y = Math.min(maxY, entity.getMotion().y + .5f);
+				entity.setMotion(entity.getMotion().x, Math.min(maxY, entity.getMotion().y + .5f), entity.getMotion().z);
 				entity.velocityChanged = true;
 			} else if (entity.getMotion().y < 0) {
 				entity.fallDistance = 0;
@@ -637,7 +635,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		});
 		cloud.setEffectDelay(0);
 		
-		cloud.setParticle(ParticleTypes.SUSPENDED);
+		cloud.setParticleData(ParticleTypes.MYCELIUM);
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
@@ -687,15 +685,12 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
-					if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
+					if (stack.isEmpty() || stack.getItem() != NostrumCurios.lightningBelt) {
 						continue;
 					}
 					
-					ItemType type = ((ItemMagicBauble) stack.getItem()).getType();
-					if (type == ItemType.BELT_LIGHTNING) {
-						count = caster.getRNG().nextInt(3) + 3;
-						break;
-					}
+					count = caster.getRNG().nextInt(3) + 3;
+					break;
 				}
 			}
 		}

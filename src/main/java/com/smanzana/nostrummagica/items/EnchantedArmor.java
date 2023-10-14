@@ -74,6 +74,8 @@ import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.BlockParticleData;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
@@ -1218,13 +1220,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		final double dx;
 		final double dy;
 		final double dz;
-		final ParticleTypes effect;
+		final IParticleData effect;
 		final int mult;
 		final float rangeMod;
-		int[] data = new int[0];
 		switch (element) {
 		case EARTH:
-			effect = ParticleTypes.SUSPENDED_DEPTH;
+			effect = ParticleTypes.MYCELIUM;
 			dx = dy = dz = 0;
 			mult = 1;
 			rangeMod = 1;
@@ -1243,12 +1244,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			rangeMod = 1.5f;
 			break;
 		case ICE:
-			effect = ParticleTypes.FALLING_DUST;
+			effect = new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.SNOW_BLOCK.getDefaultState());
 			dx = dz = 0;
 			dy = .025;
 			mult = 1;
 			rangeMod = 2;
-			data = new int[] {Block.getStateId(Blocks.SNOW.getDefaultState())};
 			break;
 		case LIGHTNING:
 //			effect = ParticleTypes.FALLING_DUST;
@@ -1286,7 +1286,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			final double px = (player.posX + radius * Math.cos(rd * Math.PI * 2));
 			final double py = (player.posY + (NostrumMagica.rand.nextFloat() * 2));
 			final double pz = (player.posZ + radius * Math.sin(rd * Math.PI * 2));
-			world.addParticle(effect, px, py, pz, dx, dy, dz, data);
+			world.addParticle(effect, px, py, pz, dx, dy, dz);
 		}
 	}
 	
@@ -1317,7 +1317,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.posX, player.posY, player.posZ).grow(5), (effect) -> {
 						// lol
 						return effect != null
-								&& (effect.getCustomParticle() == ParticleTypes.SWEEP_ATTACK || effect.getParticle() == ParticleTypes.SWEEP_ATTACK);
+								&& (effect.getCustomParticle() == ParticleTypes.SWEEP_ATTACK || effect.getParticleData() == ParticleTypes.SWEEP_ATTACK);
 					})) {
 						cloud.addTime(1, true);
 					}
@@ -2241,7 +2241,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 						growable.grow(world, random, cursor, state);
 					}
 					
-					((ServerWorld) world).addParticle(ParticleTypes.HAPPY_VILLAGER,
+					((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
 							cursor.getX() + .5 + (-.5 + random.nextDouble()),
 							cursor.getY() + .5,
 							cursor.getZ() + .5 + (-.5 + random.nextDouble()),
@@ -2384,9 +2384,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 							return;
 						}
 						
-						entity.getMotion().y -= 0.3;
-						entity.getMotion().x *= .2;
-						entity.getMotion().z *= .2;
+						entity.setMotion(entity.getMotion()
+								.mul(.2, 1, .2)
+								.add(0, -.3, 0)
+								);
+//						entity.getMotion().y -= 0.3;
+//						entity.getMotion().x *= .2;
+//						entity.getMotion().z *= .2;
 						entity.velocityChanged = true;
 						return;
 					}
@@ -2405,9 +2409,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 //					//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
 					
 					// Downward suppresive effect
-					entity.getMotion().x *= .2;
-					entity.getMotion().z *= .2;
-					entity.getMotion().y -= 0.3;
+					entity.setMotion(entity.getMotion()
+							.mul(.2, 1, .2)
+							.add(0, -.3, 0)
+							);
+//					entity.getMotion().x *= .2;
+//					entity.getMotion().z *= .2;
+//					entity.getMotion().y -= 0.3;
 					
 					
 					// Hurt unfriendlies, too
@@ -2434,14 +2442,14 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 //				cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
 //				cloud.setCustomParticleParam1(10);
 //				cloud.setCustomParticleFrequency(.2f);
-				cloud.setParticle(ParticleTypes.SUSPENDED);
+				cloud.setParticleData(ParticleTypes.MYCELIUM);
 				cloud.setIgnoreRadius(true);
 				cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 					final int count = 40;
 					EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, .65f);
 				});
 				cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
-				cloud.setCustomParticleParam1(10);
+				//cloud.setCustomParticleParam1(10);
 				cloud.setCustomParticleFrequency(.05f);
 				
 				ent.world.addEntity(cloud);

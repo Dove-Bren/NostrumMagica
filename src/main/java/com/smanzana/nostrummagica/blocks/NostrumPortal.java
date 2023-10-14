@@ -176,9 +176,9 @@ public abstract class NostrumPortal extends Block  {
 	    	final double mx = rand.nextFloat() - .5;
 	    	final double mz = rand.nextFloat() - .5;
 	    	
-//	    	worldIn.addParticle(ParticleTypes.SUSPENDED_DEPTH,
-//	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
-//	    			mx, 0, mz);
+	    	worldIn.addParticle(ParticleTypes.MYCELIUM,
+	    			pos.getX() + .5 + dx, pos.getY() + 1 + dy, pos.getZ() + .5 + dz,
+	    			mx, 0, mz);
 		}
 
         
