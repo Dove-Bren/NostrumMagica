@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak.ToggleUpgrades;
+import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem.ToggleUpgrades;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;

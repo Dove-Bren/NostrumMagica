@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.Entity;
@@ -58,8 +58,7 @@ public class EludeCloakItem extends NostrumCurio {
 								NostrumMagicaSounds.DAMAGE_WIND.play(player.world, player.posX, player.posY, player.posZ);
 								float dir = player.rotationYaw + (NostrumMagica.rand.nextBoolean() ? -1 : 1) * 90f;
 								float velocity = .5f;
-								player.getMotion().x = velocity * MathHelper.cos(dir);
-								player.getMotion().z = velocity * MathHelper.sin(dir);
+								player.setMotion(velocity * MathHelper.cos(dir), player.getMotion().y, velocity * MathHelper.sin(dir));
 								player.velocityChanged = true;
 							}
 						}

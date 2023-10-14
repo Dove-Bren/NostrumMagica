@@ -31,8 +31,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
@@ -347,15 +346,12 @@ public class SpellAction {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
-						if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
+						if (stack.isEmpty() || stack.getItem() != NostrumCurios.enderBelt) {
 							continue;
 						}
 						
-						ItemType type = ((ItemMagicBauble) stack.getItem()).getType();
-						if (type == ItemType.BELT_ENDER) {
-							efficiency *= 2;
-							break;
-						}
+						efficiency *= 2;
+						break;
 					}
 				}
 			}
@@ -797,15 +793,12 @@ public class SpellAction {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
-						if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
+						if (stack.isEmpty() || stack.getItem() != NostrumCurios.lightningBelt) {
 							continue;
 						}
 						
-						ItemType type = ((ItemMagicBauble) stack.getItem()).getType();
-						if (type == ItemType.BELT_LIGHTNING) {
-							count = caster.getRNG().nextInt(3) + 3;
-							break;
-						}
+						count = caster.getRNG().nextInt(3) + 3;
+						break;
 					}
 				}
 			}
@@ -1082,15 +1075,12 @@ public class SpellAction {
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getSizeInventory(); i++) {
 						ItemStack stack = baubles.getStackInSlot(i);
-						if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
+						if (stack.isEmpty() || stack.getItem() != NostrumCurios.enderBelt) {
 							continue;
 						}
 						
-						ItemType type = ((ItemMagicBauble) stack.getItem()).getType();
-						if (type == ItemType.BELT_ENDER) {
-							radius *= 2.0;
-							break;
-						}
+						radius *= 2.0;
+						break;
 					}
 				}
 			}

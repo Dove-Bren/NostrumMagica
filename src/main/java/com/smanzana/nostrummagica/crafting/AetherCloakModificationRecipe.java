@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.gson.JsonParseException;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak;
+import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 
 import net.minecraft.inventory.CraftingInventory;
@@ -47,7 +47,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 			throw new JsonParseException("At least one ingredient must allow a blank Aether Cloak");
 		}
 		
-		if (displayStack == null || displayStack.isEmpty() || !(displayStack.getItem() instanceof ItemAetherCloak)) {
+		if (displayStack == null || displayStack.isEmpty() || !(displayStack.getItem() instanceof AetherCloakItem)) {
 			throw new JsonParseException("Display item must be an aether cloak");
 		}
 		
@@ -66,7 +66,7 @@ public abstract class AetherCloakModificationRecipe extends ShapelessRecipe {
 		@Nonnull ItemStack found = ItemStack.EMPTY;
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			@Nonnull ItemStack stack = inv.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof ItemAetherCloak) {
+			if (!stack.isEmpty() && stack.getItem() instanceof AetherCloakItem) {
 				if (found.isEmpty()) {
 					found = stack;
 				} else {

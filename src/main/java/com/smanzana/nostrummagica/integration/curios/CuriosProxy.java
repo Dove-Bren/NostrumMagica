@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.integration.curios;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
 import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem;
@@ -314,7 +315,7 @@ public class CuriosProxy {
 					EMagicElement.FIRE,
 					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 					Ingredient.fromItems(NostrumCurios.aetherCloak),
-					new Ingredient[] {NostrumCurios.aetherCloak(APIProxy.PassivePendantItem), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.EMPTY, NostrumCurios.aetherCloak(APIProxy.PassivePendantItem)},
+					new Ingredient[] {Ingredient.fromItems(APIProxy.PassivePendantItem), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.fromItems(APIProxy.PassivePendantItem)},
 					new RRequirementResearch("aether_cloaks"),
 					new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
 						if (!item.isEmpty() && item.getItem() instanceof AetherCloakItem) {

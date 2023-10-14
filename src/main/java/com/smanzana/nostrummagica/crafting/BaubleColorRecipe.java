@@ -6,8 +6,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.curios.items.IColorableCurio;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
@@ -36,22 +35,22 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 			throw new JsonParseException("ingredients items must be provided and contain a magic bauble");
 		}
 		
-		boolean found = false;
-		for (Ingredient ing : ingredients) {
-			for (ItemMagicBauble.ItemType type : ItemType.values()) {
-				final ItemStack bauble = ItemMagicBauble.getItem(type, 1);
-				if (ing.test(bauble)) {
-					found = true;
-					break;
-				}
-			}
-		}
+//		boolean found = false;
+//		for (Ingredient ing : ingredients) {
+//			for (ItemMagicBauble.ItemType type : ItemType.values()) {
+//				final ItemStack bauble = ItemMagicBauble.getItem(type, 1);
+//				if (ing.test(bauble)) {
+//					found = true;
+//					break;
+//				}
+//			}
+//		}
+//		
+//		if (!found) {
+//			throw new JsonParseException("At least one ingredient must allow a blank magic bauble");
+//		}
 		
-		if (!found) {
-			throw new JsonParseException("At least one ingredient must allow a blank magic bauble");
-		}
-		
-		if (displayStack == null || displayStack.isEmpty() || !(displayStack.getItem() instanceof ItemMagicBauble)) {
+		if (displayStack == null || displayStack.isEmpty() || !(displayStack.getItem() instanceof IColorableCurio)) {
 			throw new JsonParseException("Display item must be a magic bauble");
 		}
 		
@@ -69,7 +68,7 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 		@Nonnull ItemStack found = ItemStack.EMPTY;
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			@Nonnull ItemStack stack = inv.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof ItemMagicBauble) {
+			if (!stack.isEmpty() && stack.getItem() instanceof IColorableCurio) {
 				if (found.isEmpty()) {
 					found = stack;
 				} else {
@@ -97,12 +96,12 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 				}
 			}
 			
-			EMagicElement current = ((ItemMagicBauble) bauble.getItem()).getEmbeddedElement(bauble);
+			EMagicElement current = ((IColorableCurio) bauble.getItem()).getEmbeddedElement(bauble);
 			EMagicElement fromIng = findElement(extras);
 			
 			if (fromIng != null && current != fromIng) {
 				result = bauble.copy();
-				((ItemMagicBauble) result.getItem()).setEmbeddedElement(result, fromIng);
+				((IColorableCurio) result.getItem()).setEmbeddedElement(result, fromIng);
 			}
 		}
 		

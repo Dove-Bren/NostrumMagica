@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
+import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 
@@ -38,8 +39,8 @@ public class ShieldRingItem extends NostrumCurio {
 					int taken = APIProxy.drawFromInventory(player.world, player, inv, cost, stack);
 					if (taken > 0) {
 						// Apply shields! Amount depends on how much aether was consumed
-						shieldAmt *= ((float) taken / (float) cost);
-						NostrumMagica.magicEffectProxy.applyPhysicalShield(player, shieldAmt);
+						double realAmt = shieldAmt * ((float) taken / (float) cost);
+						NostrumMagica.magicEffectProxy.applyPhysicalShield(player, realAmt);
 					}
 				}
 			}

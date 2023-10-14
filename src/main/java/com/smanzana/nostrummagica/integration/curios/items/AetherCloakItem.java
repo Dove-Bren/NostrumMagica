@@ -1,13 +1,16 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.smanzana.nostrumaetheria.api.component.IAetherHandlerComponent;
+import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent;
+import com.smanzana.nostrumaetheria.api.event.LivingAetherDrawEvent.Phase;
+import com.smanzana.nostrumaetheria.api.item.AetherItem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -27,10 +30,8 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -41,7 +42,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class AetherCloakItem extends /*AetherItem*/ Item implements INostrumCurio, ILoreTagged, ISpellArmor, ICapeProvider {
+public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreTagged, ISpellArmor, ICapeProvider {
 	
 	public static final AetherCloakItem GetItem() {
 		return (AetherCloakItem) NostrumCurios.aetherCloak;

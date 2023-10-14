@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -107,7 +107,7 @@ public class ManiCrystal extends Block {
 			return;
 		}
 		
-		if (worldIn.dimension.getType() == NostrumEmptyDimension.getType()) {
+		if (worldIn.dimension.getType() == NostrumDimensions.EmptyDimension) {
 			return;
 		}
 		

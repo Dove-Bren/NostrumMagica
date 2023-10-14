@@ -7,8 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemMagicBauble.ItemType;
+import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -297,15 +296,12 @@ public class TeleportRune extends ContainerBlock  {
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getSizeInventory(); i++) {
 					ItemStack stack = baubles.getStackInSlot(i);
-					if (stack.isEmpty() || !(stack.getItem() instanceof ItemMagicBauble)) {
+					if (stack.isEmpty() || stack.getItem() != NostrumCurios.enderBelt) {
 						continue;
 					}
 					
-					ItemType type = ((ItemMagicBauble) stack.getItem()).getType();
-					if (type == ItemType.BELT_ENDER) {
-						hasEnderBelt = true;
-						break;
-					}
+					hasEnderBelt = true;
+					break;
 				}
 			}
 			final boolean hasEnderSet = EnchantedArmor.GetSetCount(playerIn, EMagicElement.ENDER, EnchantedArmor.Type.TRUE) == 4;

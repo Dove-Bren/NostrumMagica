@@ -17,7 +17,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRenderItem {
+public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRenderItem, IColorableCurio {
 	
 	public static final String ID = "dragon_wing_pendant";
 
@@ -104,6 +104,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		return elem.getColor();
 	}
 	
+	@Override
 	public @Nullable EMagicElement getEmbeddedElement(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return null;
@@ -128,6 +129,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		return ret;
 	}
 	
+	@Override
 	public void setEmbeddedElement(ItemStack stack, EMagicElement element) {
 		if (stack.isEmpty()) {
 			return;

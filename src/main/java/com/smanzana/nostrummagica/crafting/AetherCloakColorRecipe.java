@@ -7,7 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.baubles.items.ItemAetherCloak.ColorUpgrades;
+import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem.ColorUpgrades;
 
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.DyeItem;
