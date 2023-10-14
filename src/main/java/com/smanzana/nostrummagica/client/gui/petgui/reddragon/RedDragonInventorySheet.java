@@ -2,18 +2,18 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.client.gui.petgui.PetInventorySheet;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonRed> {

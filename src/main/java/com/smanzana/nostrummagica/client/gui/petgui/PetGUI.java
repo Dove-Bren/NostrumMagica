@@ -1,38 +1,44 @@
 package com.smanzana.nostrummagica.client.gui.petgui;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.AutoGuiContainer;
+import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.IRerollablePet;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.PetGUIControlMessage;
 import com.smanzana.nostrummagica.network.messages.PetGUISyncMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -80,6 +86,8 @@ public class PetGUI {
 	}
 
 	public static class PetContainer<T extends IEntityPet> extends Container {
+		
+		public static final String ID = "pet_container";
 
 		private PlayerEntity player;
 		
@@ -97,7 +105,8 @@ public class PetGUI {
 		private int guiOffsetY;
 		
 		@SafeVarargs
-		public PetContainer(T pet, PlayerEntity player, IPetGUISheet<T> ... sheets) {
+		public PetContainer(int windowId, T pet, PlayerEntity player, IPetGUISheet<T> ... sheets) {
+			super(NostrumContainers.PetGui, windowId);
 			this.pet = pet;
 			this.livingPet= (LivingEntity) pet;
 			this.player = player;
@@ -109,6 +118,34 @@ public class PetGUI {
 			} else {
 				PetGUI.clientContainer = this;
 			}
+		}
+		
+		@OnlyIn(Dist.CLIENT)
+		public static final PetContainer<?> FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+			// Just gonna let this crash if it fails instead of making a 'dummy pet'
+			final UUID petID = buffer.readUniqueId();
+			final int containerID = buffer.readVarInt();
+			final int numSheets = buffer.readVarInt();
+			
+			IEntityPet pet = null;
+			Entity foundEnt = Entities.FindEntity(NostrumMagica.instance.proxy.getPlayer().world, petID);
+			
+			if (foundEnt == null || !(foundEnt instanceof IEntityPet)) {
+				return null; // crash
+			}
+			
+			pet = (IEntityPet) foundEnt;
+			
+			PetContainer<?> container = pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer());
+			container.overrideID(containerID);
+			//container.windowId = message.mcID;
+			
+			if (numSheets != container.getSheetCount()) {
+				NostrumMagica.logger.error("Sheet count differs on client and server for " + pet);
+				return null;
+			}
+			
+			return container;
 		}
 		
 		public void overrideID(int id) {
@@ -179,7 +216,7 @@ public class PetGUI {
 		
 		public void clearSlots() {
 			this.inventorySlots.clear();
-			this.inventoryItemStacks.clear();
+			// this.inventoryItemStacks.clear(); // uh oh? TODO does not having this cause pr oblems?
 		}
 		
 		public void dropContainerInventory(IInventory inv) {
@@ -187,7 +224,7 @@ public class PetGUI {
 		}
 		
 		public void addSheetSlot(Slot slot) {
-			this.addSlotToContainer(slot);
+			this.addSlot(slot);
 		}
 		
 		public int getContainerID() {
@@ -257,7 +294,7 @@ public class PetGUI {
 	
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class PetGUIContainer<T extends IEntityPet> extends AutoGuiContainer {
+	public static class PetGUIContainer<T extends IEntityPet> extends AutoGuiContainer<PetContainer<T>> {
 		
 		public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/tamed_pet_gui.png");
 		
@@ -278,10 +315,11 @@ public class PetGUI {
 		
 		//private int openTicks;
 		
-		public PetGUIContainer(PetContainer<T> container, PetGUIStatAdapter<T> adapter) {
-			super(container);
+		@SuppressWarnings("unchecked")
+		public PetGUIContainer(PetContainer<T> container, PlayerInventory playerInv, ITextComponent name) {
+			super(container, playerInv, name);
 			this.container = container;
-			this.adapter = adapter;
+			this.adapter = (PetGUIStatAdapter<T>) container.pet.getGUIAdapter();
 			//this.openTicks = 0;
 		}
 		
@@ -322,7 +360,7 @@ public class PetGUI {
 				int yPosition = GUI_LENGTH_PREVIEW / 2;
 				RenderHelper.disableStandardItemLighting();
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				GuiInventory.drawEntityOnScreen(
+				InventoryScreen.drawEntityOnScreen(
 						xPosition,
 						(int) (GUI_LENGTH_PREVIEW * .75f),
 						(int) (GUI_LENGTH_PREVIEW * .2),
@@ -499,7 +537,7 @@ public class PetGUI {
 				GlStateManager.enableAlphaTest();
 				GlStateManager.enableBlend();
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				drawModalRectWithCustomSizedTexture(-GUI_SHEET_MARGIN, -GUI_SHEET_MARGIN, 0, 0, GUI_SHEET_WIDTH + (GUI_SHEET_MARGIN * 2), GUI_SHEET_HEIGHT + (GUI_SHEET_MARGIN * 2), GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
+				blit(-GUI_SHEET_MARGIN, -GUI_SHEET_MARGIN, 0, 0, GUI_SHEET_WIDTH + (GUI_SHEET_MARGIN * 2), GUI_SHEET_HEIGHT + (GUI_SHEET_MARGIN * 2), GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
 				
 				sheet.draw(Minecraft.getInstance(), partialTicks, GUI_SHEET_WIDTH, GUI_SHEET_HEIGHT,
 						mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET);
@@ -530,10 +568,10 @@ public class PetGUI {
 		}
 		
 		@Override
-		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 			
 			if (!container.canInteractWith(NostrumMagica.instance.proxy.getPlayer())) {
-				return;
+				return false;
 			}
 			
 			// Only allow custom clicking s tuff if there isn't an item being held
@@ -545,13 +583,13 @@ public class PetGUI {
 				// Sheet button?
 				if (mouseX >= GUI_SHEET_BUTTON_HOFFSET && mouseY >= GUI_SHEET_BUTTON_VOFFSET
 						&& mouseY <= GUI_SHEET_BUTTON_VOFFSET + GUI_SHEET_BUTTON_HEIGHT) {
-					int buttonIdx = (mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH;
+					int buttonIdx = (int) ((mouseX - GUI_SHEET_BUTTON_HOFFSET) / GUI_SHEET_BUTTON_WIDTH);
 					if (buttonIdx < container.getSheets().size()) {
 						// Clicked a button!
 						NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 						this.container.setSheet(buttonIdx);
 						NetworkHelper.ClientSendSheet(container.id, buttonIdx);
-						return;
+						return true;
 					} else if (container.supportsReroll()
 							&& buttonIdx == container.getSheets().size()
 							&& NostrumMagica.instance.proxy.getPlayer().isCreative()) {
@@ -559,6 +597,7 @@ public class PetGUI {
 						// Reset sheet index in case reroll removed a tab
 						this.container.setSheet(0);
 						NetworkHelper.ClientSendSheet(container.id, this.container.currentSheet);
+						return true;
 					}
 				}
 				
@@ -567,13 +606,15 @@ public class PetGUI {
 						&& mouseY >= GUI_SHEET_VOFFSET && mouseY <= GUI_SHEET_VOFFSET + GUI_SHEET_HEIGHT) {
 					IPetGUISheet<T> sheet = container.getCurrentSheet();
 					if (sheet != null) {
-						sheet.mouseClicked(mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET, mouseButton);
+						if (sheet.mouseClicked(mouseX - GUI_SHEET_HOFFSET, mouseY - GUI_SHEET_VOFFSET, mouseButton)) {
+							return true; // else let super handle
+						}
 					}
 					
 				}
 			}
 			
-			super.mouseClicked(mouseX, mouseY, mouseButton);
+			return super.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 	}
 	

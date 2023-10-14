@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.blocks.AltarBlock;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -156,5 +157,17 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
+	}
+	
+	public EMagicElement getElement() {
+		return this.element;
+	}
+	
+	public static final @Nullable EMagicElement GetElement(ItemStack stack) {
+		EMagicElement elem = null;
+		if (!stack.isEmpty() && stack.getItem() instanceof InfusedGemItem) {
+			elem = ((InfusedGemItem) stack.getItem()).getElement();
+		}
+		return elem;
 	}
 }

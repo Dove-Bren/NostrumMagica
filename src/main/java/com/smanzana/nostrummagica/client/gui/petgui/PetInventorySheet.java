@@ -87,8 +87,8 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 	}
 
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-		
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+		return false;
 	}
 
 	@Override

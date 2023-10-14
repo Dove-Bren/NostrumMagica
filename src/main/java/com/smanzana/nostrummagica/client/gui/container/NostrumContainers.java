@@ -1,9 +1,15 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIContainer;
+import com.smanzana.nostrummagica.entity.IEntityPet;
 
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,11 +30,12 @@ public class NostrumContainers {
 	@ObjectHolder(RuneBagGui.BagContainer.ID) public static ContainerType<RuneBagGui.BagContainer> RuneBag;
 	@ObjectHolder(SpellCreationGui.SpellCreationContainer.ID) public static ContainerType<SpellCreationGui.SpellCreationContainer> SpellCreation;
 	@ObjectHolder(WispBlockGui.WispBlockContainer.ID) public static ContainerType<WispBlockGui.WispBlockContainer> WispBlock;
+	@ObjectHolder(PetGUI.PetContainer.ID) public static ContainerType<PetGUI.PetContainer<?>> PetGui;
 	
 	
 	
 	@SubscribeEvent
-	public void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
+	public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
 		final IForgeRegistry<ContainerType<?>> registry = event.getRegistry();
 		
 		registry.register(IForgeContainerType.create(ActiveHopperGui.ActiveHopperContainer::FromNetwork).setRegistryName(ActiveHopperGui.ActiveHopperContainer.ID));
@@ -39,10 +46,12 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(RuneBagGui.BagContainer::FromNetwork).setRegistryName(RuneBagGui.BagContainer.ID));
 		registry.register(IForgeContainerType.create(SpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(SpellCreationGui.SpellCreationContainer.ID));
 		registry.register(IForgeContainerType.create(WispBlockGui.WispBlockContainer::FromNetwork).setRegistryName(WispBlockGui.WispBlockContainer.ID));
+		registry.register(IForgeContainerType.create(PetGUI.PetContainer::FromNetwork).setRegistryName(PetGUI.PetContainer.ID));
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@SubscribeEvent
-	public void registerContainerScreens(FMLClientSetupEvent event) {
+	public static void registerContainerScreens(FMLClientSetupEvent event) {
 		ScreenManager.registerFactory(ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
 		ScreenManager.registerFactory(LoreTable, LoreTableGui.LoreTableGuiContainer::new);
 		ScreenManager.registerFactory(ModificationTable, ModificationTableGui.ModificationGui::new);
@@ -51,5 +60,16 @@ public class NostrumContainers {
 		ScreenManager.registerFactory(RuneBag, RuneBagGui.BagGui::new);
 		ScreenManager.registerFactory(SpellCreation, SpellCreationGui.SpellGui::new);
 		ScreenManager.registerFactory(WispBlock, WispBlockGui.WispBlockGuiContainer::new);
+		ScreenManager.registerFactory(PetGui, new PetGUIFactory());
+	}
+	
+	// To get around bounds matching. D:
+	protected static class PetGUIFactory<T extends IEntityPet> implements ScreenManager.IScreenFactory<PetGUI.PetContainer<T>, PetGUI.PetGUIContainer<T>> {
+
+			@Override
+			public PetGUIContainer<T> create(PetContainer<T> c, PlayerInventory p,
+					ITextComponent n) {
+				return new PetGUI.PetGUIContainer<T>(c, p, n);
+			}
 	}
 }

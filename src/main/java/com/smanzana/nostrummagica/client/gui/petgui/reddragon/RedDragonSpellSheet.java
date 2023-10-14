@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
@@ -10,25 +11,25 @@ import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.RedDragonSpellInventory;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fml.client.config.GuiUtils;
 
 public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
@@ -151,7 +152,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		final int cellWidth = 18;
 		
 		if (scrollShadow.isEmpty()) {
-			scrollShadow = new ItemStack(SpellScroll.instance());
+			scrollShadow = new ItemStack(NostrumItems.spellScroll);
 		}
 		
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -202,7 +203,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		int count;
 		int ghostCount;
 		
-		mc.font.drawString(title, 5, y + 1 + (cellWidth - mc.font.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+		mc.fontRenderer.drawString(title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
 		count = 0;
@@ -414,7 +415,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			
 			EntityDragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
-				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.font);
+				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
 			}
 			
 			GlStateManager.popMatrix();
@@ -422,14 +423,14 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		// Try to see if they're clicking on a gambit button
 		
 		// TODO pull out to a helper func so drawing and clicking cna use
 		
 		// Outer bounds
 		if (mouseY < dragonTopOffset - 1 || mouseY > dragonTopOffset - 1 + rowIncr + rowIncr + cellWidth) {
-			return;
+			return false;
 		}
 		
 		// Y checking
@@ -446,7 +447,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		}
 		
 		if (row == -1) {
-			return;
+			return false;
 		}
 		
 		// X checking
@@ -463,16 +464,17 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		}
 		
 		if (col == -1) {
-			return;
+			return false;
 		}
 		
 		int index = (row * RedDragonSpellInventory.MaxSpellsPerCategory) + col;
 		if (dragonInv.getStackInSlot(index).isEmpty()) {
-			return;
+			return false;
 		}
 		
 		sendGambitCycle(index, mouseButton == 0);
 		NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
+		return true;
 	}
 	
 	private static enum SheetMessageType {

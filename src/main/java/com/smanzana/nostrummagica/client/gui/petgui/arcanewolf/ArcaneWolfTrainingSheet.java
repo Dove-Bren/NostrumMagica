@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
@@ -13,15 +14,14 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
@@ -73,11 +73,11 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	private static int GUI_GEM_SPARK_HEIGHT = 21;
 	
 	protected final EntityArcaneWolf pet;
-	protected final InventoryBasic localInv;
+	protected final Inventory localInv;
 	
 	public ArcaneWolfTrainingSheet(EntityArcaneWolf pet) {
 		this.pet = pet;
-		localInv = new InventoryBasic("", false, 5);
+		localInv = new Inventory(5);
 	}
 	
 	protected SlotMode getSlotMode(EntityArcaneWolf wolf) {
@@ -107,7 +107,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			if (!(inSlot.getItem() instanceof InfusedGemItem)) {
 				continue;
 			}
-			EMagicElement elem = InfusedGemItem.instance().getTypeFromMeta(inSlot.getMetadata());
+			EMagicElement elem = InfusedGemItem.GetElement(inSlot);
 			if (elem != null && elem != EMagicElement.PHYSICAL) {
 				return elem;
 			}
@@ -141,7 +141,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			return false;
 		}
 		
-		EMagicElement element = InfusedGemItem.instance().getTypeFromMeta(stack.getMetadata());
+		EMagicElement element = InfusedGemItem.GetElement(stack);
 		if (element == null || element == EMagicElement.PHYSICAL) {
 			return false;
 		}
@@ -281,7 +281,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				return;
 			}
 			
-			EMagicElement slotElem = InfusedGemItem.instance().getTypeFromMeta(stackInSlot.getMetadata());
+			EMagicElement slotElem = InfusedGemItem.GetElement(stackInSlot);
 			if (elem == null) {
 				elem = slotElem;
 			} else if (elem != slotElem) {
@@ -550,8 +550,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			// Draw title and stage
 			{
 				String str = I18n.format("info.wolf_type." + pet.getElementalType().getNameKey() + ".name");
-				int strWidth = mc.font.getStringWidth(str);
-				mc.font.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
+				int strWidth = mc.fontRenderer.getStringWidth(str);
+				mc.fontRenderer.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
 				
 				if (pet.getTrainingElement() != null) {
 					final String substr;
@@ -568,8 +568,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 						break;
 					}
 					str = pet.getTrainingElement().getName() + " " + substr;
-					strWidth = mc.font.getStringWidth(str);
-					mc.font.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.font.FONT_HEIGHT, pet.getTrainingElement().getColor());
+					strWidth = mc.fontRenderer.getStringWidth(str);
+					mc.fontRenderer.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.fontRenderer.FONT_HEIGHT, pet.getTrainingElement().getColor());
 				}
 				
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -591,8 +591,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-		
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+		return false;
 	}
 
 	@Override

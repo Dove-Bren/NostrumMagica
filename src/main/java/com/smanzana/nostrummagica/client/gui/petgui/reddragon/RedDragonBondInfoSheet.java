@@ -31,7 +31,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 	@Override
 	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
-		font fonter = mc.font;
+		FontRenderer fonter = mc.fontRenderer;
 		int x = 0;
 		int y = 5;
 		final int infoColor = 0xFFFFFFFF;
@@ -108,8 +108,8 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 	}
 
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-		
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+		return false;
 	}
 
 	@Override

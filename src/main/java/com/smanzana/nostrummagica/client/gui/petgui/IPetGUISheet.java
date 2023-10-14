@@ -32,7 +32,7 @@ public interface IPetGUISheet<T extends IEntityPet> {
 	// Handle a mouse click.
 	// mouseX and mouseY are relative to the sheet, not global.
 	@OnlyIn(Dist.CLIENT)
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton);
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton);
 	
 	// A client sheet has sent a control message to its server counterpart. Update!
 	public void handleMessage(CompoundNBT data);
