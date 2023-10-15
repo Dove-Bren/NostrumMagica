@@ -21,7 +21,7 @@ import net.minecraft.util.ResourceLocation;
 public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
 	protected static final ResourceLocation TEXTURE_WINGS = new ResourceLocation(NostrumMagica.MODID, "textures/entity/dragonflightwing.png");
-	protected final ModelDragonFlightWings model = new ModelDragonFlightWings();
+	protected final ModelDragonFlightWings<AbstractClientPlayerEntity> model = new ModelDragonFlightWings<>();
 	protected final PlayerRenderer renderPlayer;
 	
 	public LayerDragonFlightWings(PlayerRenderer renderPlayerIn) {
@@ -111,7 +111,7 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
-		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
+		model.setRotationAngles(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 		model.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 
 		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);

@@ -27,11 +27,11 @@ import net.minecraft.util.ResourceLocation;
 
 public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
-	protected static final Map<Integer, ModelAetherCloak> ModelCache = new HashMap<>();
+	protected static final Map<Integer, ModelAetherCloak<AbstractClientPlayerEntity>> ModelCache = new HashMap<>();
 	
-	protected static final ModelAetherCloak GetModel(ResourceLocation models[]) {
+	protected static final ModelAetherCloak<AbstractClientPlayerEntity> GetModel(ResourceLocation models[]) {
 		int hash = Arrays.deepHashCode(models);
-		ModelAetherCloak cloak = ModelCache.get(hash);
+		ModelAetherCloak<AbstractClientPlayerEntity> cloak = ModelCache.get(hash);
 		if (cloak == null) {
 			IBakedModel[] bakedModels = new IBakedModel[models.length];
 			int i = 0;
@@ -40,7 +40,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 				bakedModels[i++] = mc.getModelManager().getModel(modelLoc);
 			}
 			
-			cloak = new ModelAetherCloak(bakedModels, 64, 64); // TODO make texture size configurable
+			cloak = new ModelAetherCloak<>(bakedModels, 64, 64); // TODO make texture size configurable
 			ModelCache.put(hash, cloak);
 		}
 		return cloak;
@@ -95,7 +95,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 	
 	public void render(AbstractClientPlayerEntity player, ItemStack stack, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		final ICapeProvider provider = ((ICapeProvider)stack.getItem());
-		final ModelAetherCloak model = GetModel(provider.getCapeModels(player, stack));
+		final ModelAetherCloak<AbstractClientPlayerEntity> model = GetModel(provider.getCapeModels(player, stack));
 		
 		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 0.9F);
 		
@@ -115,7 +115,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 
 		GlStateManager.pushMatrix();
 		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
-		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
+		model.setRotationAngles(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 		model.renderEx(player, provider, stack, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 
 		GlStateManager.popMatrix();
