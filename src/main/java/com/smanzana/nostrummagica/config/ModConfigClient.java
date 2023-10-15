@@ -33,7 +33,7 @@ public class ModConfigClient {
 		
 		private String desc;
 		
-		private Object def;
+		//private Object def;
 		
 		private ForgeConfigSpec.ConfigValue<?> configField;
 		

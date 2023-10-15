@@ -1,26 +1,26 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 
-public class ModelPlantBoss extends ModelBase {
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
+
+public class ModelPlantBoss extends EntityModel<EntityPlantBoss> {
 	
-	private ModelRenderer body;
-	//private ModelRenderer northFrond; etc
-	// private ModelRenderer centerTree;
+	private RendererModel body;
+	//private RendererModel northFrond; etc
+	// private RendererModel centerTree;
 	
 	public ModelPlantBoss() {
 		this.textureHeight = 256;
 		this.textureWidth = 256;
-		body = new ModelRenderer(this, 0, 0);
+		body = new RendererModel(this, 0, 0);
 		body.addBox(-24f, -24f, -24f, 48, 48, 48);
 	}
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(EntityPlantBoss entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
 		GlStateManager.pushMatrix();
 		GlStateManager.scalef(1f, 1f, 1f);
@@ -30,12 +30,12 @@ public class ModelPlantBoss extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(LivingEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(EntityPlantBoss entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 	
 	@Override
-	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
-		super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
+	public void setRotationAngles(EntityPlantBoss entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
+		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
 	}
 }

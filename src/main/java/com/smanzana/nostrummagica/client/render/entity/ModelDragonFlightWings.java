@@ -1,21 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 
-public class ModelDragonFlightWings extends ModelBase {
+public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<T> {
 
-	private /* final */ ModelRenderer rightWing;
-	private final ModelRenderer leftWing;
+	private /* final */ RendererModel rightWing;
+	private final RendererModel leftWing;
 	
-	private static final ModelRenderer createWing(ModelBase base) {
-		ModelRenderer wing = new ModelRenderer(base);
+	private static final <T extends LivingEntity> RendererModel createWing(EntityModel<T> base) {
+		RendererModel wing = new RendererModel(base);
 		wing.setRotationPoint(0.0F, 0, 0.0F);
 		wing.setTextureOffset(1, 10).addBox(-19, -13, 0, 19, 2, 1, false);
 		wing.setTextureOffset(3, 8).addBox(-17, -14, 0, 15, 1, 1, false);
@@ -53,7 +52,7 @@ public class ModelDragonFlightWings extends ModelBase {
 	/**
 	 * Sets the models various rotation angles then renders the model.
 	 */
-	public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+	public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
 	{
 //		{
 //			this.rightWing = createWing(this);
@@ -69,9 +68,9 @@ public class ModelDragonFlightWings extends ModelBase {
 	 * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
 	 * "far" arms and legs can swing at most.
 	 */
-	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
-	{
-		super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
+	@Override
+	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
+		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
 		
 		final float livingJitterPeriod = 100f;
 		// 0f - 1f
@@ -83,9 +82,9 @@ public class ModelDragonFlightWings extends ModelBase {
 		final float wingFlapMod = MathHelper.sin(3.1415f * 2 * wingFlapPerc);
 		
 		rightWing.rotateAngleX = rightWing.rotateAngleZ = 0;
-		rightWing.offsetY = entityIn.height * .3f;
-		rightWing.offsetX = -entityIn.width * .25f;
-		rightWing.offsetZ = entityIn.width * .3f;
+		rightWing.offsetY = entityIn.getHeight() * .3f;
+		rightWing.offsetX = -entityIn.getWidth() * .25f;
+		rightWing.offsetZ = entityIn.getWidth() * .3f;
 		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isElytraFlying()) {
 			rightWing.rotateAngleY = (float) (Math.PI * (.20 + livingJitterMod * .005 + wingFlapMod * .25));
 		} else {
@@ -159,8 +158,7 @@ public class ModelDragonFlightWings extends ModelBase {
 	 * Used for easily adding entity-dependent animations. The second and third float params here are the same second
 	 * and third as in the setRotationAngles method.
 	 */
-	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime)
-	{
+	public void setLivingAnimations(T entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
 		super.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 	}
 	

@@ -55,7 +55,7 @@ public abstract class RenderOBJModel<T extends Entity> extends Render<T> {
 	protected IModel retexture(int i, IModel model) {return model;}
 	protected int getColor(int i, T entity) {return -1;}
 
-	/**Adapted from ForgeBlockModelRenderer#render*/
+	/**Adapted from ForgeBlockRendererModel#render*/
 	@Override
 	public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {	
 		if (this.bakedModels == null) {

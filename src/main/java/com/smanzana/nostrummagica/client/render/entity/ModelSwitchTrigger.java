@@ -2,22 +2,20 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchType;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelSwitchTrigger extends ModelBase {
+public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 	
 	private static final double width = .45;
 	private static final double height = .8;
@@ -29,7 +27,7 @@ public class ModelSwitchTrigger extends ModelBase {
 	}
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(EntitySwitchTrigger entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		EntitySwitchTrigger trigger = (EntitySwitchTrigger) entity;
@@ -37,14 +35,14 @@ public class ModelSwitchTrigger extends ModelBase {
 		
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translatef(0, .6, 0);
+		GlStateManager.translatef(0, .6f, 0);
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
 		GlStateManager.enableAlphaTest();
 		//GlStateManager.disableCull();
 		
-		boolean magic = (te != null && te.getType() == SwitchType.MAGIC);
+		boolean magic = (te != null && te.getSwitchType() == SwitchType.MAGIC);
 		float sat = 1.0f;
 		if (te != null && te.isTriggered()) {
 			sat = 0.4f;
@@ -123,8 +121,7 @@ public class ModelSwitchTrigger extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
-		EntitySwitchTrigger trigger = (EntitySwitchTrigger) entitylivingbaseIn;
+	public void setLivingAnimations(EntitySwitchTrigger trigger, float p_78086_2_, float age, float partialTickTime) {
 		SwitchBlockTileEntity te = trigger.getLinkedTileEntity();
 		
 		boolean fast = false;
@@ -136,13 +133,13 @@ public class ModelSwitchTrigger extends ModelBase {
 			}
 		}
 		
-		final float time = entitylivingbaseIn.world.getTotalWorldTime() + partialTickTime;
+		final float time = trigger.world.getGameTime() + partialTickTime;
 		final float period = (float) (20 * (fast ? spinActivated : spinIdle));
 		float angle = 360f * ((time % period) / period);
 		GlStateManager.rotatef(angle, 0, 1, 0);
 		
 		// also bob up and down
 		angle = (float) (2 * Math.PI * (time % 60 / 60));
-		GlStateManager.translatef(0, Math.sin(angle) * .1, 0);
+		GlStateManager.translated(0, Math.sin(angle) * .1, 0);
 	}
 }

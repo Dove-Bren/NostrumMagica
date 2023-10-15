@@ -1,24 +1,25 @@
 package com.smanzana.nostrummagica.client.model;
 
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelRenderer;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.entity.Entity;
+
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 
-public class ModelEnchantedArmorBase extends ModelBiped {
+public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<T> {
 	
 	private static final int TEXTURE_WIDTH = 129;
 	private static final int TEXTURE_HEIGHT = 96;
 
-	private ModelRenderer head;
-	private ModelRenderer body;
-	private ModelRenderer armLeft;
-	private ModelRenderer armRight;
-	private ModelRenderer legLeft;
-	private ModelRenderer legRight;
-	private ModelRenderer bootLeft;
-	private ModelRenderer bootRight;
+	private RendererModel head;
+	private RendererModel body;
+	private RendererModel armLeft;
+	private RendererModel armRight;
+	private RendererModel legLeft;
+	private RendererModel legRight;
+	private RendererModel bootLeft;
+	private RendererModel bootRight;
 	
 	// Level is number of other set pieces. 0 is base, 4 is max coolness.
 	public ModelEnchantedArmorBase(float scale, int level) {
@@ -26,7 +27,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 		
 		scale = 0.01f;
 		
-		head = new ModelRenderer(this, 0, 0);
+		head = new RendererModel(this, 0, 0);
 		head.addBox(-5, -9, -5, 10, 10, 10, scale);
 		head.setTextureOffset(0, 0);
 		head.addBox(-6, -9, -2, 1, 5, 4, scale);
@@ -76,7 +77,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 		
 
 		
-		body = new ModelRenderer(this, 0, 27);
+		body = new RendererModel(this, 0, 27);
 		body.addBox(-5.0F, 0F, -3.01F, 10, 12, 6);
 		
 		// Test feature growth 2
@@ -113,7 +114,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 			
 			// Belt Tassels
 			{
-				ModelRenderer tasselRight = new ModelRenderer(this, 0, 0);
+				RendererModel tasselRight = new RendererModel(this, 0, 0);
 				// Lie about texture size to get more resolution on tassels
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 48 / 3);
@@ -124,7 +125,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 				tasselRight.rotateAngleZ = 0.125f;
 				body.addChild(tasselRight);
 				
-				ModelRenderer tasselLeft = new ModelRenderer(this, 0, 0);
+				RendererModel tasselLeft = new RendererModel(this, 0, 0);
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 48 / 3);
 				tasselLeft.mirror = true;
@@ -138,7 +139,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 		}
 		
 		
-		armLeft = new ModelRenderer(this, 0, 45);
+		armLeft = new RendererModel(this, 0, 45);
 		armLeft.addBox(-1F, -2.50F, -3F, 4, 9, 6, scale);
 		armLeft.setTextureOffset(20, 45);
 		armLeft.addBox(3.0F, -3.50F, -2F, 1, 3, 4, scale);
@@ -164,7 +165,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 			body.addBox(5, -3.5f, -1, 2, 1, 3, scale * 1.5f);
 		}
 		
-		armRight = new ModelRenderer(this, 0, 45);
+		armRight = new RendererModel(this, 0, 45);
 		armRight.addBox(-3.0F, -2.50F, -3F, 4, 9, 6, scale);
 		armRight.setTextureOffset(20, 45);
 		armRight.addBox(-4.0F, -3.50F, -2F, 1, 3, 4, scale);
@@ -198,7 +199,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 		if (level >= 4) {
 			// Shoulder Tassels
 			{
-				ModelRenderer tasselRight = new ModelRenderer(this, 0, 0);
+				RendererModel tasselRight = new RendererModel(this, 0, 0);
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 0 / 3);
 				tasselRight.addBox(0, 0, 0, 1, 5, 5, scale);
@@ -206,7 +207,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 				tasselRight.offsetY = (.5F/16F);
 				tasselRight.offsetZ = (-2F/16F);
 				body.addChild(tasselRight);
-				tasselRight = new ModelRenderer(this, 0, 0);
+				tasselRight = new RendererModel(this, 0, 0);
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 30 / 3);
 				tasselRight.addBox(0, 0, 0.01f, 6, 5, 1, scale);
@@ -215,7 +216,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 				tasselRight.offsetZ = (3F/16F);
 				body.addChild(tasselRight);
 				
-				ModelRenderer tasselLeft = new ModelRenderer(this, 0, 0);
+				RendererModel tasselLeft = new RendererModel(this, 0, 0);
 				tasselLeft.mirror = true;
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 0 / 3);
@@ -225,7 +226,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 				tasselLeft.offsetZ = (-2F/16F);
 				body.addChild(tasselLeft);
 				tasselLeft.mirror = true;
-				tasselLeft = new ModelRenderer(this, 0, 0);
+				tasselLeft = new RendererModel(this, 0, 0);
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 30 / 3);
 				tasselLeft.addBox(0, 0, 0.01f, 6, 5, 1, scale);
@@ -236,14 +237,14 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 			}
 		}
 		
-		legLeft = new ModelRenderer(this, 0, 60);
+		legLeft = new RendererModel(this, 0, 60);
 		legLeft.addBox(-2F, -.95F, -3F, 5, 10, 6, scale);
 		
-		legRight = new ModelRenderer(this, 0, 60);
+		legRight = new RendererModel(this, 0, 60);
 		legRight.addBox(-3F, -.99F, -3F, 5, 10, 6, scale);
 		legRight.mirror = true;
 		
-		bootLeft = new ModelRenderer(this, 0, 76);
+		bootLeft = new RendererModel(this, 0, 76);
 		bootLeft.addBox(-2F, 10F, -4F, 4, 2, 7, scale * .9f);
 		bootLeft.setTextureOffset(0, 85);
 		bootLeft.addBox(-2F, 7F, -3F, 5, 3, 6, scale * .9f);
@@ -258,7 +259,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 			bootLeft.addBox(4, 8, 0, 1, 1, 4, scale * .9f);
 		}
 		
-		bootRight = new ModelRenderer(this, 0, 76);
+		bootRight = new RendererModel(this, 0, 76);
 		bootRight.addBox(-2F, 10.1F, -4F, 4, 2, 7, scale * .9f);
 		bootRight.setTextureOffset(0, 85);
 		bootRight.addBox(-3F, 7.1F, -3F, 5, 3, 6, scale * .9f);
@@ -289,7 +290,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 	}
 	
 	@Override
-	public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		bipedBody.showModel = false;
 		bipedHead.showModel = false;
 		bipedHeadwear.showModel = false;
@@ -403,7 +404,7 @@ public class ModelEnchantedArmorBase extends ModelBiped {
 		GlStateManager.popMatrix();
 	}
 	
-	protected void copyOffsetAndRots(ModelRenderer to, ModelRenderer from) {
+	protected void copyOffsetAndRots(RendererModel to, RendererModel from) {
 		to.offsetX = from.offsetX;
 		to.offsetY = from.offsetY;
 		to.offsetZ = from.offsetZ;

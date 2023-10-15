@@ -7,7 +7,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelOrb extends ModelOBJ {
+public class ModelOrb<T extends Entity> extends ModelOBJ<T> {
 
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/orb.obj");
 	private float scale;
@@ -26,12 +26,12 @@ public class ModelOrb extends ModelOBJ {
 	}
 	
 	@Override
-	protected int getColor(int i, Entity ent) {
+	protected int getColor(int i, T ent) {
 		return color;
 	}
 
 	@Override
-	protected boolean preRender(Entity entity, int model, BufferBuilder buffer, double x, double y, double z,
+	protected boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z,
 			float entityYaw, float partialTicks) {
 		GlStateManager.scalef(scale, scale, scale);
 		GlStateManager.rotatef(-90f, 1f, 0f, 0f);

@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.utils;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.Random;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,6 +57,15 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 @OnlyIn(Dist.CLIENT)
 public final class RenderFuncs {
 	
+	public static final Random RenderRandom(Random existing) {
+		existing.setSeed(42); // Copied from Vanilla
+		return existing;
+	}
+	
+	public static final Random RenderRandom() {
+		return RenderRandom(new Random());
+	}
+	
 	private static final MutableBlockPos cursor = new MutableBlockPos(); // If there are ever threads at play, this will not work
 	
 	public static final void RenderBlockOutline(PlayerEntity player, World world, Vec3d pos, BlockState blockState, float partialTicks) {
@@ -104,18 +114,21 @@ public final class RenderFuncs {
 		RenderModelWithColor(model, color, buffer, offset, M4fZero);
 	}
 	
+	private static final Random RenderModelRandom = new Random();
+	
 	public static void RenderModelWithColor(IBakedModel model, int color, BufferBuilder buffer, Vector3f offset, Matrix4f transform) {
+		RenderRandom(RenderModelRandom);
 		GlStateManager.pushMatrix();
 
 		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
 		// TODO provide blockstate?
 		for (Direction enumfacing : Direction.values()) {
-			renderQuads(model.getQuads((BlockState) null, enumfacing, NostrumMagica.rand, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
+			renderQuads(model.getQuads((BlockState) null, enumfacing, RenderModelRandom, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
 					transform, 1f, color);
 		}
 		
-		renderQuads(model.getQuads((BlockState) null, null, NostrumMagica.rand, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
+		renderQuads(model.getQuads((BlockState) null, null, RenderModelRandom, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
 				transform, 1f, color);
 
 		GlStateManager.popMatrix();

@@ -5,30 +5,28 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 
-public class ModelWillo extends ModelBase {
+public class ModelWillo extends EntityModel<EntityWillo> {
 	
 	private static final int SEGMENTS = 8;
 	private static final float PERIOD = 20f * 2;
 	
-	private ModelRenderer main;
-	private List<ModelRenderer> armLeft;
-	private List<ModelRenderer> armRight;
+	private RendererModel main;
+	private List<RendererModel> armLeft;
+	private List<RendererModel> armRight;
 	
 	public ModelWillo() {
 		this.textureHeight = 64;
 		this.textureWidth = 64;
-		main = new ModelRenderer(this, 0, 0);
+		main = new RendererModel(this, 0, 0);
 		
 		//main.addBox(-8f, -8f, -8f, 16, 16, 16);
 		
@@ -38,7 +36,7 @@ public class ModelWillo extends ModelBase {
 		final float offset = .75f;
 		final float spacing = .75f;
 		for (int i = 0; i < SEGMENTS; i++) {
-			ModelRenderer render = new ModelRenderer(this, 0, 0);
+			RendererModel render = new RendererModel(this, 0, 0);
 			render.setTextureOffset(0, 18);
 			render.addBox(-4.5f, -4.5f, -4.5f, 9, 9, 9);
 			render.offsetX = offset + (i+1) * spacing;
@@ -47,7 +45,7 @@ public class ModelWillo extends ModelBase {
 		}
 		
 		for (int i = 0; i < SEGMENTS; i++) {
-			ModelRenderer render = new ModelRenderer(this, 0, 0);
+			RendererModel render = new RendererModel(this, 0, 0);
 			render.setTextureOffset(0, 18);
 			render.addBox(-4.5f, -4.5f, -4.5f, 9, 9, 9);
 			render.offsetX = -offset + (i+1) * -spacing;
@@ -57,7 +55,7 @@ public class ModelWillo extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
+	public void setLivingAnimations(EntityWillo entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
 		super.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTickTime);
 		
 		float progress = ((float) entity.ticksExisted + partialTickTime) / PERIOD;
@@ -158,18 +156,18 @@ public class ModelWillo extends ModelBase {
 	
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(EntityWillo entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
 		final EntityWillo willo = (EntityWillo) entity;
 		final float partialTicks = time % 1f;
 		final float rotPeriod = 6f;
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, 1.5, 0);
-		GlStateManager.translatef(0, -entity.height / 2, 0);
+		GlStateManager.translatef(0, 1.5f, 0);
+		GlStateManager.translatef(0, -entity.getHeight() / 2, 0);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.scalef(.25, .25, .25);
+		GlStateManager.scalef(.25f, .25f, .25f);
 		main.render(scale);
 		GlStateManager.popMatrix();
 		
@@ -177,7 +175,7 @@ public class ModelWillo extends ModelBase {
 		
 		GlStateManager.pushMatrix();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-		GlStateManager.scalef(.4, .4, .4);
+		GlStateManager.scalef(.4f, .4f, .4f);
 		renderFace(buffer, willo, partialTicks);
 		Tessellator.getInstance().draw();
 		GlStateManager.popMatrix();
@@ -185,7 +183,7 @@ public class ModelWillo extends ModelBase {
 		final float rotY = 360f * (time % rotPeriod) / rotPeriod;
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		GlStateManager.pushMatrix();
-		GlStateManager.scalef(.5, .5, .5);
+		GlStateManager.scalef(.5f, .5f, .5f);
 		GlStateManager.rotatef(rotY, 1, 0, 0);
 		renderCube(buffer, willo, partialTicks);
 		Tessellator.getInstance().draw();

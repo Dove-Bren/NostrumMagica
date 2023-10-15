@@ -1,14 +1,13 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelKoid extends ModelOBJ {
+public class ModelKoid extends ModelOBJ<EntityKoid> {
 
 	public ModelKoid() {
 		super();
@@ -22,7 +21,7 @@ public class ModelKoid extends ModelOBJ {
 	}
 	
 	@Override
-	protected int getColor(int i, Entity ent) {
+	protected int getColor(int i, EntityKoid ent) {
 		final int bright = 0x00202020;
 		
 		int color = 0x00;
@@ -62,9 +61,9 @@ public class ModelKoid extends ModelOBJ {
 	}
 
 	@Override
-	protected boolean preRender(Entity entity, int model, BufferBuilder buffer, double x, double y, double z,
+	protected boolean preRender(EntityKoid entity, int model, BufferBuilder buffer, double x, double y, double z,
 			float entityYaw, float partialTicks) {
-		GlStateManager.translatef(0, entity.height, 0);
+		GlStateManager.translatef(0, entity.getHeight(), 0);
 		float frac = (entity.ticksExisted + partialTicks) / (20f * 3.0f);
 		GlStateManager.rotatef(360f * frac, 0, 1f, 0);
 		frac = (entity.ticksExisted + partialTicks) / (20f * 10f);

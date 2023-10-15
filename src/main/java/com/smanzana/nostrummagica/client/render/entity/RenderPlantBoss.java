@@ -32,7 +32,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 	}
 	
 	/**
-	 * Defines what float the third param in setRotationAngles of ModelBase is
+	 * Defines what float the third param in setRotationAngles of EntityModel is
 	 * @param livingBase
 	 * @param partialTicks
 	 * @return

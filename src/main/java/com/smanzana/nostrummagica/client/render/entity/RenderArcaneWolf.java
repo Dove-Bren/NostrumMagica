@@ -19,7 +19,7 @@ public class RenderArcaneWolf extends LivingRenderer<EntityArcaneWolf, ModelArca
 	}
 	
 	/**
-	 * Defines what float the third param in setRotationAngles of ModelBase is
+	 * Defines what float the third param in setRotationAngles of EntityModel is
 	 * @param livingBase
 	 * @param partialTicks
 	 * @return

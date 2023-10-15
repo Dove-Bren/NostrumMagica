@@ -7,11 +7,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -338,22 +335,22 @@ public class ModConfig {
 		//base.save();
 	}
 	
-	@SubscribeEvent
-	public void onPlayerLogin(PlayerLoggedInEvent event) {
-		if (event.getPlayer() instanceof ServerPlayerEntity) {
-			NostrumMagica.logger.info("sending config overrides to client...");
-			NostrumMagica.instance.proxy.sendServerConfig((ServerPlayerEntity) event.getPlayer());
-		} else {
-			NostrumMagica.logger.info("Ignoring player join event, as no MP =========================================");
-		}
-	}
-	
-	@SubscribeEvent
-	public void onPlayerDisconnect(WorldEvent.Unload event) {
-		//reset config
-		NostrumMagica.logger.info("Resetting config local values");
-		loadLocals();
-	}
+//	@SubscribeEvent
+//	public void onPlayerLogin(PlayerLoggedInEvent event) {
+//		if (event.getPlayer() instanceof ServerPlayerEntity) {
+//			NostrumMagica.logger.info("sending config overrides to client...");
+//			NostrumMagica.instance.proxy.sendServerConfig((ServerPlayerEntity) event.getPlayer());
+//		} else {
+//			NostrumMagica.logger.info("Ignoring player join event, as no MP =========================================");
+//		}
+//	}
+//	
+//	@SubscribeEvent
+//	public void onPlayerDisconnect(WorldEvent.Unload event) {
+//		//reset config
+//		NostrumMagica.logger.info("Resetting config local values");
+//		loadLocals();
+//	}
 	
 //	public boolean updateLocal(Key key, Object newValue) {
 //		if (localValues.containsKey(key)) {
@@ -437,43 +434,43 @@ public class ModConfig {
 //	}	
 	
 	public boolean spellDebug() {
-		return (Boolean) common.get(ModConfigCommon.Key.SPELL_DEBUG);
+		return common.configSpellDebug.get();
 	}
 	
 	public boolean getObeliskList() {
-		return (Boolean) client.get(ModConfigClient.Key.OBELISK_LIST);
+		return client.configObeliskList.get();
 	}
 	
 	public boolean obeliskReqMagic() {
-		return (Boolean) common.get(ModConfigCommon.Key.OBELISK_REQ_MAGIC);
+		return common.configObeliskMagic.get();
 	}
 	
 	public boolean displayManaOrbs() {
-		return (Boolean) client.get(ModConfigClient.Key.MP_DISPLAY_SPHERES);
+		return client.configMPDisplaySpheres.get();
 	}
 	
 	public boolean displayManaBar() {
-		return (Boolean) client.get(ModConfigClient.Key.MP_DISPLAY_BAR);
+		return client.configMPDisplayBar.get();
 	}
 	
 	public boolean displayManaText() {
-		return (Boolean) client.get(ModConfigClient.Key.MP_DISPLAY_TEXT);
+		return client.configMPDisplayText.get();
 	}
 	
 	public boolean displayXPText() {
-		return (Boolean) client.get(ModConfigClient.Key.XP_DISPLAY_TEXT);
+		return client.configXPDisplayText.get();
 	}
 	
 	public boolean displayXPBar() {
-		return (Boolean) client.get(ModConfigClient.Key.XP_DISPLAY_BAR);
+		return client.configXPDisplayBar.get();
 	}
 
 	public boolean displayEffects() {
-		return (Boolean) client.get(ModConfigClient.Key.EFFECT_DISPLAY);
+		return client.configEffectDisplay.get();
 	}
 	
 	public boolean displayLoginText() {
-		return (Boolean) client.get(ModConfigClient.Key.LOGIN_TEXT);
+		return client.configLoginText.get();
 	}
 	
 //	public int[] getDimensionList() {
@@ -481,11 +478,11 @@ public class ModConfig {
 //	}
 	
 	public boolean displayAllMirrorQuestNodes() {
-		return (Boolean) client.get(ModConfigClient.Key.MIRROR_QUEST_NODE_SPOILERS);
+		return client.configMirrorNodeSpoilers.get();
 	}
 	
 	public boolean displayArmorOverlay() {
-		return (Boolean) client.get(ModConfigClient.Key.ARMOR_DISPLAY);
+		return client.configArmorDisplay.get();
 	}
 	
 //	public int sorceryDimensionIndex() {
@@ -493,42 +490,42 @@ public class ModConfig {
 //	}
 
 	public boolean displayShieldHearts() {
-		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_SHIELDS);
+		return client.configDisplayShields.get();
 	}
 	
 	public boolean displayHookshotCrosshair() {
-		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_HOOKSHOT_CROSSHAIR);
+		return client.configDisplayHookshotCrosshair.get();
 	}
 	
 	public boolean displayDragonHealthbars() {
-		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_DRAGON_HEALTHBARS);
+		return client.configDisplayDragonHealthbars.get();
 	}
 	
 	public boolean displayPetHealthbars() {
-		return (Boolean) client.get(ModConfigClient.Key.DISPLAY_PET_HEALTHBARS);
+		return client.configDisplayPetHealthbars.get();
 	}
 	
 	public boolean overrideElytraCode() {
-		return (Boolean) common.get(ModConfigCommon.Key.NOSTRUM_OVERRIDE_ELYTRA);
+		return common.configOverrideElytra.get();
 	}
 	
 	public boolean doubleEnderDash() {
-		return (Boolean) client.get(ModConfigClient.Key.CONTROL_DASH_DOUBLEPRESS);
+		return client.configDashDoublePress.get();
 	}
 	
 	public boolean usingAdvancedArmors() {
-		return (Boolean) common.get(ModConfigCommon.Key.HIGHER_BALANCED);
+		return common.configHigherBalancedArmor.get();
 	}
 	
 	public int getManaSphereOffset() {
-		return (Integer) client.get(ModConfigClient.Key.DISPLAY_MANA_HEIGHT);
+		return client.configManaHeight.get();
 	}
 	
 	public boolean vacuumWhileSneaking() {
-		return (Boolean) common.get(ModConfigCommon.Key.BAG_VACUUM_ON_SNEAK);
+		return common.configBagSneakVacuum.get();
 	}
 	
 	public boolean usingEasierThano() {
-		return (Boolean) common.get(ModConfigCommon.Key.EASIER_THANO);
+		return common.configEasierThano.get();
 	}
 }

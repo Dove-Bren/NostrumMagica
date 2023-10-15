@@ -2,16 +2,15 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 
-public class ModelDragonEgg extends ModelBase {
+public class ModelDragonEgg extends EntityModel<EntityDragonEgg> {
 
-	private ModelRenderer main;
+	private RendererModel main;
 	
 	private static final int textureHeight = 32;
 	private static final int textureWidth = 32;
@@ -21,7 +20,7 @@ public class ModelDragonEgg extends ModelBase {
 	}
 	
 	public ModelDragonEgg() {
-		main = new ModelRenderer(this, 0, 0);
+		main = new RendererModel(this, 0, 0);
 		int y = 28;
 		
 		main.setTextureSize(textureWidth, textureHeight);
@@ -39,20 +38,16 @@ public class ModelDragonEgg extends ModelBase {
 	}
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(EntityDragonEgg entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
-		setRotationAngles(time, swingProgress, swing, headAngleY, headAngleX, scale, entity);
+		setRotationAngles(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		
 		GL11.glPushMatrix();
 		
 		float modelScale = 0.5f;
 		GL11.glScalef(modelScale, modelScale, modelScale);
 		
-		float coldScale = 0f;
-		if (entity instanceof EntityDragonEgg) {
-			EntityDragonEgg egg = (EntityDragonEgg) entity;
-			coldScale = 1f - (egg.getHeat() / EntityDragonEgg.HEAT_MAX);
-		}
+		float coldScale = 1f - (entity.getHeat() / EntityDragonEgg.HEAT_MAX);
 		
 		GlStateManager.color4f(1f - (coldScale * .4f), 1f - (coldScale * .1f), 1f - (coldScale * .1f), 1f);
 		

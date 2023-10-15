@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.entity.Entity;
@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
-public class ModelAetherCloak extends ModelBase {
+public class ModelAetherCloak<T extends LivingEntity> extends EntityModel<T> {
 
 	private final IBakedModel[] models;
 	
@@ -27,7 +27,7 @@ public class ModelAetherCloak extends ModelBase {
 		this.models = models;
 	}
 	
-	public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		renderEx(entityIn, null, null, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 	}
 
@@ -68,7 +68,7 @@ public class ModelAetherCloak extends ModelBase {
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.scalef(objScale, -objScale, objScale);
-		GlStateManager.translatef(0, entityIn.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);
+		GlStateManager.translated(0, entityIn.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);
 		GlStateManager.rotatef(rot, 1, 0, 0);
 		//GlStateManager.rotatef(180f, 1, 0, 0);
 		//GlStateManager.rotatef(180f, 0, 1, 0);
@@ -101,8 +101,9 @@ public class ModelAetherCloak extends ModelBase {
 	 * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
 	 * "far" arms and legs can swing at most.
 	 */
-	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
-		super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
+	@Override
+	public void setRotationAngles( T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
+		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
 		//model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
 		
 	}
@@ -111,7 +112,8 @@ public class ModelAetherCloak extends ModelBase {
 	 * Used for easily adding entity-dependent animations. The second and third float params here are the same second
 	 * and third as in the setRotationAngles method.
 	 */
-	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
+	@Override
+	public void setLivingAnimations(T entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
 		super.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 		//model.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 	}

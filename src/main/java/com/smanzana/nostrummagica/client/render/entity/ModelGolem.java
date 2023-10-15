@@ -4,16 +4,15 @@ import org.lwjgl.opengl.GL11;
 
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 
-public class ModelGolem extends ModelBase {
+public class ModelGolem<T extends EntityGolem> extends EntityModel<T> {
 
-	private ModelRenderer head;
-	private ModelRenderer body1;
-	private ModelRenderer body2;
-	private ModelRenderer body3;
+	private RendererModel head;
+	private RendererModel body1;
+	private RendererModel body2;
+	private RendererModel body3;
 	
 	private static final int textureHeight = 64;
 	private static final int textureWidth = 64;
@@ -28,22 +27,22 @@ public class ModelGolem extends ModelBase {
 		int centerX, centerZ;
 		centerX = centerZ = 0;
 		
-		head = new ModelRenderer(this, 0, 0);
+		head = new RendererModel(this, 0, 0);
 		head.addBox(-4, -5, -4, 8, 10, 8);
 		head.setTextureSize(textureWidth, textureHeight);
 		head.setRotationPoint(centerX, 5.0f, centerZ); // 34
 		
-		body1 = new ModelRenderer(this, 0, 0);
+		body1 = new RendererModel(this, 0, 0);
 		body1.addBox(-6, -3, -2, 16, 6, 10);
 		body1.setTextureSize(textureWidth, textureHeight);
 		body1.setRotationPoint(centerX, 26.0f, centerZ); // 24
 		
-		body2 = new ModelRenderer(this, 0, 0);
+		body2 = new RendererModel(this, 0, 0);
 		body2.addBox(-4, -4, -6, 10, 8, 8);
 		body2.setTextureSize(textureWidth, textureHeight);
 		body2.setRotationPoint(centerX, 17.0f, centerZ); // 14
 		
-		body3 = new ModelRenderer(this, 0, 0);
+		body3 = new RendererModel(this, 0, 0);
 		body3.addBox(-6, -2, -4, 8, 4, 8);
 		body3.setTextureSize(textureWidth, textureHeight);
 		body3.setRotationPoint(centerX, 34.0f, centerZ); // 10
@@ -51,9 +50,9 @@ public class ModelGolem extends ModelBase {
 	}
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(T entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
-		setRotationAngles(time, swingProgress, swing, headAngleY, headAngleX, scale, entity);
+		setRotationAngles(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		
 		GL11.glPushMatrix();
 		
@@ -70,7 +69,7 @@ public class ModelGolem extends ModelBase {
 	}
 	
 	@Override
-	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
+	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
 		float ticks = entityIn.ticksExisted;
 		
 		float speedup = 1.0f;

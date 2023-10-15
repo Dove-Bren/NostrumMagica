@@ -331,10 +331,6 @@ public class CommonProxy {
 		; // Nothing on server side
 	}
 
-	public void sendServerConfig(ServerPlayerEntity player) {
-		ModConfig.channel.sendTo(new ServerConfigMessage(ModConfig.config), player);
-	}
-	
 	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
 		NetworkHandler.sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);
 	}

@@ -289,7 +289,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		try {
-			mc.getBlockRendererDispatcher().getBlockModelRenderer()
+			mc.getBlockRendererDispatcher().getBlockRendererModel()
 				.renderModelFlat(mc.world, model, state, new BlockPos(x, y, z), buffer, false, NostrumMagica.rand, 55, EmptyModelData.INSTANCE);
 			
 		} catch (Exception e) {

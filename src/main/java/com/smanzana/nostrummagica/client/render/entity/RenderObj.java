@@ -1,57 +1,57 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import java.util.List;
+import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.collect.ImmutableMap;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GLAllocation;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.model.Model;
+import net.minecraft.client.renderer.model.ModelManager;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.client.model.obj.OBJModel.Material;
-import net.minecraftforge.client.model.obj.OBJModel.OBJBakedModel;
-import net.minecraftforge.client.model.pipeline.LightUtil;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.obj.OBJModel.OBJBakedModel;
+import net.minecraftforge.client.model.pipeline.LightUtil;
 
 /**
- * This class taken from 
- * https://github.com/2piradians/Minewatch/blob/1.12.1/src/main/java/twopiradians/minewatch/client/render/entity/RenderOBJModel.java
+ * An OBJ Model (like what you get with OBJLoader) but as a RendererModel, and sped up using OpenGL's compiled instruction lists.
+ * 
+ * This class originally adapted from 
+ * https://github.com/2piradians/Minewatch/blob/1.12.1/src/main/java/twopiradians/minewatch/client/render/entity/RenderOBJModel.java.
  * @author Skyler
  *
  * @param <T>
  */
-public class RenderObj extends ModelRenderer {
+@SuppressWarnings("deprecation")
+public class RenderObj extends RendererModel {
 
 	private ResourceLocation resource;
 	
 	// The GL display list rendered by the Tessellator for this model
-	// ModelRenderer does not expose, so we have to basically dupe
+	// RendererModel does not expose, so we have to basically dupe
 	// One display list per model. Matches resources[]
     private int compiledList;
     
     private boolean initted;
 
-	protected RenderObj(ModelBase base, ResourceLocation loc) {
+	protected RenderObj(Model base, ResourceLocation loc) {
 		super(base);
 		
 		this.resource = loc;
@@ -59,23 +59,43 @@ public class RenderObj extends ModelRenderer {
 	
 	private void init() {
 		if (!initted) {
+			final ModelManager manager = Minecraft.getInstance().getModelManager();
+			IBakedModel model = manager.getModel(this.resource);
+			if (model == null) {
+				NostrumMagica.logger.error("Could not find model to match " + this.resource);
+				model = manager.getMissingModel();
+			} else if (!(model instanceof OBJBakedModel)) {
+				NostrumMagica.logger.error("Loaded obj model, but it doesn't appera to be an .obj: " + this.resource);
+				; // I guess just leave model
+			}
 			
-			IModel model = ModelLoaderRegistry.getModelOrLogError(this.resource, "Nostrum Magica is missing a model. Please report this to the mod authors.");
-			model = this.retexture(model);
-			IBakedModel bakedModel = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			int color = this.getColor();
 			
 			BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
+			compiledList = GLAllocation.generateDisplayLists(1);
+			GlStateManager.newList(compiledList, GL11.GL_COMPILE);
 			
-			if (bakedModel instanceof OBJBakedModel && model instanceof OBJModel) {
-				int color = this.getColor();
-				
-				compiledList = GLAllocation.generateDisplayLists(1);
-				GlStateManager.glNewList(compiledList, GL11.GL_COMPILE);
-				
-				renderModel(bakedModel, vertexbuffer, color);
+			renderForCapture(model, vertexbuffer, color);
 
-				GlStateManager.glEndList();
-			}
+			GlStateManager.endList();
+			
+			
+//			IModel model = ModelLoaderRegistry.getModelOrLogError(this.resource, "Nostrum Magica is missing a model. Please report this to the mod authors.");
+//			model = this.retexture(model);
+//			IBakedModel bakedModel = model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+//			
+//			BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
+//			
+//			if (bakedModel instanceof OBJBakedModel && model instanceof OBJModel) {
+//				int color = this.getColor();
+//				
+//				compiledList = GLAllocation.generateDisplayLists(1);
+//				GlStateManager.glNewList(compiledList, GL11.GL_COMPILE);
+//				
+//				renderModel(bakedModel, vertexbuffer, color);
+//
+//				GlStateManager.glEndList();
+//			}
 	        
 	        initted = true;
 		}
@@ -85,29 +105,32 @@ public class RenderObj extends ModelRenderer {
 		return true;
 	}
 	
-	protected IModel retexture(IModel model) {
-		return model;
-	}
+//	protected IModel retexture(IModel model) {
+//		return model;
+//	}
 	
 	protected int getColor() {
 		return -1;
 	}
 
+	// Render the model, where it will be captured to a GL compiled list for faster rendering in the future.
+	// This means things like color etc. are baked in, though.
 	@OnlyIn(Dist.CLIENT)
-    private void renderModel(IBakedModel model, BufferBuilder buffer, int color) {
+    private void renderForCapture(IBakedModel model, BufferBuilder buffer, int color) {
+		Random rand = new Random();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 		GlStateManager.pushMatrix();
 		GlStateManager.rotatef(180, 1, 0, 0);
 		
 		for(Direction side : Direction.values()) {
-			List<BakedQuad> quads = model.getQuads(null, side, 0);
+			List<BakedQuad> quads = model.getQuads(null, side, RenderFuncs.RenderRandom(rand), EmptyModelData.INSTANCE);
 			if(!quads.isEmpty()) 
 				for(BakedQuad quad : quads) {
 					//buffer.addVertexData(quad.getVertexData());
 					LightUtil.renderQuadColor(buffer, quad, color);
 				}
 		}
-		List<BakedQuad> quads = model.getQuads(null, null, 0);
+		List<BakedQuad> quads = model.getQuads(null, null, RenderFuncs.RenderRandom(rand), EmptyModelData.INSTANCE);
 		if(!quads.isEmpty()) {
 			for(BakedQuad quad : quads) 
 				//buffer.addVertexData(quad.getVertexData());
@@ -163,22 +186,22 @@ public class RenderObj extends ModelRenderer {
 //			Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 	}
 	
-	public static ImmutableMap<String, TextureAtlasSprite> getTextures(OBJModel model) {
-		ImmutableMap.Builder<String, TextureAtlasSprite> builder = ImmutableMap.builder();
-		builder.put(ModelLoader.White.LOCATION.toString(), ModelLoader.White.INSTANCE);
-		TextureAtlasSprite missing = ModelLoader.defaultTextureGetter().apply(new ResourceLocation("missingno"));
-		for (String materialName : model.getMatLib().getMaterialNames()) {
-			Material material = model.getMatLib().getMaterial(materialName);
-			if (material.getTexture().getTextureLocation().getResourcePath().startsWith("#")) {
-				FMLLog.bigWarning("OBJLoaderMW: Unresolved texture '%s' for obj model '%s'", material.getTexture().getTextureLocation().getResourcePath(), model.toString());
-				builder.put(materialName, missing);
-			}
-			else
-				builder.put(materialName, ModelLoader.defaultTextureGetter().apply(material.getTexture().getTextureLocation()));
-		}
-		builder.put("missingno", missing);
-		return builder.build();
-	}
+//	public static ImmutableMap<String, TextureAtlasSprite> getTextures(OBJModel model) {
+//		ImmutableMap.Builder<String, TextureAtlasSprite> builder = ImmutableMap.builder();
+//		builder.put(ModelLoader.White.LOCATION.toString(), ModelLoader.White.INSTANCE);
+//		TextureAtlasSprite missing = ModelLoader.defaultTextureGetter().apply(new ResourceLocation("missingno"));
+//		for (String materialName : model.getMatLib().getMaterialNames()) {
+//			Material material = model.getMatLib().getMaterial(materialName);
+//			if (material.getTexture().getTextureLocation().getResourcePath().startsWith("#")) {
+//				FMLLog.bigWarning("OBJLoaderMW: Unresolved texture '%s' for obj model '%s'", material.getTexture().getTextureLocation().getResourcePath(), model.toString());
+//				builder.put(materialName, missing);
+//			}
+//			else
+//				builder.put(materialName, ModelLoader.defaultTextureGetter().apply(material.getTexture().getTextureLocation()));
+//		}
+//		builder.put("missingno", missing);
+//		return builder.build();
+//	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
@@ -222,7 +245,7 @@ public class RenderObj extends ModelRenderer {
 		super.render(scale); // Any boxes and stuff that was added (and children!!!!!!!)
 	}
 	
-	// This is a copy of ModelRenderer's render method, but using our display list
+	// This is a copy of RendererModel's render method, but using our display list
 	private void renderInternal(float scale, int displayList) {
 		if (!this.isHidden) {
 			if (this.showModel) {

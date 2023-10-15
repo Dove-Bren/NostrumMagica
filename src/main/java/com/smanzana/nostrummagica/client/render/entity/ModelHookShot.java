@@ -2,19 +2,18 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityHookShot;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelHookShot extends ModelBase {
+public class ModelHookShot extends EntityModel<EntityHookShot> {
 	
 	private static final double width = .2;
 	private static final double height = .2;
@@ -24,13 +23,13 @@ public class ModelHookShot extends ModelBase {
 	}
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(EntityHookShot entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translatef(0, .6, 0);
+		GlStateManager.translated(0, .6, 0);
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.enableBlend();
 		GlStateManager.disableLighting();
@@ -71,7 +70,7 @@ public class ModelHookShot extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(LivingEntity entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
+	public void setLivingAnimations(EntityHookShot entitylivingbaseIn, float p_78086_2_, float age, float partialTickTime) {
 		
 	}
 }

@@ -12,13 +12,11 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.utils.MemoryPool;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-public class ModelDragonRed extends ModelBase {
+public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T> {
 	
 	public static enum EDragonOverlayMaterial {
 		NONE(""),
@@ -324,9 +322,9 @@ public class ModelDragonRed extends ModelBase {
 	
 	
 	@Override
-	public void render(Entity entity, float time, float swingProgress,
+	public void render(T entity, float time, float swingProgress,
 			float swing, float headAngleY, float headAngleX, float scale) {
-		setRotationAngles(time, swingProgress, swing, headAngleY, headAngleX, scale, entity);
+		setRotationAngles(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
 		
 		// Update overlay visiblility
 		for (DragonArmorKey key : overlays.keySet()) {
@@ -346,7 +344,7 @@ public class ModelDragonRed extends ModelBase {
 	}
 	
 	@Override
-	public void setLivingAnimations(LivingEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(T entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 		float frac;
 		float weight;
@@ -435,13 +433,11 @@ public class ModelDragonRed extends ModelBase {
 	}
 	
 	@Override
-	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
+	public void setRotationAngles(T dragon, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
 		
 		float period;
 		float frac;
 		float weight;
-		
-		EntityDragonRedBase dragon = (EntityDragonRedBase) entityIn;
 		
 		limbSwing *= .4;
 		limbSwingAmount *= .4;

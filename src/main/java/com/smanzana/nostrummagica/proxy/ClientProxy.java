@@ -307,6 +307,8 @@ public class ClientProxy extends CommonProxy {
     	
     	EnchantedArmor.ClientInit();
     	
+    	// idk why this is deprecated. It's what's in the docs and in the forge samples.
+    	// https://github.com/MinecraftForge/MinecraftForge/blob/1.14.x/src/test/java/net/minecraftforge/testmods/TestOBJModelMod.java
     	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
     	
     	MinecraftForge.EVENT_BUS.register(this);
@@ -1300,11 +1302,6 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openSpellScreen(Spell spell) {
 		Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
-	}
-	
-	@Override
-	public void sendServerConfig(ServerPlayerEntity player) {
-		; //do nothing on client side
 	}
 	
 	@Override
