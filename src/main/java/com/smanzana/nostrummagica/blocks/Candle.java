@@ -386,7 +386,8 @@ public class Candle extends ContainerBlock {
 		}
 	}
 	
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn) {
+	@Override
+	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		if (!isValidPosition(worldIn, pos, state.get(FACING))) {
 			worldIn.destroyBlock(pos, true);
 		}

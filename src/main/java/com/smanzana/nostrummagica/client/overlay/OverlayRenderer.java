@@ -1518,7 +1518,7 @@ public class OverlayRenderer extends AbstractGui {
 			final BlockState state = player.world.getBlockState(blockpos);
 			final Block block = state.getBlock();
 
-			int unused; // Check!
+			int unused; // Check! Need to render fluid overlay manually?
 //			if (block instanceof FluidBlock && ((BlockFluidBase) block).getFluid() != null) {
 //				BlockFluidBase fblock = (BlockFluidBase) block;
 //				Vec3d fogColor = fblock.getFogColor(player.world, blockpos, state, player,

@@ -1,102 +1,147 @@
 package com.smanzana.nostrummagica.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.model.data.IModelData;
 
+@SuppressWarnings("deprecation")
 public class MimicBlockBakedModel implements IBakedModel {
 
-	private final TextureAtlasSprite particle;
+	//private final TextureAtlasSprite particle;
+	private final IBakedModel undisguisedModel;
 	
-	public MimicBlockBakedModel() {
-		particle = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "blocks/mimic_facade").toString());
+	public MimicBlockBakedModel(IBakedModel undisguisedModel) {
+		//particle = Minecraft.getInstance().getTextureMap().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "blocks/mimic_facade").toString());
+		this.undisguisedModel = undisguisedModel;
 	}
 	
-	protected BlockState getNestedState(@Nullable BlockState state) {
-		if (state != null) {
-			IExtendedBlockState ex = (IExtendedBlockState) state;
-			BlockState nestedState = ex.get(MimicBlock.NESTED_STATE);
-			
-			while (nestedState instanceof IExtendedBlockState && nestedState.getBlock() instanceof MimicBlock) {
-				nestedState = ((IExtendedBlockState)nestedState).get(MimicBlock.NESTED_STATE);
-			}
-			
-			if (nestedState != null) {
-				return nestedState;
+	public MimicBlockBakedModel() {
+		this(Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(NostrumBlocks.mimicFacade.getDefaultState()));
+	}
+	
+	protected MimicBlock.MimicBlockData getNestedData(@Nullable IModelData data) {
+		MimicBlock.MimicBlockData ret = null;
+		if (data != null) {
+			ret = data.getData(MimicBlock.MIMIC_MODEL_PROPERTY);
+		}
+		
+		return ret;
+	}
+	
+	protected @Nullable BlockState getNestedState(@Nullable IModelData data) {
+		BlockState state = null;
+		if (data != null) {
+			MimicBlock.MimicBlockData mimicData = getNestedData(data);
+			if (mimicData != null) {
+				state = mimicData.getBlockState();
 			}
 		}
 		
-		return null;
+		return state;
 	}
 	
-	protected IBakedModel getModelToRender(@Nullable BlockState nestedState) {
-		IBakedModel missing = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
+	protected @Nonnull IBakedModel getModelToRender(@Nullable BlockState nestedState) {
+		final IBakedModel missing = this.undisguisedModel;//Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
 		IBakedModel nestedModel = null;
 		
 		if (nestedState != null) {
 			
-			// Stupid CTM wraps up models and needs to be unwrapped
-			if (nestedState instanceof IExtendedBlockState) {
-				BlockState trueState = ((IExtendedBlockState) nestedState).getClean();
-				if (trueState != null) {
-					nestedState = trueState;
-				}
-			}
+//			// Stupid CTM wraps up models and needs to be unwrapped
+//			if (nestedState instanceof IExtendedBlockState) {
+//				BlockState trueState = ((IExtendedBlockState) nestedState).getClean();
+//				if (trueState != null) {
+//					nestedState = trueState;
+//				}
+//			}
 			
-			nestedModel = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(nestedState);
+			nestedModel = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(nestedState);
 		}
 		
 		return nestedModel == null ? missing : nestedModel;
 	}
 	
-	@Override
-	public List<BakedQuad> getQuads(@Nullable BlockState state, Direction side, long rand) {
-		BlockState nested = getNestedState(state);
-		return getModelToRender(nested).getQuads(nested, side, rand);
+	protected @Nonnull IBakedModel getModelToRender(@Nullable IModelData extraData) {
+		return getModelToRender(getNestedState(extraData));
 	}
-
+	
+	//////Things based on wrapped model
+	@Override
+	public TextureAtlasSprite getParticleTexture(IModelData data) {
+		return getModelToRender(data).getParticleTexture(data);
+	}
+	
+	protected static final List<BakedQuad> EmptyQuads = new ArrayList<>(0);
+	
+	@Override
+	public List<BakedQuad> getQuads(@Nullable BlockState state, Direction side, Random rand, IModelData extraData) {
+		// Note: block says "render me in ALL layers" so that this func gets called in each layer.
+		// And this model then checks the wrapped model and sees if it should be rendered in the current layer.
+		
+		BlockState nested = getNestedState(extraData);
+		if (nested.canRenderInLayer(MinecraftForgeClient.getRenderLayer())) {
+			return getModelToRender(nested).getQuads(nested, side, rand, extraData);
+		} else {
+			return EmptyQuads;
+		}
+	}
+	
+	////// Hardcoded things based on base undisguised model
+	// Couldn't I just override getBakedModel ?
 	@Override
 	public boolean isAmbientOcclusion() {
-		return true;
+		return this.undisguisedModel.isAmbientOcclusion();
 	}
 
 	@Override
 	public boolean isGui3d() {
-		return true;
+		return this.undisguisedModel.isGui3d();
 	}
 
 	@Override
 	public boolean isBuiltInRenderer() {
-		return false;
+		return this.undisguisedModel.isBuiltInRenderer();
 	}
-
-	@Override
-	public TextureAtlasSprite getParticleTexture() {
-		return particle;
-	}
-
+	
 	@Override
 	public ItemCameraTransforms getItemCameraTransforms() {
-		return ItemCameraTransforms.DEFAULT;
+		return this.undisguisedModel.getItemCameraTransforms();
 	}
 
 	@Override
 	public ItemOverrideList getOverrides() {
-		return ItemOverrideList.NONE;
+		return this.undisguisedModel.getOverrides();
 	}
+	
+	@Override
+	public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand) {
+		// Show undisguised state
+		return undisguisedModel.getQuads(state, side, rand);
+	}
+	
+	@Override
+	public TextureAtlasSprite getParticleTexture() {
+		return undisguisedModel.getParticleTexture();
+	}
+	
+	
+
+	
 
 }

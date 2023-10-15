@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -48,6 +49,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -63,29 +65,20 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 		}
 	}
 	
-//	public static IUnlistedProperty<BlockState> NESTED_STATE = new IUnlistedProperty<BlockState>() {
-//
-//		@Override
-//		public String getName() {
-//			return "Mimic::NestedState";
-//		}
-//
-//		@Override
-//		public boolean isValid(BlockState value) {
-//			return value != null;
-//		}
-//
-//		@Override
-//		public Class<BlockState> getType() {
-//			return BlockState.class;
-//		}
-//
-//		@Override
-//		public String valueToString(BlockState value) {
-//			return value.toString();
-//		}
-//		
-//	};
+	public static final ModelProperty<MimicBlockData> MIMIC_MODEL_PROPERTY = new ModelProperty<>();
+	
+	public static @Nonnull BlockState GetMimickedState(World world, BlockPos myPos) {
+		// Mimic blocks mimic what's below them.
+		BlockPos pos = myPos.down();
+		BlockState state = world.getBlockState(pos);
+		
+		// If it's another mimic block, use what it's mimicking
+		if (state.getBlock() instanceof MimicBlock) {
+			state = getMirrorState(world, pos).orElse(state);
+		}
+		
+		return state;
+	}
 	
 	public static BooleanProperty UNBREAKABLE = BooleanProperty.create("unbreakable");
 
@@ -265,6 +258,17 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 		}
 	}
 	
+	@Override
+	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
+		
+		if (pos.equals(fromPos.up())) {
+			// Block below changed, so refresh tile entity
+			MimicBlockTileEntity te = (MimicBlockTileEntity) worldIn.getTileEntity(pos);
+			te.updateBlock();
+		}
+	}
+	
 	// Mimiced block attributes
 	@Override
 	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
@@ -288,7 +292,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 
 	@Override
 	public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
-		return true;
+		return true; // MimicBlockBakedModel checks wrapped state when rendered
 	}
 	
 	@Override
@@ -474,13 +478,6 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
         TileEntity te = world.getTileEntity(pos);
         return world.getBlockState(pos).getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity ?
             Optional.of(((MimicBlockTileEntity) te).getData()) : Optional.empty();
-    }
-
-    public static void requestModelRefresh(IBlockReader world, BlockPos pos) {
-        TileEntity tileEntity = world.getTileEntity(pos);
-        if(tileEntity != null) {
-            tileEntity.requestModelDataUpdate();
-        }
     }
 
     private interface StateFunction<T, W extends IBlockReader> {
