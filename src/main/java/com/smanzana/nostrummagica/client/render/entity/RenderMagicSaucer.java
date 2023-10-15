@@ -1,22 +1,22 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer.Vector;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderMagicSaucer extends Render<EntitySpellSaucer> {
+public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRenderer<T> {
 	
-	private ModelMagicSaucer mainModel;
+	private ModelMagicSaucer<T> mainModel;
 
-	public RenderMagicSaucer(RenderManager renderManagerIn) {
+	public RenderMagicSaucer(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
-		mainModel = new ModelMagicSaucer();
+		mainModel = new ModelMagicSaucer<>();
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class RenderMagicSaucer extends Render<EntitySpellSaucer> {
 	}
 	
 	@Override
-	public void doRender(EntitySpellSaucer entity, double x, double y, double z, float entityYaw, float partialTicks) {
+	public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		
 		GlStateManager.pushMatrix();
 		
@@ -43,10 +43,10 @@ public class RenderMagicSaucer extends Render<EntitySpellSaucer> {
         	Vector vec = cycler.getTargetLoc(partialTicks);
         	vec.subtract(NostrumMagica.instance.proxy.getPlayer().getPositionVector());
         	
-        	GlStateManager.translatef(vec.x, vec.y, vec.z);
+        	GlStateManager.translated(vec.x, vec.y, vec.z);
         } else {
             // Render at actual positional offset from player
-        	GlStateManager.translatef(x, y, z);
+        	GlStateManager.translated(x, y, z);
             GlStateManager.rotatef(entity.rotationPitch, 1, 0, 0);
         }
         

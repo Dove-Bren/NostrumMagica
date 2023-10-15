@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPlantBossLeaf extends Render<EntityPlantBoss.PlantBossLeafLimb> {
+public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBossLeafLimb> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
 	protected ModelPlantBossLeaf mainModel;
 	
-	public RenderPlantBossLeaf(RenderManager renderManagerIn) {
+	public RenderPlantBossLeaf(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossLeaf();
@@ -31,7 +31,7 @@ public class RenderPlantBossLeaf extends Render<EntityPlantBoss.PlantBossLeafLim
 		
 		//this.mainModel = new ModelPlantBoss();
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x, y, z);
+		GlStateManager.translated(x, y, z);
 		mainModel.render(entity, partialTicks, 0f, 0f, entityYaw, 0f, 1f);
 		GlStateManager.popMatrix();
 		

@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityWillo;
-
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.EntityWillo;
+
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderWillo extends RenderLiving<EntityWillo> {
+public class RenderWillo extends LivingRenderer<EntityWillo, ModelWillo> {
 
 	private static final ResourceLocation RES_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/entity/willo.png");
 	
-	public RenderWillo(RenderManager renderManagerIn, float scale) {
+	public RenderWillo(EntityRendererManager renderManagerIn, float scale) {
 		super(renderManagerIn, new ModelWillo(), .33f);
 	}
 	
@@ -26,7 +26,7 @@ public class RenderWillo extends RenderLiving<EntityWillo> {
 		GlStateManager.disableCull();
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		GlStateManager.enableCull();
-		GlStateManager.color4f(1f, 1f, 1f);
+		GlStateManager.color3f(1f, 1f, 1f);
 	}
 
 	@Override

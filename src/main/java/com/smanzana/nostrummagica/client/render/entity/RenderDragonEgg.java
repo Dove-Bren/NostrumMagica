@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderDragonEgg extends RenderLiving<EntityDragonEgg> {
+public class RenderDragonEgg extends LivingRenderer<EntityDragonEgg, ModelDragonEgg> {
 
-	public RenderDragonEgg(RenderManager renderManagerIn, float shadowSizeIn) {
+	public RenderDragonEgg(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelDragonEgg(), shadowSizeIn);
 	}
 

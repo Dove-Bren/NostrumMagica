@@ -1,25 +1,25 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderSpellProjectile extends Render<EntitySpellProjectile> {
+public class RenderSpellProjectile extends EntityRenderer<EntitySpellProjectile> {
 	
 	private static final ResourceLocation LOC_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
 	private final float scale;
 
-	public RenderSpellProjectile(RenderManager renderManager, float scale) {
+	public RenderSpellProjectile(EntityRendererManager renderManager, float scale) {
 		super(renderManager);
 		this.scale = scale;
 	}
@@ -46,7 +46,8 @@ public class RenderSpellProjectile extends Render<EntitySpellProjectile> {
 
 		if (this.renderOutlines) {
 			GlStateManager.enableColorMaterial();
-			GlStateManager.enableOutlineMode(this.getTeamColor(entity));
+			//GlStateManager.enableOutlineMode(this.getTeamColor(entity));
+			GlStateManager.setupSolidRenderingTextureCombine(this.getTeamColor(entity));
 		}
 		GlStateManager.enableBlend();
 		GlStateManager.alphaFunc(516, 0);
@@ -70,7 +71,8 @@ public class RenderSpellProjectile extends Render<EntitySpellProjectile> {
 		tessellator.draw();
 
 		if (this.renderOutlines) {
-			GlStateManager.disableOutlineMode();
+			//GlStateManager.disableOutlineMode();
+			GlStateManager.tearDownSolidRenderingTextureCombine();
 			GlStateManager.disableColorMaterial();
 		}
 

@@ -3,15 +3,15 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderSprite extends RenderLiving<EntitySprite> {
+public class RenderSprite extends LivingRenderer<EntitySprite, ModelSpriteCore> {
 
 	//private ModelSpriteArms armModel;
 	
-	public RenderSprite(RenderManager renderManagerIn, float shadowSizeIn) {
+	public RenderSprite(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelSpriteCore(), shadowSizeIn);
 		
 		//this.armModel = new ModelSpriteArms();

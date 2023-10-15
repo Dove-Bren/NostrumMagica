@@ -9,26 +9,26 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderDragonRed extends RenderLiving<EntityDragonRedBase> {
+public class RenderDragonRed<T extends EntityDragonRedBase> extends LivingRenderer<T, ModelDragonRed<T>> {
 
-	protected final ModelDragonRed dragonModel;
+	protected final ModelDragonRed<T> dragonModel;
 	
-	public RenderDragonRed(RenderManager renderManagerIn, float shadowSizeIn) {
-		this(renderManagerIn, new ModelDragonRed(), shadowSizeIn);
+	public RenderDragonRed(EntityRendererManager renderManagerIn, float shadowSizeIn) {
+		this(renderManagerIn, new ModelDragonRed<>(), shadowSizeIn);
 	}
 	
-	protected RenderDragonRed(RenderManager renderManagerIn, ModelDragonRed modelBase, float shadowSizeIn) {
+	protected RenderDragonRed(EntityRendererManager renderManagerIn, ModelDragonRed<T> modelBase, float shadowSizeIn) {
 		super(renderManagerIn, modelBase, shadowSizeIn);
 		this.dragonModel = modelBase;
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityDragonRedBase entity) {
+	protected ResourceLocation getEntityTexture(T entity) {
 		// TODO fixme?
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/koid.png"
@@ -36,7 +36,7 @@ public class RenderDragonRed extends RenderLiving<EntityDragonRedBase> {
 	}
 	
 	@Override
-	public void doRender(EntityDragonRedBase dragon, double x, double y, double z, float entityYaw, float partialTicks) {
+	public void doRender(T dragon, double x, double y, double z, float entityYaw, float partialTicks) {
 		// Set up armor visiblity
 		@Nonnull final ItemStack chestArmor = dragon.getDragonEquipment(DragonEquipmentSlot.BODY);
 		@Nonnull final ItemStack headArmor = dragon.getDragonEquipment(DragonEquipmentSlot.HELM);

@@ -642,4 +642,9 @@ public final class RenderFuncs {
 //		GlStateManager.enableAlpha();
 //		GlStateManager.enableTexture2D();
 //    }
+	
+	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
+		return MathHelper.func_219805_h(partialTicks, prevYawOffset, yawOffset);
+	}
+	
 }

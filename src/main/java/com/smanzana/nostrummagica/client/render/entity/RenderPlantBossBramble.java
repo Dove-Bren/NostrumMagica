@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPlantBossBramble extends Render<EntityPlantBossBramble> {
+public class RenderPlantBossBramble extends EntityRenderer<EntityPlantBossBramble> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
 	protected ModelPlantBossBramble mainModel;
 	
-	public RenderPlantBossBramble(RenderManager renderManagerIn) {
+	public RenderPlantBossBramble(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossBramble();
@@ -38,7 +38,7 @@ public class RenderPlantBossBramble extends Render<EntityPlantBossBramble> {
 		GlStateManager.pushMatrix();
 		
 		// Copied from renderliving
-		GlStateManager.translatef(x, y, z);
+		GlStateManager.translated(x, y, z);
 
 		// yaw 0 is south, z+
 		GlStateManager.rotatef(180.0F - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
@@ -47,7 +47,7 @@ public class RenderPlantBossBramble extends Render<EntityPlantBossBramble> {
 		GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
 
 		GlStateManager.scalef(scale, 1, 1);
-		GlStateManager.translatef(0, - 1.5, 0);
+		GlStateManager.translatef(0, - 1.5f, 0);
 		GlStateManager.scalef((1f / 16f), (1f / 16f) * 1, (1f / 16f) * 1);
 		mainModel.render(entity, partialTicks, 0f, 0f, entityYaw, 0f, 1f);
 		GlStateManager.popMatrix();

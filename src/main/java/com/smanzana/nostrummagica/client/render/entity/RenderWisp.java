@@ -3,20 +3,20 @@ package com.smanzana.nostrummagica.client.render.entity;
 import java.util.EnumMap;
 import java.util.Map;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderWisp extends Render<EntityWisp> {
+public class RenderWisp extends EntityRenderer<EntityWisp> {
 
 	private Map<EMagicElement, ModelWisp> modelCache;
 	private float scale;
 	
-	public RenderWisp(RenderManager renderManagerIn, float scale) {
+	public RenderWisp(EntityRendererManager renderManagerIn, float scale) {
 		super(renderManagerIn);
 		modelCache = new EnumMap<>(EMagicElement.class);
 		this.scale = scale;
@@ -33,7 +33,7 @@ public class RenderWisp extends Render<EntityWisp> {
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(x, y, z);
+		GlStateManager.translated(x, y, z);
 		model.render(entity, partialTicks, 0, 0, 0, 0, this.scale);
 		GlStateManager.popMatrix();
 	}

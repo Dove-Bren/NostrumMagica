@@ -2,27 +2,28 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossLeafLimb;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
+public class RenderPlantBoss extends LivingRenderer<EntityPlantBoss, ModelPlantBoss> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
 	protected ModelPlantBossLeaf leafModels[];
 	
-	public RenderPlantBoss(RenderManager renderManagerIn, float shadowSizeIn) {
+	public RenderPlantBoss(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelPlantBoss(), shadowSizeIn);
 		
 		leafModels = new ModelPlantBossLeaf[EntityPlantBoss.NumberOfLeaves];
@@ -63,7 +64,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, -plant.getBody().height/2, 0);
+		GlStateManager.translatef(0, -plant.getBody().getHeight()/2, 0);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
@@ -126,7 +127,7 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, -plant.getBody().height/2, 0);
+		GlStateManager.translatef(0, -plant.getBody().getHeight()/2, 0);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
 		
@@ -226,17 +227,17 @@ public class RenderPlantBoss extends RenderLiving<EntityPlantBoss> {
 		
 		// Also render leaf models. Do it here so I don't have to repeat all the rotations and scaling
 		GlStateManager.pushMatrix();
-		final float existingRotation = this.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
+		final float existingRotation = RenderFuncs.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
 		GlStateManager.rotatef((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
-		GlStateManager.translatef(0, plant.getBody().height/2, 0);
+		GlStateManager.translatef(0, plant.getBody().getHeight()/2, 0);
 		for (int i = 0; i < leafModels.length; i++) {
 			PlantBossLeafLimb leaf = plant.getLeafLimb(i);
-			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().width;
+			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().getWidth();
 			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
 			
 			GlStateManager.pushMatrix();
 			GlStateManager.rotatef(180 + leaf.getYawOffset(), 0, 1, 0);
-			GlStateManager.translatef(offset, -.001 * i, 0);
+			GlStateManager.translated(offset, -.001 * i, 0);
 			GlStateManager.rotatef(-leaf.getPitch(), 0, 0, 1);
 			leafModels[i].render(leaf, 0f, 0f, ageInTicks, 0f, 0f, scaleFactor);
 			GlStateManager.popMatrix();

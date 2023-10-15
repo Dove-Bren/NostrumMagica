@@ -1,25 +1,25 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellMortar;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderSpellMortar extends Render<EntitySpellMortar> {
+public class RenderSpellMortar extends EntityRenderer<EntitySpellMortar> {
 	
 	private static final ResourceLocation LOC_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
 	private final float scale;
 
-	public RenderSpellMortar(RenderManager renderManager, float scale) {
+	public RenderSpellMortar(EntityRendererManager renderManager, float scale) {
 		super(renderManager);
 		this.scale = scale;
 	}
@@ -38,7 +38,7 @@ public class RenderSpellMortar extends Render<EntitySpellMortar> {
 		this.bindEntityTexture(entity);
 		GlStateManager.translatef((float)x, (float)y, (float)z);
 		GlStateManager.enableRescaleNormal();
-		GlStateManager.scalef(1.5 * this.scale, 1.5 * this.scale, 1.5 * this.scale);
+		GlStateManager.scalef(1.5f * this.scale, 1.5f * this.scale, 1.5f * this.scale);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		GlStateManager.rotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
@@ -46,7 +46,8 @@ public class RenderSpellMortar extends Render<EntitySpellMortar> {
 
 		if (this.renderOutlines) {
 			GlStateManager.enableColorMaterial();
-			GlStateManager.enableOutlineMode(this.getTeamColor(entity));
+			//GlStateManager.enableOutlineMode(this.getTeamColor(entity));
+			GlStateManager.setupSolidRenderingTextureCombine(this.getTeamColor(entity));
 		}
 		GlStateManager.enableBlend();
 		GlStateManager.alphaFunc(516, 0);
@@ -70,7 +71,8 @@ public class RenderSpellMortar extends Render<EntitySpellMortar> {
 		tessellator.draw();
 
 		if (this.renderOutlines) {
-			GlStateManager.disableOutlineMode();
+			//GlStateManager.disableOutlineMode();
+			GlStateManager.tearDownSolidRenderingTextureCombine();
 			GlStateManager.disableColorMaterial();
 		}
 

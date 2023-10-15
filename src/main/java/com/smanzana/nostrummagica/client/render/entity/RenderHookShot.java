@@ -2,27 +2,27 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
-public class RenderHookShot extends Render<EntityHookShot> {
+public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 
 	private ModelHookShot model;
 	
-	public RenderHookShot(RenderManager renderManagerIn) {
+	public RenderHookShot(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
 		
 		this.model = new ModelHookShot();
@@ -88,7 +88,7 @@ public class RenderHookShot extends Render<EntityHookShot> {
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		GlStateManager.pushMatrix();
 		
-		GlStateManager.translatef(x, y, z);
+		GlStateManager.translated(x, y, z);
 		//GlStateManager.enableAlphaTest();
 		
 		// First, render chain
@@ -126,7 +126,7 @@ public class RenderHookShot extends Render<EntityHookShot> {
 			Minecraft.getInstance().getTextureManager().bindTexture(getEntityTexture(entity));
 		}
 		
-		GlStateManager.translatef(0, -.5, 0);
+		GlStateManager.translatef(0, -.5f, 0);
 		// then, render hook
 		model.render(entity, partialTicks, 0f, 0f, 0f, 0f, 1f);
 		

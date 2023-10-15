@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderKoid extends RenderLiving<EntityKoid> {
+public class RenderKoid extends LivingRenderer<EntityKoid, ModelKoid> {
 
-	public RenderKoid(RenderManager renderManagerIn, float shadowSizeIn) {
+	public RenderKoid(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelKoid(), shadowSizeIn);
 	}
 

@@ -4,21 +4,21 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityLux;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderLux extends RenderLiving<EntityLux> {
+public class RenderLux extends LivingRenderer<EntityLux, ModelLux> {
 
-	public RenderLux(RenderManager renderManagerIn, float scale) {
+	public RenderLux(EntityRendererManager renderManagerIn, float scale) {
 		super(renderManagerIn, new ModelLux(), .33f);
 	}
 	
 	@Override
 	public void doRender(EntityLux entity, double x, double y, double z, float entityYaw, float partialTicks) {
-		GlStateManager.color4f(.65f, 1f, .7f);
+		GlStateManager.color3f(.65f, 1f, .7f);
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
-		GlStateManager.color4f(1f, 1f, 1f);
+		GlStateManager.color3f(1f, 1f, 1f);
 	}
 
 	@Override

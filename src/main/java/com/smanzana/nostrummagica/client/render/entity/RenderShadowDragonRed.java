@@ -1,10 +1,12 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import net.minecraft.client.renderer.entity.RenderManager;
+import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 
-public class RenderShadowDragonRed extends RenderDragonRed {
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 
-	public RenderShadowDragonRed(RenderManager renderManagerIn, float shadowSizeIn) {
+public class RenderShadowDragonRed extends RenderDragonRed<EntityShadowDragonRed> {
+
+	public RenderShadowDragonRed(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelShadowDragonRed(), shadowSizeIn);
 	}
 
