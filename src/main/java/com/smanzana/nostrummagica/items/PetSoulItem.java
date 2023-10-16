@@ -116,7 +116,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		
 		UUID worldID = NostrumMagica.instance.getPetSoulRegistry().rotateWorldID(soulID);
 		
-		Entity rawEnt = IPetWithSoul.SpawnPetFromSnapshot(world, pos, snapshot, false);
+		Entity rawEnt = IPetWithSoul.CreatePetFromSnapshot(world, pos, snapshot);
 		if (rawEnt == null) {
 			return null;
 		} else if (!(rawEnt instanceof LivingEntity)) {

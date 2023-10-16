@@ -44,6 +44,22 @@ public enum NostrumParticles {
 	public NostrumParticleType getType() {
 		return this.type;
 	}
+
+	public @Nullable INostrumParticleFactory<?> getFactory() {
+		if (factory == null) {
+			try {
+				factory = factoryClazz.newInstance();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return factory;
+	}
 	
 	public void spawn(World world, SpawnParams params) {
 		Spawn(this, world, params);
@@ -63,20 +79,9 @@ public enum NostrumParticles {
 			NetworkHandler.sendToDimension(new SpawnNostrumParticleMessage(type, params),
 					world.getDimension().getType());
 		} else {
-			if (type.factory == null) {
-				try {
-					type.factory = type.factoryClazz.newInstance();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-			if (type.factory != null) {
-				type.factory.createParticle(world, params);
+			INostrumParticleFactory<?> factory = type.getFactory();
+			if (factory != null) {
+				factory.createParticle(world, params);
 			}
 		}
 	}

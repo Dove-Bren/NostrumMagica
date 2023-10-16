@@ -61,6 +61,8 @@ import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
+import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.render.entity.ModelGolem;
 import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
@@ -200,6 +202,9 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.IParticleFactory;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.Render;
@@ -237,6 +242,7 @@ import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
@@ -890,6 +896,21 @@ public class ClientProxy extends CommonProxy {
 				return new RenderPlantBossBramble(manager);
 			}
 		});
+	}
+	
+	@SubscribeEvent
+	public static void registerClientParticleFactories(ParticleFactoryRegisterEvent event) {
+		final Minecraft mc = Minecraft.getInstance();
+		ParticleManager manager = mc.particles;
+		
+		for (NostrumParticles particle : NostrumParticles.values()) {
+			manager.registerFactory(particle.getType(), new IParticleFactory<NostrumParticleData>() {
+				@Override
+				public Particle makeParticle(NostrumParticleData typeIn, World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+					return particle.getFactory().createParticle(worldIn, typeIn.getParams());
+				}
+			});
+		}
 	}
 	
 	@SubscribeEvent

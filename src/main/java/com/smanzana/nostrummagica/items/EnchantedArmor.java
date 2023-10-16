@@ -484,7 +484,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 
 	// TODO: move?
 	@OnlyIn(Dist.CLIENT)
-	private static ModelEnchantedArmorBase armorModels[];
+	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels = null;
 	
 	public EnchantedArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
 		super(ArmorMaterial.IRON, slot, builder.maxDamage(calcArmorDurability(slot, element, type)));
@@ -500,9 +500,9 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		// TODO move somewhere else?
 		if (!NostrumMagica.instance.proxy.isServer()) {
 			if (armorModels == null) {
-				armorModels = new ModelEnchantedArmorBase[5];
+				armorModels = new ArrayList<ModelEnchantedArmorBase<LivingEntity>>(5);
 				for (int i = 0; i < 5; i++) {
-					armorModels[i] = new ModelEnchantedArmorBase(1f, i);
+					armorModels.add(i, new ModelEnchantedArmorBase<LivingEntity>(1f, i));
 				}
 			}
 		}
@@ -1121,12 +1121,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return NostrumMagica.MODID + ":textures/models/armor/magic_armor_" + element.name().toLowerCase() + ".png"; 
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public <A extends BipedModel<?>> A getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot, A defaultModel) {
+	public BipedModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot, BipedModel defaultModel) {
 		final int setCount = getSetPieces(entity);
 		final int index = (setCount - 1) + (type == Type.TRUE ? 1 : 0); // Boost 1 if ultimate armor
-		ModelEnchantedArmorBase model = armorModels[index % armorModels.length];
+		ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());
 		model.setVisibleFrom(slot);
 		
 		return model;
