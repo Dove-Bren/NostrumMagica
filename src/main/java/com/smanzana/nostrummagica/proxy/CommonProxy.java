@@ -20,8 +20,6 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.Predefin
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.config.network.ServerConfigMessage;
 import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.IEntityPet;
@@ -89,11 +87,15 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
-import com.smanzana.nostrummagica.world.NostrumFlowerGenerator;
-import com.smanzana.nostrummagica.world.NostrumOreGenerator;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator.NostrumDungeonConfig;
+import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
+import com.smanzana.nostrummagica.world.gen.NostrumFlowerGenerator;
+import com.smanzana.nostrummagica.world.gen.NostrumFlowerGenerator.NostrumFlowerConfig;
+import com.smanzana.nostrummagica.world.gen.NostrumOreGenerator;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.enchantment.Enchantment;
@@ -111,6 +113,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.OreFeatureConfig;
+import net.minecraft.world.gen.placement.CountRangeConfig;
+import net.minecraft.world.gen.placement.DepthAverageConfig;
+import net.minecraft.world.gen.placement.IPlacementConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -123,6 +132,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.registries.DataSerializerEntry;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
@@ -154,23 +164,26 @@ public class CommonProxy {
 	}
 	
 	public void init() {
-    	GameRegistry.registerWorldGenerator(new NostrumOreGenerator(), 0);
-    	GameRegistry.registerWorldGenerator(new NostrumFlowerGenerator(), 0);
-    	GameRegistry.registerWorldGenerator(new NostrumDungeonGenerator(), 0);
-    	
     	NetworkRegistry.INSTANCE.registerGuiHandler(NostrumMagica.instance, new NostrumGui());
     	
     	LoreRegistry.instance();
 	}
 	
 	public void postinit() {
-		for (Biome biome : Biome.REGISTRY) {
-			biome.addFlower(NostrumMagicaFlower.instance().getState(NostrumMagicaFlower.Type.MIDNIGHT_IRIS), 8);
-			biome.addFlower(NostrumMagicaFlower.instance().getState(NostrumMagicaFlower.Type.CRYSTABLOOM), 7);
-		}
-		
 		NostrumQuest.Validate();
 		NostrumResearch.Validate();
+	}
+	
+	public void registerWorldGen() {
+		// Note: features registered in NostrumFeatures
+		for(Biome biome : ForgeRegistries.BIOMES) {
+			// Filter this list maybe?
+			biome.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Biome.createDecoratedFeature(NostrumFeatures.flowers, new NostrumFlowerConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.dungeons, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+			
+			biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(Feature.ORE, new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.maniOre.getDefaultState(), 9), Placement.COUNT_RANGE, new CountRangeConfig(20, 0, 0, 240)));
+			biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(Feature.ORE, new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.essenceOre.getDefaultState(), 3), Placement.COUNT_RANGE, new CountRangeConfig(10, 20, 20, 60)));
+		}
 	}
     
     private void registerShapes() {

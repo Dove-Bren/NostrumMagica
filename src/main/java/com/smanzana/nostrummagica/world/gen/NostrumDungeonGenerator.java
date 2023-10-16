@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.world;
+package com.smanzana.nostrummagica.world.gen;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -8,8 +8,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
+import javax.annotation.Nonnull;
+
+import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.types.DynamicOps;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
@@ -22,18 +25,42 @@ import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator.NostrumDungeonConfig;
 
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraft.world.gen.feature.WorldGenerator;
-import net.minecraftforge.fml.common.IWorldGenerator;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 
-public class NostrumDungeonGenerator implements IWorldGenerator {
+// TODO: convert to a Structure; generate with starts and pieces and dump into world one chunk at a time
+public class NostrumDungeonGenerator extends Feature<NostrumDungeonConfig> {
+	
+	public static final class NostrumDungeonConfig implements IFeatureConfig {
 
-	private static class WorldGenNostrumShrine extends WorldGenerator {
+		public static NostrumDungeonConfig deserialize(Dynamic<?> dynamic) {
+			return new NostrumDungeonConfig();
+		}
+
+		@Override
+		public <T> Dynamic<T> serialize(DynamicOps<T> ops) {
+			return new Dynamic<>(ops);
+		}
+		
+		public boolean allowedInDimension(DimensionType dimension) {
+			return dimension == DimensionType.OVERWORLD;
+		}
+		
+		public boolean allowedAtPos(IWorld world, BlockPos pos) {
+			return true;
+		}
+		
+	}
+
+	public static class WorldGenNostrumShrine {
 		
 		private NostrumDungeon dungeon;
 		
@@ -41,12 +68,10 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			this.dungeon = dungeon;
 		}
 		
-		@Override
-		public boolean generate(World worldIn, Random rand, BlockPos position)
-	    {
+		public boolean generate(IWorld worldIn, Random rand, BlockPos position) {
 	        dungeon.spawn(worldIn,
 	        		new NostrumDungeon.DungeonExitPoint(position, 
-	        				Direction.HORIZONTALS[rand.nextInt(4)]
+	        				Direction.Plane.HORIZONTAL.random(rand)
 	        				));
 	        
 	        return true;
@@ -132,12 +157,12 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 		;
 //		TEST(new WorldGenNostrumShrine(new NostrumLoadedDungeon("test", new StartRoom(), new RoomArena())), 30, 60);
 		
-		private WorldGenerator gen = null;
-		private final Function<Integer, WorldGenerator> constructor;
+		private WorldGenNostrumShrine gen = null;
+		private final Function<Integer, WorldGenNostrumShrine> constructor;
 		private final int minY;
 		private final int maxY;
 		
-		private DungeonGen(Function<Integer, WorldGenerator> constructor, int minY, int maxY) {
+		private DungeonGen(Function<Integer, WorldGenNostrumShrine> constructor, int minY, int maxY) {
 			this.constructor = constructor;
 			this.minY = minY;
 			this.maxY = maxY;
@@ -150,7 +175,7 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			gen = constructor.apply(0);
 		}
 		
-		public WorldGenerator getGenerator() {
+		public WorldGenNostrumShrine getGenerator() {
 			return gen;
 		}
 
@@ -162,7 +187,7 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 			return maxY;
 		}
 		
-		public boolean chanceSpawn(Random random, World world, int chunkX, int chunkZ, int bonusOdds) {
+		public boolean chanceSpawn(Random random, IWorld world, int chunkX, int chunkZ, int bonusOdds) {
 			int count = 0;
 			int chance = 1;
 			
@@ -203,7 +228,8 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	
 	public static final int MAX_BOOSTS = 10;
 	
-	public NostrumDungeonGenerator() {
+	public NostrumDungeonGenerator(Function<Dynamic<?>, ? extends NostrumDungeonConfig> configFactoryIn) {
+		super(configFactoryIn);
 		increasedOdds = new EnumMap<>(DungeonGen.class);
 	}
 	
@@ -240,37 +266,35 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	}
 	
 	@Override
-	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+	public boolean place(@Nonnull IWorld world, @Nonnull ChunkGenerator<? extends GenerationSettings> generator, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull NostrumDungeonConfig config) {
 		
 		// Do not allow recursion!
 		if (NostrumDungeonGenerator.generating) {
-			return;
+			return false;
 		}
 		
-		int dim = world.provider.getDimension();
-		int[] dims = ModConfig.config.getDimensionList();
-		boolean found = false;
-		for (int d : dims) {
-			if (d == dim) {
-				found = true;
-				break;
-			}
+		if (!config.allowedInDimension(world.getDimension().getType())) {
+			return false;
 		}
 		
-		if (!found)
-			return;
+		if (!config.allowedAtPos(world, pos)) {
+			return false;
+		}
 		
 		NostrumDungeonGenerator.generating = true;
+		
+		final int chunkX = pos.getX() << 4;
+		final int chunkZ = pos.getZ() << 4;
 		
 		long seed = world.getSeed();
 		// Spawn a portal shrine somewhere in the 32x32 chunks around 0
 		if (chunkX == (int) ((seed & (0x1F << 14)) >> 14) - 16
 				&& chunkZ == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
 			DungeonGen gen = DungeonGen.PORTAL;
-			runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
+			runGenerator(gen.getGenerator(), world, rand, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
 			NostrumDungeonGenerator.generating = false;
-			return;
+			return true;
 		}
 		
 		if (list == null) {
@@ -280,17 +304,20 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 		}
 		Collections.shuffle(list);
 		
+		boolean genned = false;
 		for (DungeonGen gen : list) {
-			if (gen.chanceSpawn(random, world, chunkX, chunkZ, getBonusOdds(gen))) {
+			if (gen.chanceSpawn(rand, world, chunkX, chunkZ, getBonusOdds(gen))) {
 				NostrumMagica.logger.info("Generating NostrumMagica dungeon with type " + gen.name());
-				runGenerator(gen.getGenerator(), world, random, chunkX, chunkZ,
+				runGenerator(gen.getGenerator(), world, rand, chunkX, chunkZ,
 					gen.getMinY(), gen.getMaxY());
 				clearOdds(gen);
+				genned = true;
 				break;
 			}
 		}
 		NostrumDungeonGenerator.generating = false;
 		
+		return genned;
 	}
 
 	/**
@@ -304,7 +331,7 @@ public class NostrumDungeonGenerator implements IWorldGenerator {
 	 * @param minHeight
 	 * @param maxHeight
 	 */
-	private void runGenerator(WorldGenerator generator, World world, Random rand,
+	private void runGenerator(WorldGenNostrumShrine generator, IWorld world, Random rand,
 			int chunk_X, int chunk_Z, int minHeight, int maxHeight) {
 	    if (minHeight < 0 || maxHeight > 256 || minHeight > maxHeight)
 	        throw new IllegalArgumentException("Illegal Height Arguments for WorldGenerator");

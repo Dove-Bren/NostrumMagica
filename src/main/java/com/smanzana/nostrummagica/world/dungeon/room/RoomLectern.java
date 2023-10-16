@@ -38,7 +38,7 @@ import net.minecraft.state.properties.StairsShape;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class RoomLectern extends StaticRoom {
@@ -336,7 +336,7 @@ public class RoomLectern extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start)
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start)
 	{
 		super.spawn(dungeon, world, start);
 		
@@ -348,13 +348,13 @@ public class RoomLectern extends StaticRoom {
 		if (null == ent)
 		{
 			System.out.println("Could not find lectern! (" + pos.getX() + " " + pos.getY() + " " + pos.getZ());
-			world.setBlockState(pos, Blocks.BEDROCK.getDefaultState());
+			world.setBlockState(pos, Blocks.BEDROCK.getDefaultState(), 2);
 		}
 		else
 		{
 			AltarTileEntity te = (AltarTileEntity) ent;
 			ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
-			Spell spell =  genSpell(world.rand);
+			Spell spell =  genSpell(world.getRandom());
 			SpellScroll.setSpell(scroll, spell);
 			scroll.setDamage(NostrumMagica.rand.nextInt(10));
 			

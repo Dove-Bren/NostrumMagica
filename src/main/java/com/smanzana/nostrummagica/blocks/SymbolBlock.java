@@ -12,7 +12,7 @@ import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -80,8 +80,8 @@ public class SymbolBlock extends ContainerBlock {
 //        world.removeTileEntity(pos);
 //	}
 	
-	public void setInWorld(World world, BlockPos pos, SpellComponentWrapper component) {
-		world.setBlockState(pos, this.getDefaultState());
+	public void setInWorld(IWorld world, BlockPos pos, SpellComponentWrapper component) {
+		world.setBlockState(pos, this.getDefaultState(), 3);
 		SymbolTileEntity te = (SymbolTileEntity) world.getTileEntity(pos);
 		te.setComponent(component);
 	}

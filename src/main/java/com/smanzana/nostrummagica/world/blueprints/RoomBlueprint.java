@@ -30,7 +30,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
 /**
@@ -82,7 +82,7 @@ public class RoomBlueprint {
 			}
 		}
 		
-		public BlueprintBlock(World world, BlockPos pos) {
+		public BlueprintBlock(IWorld world, BlockPos pos) {
 			if (world.isAirBlock(pos)) {
 				; //leave null
 			} else {
@@ -365,11 +365,11 @@ public class RoomBlueprint {
 	 * @param pos2
 	 * @param usePlaceholders if true, special blocks to mark entries and doors (For dungeon genning) are detected. Otherwise, just a regular room.
 	 */
-	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders) {
+	public RoomBlueprint(IWorld world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders) {
 		this(world, pos1, pos2, usePlaceholders, null, null);
 	}
 	
-	public RoomBlueprint(World world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders, BlockPos origin, Direction originDir) {
+	public RoomBlueprint(IWorld world, BlockPos pos1, BlockPos pos2, boolean usePlaceholders, BlockPos origin, Direction originDir) {
 		this(null, null, null, null);
 		
 		BlockPos low = new BlockPos(pos1.getX() < pos2.getX() ? pos1.getX() : pos2.getX(),
@@ -529,7 +529,7 @@ public class RoomBlueprint {
 		return false;
 	}
 	
-	protected void placeBlock(World world, BlockPos at, Direction direction, BlueprintBlock block) {
+	protected void placeBlock(IWorld world, BlockPos at, Direction direction, BlueprintBlock block) {
 		
 		if (spawnerFunc != null) {
 			spawnerFunc.spawnBlock(world, at, direction, block);
@@ -553,7 +553,7 @@ public class RoomBlueprint {
 					}
 					
 					if (te != null) {
-						world.setTileEntity(at, te);
+						world.getWorld().setTileEntity(at, te);
 						if (te instanceof IOrientedTileEntity) {
 							// Let tile ent respond to rotation
 							((IOrientedTileEntity) te).setSpawnedFromRotation(direction);
@@ -563,17 +563,17 @@ public class RoomBlueprint {
 					}
 				}
 			} else {
-				world.removeTileEntity(at);
+				world.getWorld().removeTileEntity(at);
 				world.removeBlock(at, false);
 			}
 		}
 	}
 	
-	public void spawn(World world, BlockPos at) {
+	public void spawn(IWorld world, BlockPos at) {
 		this.spawn(world, at, Direction.NORTH);
 	}
 	
-	public void spawn(World world, BlockPos at, Direction direction) {
+	public void spawn(IWorld world, BlockPos at, Direction direction) {
 		
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
@@ -664,7 +664,7 @@ public class RoomBlueprint {
 			for (int i = startX; i < endX; i++)
 			for (int j = 0; j < height; j++)
 			for (int k = startZ; k < endZ; k++) {
-				// World pos is simply chunk position + inner loop offset
+				// IWorld pos is simply chunk position + inner loop offset
 				// (j is data y, so offset to world y)
 				cursor.setPos(chunkOffsetX + i, j + origin.getY(), chunkOffsetZ + k);
 				
@@ -1336,7 +1336,7 @@ public class RoomBlueprint {
 	
 	public static interface IBlueprintSpawner {
 		
-		public void spawnBlock(World world, BlockPos pos, Direction direction, BlueprintBlock block);
+		public void spawnBlock(IWorld world, BlockPos pos, Direction direction, BlueprintBlock block);
 	}
 	
 }

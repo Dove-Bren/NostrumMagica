@@ -15,7 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 /**
  * Room where all blocks are loaded from a file at startup.
@@ -47,7 +47,7 @@ public class LoadedRoom implements IDungeonRoom {
 	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
 	
 	@Override
-	public boolean canSpawnAt(World world, DungeonExitPoint start) {
+	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
 		BlockPos dims = blueprint.getAdjustedDimensions(start.getFacing());
 		BlockPos offset = blueprint.getAdjustedOffset(start.getFacing());
 		
@@ -72,7 +72,7 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
 		// See note about dungeon vs blueprint facing in @getExits
 		blueprint.spawn(world, start.getPos(), start.getFacing());
 		

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.world.dungeon;
 
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public class NostrumDragonDungeon extends NostrumDungeon {
 
@@ -11,7 +11,7 @@ public class NostrumDragonDungeon extends NostrumDungeon {
 	}
 	
 	@Override
-	public void spawn(World world, DungeonExitPoint start) {
+	public void spawn(IWorld world, DungeonExitPoint start) {
 		super.spawn(world, start);
 	}
 

@@ -5,10 +5,10 @@ import java.util.List;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public interface IDungeonRoom {
-
+	
 	/**
 	 * Check whether the room can be spawned at the indicated position with the
 	 * given direction. This should check all affected blocks and make sure that
@@ -16,7 +16,7 @@ public interface IDungeonRoom {
 	 * @param world
 	 * @return
 	 */
-	public boolean canSpawnAt(World world, DungeonExitPoint start);
+	public boolean canSpawnAt(IWorld world, DungeonExitPoint start);
 	
 	/**
 	 * Return the number of exits this room has
@@ -53,6 +53,6 @@ public interface IDungeonRoom {
 	
 	public boolean hasTraps();
 	
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start);
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start);
 	
 }

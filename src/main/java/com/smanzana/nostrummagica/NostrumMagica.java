@@ -153,11 +153,11 @@ import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.utils.Entities;
-import com.smanzana.nostrummagica.world.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientWorld;

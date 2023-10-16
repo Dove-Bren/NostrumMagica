@@ -14,7 +14,7 @@ import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	
@@ -190,7 +190,7 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
 		super.spawn(dungeon, world, start);
 		
 		RoomExtendedShrineStaircase stairs = new RoomExtendedShrineStaircase(component, false);

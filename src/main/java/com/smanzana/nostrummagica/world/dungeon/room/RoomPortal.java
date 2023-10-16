@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public class RoomPortal extends StaticRoom {
 	
@@ -291,7 +291,7 @@ public class RoomPortal extends StaticRoom {
 	BlockPos tilePos;
 	
 	@Override
-	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
+	protected void applyBlockOverrides(IWorld world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
 		if (dataPos.getX() == 0 && dataPos.getZ() == 13 && dataPos.getY() == 0) {
 			if (tilePos != null) {
 				throw new RuntimeException("Spawning multiple portal rooms at the same time!");
@@ -302,7 +302,7 @@ public class RoomPortal extends StaticRoom {
 			if (tilePos == null) {
 				throw new RuntimeException("Portal room spawned out of assumed order!");
 			}
-			world.setBlockState(worldPos, NostrumBlocks.switchBlock.getDefaultState());
+			world.setBlockState(worldPos, NostrumBlocks.switchBlock.getDefaultState(), 2);
 			TileEntity te = world.getTileEntity(worldPos);
 			if (te != null && te instanceof SwitchBlockTileEntity) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;

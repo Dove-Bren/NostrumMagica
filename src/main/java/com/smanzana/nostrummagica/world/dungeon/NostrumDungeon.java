@@ -15,7 +15,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public class NostrumDungeon {
 	
@@ -132,7 +132,7 @@ public class NostrumDungeon {
 		doorRooms.clear();
 	}
 	
-	public void spawn(World world, DungeonExitPoint start) {
+	public void spawn(IWorld world, DungeonExitPoint start) {
 		starting.spawn(this, world, start);
 		
 		// Calculate caches
@@ -270,11 +270,11 @@ public class NostrumDungeon {
 //			return null;
 //		}
 		
-		public void spawn(World world, DungeonExitPoint entry, IDungeonRoom ending) {
+		public void spawn(IWorld world, DungeonExitPoint entry, IDungeonRoom ending) {
 			spawn(world, entry, remaining, ending);
 		}
 		
-		private void spawn(World world, DungeonExitPoint entry, int remaining, IDungeonRoom ending) {
+		private void spawn(IWorld world, DungeonExitPoint entry, int remaining, IDungeonRoom ending) {
 			/*
 			 * 0) If remaining is 0, spawn end if we have it. Otherwise, if we
 			 *    somehow still have the key, spawn a keyroom. Otherwise, try to
@@ -366,7 +366,7 @@ public class NostrumDungeon {
 			}
 		}
 
-		private void spawnKey(World world, DungeonExitPoint keyLocation) {
+		private void spawnKey(IWorld world, DungeonExitPoint keyLocation) {
 			NonNullList<ItemStack> loot = NonNullList.withSize(27, ItemStack.EMPTY);
 			for (int i = 0; i < 27; i++) {
 				if (rand.nextFloat() < .2) {

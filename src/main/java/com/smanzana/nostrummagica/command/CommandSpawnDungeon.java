@@ -6,7 +6,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.smanzana.nostrummagica.world.NostrumDungeonGenerator.DungeonGen;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator.DungeonGen;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

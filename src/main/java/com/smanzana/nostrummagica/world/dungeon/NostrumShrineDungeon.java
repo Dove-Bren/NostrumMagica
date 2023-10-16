@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.room.ISpellComponentRoom;
 
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public class NostrumShrineDungeon extends NostrumDungeon {
 
@@ -20,7 +20,7 @@ public class NostrumShrineDungeon extends NostrumDungeon {
 	}
 	
 	@Override
-	public void spawn(World world, DungeonExitPoint start) {
+	public void spawn(IWorld world, DungeonExitPoint start) {
 		SpellComponentWrapper comp = component.getRandom();
 		((ISpellComponentRoom) this.starting).setComponent(comp);
 		((ISpellComponentRoom) this.ending).setComponent(comp);

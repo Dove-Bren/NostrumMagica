@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 
 /**
@@ -29,7 +29,7 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 	}
 	
 	@Override
-	public boolean canSpawnAt(World world, DungeonExitPoint start) {
+	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
 		int minX = start.getPos().getX() - 5;
 		int minY = start.getPos().getY();
 		int minZ = start.getPos().getZ() - 5;
@@ -51,7 +51,7 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
 		
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();

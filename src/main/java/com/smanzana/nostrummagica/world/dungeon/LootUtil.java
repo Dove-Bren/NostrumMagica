@@ -12,7 +12,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public final class LootUtil {
 	
@@ -25,18 +25,18 @@ public final class LootUtil {
 	 * @param pos
 	 * @param facing
 	 */
-	public static final void generateLoot(World world, BlockPos pos, Direction facing) {
+	public static final void generateLoot(IWorld world, BlockPos pos, Direction facing) {
 		generateLoot(world, pos, facing, NostrumMagica.MODID + ":nostrum_shrine_room");
 	}
 	
-	public static final void generateLoot(World world, BlockPos pos, Direction facing,
+	public static final void generateLoot(IWorld world, BlockPos pos, Direction facing,
 			String loottable) {
-		world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing));
+		world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing), 2);
 		
 		ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(pos);
 		
 		if (chest == null) {
-			world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState());
+			world.setBlockState(pos, Blocks.GOLD_BLOCK.getDefaultState(), 2);
 		} else {
 			chest.setLootTable(new ResourceLocation(loottable), rand.nextLong());
 		}
@@ -50,9 +50,9 @@ public final class LootUtil {
 	 * @param facing
 	 * @param loot
 	 */
-	public static final void createLoot(World world, BlockPos pos, Direction facing,
+	public static final void createLoot(IWorld world, BlockPos pos, Direction facing,
 			NonNullList<ItemStack> loot) {
-		world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing));
+		world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing), 2); // 2 here assumes world is generating and block updates shouldn't happen
 		
 		ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(pos);
 		int len = Math.min(27, loot.size());

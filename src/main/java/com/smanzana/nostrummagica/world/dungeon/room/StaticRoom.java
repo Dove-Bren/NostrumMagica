@@ -20,7 +20,7 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 
 /**
@@ -41,7 +41,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 			this.wrappedState = state;
 		}
 		
-		public void set(World world, BlockPos pos, Direction rotation) {
+		public void set(IWorld world, BlockPos pos, Direction rotation) {
 			final Block block = wrappedState.getBlock();
 			BlockState state = this.wrappedState;
 			
@@ -62,7 +62,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 				cur = rotate(cur, rotation);
 				state = state.with(StairsBlock.FACING, cur);
 			}
-			world.setBlockState(pos, state);
+			world.setBlockState(pos, state, 2);
 		}
 		
 		private static Direction rotate(Direction in, Direction rotation) {
@@ -162,7 +162,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public boolean canSpawnAt(World world, DungeonExitPoint start) {
+	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
 		int relMinX = locMinX;
 		int relMinY = locMinY;
 		int relMinZ = locMinZ;
@@ -209,7 +209,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
 		Set<IChunk> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
@@ -360,7 +360,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 	}
 	
-	protected void applyBlockOverrides(World world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
+	protected void applyBlockOverrides(IWorld world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
 		
 	}
 }

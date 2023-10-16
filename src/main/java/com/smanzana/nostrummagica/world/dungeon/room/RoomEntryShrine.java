@@ -15,7 +15,7 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 // Tiny tight spiral staircase used when creating the entrance to the dungeon
 public class RoomEntryShrine extends StaticRoom {
@@ -345,7 +345,7 @@ public class RoomEntryShrine extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, World world, DungeonExitPoint start) {
+	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
 		super.spawn(dungeon, world, start);
 		
 		if (this.component != null) {
