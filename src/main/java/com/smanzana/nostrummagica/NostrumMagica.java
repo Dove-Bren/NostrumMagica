@@ -132,6 +132,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
@@ -601,7 +602,7 @@ public class NostrumMagica {
 					Ingredient.fromStacks(alteration.getReagents().get(0)),
 					IRitualRequirement.AND(new RRequirementAlterationMastery(alteration),
 							new RRequirementResearch("spellrunes")),
-					new OutcomeSpawnItem(SpellRune.getRune(alteration, 1)));
+					new OutcomeSpawnItem(SpellRune.getRune(alteration)));
 			RitualRegistry.instance().addRitual(recipe);
 		}
 
@@ -615,7 +616,7 @@ public class NostrumMagica {
 							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
 					IRitualRequirement.AND(new RRequirementTriggerMastery(trigger),
 							new RRequirementResearch("spellrunes")),
-					new OutcomeSpawnItem(SpellRune.getRune(trigger, 1)));
+					new OutcomeSpawnItem(SpellRune.getRune(trigger)));
 			RitualRegistry.instance().addRitual(recipe);
 		}
 
@@ -1964,7 +1965,7 @@ public class NostrumMagica {
 				new ItemStack(NostrumItems.spellTomeNovice));
 
 		NostrumResearch.startBuilding().parent("origin")
-				.reference("builtin::guides::spellmaking", "info.spellmaking.name").reference(NostrumItems.spellRune)
+				.reference("builtin::guides::spellmaking", "info.spellmaking.name").reference(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)))
 				.reference(NostrumItems.blankScroll).reference(NostrumItems.spellScroll).reference(NostrumItems.reagentMandrakeRoot)
 				.build("spellcraft", NostrumResearchTab.MAGICA, Size.GIANT, -1, 1, false,
 						new ItemStack(NostrumItems.spellScroll));
@@ -2061,7 +2062,7 @@ public class NostrumMagica {
 						new ItemStack(NostrumItems.resourceSeekingGem));
 
 		NostrumResearch.startBuilding().hiddenParent("magic_token").hiddenParent("spellcraft")
-				.lore(NostrumItems.spellRune).reference("ritual::rune.physical", "ritual.rune.physical.name")
+				.lore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE))).reference("ritual::rune.physical", "ritual.rune.physical.name")
 				.reference("ritual::rune.single", "ritual.rune.single.name")
 				.reference("ritual::rune.inflict", "ritual.rune.inflict.name")
 				.reference("ritual::rune.trigger_touch", "ritual.rune.trigger_touch.name")
@@ -2137,7 +2138,7 @@ public class NostrumMagica {
 				.reference("ritual::reagent_bag", "ritual.reagent_bag.name").build("reagent_bag",
 						NostrumResearchTab.OUTFITTING, Size.NORMAL, -2, -1, true, new ItemStack(NostrumItems.reagentBag));
 
-		NostrumResearch.startBuilding().parent("reagent_bag").lore(NostrumItems.spellRune)
+		NostrumResearch.startBuilding().parent("reagent_bag").lore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)))
 				.reference("ritual::rune_bag", "ritual.rune_bag.name").build("rune_bag", NostrumResearchTab.OUTFITTING,
 						Size.NORMAL, -3, -1, true, new ItemStack(NostrumItems.runeBag));
 

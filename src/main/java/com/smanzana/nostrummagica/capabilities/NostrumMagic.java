@@ -170,7 +170,7 @@ public class NostrumMagic implements INostrumMagic {
 			this.completeResearch("origin");
 			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
-			this.giveBasicLore(NostrumItems.spellRune);
+			this.giveBasicLore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)));
 			this.giveBasicLore(NostrumItems.blankScroll);
 			this.giveBasicLore(NostrumItems.spellScroll);
 			this.giveBasicLore(NostrumItems.reagentMandrakeRoot);

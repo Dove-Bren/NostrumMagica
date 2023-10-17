@@ -2,22 +2,23 @@ package com.smanzana.nostrummagica.items;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.SwordItem;
@@ -37,6 +38,15 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 	
 	public ThanosStaff() {
 		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
+		
+		this.addPropertyOverride(new ResourceLocation("activated"), new IItemPropertyGetter() {
+			@OnlyIn(Dist.CLIENT)
+			@Override
+			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+				return entityIn != null && hasFreeCast(stack)
+						? 1.0F : 0.0F;
+			}
+		});
 	}
 	
 	@Override
@@ -163,21 +173,4 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 		
 		return remaining;
 	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public static class ModelMesher implements ItemMeshDefinition {
-
-		@Override
-		public ModelResourceLocation getModelLocation(ItemStack stack) {
-			String suffix = "";
-			
-			if (hasFreeCast(stack))
-				suffix = "_activated";
-			
-			return new ModelResourceLocation(
-					new ResourceLocation(NostrumMagica.MODID, ID + suffix),
-					"inventory");
-		}
-	}
-
 }

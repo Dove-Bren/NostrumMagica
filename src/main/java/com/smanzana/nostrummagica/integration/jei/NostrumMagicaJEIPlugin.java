@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
@@ -13,7 +12,6 @@ import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIHe
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
 import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
@@ -33,20 +31,6 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	@Override
 	public void registerItemSubtypes(@Nonnull ISubtypeRegistry subtypeRegistry) {
-		subtypeRegistry.registerSubtypeInterpreter(NostrumItems.spellRune, new ISubtypeRegistry.ISubtypeInterpreter() {
-			
-			@Override
-			@Nullable
-			public String getSubtypeInfo(ItemStack itemStack) {
-				return apply(itemStack); // remove once removed
-			}
-
-			@Override
-			public String apply(ItemStack itemStack) {
-				return SpellRune.toComponentWrapper(itemStack).getKeyString();
-			}
-		});
-		
 		subtypeRegistry.useNbtForSubtypes(NostrumItems.spellTomePage);
 	}
 

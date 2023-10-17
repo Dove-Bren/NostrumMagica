@@ -2,5 +2,13 @@
 	"parent": "nostrummagica:item/mage_staff",
 	"textures": {
 		"layer0": "nostrummagica:items/thanos_staff"
-	}
+	},
+    "overrides": [
+        {
+            "predicate": {
+                "activated": 1
+            },
+            "model": "nostrummagica:item/thanos_staff_activated"
+        }
+    ]
 }

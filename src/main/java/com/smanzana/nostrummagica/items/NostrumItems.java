@@ -6,9 +6,17 @@ import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellRune.AlterationSpellRune;
+import com.smanzana.nostrummagica.items.SpellRune.ElementSpellRune;
+import com.smanzana.nostrummagica.items.SpellRune.ShapeSpellRune;
+import com.smanzana.nostrummagica.items.SpellRune.TriggerSpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BucketItem;
@@ -268,7 +276,6 @@ public class NostrumItems {
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY) public static SpellPlate spellPlateSpooky;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED) public static SpellPlate spellPlateMuted;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING) public static SpellPlate spellPlateLiving;
-	@ObjectHolder(SpellRune.ID) public static SpellRune spellRune;
 	@ObjectHolder(SpellScroll.ID) public static SpellScroll spellScroll;
 	@ObjectHolder(SpellTableItem.ID) public static SpellTableItem spellTableItem;
 	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE) public static SpellTome spellTomeNovice;
@@ -563,7 +570,7 @@ public class NostrumItems {
     	register(registry, new SpellPlate(SpellTome.TomeStyle.SPOOKY).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_SPOOKY));
     	register(registry, new SpellPlate(SpellTome.TomeStyle.MUTED).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED));
     	register(registry, new SpellPlate(SpellTome.TomeStyle.LIVING).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING));
-    	register(registry, new SpellRune().setRegistryName(SpellRune.ID));
+    	//register(registry, new SpellRune().setRegistryName(SpellRune.ID));
     	register(registry, new SpellScroll().setRegistryName(SpellScroll.ID));
     	register(registry, new SpellTableItem().setRegistryName(SpellTableItem.ID));
     	register(registry, new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE));
@@ -578,6 +585,30 @@ public class NostrumItems {
     	register(registry, new ThanosStaff().setRegistryName(ThanosStaff.ID));
     	register(registry, new WarlockSword().setRegistryName(WarlockSword.ID));
     	
+    	// Generate and register spell runes
+    	{
+	    	for (EMagicElement type : EMagicElement.values()) {
+	    		registerRune(registry, new ElementSpellRune(type));
+	    	}
+	    	for (EAlteration type : EAlteration.values()) {
+	    		registerRune(registry, new AlterationSpellRune(type));
+	    	}
+	    	for (SpellShape type : SpellShape.getAllShapes()) {
+	    		registerRune(registry, new ShapeSpellRune(type));
+	    	}
+	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
+	    		registerRune(registry, new TriggerSpellRune(type));
+	    	}
+    	}
 	}
 	
+	private static void registerRune(IForgeRegistry<Item> registry, SpellRune rune) {
+		rune.setRegistryName(rune.makeRegistryName());
+		register(registry, rune); // Register item and lore
+		SpellRune.SetRuneForType(rune.getComponent(), rune);
+	}
+	
+	public static SpellRune GetRune(SpellComponentWrapper type) {
+		return SpellRune.GetRuneForType(type);
+	}
 }
