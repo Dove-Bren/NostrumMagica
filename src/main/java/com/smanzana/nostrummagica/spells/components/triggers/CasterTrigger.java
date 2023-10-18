@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class CasterTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_caster";
+	private static final String TRIGGER_KEY = "caster";
 	private static CasterTrigger instance = null;
 	
 	public static CasterTrigger instance() {

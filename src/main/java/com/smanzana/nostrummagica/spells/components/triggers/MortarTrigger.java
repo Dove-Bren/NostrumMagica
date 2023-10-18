@@ -199,7 +199,7 @@ public class MortarTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_mortar";
+	private static final String TRIGGER_KEY = "mortar";
 	private static MortarTrigger instance = null;
 	
 	public static MortarTrigger instance() {

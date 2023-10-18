@@ -10,7 +10,7 @@
   ],
   "key": {
     "D": {
-      "tag": "forge:dirt"
+      "item": "minecraft:dirt"
     },
     "C": {
       "tag": "nostrummagica:infusedgem/void"

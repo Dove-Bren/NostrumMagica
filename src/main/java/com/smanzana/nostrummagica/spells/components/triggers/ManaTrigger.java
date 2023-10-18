@@ -99,7 +99,7 @@ public class ManaTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_mana";
+	private static final String TRIGGER_KEY = "mana";
 	private static ManaTrigger instance = null;
 	
 	public static ManaTrigger instance() {

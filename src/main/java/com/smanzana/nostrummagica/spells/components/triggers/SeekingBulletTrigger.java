@@ -181,7 +181,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_bullet";
+	private static final String TRIGGER_KEY = "bullet";
 	private static SeekingBulletTrigger instance = null;
 	
 	public static SeekingBulletTrigger instance() {

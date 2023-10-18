@@ -34,7 +34,7 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
-	public static final String ID = "spell_table_item";
+	public static final String ID = "spell_table";
 	
 	public SpellTable() {
 		super(Block.Properties.create(Material.WOOD)

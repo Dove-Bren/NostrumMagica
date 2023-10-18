@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class AtFeetTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_feet";
+	private static final String TRIGGER_KEY = "feet";
 	private static AtFeetTrigger instance = null;
 	
 	public static AtFeetTrigger instance() {

@@ -80,7 +80,7 @@ public class ProximityTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_proximity";
+	private static final String TRIGGER_KEY = "proximity";
 	private static ProximityTrigger instance = null;
 	
 	public static ProximityTrigger instance() {

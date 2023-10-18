@@ -103,7 +103,7 @@ public class FoodTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_food";
+	private static final String TRIGGER_KEY = "food";
 	private static FoodTrigger instance = null;
 	
 	public static FoodTrigger instance() {

@@ -29,7 +29,7 @@ import net.minecraft.world.World;
  */
 public class BeamTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_beam";
+	private static final String TRIGGER_KEY = "beam";
 	private static BeamTrigger instance = null;
 	
 	public static BeamTrigger instance() {

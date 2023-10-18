@@ -77,7 +77,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_field";
+	private static final String TRIGGER_KEY = "field";
 	private static FieldTrigger instance = null;
 	
 	public static FieldTrigger instance() {

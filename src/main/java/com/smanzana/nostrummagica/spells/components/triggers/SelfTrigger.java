@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class SelfTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_self";
+	private static final String TRIGGER_KEY = "self";
 	private static SelfTrigger instance = null;
 	
 	public static SelfTrigger instance() {

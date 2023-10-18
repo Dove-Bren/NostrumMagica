@@ -19,7 +19,7 @@ import net.minecraft.world.World;
  */
 public class AITargetTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_ai";
+	private static final String TRIGGER_KEY = "ai";
 	private static AITargetTrigger instance = null;
 	
 	public static AITargetTrigger instance() {

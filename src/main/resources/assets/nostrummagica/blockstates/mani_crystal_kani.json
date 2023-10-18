@@ -11,10 +11,6 @@
             "south": { "model": "nostrummagica:block/crystal_embedded.obj", "y": 270 },
             "north": { "model": "nostrummagica:block/crystal_embedded.obj", "y": 90 },
             "west": { "model": "nostrummagica:block/crystal_embedded.obj" }
-        },
-        "level": {
-            "0": { },
-            "1": { }
         }
     }
 }

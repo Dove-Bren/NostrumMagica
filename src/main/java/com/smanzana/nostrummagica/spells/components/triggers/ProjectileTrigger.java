@@ -138,7 +138,7 @@ public class ProjectileTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_projectile";
+	private static final String TRIGGER_KEY = "projectile";
 	private static ProjectileTrigger instance = null;
 	
 	public static ProjectileTrigger instance() {

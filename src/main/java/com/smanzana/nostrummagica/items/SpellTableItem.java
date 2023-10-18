@@ -9,7 +9,7 @@ import net.minecraft.item.BlockItem;
 
 public class SpellTableItem extends BlockItem implements ILoreTagged {
 
-	public static final String ID = "spell_table";
+	public static final String ID = "spell_table_item";
 
 	public SpellTableItem() {
 		super(NostrumBlocks.spellTable, NostrumItems.PropBase());

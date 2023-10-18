@@ -3,7 +3,6 @@
         "facing=north": { "model": "nostrummagica:block/paradox_mirror" },
         "facing=south": { "model": "nostrummagica:block/paradox_mirror", "y": 180 },
         "facing=west":  { "model": "nostrummagica:block/paradox_mirror", "y": 270 },
-        "facing=east":  { "model": "nostrummagica:block/paradox_mirror", "y": 90 },
-        "inventory": { "model": "nostrummagica:block/paradox_mirror" }
+        "facing=east":  { "model": "nostrummagica:block/paradox_mirror", "y": 90 }
     }
 }

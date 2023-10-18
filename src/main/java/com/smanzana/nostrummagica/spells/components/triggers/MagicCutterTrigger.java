@@ -101,7 +101,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_cutter";
+	private static final String TRIGGER_KEY = "cutter";
 	private static MagicCutterTrigger instance = null;
 	
 	public static MagicCutterTrigger instance() {

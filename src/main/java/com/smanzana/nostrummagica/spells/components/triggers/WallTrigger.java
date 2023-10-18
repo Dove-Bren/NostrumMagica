@@ -87,7 +87,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_wall";
+	private static final String TRIGGER_KEY = "wall";
 	private static WallTrigger instance = null;
 	
 	public static WallTrigger instance() {

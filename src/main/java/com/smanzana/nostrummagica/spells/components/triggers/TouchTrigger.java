@@ -25,7 +25,7 @@ import net.minecraft.world.World;
  */
 public class TouchTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_touch";
+	private static final String TRIGGER_KEY = "touch";
 	private static TouchTrigger instance = null;
 	
 	public static TouchTrigger instance() {

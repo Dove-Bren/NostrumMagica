@@ -99,7 +99,7 @@ public class HealthTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_health";
+	private static final String TRIGGER_KEY = "health";
 	private static HealthTrigger instance = null;
 	
 	public static HealthTrigger instance() {

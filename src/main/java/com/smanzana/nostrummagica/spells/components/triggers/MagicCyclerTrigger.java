@@ -78,7 +78,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_vortex_blade";
+	private static final String TRIGGER_KEY = "vortex_blade";
 	private static MagicCyclerTrigger instance = null;
 	
 	public static MagicCyclerTrigger instance() {

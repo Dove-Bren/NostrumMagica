@@ -161,7 +161,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_aura";
+	private static final String TRIGGER_KEY = "aura";
 	private static AuraTrigger instance = null;
 	
 	public static AuraTrigger instance() {

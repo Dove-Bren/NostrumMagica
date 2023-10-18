@@ -5,7 +5,6 @@
         "facing=north": { "model": "nostrummagica:block/putter" },
         "facing=south": { "model": "nostrummagica:block/putter", "y": 180 },
         "facing=west":  { "model": "nostrummagica:block/putter", "y": 270 },
-        "facing=east":  { "model": "nostrummagica:block/putter", "y": 90 },
-        "inventory": { "model": "nostrummagica:block/putter" }
+        "facing=east":  { "model": "nostrummagica:block/putter", "y": 90 }
     }
 }

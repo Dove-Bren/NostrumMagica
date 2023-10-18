@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 public class OtherTrigger extends InstantTrigger {
 
-	private static final String TRIGGER_KEY = "trigger_other";
+	private static final String TRIGGER_KEY = "other";
 	private static OtherTrigger instance = null;
 	
 	public static OtherTrigger instance() {

@@ -86,7 +86,7 @@ public class DamagedTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_hit";
+	private static final String TRIGGER_KEY = "hit";
 	private static DamagedTrigger instance = null;
 	
 	public static DamagedTrigger instance() {

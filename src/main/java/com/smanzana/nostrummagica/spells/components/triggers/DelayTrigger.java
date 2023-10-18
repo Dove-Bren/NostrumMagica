@@ -51,7 +51,7 @@ public class DelayTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "trigger_delay";
+	private static final String TRIGGER_KEY = "delay";
 	private static DelayTrigger instance = null;
 	
 	public static DelayTrigger instance() {

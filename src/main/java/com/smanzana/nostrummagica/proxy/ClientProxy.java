@@ -184,6 +184,7 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -1497,20 +1498,23 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-    	for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled", "block/pedestal.obj"}) {
-		IUnbakedModel model;
-		try {
-			model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, key + ".obj"));
-			
-			if (model != null && model instanceof OBJModel) {
-				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, ""), bakedModel);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			NostrumMagica.logger.warn("Failed to load effect " + key);
-		}	
-	}
+    	for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled",
+    			"block/pedestal", "block/crystal_standing", "block/crystal_embedded", "block/crystal_hanging", "block/mirror"}) {
+			IUnbakedModel model;
+			try {
+				model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, key + ".obj"));
+				
+				if (model != null && model instanceof OBJModel) {
+					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+					event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key + ".obj", ""), bakedModel);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				NostrumMagica.logger.warn("Failed to load effect " + key);
+			}	
+		}
+    	
+    	
 	}
 	
 	private static void initDefaultEffects(ClientEffectRenderer renderer) {
