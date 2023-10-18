@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.blocks.AetherTickingTileEntity;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumObelisk;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
@@ -18,6 +17,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -25,7 +25,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class NostrumObeliskEntity extends AetherTickingTileEntity {
+public class NostrumObeliskEntity extends TileEntity implements ITickableTileEntity {
 	
 	protected static final TicketType<BlockPos> ObeliskChunkLoaderType = TicketType.create("nostrum_obelisk_chunkloader", Comparator.comparingLong(BlockPos::toLong));
 	
@@ -85,7 +85,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		}
 	}
 	
-	private static final float AetherPerBlock = 1f / 2f;
+	//private static final float AetherPerBlock = 1f / 2f;
 	
 	private boolean master;
 	private List<NostrumObeliskTarget> targets;
@@ -100,12 +100,12 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	private boolean isDestructing;
 	
 	public NostrumObeliskEntity() {
-		super(NostrumTileEntities.NostrumObeliskEntityType, 0, 2000);
+		super(NostrumTileEntities.NostrumObeliskEntityType); //, 0, 2000);
 		master = false;
 		isDestructing = false;
 		targets = new LinkedList<>();
 		targetIndex = 0;
-		this.compWrapper.configureInOut(true, false);
+		//this.compWrapper.configureInOut(true, false);
 	}
 	
 	public NostrumObeliskEntity(boolean master) {
@@ -121,7 +121,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	@Override
 	public void setWorld(World world) {
 		super.setWorld(world);
-		this.compWrapper.setAutoFill(!world.isRemote && this.isMaster());
+		//this.compWrapper.setAutoFill(!world.isRemote && this.isMaster());
 		//aetherHandler.setAutoFill(!world.isRemote);
 	}
 	
@@ -363,7 +363,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 
 	@Override
 	public void tick() {
-		super.tick();
+		//super.tick();
 		
 
 		aliveCount++;
@@ -421,22 +421,23 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 		return pos;
 	};
 	
-	protected int getAetherCost(BlockPos destination) {
-		if (this.targetOverride != null && destination == this.targetOverride) {
-			// No cost for overrides
-			return 0;
-		}
-		
-		double dist = (Math.abs(this.pos.getX() - destination.getX())
-						 + Math.abs(this.pos.getY() - destination.getY())
-						 + Math.abs(this.pos.getZ() - destination.getZ()));
-		//double dist = Math.sqrt(this.pos.distanceSq(destination));
-		
-		return (int) Math.round(AetherPerBlock * dist);
-	}
+//	protected int getAetherCost(BlockPos destination) {
+//		if (this.targetOverride != null && destination == this.targetOverride) {
+//			// No cost for overrides
+//			return 0;
+//		}
+//		
+//		double dist = (Math.abs(this.pos.getX() - destination.getX())
+//						 + Math.abs(this.pos.getY() - destination.getY())
+//						 + Math.abs(this.pos.getZ() - destination.getZ()));
+//		//double dist = Math.sqrt(this.pos.distanceSq(destination));
+//		
+//		return (int) Math.round(AetherPerBlock * dist);
+//	}
 	
 	public boolean canAffordTeleport(BlockPos destination) {
-		return this.compWrapper.check(getAetherCost(destination));
+		return true;
+		//return this.compWrapper.check(getAetherCost(destination));
 	}
 	
 	/**
@@ -446,6 +447,7 @@ public class NostrumObeliskEntity extends AetherTickingTileEntity {
 	 * @return
 	 */
 	public boolean deductForTeleport(BlockPos destination) {
-		return this.compWrapper.checkAndWithdraw(getAetherCost(destination));
+		return true;
+		//return this.compWrapper.checkAndWithdraw(getAetherCost(destination));
 	}
 }

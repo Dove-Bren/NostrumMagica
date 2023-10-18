@@ -1387,12 +1387,18 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void stitchEventPre(TextureStitchEvent.Pre event) {
+		// Note: called multiple times for different texture atlases.
+		// Using what Botania does
+		if(event.getMap() != Minecraft.getInstance().getTextureMap()) {
+			return;
+		}
+		
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/koid"));
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/golem_ender"));
 		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/dragon_C"));
+				NostrumMagica.MODID, "entity/dragon_c"));
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/armor/dragon_scales"));
 		event.addSprite(new ResourceLocation(

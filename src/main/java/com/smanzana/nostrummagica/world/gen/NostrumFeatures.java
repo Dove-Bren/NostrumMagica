@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.world.gen;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.event.RegistryEvent;
@@ -22,6 +23,9 @@ public class NostrumFeatures {
 	@SubscribeEvent
 	public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
 		final IForgeRegistry<Feature<?>> registry = event.getRegistry();
+		
+		// Load rooms now, since dungeons require them
+		DungeonRoomRegistry.instance().loadRegistryFromDisk();
 		
 		registry.register(new NostrumFlowerGenerator(NostrumFlowerGenerator.NostrumFlowerConfig::deserialize).setRegistryName(FLOWERGEN_ID));
 		registry.register(new NostrumDungeonGenerator(NostrumDungeonGenerator.NostrumDungeonConfig::deserialize).setRegistryName(DUNGEONGEN_ID));

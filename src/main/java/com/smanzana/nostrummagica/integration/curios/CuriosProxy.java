@@ -231,36 +231,6 @@ public class CuriosProxy {
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.floatGuard)));
 		RitualRegistry.instance().addRitual(recipe);
 		
-		recipe = RitualRecipe.createTier3("shield_ring_small",
-				new ItemStack(NostrumCurios.ringShieldSmall),
-				EMagicElement.EARTH,
-				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-				Ingredient.fromItems(NostrumCurios.ringSilver),
-				new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(SelfTrigger.instance())), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
-				new RRequirementResearch("shield_rings"),
-				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringShieldSmall)));
-		RitualRegistry.instance().addRitual(recipe);
-		
-		recipe = RitualRecipe.createTier3("shield_ring_large",
-				new ItemStack(NostrumCurios.ringShieldLarge),
-				EMagicElement.EARTH,
-				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-				Ingredient.fromItems(NostrumCurios.ringShieldSmall),
-				new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), silver, Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
-				new RRequirementResearch("shield_rings"),
-				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringShieldLarge)));
-		RitualRegistry.instance().addRitual(recipe);
-		
-		recipe = RitualRecipe.createTier3("elude_cape_small",
-				new ItemStack(NostrumCurios.eludeCape),
-				EMagicElement.WIND,
-				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-				Ingredient.fromTag(ItemTags.WOOL),
-				new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(DamagedTrigger.instance())), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
-				new RRequirementResearch("elude_capes"),
-				new OutcomeSpawnItem(new ItemStack(NostrumCurios.eludeCape)));
-		RitualRegistry.instance().addRitual(recipe);
-		
 		ItemStack dragonwings = new ItemStack(NostrumCurios.dragonWingPendant);
 		((DragonWingPendantItem) dragonwings.getItem()).setEmbeddedElement(dragonwings, EMagicElement.PHYSICAL);
 		recipe = RitualRecipe.createTier3("create_dragon_wing_pendant",
@@ -298,6 +268,36 @@ public class CuriosProxy {
 		}
 		
 		if (NostrumMagica.instance.aetheria.isEnabled()) {
+			recipe = RitualRecipe.createTier3("shield_ring_small",
+					new ItemStack(NostrumCurios.ringShieldSmall),
+					EMagicElement.EARTH,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+					Ingredient.fromItems(NostrumCurios.ringSilver),
+					new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(SelfTrigger.instance())), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+					new RRequirementResearch("shield_rings"),
+					new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringShieldSmall)));
+			RitualRegistry.instance().addRitual(recipe);
+			
+			recipe = RitualRecipe.createTier3("shield_ring_large",
+					new ItemStack(NostrumCurios.ringShieldLarge),
+					EMagicElement.EARTH,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+					Ingredient.fromItems(NostrumCurios.ringShieldSmall),
+					new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), silver, Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+					new RRequirementResearch("shield_rings"),
+					new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringShieldLarge)));
+			RitualRegistry.instance().addRitual(recipe);
+			
+			recipe = RitualRecipe.createTier3("elude_cape_small",
+					new ItemStack(NostrumCurios.eludeCape),
+					EMagicElement.WIND,
+					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
+					Ingredient.fromTag(ItemTags.WOOL),
+					new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(DamagedTrigger.instance())), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
+					new RRequirementResearch("elude_capes"),
+					new OutcomeSpawnItem(new ItemStack(NostrumCurios.eludeCape)));
+			RitualRegistry.instance().addRitual(recipe);
+			
 			recipe = RitualRecipe.createTier3("aether_cloak",
 					new ItemStack(NostrumCurios.aetherCloak),
 					EMagicElement.ICE,

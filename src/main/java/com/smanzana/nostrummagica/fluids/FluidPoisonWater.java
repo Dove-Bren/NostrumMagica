@@ -4,6 +4,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -24,6 +25,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockReader;
@@ -32,8 +34,10 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
 
-public abstract class FluidPoisonWater extends FlowingFluid {
+public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 
 	private static final String ID_BASE = "poison_water";
 	
@@ -45,7 +49,12 @@ public abstract class FluidPoisonWater extends FlowingFluid {
 	public final boolean bUnbreakable;
 	
 	public FluidPoisonWater(boolean bUnbreakable) {
-		super();
+		super(new ForgeFlowingFluid.Properties(() -> new Source(bUnbreakable), () -> new Flowing(bUnbreakable), FluidAttributes.builder(
+				new ResourceLocation(NostrumMagica.MODID, "blocks/" + ID_BASE + "_still"), // same visually whether unbreakable or not
+				new ResourceLocation(NostrumMagica.MODID, "blocks/" + ID_BASE + "_flowing")
+				).overlay(new ResourceLocation(NostrumMagica.MODID, "blocks/" + ID_BASE + "_overlay"))
+				.color(0xFF1D452F)
+			));
 		this.bUnbreakable = bUnbreakable;
 	}
 	

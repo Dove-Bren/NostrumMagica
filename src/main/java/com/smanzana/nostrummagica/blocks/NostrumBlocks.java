@@ -95,6 +95,7 @@ public class NostrumBlocks {
     	registerBlockItem(essenceOre, essenceOre.getRegistryName(), registry);
     	registerBlockItem(itemDuct, itemDuct.getRegistryName(), registry);
     	registerBlockItem(logicDoor, logicDoor.getRegistryName(), registry);
+    	registerBlockItem(loreTable, loreTable.getRegistryName(), registry);
     	registerBlockItem(magicDirt, magicDirt.getRegistryName(), registry);
     	registerBlockItem(magicWall, magicWall.getRegistryName(), registry);
     	registerBlockItem(manaArmorerBlock, manaArmorerBlock.getRegistryName(), registry);
@@ -177,6 +178,7 @@ public class NostrumBlocks {
     	registerBlock(new EssenceOre(), EssenceOre.ID, registry);
     	registerBlock(new ItemDuct(), ItemDuct.ID, registry);
     	registerBlock(new LogicDoor(), LogicDoor.ID, registry);
+    	registerBlock(new LoreTable(), LoreTable.ID, registry);
     	registerBlock(new MagicDirt(), MagicDirt.ID, registry);
     	registerBlock(new MagicWall(), MagicWall.ID, registry);
     	registerBlock(new ManaArmorerBlock(), ManaArmorerBlock.ID, registry);
@@ -196,7 +198,7 @@ public class NostrumBlocks {
     	registerBlock(new ObeliskPortal(), ObeliskPortal.ID, registry);
     	registerBlock(new ParadoxMirrorBlock(), ParadoxMirrorBlock.ID, registry);
     	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.poisonWater;}, false), PoisonWaterBlock.ID_BREAKABLE, registry);
-    	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.unbreakablePoisonWater;}, true), PoisonWaterBlock.ID_BREAKABLE, registry);
+    	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.unbreakablePoisonWater;}, true), PoisonWaterBlock.ID_UNBREAKABLE, registry);
     	registerBlock(new ProgressionDoor(), ProgressionDoor.ID, registry);
     	registerBlock(new PutterBlock(), PutterBlock.ID, registry);
     	registerBlock(new ShrineBlock(), ShrineBlock.ID, registry);

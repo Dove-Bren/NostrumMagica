@@ -136,7 +136,6 @@ import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator;
 
 import net.minecraft.block.Blocks;
@@ -257,17 +256,17 @@ public class NostrumMagica {
 		(new ModConfig()).register();
 
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
-	}
-
-	@SubscribeEvent
-	public void commonSetup(FMLCommonSetupEvent event) {
 		
 		proxy.preinit();
 		aetheria.preInit();
 		curios.preInit();
 		//enderIO.preInit();
 		musica.preInit();
+	}
 
+	@SubscribeEvent
+	public void commonSetup(FMLCommonSetupEvent event) {
+		
 		RitualRegistry.instance();
 
 		SpellTomeEnhancement.initDefaultEnhancements();
@@ -279,7 +278,7 @@ public class NostrumMagica {
 		registerDefaultResearch();
 
 		new NostrumLootHandler();
-		DungeonRoomRegistry.instance().loadRegistryFromDisk();
+		//DungeonRoomRegistry.instance().loadRegistryFromDisk(); Done in feature loading since it's required by that system and this is too late :(
 		//NostrumDimensionMapper.registerDimensions();
 		NostrumDungeonGenerator.initGens();
 

@@ -30,7 +30,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-@Mod(NostrumMagica.MODID)
+@ObjectHolder(NostrumMagica.MODID)
 public class NostrumItems {
 	
 	// Not sure where to put these...
@@ -197,7 +197,7 @@ public class NostrumItems {
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_LIGHTNING) public static EssenceItem essenceLightning;
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_PHYSICAL) public static EssenceItem essencePhysical;
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_WIND) public static EssenceItem essenceWind;
-	@ObjectHolder(HookshotItem.ID_PREFIX + "weak") public static AltarItem hookshotWeak;
+	@ObjectHolder(HookshotItem.ID_PREFIX + "weak") public static HookshotItem hookshotWeak;
 	@ObjectHolder(HookshotItem.ID_PREFIX + "medium") public static HookshotItem hookshotMedium;
 	@ObjectHolder(HookshotItem.ID_PREFIX + "strong") public static HookshotItem hookshotStrong;
 	@ObjectHolder(HookshotItem.ID_PREFIX + "claw") public static HookshotItem hookshotClaw;
@@ -506,6 +506,10 @@ public class NostrumItems {
     	register(registry, new InfusedGemItem(EMagicElement.ICE).setRegistryName(InfusedGemItem.ID_PREFIX + ID_ICE));
     	register(registry, new InfusedGemItem(EMagicElement.LIGHTNING).setRegistryName(InfusedGemItem.ID_PREFIX + ID_LIGHTNING));
     	register(registry, new InfusedGemItem(EMagicElement.WIND).setRegistryName(InfusedGemItem.ID_PREFIX + ID_WIND));
+    	register(registry, new MagicArmorBase(EquipmentSlotType.HEAD, PropEquipment()).setRegistryName(MagicArmorBase.ID_HELM));
+    	register(registry, new MagicArmorBase(EquipmentSlotType.CHEST, PropEquipment()).setRegistryName(MagicArmorBase.ID_CHEST));
+    	register(registry, new MagicArmorBase(EquipmentSlotType.LEGS, PropEquipment()).setRegistryName(MagicArmorBase.ID_LEGS));
+    	register(registry, new MagicArmorBase(EquipmentSlotType.FEET, PropEquipment()).setRegistryName(MagicArmorBase.ID_FEET));
     	register(registry, new MageStaff().setRegistryName(MageStaff.ID));
     	register(registry, new MagicCharm(EMagicElement.EARTH).setRegistryName(MagicCharm.ID_PREFIX + ID_EARTH));
     	register(registry, new MagicCharm(EMagicElement.ENDER).setRegistryName(MagicCharm.ID_PREFIX + ID_ENDER));

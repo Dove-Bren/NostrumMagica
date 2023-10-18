@@ -155,7 +155,9 @@ public class RoomBlueprint {
 //					teData = nbt.getCompound(NBT_TILE_ENTITY);
 //				}
 //				break;
-				throw new RuntimeException("Blueprint block doesn't understand version " + version);
+				// throw new RuntimeException("Blueprint block doesn't understand version " + version); TODO do this
+				state = null;
+				teData = null;
 			case 3:
 				state = NBTUtil.readBlockState(nbt.getCompound(NBT_BLOCKSTATE_TAG));
 				

@@ -149,9 +149,6 @@ public class CommonProxy {
 	public void preinit() {
 		//MinecraftForge.EVENT_BUS.register(this);
 		
-		CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
-		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
-		capabilityHandler = new CapabilityHandler();
 		NetworkHandler.getInstance();
 		
 		// Fluids registered with blocks
@@ -168,6 +165,10 @@ public class CommonProxy {
 	
 	public void init() {
     	LoreRegistry.instance();
+    	
+    	CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
+		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
+		capabilityHandler = new CapabilityHandler();
 	}
 	
 	public void postinit() {
