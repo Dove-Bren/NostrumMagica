@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.items;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -15,7 +16,7 @@ public interface ICapeProvider {
 	public boolean shouldRenderCape(LivingEntity entity, ItemStack stack);
 	
 	@OnlyIn(Dist.CLIENT)
-	public ResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack);
+	public ModelResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack);
 	
 	@OnlyIn(Dist.CLIENT)
 	public @Nullable ResourceLocation[] getCapeTextures(LivingEntity entity, ItemStack stack);

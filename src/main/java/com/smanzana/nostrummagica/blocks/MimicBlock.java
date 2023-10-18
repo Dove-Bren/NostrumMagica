@@ -276,8 +276,8 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 	}
 
 	@Override
-	public float func_220080_a(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(world, pos, BlockState::func_215703_d, () -> super.func_220080_a(state, world, pos));
+	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader world, BlockPos pos) {
+		return getValue(world, pos, BlockState::getAmbientOcclusionLightValue, () -> super.getAmbientOcclusionLightValue(state, world, pos));
 	}
 
 	@Override

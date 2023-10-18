@@ -21,15 +21,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.pipeline.LightUtil;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityManaArmorerRenderer extends TileEntityRenderer<ManaArmorerTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(ManaArmorerTileEntity.class,
-				new TileEntityManaArmorerRenderer());
-	}
-	
 	private IBakedModel model;
 	
 	public TileEntityManaArmorerRenderer() {

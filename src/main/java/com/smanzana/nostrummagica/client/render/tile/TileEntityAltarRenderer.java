@@ -7,15 +7,9 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityAltarRenderer extends TileEntityRenderer<AltarTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(AltarTileEntity.class,
-				new TileEntityAltarRenderer());
-	}
-	
 	public TileEntityAltarRenderer() {
 		
 	}

@@ -1,15 +1,17 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelOrb<T extends Entity> extends ModelOBJ<T> {
 
-	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/orb.obj");
+	private static final ModelResourceLocation MODEL = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/orb.obj"));
 	private float scale;
 	private int color;
 	
@@ -19,8 +21,8 @@ public class ModelOrb<T extends Entity> extends ModelOBJ<T> {
 	}
 	
 	@Override
-	protected ResourceLocation[] getEntityModels() {
-		return new ResourceLocation[] {
+	protected ModelResourceLocation[] getEntityModels() {
+		return new ModelResourceLocation[] {
 			MODEL
 		};
 	}

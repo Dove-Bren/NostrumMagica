@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
-import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
@@ -23,26 +22,6 @@ import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
-import com.smanzana.nostrummagica.command.CommandAllQuests;
-import com.smanzana.nostrummagica.command.CommandAllResearch;
-import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
-import com.smanzana.nostrummagica.command.CommandDebugEffect;
-import com.smanzana.nostrummagica.command.CommandEnhanceTome;
-import com.smanzana.nostrummagica.command.CommandForceBind;
-import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
-import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
-import com.smanzana.nostrummagica.command.CommandRandomSpell;
-import com.smanzana.nostrummagica.command.CommandReadRoom;
-import com.smanzana.nostrummagica.command.CommandReloadResearch;
-import com.smanzana.nostrummagica.command.CommandSetDimension;
-import com.smanzana.nostrummagica.command.CommandSetLevel;
-import com.smanzana.nostrummagica.command.CommandSetManaArmor;
-import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
-import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
-import com.smanzana.nostrummagica.command.CommandTestConfig;
-import com.smanzana.nostrummagica.command.CommandUnlock;
-import com.smanzana.nostrummagica.command.CommandUnlockAll;
-import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -162,7 +141,6 @@ import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.command.CommandSource;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -200,7 +178,6 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -316,33 +293,6 @@ public class NostrumMagica {
 		initFinished = true;
 
 		MinecraftForge.EVENT_BUS.register(this);
-	}
-
-	@SubscribeEvent
-	public void startup(FMLServerStartingEvent event) {
-		final CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
-		
-		CommandTestConfig.register(dispatcher);
-		CommandTestConfig.register(dispatcher);
-		CommandSpawnObelisk.register(dispatcher);
-		CommandEnhanceTome.register(dispatcher);
-		CommandSetLevel.register(dispatcher);
-		CommandUnlock.register(dispatcher);
-		CommandGiveSkillpoint.register(dispatcher);
-		CommandAllQuests.register(dispatcher);
-		CommandAllResearch.register(dispatcher);
-		CommandCreateGeotoken.register(dispatcher);
-		CommandForceBind.register(dispatcher);
-		CommandSpawnDungeon.register(dispatcher);
-		CommandUnlockAll.register(dispatcher);
-		CommandSetDimension.register(dispatcher);
-		CommandWriteRoom.register(dispatcher);
-		CommandReadRoom.register(dispatcher);
-		CommandGiveResearchpoint.register(dispatcher);
-		CommandReloadResearch.register(dispatcher);
-		CommandRandomSpell.register(dispatcher);
-		CommandDebugEffect.register(dispatcher);
-		CommandSetManaArmor.register(dispatcher);
 	}
 
 	/**

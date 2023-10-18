@@ -611,7 +611,7 @@ public class SpellCreationGui {
 			final Minecraft mc = Minecraft.getInstance();
 			this.nameField = new TextFieldWidget(mc.fontRenderer, 0, 0, NAME_WIDTH, NAME_HEIGHT, container.name);
 			this.nameField.setMaxStringLength(NAME_MAX);
-			this.nameField.func_212954_a((s) -> {
+			this.nameField.setResponder((s) -> {
 				container.name = s;
 			});
 			this.nameField.setValidator((s) -> {

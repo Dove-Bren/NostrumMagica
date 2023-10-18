@@ -22,16 +22,10 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityAetherInfuserRenderer extends TileEntityRenderer<AetherInfuserTileEntity> {
 
 	public static final float ORB_RADIUS = 2f;
-	
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(AetherInfuserTileEntity.class,
-				new TileEntityAetherInfuserRenderer());
-	}
 	
 	//private static final ModelResourceLocation ORB_MODEL_LOC = new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_pure"), "normal");
 	//private static IBakedModel MODEL_ORB;

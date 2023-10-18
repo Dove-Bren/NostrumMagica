@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -25,7 +26,7 @@ public class SpawnPredefinedEffectMessage {
 	public static void handle(SpawnPredefinedEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (player.dimension.getId() != message.dimension) {
+		if (player.dimension != message.dimension) {
 			return;
 		}
 		
@@ -40,24 +41,24 @@ public class SpawnPredefinedEffectMessage {
 	}
 
 	protected final PredefinedEffect type;
-	protected final int dimension;
+	protected final DimensionType dimension;
 	protected final int duration;
 	
 	protected final @Nullable Vec3d position;
 	protected final int entityID;
 	
-	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, int dimensionID, Vec3d position) {
+	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, DimensionType dimension, Vec3d position) {
 		this.type = type;
 		this.duration = duration;
-		this.dimension = dimensionID;
+		this.dimension = dimension;
 		this.position = position;
 		this.entityID = 0;
 	}
 	
-	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, int dimensionID, int entityID) {
+	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, DimensionType dimension, int entityID) {
 		this.type = type;
 		this.duration = duration;
-		this.dimension = dimensionID;
+		this.dimension = dimension;
 		this.entityID = entityID;
 		this.position = null;
 	}
@@ -75,16 +76,16 @@ public class SpawnPredefinedEffectMessage {
 		dimension = buf.readVarInt();
 		
 		if (buf.readBoolean()) {
-			return new SpawnPredefinedEffectMessage(type, duration, dimension, new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble()));
+			return new SpawnPredefinedEffectMessage(type, duration, DimensionType.getById(dimension), new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble()));
 		} else {
-			return new SpawnPredefinedEffectMessage(type, duration, dimension, buf.readVarInt());
+			return new SpawnPredefinedEffectMessage(type, duration, DimensionType.getById(dimension), buf.readVarInt());
 		}
 	}
 
 	public static void encode(SpawnPredefinedEffectMessage msg, PacketBuffer buf) {
 		buf.writeEnumValue(msg.type);
 		buf.writeVarInt(msg.duration);
-		buf.writeVarInt(msg.dimension);
+		buf.writeVarInt(msg.dimension.getId());
 		
 		buf.writeBoolean(msg.position != null);
 		if (msg.position != null) {

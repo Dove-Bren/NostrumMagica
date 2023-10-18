@@ -22,15 +22,9 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(WispBlockTileEntity.class,
-				new TileEntityWispBlockRenderer());
-	}
-	
 	//private static final ResourceLocation MODEL_LOC = new ResourceLocation(NostrumMagica.MODID, "block/crystal.obj");
 	private static final ResourceLocation BASE_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/stone_generic1.png");
 	private static final ResourceLocation PLATFORM_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/ceramic_generic.png");

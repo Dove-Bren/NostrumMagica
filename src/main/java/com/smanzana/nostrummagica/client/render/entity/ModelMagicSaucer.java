@@ -4,8 +4,10 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelMagicSaucer<T extends EntitySpellSaucer> extends ModelOBJ<T> {
@@ -15,9 +17,9 @@ public class ModelMagicSaucer<T extends EntitySpellSaucer> extends ModelOBJ<T> {
 	}
 
 	@Override
-	protected ResourceLocation[] getEntityModels() {
-		return new ResourceLocation[] {
-			new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer.obj")
+	protected ModelResourceLocation[] getEntityModels() {
+		return new ModelResourceLocation[] {
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer.obj"))
 		};
 	}
 	

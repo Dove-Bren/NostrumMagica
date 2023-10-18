@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.utils.MemoryPool;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.util.ResourceLocation;
@@ -77,7 +78,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		renderers = new EnumMap<>(EDragonPart.class);
 		
 		for (EDragonPart part : EDragonPart.values()) {
-			RenderObj render = new RenderObj(this, part.getLoc()) {
+			RenderObj render = new RenderObj(this, RenderFuncs.makeDefaultModelLocation(part.getLoc())) {
 				@Override
 				protected int getColor() {
 					return color;
@@ -118,7 +119,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 				}
 				
 				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + ".obj");
-				RenderObj render = new RenderObj(this, loc) {
+				RenderObj render = new RenderObj(this, RenderFuncs.makeDefaultModelLocation(loc)) {
 					@Override
 					protected int getColor() {
 						return color;

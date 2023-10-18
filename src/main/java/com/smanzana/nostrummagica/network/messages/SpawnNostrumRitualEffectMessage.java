@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -27,7 +28,7 @@ public class SpawnNostrumRitualEffectMessage {
 	public static void handle(SpawnNostrumRitualEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (player.dimension.getId() != message.dimID) {
+		if (player.dimension != message.dimension) {
 			return;
 		}
 		
@@ -40,7 +41,7 @@ public class SpawnNostrumRitualEffectMessage {
 		ClientPredefinedEffect.SpawnRitualEffect(message.pos, message.element, message.center, message.extras, message.reagents, message.output);
 	}
 
-	private final int dimID;
+	private final DimensionType dimension;
 	private final BlockPos pos;
 	private final EMagicElement element;
 	private final ReagentType[] reagents;
@@ -48,9 +49,9 @@ public class SpawnNostrumRitualEffectMessage {
 	private final @Nullable NonNullList<ItemStack> extras;
 	private final ItemStack output;
 	
-	public SpawnNostrumRitualEffectMessage(int dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
+	public SpawnNostrumRitualEffectMessage(DimensionType dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
 			ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output) {
-		this.dimID = dimension;
+		this.dimension = dimension;
 		this.pos = pos;
 		this.element = element;
 		this.reagents = reagents;
@@ -100,11 +101,11 @@ public class SpawnNostrumRitualEffectMessage {
 			output = ItemStack.EMPTY;
 		}
 		
-		return new SpawnNostrumRitualEffectMessage(dimID, pos, element, reagents, center, extras, output);
+		return new SpawnNostrumRitualEffectMessage(DimensionType.getById(dimID), pos, element, reagents, center, extras, output);
 	}
 
 	public static void encode(SpawnNostrumRitualEffectMessage msg, PacketBuffer buf) {
-		buf.writeVarInt(msg.dimID);
+		buf.writeVarInt(msg.dimension.getId());
 		buf.writeBlockPos(msg.pos);
 		buf.writeEnumValue(msg.element);
 		

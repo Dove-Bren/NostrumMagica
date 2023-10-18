@@ -318,7 +318,7 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public boolean func_222268_a(Entity entityIn, float yaw) { // placeInPortal, placeInExistingPortal
+		public boolean placeInPortal(Entity entityIn, float yaw) { // placeInPortal, placeInExistingPortal
 			if (!(entityIn instanceof PlayerEntity)) {
 				return false;
 			}
@@ -379,7 +379,7 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		@Nullable
-		public BlockPattern.PortalInfo func_222272_a(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
+		public BlockPattern.PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
 			// "GetExistingPortalLocation" that base entity uses to try and move to another dimension.
 			// Our dimension doesn't support non-players going through as we don't have a spot for them, so return NULL.
 			return null;
@@ -432,7 +432,7 @@ public class NostrumEmptyDimension {
 		}
 		
 		@Override
-		public boolean func_222268_a(Entity entityIn, float yaw) { // placeInExistingPortal
+		public boolean placeInPortal(Entity entityIn, float yaw) { // placeInExistingPortal
 			BlockPos pos = null;
 			
 			if (NostrumMagica.getMagicWrapper(entityIn) != null) {
@@ -478,7 +478,7 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		@Nullable
-		public BlockPattern.PortalInfo func_222272_a(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
+		public BlockPattern.PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
 			// We can put items 'back' and default to world spawn...
 			// But nah just ignore them
 			return null;
@@ -537,7 +537,7 @@ public class NostrumEmptyDimension {
 					teleportingMarker.put(player.getUniqueID(), true);
 					DimensionEntryTeleporter.respawnPlayer(player);
 					new DimensionEntryTeleporter(server.getWorld(dim))
-						.func_222268_a(player, 0f);
+						.placeInPortal(player, 0f);
 //					server.getPlayerList().transferPlayerToDimension(
 //							player, dim, new DimensionEntryTeleporter(server.getWorld(dim)));
 					teleportingMarker.put(player.getUniqueID(), false);
@@ -568,7 +568,7 @@ public class NostrumEmptyDimension {
 					}
 					
 					new DimensionReturnTeleporter(server.getWorld(toDim))
-						.func_222268_a(player, 0f);
+						.placeInPortal(player, 0f);
 //					server.getPlayerList().transferPlayerToDimension(
 //							player, toDim, new DimensionReturnTeleporter(server.getWorld(toDim)));
 					teleportingMarker.put(player.getUniqueID(), false);

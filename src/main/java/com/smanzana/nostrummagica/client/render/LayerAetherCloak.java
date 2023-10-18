@@ -19,23 +19,23 @@ import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
 public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
 	protected static final Map<Integer, ModelAetherCloak<AbstractClientPlayerEntity>> ModelCache = new HashMap<>();
 	
-	protected static final ModelAetherCloak<AbstractClientPlayerEntity> GetModel(ResourceLocation models[]) {
+	protected static final ModelAetherCloak<AbstractClientPlayerEntity> GetModel(ModelResourceLocation models[]) {
 		int hash = Arrays.deepHashCode(models);
 		ModelAetherCloak<AbstractClientPlayerEntity> cloak = ModelCache.get(hash);
 		if (cloak == null) {
 			IBakedModel[] bakedModels = new IBakedModel[models.length];
 			int i = 0;
-			for (ResourceLocation modelLoc : models) {
+			for (ModelResourceLocation modelLoc : models) {
 				Minecraft mc = Minecraft.getInstance();
 				bakedModels[i++] = mc.getModelManager().getModel(modelLoc);
 			}

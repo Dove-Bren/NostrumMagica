@@ -17,15 +17,9 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<ProgressionDoorTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class,
-				new TileEntityProgressionDoorRenderer());
-	}
-	
 	private static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
 	private static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/ceramic_generic.png");
 	

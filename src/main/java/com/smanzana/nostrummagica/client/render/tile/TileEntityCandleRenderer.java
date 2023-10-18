@@ -10,15 +10,9 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(CandleTileEntity.class,
-				new TileEntityCandleRenderer());
-	}
-	
 	private NonNullEnumMap<ReagentType, ItemStack> itemCache;
 	
 	public TileEntityCandleRenderer() {

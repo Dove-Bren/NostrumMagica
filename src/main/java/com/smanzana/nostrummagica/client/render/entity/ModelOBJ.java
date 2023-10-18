@@ -5,8 +5,8 @@ import java.util.List;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,7 +18,7 @@ public abstract class ModelOBJ<T extends Entity> extends EntityModel<T> {
 		children = null;
 	}
 
-	protected abstract ResourceLocation[] getEntityModels();
+	protected abstract ModelResourceLocation[] getEntityModels();
 	protected abstract boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z, float entityYaw, float partialTicks);
 	//protected IUnbakedModel retexture(int i, UnbakedOBJModel model) {return model.model;}
 	protected int getColor(int i, T entity) {return -1;}
@@ -36,7 +36,7 @@ public abstract class ModelOBJ<T extends Entity> extends EntityModel<T> {
 	}
 	
 	protected void init() {
-		ResourceLocation[] locs = this.getEntityModels();
+		ModelResourceLocation[] locs = this.getEntityModels();
 		final int len = locs.length;
 		this.children = new ArrayList<>(len);
 		
@@ -50,7 +50,7 @@ public abstract class ModelOBJ<T extends Entity> extends EntityModel<T> {
 		private T ent;
 		private int modelIdx;
 
-		protected RenderObjCapture(EntityModel<T> base, ResourceLocation loc) {
+		protected RenderObjCapture(EntityModel<T> base, ModelResourceLocation loc) {
 			super(base, loc);
 		}
 

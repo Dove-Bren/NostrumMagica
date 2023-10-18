@@ -3,24 +3,20 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObeliskEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(NostrumObeliskEntity.class,
-				new TileEntityObeliskRenderer());
-	}
-	
-	private static final ResourceLocation MODEL_LOC = new ResourceLocation(NostrumMagica.MODID, "models/block/orb_crystal.obj");
-	private static final ResourceLocation TEXT_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ender.png");
+	private static final ModelResourceLocation MODEL_LOC = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "models/block/orb_crystal.obj"));
+	private static final ModelResourceLocation TEXT_LOC = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ender.png"));
 	private static IBakedModel model = null;
 	private static boolean attemptedLoading = false;
 	

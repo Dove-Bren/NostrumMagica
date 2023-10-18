@@ -6,9 +6,9 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
-import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -18,18 +18,32 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
-import com.smanzana.nostrummagica.client.gui.NostrumGui;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.crafting.SpellTomePageCombineRecipe;
+import com.smanzana.nostrummagica.command.CommandAllQuests;
+import com.smanzana.nostrummagica.command.CommandAllResearch;
+import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
+import com.smanzana.nostrummagica.command.CommandDebugEffect;
+import com.smanzana.nostrummagica.command.CommandEnhanceTome;
+import com.smanzana.nostrummagica.command.CommandForceBind;
+import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
+import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
+import com.smanzana.nostrummagica.command.CommandRandomSpell;
+import com.smanzana.nostrummagica.command.CommandReadRoom;
+import com.smanzana.nostrummagica.command.CommandReloadResearch;
+import com.smanzana.nostrummagica.command.CommandSetDimension;
+import com.smanzana.nostrummagica.command.CommandSetLevel;
+import com.smanzana.nostrummagica.command.CommandSetManaArmor;
+import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
+import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
+import com.smanzana.nostrummagica.command.CommandTestConfig;
+import com.smanzana.nostrummagica.command.CommandUnlock;
+import com.smanzana.nostrummagica.command.CommandUnlockAll;
+import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.fluids.FluidPoisonWater;
-import com.smanzana.nostrummagica.fluids.FluidPoisonWater.FluidPoisonWaterBlock;
-import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -87,25 +101,17 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator.NostrumDungeonConfig;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
-import com.smanzana.nostrummagica.world.gen.NostrumFlowerGenerator;
 import com.smanzana.nostrummagica.world.gen.NostrumFlowerGenerator.NostrumFlowerConfig;
-import com.smanzana.nostrummagica.world.gen.NostrumOreGenerator;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.MaterialLiquid;
+import net.minecraft.command.CommandSource;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -117,20 +123,16 @@ import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.placement.CountRangeConfig;
-import net.minecraft.world.gen.placement.DepthAverageConfig;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fml.common.registry.EntityEntry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -140,7 +142,8 @@ public class CommonProxy {
 	public CapabilityHandler capabilityHandler;
 	
 	public CommonProxy() {
-		MinecraftForge.EVENT_BUS.register(this);
+		//MinecraftForge.EVENT_BUS.register(this);
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 	}
 	
 	public void preinit() {
@@ -164,14 +167,39 @@ public class CommonProxy {
 	}
 	
 	public void init() {
-    	NetworkRegistry.INSTANCE.registerGuiHandler(NostrumMagica.instance, new NostrumGui());
-    	
     	LoreRegistry.instance();
 	}
 	
 	public void postinit() {
 		NostrumQuest.Validate();
 		NostrumResearch.Validate();
+	}
+	
+	@SubscribeEvent
+	public void startup(FMLServerStartingEvent event) {
+		final CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
+		
+		CommandTestConfig.register(dispatcher);
+		CommandTestConfig.register(dispatcher);
+		CommandSpawnObelisk.register(dispatcher);
+		CommandEnhanceTome.register(dispatcher);
+		CommandSetLevel.register(dispatcher);
+		CommandUnlock.register(dispatcher);
+		CommandGiveSkillpoint.register(dispatcher);
+		CommandAllQuests.register(dispatcher);
+		CommandAllResearch.register(dispatcher);
+		CommandCreateGeotoken.register(dispatcher);
+		CommandForceBind.register(dispatcher);
+		CommandSpawnDungeon.register(dispatcher);
+		CommandUnlockAll.register(dispatcher);
+		CommandSetDimension.register(dispatcher);
+		CommandWriteRoom.register(dispatcher);
+		CommandReadRoom.register(dispatcher);
+		CommandGiveResearchpoint.register(dispatcher);
+		CommandReloadResearch.register(dispatcher);
+		CommandRandomSpell.register(dispatcher);
+		CommandDebugEffect.register(dispatcher);
+		CommandSetManaArmor.register(dispatcher);
 	}
 	
 	public void registerWorldGen() {
@@ -217,11 +245,6 @@ public class CommonProxy {
     }
     
     @SubscribeEvent
-    public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
-    	
-    }
-    
-    @SubscribeEvent
     public void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
     	event.getRegistry().register(EnchantmentManaRecovery.instance());
     }
@@ -233,13 +256,16 @@ public class CommonProxy {
 		}
     }
     
-    @SubscribeEvent
-    public void registerCustomRecipes(RegistryEvent.Register<IRecipe> event) {
-    	final IForgeRegistry<IRecipe> registry = event.getRegistry();
-    	
-    	registry.register(new SpellRune.RuneRecipe());
-    	registry.register(new SpellTomePageCombineRecipe());
-    }
+    // Just have data files now.
+//    @SubscribeEvent
+//    public void registerCustomRecipes(RegistryEvent.Register<IRecipe> event) {
+//    	RecipeProvider p;
+//    	
+//    	final IForgeRegistry<IRecipe> registry = event.getRegistry();
+//    	
+//    	registry.register(new SpellRune.RuneRecipe());
+//    	registry.register(new SpellTomePageCombineRecipe());
+//    }
     
     @SubscribeEvent
     public void registerDataSerializers(RegistryEvent.Register<DataSerializerEntry> event) {
@@ -258,35 +284,35 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(OptionalParticleDataSerializer.instance).setRegistryName("nostrum.serial.particle_opt"));
     }
     
-    @SubscribeEvent(priority = EventPriority.HIGH) // Register fluids before blocks so fluids will be there for blocks
-    public void registerFluids(RegistryEvent.Register<Block> event) {
-    	for (NostrumFluids fluid : NostrumFluids.values()) {
-    		FluidRegistry.registerFluid(fluid.getFluid());
-    	}
-    	
-    	NostrumFluids.POISON_WATER.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
-			@Override
-			public boolean isReplaceable() {
-				return true;
-			}
-			
-			@Override
-			public boolean blocksMovement() {
-				return true; // so our liquids are not replaced by water
-			}
-		}, false));
-    	NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
-			@Override
-			public boolean isReplaceable() {
-				return false;
-			}
-			
-			@Override
-			public boolean blocksMovement() {
-				return true; // so our liquids are not replaced by water
-			}
-		}, true));
-    }
+//    @SubscribeEvent
+//    public void registerFluids(RegistryEvent.Register<Fluid> event) {
+//    	for (NostrumFluids fluid : NostrumFluids.values()) {
+//    		FluidRegistry.registerFluid(fluid.getFluid());
+//    	}
+//    	
+//    	NostrumFluids.POISON_WATER.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
+//			@Override
+//			public boolean isReplaceable() {
+//				return true;
+//			}
+//			
+//			@Override
+//			public boolean blocksMovement() {
+//				return true; // so our liquids are not replaced by water
+//			}
+//		}, false));
+//    	NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
+//			@Override
+//			public boolean isReplaceable() {
+//				return false;
+//			}
+//			
+//			@Override
+//			public boolean blocksMovement() {
+//				return true; // so our liquids are not replaced by water
+//			}
+//		}, true));
+//    }
     
     public void syncPlayer(ServerPlayerEntity player) {
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -387,61 +413,55 @@ public class CommonProxy {
 				world = caster.world;
 		}
 		
-		final double MAX_RANGE_SQR = 2500.0;
+		final double MAX_RANGE = 50.0;
 		
-		Set<PlayerEntity> players = new HashSet<>();
-		
-		if (caster != null) {
-			//caster.addTrackingPlayer(player);
-			players.addAll(((ServerWorld) world).getEntityTracker()
-				.getTrackingPlayers(caster));
-		}
-		
+		ClientEffectRenderMessage message = new ClientEffectRenderMessage(
+				caster, casterPos,
+				target, targetPos,
+				comp, flavor,
+				isNegative, compParam);
 		if (target != null) {
-			//caster.addTrackingPlayer(player);
-			players.addAll(((ServerWorld) world).getEntityTracker()
-				.getTrackingPlayers(target));
+			NetworkHandler.sendToAllTracking(message, target);
+		} else {
+			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimension().getType()));
 		}
 		
-		if (caster != null && caster == target && caster instanceof PlayerEntity) {
-			// Very specific case here
-			players.add((PlayerEntity) caster);
-		}
-		
-		if (players.isEmpty()) {
-			// Fall back to distance check against locations
-			if (casterPos != null) {
-				for (PlayerEntity player : world.playerEntities) {
-					if (player.getDistanceSq(casterPos.x, casterPos.y, casterPos.z) <= MAX_RANGE_SQR)
-						players.add(player);
-				}
-			}
-			
-			if (targetPos != null) {
-				for (PlayerEntity player : world.playerEntities) {
-					if (player.getDistanceSq(targetPos.x, targetPos.y, targetPos.z) <= MAX_RANGE_SQR)
-						players.add(player);
-				}
-			}
-		}
-		
-		if (!players.isEmpty()) {
-			ClientEffectRenderMessage message = new ClientEffectRenderMessage(
-					caster, casterPos,
-					target, targetPos,
-					comp, flavor,
-					isNegative, compParam);
-			for (PlayerEntity player : players) {
-				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);
-			}
-		}
+//		if (caster != null) {
+//			//caster.addTrackingPlayer(player);
+//			players.addAll(((ServerWorld) world).getEntityTracker()
+//				.getTrackingPlayers(caster));
+//		}
+//		
+//		if (target != null) {
+//			//caster.addTrackingPlayer(player);
+//			players.addAll(((ServerWorld) world).getEntityTracker()
+//				.getTrackingPlayers(target));
+//		}
+//		
+//		if (caster != null && caster == target && caster instanceof PlayerEntity) {
+//			// Very specific case here
+//			players.add((PlayerEntity) caster);
+//		}
+//		
+//		if (players.isEmpty()) {
+//			// Fall back to distance check against locations
+//			if (casterPos != null) {
+//				for (PlayerEntity player : world.playerEntities) {
+//					if (player.getDistanceSq(casterPos.x, casterPos.y, casterPos.z) <= MAX_RANGE_SQR)
+//						players.add(player);
+//				}
+//			}
+//			
+//			if (targetPos != null) {
+//				for (PlayerEntity player : world.playerEntities) {
+//					if (player.getDistanceSq(targetPos.x, targetPos.y, targetPos.z) <= MAX_RANGE_SQR)
+//						players.add(player);
+//				}
+//			}
+//		}
 	}
 	
 	public void sendMana(PlayerEntity player) {
-		EntityTracker tracker = ((ServerWorld) player.world).getEntityTracker();
-		if (tracker == null)
-			return;
-		
 		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
 		final int mana;
 		if (stats == null) {
@@ -450,19 +470,12 @@ public class CommonProxy {
 			mana = stats.getMana();
 		}
 		
-		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
-				.getPacketFrom(new ManaMessage(player, mana)));
+		NetworkHandler.sendToAllTracking(new ManaMessage(player, mana), player);
 	}
 	
 	public void sendManaArmorCapability(PlayerEntity player) {
-		EntityTracker tracker = ((ServerWorld) player.world).getEntityTracker();
-		if (tracker == null)
-			return;
-		
 		IManaArmor stats = NostrumMagica.getManaArmor(player);
-		
-		tracker.sendToTrackingAndSelf(player, NetworkHandler.getSyncChannel()
-				.getPacketFrom(new ManaArmorSyncMessage(player, stats)));
+		NetworkHandler.sendToAllTracking(new ManaArmorSyncMessage(player, stats), player);
 	}
 	
 	public void receiveManaArmorOverride(@Nonnull Entity ent, IManaArmor override) {
@@ -474,7 +487,7 @@ public class CommonProxy {
 		Set<PlayerEntity> players = new HashSet<>();
 		final double MAX_RANGE_SQR = 2500.0;
 		if (pos != null) {
-			for (PlayerEntity player : world.playerEntities) {
+			for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
 				if (player.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= MAX_RANGE_SQR)
 					players.add(player);
 			}
@@ -483,7 +496,7 @@ public class CommonProxy {
 		if (!players.isEmpty()) {
 			SpawnNostrumRitualEffectMessage message = new SpawnNostrumRitualEffectMessage(
 					//int dimension, BlockPos pos, ReagentType[] reagents, ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output
-					world.provider.getDimension(),
+					world.getDimension().getType(),
 					pos, element, types, center, extras, output
 					);
 			for (PlayerEntity player : players) {
@@ -493,27 +506,15 @@ public class CommonProxy {
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vec3d position) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.provider.getDimension(), position), world, position);
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), position), world, position);
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Entity entity) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.provider.getDimension(), entity.getEntityId()), world, entity.getPositionVector());
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), entity.getEntityId()), world, entity.getPositionVector());
 	}
 	
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vec3d center) {
-		Set<PlayerEntity> players = new HashSet<>();
-		final double MAX_RANGE_SQR = 2500.0;
-		if (center != null) {
-			for (PlayerEntity player : world.playerEntities) {
-				if (player.getDistanceSq(center.x, center.y, center.z) <= MAX_RANGE_SQR)
-					players.add(player);
-			}
-		}
-		
-		if (!players.isEmpty()) {
-			for (PlayerEntity player : players) {
-				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);
-			}
-		}
+		final double MAX_RANGE = 50.0;
+		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimension().getType()));
 	}
 }

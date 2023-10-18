@@ -3,8 +3,10 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelSpriteCore extends ModelOBJ<EntitySprite> {
@@ -14,10 +16,10 @@ public class ModelSpriteCore extends ModelOBJ<EntitySprite> {
 	}
 
 	@Override
-	protected ResourceLocation[] getEntityModels() {
-		return new ResourceLocation[] {
-			new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core.obj"),
-			new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms.obj")
+	protected ModelResourceLocation[] getEntityModels() {
+		return new ModelResourceLocation[] {
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core.obj")),
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms.obj"))
 		};
 	}
 	

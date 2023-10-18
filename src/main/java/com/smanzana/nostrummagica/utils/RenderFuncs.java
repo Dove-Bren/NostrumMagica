@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.crash.CrashReport;
@@ -645,6 +646,12 @@ public final class RenderFuncs {
 	
 	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
 		return MathHelper.func_219805_h(partialTicks, prevYawOffset, yawOffset);
+	}
+	
+	// Should be somewhere else?
+	@OnlyIn(Dist.CLIENT)
+	public static final ModelResourceLocation makeDefaultModelLocation(ResourceLocation loc) {
+		return new ModelResourceLocation(loc, "normal");
 	}
 	
 }

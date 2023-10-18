@@ -24,7 +24,7 @@ public class ColorUtil {
 	}
 	
 	public static final int dyeToARGB(DyeColor color) {
-		return 0xFF000000 | color.func_218388_g();
+		return 0xFF000000 | color.getColorValue();
 	}
 	
 	public static final float[] ARGBToColor(int ARGB) {

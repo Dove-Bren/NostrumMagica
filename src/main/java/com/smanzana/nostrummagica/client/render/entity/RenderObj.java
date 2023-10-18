@@ -20,10 +20,10 @@ import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.renderer.model.ModelManager;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -39,10 +39,9 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
  *
  * @param <T>
  */
-@SuppressWarnings("deprecation")
 public class RenderObj extends RendererModel {
 
-	private ResourceLocation resource;
+	private ModelResourceLocation resource;
 	
 	// The GL display list rendered by the Tessellator for this model
 	// RendererModel does not expose, so we have to basically dupe
@@ -51,7 +50,7 @@ public class RenderObj extends RendererModel {
     
     private boolean initted;
 
-	protected RenderObj(Model base, ResourceLocation loc) {
+	protected RenderObj(Model base, ModelResourceLocation loc) {
 		super(base);
 		
 		this.resource = loc;

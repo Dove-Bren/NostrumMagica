@@ -1,24 +1,12 @@
 package com.smanzana.nostrummagica.integration.aetheria;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAetherInfuserRenderer;
-import com.smanzana.nostrummagica.client.render.tile.TileEntityWispBlockRenderer;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuser;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
-import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
-import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens;
-import com.smanzana.nostrummagica.integration.aetheria.items.ItemAetherLens.LensType;
-import com.smanzana.nostrummagica.integration.aetheria.items.NostrumAetherResourceItem;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 //
 public class AetheriaClientProxy extends AetheriaProxy {
@@ -33,9 +21,6 @@ public class AetheriaClientProxy extends AetheriaProxy {
 			return false;
 		}
 
-    	TileEntityWispBlockRenderer.init();
-    	TileEntityAetherInfuserRenderer.init();
-		
 		return true;
 	}
 	
@@ -57,47 +42,32 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		return true;
 	}
 	
-	private void registerItemVariants(ModelRegistryEvent event) {
-		List<ResourceLocation> list = new LinkedList<>();
-    	for (AetherResourceType type : AetherResourceType.values()) {
-    		list.add(new ResourceLocation(NostrumMagica.MODID, type.getUnlocalizedKey()));
-    	}
-		
-    	ResourceLocation variants[] = list.toArray(new ResourceLocation[list.size()]);
-    	ModelBakery.registerItemVariants(NostrumAetherResourceItem.instance(), variants);
+	@SubscribeEvent
+	public void registerAllModels(ModelRegistryEvent event) {
+		// All of this handled because each item has its own ID?
+//		ClientProxy.registerModel(Item.getItemFromBlock(WispBlock.instance()),
+//				0,
+//				WispBlock.ID);
     	
+//    	for (AetherResourceType type : AetherResourceType.values()) {
+//    		ClientProxy.registerModel(NostrumAetherResourceItem.instance(),
+//    				NostrumAetherResourceItem.getMetaFromType(type),
+//					type.getUnlocalizedKey());
+//		}
+
+//		ClientProxy.registerModel(Item.getItemFromBlock(AetherInfuser.instance()),
+//				0,
+//				AetherInfuser.ID);
     	
-    	list.clear();
-		for (LensType type : LensType.values()) {
-			list.add(new ResourceLocation(NostrumMagica.MODID,
-					ItemAetherLens.UNLOC_PREFIX + type.getUnlocSuffix()));
-		}
-		variants = list.toArray(new ResourceLocation[list.size()]);
-		ModelBakery.registerItemVariants(ItemAetherLens.instance(), variants);
+//    	for (LensType type : LensType.values()) {
+//    		ClientProxy.registerModel(ItemAetherLens.instance(),
+//    				ItemAetherLens.MetaFromType(type),
+//    				ItemAetherLens.UNLOC_PREFIX + type.getUnlocSuffix());
+//		}
 	}
 	
 	@SubscribeEvent
-	public void registerAllModels(ModelRegistryEvent event) {
-		registerItemVariants(event);
-		
-		ClientProxy.registerModel(Item.getItemFromBlock(WispBlock.instance()),
-				0,
-				WispBlock.ID);
-    	
-    	for (AetherResourceType type : AetherResourceType.values()) {
-    		ClientProxy.registerModel(NostrumAetherResourceItem.instance(),
-    				NostrumAetherResourceItem.getMetaFromType(type),
-					type.getUnlocalizedKey());
-		}
-
-		ClientProxy.registerModel(Item.getItemFromBlock(AetherInfuser.instance()),
-				0,
-				AetherInfuser.ID);
-    	
-    	for (LensType type : LensType.values()) {
-    		ClientProxy.registerModel(ItemAetherLens.instance(),
-    				ItemAetherLens.MetaFromType(type),
-    				ItemAetherLens.UNLOC_PREFIX + type.getUnlocSuffix());
-		}
+	public void clientSetup(FMLClientSetupEvent event) {
+		ClientRegistry.bindTileEntitySpecialRenderer(AetherInfuserTileEntity.class, new TileEntityAetherInfuserRenderer());
 	}
 }

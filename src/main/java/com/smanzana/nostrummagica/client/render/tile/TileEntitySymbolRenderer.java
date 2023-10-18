@@ -13,15 +13,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntity> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(SymbolTileEntity.class,
-				new TileEntitySymbolRenderer());
-	}
-	
 	public TileEntitySymbolRenderer() {
 		
 	}

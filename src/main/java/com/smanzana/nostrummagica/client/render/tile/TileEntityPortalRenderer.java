@@ -13,15 +13,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTileEntityBase> {
 
-	public static void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(NostrumPortalTileEntityBase.class,
-				new TileEntityPortalRenderer());
-	}
-	
 	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/portal.png");
 	
 	public TileEntityPortalRenderer() {
