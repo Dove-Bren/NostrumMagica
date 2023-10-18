@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.integration.jei.ingredients;
 
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 
-import mezz.jei.api.recipe.IIngredientType;
+import mezz.jei.api.ingredients.IIngredientType;
 
 public class RitualOutcomeIngredientType implements IIngredientType<RitualOutcomeWrapper> {
 

@@ -3,37 +3,36 @@ package com.smanzana.nostrummagica.integration.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
-import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IDrawable;
-import mezz.jei.api.gui.IGuiIngredientGroup;
-import mezz.jei.api.gui.IGuiItemStackGroup;
+import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
+import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
+import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.ingredients.VanillaTypes;
-import mezz.jei.api.recipe.IRecipeCategory;
+import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 
-public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper> {
+public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 
 	private static final ResourceLocation TEXT_TIER1 = new ResourceLocation(NostrumMagica.MODID, "textures/gui/nei/tier_1.png");
 	private static final ResourceLocation TEXT_TIER2 = new ResourceLocation(NostrumMagica.MODID, "textures/gui/nei/tier_2.png");
@@ -44,7 +43,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 	private static final int RING_WIDTH = 62;
 	private static final int RING_HEIGHT = 62;
 	
-	public static String UID = "nostrummagica:ritual_recipe";
+	public static final ResourceLocation UID = new ResourceLocation(NostrumMagica.MODID, "ritual_recipe");
 	
 	private String title;
 	private IDrawable backgroundTier1;
@@ -53,7 +52,6 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 	private EMagicElement recipeFlavor;
 	private int recipeTier;
 	private String recipeName;
-	private boolean canPerform;
 	
 	public RitualRecipeCategory(IGuiHelper guiHelper) {
 		title = I18n.format("nei.category.ritual.name", (Object[]) null);
@@ -65,8 +63,13 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 	}
 	
 	@Override
-	public String getUid() {
+	public ResourceLocation getUid() {
 		return UID;
+	}
+	
+	@Override
+	public Class<RitualRecipe> getRecipeClass() {
+		return RitualRecipe.class;
 	}
 
 	@Override
@@ -88,7 +91,8 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 	}
 
 	@Override
-	public void drawExtras(Minecraft minecraft) {
+	public void draw(RitualRecipe recipe, double mouseX, double mouseY) {
+		final Minecraft minecraft = Minecraft.getInstance();
 		GlStateManager.pushMatrix();
 		
 		float red, green, blue, alpha, angle;
@@ -118,7 +122,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		
 		GlStateManager.popMatrix();
 		
-		if (!canPerform) {
+		if (!canPerform(recipe)) {
 			minecraft.fontRenderer.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
@@ -127,9 +131,31 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		int len = minecraft.fontRenderer.getStringWidth(title);
 		minecraft.fontRenderer.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
+	
+	@Override
+	public void setIngredients(RitualRecipe ritual, IIngredients ingredients) {
+		List<List<ItemStack>> stackInputs = new ArrayList<>();
+		if (ritual.getCenterItem() != Ingredient.EMPTY && !ritual.getCenterItem().hasNoMatchingItems()) {
+			stackInputs.add(Lists.newArrayList(ritual.getCenterItem().getMatchingStacks()));
+		}
+		for (Ingredient ing : ritual.getExtraItems()) {
+			if (ing == Ingredient.EMPTY || ing.hasNoMatchingItems()) {
+				stackInputs.add(new ArrayList<>()); // should be null?
+			} else {
+				stackInputs.add(Lists.newArrayList(ing.getMatchingStacks()));
+			}
+		}
+		
+		ingredients.setInputLists(VanillaTypes.ITEM, stackInputs);
+		if (ritual.getOutcome() instanceof IItemRitualOutcome) {
+			ingredients.setOutput(VanillaTypes.ITEM, ((IItemRitualOutcome) ritual.getOutcome()).getResult());
+		} else {
+			ingredients.setOutput(RitualOutcomeIngredientType.instance, new RitualOutcomeWrapper(ritual.getOutcome()));
+		}
+	}
 
 	@Override
-	public void setRecipe(IRecipeLayout recipeLayout, RitualRecipeWrapper recipeWrapper, IIngredients ingredients) {
+	public void setRecipe(IRecipeLayout recipeLayout, RitualRecipe ritual, IIngredients ingredients) {
 		IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
 		
 		/*
@@ -138,8 +164,6 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		 * extra items next
 		 * nulls exist!
 		 */
-		
-		RitualRecipe ritual = recipeWrapper.getRitual();
 		
 		recipeFlavor = ritual.getElement();
 		recipeTier = ritual.getTier();
@@ -188,9 +212,36 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 		
 		guiItemStacks.set(ingredients);
 		guiOutcomes.set(ingredients);
-		
+	}
+
+	@Override
+	public IDrawable getIcon() {
+		return null;
+	}
+	
+	private String tooltipInvalidKey = null;
+	private List<String> tooltipInvalid = null;
+	private List<String> tooltipEmpty = new ArrayList<>();
+
+	@Override
+	public List<String> getTooltipStrings(RitualRecipe ritual, double mouseX, double mouseY) {
+		//108, 70
+		if (!canPerform(ritual)
+				&& mouseX > 101 && mouseX < 124
+				&& mouseY > 66 && mouseY < 85) {
+			if (tooltipInvalidKey == null || !tooltipInvalidKey.equals(I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK))) {
+				tooltipInvalidKey = I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK);;
+				tooltipInvalid = Lists.newArrayList(tooltipInvalidKey.split("\\|"));
+			}
+			return tooltipInvalid;
+		}
+			
+		return tooltipEmpty;
+	}
+	
+	protected boolean canPerform(RitualRecipe ritual) {
 		// Check whether this ritual can be performed
-		canPerform = true;
+		boolean canPerform = true;
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (player != null) {
 			// Client side, so check if player has unlocked the ritual
@@ -204,37 +255,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipeWrapper
 				}
 			}
 		}
-	}
-
-	@Override
-	public IDrawable getIcon() {
-		return null;
-	}
-	
-	private String tooltipInvalidKey = null;
-	private List<String> tooltipInvalid = null;
-	private List<String> tooltipEmpty = new ArrayList<>();
-
-	@Override
-	public List<String> getTooltipStrings(int mouseX, int mouseY) {
-		//108, 70
-		if (!this.canPerform
-				&& mouseX > 101 && mouseX < 124
-				&& mouseY > 66 && mouseY < 85) {
-			if (tooltipInvalidKey == null || !tooltipInvalidKey.equals(I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK))) {
-				tooltipInvalidKey = I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK);;
-				tooltipInvalid = Lists.newArrayList(tooltipInvalidKey.split("\\|"));
-			}
-			return tooltipInvalid;
-		}
-			
-		return tooltipEmpty;
-	}
-
-	@Nonnull
-	@Override
-	public String getModName() {
-		return NostrumMagica.MODID;
+		return canPerform;
 	}
 
 }

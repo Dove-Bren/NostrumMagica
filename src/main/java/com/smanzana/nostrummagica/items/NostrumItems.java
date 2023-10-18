@@ -30,17 +30,17 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-@ObjectHolder(NostrumMagica.MODID)
+@Mod(NostrumMagica.MODID)
 public class NostrumItems {
 	
 	// Not sure where to put these...
-	public static final String ID_EARTH = "earth";
-	public static final String ID_ENDER = "ender";
-	public static final String ID_FIRE = "fire";
-	public static final String ID_ICE = "ice";
-	public static final String ID_LIGHTNING = "lightning";
-	public static final String ID_PHYSICAL = "physical";
-	public static final String ID_WIND = "wind";
+	protected static final String ID_EARTH = "earth";
+	protected static final String ID_ENDER = "ender";
+	protected static final String ID_FIRE = "fire";
+	protected static final String ID_ICE = "ice";
+	protected static final String ID_LIGHTNING = "lightning";
+	protected static final String ID_PHYSICAL = "physical";
+	protected static final String ID_WIND = "wind";
 	
 	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem; // TODO could clean up; is just a BlockItem
 	@ObjectHolder(ArcaneWolfSoulItem.ID) public static ArcaneWolfSoulItem arcaneWolfSoulItem;

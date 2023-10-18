@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.integration.jei.ingredients;
 
-import java.awt.Color;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
@@ -11,10 +9,10 @@ import mezz.jei.api.ingredients.IIngredientHelper;
 
 public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWrapper> {
 
-	@Override
-	public List<RitualOutcomeWrapper> expandSubtypes(List<RitualOutcomeWrapper> ingredients) {
-		return ingredients;
-	}
+//	@Override
+//	public List<RitualOutcomeWrapper> expandSubtypes(List<RitualOutcomeWrapper> ingredients) {
+//		return ingredients;
+//	}
 
 	@Override
 	public RitualOutcomeWrapper getMatch(Iterable<RitualOutcomeWrapper> ingredients, RitualOutcomeWrapper ingredientToMatch) {
@@ -42,7 +40,7 @@ public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWr
 	}
 
 	@Override
-	public Iterable<Color> getColors(RitualOutcomeWrapper ingredient) {
+	public Iterable<Integer> getColors(RitualOutcomeWrapper ingredient) {
 		return new ArrayList<>();
 	}
 

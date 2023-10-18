@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -27,7 +28,7 @@ import net.minecraftforge.common.ToolType;
 
 public class PutterBlock extends ContainerBlock {
 	
-	public static final DirectionProperty FACING = DirectionProperty.create("facing");
+	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
 	public static final String ID = "putter";
 	

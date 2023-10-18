@@ -138,7 +138,7 @@ public abstract class FluidPoisonWater extends FlowingFluid {
 	}
 	
 	@Override // no clue what this is
-	public boolean func_215665_a(IFluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
+	public boolean canDisplace(IFluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
 		return p_215665_5_ == Direction.DOWN && !p_215665_4_.isIn(FluidTags.WATER);
 	}
 

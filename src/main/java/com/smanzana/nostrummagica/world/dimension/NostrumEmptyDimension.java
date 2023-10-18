@@ -61,7 +61,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class NostrumEmptyDimension {
 	
-	public static final String TYPE_ID = "NostrumSorceryDim";
+	public static final String TYPE_ID = "nostrumsorcerydim";
 	//private static final String DIMENSION_SUFFIX = "_" + DIMENSION_NAME;
 	//private static DimensionType DIMENSION_TYPE;
 	

@@ -20,7 +20,9 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ColorUtil;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -161,30 +163,30 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	public static final DyeColor COLOR_DEFAULT_INSIDE = DyeColor.GRAY;
 	public static final DyeColor COLOR_DEFAULT_RUNES = DyeColor.WHITE;
 
-	private static final ResourceLocation CapeModelTrimmedOutside = new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_outside.obj");
-	private static final ResourceLocation CapeModelTrimmedInside = new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_inside.obj");
-	private static final ResourceLocation CapeModelTrimmedDecor = new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_decor.obj");
-	private static final ResourceLocation CapeModelFullOutside = new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_outside.obj");
-	private static final ResourceLocation CapeModelFullInside = new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_inside.obj");
-	private static final ResourceLocation CapeModelFullDecor = new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_decor.obj");
+	private static final ModelResourceLocation CapeModelTrimmedOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_outside.obj"));
+	private static final ModelResourceLocation CapeModelTrimmedInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_inside.obj"));
+	private static final ModelResourceLocation CapeModelTrimmedDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_decor.obj"));
+	private static final ModelResourceLocation CapeModelFullOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_outside.obj"));
+	private static final ModelResourceLocation CapeModelFullInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_inside.obj"));
+	private static final ModelResourceLocation CapeModelFullDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_decor.obj"));
 	
-	private static final ResourceLocation[] CapeModelsTrimmed = new ResourceLocation[] {
+	private static final ModelResourceLocation[] CapeModelsTrimmed = new ModelResourceLocation[] {
 		CapeModelTrimmedInside,
 		CapeModelTrimmedOutside,
 	};
 
-	private static final ResourceLocation[] CapeModelsTrimmedDecor = new ResourceLocation[] {
+	private static final ModelResourceLocation[] CapeModelsTrimmedDecor = new ModelResourceLocation[] {
 		CapeModelTrimmedInside,
 		CapeModelTrimmedOutside,
 		CapeModelTrimmedDecor,
 	};
 	
-	private static final ResourceLocation[] CapeModelsFull = new ResourceLocation[] {
+	private static final ModelResourceLocation[] CapeModelsFull = new ModelResourceLocation[] {
 		CapeModelFullInside,
 		CapeModelFullOutside,
 	};
 	
-	private static final ResourceLocation[] CapeModelsFullDecor = new ResourceLocation[] {
+	private static final ModelResourceLocation[] CapeModelsFullDecor = new ModelResourceLocation[] {
 		CapeModelFullInside,
 		CapeModelFullOutside,
 		CapeModelFullDecor,
@@ -626,7 +628,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public ResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack) {
+	public ModelResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack) {
 		final boolean trimmed = getDisplayTrimmed(stack);
 		final boolean runes = getDisplayRunes(stack);
 		if (trimmed) {

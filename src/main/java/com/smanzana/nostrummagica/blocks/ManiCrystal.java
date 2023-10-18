@@ -33,7 +33,7 @@ public class ManiCrystal extends Block {
 	public static final String ID_MANI = ID_PREFIX + "mani";
 	public static final String ID_KANI = ID_PREFIX + "kani";
 	public static final String ID_VANI = ID_PREFIX + "vani";
-	public static final DirectionProperty FACING = DirectionProperty.create("facing");
+	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
 	protected static final VoxelShape STANDING_AABB = Block.makeCuboidShape(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
 	protected static final VoxelShape HANGING_AABB = Block.makeCuboidShape(.5-(.16), .55, .5-.16, .5+.16, 1.0, .5+.16);

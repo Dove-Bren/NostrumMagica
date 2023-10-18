@@ -256,6 +256,12 @@ public class NostrumMagica {
 		
 		(new ModConfig()).register();
 
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
+	}
+
+	@SubscribeEvent
+	public void commonSetup(FMLCommonSetupEvent event) {
+		
 		proxy.preinit();
 		aetheria.preInit();
 		curios.preInit();
@@ -266,11 +272,6 @@ public class NostrumMagica {
 
 		SpellTomeEnhancement.initDefaultEnhancements();
 		
-		FMLJavaModLoadingContext.get().getModEventBus().register(this);
-	}
-
-	@SubscribeEvent
-	public void commonSetup(FMLCommonSetupEvent event) {
 		// Register rituals, quests, etc. after item and block init
 		registerDefaultRituals();
 		registerDefaultQuests();

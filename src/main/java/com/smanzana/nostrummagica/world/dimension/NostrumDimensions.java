@@ -16,26 +16,18 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ObjectHolder;
 
 @EventBusSubscriber(modid = NostrumMagica.MODID, bus = EventBusSubscriber.Bus.FORGE) // for RegisterDimensionsEvent
-@ObjectHolder(NostrumMagica.MODID)
 public class NostrumDimensions {
 
-	@ObjectHolder(NostrumEmptyDimension.TYPE_ID) public static DimensionType EmptyDimension;
+	public static DimensionType EmptyDimension;
 	
-	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void onRegisterDim(@Nonnull final RegisterDimensionsEvent event) {
-		if(!DimensionManager.getRegistry().containsKey(new ResourceLocation(NostrumMagica.MODID, NostrumEmptyDimension.TYPE_ID)))
-		{
-			DimensionManager.registerDimension(new ResourceLocation(NostrumMagica.MODID, NostrumEmptyDimension.TYPE_ID), NostrumDimensionWrappers.EmptyDimensionWrapper,
-					null, false);
-		}
-		else
-		{
-			; // already registered
-		}
+		EmptyDimension = DimensionManager.registerOrGetDimension(new ResourceLocation(NostrumMagica.MODID, NostrumEmptyDimension.TYPE_ID), NostrumDimensionWrappers.EmptyDimensionWrapper,
+				null, false);
 	}
 	
 	@EventBusSubscriber(modid = NostrumMagica.MODID, bus = EventBusSubscriber.Bus.MOD) // for ModDimension registry event
+	@ObjectHolder(NostrumMagica.MODID)
 	protected static class NostrumDimensionWrappers {
 		
 		private static final String EMPTY_DIM_WRAPPER_ID = NostrumEmptyDimension.TYPE_ID + "_moddim";

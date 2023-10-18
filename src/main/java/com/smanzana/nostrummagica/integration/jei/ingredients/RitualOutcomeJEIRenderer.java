@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -35,10 +36,10 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 	
 	@Override
-	public void render(Minecraft minecraft, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
+	public void render(int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return;
-		minecraft.getTextureManager().bindTexture(RITUAL_TEXTURE);
+		Minecraft.getInstance().getTextureManager().bindTexture(RITUAL_TEXTURE);
 		ItemStack item = fetchItem(ingredient.getOutcome());
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -51,7 +52,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 					RITUAL_TEXT_WIDTH,
 					RITUAL_TEXT_HEIGHT);
 			
-			minecraft.getItemRenderer().renderItemIntoGUI(item, xPosition + 1, yPosition + 1);
+			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(item, xPosition + 1, yPosition + 1);
 		} else {
 			RenderFuncs.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
 					0,
@@ -64,7 +65,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public List<String> getTooltip(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
+	public List<String> getTooltip(RitualOutcomeWrapper ingredient, ITooltipFlag flag) {
 		if (ingredient == null)
 			return new LinkedList<>();
 		

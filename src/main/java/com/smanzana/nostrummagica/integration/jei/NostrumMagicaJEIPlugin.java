@@ -10,27 +10,29 @@ import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategor
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIHelper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
-import com.smanzana.nostrummagica.integration.jei.wrappers.RitualRecipeWrapper;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.ISubtypeRegistry;
-import mezz.jei.api.JEIPlugin;
-import mezz.jei.api.ingredients.IIngredientBlacklist;
-import mezz.jei.api.ingredients.IModIngredientRegistration;
-import mezz.jei.api.recipe.IRecipeCategoryRegistration;
+import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.registration.IModIngredientRegistration;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
-@JEIPlugin
+@JeiPlugin
 public class NostrumMagicaJEIPlugin implements IModPlugin {
+	
+	private static final ResourceLocation pluginUID = new ResourceLocation(NostrumMagica.MODID, "JEIPlugin");
 	
 	private List<RitualOutcomeWrapper> ritualOutcomes;
 	
 	@Override
-	public void registerItemSubtypes(@Nonnull ISubtypeRegistry subtypeRegistry) {
+	public void registerItemSubtypes(@Nonnull ISubtypeRegistration subtypeRegistry) {
 		subtypeRegistry.useNbtForSubtypes(NostrumItems.spellTomePage);
 	}
 
@@ -56,27 +58,32 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	}
 	
 	@Override
-	public void register(IModRegistry registry) {
+	public void registerRecipes(IRecipeRegistration registry) {
 		NostrumMagica.logger.info("Registering rituals with JEI...");
-		
-		registry.handleRecipes(RitualRecipe.class, RitualRecipeWrapper::new, RitualRecipeCategory.UID);
 		
 		registry.addRecipes(RitualRegistry.instance().getRegisteredRituals(), RitualRecipeCategory.UID);
 		
 		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size() + " rituals");
 		
-		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.UID);
-		
-		
-		// Hide our cool wrapper to outputs
-		IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();
-		for (RitualOutcomeWrapper wrapper : ritualOutcomes) {
-			blacklist.addIngredientToBlacklist(wrapper);
-		}
+//		// Hide our cool wrapper to outputs
+//		IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();
+//		for (RitualOutcomeWrapper wrapper : ritualOutcomes) {
+//			blacklist.addIngredientToBlacklist(wrapper);
+//		}
 		//blacklist.addIngredientToBlacklist(new ItemStack(DungeonBlock.instance()));
 		//blacklist.addIngredientToBlacklist(new ItemStack(NostrumSingleSpawner.instance()));
 		int unused; // hmmm above doesn't work? is block registering right?
 		
+	}
+	
+	@Override
+	public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
+		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.UID);
+	}
+
+	@Override
+	public ResourceLocation getPluginUid() {
+		return pluginUID;
 	}
 	
 }
