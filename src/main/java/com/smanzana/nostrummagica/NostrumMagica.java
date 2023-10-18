@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -2831,7 +2832,7 @@ public class NostrumMagica {
 			PrioritizedGoal followTask = null;
 			
 			// Get private goal list
-			List<PrioritizedGoal> goals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.goalSelector, "field_220892_d"); 
+			LinkedHashSet<PrioritizedGoal> goals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.goalSelector, "field_220892_d"); 
 
 			// Scan for existing task
 			for (PrioritizedGoal entry : goals) {

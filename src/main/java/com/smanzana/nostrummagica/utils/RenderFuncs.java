@@ -651,7 +651,7 @@ public final class RenderFuncs {
 	// Should be somewhere else?
 	@OnlyIn(Dist.CLIENT)
 	public static final ModelResourceLocation makeDefaultModelLocation(ResourceLocation loc) {
-		return new ModelResourceLocation(loc, "normal");
+		return new ModelResourceLocation(loc, "");
 	}
 	
 }

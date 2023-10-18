@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
@@ -19,6 +20,7 @@ public class NostrumCrafting {
 	@ObjectHolder(ShapedWithRemainingRecipe.Serializer.ID) public static ShapedWithRemainingRecipe.Serializer shapedWithRemainingSerializer;
 	@ObjectHolder(SpellTomePageCombineRecipe.SERIALIZER_ID) public static SpecialRecipeSerializer<SpellTomePageCombineRecipe> spellTomePageCombineSerializer;
 	
+	@SubscribeEvent
 	public static void registerSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
 		final IForgeRegistry<IRecipeSerializer<?>> registry = event.getRegistry();
 		

@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 
 public class AoEShape extends SpellShape {
 
-	private static final String SHAPE_KEY = "shape_aoe";
+	private static final String SHAPE_KEY = "aoe";
 	private static AoEShape instance = null;
 	
 	public static AoEShape instance() {

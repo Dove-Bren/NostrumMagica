@@ -1,7 +1,6 @@
 {
 	"replace": false,
 	"values": [
-		"#nostrummagica:reagent/any",
 		"#nostrummagica:reagent/mandrake_root",
 		"#nostrummagica:reagent/ginseng",
 		"#nostrummagica:reagent/spider_silk",

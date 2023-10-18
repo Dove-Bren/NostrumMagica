@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 
 public class SingleShape extends SpellShape {
 
-	private static final String SHAPE_KEY = "shape_single";
+	private static final String SHAPE_KEY = "single";
 	private static SingleShape instance = null;
 	
 	public static SingleShape instance() {

@@ -1,7 +1,6 @@
 {
 	"replace": false,
 	"values": [
-		"#nostrummagica:tome_plate/any",
 		"#nostrummagica:tome_plate/novice",
 		"#nostrummagica:tome_plate/advanced",
 		"#nostrummagica:tome_plate/combat",

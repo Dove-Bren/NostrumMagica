@@ -1,5 +1,5 @@
 {	
 	"variants": {
-        "normal": { "model": "nostrummagica:block/mana_armorer" }
+        "": { "model": "nostrummagica:block/mana_armorer" }
     }
 }

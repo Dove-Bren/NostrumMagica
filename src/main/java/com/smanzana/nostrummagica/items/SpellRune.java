@@ -310,7 +310,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 	}
 	
-	protected static final String ID_PREFIX = "nostrum_rune";
+	protected static final String ID_PREFIX = "rune_";
 	private static final String NBT_PARAM_VAL = "param_value"; // shapes/triggers
 	private static final String NBT_PARAM_FLIP = "param_flip"; // shapes/triggers
 	

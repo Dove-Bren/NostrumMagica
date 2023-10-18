@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:block/essore" }
+        "": { "model": "nostrummagica:block/essore" }
     }
 }

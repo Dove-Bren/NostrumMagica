@@ -1,7 +1,6 @@
 {
 	"replace": false,
 	"values": [
-		"#nostrummagica:hookshot/any",
 		"#nostrummagica:hookshot/weak",
 		"#nostrummagica:hookshot/medium",
 		"#nostrummagica:hookshot/strong",

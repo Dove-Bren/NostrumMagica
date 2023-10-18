@@ -147,6 +147,10 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.CommandSource;
@@ -174,8 +178,11 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.BasicState;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -1490,7 +1497,20 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-    	
+    	for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled", "block/pedestal.obj"}) {
+		IUnbakedModel model;
+		try {
+			model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, key + ".obj"));
+			
+			if (model != null && model instanceof OBJModel) {
+				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, ""), bakedModel);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			NostrumMagica.logger.warn("Failed to load effect " + key);
+		}	
+	}
 	}
 	
 	private static void initDefaultEffects(ClientEffectRenderer renderer) {

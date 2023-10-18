@@ -1,7 +1,6 @@
 {
 	"replace": false,
 	"values": [
-		"#nostrummagica:essence/any",
 		"#nostrummagica:essence/void",
 		"#nostrummagica:essence/earth",
 		"#nostrummagica:essence/fire",

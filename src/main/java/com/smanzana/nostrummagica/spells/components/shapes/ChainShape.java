@@ -25,7 +25,7 @@ import net.minecraft.world.World;
 
 public class ChainShape extends SpellShape {
 
-	private static final String SHAPE_KEY = "shape_chain";
+	private static final String SHAPE_KEY = "chain";
 	private static ChainShape instance = null;
 	
 	public static ChainShape instance() {

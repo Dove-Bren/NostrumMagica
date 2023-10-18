@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:block/wisp_block" }
+        "": { "model": "nostrummagica:block/wisp_block" }
     }
 }

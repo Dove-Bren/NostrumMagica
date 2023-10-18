@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:block/chalk_block" }
+        "": { "model": "nostrummagica:block/chalk_block" }
     }
 }

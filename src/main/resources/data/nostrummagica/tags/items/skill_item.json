@@ -1,7 +1,6 @@
 {
 	"replace": false,
 	"values": [
-		"#nostrummagica:skill_item/any",
 		"#nostrummagica:skill_item/mirror",
 		"#nostrummagica:skill_item/ooze",
 		"#nostrummagica:skill_item/pendant",

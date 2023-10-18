@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nostrummagica:block/pedestal.obj", "x": 270 }
+        "": { "model": "nostrummagica:block/pedestal.obj", "x": 270 }
     }
 }

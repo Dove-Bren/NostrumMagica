@@ -1,7 +1,6 @@
 {
 	"replace": false,
 	"values": [
-		"#nostrummagica:spell_tome/any",
 		"#nostrummagica:spell_tome/novice",
 		"#nostrummagica:spell_tome/advanced",
 		"#nostrummagica:spell_tome/combat",

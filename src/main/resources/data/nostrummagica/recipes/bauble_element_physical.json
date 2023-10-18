@@ -1,7 +1,7 @@
 {
   "type": "nostrummagica:bauble_color",
   "display": {
-	  "item": "nostrummagica:bauble_dragon_wing_pendant"
+	  "item": "nostrummagica:bauble_dragon_wing_pendant",
 	  "nbt": {
 		  "element": "PHYSICAL"
 	  }
