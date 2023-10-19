@@ -139,7 +139,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 //		tooltip.add("Magic Potency Bonus: 20%");
 		tooltip.add(new StringTextComponent("Mana Cost Reduction: 5%"));
-		tooltip.add(new TranslationTextComponent("item.soul_dagger.desc"));
+		tooltip.add(new TranslationTextComponent("item.nostrummagica.soul_dagger.desc"));
 	}
 	
 	@Override

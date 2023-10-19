@@ -11,6 +11,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
@@ -30,6 +33,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
 public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
@@ -135,17 +139,54 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	@Override
 	public void setIngredients(RitualRecipe ritual, IIngredients ingredients) {
 		List<List<ItemStack>> stackInputs = new ArrayList<>();
-		if (ritual.getCenterItem() != Ingredient.EMPTY && !ritual.getCenterItem().hasNoMatchingItems()) {
-			stackInputs.add(Lists.newArrayList(ritual.getCenterItem().getMatchingStacks()));
-		}
-		for (Ingredient ing : ritual.getExtraItems()) {
-			if (ing == Ingredient.EMPTY || ing.hasNoMatchingItems()) {
-				stackInputs.add(new ArrayList<>()); // should be null?
-			} else {
-				stackInputs.add(Lists.newArrayList(ing.getMatchingStacks()));
-			}
-		}
 		
+		// Add flavor gem
+		stackInputs.add(Lists.newArrayList(InfusedGemItem.getGem(ritual.getElement(), 1)));
+		ItemStack reagent2, reagent3, reagent4;
+		ReagentType reagents[] = ritual.getTypes();
+		stackInputs.add(Lists.newArrayList(ReagentItem.CreateStack(reagents[0], 1)));
+		if (reagents.length > 1) {
+			reagent2 = ReagentItem.CreateStack(reagents[1], 1);
+			reagent3 = ReagentItem.CreateStack(reagents[2], 1);
+			reagent4 = ReagentItem.CreateStack(reagents[3], 1);
+		} else {
+			reagent2 = reagent3 = reagent4 = null;
+		}
+		stackInputs.add(Lists.newArrayList(reagent2));
+		stackInputs.add(Lists.newArrayList(reagent3));
+		stackInputs.add(Lists.newArrayList(reagent4));
+		
+		stackInputs.add(Lists.newArrayList(ritual.getCenterItem().getMatchingStacks()));
+		NonNullList<Ingredient> extras = ritual.getExtraItems();
+		Ingredient extra1, extra2, extra3, extra4;
+		extra1 = extra2 = extra3 = extra4 = Ingredient.EMPTY;
+		if (extras != null) {
+			int len = extras.size();
+			if (len > 0)
+				extra1 = extras.get(0);
+			if (len > 1)
+				extra2 = extras.get(1);
+			if (len > 2)
+				extra3 = extras.get(2);
+			if (len > 3)
+				extra4 = extras.get(3);
+		}
+		stackInputs.add(Lists.newArrayList(extra1.getMatchingStacks()));
+		stackInputs.add(Lists.newArrayList(extra2.getMatchingStacks()));
+		stackInputs.add(Lists.newArrayList(extra3.getMatchingStacks()));
+		stackInputs.add(Lists.newArrayList(extra4.getMatchingStacks()));
+		
+//		if (ritual.getCenterItem() != Ingredient.EMPTY && !ritual.getCenterItem().hasNoMatchingItems()) {
+//			stackInputs.add(Lists.newArrayList(ritual.getCenterItem().getMatchingStacks()));
+//		}
+//		for (Ingredient ing : ritual.getExtraItems()) {
+//			if (ing == Ingredient.EMPTY || ing.hasNoMatchingItems()) {
+//				stackInputs.add(new ArrayList<>()); // should be null?
+//			} else {
+//				stackInputs.add(Lists.newArrayList(ing.getMatchingStacks()));
+//			}
+//		}
+//		
 		ingredients.setInputLists(VanillaTypes.ITEM, stackInputs);
 		if (ritual.getOutcome() instanceof IItemRitualOutcome) {
 			ingredients.setOutput(VanillaTypes.ITEM, ((IItemRitualOutcome) ritual.getOutcome()).getResult());

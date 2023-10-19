@@ -50,9 +50,9 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	
 	public FluidPoisonWater(boolean bUnbreakable) {
 		super(new ForgeFlowingFluid.Properties(() -> new Source(bUnbreakable), () -> new Flowing(bUnbreakable), FluidAttributes.builder(
-				new ResourceLocation(NostrumMagica.MODID, "blocks/" + ID_BASE + "_still"), // same visually whether unbreakable or not
-				new ResourceLocation(NostrumMagica.MODID, "blocks/" + ID_BASE + "_flowing")
-				).overlay(new ResourceLocation(NostrumMagica.MODID, "blocks/" + ID_BASE + "_overlay"))
+				new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_still"), // same visually whether unbreakable or not
+				new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_flowing")
+				).overlay(new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_overlay"))
 				.color(0xFF1D452F)
 			));
 		this.bUnbreakable = bUnbreakable;

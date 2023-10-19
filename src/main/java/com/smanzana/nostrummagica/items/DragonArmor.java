@@ -346,7 +346,7 @@ public class DragonArmor extends Item {
 			if (!multimap.isEmpty())
 			{
 				tooltip.add(new StringTextComponent(""));
-				tooltip.add(new TranslationTextComponent("item.modifiers.dragonslot." + dragonSlot.getName()));
+				tooltip.add(new TranslationTextComponent("item.nostrummagica.modifiers.dragonslot." + dragonSlot.getName()));
 
 				for (Entry<String, AttributeModifier> entry : multimap.entries())
 				{

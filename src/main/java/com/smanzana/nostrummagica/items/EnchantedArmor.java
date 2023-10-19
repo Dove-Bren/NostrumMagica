@@ -1601,7 +1601,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		final @Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		final int setCount = this.getSetPieces(player);
 		
-		final String setName = I18n.format("item.armor.set." + element.name().toLowerCase() + "." + type.name().toLowerCase() + ".name", new Object[0]);
+		final String setName = I18n.format("item.nostrummagica.armor.set." + element.name().toLowerCase() + "." + type.name().toLowerCase() + ".name", new Object[0]);
 		if (showFull) {
 			tooltip.add(new TranslationTextComponent("info.armor.set_total", setName, TextFormatting.DARK_PURPLE, TextFormatting.RESET));
 		} else {

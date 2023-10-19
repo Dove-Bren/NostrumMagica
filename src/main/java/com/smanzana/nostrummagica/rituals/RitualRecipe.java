@@ -209,6 +209,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 		this.tier = tier;
 		this.element = element;
 		this.titleKey = nameKey;
+		this.centerItem = Ingredient.EMPTY;
 		if (tier == 0) {
 			this.types = new ReagentType[1];
 		} else {

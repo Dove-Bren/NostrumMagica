@@ -83,7 +83,7 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 	}
 	
 	protected String getDescKey() {
-		return "item." + this.getRegistryName().getPath() + ".desc"; 
+		return "item.nostrummagica." + this.getRegistryName().getPath() + ".desc"; 
 	}
 	
 	@Override
