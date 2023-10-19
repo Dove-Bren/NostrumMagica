@@ -101,7 +101,10 @@ import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlockTileEntity;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
@@ -144,6 +147,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
@@ -184,7 +188,6 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -696,16 +699,28 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void registerColorHandlers(ColorHandlerEvent.Item ev) {
-//		IItemColor tinter = new IItemColor() {
-//			@Override
-//			public int getColor(ItemStack stack, int tintIndex) {
-//				EMagicElement element = EssenceItem.findType(stack);
-//				return element.getColor();
-//			}
-//			
-//		};
-//		ev.getItemColors().register(tinter, NostrumItems.essenceEarth, NostrumItems.e
-//				);
+		IItemColor tinter = new IItemColor() {
+			@Override
+			public int getColor(ItemStack stack, int tintIndex) {
+				EMagicElement element = EssenceItem.findType(stack);
+				return element.getColor();
+			}
+			
+		};
+		ev.getItemColors().register(tinter, NostrumItems.essenceEarth, NostrumItems.essenceEnder, NostrumItems.essenceFire,
+				NostrumItems.essenceIce, NostrumItems.essenceLightning, NostrumItems.essencePhysical, NostrumItems.essenceWind
+				);
+		
+		tinter = new IItemColor() {
+			@Override
+			public int getColor(ItemStack stack, int tintIndex) {
+				EMagicElement element = InfusedGemItem.GetElement(stack);
+				return element.getColor();
+			}
+		};
+		ev.getItemColors().register(tinter, NostrumItems.infusedGemEarth, NostrumItems.infusedGemEnder, NostrumItems.infusedGemFire,
+				NostrumItems.infusedGemIce, NostrumItems.infusedGemLightning, NostrumItems.infusedGemUnattuned, NostrumItems.infusedGemWind
+				);
 	}
 	
 	private void registerEntityRenderers() {

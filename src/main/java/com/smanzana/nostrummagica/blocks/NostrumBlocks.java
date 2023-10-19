@@ -118,9 +118,9 @@ public class NostrumBlocks {
     	//registerBlockItem(unbreakablePoisonWaterBlock, unbreakablePoisonWaterBlock.getRegistryName(), registry);
     	registerBlockItem(progressionDoor, progressionDoor.getRegistryName(), registry);
     	registerBlockItem(putterBlock, putterBlock.getRegistryName(), registry);
-    	registerBlockItem(shrineBlock, shrineBlock.getRegistryName(), registry);
+    	//registerBlockItem(shrineBlock, shrineBlock.getRegistryName(), registry);
     	//registerBlockItem(sorceryPortal, sorceryPortal.getRegistryName(), registry);
-    	registerBlockItem(sorceryPortalSpawner, sorceryPortalSpawner.getRegistryName(), registry);
+    	//registerBlockItem(sorceryPortalSpawner, sorceryPortalSpawner.getRegistryName(), registry);
     	//registerBlockItem(spellTable, spellTable.getRegistryName(), registry);
     	registerBlockItem(switchBlock, switchBlock.getRegistryName(), registry);
     	//registerBlockItem(teleportationPortal, teleportationPortal.getRegistryName(), registry);
