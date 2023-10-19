@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/pendant_right"
+        "layer0": "nostrummagica:item/pendant_right"
     }
 }

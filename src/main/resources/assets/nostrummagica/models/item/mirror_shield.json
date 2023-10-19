@@ -1,8 +1,8 @@
 {
 	"textures": {
-		"front": "nostrummagica:items/mirror_shield",
-        "back": "nostrummagica:items/mirror_shield_back",
-        "blank": "nostrummagica:items/shield_side"
+		"front": "nostrummagica:item/mirror_shield",
+        "back": "nostrummagica:item/mirror_shield_back",
+        "blank": "nostrummagica:item/shield_side"
 	},
     "elements": [
         {

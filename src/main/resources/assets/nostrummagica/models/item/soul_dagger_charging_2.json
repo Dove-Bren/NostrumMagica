@@ -1,7 +1,7 @@
 {
     "parent": "nostrummagica:item/soul_dagger",
 	"textures": {
-		"layer0": "nostrummagica:items/soul_dagger_charged"
+		"layer0": "nostrummagica:item/soul_dagger_charged"
 	},
     "display": {
         "thirdperson_righthand": {

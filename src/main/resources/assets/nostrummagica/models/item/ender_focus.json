@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/ender_focus"
+        "layer0": "nostrummagica:item/ender_focus"
     }
 }

@@ -1,6 +1,6 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:items/sword_wind3"
+		"layer0": "nostrummagica:item/sword_wind_master"
 	}
 }

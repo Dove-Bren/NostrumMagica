@@ -1,7 +1,7 @@
 {
     "textures": {
-        "side": "nostrummagica:blocks/candle_full",
-        "particle": "nostrummagica:blocks/candle"
+        "side": "nostrummagica:block/candle_full",
+        "particle": "nostrummagica:block/candle"
     },
     "elements": [
         {   "from": [ -1, 6, 7 ],

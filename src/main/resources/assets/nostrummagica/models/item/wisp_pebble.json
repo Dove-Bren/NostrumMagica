@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/wisp_pebble"
+        "layer0": "nostrummagica:item/wisp_pebble"
     }
 }

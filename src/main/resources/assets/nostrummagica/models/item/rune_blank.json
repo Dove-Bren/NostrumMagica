@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/rune_blank"
+        "layer0": "nostrummagica:item/rune_blank"
     }
 }

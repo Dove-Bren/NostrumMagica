@@ -1,7 +1,7 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/magic_door"
+        "all": "nostrummagica:block/magic_door"
     },
     "elements": [
         {

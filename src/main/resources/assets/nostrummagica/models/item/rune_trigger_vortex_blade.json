@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/rune_vortex_blade"
+        "layer0": "nostrummagica:item/rune_vortex_blade"
     }
 }

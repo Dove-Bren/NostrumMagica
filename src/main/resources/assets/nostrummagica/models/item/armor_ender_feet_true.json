@@ -1,7 +1,7 @@
 {
 	"parent": "builtin/generated",
 	"textures": {
-		"layer0": "nostrummagica:items/armor_ender_feet_true"
+		"layer0": "nostrummagica:item/armor_ender_feet_true"
 	},
 	"display": {
 		"thirdperson": {

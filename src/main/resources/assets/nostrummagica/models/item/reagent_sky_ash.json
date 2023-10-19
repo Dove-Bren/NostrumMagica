@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/sky_ash"
+        "layer0": "nostrummagica:item/sky_ash"
     }
 }

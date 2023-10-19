@@ -1,6 +1,6 @@
 {
     "parent": "block/cross",
     "textures": {
-        "cross": "nostrummagica:blocks/crystabloom"
+        "cross": "nostrummagica:block/crystabloom"
     }
 }

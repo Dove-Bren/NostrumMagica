@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/dragon_wing"
+        "layer0": "nostrummagica:item/dragon_wing"
     }
 }

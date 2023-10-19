@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/seeking_gem"
+        "layer0": "nostrummagica:item/seeking_gem"
     }
 }

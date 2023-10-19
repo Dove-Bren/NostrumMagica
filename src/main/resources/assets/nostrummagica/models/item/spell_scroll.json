@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "nostrummagica:items/spell_scroll"
+        "layer0": "nostrummagica:item/spell_scroll"
     },
     "display": {
         "thirdperson": {

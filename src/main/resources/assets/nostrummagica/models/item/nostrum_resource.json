@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/magic_token"
+        "layer0": "nostrummagica:item/magic_token"
     }
 }

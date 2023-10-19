@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/dungeon_air"
+        "all": "nostrummagica:block/dungeon_air"
     }
 }

@@ -1,7 +1,7 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/arcane_wolf_soul_item"
+        "layer0": "nostrummagica:item/arcane_wolf_soul_item"
     },
     "overrides": [
         {

@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/mana_leaf"
+        "layer0": "nostrummagica:item/mana_leaf"
     }
 }

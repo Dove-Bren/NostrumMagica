@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/mimic_facade"
+        "all": "nostrummagica:block/mimic_facade"
     }
 }

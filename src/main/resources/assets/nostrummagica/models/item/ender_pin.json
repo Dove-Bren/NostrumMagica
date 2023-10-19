@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/ender_pin"
+        "layer0": "nostrummagica:item/ender_pin"
     }
 }

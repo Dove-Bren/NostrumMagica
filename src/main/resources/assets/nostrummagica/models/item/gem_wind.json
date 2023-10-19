@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/gem_wind"
+        "layer0": "nostrummagica:item/gem_wind"
     }
 }

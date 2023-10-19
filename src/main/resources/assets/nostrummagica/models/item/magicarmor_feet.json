@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/boot_missing"
+        "layer0": "nostrummagica:item/boot_missing"
     }
 }

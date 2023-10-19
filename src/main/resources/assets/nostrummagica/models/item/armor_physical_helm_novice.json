@@ -1,7 +1,7 @@
 {
 	"parent": "builtin/generated",
 	"textures": {
-		"layer0": "nostrummagica:items/armor_physical_head_novice"
+		"layer0": "nostrummagica:item/armor_physical_head_novice"
 	},
 	"display": {
 		"thirdperson": {

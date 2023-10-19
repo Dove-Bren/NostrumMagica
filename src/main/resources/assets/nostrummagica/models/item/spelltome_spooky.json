@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "nostrummagica:items/tome5"
+        "layer0": "nostrummagica:item/tome5"
     },
     "display": {
         "thirdperson": {

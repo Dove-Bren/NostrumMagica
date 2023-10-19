@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/lens_bore"
+        "layer0": "nostrummagica:item/lens_bore"
     }
 }

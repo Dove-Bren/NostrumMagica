@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/seeker_idol"
+        "layer0": "nostrummagica:item/seeker_idol"
     }
 }

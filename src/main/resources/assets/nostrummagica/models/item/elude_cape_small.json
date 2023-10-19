@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/elude_cape_small"
+        "layer0": "nostrummagica:item/elude_cape_small"
     }
 }

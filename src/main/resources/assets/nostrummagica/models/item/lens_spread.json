@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/lens_spread"
+        "layer0": "nostrummagica:item/lens_spread"
     }
 }

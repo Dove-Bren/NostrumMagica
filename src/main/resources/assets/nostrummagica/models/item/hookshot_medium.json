@@ -1,7 +1,7 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/hookshot_medium"
+        "layer0": "nostrummagica:item/hookshot_medium"
     },
     "overrides": [
         {

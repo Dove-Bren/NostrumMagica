@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"particle": "nostrummagica:blocks/duct",
-		"side": "nostrummagica:blocks/duct"
+		"particle": "nostrummagica:block/duct",
+		"side": "nostrummagica:block/duct"
 	},
 	"elements": [
 		{

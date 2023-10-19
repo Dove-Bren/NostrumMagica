@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/mandrake_flower"
+        "layer0": "nostrummagica:item/mandrake_flower"
     }
 }

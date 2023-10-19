@@ -1,8 +1,8 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "nostrummagica:blocks/dungeon_bars",
-        "bars": "nostrummagica:blocks/dungeon_bars"
+        "particle": "nostrummagica:block/dungeon_bars",
+        "bars": "nostrummagica:block/dungeon_bars"
     },
     "elements": [
         {   "from": [ 8, 0, 7 ],

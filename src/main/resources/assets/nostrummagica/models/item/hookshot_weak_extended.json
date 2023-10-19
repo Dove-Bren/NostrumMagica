@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/hookshot_weak_extended"
+        "layer0": "nostrummagica:item/hookshot_weak_extended"
     }
 }

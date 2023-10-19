@@ -1,7 +1,7 @@
 {
     "parent": "block/crop",
     "textures": {
-        "crop": "nostrummagica:blocks/mandrake_stage_1"
+        "crop": "nostrummagica:block/mandrake_stage_1"
     }
 }
 

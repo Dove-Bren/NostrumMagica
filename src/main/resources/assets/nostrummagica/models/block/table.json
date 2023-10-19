@@ -1,8 +1,8 @@
 {
 	"__comment": "Designed by Trigition with Cubik Studio - https://cubik.studio",
 	"textures": {
-		"texture": "nostrummagica:blocks/table",
-        "particle": "nostrummagica:blocks/table"
+		"texture": "nostrummagica:block/table",
+        "particle": "nostrummagica:block/table"
 	},
 	"elements": [ 	 
 		{

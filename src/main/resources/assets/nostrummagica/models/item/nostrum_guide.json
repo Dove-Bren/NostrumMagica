@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "nostrummagica:items/guide_book"
+        "layer0": "nostrummagica:item/guide_book"
     },
     "display": {
         "thirdperson": {

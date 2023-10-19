@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:blocks/crystabloom"
+        "layer0": "nostrummagica:block/crystabloom"
     }
 }

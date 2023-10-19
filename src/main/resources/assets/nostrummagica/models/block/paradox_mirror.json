@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"0": "nostrummagica:blocks/paradox_mirror",
-		"particle": "nostrummagica:blocks/paradox_mirror"
+		"0": "nostrummagica:block/paradox_mirror",
+		"particle": "nostrummagica:block/paradox_mirror"
 	},
 	"elements": [
 		{

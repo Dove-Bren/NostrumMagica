@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "nostrummagica:blocks/mana_armorer_base",
+		"0": "nostrummagica:block/mana_armorer_base",
 		"1": "nostrummagica:models/crystal",
-		"particle": "nostrummagica:blocks/mana_armorer_base"
+		"particle": "nostrummagica:block/mana_armorer_base"
 	},
 	"elements": [
 		{

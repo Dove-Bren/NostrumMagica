@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "nostrummagica:blocks/dungeon_bars"
+        "layer0": "nostrummagica:block/dungeon_bars"
     }
 }

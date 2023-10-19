@@ -1,7 +1,7 @@
 {
     "parent": "block/cross",
     "textures": {
-        "cross": "nostrummagica:blocks/esscrop_stage_1"
+        "cross": "nostrummagica:block/esscrop_stage_1"
     }
 }
 

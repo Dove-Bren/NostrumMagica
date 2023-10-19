@@ -1,8 +1,8 @@
 {
     "parent": "block/thin_block",
     "textures": {
-        "all": "nostrummagica:blocks/magic_rune",
-        "particle": "nostrummagica:blocks/magic_rune"
+        "all": "nostrummagica:block/magic_rune",
+        "particle": "nostrummagica:block/magic_rune"
     },
     "elements": [
         {

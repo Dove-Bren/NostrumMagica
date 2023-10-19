@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/lens_wide_charge"
+        "layer0": "nostrummagica:item/lens_wide_charge"
     }
 }

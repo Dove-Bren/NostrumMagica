@@ -1,7 +1,7 @@
 {
 	"parent": "builtin/generated",
 	"textures": {
-		"layer0": "nostrummagica:items/armor_fire_legs_true"
+		"layer0": "nostrummagica:item/armor_fire_legs_true"
 	},
 	"display": {
 		"thirdperson": {

@@ -1,6 +1,6 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:items/sword_lightning3"
+		"layer0": "nostrummagica:item/sword_lightning_master"
 	}
 }

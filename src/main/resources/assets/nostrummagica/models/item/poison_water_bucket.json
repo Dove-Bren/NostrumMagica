@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/poison_water_bucket"
+        "layer0": "nostrummagica:item/poison_water_bucket"
     }
 }

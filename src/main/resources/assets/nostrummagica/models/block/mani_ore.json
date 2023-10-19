@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/mani_ore"
+        "all": "nostrummagica:block/mani_ore"
     }
 }

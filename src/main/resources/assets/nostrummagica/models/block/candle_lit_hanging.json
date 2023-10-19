@@ -1,7 +1,7 @@
 {
     "parent": "nostrummagica:block/candle",
     "textures": {
-        "fire": "nostrummagica:blocks/candle_fire"
+        "fire": "nostrummagica:block/candle_fire"
     },
     "elements": [
         {   "from": [ -1, 6, 7 ],

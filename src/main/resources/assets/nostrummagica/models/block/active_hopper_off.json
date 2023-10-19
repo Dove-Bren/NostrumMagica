@@ -1,10 +1,10 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "nostrummagica:blocks/hopper_outside_off",
-        "top": "nostrummagica:blocks/hopper_top",
-        "side": "nostrummagica:blocks/hopper_outside_off",
-        "inside": "nostrummagica:blocks/hopper_inside"
+        "particle": "nostrummagica:block/hopper_outside_off",
+        "top": "nostrummagica:block/hopper_top",
+        "side": "nostrummagica:block/hopper_outside_off",
+        "inside": "nostrummagica:block/hopper_inside"
     },
     "elements": [
         {   "from": [ 0, 10, 0 ],

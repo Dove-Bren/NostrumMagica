@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/magic_dirt"
+        "all": "nostrummagica:block/magic_dirt"
     }
 }

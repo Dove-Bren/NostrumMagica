@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/grave_dust"
+        "layer0": "nostrummagica:item/grave_dust"
     }
 }

@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/slab_balanced"
+        "layer0": "nostrummagica:item/slab_balanced"
     }
 }

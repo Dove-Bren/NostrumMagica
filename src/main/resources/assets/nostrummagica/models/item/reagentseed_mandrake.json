@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/reagentseed_mandrake"
+        "layer0": "nostrummagica:item/reagentseed_mandrake"
     }
 }

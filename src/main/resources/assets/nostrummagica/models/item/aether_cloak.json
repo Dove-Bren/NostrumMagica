@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/aether_cloak"
+        "layer0": "nostrummagica:item/aether_cloak"
     }
 }

@@ -1,6 +1,6 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:items/armor_fire_feet_novice"
+		"layer0": "nostrummagica:item/armor_fire_feet_novice"
 	}
 }

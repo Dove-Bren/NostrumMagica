@@ -1,6 +1,6 @@
 {
     "textures": {
-        "particle": "nostrummagica:blocks/table"
+        "particle": "nostrummagica:block/table"
 	},
 	"elements": [ 	 
 		{

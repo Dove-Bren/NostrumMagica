@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "nostrummagica:items/spellcraft_book"
+        "layer0": "nostrummagica:item/spellcraft_book"
     },
     "display": {
         "thirdperson": {

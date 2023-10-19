@@ -1,7 +1,7 @@
 {
 	"parent": "nostrummagica:item/mage_staff",
 	"textures": {
-		"layer0": "nostrummagica:items/thanos_staff"
+		"layer0": "nostrummagica:item/thanos_staff"
 	},
     "overrides": [
         {

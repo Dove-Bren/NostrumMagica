@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/magic_wall_decay3"
+        "all": "nostrummagica:block/magic_wall_decay3"
     }
 }

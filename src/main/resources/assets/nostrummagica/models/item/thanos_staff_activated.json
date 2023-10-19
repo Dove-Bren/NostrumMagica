@@ -1,6 +1,6 @@
 {
 	"parent": "nostrummagica:item/thanos_staff",
 	"textures": {
-		"layer0": "nostrummagica:items/thanos_staff_activated"
+		"layer0": "nostrummagica:item/thanos_staff_activated"
 	}
 }

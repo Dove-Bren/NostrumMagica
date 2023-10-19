@@ -1,6 +1,6 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:items/ribbon_kind"
+		"layer0": "nostrummagica:item/ribbon_kind"
 	}
 }

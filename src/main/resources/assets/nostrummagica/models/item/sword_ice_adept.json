@@ -1,7 +1,7 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:items/sword_ice2"
+		"layer0": "nostrummagica:item/sword_ice_adept"
 	},
     "display": {
         "thirdperson_righthand": {

@@ -1,6 +1,6 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:items/dragonarmor_helm_gold"
+		"layer0": "nostrummagica:item/dragonarmor_helm_gold"
 	}
 }

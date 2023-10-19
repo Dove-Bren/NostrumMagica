@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nostrummagica:blocks/teleporation_rune"
+        "all": "nostrummagica:block/magic_rune"
     }
 }

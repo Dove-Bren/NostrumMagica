@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:items/dragon_egg_part"
+        "layer0": "nostrummagica:item/dragon_egg_part"
     }
 }
