@@ -133,21 +133,21 @@ public class DragonArmor extends Item {
 		case WINGS:
 			switch (material) {
 			case IRON:
-				return NostrumItems.dragonArmorWingsIron;
+				//return NostrumItems.dragonArmorWingsIron;
 			case GOLD:
-				return NostrumItems.dragonArmorWingsGold;
+				//return NostrumItems.dragonArmorWingsGold;
 			case DIAMOND:
-				return NostrumItems.dragonArmorWingsDiamond;
+				//return NostrumItems.dragonArmorWingsDiamond;
 			}
 			break;
 		case CREST:
 			switch (material) {
 			case IRON:
-				return NostrumItems.dragonArmorCrestIron;
+				//return NostrumItems.dragonArmorCrestIron;
 			case GOLD:
-				return NostrumItems.dragonArmorCrestGold;
+				//return NostrumItems.dragonArmorCrestGold;
 			case DIAMOND:
-				return NostrumItems.dragonArmorCrestDiamond;
+				//return NostrumItems.dragonArmorCrestDiamond;
 			}
 			break;
 		}

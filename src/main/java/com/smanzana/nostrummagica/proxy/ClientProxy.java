@@ -1521,7 +1521,7 @@ public class ClientProxy extends CommonProxy {
 				
 				if (model != null && model instanceof OBJModel) {
 					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-					event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key + ".obj", ""), bakedModel);
+					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1529,7 +1529,14 @@ public class ClientProxy extends CommonProxy {
 			}	
 		}
     	
-    	
+    	// Warlock blade; put obj in place for item model
+    	{
+    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, "item/warlock_blade.obj"));
+			if (model != null && model instanceof OBJModel) {
+				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":warlock_blade", "inventory"), bakedModel);
+			}
+    	}
 	}
 	
 	private static void initDefaultEffects(ClientEffectRenderer renderer) {

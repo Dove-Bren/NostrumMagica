@@ -96,7 +96,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	public static final String ID_WIND_ADEPT = ID_PREFIX + "wind_" + ID_SUFFIX_ADEPT;
 	public static final String ID_WIND_MASTER = ID_PREFIX + "wind_" + ID_SUFFIX_MASTER;
 	
-	public static final String ID_LIGHTNING_NOVICE = ID_PREFIX + "lighting_" + ID_SUFFIX_NOVICE;
+	public static final String ID_LIGHTNING_NOVICE = ID_PREFIX + "lightning_" + ID_SUFFIX_NOVICE;
 	public static final String ID_LIGHTNING_ADEPT = ID_PREFIX + "lightning_" + ID_SUFFIX_ADEPT;
 	public static final String ID_LIGHTNING_MASTER = ID_PREFIX + "lightning_" + ID_SUFFIX_MASTER;
 	

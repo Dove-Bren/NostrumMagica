@@ -813,13 +813,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case HEAD:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorIceHeadNovice;
+					//armor = NostrumItems.enchantedArmorIceHeadNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorIceHeadAdept;
+					//armor = NostrumItems.enchantedArmorIceHeadAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorIceHeadMaster;
+					//armor = NostrumItems.enchantedArmorIceHeadMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorIceHeadTrue;
@@ -829,13 +829,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case CHEST:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorIceChestNovice;
+					//armor = NostrumItems.enchantedArmorIceChestNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorIceChestAdept;
+					//armor = NostrumItems.enchantedArmorIceChestAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorIceChestMaster;
+					//armor = NostrumItems.enchantedArmorIceChestMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorIceChestTrue;
@@ -845,13 +845,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case LEGS:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorIceLegsNovice;
+					//armor = NostrumItems.enchantedArmorIceLegsNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorIceLegsAdept;
+					//armor = NostrumItems.enchantedArmorIceLegsAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorIceLegsMaster;
+					//armor = NostrumItems.enchantedArmorIceLegsMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorIceLegsTrue;
@@ -861,13 +861,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case FEET:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorIceFeetNovice;
+					//armor = NostrumItems.enchantedArmorIceFeetNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorIceFeetAdept;
+					//armor = NostrumItems.enchantedArmorIceFeetAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorIceFeetMaster;
+					//armor = NostrumItems.enchantedArmorIceFeetMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorIceFeetTrue;
@@ -884,13 +884,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case HEAD:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorLightningHeadNovice;
+					//armor = NostrumItems.enchantedArmorLightningHeadNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorLightningHeadAdept;
+					//armor = NostrumItems.enchantedArmorLightningHeadAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorLightningHeadMaster;
+					//armor = NostrumItems.enchantedArmorLightningHeadMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorLightningHeadTrue;
@@ -900,13 +900,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case CHEST:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorLightningChestNovice;
+					//armor = NostrumItems.enchantedArmorLightningChestNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorLightningChestAdept;
+					//armor = NostrumItems.enchantedArmorLightningChestAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorLightningChestMaster;
+					//armor = NostrumItems.enchantedArmorLightningChestMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorLightningChestTrue;
@@ -916,13 +916,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case LEGS:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorLightningLegsNovice;
+					//armor = NostrumItems.enchantedArmorLightningLegsNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorLightningLegsAdept;
+					//armor = NostrumItems.enchantedArmorLightningLegsAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorLightningLegsMaster;
+					//armor = NostrumItems.enchantedArmorLightningLegsMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorLightningLegsTrue;
@@ -932,13 +932,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case FEET:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorLightningFeetNovice;
+					//armor = NostrumItems.enchantedArmorLightningFeetNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorLightningFeetAdept;
+					//armor = NostrumItems.enchantedArmorLightningFeetAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorLightningFeetMaster;
+					//armor = NostrumItems.enchantedArmorLightningFeetMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorLightningFeetTrue;
@@ -1026,13 +1026,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case HEAD:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorWindHeadNovice;
+					//armor = NostrumItems.enchantedArmorWindHeadNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorWindHeadAdept;
+					//armor = NostrumItems.enchantedArmorWindHeadAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorWindHeadMaster;
+					//armor = NostrumItems.enchantedArmorWindHeadMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorWindHeadTrue;
@@ -1042,13 +1042,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case CHEST:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorWindChestNovice;
+					//armor = NostrumItems.enchantedArmorWindChestNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorWindChestAdept;
+					//armor = NostrumItems.enchantedArmorWindChestAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorWindChestMaster;
+					//armor = NostrumItems.enchantedArmorWindChestMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorWindChestTrue;
@@ -1058,13 +1058,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case LEGS:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorWindLegsNovice;
+					//armor = NostrumItems.enchantedArmorWindLegsNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorWindLegsAdept;
+					//armor = NostrumItems.enchantedArmorWindLegsAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorWindLegsMaster;
+					//armor = NostrumItems.enchantedArmorWindLegsMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorWindLegsTrue;
@@ -1074,13 +1074,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			case FEET:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorWindFeetNovice;
+					//armor = NostrumItems.enchantedArmorWindFeetNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorWindFeetAdept;
+					//armor = NostrumItems.enchantedArmorWindFeetAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorWindFeetMaster;
+					//armor = NostrumItems.enchantedArmorWindFeetMaster;
 					break;
 				case TRUE:
 					armor = NostrumItems.enchantedArmorWindFeetTrue;
