@@ -82,7 +82,7 @@ public class NostrumBlocks {
     	
     	registerBlockItem(activeHopper, activeHopper.getRegistryName(), registry);
     	//registerBlockItem(altar, altar.getRegistryName(), registry);
-    	//registerBlockItem(candle, candle.getRegistryName(), registry);
+    	registerBlockItem(candle, candle.getRegistryName(), registry);
     	//registerBlockItem(chalk, chalk.getRegistryName(), registry);
     	//registerBlockItem(essenceCrop, essenceCrop.getRegistryName(), registry);
     	//registerBlockItem(ginsengCrop, ginsengCrop.getRegistryName(), registry);

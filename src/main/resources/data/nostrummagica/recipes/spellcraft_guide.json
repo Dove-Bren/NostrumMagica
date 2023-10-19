@@ -14,7 +14,7 @@
       "item": "minecraft:leather"
     },
     {
-      "item": "rune"
+      "tag": "nostrummagica:rune"
     }
   ]
 }

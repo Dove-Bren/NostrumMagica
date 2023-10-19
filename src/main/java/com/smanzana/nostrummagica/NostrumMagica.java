@@ -2881,7 +2881,7 @@ public class NostrumMagica {
 			boolean hasTaskAlready = false;
 			
 			// Get private goal list
-			List<PrioritizedGoal> targetGoals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.targetSelector, "field_220892_d"); 
+			LinkedHashSet<PrioritizedGoal> targetGoals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.targetSelector, "field_220892_d"); 
 
 			// Scan for existing task
 			for (PrioritizedGoal entry : targetGoals) {

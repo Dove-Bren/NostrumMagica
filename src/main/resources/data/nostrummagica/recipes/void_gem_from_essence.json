@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrum_gem_unattuned"
+    "item": "nostrummagica:nostrum_gem_unattuned"
   },
   "ingredients": [
     {
