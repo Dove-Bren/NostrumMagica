@@ -2010,6 +2010,10 @@ public class ClientProxy extends CommonProxy {
 					}));
 			ClientProxy.shownText = true;
 		}
+		
+		if (event.getWorld() != null && event.getWorld().isRemote() && event.getEntity() instanceof PlayerEntity) {
+			NostrumMagica.instance.proxy.requestStats((PlayerEntity) event.getEntity());
+		}
 	}
 	
 	@Override

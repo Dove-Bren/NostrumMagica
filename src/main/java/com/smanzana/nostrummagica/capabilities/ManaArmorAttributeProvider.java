@@ -29,7 +29,7 @@ public class ManaArmorAttributeProvider implements ICapabilitySerializable<INBT>
 			return CAPABILITY.orEmpty(capability, LazyOptional.of(() -> instance));
 		}
 		
-		return null;
+		return LazyOptional.empty();
 	}
 
 	@Override

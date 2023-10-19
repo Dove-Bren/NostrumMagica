@@ -1,92 +1,142 @@
 {
   "pools": [{
     "name": "main",
-    "rolls": 3,
+    "rolls": 2,
     "entries": [
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_reagent",
-        "weight": 35,
-        "functions": [{ "function": "set_data", "data": { "min": 0, "max": 7 } }]
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:nostrum_gem",
+        "name": "nostrummagica:nostrum_gem_unattuned",
         "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_lightning",
         "entryName": "runeSpec",
-        "weight": 10,
-        "functions": [{ "function": "set_nbt", "tag": "{type: element, name: LIGHTNING, e_count: 1}" }]
+        "weight": 10
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_shape_single",
         "entryName": "rune1",
-        "weight": 4,
-        "functions": [{ "function": "set_nbt", "tag": "{type: shape, name: shape_single}" }]
+        "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_trigger_self",
         "entryName": "rune2",
-        "weight": 4,
-        "functions": [{ "function": "set_nbt", "tag": "{type: trigger, name: trigger_self}" }]
+        "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_trigger_touch",
         "entryName": "rune3",
-        "weight": 4,
-        "functions": [{ "function": "set_nbt", "tag": "{type: trigger, name: trigger_touch}" }]
+        "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_trigger_projectile",
         "entryName": "rune4",
-        "weight": 4,
-        "functions": [{ "function": "set_nbt", "tag": "{type: trigger, name: trigger_projectile}" }]
+        "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_shape_aoe",
         "entryName": "rune5",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: shape, name: shape_aoe}" }]
+        "weight": 2
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_resist",
         "entryName": "rune6",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: RESIST}" }]
+        "weight": 2
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_inflict",
         "entryName": "rune7",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: INFLICT}" }]
+        "weight": 2
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_growth",
         "entryName": "rune8",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: GROWTH}" }]
+        "weight": 2
       },
       {
         "type": "item",
-        "name": "nostrummagica:nostrum_rune",
+        "name": "nostrummagica:rune_support",
         "entryName": "rune9",
-        "weight": 2,
-        "functions": [{ "function": "set_nbt", "tag": "{type: alteration, name: SUPPORT}" }]
+        "weight": 2
       },
       {
         "type": "empty",
         "weight": 25
       }]
-    }]
+    },
+	{
+		"name": "reagents",
+		"rolls": 1,
+		"entries": [
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_black_pearl",
+			"entryName": "reagent_black_pearl",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_crystabloom",
+			"entryName": "reagent_crystabloom",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_ginseng",
+			"entryName": "reagent_ginseng",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_grave_dust",
+			"entryName": "reagent_grave_dust",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_mandrake_root",
+			"entryName": "reagent_mandrake_root",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_mani_dust",
+			"entryName": "reagent_mani_dust",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_sky_ash",
+			"entryName": "reagent_sky_ash",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_spider_silk",
+			"entryName": "reagent_spider_silk",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 2 } }]
+		},
+		{
+			"type": "empty",
+			"weight": 8
+		}
+		]
+	}]
 }

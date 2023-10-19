@@ -54,10 +54,11 @@ public class ManaArmorSyncMessage {
 
 	public static ManaArmorSyncMessage decode(PacketBuffer buf) {
 		IManaArmor stats = CAPABILITY.getDefaultInstance();
+		final int entID = buf.readVarInt();
 		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readCompoundTag());
 		
 		return new ManaArmorSyncMessage(
-				buf.readVarInt(),
+				entID,
 				stats
 				);
 	}

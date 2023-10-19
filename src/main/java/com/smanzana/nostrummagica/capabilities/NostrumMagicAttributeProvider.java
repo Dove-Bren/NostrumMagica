@@ -29,7 +29,7 @@ public class NostrumMagicAttributeProvider implements ICapabilitySerializable<IN
 			return CAPABILITY.orEmpty(capability, LazyOptional.of(() -> this.instance));
 		}
 		
-		return null;
+		return LazyOptional.empty();
 	}
 
 	@Override

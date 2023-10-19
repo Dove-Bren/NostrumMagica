@@ -27,7 +27,7 @@ import net.minecraft.util.ResourceLocation;
 @JeiPlugin
 public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
-	private static final ResourceLocation pluginUID = new ResourceLocation(NostrumMagica.MODID, "JEIPlugin");
+	private static final ResourceLocation pluginUID = new ResourceLocation(NostrumMagica.MODID, "jeiplugin");
 	
 	private List<RitualOutcomeWrapper> ritualOutcomes;
 	
