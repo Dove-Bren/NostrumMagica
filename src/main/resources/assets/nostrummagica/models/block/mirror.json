@@ -1,6 +1,3 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "nostrummagica:block/mirror"
-    }
+    "model": "nostrummagica:block/mirror.obj"
 }

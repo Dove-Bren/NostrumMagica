@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
@@ -34,7 +35,7 @@ import net.minecraft.world.World;
 public class AltarBlock extends ContainerBlock {
 	
 	public static final String ID = "altar_block";
-	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(0.3D, 0.0D, 0.3D, 0.7D, 0.8D, 0.7D);
+	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
 	private static final int TICK_DELAY = 5;
 	
 	public AltarBlock() {
@@ -48,6 +49,11 @@ public class AltarBlock extends ContainerBlock {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return ALTAR_AABB;
+	}
+	
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
 	}
 	
 //	@Override

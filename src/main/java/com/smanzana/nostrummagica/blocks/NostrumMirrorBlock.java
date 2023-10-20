@@ -25,8 +25,8 @@ import net.minecraftforge.fml.DistExecutor;
 public class NostrumMirrorBlock extends HorizontalBlock {
 	
 	public static final String ID = "mirror_block";
-	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(0.4D, 0.0D, 0.1D, 0.6D, 1.05D, 0.9D);
-	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0.1D, 0.0D, 0.4D, 0.9D, 1.05D, 0.6D);
+	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(16 * 0.4D, 16 * 0.0D, 16 * 0.1D, 16 * 0.6D, 16 * 1.05D, 16 * 0.9D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(16 * 0.1D, 16 * 0.0D, 16 * 0.4D, 16 * 0.9D, 16 * 1.05D, 16 * 0.6D);
 	
 	public NostrumMirrorBlock() {
 		super(Block.Properties.create(Material.ROCK)

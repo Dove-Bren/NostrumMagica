@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBase;
@@ -153,6 +154,7 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
@@ -183,11 +185,14 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.BasicState;
+import net.minecraftforge.client.model.ForgeBlockStateV1.Transforms;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.PerspectiveMapWrapper;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -245,10 +250,6 @@ public class ClientProxy extends CommonProxy {
     	
     	EnchantedArmor.ClientInit();
     	
-    	// idk why this is deprecated. It's what's in the docs and in the forge samples.
-    	// https://github.com/MinecraftForge/MinecraftForge/blob/1.14.x/src/test/java/net/minecraftforge/testmods/TestOBJModelMod.java
-    	OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
-    	
     	MinecraftForge.EVENT_BUS.register(this);
 	}
 	
@@ -281,6 +282,8 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void clientSetup(FMLClientSetupEvent event) {
+		OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
+		
 		ClientRegistry.bindTileEntitySpecialRenderer(SymbolTileEntity.class, new TileEntitySymbolRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(CandleTileEntity.class, new TileEntityCandleRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(AltarTileEntity.class, new TileEntityAltarRenderer());
@@ -684,6 +687,30 @@ public class ClientProxy extends CommonProxy {
 //					return locationIgnoringVariant;
 //				}
 //			});
+//		}
+		
+//		for (String key : new String[] {
+//    			"pedestal", "crystal_standing", "crystal_embedded", "crystal_hanging", "mirror"}) {
+//			Minecraft.getInstance().getModelManager().getModel(modelLocation)
+//			try {
+//				IUnbakedModel model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/" + key + ".obj"));
+//				
+//				if (model != null && model instanceof OBJModel) {
+//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key + ".obj"), bakedModel);
+//					
+////					IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
+////	                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
+////	                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, BLOCK_TRANSFORMS);
+////	                event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, "inventory"), bakedInvModel);
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				NostrumMagica.logger.warn("Failed to load effect " + key);
+//			}	
 //		}
 	}
 	
@@ -1364,7 +1391,10 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
-		; // Do nothing
+		if (!player.world.isRemote) {
+			super.openContainer(player, provider);
+		}
+		; // On client, do nothing
 	}
 	
 	@Override
@@ -1435,7 +1465,7 @@ public class ClientProxy extends CommonProxy {
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/magic_blade"));
 		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "blocks/portal"));
+				NostrumMagica.MODID, "block/portal"));
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/item/blade"));
 		event.addSprite(new ResourceLocation(
@@ -1508,20 +1538,42 @@ public class ClientProxy extends CommonProxy {
 		THORN_4("thorn4", true),
 		 */
     }
-    	
+    
+	private static final TRSRTransformation THIRD_PERSON_BLOCK = Transforms.convert(0, 2.5f, 0, 75, 45, 0, 0.375f);
+    private static final ImmutableMap<TransformType, TRSRTransformation> BLOCK_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
+            .put(TransformType.GUI, Transforms.convert(0, 0, 0, 30, 225, 0, 0.625f))
+            .put(TransformType.GROUND, Transforms.convert(0, 3, 0, 0, 0, 0, 0.25f))
+            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, 0.5f))
+            .put(TransformType.THIRD_PERSON_RIGHT_HAND, THIRD_PERSON_BLOCK)
+            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(THIRD_PERSON_BLOCK))
+            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 45, 0, 0.4f))
+            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.convert(0, 0, 0, 0, 225, 0, 0.4f))
+            .build();
 		
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-    	for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled",
-    			"block/pedestal", "block/crystal_standing", "block/crystal_embedded", "block/crystal_hanging", "block/mirror"}) {
+		for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled"}) {
+			
+		}
+		
+    	for (String key : new String[] {
+    			"pedestal", "crystal_standing", "crystal_embedded", "crystal_hanging", "mirror"}) {
 			IUnbakedModel model;
 			try {
-				model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, key + ".obj"));
+				model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/" + key + ".obj"));
 				
 				if (model != null && model instanceof OBJModel) {
-					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
+//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key + ".obj"), bakedModel);
+					
+					IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
+	                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
+	                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, BLOCK_TRANSFORMS);
+	                event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, "inventory"), bakedInvModel);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1529,12 +1581,76 @@ public class ClientProxy extends CommonProxy {
 			}	
 		}
     	
+//		{
+//			IUnbakedModel model = null;
+//			try {
+//				model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/mirror.obj"));
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//	    	IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
+//			IBakedModel existing = null;
+//			String[] paths = {"dirt", "block/dirt", "minecraft:dirt", "minecraft:block/dirt"};
+//			String[] variants = {"", "inventory", "normal"};
+//			for (String path : paths) {
+//				for (String variant : variants) {
+//					existing = event.getModelRegistry().get(new ModelResourceLocation(path, variant));
+//					boolean exists = existing != null && existing != event.getModelManager().getMissingModel();
+//					NostrumMagica.logger.info((!exists ? "FAIL: " : "EXIST: ")
+//						+ path + "#" + variant);
+//					System.out.println((!exists ? "FAIL: " : "EXIST: ")
+//							+ path + "#" + variant);
+//					
+//					if (exists) {
+//						event.getModelRegistry().put(new ModelResourceLocation(path, variant), bakedModel);
+//						break;
+//					}
+//				}
+//				if (existing != null && existing != event.getModelManager().getMissingModel()) {
+//					break;
+//				}
+//			}
+//		}
+    	
     	// Warlock blade; put obj in place for item model
     	{
-    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, "item/warlock_blade.obj"));
+    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, "item/warlock_sword.obj"));
 			if (model != null && model instanceof OBJModel) {
-				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":warlock_blade", "inventory"), bakedModel);
+				IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
+                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
+				
+				final ImmutableMap<TransformType, TRSRTransformation> SWORD_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
+			            .put(TransformType.GUI, Transforms.convert(-1.6f, -2f, 0.f, 0, 0, -45f, .125f))
+			            .put(TransformType.GROUND, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
+			            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
+			            .put(TransformType.THIRD_PERSON_RIGHT_HAND, Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f))
+			            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f)))
+			            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 90, 15, .125f))
+			            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0, 0, 0, 0, 90, 15, .125f)))
+			            .build();
+				
+                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, SWORD_TRANSFORMS);
+				
+				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":warlock_sword", "inventory"), bakedInvModel);
+				
+//				"transform": {
+//		            "scale": 0.125,
+//		            "thirdperson": {
+//		                "scale": 1.6,
+//		                "translation": [0.05, 0, 0.05],
+//		                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 0} ]
+//		            },
+//		            "firstperson": {
+//		                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 15} ]
+//		            },
+//		            "gui": {
+//		                "rotation": [ { "x": 0 }, { "y": 0 }, { "z": -45} ],
+//		                "translation": [-0.2, -0.25, 0]
+//		            }
+//		        }
+				
+				//event.getModelRegistry().put(new ModelResourceLocation("minecraft:item/stick", "inventory"), bakedModel);
 			}
     	}
 	}

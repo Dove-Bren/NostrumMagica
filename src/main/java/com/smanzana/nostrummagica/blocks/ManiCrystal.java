@@ -35,12 +35,12 @@ public class ManiCrystal extends Block {
 	public static final String ID_VANI = ID_PREFIX + "vani";
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
-	protected static final VoxelShape STANDING_AABB = Block.makeCuboidShape(.5-(.16), 0.1D, .5-.16, .5+.16, 0.8D, .5+.16);
-	protected static final VoxelShape HANGING_AABB = Block.makeCuboidShape(.5-(.16), .55, .5-.16, .5+.16, 1.0, .5+.16);
-	protected static final VoxelShape WALL_NORTH_AABB = Block.makeCuboidShape(.5-.16, 0.2D, 1-.16, .5 + .16, 0.8D, 1);
-	protected static final VoxelShape WALL_EAST_AABB = Block.makeCuboidShape(0, 0.2D, .5-.16, .16, 0.8D, .5+.16);
-	protected static final VoxelShape WALL_SOUTH_AABB = Block.makeCuboidShape(.5-.16, 0.2D, 0, .5 + .16, 0.8D, .16);
-	protected static final VoxelShape WALL_WEST_AABB = Block.makeCuboidShape(1-.16, 0.2D, .5-.16, 1, 0.8D, .5+.16);
+	protected static final VoxelShape STANDING_AABB = Block.makeCuboidShape(16*(.5-(.16)), 16*0.1D, 16*(.5-.16), 16*(.5+.16), 16*0.8D, 16*(.5+.16));
+	protected static final VoxelShape HANGING_AABB = Block.makeCuboidShape(16*(.5-(.16)), 16*.55, 16*(.5-.16), 16*(.5+.16), 16*1.0, 16*(.5+.16));
+	protected static final VoxelShape WALL_NORTH_AABB = Block.makeCuboidShape(16*(.5-.16), 16*0.2D, 16*(1-.16), 16*(.5 + .16), 16*0.8D, 16*1);
+	protected static final VoxelShape WALL_EAST_AABB = Block.makeCuboidShape(16*0, 16*0.2D, 16*(.5-.16), 16*.16, 16*0.8D, 16*(.5+.16));
+	protected static final VoxelShape WALL_SOUTH_AABB = Block.makeCuboidShape(16*(.5-.16), 16*0.2D, 16*0, 16*(.5 + .16), 16*0.8D, 16*.16);
+	protected static final VoxelShape WALL_WEST_AABB = Block.makeCuboidShape(16*(1-.16), 16*0.2D, 16*(.5-.16), 16*1, 16*0.8D, 16*(.5+.16));
 	
 	private final int level;
 	

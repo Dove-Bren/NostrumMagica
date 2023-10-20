@@ -4,7 +4,7 @@
 		"model": "forge:block/fluid"
 	},
 	"variants": {
-		"": [{
+		"fluid": [{
 			"custom": {
 				"fluid": "poison_water"
 			}

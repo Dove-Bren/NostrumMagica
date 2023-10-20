@@ -390,7 +390,9 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 		ItemStack scroll = ItemStack.EMPTY;
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
-			scroll = ((WispBlock) AetheriaProxy.BlockWisp).getScroll(world, homePos); // ENCAPSULATION LEAK
+			if (NostrumMagica.instance.aetheria.isEnabled()) {
+				scroll = ((WispBlock) AetheriaProxy.BlockWisp).getScroll(world, homePos); // ENCAPSULATION LEAK
+			}
 		}
 		
 		@Nullable Spell spell = null;

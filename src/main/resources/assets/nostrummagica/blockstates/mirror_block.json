@@ -1,8 +1,15 @@
 {
+	"forge_marker": 1,
+	"defaults": {
+		"model": "nostrummagica:block/mirror.obj",
+		"textures": {
+			"particle": "nostrummagica:block/stone_generic1"
+		}
+	},
     "variants": {
-        "facing=north": { "model": "nostrummagica:block/mirror.obj", "x": 270, "y": 180 },
-        "facing=east": { "model": "nostrummagica:block/mirror.obj", "x": 270, "y": 270 },
-        "facing=south": { "model": "nostrummagica:block/mirror.obj", "x": 270 },
-        "facing=west": { "model": "nostrummagica:block/mirror.obj", "x": 270, "y": 90 }
+        "facing=north": { "x": 270, "y": 180 },
+        "facing=east": { "x": 270, "y": 270 },
+        "facing=south": { "x": 270 },
+        "facing=west": { "x": 270, "y": 90 }
     }
 }

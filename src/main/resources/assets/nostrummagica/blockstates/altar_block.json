@@ -1,5 +1,13 @@
 {
+	"forge_marker": 1,
+	"defaults": {
+		"model": "nostrummagica:block/pedestal.obj",
+		"x": 270,
+		"textures": {
+			"particle": "nostrummagica:block/stone_generic1"
+		}
+	},
     "variants": {
-        "": { "model": "nostrummagica:block/pedestal.obj", "x": 270 }
-    }
+		"": [{}]
+	}
 }
