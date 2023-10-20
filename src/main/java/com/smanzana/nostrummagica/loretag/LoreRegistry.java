@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
+import com.smanzana.nostrummagica.entity.IEntityPet.SoulBoundLore;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -79,7 +83,7 @@ public class LoreRegistry {
 //		register(DragonEgg.instance());
 //		register(NostrumRoseItem.instance());
 //		register(NostrumSkillItem.instance());
-//		register(TameRedDragonLore.instance());
+		register(TameRedDragonLore.instance());
 //		register(new EntitySprite(null));
 //		register(new EntityDragonEgg(null));
 //		register(MirrorShield.instance());
@@ -89,11 +93,11 @@ public class LoreRegistry {
 //		register(WarlockSword.instance());
 //		register(new EntityLux(null));
 //		register(DragonSoulItem.instance());
-//		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
+		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
 //		register(SoulDagger.instance());
 //		register(ArcaneWolfSoulItem.instance());
-//		register(SoulBoundLore.instance());
-//		register(WolfTameLore.instance());
+		register(SoulBoundLore.instance());
+		register(WolfTameLore.instance());
 //		register(ParadoxMirrorBlock.instance());
 		
 		

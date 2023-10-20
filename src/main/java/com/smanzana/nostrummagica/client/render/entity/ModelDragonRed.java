@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
@@ -118,7 +120,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 					continue;
 				}
 				
-				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + ".obj");
+				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
 				RenderObj render = new RenderObj(this, RenderFuncs.makeDefaultModelLocation(loc)) {
 					@Override
 					protected int getColor() {
@@ -186,19 +188,19 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 	 */
 	
 	protected static enum EDragonPart {
-		BODY("entity/red_dragon/body.obj", 0, -.889, 0),
-		NECK("entity/red_dragon/neck.obj", 0, -.975, -1.6, EDragonPart.BODY),
-		HEAD("entity/red_dragon/head.obj", 0, -1.90, -1.575, EDragonPart.NECK),
-		//TAIL1("entity/red_dragon/tail1.obj", 0, -.95, 2.9, EDragonPart.BODY),
-		//TAIL2("entity/red_dragon/tail2.obj", 0, .2245, 6.67, EDragonPart.TAIL1),
-		//TAIL3("entity/red_dragon/tail3.obj", 0, .85, 9.9, EDragonPart.TAIL2),
-		TAIL("entity/red_dragon/tail.obj", 0, -.95, 2.5, EDragonPart.BODY),
-		WING_LEFT("entity/red_dragon/wing_left.obj", .35, -1.4, -.75, EDragonPart.BODY),
-		WING_RIGHT("entity/red_dragon/wing_right.obj", -.35, -1.4, -.75, EDragonPart.BODY),
-		LEG_FRONT_LEFT("entity/red_dragon/leg_fl.obj", .75, -.45, -.76, EDragonPart.BODY),
-		LEG_FRONT_RIGHT("entity/red_dragon/leg_fr.obj", -.725, -.45, -.82, EDragonPart.BODY),
-		LEG_BACK_LEFT("entity/red_dragon/leg_bl.obj", .54, -1, 1.78, EDragonPart.BODY),
-		LEG_BACK_RIGHT("entity/red_dragon/leg_br.obj", -.593, -1, 1.64, EDragonPart.BODY);
+		BODY("entity/red_dragon/body", 0, -.889, 0),
+		NECK("entity/red_dragon/neck", 0, -.975, -1.6, EDragonPart.BODY),
+		HEAD("entity/red_dragon/head", 0, -1.90, -1.575, EDragonPart.NECK),
+		//TAIL1("entity/red_dragon/tail1", 0, -.95, 2.9, EDragonPart.BODY),
+		//TAIL2("entity/red_dragon/tail2", 0, .2245, 6.67, EDragonPart.TAIL1),
+		//TAIL3("entity/red_dragon/tail3", 0, .85, 9.9, EDragonPart.TAIL2),
+		TAIL("entity/red_dragon/tail", 0, -.95, 2.5, EDragonPart.BODY),
+		WING_LEFT("entity/red_dragon/wing_left", .35, -1.4, -.75, EDragonPart.BODY),
+		WING_RIGHT("entity/red_dragon/wing_right", -.35, -1.4, -.75, EDragonPart.BODY),
+		LEG_FRONT_LEFT("entity/red_dragon/leg_fl", .75, -.45, -.76, EDragonPart.BODY),
+		LEG_FRONT_RIGHT("entity/red_dragon/leg_fr", -.725, -.45, -.82, EDragonPart.BODY),
+		LEG_BACK_LEFT("entity/red_dragon/leg_bl", .54, -1, 1.78, EDragonPart.BODY),
+		LEG_BACK_RIGHT("entity/red_dragon/leg_br", -.593, -1, 1.64, EDragonPart.BODY);
 		
 		private ResourceLocation loc;
 		public double offsetX;
@@ -624,6 +626,27 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		for (EDragonArmorPart part : EDragonArmorPart.values()) {
 			overlayMaterial.put(part, EDragonOverlayMaterial.NONE);
 		}
+	}
+	
+	public static List<ResourceLocation> getModelParts() {
+		List<ResourceLocation> list = new ArrayList<>(EDragonPart.values().length + (EDragonArmorPart.values().length * EDragonOverlayMaterial.values().length));
+		for (EDragonPart part : EDragonPart.values()) {
+			// Body pieces
+			list.add(part.getLoc());
+		}
+		
+		// Armor overlays
+		for (EDragonArmorPart part : EDragonArmorPart.values()) {
+			for (EDragonOverlayMaterial material : EDragonOverlayMaterial.values()) {
+				if (material == EDragonOverlayMaterial.NONE) {
+					continue;
+				}
+				
+				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
+				list.add(loc);
+			}
+		}
+		return list;
 	}
 
 }

@@ -18,8 +18,8 @@ public class ModelSpriteCore extends ModelOBJ<EntitySprite> {
 	@Override
 	protected ModelResourceLocation[] getEntityModels() {
 		return new ModelResourceLocation[] {
-			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core.obj")),
-			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms.obj"))
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core")),
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms"))
 		};
 	}
 	

@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.tiles.SingleSpawnerTileEntity;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
@@ -97,6 +98,11 @@ public class NostrumSingleSpawner extends ContainerBlock {
     public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT;
     }
+	
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
+	}
 	
 	@Override
 	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {

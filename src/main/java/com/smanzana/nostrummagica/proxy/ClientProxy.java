@@ -38,6 +38,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.ModelGolem;
 import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
@@ -101,6 +102,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlockTileEntity;
+import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
@@ -143,6 +145,7 @@ import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
@@ -1446,6 +1449,8 @@ public class ClientProxy extends CommonProxy {
 			return;
 		}
 		
+		// We have to request loading textures that aren't explicitly loaded by any of the normal registered models.
+		// That means entity OBJ models, or textures we load on the fly, etc.
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/koid"));
 		event.addSprite(new ResourceLocation(
@@ -1539,47 +1544,80 @@ public class ClientProxy extends CommonProxy {
 		 */
     }
     
-	private static final TRSRTransformation THIRD_PERSON_BLOCK = Transforms.convert(0, 2.5f, 0, 75, 45, 0, 0.375f);
-    private static final ImmutableMap<TransformType, TRSRTransformation> BLOCK_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
-            .put(TransformType.GUI, Transforms.convert(0, 0, 0, 30, 225, 0, 0.625f))
-            .put(TransformType.GROUND, Transforms.convert(0, 3, 0, 0, 0, 0, 0.25f))
-            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, 0.5f))
-            .put(TransformType.THIRD_PERSON_RIGHT_HAND, THIRD_PERSON_BLOCK)
-            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(THIRD_PERSON_BLOCK))
-            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 45, 0, 0.4f))
-            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.convert(0, 0, 0, 0, 225, 0, 0.4f))
-            .build();
+//	private static final TRSRTransformation THIRD_PERSON_BLOCK = Transforms.convert(0, 2.5f, 0, 75, 45, 0, 0.375f);
+//    private static final ImmutableMap<TransformType, TRSRTransformation> BLOCK_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
+//            .put(TransformType.GUI, Transforms.convert(0, 0, 0, 30, 225, 0, 0.625f))
+//            .put(TransformType.GROUND, Transforms.convert(0, 3, 0, 0, 0, 0, 0.25f))
+//            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, 0.5f))
+//            .put(TransformType.THIRD_PERSON_RIGHT_HAND, THIRD_PERSON_BLOCK)
+//            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(THIRD_PERSON_BLOCK))
+//            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 45, 0, 0.4f))
+//            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.convert(0, 0, 0, 0, 225, 0, 0.4f))
+//            .build();
 		
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-		for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled"}) {
+		for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled", "block/orb_crystal",
+				"entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
+			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, key + ".obj"), "Failed to get obj model for " + key);
 			
+			if (model != null && model instanceof OBJModel) {
+				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, key)), bakedModel);
+			}
 		}
 		
-    	for (String key : new String[] {
-    			"pedestal", "crystal_standing", "crystal_embedded", "crystal_hanging", "mirror"}) {
-			IUnbakedModel model;
-			try {
-				model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/" + key + ".obj"));
+		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
+			ResourceLocation fullLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
+			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(fullLoc, "Failed to get obj model for " + fullLoc);
+			
+			if (model != null && model instanceof OBJModel) {
+				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(loc), bakedModel);
+			}
+		}
+		
+		if (NostrumMagica.instance.aetheria.isEnabled()) {
+			for (ModelResourceLocation loc : AetherCloakItem.AllCapeModels) {
+				ResourceLocation modelLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
+				IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(modelLoc, "Failed to get obj model for " + modelLoc);
 				
 				if (model != null && model instanceof OBJModel) {
-//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
-//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key), bakedModel);
-//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
-//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key), bakedModel);
-//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key + ".obj"), bakedModel);
-					
-					IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
-	                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
-	                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, BLOCK_TRANSFORMS);
-	                event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, "inventory"), bakedInvModel);
+					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+					// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+					event.getModelRegistry().put(loc, bakedModel);
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				NostrumMagica.logger.warn("Failed to load effect " + key);
-			}	
+			}
 		}
+		
+		//AllCapeModels
+		
+//    	for (String key : new String[] {
+//    			"pedestal", "crystal_standing", "crystal_embedded", "crystal_hanging", "mirror"}) {
+//			IUnbakedModel model;
+//			try {
+//				model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/" + key + ".obj"));
+//				
+//				if (model != null && model instanceof OBJModel) {
+//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
+////					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key), bakedModel);
+////					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
+//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":models/block/" + key), bakedModel);
+////					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key + ".obj"), bakedModel);
+//					
+//					IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
+//	                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
+//	                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, BLOCK_TRANSFORMS);
+//	                event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, "inventory"), bakedInvModel);
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				NostrumMagica.logger.warn("Failed to load effect " + key);
+//			}	
+//		}
     	
 //		{
 //			IUnbakedModel model = null;
@@ -1621,7 +1659,7 @@ public class ClientProxy extends CommonProxy {
                         new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
 				
 				final ImmutableMap<TransformType, TRSRTransformation> SWORD_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
-			            .put(TransformType.GUI, Transforms.convert(-1.6f, -2f, 0.f, 0, 0, -45f, .125f))
+			            .put(TransformType.GUI, Transforms.convert(-2.4f, -3f, 0.f, 0, 0, -45f, .125f))
 			            .put(TransformType.GROUND, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
 			            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
 			            .put(TransformType.THIRD_PERSON_RIGHT_HAND, Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f))

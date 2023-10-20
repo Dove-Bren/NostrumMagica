@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class ModelOrb<T extends Entity> extends ModelOBJ<T> {
 
-	private static final ModelResourceLocation MODEL = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/orb.obj"));
+	private static final ModelResourceLocation MODEL = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/orb"));
 	private float scale;
 	private int color;
 	

@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
@@ -140,6 +141,11 @@ public class Candle extends ContainerBlock {
     public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT;
     }
+	
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
+	}
 	
 //	@Override
 //	public boolean isFullCube(BlockState state) {

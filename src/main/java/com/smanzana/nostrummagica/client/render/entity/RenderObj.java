@@ -60,7 +60,7 @@ public class RenderObj extends RendererModel {
 		if (!initted) {
 			final ModelManager manager = Minecraft.getInstance().getModelManager();
 			IBakedModel model = manager.getModel(this.resource);
-			if (model == null) {
+			if (model == null || model == manager.getMissingModel()) {
 				NostrumMagica.logger.error("Could not find model to match " + this.resource);
 				model = manager.getMissingModel();
 			} else if (!(model instanceof OBJBakedModel)) {

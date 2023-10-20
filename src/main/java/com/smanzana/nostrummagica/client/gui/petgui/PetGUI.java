@@ -140,14 +140,16 @@ public class PetGUI {
 			pet = (IEntityPet) foundEnt;
 			
 			final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			PetContainer<?> container = new PetContainer(windowId, containerID, pet, player, pet.getContainerSheets(player)); 
-					//pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer(), windowId, containerID);
-			
-			if (numSheets != container.getSheetCount()) {
+			final IPetGUISheet<?>[] sheets = pet.getContainerSheets(player);
+
+			if (numSheets != sheets.length) {
 				NostrumMagica.logger.error("Sheet count differs on client and server for " + pet);
 				return null;
 			}
+			
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			PetContainer<?> container = new PetContainer(windowId, containerID, pet, player, sheets); 
+					//pet.getGUIContainer(NostrumMagica.instance.proxy.getPlayer(), windowId, containerID);
 			
 			return container;
 		}

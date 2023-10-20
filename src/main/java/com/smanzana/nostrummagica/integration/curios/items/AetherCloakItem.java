@@ -163,12 +163,12 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	public static final DyeColor COLOR_DEFAULT_INSIDE = DyeColor.GRAY;
 	public static final DyeColor COLOR_DEFAULT_RUNES = DyeColor.WHITE;
 
-	private static final ModelResourceLocation CapeModelTrimmedOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_outside.obj"));
-	private static final ModelResourceLocation CapeModelTrimmedInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_inside.obj"));
-	private static final ModelResourceLocation CapeModelTrimmedDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_decor.obj"));
-	private static final ModelResourceLocation CapeModelFullOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_outside.obj"));
-	private static final ModelResourceLocation CapeModelFullInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_inside.obj"));
-	private static final ModelResourceLocation CapeModelFullDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_decor.obj"));
+	private static final ModelResourceLocation CapeModelTrimmedOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_outside"));
+	private static final ModelResourceLocation CapeModelTrimmedInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_inside"));
+	private static final ModelResourceLocation CapeModelTrimmedDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_trimmed_decor"));
+	private static final ModelResourceLocation CapeModelFullOutside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_outside"));
+	private static final ModelResourceLocation CapeModelFullInside = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_inside"));
+	private static final ModelResourceLocation CapeModelFullDecor = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/cloak_medium_decor"));
 	
 	private static final ModelResourceLocation[] CapeModelsTrimmed = new ModelResourceLocation[] {
 		CapeModelTrimmedInside,
@@ -190,6 +190,15 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 		CapeModelFullInside,
 		CapeModelFullOutside,
 		CapeModelFullDecor,
+	};
+	
+	public static final ModelResourceLocation[] AllCapeModels = new ModelResourceLocation[] {
+			CapeModelTrimmedOutside,
+			CapeModelTrimmedInside,
+			CapeModelTrimmedDecor,
+			CapeModelFullOutside,
+			CapeModelFullInside,
+			CapeModelFullDecor,
 	};
 	
 	public AetherCloakItem() {

@@ -58,10 +58,10 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final double BB_DEPTH = 2.0 / 16.0;
 	private static final double BB_MARGIN = 1.0 / 16.0;
-	private static final VoxelShape AABB_N = Block.makeCuboidShape(BB_MARGIN, 0, 1 - BB_DEPTH, 1 - BB_MARGIN, 1, 1); // TODO final
-	private static final VoxelShape AABB_E = Block.makeCuboidShape(0, 0, BB_MARGIN, BB_DEPTH, 1, 1-BB_MARGIN);
-	private static final VoxelShape AABB_S = Block.makeCuboidShape(BB_MARGIN, 0, 0, 1-BB_MARGIN, 1, BB_DEPTH);
-	private static final VoxelShape AABB_W = Block.makeCuboidShape(1 - BB_DEPTH, 0, BB_MARGIN, 1, 1, 1-BB_MARGIN);
+	private static final VoxelShape AABB_N = Block.makeCuboidShape(16 * BB_MARGIN, 16 * 0, 16 * (1 - BB_DEPTH), 16 * (1 - BB_MARGIN), 16 * 1, 16 * 1);
+	private static final VoxelShape AABB_E = Block.makeCuboidShape(16 * 0, 16 * 0, 16 * BB_MARGIN, 16 * BB_DEPTH, 16 * 1, 16 * (1-BB_MARGIN));
+	private static final VoxelShape AABB_S = Block.makeCuboidShape(16 * BB_MARGIN, 16 * 0, 16 * 0, 16 * (1-BB_MARGIN), 16 * 1, 16 * BB_DEPTH);
+	private static final VoxelShape AABB_W = Block.makeCuboidShape(16 * (1 - BB_DEPTH), 16 * 0, 16 * BB_MARGIN, 16 * 1, 16 * 1, 16 * (1-BB_MARGIN));
 	
 	private static final String NBT_LINKED_POS = "linked_pos";
 	

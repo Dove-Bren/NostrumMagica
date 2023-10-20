@@ -18,7 +18,7 @@ public class ModelKoid extends ModelOBJ<EntityKoid> {
 	@Override
 	protected ModelResourceLocation[] getEntityModels() {
 		return new ModelResourceLocation[] {
-			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/koid.obj"))
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/koid"))
 		};
 	}
 	

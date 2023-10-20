@@ -15,8 +15,8 @@ import net.minecraft.world.World;
 
 public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObeliskEntity> {
 
-	private static final ModelResourceLocation MODEL_LOC = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "models/block/orb_crystal.obj"));
-	private static final ModelResourceLocation TEXT_LOC = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ender.png"));
+	private static final ModelResourceLocation MODEL_LOC = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "block/orb_crystal"));
+	private static final ResourceLocation TEXT_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ender.png");
 	private static IBakedModel model = null;
 	private static boolean attemptedLoading = false;
 	

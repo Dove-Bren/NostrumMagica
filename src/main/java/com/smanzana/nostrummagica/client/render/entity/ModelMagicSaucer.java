@@ -19,7 +19,7 @@ public class ModelMagicSaucer<T extends EntitySpellSaucer> extends ModelOBJ<T> {
 	@Override
 	protected ModelResourceLocation[] getEntityModels() {
 		return new ModelResourceLocation[] {
-			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer.obj"))
+			RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer"))
 		};
 	}
 	
