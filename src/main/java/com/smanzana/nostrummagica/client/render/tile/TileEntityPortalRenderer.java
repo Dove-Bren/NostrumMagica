@@ -16,7 +16,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTileEntityBase> {
 
-	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/portal.png");
+	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/portal.png");
 	
 	public TileEntityPortalRenderer() {
 		

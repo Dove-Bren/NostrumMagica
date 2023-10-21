@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -40,7 +41,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityKoid extends MonsterEntity implements ILoreTagged {
+public class EntityKoid extends MonsterEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_koid";
 
@@ -165,27 +166,45 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 		}
 	}
 	
-	public static String LoreKey = "nostrum__koid";
-	
 	@Override
-	public String getLoreKey() {
-		return LoreKey;
+	public ILoreTagged getLoreTag() {
+		return KoidLore.instance;
 	}
+	
+	public static final class KoidLore implements ILoreTagged {
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Koids";
-	}
+		public static final KoidLore instance = new KoidLore();
+		public static final KoidLore instance() {
+			return instance;
+		}
 	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("Koids are strange wisps of energy that have over time become attuned to the elements.");
-				
-	}
+		public static String LoreKey = "nostrum__koid";
 	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("Koids are created when too much of one element of energy gathers in a location.", "Koids hate other koids, golems, and players.", "Koids have a chance of dropping elemental runes.");
+		@Override
+		public String getLoreKey() {
+			return LoreKey;
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Koids";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Koids are strange wisps of energy that have over time become attuned to the elements.");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Koids are created when too much of one element of energy gathers in a location.", "Koids hate other koids, golems, and players.", "Koids have a chance of dropping elemental runes.");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
 	}
 	
 	public EMagicElement getElement() {
@@ -261,11 +280,6 @@ public class EntityKoid extends MonsterEntity implements ILoreTagged {
 //			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
 //		}
 //	}
-
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
-	}
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {

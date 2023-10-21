@@ -27,6 +27,7 @@ public class DungeonAir extends BreakableBlock {
 		super(Block.Properties.create(Material.BARRIER)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
+				.doesNotBlockMovement()
 				);
 	}
 	

@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
@@ -77,7 +78,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityWisp extends GolemEntity implements ILoreTagged {
+public class EntityWisp extends GolemEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_wisp";
 	
@@ -261,24 +262,42 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return LoreKey;
+	public ILoreTagged getLoreTag() {
+		return WispLoreTag.instance;
 	}
+	
+	public static final class WispLoreTag implements ILoreTagged {
+		
+		private static final WispLoreTag instance = new WispLoreTag();
+		public static final WispLoreTag instance() {
+			return instance;
+		}
+	
+		@Override
+		public String getLoreKey() {
+			return LoreKey;
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Wisps";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Strange floating vortexes of magical energy");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Strange floating vortexes of magical energy.", "They are drawn to mani crystals, and can be passively spawned to protect you and your base.");
+		}
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Wisps";
-	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("Strange floating vortexes of magical energy");
-				
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("Strange floating vortexes of magical energy.", "They are drawn to mani crystals, and can be passively spawned to protect you and your base.");
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
 	}
 	
 	
@@ -360,11 +379,6 @@ public class EntityWisp extends GolemEntity implements ILoreTagged {
 //			}
 //		}
 //	}
-
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
-	}
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {

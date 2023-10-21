@@ -10,11 +10,10 @@ import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityPet.SoulBoundLore;
-import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
+import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -78,8 +77,6 @@ public class LoreRegistry {
 //		register(PositionToken.instance());
 //		register(SeekerIdol.instance());
 //		register(ShrineSeekingGem.instance());
-		register(new EntityGolemPhysical(NostrumEntityTypes.golemPhysical, null));
-		register(new EntityKoid(NostrumEntityTypes.koid, null));
 		//register(new EntityDragonRed(null));
 //		register(MageStaff.instance());
 //		register(ThanosStaff.instance());
@@ -91,14 +88,10 @@ public class LoreRegistry {
 //		register(NostrumRoseItem.instance());
 //		register(NostrumSkillItem.instance());
 		register(TameRedDragonLore.instance());
-		register(new EntitySprite(NostrumEntityTypes.sprite, null));
-		register(new EntityDragonEgg(NostrumEntityTypes.dragonEgg, null));
 //		register(MirrorShield.instance());
 //		register(MirrorShieldImproved.instance());
 //		register(HookshotItem.instance());
-		register(new EntityWisp(NostrumEntityTypes.wisp, null));
 //		register(WarlockSword.instance());
-		register(new EntityLux(NostrumEntityTypes.lux, null));
 //		register(DragonSoulItem.instance());
 		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
 //		register(SoulDagger.instance());
@@ -106,6 +99,13 @@ public class LoreRegistry {
 		register(SoulBoundLore.instance());
 		register(WolfTameLore.instance());
 //		register(ParadoxMirrorBlock.instance());
+		
+		register(EntityLux.LuxLoreTag.instance());
+		register(EntityWisp.WispLoreTag.instance());
+		register(EntitySprite.SpriteLoreTag.instance());
+		register(EntityDragonEgg.DragonEggLore.instance());
+		register(EntityGolem.GolemLore.instance());
+		register(EntityKoid.KoidLore.instance());
 		
 		
 		for (Preset preset : Preset.values()) {

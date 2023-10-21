@@ -26,7 +26,7 @@ public class SorceryPortalSpawner extends Block implements ITriggeredBlock {
 	}
 	
 	protected void activatePortal(World world, BlockPos pos, BlockState state) {
-		world.setBlockState(pos.up(), NostrumBlocks.sorceryPortal.getDefaultState());
+		world.setBlockState(pos.up(), NostrumBlocks.sorceryPortal.getMaster());
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {

@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -111,9 +112,9 @@ public class ObeliskScreen extends Screen {
 			index++;
 		}
 		
-		this.buttons.add(centralButton);
-		this.buttons.addAll(floatingButtons);
-		this.buttons.addAll(listButtons);
+		this.addButton(centralButton);
+		for (Widget w : floatingButtons) addButton(w);
+		for (Widget w : listButtons) addButton(w);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.visible = drawList;
@@ -136,7 +137,7 @@ public class ObeliskScreen extends Screen {
 		double time = (float) ((double) System.currentTimeMillis() / 15000);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
 		
-		blit(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
@@ -163,12 +164,12 @@ public class ObeliskScreen extends Screen {
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			blit(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			RenderFuncs.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			blit(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			RenderFuncs.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		}
 		
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -248,13 +249,13 @@ public class ObeliskScreen extends Screen {
 				this.updateButtons();
 				return true;
 			} else if (drawList && mouseX < this.width / 3) {
-				return true;
+				; //return true;
 			} else {
 				mouseClickX = mouseX;
 				mouseClickY = mouseY;
 				mouseClickXOffset = xOffset;
 				mouseClickYOffset = yOffset;
-				return true;
+				// fall through
 			}
 		}
 		
@@ -343,7 +344,7 @@ public class ObeliskScreen extends Screen {
         public DestinationButton(ObeliskScreen screen, int parPosX, int parPosY, 
               BlockPos pos, int index, boolean isCenter, boolean isListed, String title,
               boolean isValid) {
-            super(13, 13, parPosX, parPosY, "", (b) -> {
+            super(parPosX, parPosY, 13, 13, "", (b) -> {
             	screen.onDestinationClicked(b);
             });
             this.pos = pos;

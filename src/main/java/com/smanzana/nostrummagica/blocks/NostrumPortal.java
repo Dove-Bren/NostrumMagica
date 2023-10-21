@@ -40,7 +40,7 @@ public abstract class NostrumPortal extends Block  {
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public NostrumPortal(Block.Properties properties) {
-		super(properties);
+		super(properties.doesNotBlockMovement());
 		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false));
 	}
 	
@@ -66,7 +66,7 @@ public abstract class NostrumPortal extends Block  {
 	
 	@Override
 	public VoxelShape getShape(BlockState blockState, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.empty();
+		return VoxelShapes.fullCube();
 	}
 	
 	@Override
@@ -99,7 +99,7 @@ public abstract class NostrumPortal extends Block  {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
-		return BlockRenderType.INVISIBLE;
+		return BlockRenderType.ENTITYBLOCK_ANIMATED;
 	}
 	
 	public BlockState getSlaveState() {

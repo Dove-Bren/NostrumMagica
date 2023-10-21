@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.GolemTask;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -42,7 +43,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public abstract class EntityGolem extends TameableEntity implements ILoreTagged {
+public abstract class EntityGolem extends TameableEntity implements ILoreSupplier {
 
 	Entity e;
 	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>createKey(EntityGolem.class, DataSerializers.FLOAT);
@@ -238,29 +239,42 @@ public abstract class EntityGolem extends TameableEntity implements ILoreTagged 
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return "nostrum__golem";
-	}
-
-	@Override
-	public String getLoreDisplayName() {
-		return "Golems";
+	public ILoreTagged getLoreTag() {
+		return GolemLore.instance;
 	}
 	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("By infusing stones with an element, a spark of life is born.", "These golems seem to be bound to their casters by an invisible bond.");
-				
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("By infusing stones with an element, a spark of life is born.", "Golems take after the element they are infused with. Golems can have melee attacks, ranged spells, or even buffs they might share with their caster.");
-	}
+	public static final class GolemLore implements ILoreTagged {
 
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
+		public static final GolemLore instance = new GolemLore();
+		public static final GolemLore instance() {
+			return instance;
+		}
+	
+		@Override
+		public String getLoreKey() {
+			return "nostrum__golem";
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Golems";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("By infusing stones with an element, a spark of life is born.", "These golems seem to be bound to their casters by an invisible bond.");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("By infusing stones with an element, a spark of life is born.", "Golems take after the element they are infused with. Golems can have melee attacks, ranged spells, or even buffs they might share with their caster.");
+		}
+	
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
 	}
 	
 	public EMagicElement getElement() {

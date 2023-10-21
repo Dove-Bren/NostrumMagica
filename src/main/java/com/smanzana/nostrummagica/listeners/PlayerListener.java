@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.ThanoPendant;
 import com.smanzana.nostrummagica.items.ThanosStaff;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -782,6 +783,11 @@ public class PlayerListener {
 			if (attr != null && attr.isUnlocked()) {
 				if (event.getEntityLiving() instanceof ILoreTagged) {
 					attr.giveBasicLore((ILoreTagged) event.getEntityLiving());
+				} else if (event.getEntityLiving() instanceof ILoreSupplier) {
+					ILoreTagged tag = ((ILoreSupplier) event.getEntityLiving()).getLoreTag();
+					if (tag != null) {
+						attr.giveBasicLore(tag);
+					}
 				} else if (null != LoreRegistry.getPreset(event.getEntityLiving())) {
 					attr.giveBasicLore(LoreRegistry.getPreset(event.getEntityLiving()));
 				}

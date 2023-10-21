@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -54,7 +55,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntitySprite extends CreatureEntity implements ILoreTagged {
+public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_sprite";
 
@@ -278,24 +279,42 @@ public class EntitySprite extends CreatureEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return "nostrum__sprite";
+	public ILoreTagged getLoreTag() {
+		return SpriteLoreTag.instance;
 	}
+	
+	public static final class SpriteLoreTag implements ILoreTagged {
+		
+		private static final SpriteLoreTag instance = new SpriteLoreTag();
+		public static final SpriteLoreTag instance() {
+			return instance;
+		}
+	
+		@Override
+		public String getLoreKey() {
+			return "nostrum__sprite";
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Sprites";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Strange, crystaline pieces of magic sometimes swirl together.", "While they do attack when provoked, they seem to be creatures of curiosity instead of wrath...");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Strange, crystaline pieces of magic sometimes swirl together.", "While they do attack when provoked, they seem to be creatures of curiosity instead of wrath...");
+		}
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Sprites";
-	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("Strange, crystaline pieces of magic sometimes swirl together.", "While they do attack when provoked, they seem to be creatures of curiosity instead of wrath...");
-				
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("Strange, crystaline pieces of magic sometimes swirl together.", "While they do attack when provoked, they seem to be creatures of curiosity instead of wrath...");
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
 	}
 	
 	
@@ -370,11 +389,6 @@ public class EntitySprite extends CreatureEntity implements ILoreTagged {
 //			this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
 //		}
 //	}
-
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
-	}
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {

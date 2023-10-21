@@ -296,7 +296,7 @@ public class NostrumObeliskEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	protected void activatePortal() {
-		world.setBlockState(pos.up(), NostrumBlocks.obeliskPortal.getDefaultState());
+		world.setBlockState(pos.up(), NostrumBlocks.obeliskPortal.getMaster());
 		NostrumBlocks.obeliskPortal.createPaired(world, pos.up());
 	}
 	

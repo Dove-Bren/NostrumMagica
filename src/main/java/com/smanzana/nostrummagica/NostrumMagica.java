@@ -1981,7 +1981,7 @@ public class NostrumMagica {
 				.reference("ritual::buff.waterbreathing", "ritual.buff.waterbreathing.name")
 				.build("boon", NostrumResearchTab.MAGICA, Size.LARGE, 3, 0, true, new ItemStack(Items.SPLASH_POTION));
 
-		NostrumResearch.startBuilding().parent("rituals").hiddenParent("magic_token").lore(EntityKoid.LoreKey)
+		NostrumResearch.startBuilding().parent("rituals").hiddenParent("magic_token").lore(EntityKoid.KoidLore.instance())
 				.reference("ritual::koid", "ritual.koid.name").build("summonkoids", NostrumResearchTab.MAGICA,
 						Size.NORMAL, 3, 2, true, new ItemStack(NostrumItems.essencePhysical));
 
@@ -2001,7 +2001,7 @@ public class NostrumMagica {
 						new ItemStack(NostrumItems.resourceToken));
 
 		NostrumResearch.startBuilding().hiddenParent("magic_token").lore(NostrumItems.essencePhysical)
-				.lore(EntityKoid.LoreKey).lore(EntityWisp.LoreKey)
+				.lore(EntityKoid.KoidLore.instance()).lore(EntityWisp.WispLoreTag.instance())
 				.reference("ritual::essence_seed", "ritual.essence_seed.name").build("essence_seeds",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -3, 0, false, new ItemStack(NostrumItems.reagentSeedEssence));
 

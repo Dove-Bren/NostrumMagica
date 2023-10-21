@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.GenericTemptGoal;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -72,7 +73,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityLux extends AnimalEntity implements ILoreTagged/*, ITameableEntity*/ {
+public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameableEntity*/ {
 	
 	public static final String ID = "entity_lux";
 	
@@ -334,24 +335,42 @@ public class EntityLux extends AnimalEntity implements ILoreTagged/*, ITameableE
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return LoreKey;
+	public ILoreTagged getLoreTag() {
+		return LuxLoreTag.instance;
 	}
+	
+	public static final class LuxLoreTag implements ILoreTagged {
+		
+		private static final LuxLoreTag instance = new LuxLoreTag(); 
+		public static final LuxLoreTag instance() {
+			return instance;
+		}
+	
+		@Override
+		public String getLoreKey() {
+			return LoreKey;
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Lux";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Simple floating chunks of magical energy.", "They seem docile, love flowers, and only attack once attacked themselves.");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Simple floating chunks of magical energy.", "They seem docile, and only attack once attacked themselves.", "The magical dust that drops off them might be collectable...");
+		}
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Lux";
-	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("Simple floating chunks of magical energy.", "They seem docile, love flowers, and only attack once attacked themselves.");
-				
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("Simple floating chunks of magical energy.", "They seem docile, and only attack once attacked themselves.", "The magical dust that drops off them might be collectable...");
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
 	}
 	
 	
@@ -444,11 +463,6 @@ public class EntityLux extends AnimalEntity implements ILoreTagged/*, ITameableE
 //			}
 //		}
 //	}
-
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
-	}
 	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {

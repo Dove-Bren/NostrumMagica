@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -24,7 +25,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public class EntityDragonEgg extends MobEntity implements ILoreTagged {
+public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_dragon_egg";
 	
@@ -236,30 +237,43 @@ public class EntityDragonEgg extends MobEntity implements ILoreTagged {
 		
 		this.remove();
 	}
-
-	@Override
-	public String getLoreKey() {
-		return "nostrum_dragon_egg_entity";
-	}
-
-	@Override
-	public String getLoreDisplayName() {
-		return "Caring For Dragon Eggs";
-	}
-
-	@Override
-	public Lore getBasicLore() {
-		// Never used
-		return new Lore().add("");
-	}
-
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("You've placed a dragon egg!", "Be careful, as dragon eggs must be kept warm in order to survive!", "To keep the egg warm, keep it near a strong source of light. Additionally, ensure the egg stays on-top of a bed of straw or hay.", "If the egg gets too cold (or if it falls and cracks, or is damaged), it will die, and the creature inside will perish.", "Be warned: Once hatched, the creature inside will be wild, and must be tamed!");
-	}
 	
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
+	public ILoreTagged getLoreTag() {
+		return DragonEggLore.instance;
+	}
+	
+	public static final class DragonEggLore implements ILoreTagged {
+
+		public static final DragonEggLore instance = new DragonEggLore();
+		public static final DragonEggLore instance() {
+			return instance;
+		}
+		
+		@Override
+		public String getLoreKey() {
+			return "nostrum_dragon_egg_entity";
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Caring For Dragon Eggs";
+		}
+	
+		@Override
+		public Lore getBasicLore() {
+			// Never used
+			return new Lore().add("");
+		}
+	
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("You've placed a dragon egg!", "Be careful, as dragon eggs must be kept warm in order to survive!", "To keep the egg warm, keep it near a strong source of light. Additionally, ensure the egg stays on-top of a bed of straw or hay.", "If the egg gets too cold (or if it falls and cracks, or is damaged), it will die, and the creature inside will perish.", "Be warned: Once hatched, the creature inside will be wild, and must be tamed!");
+		}
+		
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
 	}
 }

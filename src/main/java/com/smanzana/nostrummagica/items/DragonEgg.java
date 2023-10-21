@@ -69,7 +69,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr != null) {
-			attr.giveFullLore(egg);
+			attr.giveFullLore(egg.getLoreTag());
 		}
 		
 		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"));
