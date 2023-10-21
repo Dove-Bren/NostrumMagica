@@ -12,10 +12,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.IForegroundRenderable;
 import com.smanzana.nostrummagica.client.gui.StackableScreen;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
@@ -114,7 +116,7 @@ public class InfoScreen extends StackableScreen {
 			if (butt.buttons == null || butt.buttons.isEmpty())
 				continue;
 			tabs.add(butt);
-			this.buttons.add(butt);
+			this.addButton(butt);
 		}
 		
 		// Open up startup location, if one was provided
@@ -184,17 +186,22 @@ public class InfoScreen extends StackableScreen {
 //			((GuiLabel)this.labelList.get(j)).drawLabel(this.minecraft, mouseX, mouseY);
 //		}
 		
-//		// Only show sub buttons if mouseY is lower than button  vertical offset
-//		if (mouseY > POS_SUBSCREEN_VOFFSET) {
-//			for (int i = 0; i < this.buttons.size(); ++i) {
-//				((AbstractButton)this.buttons.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
-//			}
-//		}
-//		
-//		for (int i = 0; i < this.tabs.size(); ++i) {
-//			((AbstractButton)this.tabs.get(i)).drawButtonForegroundLayer(mouseX, mouseY);
-//		}
-		// TODO ?
+		// Only show sub buttons if mouseY is lower than button  vertical offset
+		if (mouseY > POS_SUBSCREEN_VOFFSET) {
+			for (int i = 0; i < this.buttons.size(); ++i) {
+				Widget w = this.buttons.get(i);
+				if (w instanceof IForegroundRenderable) {
+					((IForegroundRenderable)this.buttons.get(i)).renderForeground(mouseX, mouseY, partialTicks);
+				}
+			}
+		}
+		
+		for (int i = 0; i < this.tabs.size(); ++i) {
+			Widget w = this.buttons.get(i);
+			if (w instanceof IForegroundRenderable) {
+				((IForegroundRenderable)this.buttons.get(i)).renderForeground(mouseX, mouseY, partialTicks);
+			}
+		}
 		
 	}
 	
@@ -227,9 +234,14 @@ public class InfoScreen extends StackableScreen {
 		}
 		
 		this.buttons.clear();
-		this.buttons.addAll(this.tabs);
-		this.buttons.addAll(this.infoButtons);
-		this.buttons.addAll(this.subscreenButtons);
+		this.children.clear();
+		
+		for (Widget w : this.tabs) { this.addButton(w); }
+		for (Widget w : this.infoButtons) { this.addButton(w); }
+		for (Widget w : this.subscreenButtons) { this.addButton(w); }
+//		this.buttons.addAll(this.tabs);
+//		this.buttons.addAll(this.infoButtons);
+//		this.buttons.addAll(this.subscreenButtons);
 	}
 	
 	private void activateButtons(List<InfoButton> buttons) {
@@ -240,9 +252,14 @@ public class InfoScreen extends StackableScreen {
 		}
 		this.infoButtons = buttons;
 		this.buttons.clear();
-		this.buttons.addAll(this.tabs);
-		this.buttons.addAll(this.infoButtons);
-		this.buttons.addAll(this.subscreenButtons);
+		this.children.clear();
+		
+		for (Widget w : this.tabs) { this.addButton(w); }
+		for (Widget w : this.infoButtons) { this.addButton(w); }
+		for (Widget w : this.subscreenButtons) { this.addButton(w); }
+//		this.buttons.addAll(this.tabs);
+//		this.buttons.addAll(this.infoButtons);
+//		this.buttons.addAll(this.subscreenButtons);
 		int i = 0;
 		int j = 0;
 		
@@ -302,7 +319,7 @@ public class InfoScreen extends StackableScreen {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	class TabButton extends AbstractButton {
+	class TabButton extends AbstractButton implements IForegroundRenderable {
 		
 		private static final int TEXT_BUTTON_TAB_WIDTH = 32;
         private InfoScreenTab tab;
@@ -358,11 +375,11 @@ public class InfoScreen extends StackableScreen {
                 int y = this.y + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
                 minecraft.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x, y);
                 
-                drawButtonForegroundLayer(parX, parY);
+                //drawButtonForegroundLayer(parX, parY);
             }
         }
         
-    	public void drawButtonForegroundLayer(int mouseX, int mouseY) {
+    	public void renderForeground(int mouseX, int mouseY, float partialTicks) {
     		if (mouseX >= this.x && mouseY > this.y
     			&& mouseX <= this.x + this.width
     			&& mouseY <= this.y + this.height) {

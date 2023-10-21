@@ -5,7 +5,9 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 
 public class MirrorItem extends BlockItem implements ILoreTagged {
 
@@ -13,6 +15,11 @@ public class MirrorItem extends BlockItem implements ILoreTagged {
 
 	public MirrorItem() {
 		super(NostrumBlocks.mirrorBlock, NostrumItems.PropBase());
+	}
+	
+	@Override
+	protected BlockState getStateForPlacement(BlockItemUseContext context) {
+		return super.getStateForPlacement(context);
 	}
 	
 //	@Override

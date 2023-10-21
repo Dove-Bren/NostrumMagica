@@ -3,12 +3,13 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 import java.util.List;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.IForegroundRenderable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
-public abstract class InfoButton extends AbstractButton {
+public abstract class InfoButton extends AbstractButton implements IForegroundRenderable {
 
 	protected static final int BUTTON_WIDTH = 18;
 	
@@ -24,9 +25,7 @@ public abstract class InfoButton extends AbstractButton {
 	public abstract List<String> getDescription();
 	
 	@Override
-	public void renderButton(int mouseX, int mouseY, float partialTicks) {
-		super.renderButton(mouseX, mouseY, partialTicks);
-		
+	public void renderForeground(int mouseX, int mouseY, float partialTicks) {
 		if (mouseX >= this.x && mouseY > this.y
 			&& mouseX <= this.x + this.width
 			&& mouseY <= this.y + this.height) {

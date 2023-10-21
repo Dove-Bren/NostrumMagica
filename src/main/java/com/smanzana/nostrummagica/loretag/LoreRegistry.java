@@ -5,9 +5,16 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
+import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.EntityLux;
+import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityPet.SoulBoundLore;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
+import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -71,9 +78,9 @@ public class LoreRegistry {
 //		register(PositionToken.instance());
 //		register(SeekerIdol.instance());
 //		register(ShrineSeekingGem.instance());
-//		register(new EntityGolemPhysical(null));
-//		register(new EntityKoid(null));
-//		//register(new EntityDragonRed(null));
+		register(new EntityGolemPhysical(NostrumEntityTypes.golemPhysical, null));
+		register(new EntityKoid(NostrumEntityTypes.koid, null));
+		//register(new EntityDragonRed(null));
 //		register(MageStaff.instance());
 //		register(ThanosStaff.instance());
 //		register(ThanoPendant.instance());
@@ -84,14 +91,14 @@ public class LoreRegistry {
 //		register(NostrumRoseItem.instance());
 //		register(NostrumSkillItem.instance());
 		register(TameRedDragonLore.instance());
-//		register(new EntitySprite(null));
-//		register(new EntityDragonEgg(null));
+		register(new EntitySprite(NostrumEntityTypes.sprite, null));
+		register(new EntityDragonEgg(NostrumEntityTypes.dragonEgg, null));
 //		register(MirrorShield.instance());
 //		register(MirrorShieldImproved.instance());
 //		register(HookshotItem.instance());
-//		register(new EntityWisp(null));
+		register(new EntityWisp(NostrumEntityTypes.wisp, null));
 //		register(WarlockSword.instance());
-//		register(new EntityLux(null));
+		register(new EntityLux(NostrumEntityTypes.lux, null));
 //		register(DragonSoulItem.instance());
 		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
 //		register(SoulDagger.instance());

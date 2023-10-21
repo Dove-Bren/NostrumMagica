@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 
 import net.minecraft.block.Block;
@@ -9,8 +11,10 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -36,6 +40,15 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 				.harvestLevel(0)
 				.lightValue(4)
 				);
+	}
+	
+	@Override
+	@Nullable
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		Direction direction = context.getPlacementHorizontalFacing().getOpposite();
+		BlockPos blockpos = context.getPos();
+		BlockPos blockpos1 = blockpos.offset(direction);
+		return context.getWorld().getBlockState(blockpos1).isReplaceable(context) ? this.getDefaultState().with(HORIZONTAL_FACING, direction) : null;
 	}
 	
 	// todo ??
