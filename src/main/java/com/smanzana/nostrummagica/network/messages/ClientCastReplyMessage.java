@@ -80,6 +80,7 @@ public class ClientCastReplyMessage {
 		this.reagentCost = new HashMap<>();
 		
 		// remove empty elements
+		if (reagentCostIn != null)
 		for (ReagentType type : reagentCostIn.keySet()) {
 			if (type == null)
 				continue;

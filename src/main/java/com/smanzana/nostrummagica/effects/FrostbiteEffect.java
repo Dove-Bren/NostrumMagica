@@ -80,6 +80,7 @@ public class FrostbiteEffect extends Effect {
 				cloud.setOwner(entity);
 				cloud.setIgnoreOwner(true);
 				cloud.setRadius(10f);
+				cloud.setHeight(3f);
 				cloud.setGravity(true, 1.0);
 				cloud.setVerticleStepping(false);
 				cloud.setDuration(0);

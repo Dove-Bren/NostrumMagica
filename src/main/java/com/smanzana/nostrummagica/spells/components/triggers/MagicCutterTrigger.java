@@ -24,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class MagicCutterTrigger extends SpellTrigger {
 	
@@ -77,7 +78,6 @@ public class MagicCutterTrigger extends SpellTrigger {
 //							5.0f, 500);
 					
 					world.addEntity(projectile);
-			
 				}
 			
 			});

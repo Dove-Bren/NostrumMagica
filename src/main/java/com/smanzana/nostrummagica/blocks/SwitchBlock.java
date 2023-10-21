@@ -32,7 +32,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class SwitchBlock extends Block {
 	
-	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1D, 0.2D, 1D);
+	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16D, 3.2D, 16D);
 
 	public static final String ID = "switch_block";
 	

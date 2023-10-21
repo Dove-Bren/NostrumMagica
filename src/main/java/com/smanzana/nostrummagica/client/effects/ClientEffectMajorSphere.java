@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -21,8 +22,8 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		
 		private static IBakedModel MODEL_CLOUDY;
 		private static IBakedModel MODEL_SCALY;
-		private static ModelResourceLocation LOC_CLOUDY = new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_cloudy"), "normal");
-		private static ModelResourceLocation LOC_SCALY = new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_scaled"), "normal");
+		private static ModelResourceLocation LOC_CLOUDY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_cloudy"));
+		private static ModelResourceLocation LOC_SCALY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_scaled"));
 
 		private float scale;
 		private boolean cloudy;

@@ -39,7 +39,7 @@ public class StatSyncMessage {
 	protected CompoundNBT tag;
 	
 	public StatSyncMessage(CompoundNBT tag) {
-		this.tag = new CompoundNBT();
+		this.tag = tag == null ? new CompoundNBT() : tag;
 	}
 	
 	public StatSyncMessage(INostrumMagic stats) {

@@ -46,7 +46,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class TeleportRune extends ContainerBlock  {
 	
 	public static final String ID = "teleport_rune";
-	protected static final VoxelShape RUNE_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.125D, 1.0D);
+	protected static final VoxelShape RUNE_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 2D, 16.0D);
 	
 	public TeleportRune() {
 		super(Block.Properties.create(Material.CARPET)

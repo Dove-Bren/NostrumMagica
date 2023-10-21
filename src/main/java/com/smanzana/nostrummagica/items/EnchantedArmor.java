@@ -1531,7 +1531,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	public static void ServerWorldTick(ServerWorld world) {
 		world.getEntities().forEach((ent)-> {
 			if (ent instanceof LivingEntity) {
-				UpdateEntity((LivingEntity) ent);
+				LivingEntity living = (LivingEntity) ent;
+				UpdateEntity(living);
+				
+				if (living.isElytraFlying() && living.isSneaking() && living instanceof ServerPlayerEntity) {
+					((ServerPlayerEntity) living).clearElytraFlying();
+				}
 			}
 		});
 	}

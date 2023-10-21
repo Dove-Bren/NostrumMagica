@@ -541,6 +541,7 @@ public class OverlayRenderer extends AbstractGui {
 			
 			final float ratio = ((float) (20 - Math.abs(index)) / 20f);
 			final float rot = ratio * 120.0f;
+			final float drawScale = (10f / GUI_WING_SIZE);
 			
 			Minecraft mc = Minecraft.getInstance();
 			mc.getTextureManager().bindTexture(GUI_ICONS);
@@ -552,8 +553,9 @@ public class OverlayRenderer extends AbstractGui {
 			GlStateManager.rotatef(rot, 0, 0, 1f);
 			GlStateManager.translatef(-1, -10, 0);
 			GlStateManager.color4f(1f, 1f, 1f, 1f - ratio);
-			blit(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY,
-					-GUI_WING_SIZE, GUI_WING_SIZE, 10, 10); // TODO right? used to have 256f, 256f
+			//blit(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE); // -10, 10, 
+			RenderFuncs.drawScaledCustomSizeModalRect(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY,
+					-GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
 			GlStateManager.popMatrix();
 			
 			GlStateManager.pushMatrix();
@@ -563,8 +565,9 @@ public class OverlayRenderer extends AbstractGui {
 			GlStateManager.rotatef(-rot, 0, 0, 1f);
 			GlStateManager.translatef(-10, -10, 0);
 			GlStateManager.color4f(1f, 1f, 1f, 1f - ratio);
-			blit(0, 0, 0, GUI_WING_OFFSETY,
-					GUI_WING_SIZE, GUI_WING_SIZE, 10, 10); // TODO right? used to have 256f, 256f
+			//blit(0, 0, 0, offsetX, offsetY, width, height, texWidth, texHeight); // -10, 10, 
+			RenderFuncs.drawScaledCustomSizeModalRect(0, 0, 0, GUI_WING_OFFSETY,
+					GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
 			GlStateManager.popMatrix();
 			
 			

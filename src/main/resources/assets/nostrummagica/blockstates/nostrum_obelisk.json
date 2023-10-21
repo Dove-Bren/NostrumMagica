@@ -3,6 +3,6 @@
         "master=false,tile=false": { "model": "nostrummagica:block/dungeon_dark" },
         "master=true,tile=false": { "model": "nostrummagica:block/dungeon_dark" },
         "master=false,tile=true": { "model": "nostrummagica:block/none" },
-        "master=true,tile=true": { "model": "nostrummagica:block/mirror" }
+        "master=true,tile=true": { "model": "nostrummagica:block/obelisk_core" }
     }
 }

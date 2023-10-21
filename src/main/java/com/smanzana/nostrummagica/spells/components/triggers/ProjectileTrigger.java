@@ -88,10 +88,10 @@ public class ProjectileTrigger extends SpellTrigger {
 						}
 						
 						if (!hitAllies) {
-							if (NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+							if (NostrumMagica.getOwner(ent) != null && NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
 								return false; // We own the target
 							}
-							if (NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+							if (NostrumMagica.getOwner(getState().getSelf()) != null && NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
 								return false; // ent owns us
 							}
 							

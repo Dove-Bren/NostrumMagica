@@ -96,10 +96,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 										return false;
 									}
 									
-									if (NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+									if (NostrumMagica.getOwner(ent) != null && NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
 										return false; // We own the target
 									}
-									if (NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+									if (NostrumMagica.getOwner(getState().getSelf()) != null && NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
 										return false; // ent owns us
 									}
 								}
@@ -142,10 +142,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					
 					bullet.setFilter((ent) -> {
 						if (ent != null && getState().getSelf() != ent) {
-							if (NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+							if (NostrumMagica.getOwner(ent) != null && NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
 								return false; // We own the target
 							}
-							if (NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+							if (NostrumMagica.getOwner(getState().getSelf()) != null && NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
 								return false; // ent owns us
 							}
 						}

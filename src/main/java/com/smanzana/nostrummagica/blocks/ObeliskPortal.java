@@ -91,9 +91,4 @@ public class ObeliskPortal extends TeleportationPortal {
 		
 		return true;
 	}
-	
-	@Override
-	public BlockRenderType getRenderType(BlockState state) {
-		return BlockRenderType.MODEL;
-	}
 }

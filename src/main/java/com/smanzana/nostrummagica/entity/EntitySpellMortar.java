@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
@@ -23,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class EntitySpellMortar extends FireballEntity {
 	
@@ -157,5 +159,11 @@ public class EntitySpellMortar extends FireballEntity {
 	
 	public EMagicElement getElement() {
 		return this.dataManager.get(ELEMENT);
+	}
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		// Have to override and use forge to use with non-living Entity types even though parent defines
+		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 }

@@ -33,8 +33,8 @@ import net.minecraft.world.server.ServerWorld;
 public abstract class NostrumMagicDoor extends HorizontalBlock {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
-	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(0.4D, 0.0D, 0D, 0.6D, 1.0D, 1D);
-	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 0.4D, 1D, 1D, 0.6D);
+	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 6.4D, 1D, 1D, 9.6D);
 
 	public NostrumMagicDoor() {
 		this(Block.Properties.create(Material.ROCK)

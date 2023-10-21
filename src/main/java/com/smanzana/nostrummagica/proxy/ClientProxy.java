@@ -1558,7 +1558,23 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-		for (String key : new String[] {"effect/orb_cloudy", "effect/orb_scaled", "block/orb_crystal",
+		for (ClientEffectIcon icon : ClientEffectIcon.values()) {
+			if (!icon.getModelKey().endsWith(".obj")) {
+				continue;
+			}
+			
+			//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
+			final String modelLoc = "effect/" + icon.getKey();
+			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, modelLoc + ".obj"), "Failed to get obj model for " + modelLoc);
+			
+			if (model != null && model instanceof OBJModel) {
+				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, modelLoc)), bakedModel);
+			}
+		}
+		
+		for (String key : new String[] {"block/orb_crystal",
 				"entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
 			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, key + ".obj"), "Failed to get obj model for " + key);
 			
@@ -1659,10 +1675,10 @@ public class ClientProxy extends CommonProxy {
                         new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
 				
 				final ImmutableMap<TransformType, TRSRTransformation> SWORD_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
-			            .put(TransformType.GUI, Transforms.convert(-2.4f, -3f, 0.f, 0, 0, -45f, .125f))
+			            .put(TransformType.GUI, Transforms.convert(-3.2f, -4f, 0.f, 0, 0, -45f, .125f))
 			            .put(TransformType.GROUND, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
 			            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
-			            .put(TransformType.THIRD_PERSON_RIGHT_HAND, Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f))
+			            .put(TransformType.THIRD_PERSON_RIGHT_HAND, Transforms.convert(0.4f, 0, 0.4f, 0, 90, 0, 1.6f * .125f))
 			            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f)))
 			            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 90, 15, .125f))
 			            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0, 0, 0, 0, 90, 15, .125f)))

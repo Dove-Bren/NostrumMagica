@@ -98,11 +98,11 @@ public class SpellAction {
 		
 		public final boolean apply(LivingEntity caster, LivingEntity entity, float eff) {
 			if (entity != null && isHarmful() && caster != entity) {
-				if (caster.equals(NostrumMagica.getOwner(entity))) {
+				if (NostrumMagica.getOwner(entity) != null && caster.equals(NostrumMagica.getOwner(entity))) {
 					return false; // we own the target entity
 				}
 				
-				if (entity.equals(NostrumMagica.getOwner(caster))) {
+				if (NostrumMagica.getOwner(caster) != null && entity.equals(NostrumMagica.getOwner(caster))) {
 					return false; // they own us
 				}
 			}

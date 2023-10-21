@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ChalkBlock extends Block {
 
 	public static final String ID = "nostrum_chalk_block";
-	protected static final VoxelShape CHALK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.03125D, 1.0D);
+	protected static final VoxelShape CHALK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16 * 0.03125D, 16.0D);
 	
 	public ChalkBlock() {
 		super(Block.Properties.create(Material.CARPET)

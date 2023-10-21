@@ -34,8 +34,8 @@ public class ManaArmorerBlock extends ContainerBlock {
 
 	public static final String ID = "mana_armorer";
 
-	private static final double AABB_RADIUS = (4.0 / 16.0);
-	protected static final VoxelShape BASE_AABB = Block.makeCuboidShape(.5 - AABB_RADIUS, .5 - AABB_RADIUS, .5 - AABB_RADIUS, .5 + AABB_RADIUS, .5 + AABB_RADIUS, .5 + AABB_RADIUS);
+	private static final double AABB_RADIUS = (4.0);
+	protected static final VoxelShape BASE_AABB = Block.makeCuboidShape(8 - AABB_RADIUS, 8 - AABB_RADIUS, 8 - AABB_RADIUS, 8 + AABB_RADIUS, 8 + AABB_RADIUS, 8 + AABB_RADIUS);
 	
 	public ManaArmorerBlock() {
 		super(Block.Properties.create(Material.ROCK)

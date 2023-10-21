@@ -290,6 +290,12 @@ public class NostrumMagica {
 		musica.init();
 	
 		// Used to be two different mod init steps!
+		
+		proxy.postinit();
+		aetheria.postInit();
+		//curios.postInit();
+		//enderIO.postInit();
+		musica.postInit();
 
 		initFinished = true;
 

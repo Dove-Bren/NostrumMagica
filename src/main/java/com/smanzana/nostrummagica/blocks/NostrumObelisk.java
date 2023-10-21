@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.Corner;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ContainerBlock;
@@ -61,7 +62,7 @@ public class NostrumObelisk extends ContainerBlock {
 	public static final int TILE_OFFSETH = 3; // horizontal distance between master and pillars
 	public static final int TILE_HEIGHT = 4; // Total height of corner pillars
 	
-	private static final VoxelShape TILE_SHAPE = Block.makeCuboidShape(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);
+	private static final VoxelShape TILE_SHAPE = Block.makeCuboidShape(4.8D, 4.8D, 4.8D, 11.2D, 11.2D, 11.2D);
 	
 	public static final String ID = "nostrum_obelisk";
 	
@@ -187,6 +188,11 @@ public class NostrumObelisk extends ContainerBlock {
 	@OnlyIn(Dist.CLIENT)
     public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.SOLID;
+	}
+	
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.MODEL;
 	}
 	
 	public static boolean blockIsMaster(BlockState state) {

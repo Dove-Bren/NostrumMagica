@@ -48,11 +48,11 @@ public class Candle extends ContainerBlock {
 
 	public static final String ID = "nostrum_candle";
 	public static BooleanProperty LIT = BooleanProperty.create("lit");
-	protected static final VoxelShape CANDLE_AABB = Block.makeCuboidShape(0.4375D, 0.0D, 0.4375D, 0.5625D, 0.5D, 0.5625D);
-	protected static final VoxelShape CANDLE_E_AABB = Block.makeCuboidShape(0.0D, 0.35D, 0.4375D, 0.25D, 0.85D, 0.5625D);
-	protected static final VoxelShape CANDLE_N_AABB = Block.makeCuboidShape(0.4375D, 0.35D, 0.75D, 0.5625D, 0.85D, 1D);
-	protected static final VoxelShape CANDLE_W_AABB = Block.makeCuboidShape(0.75D, 0.35D, 0.4375D, 1D, 0.85D, 0.5625D);
-	protected static final VoxelShape CANDLE_S_AABB = Block.makeCuboidShape(0.4375D, 0.35D, 0D, 0.5625D, 0.85D, 0.25D);
+	protected static final VoxelShape CANDLE_AABB = Block.makeCuboidShape(16 * 0.4375D, 16 * 0.0D, 16 * 0.4375D, 16 * 0.5625D, 16 * 0.5D, 16 * 0.5625D);
+	protected static final VoxelShape CANDLE_E_AABB = Block.makeCuboidShape(16 * 0.0D, 16 * 0.35D, 16 * 0.4375D, 16 * 0.25D, 16 * 0.85D, 16 * 0.5625D);
+	protected static final VoxelShape CANDLE_N_AABB = Block.makeCuboidShape(16 * 0.4375D, 16 * 0.35D, 16 * 0.75D, 16 * 0.5625D, 16 * 0.85D, 16D);
+	protected static final VoxelShape CANDLE_W_AABB = Block.makeCuboidShape(16 * 0.75D, 16 * 0.35D, 16 * 0.4375D, 1D, 16 * 0.85D, 16 * 0.5625D);
+	protected static final VoxelShape CANDLE_S_AABB = Block.makeCuboidShape(16 * 0.4375D, 16 * 0.35D, 0D, 16 * 0.5625D, 16 * 0.85D, 16 * 0.25D);
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", new Predicate<Direction>() {
 		public boolean apply(@Nullable Direction facing) {

@@ -71,7 +71,7 @@ public class CursedIce extends BreakableBlock {
 	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
 		final Block adjacentBlock = adjacentBlockState.getBlock();
 		
-		return !(Tags.Blocks.GLASS.contains(adjacentBlock) || Tags.Blocks.STAINED_GLASS.contains(adjacentBlock)
+		return (Tags.Blocks.GLASS.contains(adjacentBlock) || Tags.Blocks.STAINED_GLASS.contains(adjacentBlock)
 				|| BlockTags.ICE.contains(adjacentBlock) || adjacentBlock == this);
 	}
 	

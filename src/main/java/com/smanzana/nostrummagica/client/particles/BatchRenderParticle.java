@@ -92,22 +92,39 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		final float radius = /*particle.particleScale*/1 * scale;
 		
 		
-		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
+		buffer.pos(offsetX - (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ - (rYZ * radius) - (rXZ * radius))
 			.tex(0, 0)
 			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
 			.normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX - (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ - (rZ * radius) + (rXY * radius))
+		buffer.pos(offsetX - (rX * radius) + (rXY * radius), offsetY + (rZ * radius), offsetZ - (rYZ * radius) + (rXZ * radius))
 			.tex(0, 1)
 			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
 			.normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX + (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ + (rZ * radius) + (rXY * radius))
+		buffer.pos(offsetX + (rX * radius) + (rXY * radius), offsetY + (rZ * radius), offsetZ + (rYZ * radius) + (rXZ * radius))
 			.tex(1, 1)
 			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
 			.normal(0, 0, 1).endVertex();
-		buffer.pos(offsetX + (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ + (rZ * radius) - (rXY * radius))
+		buffer.pos(offsetX + (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ + (rYZ * radius) - (rXZ * radius))
 			.tex(1, 0)
 			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
 			.normal(0, 0, 1).endVertex();
+		
+//		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
+//			.tex(0, 0)
+//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX - (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ - (rZ * radius) + (rXY * radius))
+//			.tex(0, 1)
+//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX + (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ + (rZ * radius) + (rXY * radius))
+//			.tex(1, 1)
+//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(offsetX + (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ + (rZ * radius) - (rXY * radius))
+//			.tex(1, 0)
+//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
+//			.normal(0, 0, 1).endVertex();
 	}
 	
 }

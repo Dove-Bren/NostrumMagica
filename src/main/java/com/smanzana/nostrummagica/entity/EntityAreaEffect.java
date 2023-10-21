@@ -20,6 +20,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Pose;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -31,6 +32,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 /**
  * More generic version of EntityAreaEffectCloud
@@ -511,6 +513,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	
 	@Override
 	protected void registerData() {
+		super.registerData();
 		this.getDataManager().register(HEIGHT, 1f);
         this.getDataManager().register(EXTRA_PARTICLE, Optional.empty());
         this.getDataManager().register(EXTRA_PARTICLE_OFFSET_Y, 0f);
@@ -548,5 +551,11 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		}
         compound.putFloat("ParticleYOffset", this.getCustomParticleYOffset());
         compound.putFloat("ParticleFreq", this.getCustomParticleFrequency());
+	}
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		// Have to override and use forge to use with non-living Entity types even though parent defines
+		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 }

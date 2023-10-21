@@ -18,6 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.ShulkerBulletEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
@@ -33,6 +34,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 // Like shulker bullets but have spells in them
 public class EntitySpellBullet extends ShulkerBulletEntity {
@@ -336,6 +338,12 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				}
 			}
 		}
+	}
+
+	@Override
+	public IPacket<?> createSpawnPacket() {
+		// Have to override and use forge to use with non-living Entity types even though parent defines
+		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 }
