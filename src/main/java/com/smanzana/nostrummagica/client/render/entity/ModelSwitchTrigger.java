@@ -88,7 +88,7 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 		
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
-				"textures/blocks/spawner.png"
+				"textures/block/spawner.png"
 				));
 		
 		wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);

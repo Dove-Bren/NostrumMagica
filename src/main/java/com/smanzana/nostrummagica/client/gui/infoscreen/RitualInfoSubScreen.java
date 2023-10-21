@@ -283,7 +283,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		GlStateManager.disableLighting();
 		GlStateManager.enableTexture();
 		GlStateManager.enableAlphaTest();
-		//mc.getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/blocks/ceramic_generic.png"));
+		//mc.getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png"));
 		mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();

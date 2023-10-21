@@ -16,7 +16,7 @@ public class RenderSwitchTrigger extends LivingRenderer<EntitySwitchTrigger, Mod
 	@Override
 	protected ResourceLocation getEntityTexture(EntitySwitchTrigger entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
-				"textures/blocks/spawner.png"
+				"textures/block/spawner.png"
 				);
 	}
 	

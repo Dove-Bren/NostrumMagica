@@ -21,7 +21,7 @@ import net.minecraft.util.math.BlockPos;
 public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<ProgressionDoorTileEntity> {
 
 	private static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
-	private static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/ceramic_generic.png");
+	private static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
 	
 	public TileEntityProgressionDoorRenderer() {
 		

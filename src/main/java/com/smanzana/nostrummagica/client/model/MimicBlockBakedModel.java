@@ -28,7 +28,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 	private final IBakedModel undisguisedModel;
 	
 	public MimicBlockBakedModel(IBakedModel undisguisedModel) {
-		//particle = Minecraft.getInstance().getTextureMap().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "blocks/mimic_facade").toString());
+		//particle = Minecraft.getInstance().getTextureMap().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "block/mimic_facade").toString());
 		this.undisguisedModel = undisguisedModel;
 	}
 	

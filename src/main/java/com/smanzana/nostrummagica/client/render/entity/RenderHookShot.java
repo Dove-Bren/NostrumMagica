@@ -31,7 +31,7 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 	@Override
 	protected ResourceLocation getEntityTexture(EntityHookShot entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
-				"textures/blocks/dungeon_dark.png"
+				"textures/block/dungeon_dark.png"
 				);
 	}
 	
@@ -109,7 +109,7 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 			// UVs depending on where we're at in the chain
 		
 			Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
-					"textures/blocks/spawner.png"
+					"textures/block/spawner.png"
 					));
 			
 			//GlStateManager.disableDepth();

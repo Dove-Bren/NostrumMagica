@@ -36,7 +36,7 @@ public class ModelHookShot extends EntityModel<EntityHookShot> {
 		GlStateManager.enableAlphaTest();
 		
 		Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID,
-				"textures/blocks/dungeon_dark.png"
+				"textures/block/dungeon_dark.png"
 				));
 		
 		wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);

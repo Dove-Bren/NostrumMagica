@@ -26,8 +26,8 @@ import net.minecraft.util.ResourceLocation;
 public class TileEntityWispBlockRenderer extends TileEntityRenderer<WispBlockTileEntity> {
 
 	//private static final ResourceLocation MODEL_LOC = new ResourceLocation(NostrumMagica.MODID, "block/crystal.obj");
-	private static final ResourceLocation BASE_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/stone_generic1.png");
-	private static final ResourceLocation PLATFORM_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/blocks/ceramic_generic.png");
+	private static final ResourceLocation BASE_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/stone_generic1.png");
+	private static final ResourceLocation PLATFORM_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
 	private static final ResourceLocation GEM_TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/crystal_blank.png");
 	
 	//private IBakedModel model;
