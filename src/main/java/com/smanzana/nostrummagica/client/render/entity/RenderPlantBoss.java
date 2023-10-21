@@ -13,11 +13,11 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPlantBoss extends LivingRenderer<EntityPlantBoss, ModelPlantBoss> {
+public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	

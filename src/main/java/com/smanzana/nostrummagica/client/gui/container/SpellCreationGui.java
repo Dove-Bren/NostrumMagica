@@ -565,7 +565,7 @@ public class SpellCreationGui {
 			private SpellGui gui;
 			
 			public SpellIconButton(int x, int y, int val, SpellGui gui) {
-				super(ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, x, y, "", (b) -> {
+				super(x, y, ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, "", (b) -> {
 					gui.iconButtonClicked(b);
 				});
 				this.value = val;
@@ -590,7 +590,7 @@ public class SpellCreationGui {
 					x += 20;
 				
 				GlStateManager.color3f(tint, tint, tint);
-				blit(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
+				RenderFuncs.drawScaledCustomSizeModalRect(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
 						20, 20, this.width, this.height, 256, 256);
 				
 				GlStateManager.color3f(tint, tint, tint);
@@ -613,12 +613,15 @@ public class SpellCreationGui {
 			this.nameField.setMaxStringLength(NAME_MAX);
 			this.nameField.setResponder((s) -> {
 				container.name = s;
+				container.validate();
 			});
 			this.nameField.setValidator((s) -> {
 				// do this better? If it ends up sucking. Otherwise this is probably fine
 				return s.codePoints().allMatch(SpellCreationGui::isValidChar);
 			});
 			this.buttons = new ArrayList<>(SpellIcon.numIcons);
+			
+			this.addButton(nameField);
 		}
 		
 		@Override
@@ -647,6 +650,7 @@ public class SpellCreationGui {
 				this.addButton(button);
 			}
 			
+			this.addButton(nameField);
 			this.nameField.x = horizontalMargin + NAME_HOFFSET;
 			this.nameField.y = verticalMargin + NAME_VOFFSET;
 		}

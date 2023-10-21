@@ -1274,12 +1274,15 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void getCollisions(@Nonnull GetCollisionBoxesEvent event) {
+		// Note: This even isn't fired on 1.14 :(
+		// Going to make the capability say 'Lava Swim' to players.
+		
 		if (event.isCanceled()) {
 			return;
 		}
 		
 		// Arcane Wolves have the ability to walk on water
-		if (event.getEntity() instanceof EntityArcaneWolf) {
+		if (event.getEntity() != null && event.getEntity() instanceof EntityArcaneWolf) {
 			EntityArcaneWolf wolf = (EntityArcaneWolf) event.getEntity();
 			if (wolf.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
 				AxisAlignedBB entityBB = wolf.getBoundingBox();
@@ -1292,8 +1295,8 @@ public class PlayerListener {
 						(int)Math.floor(entityBB.maxY),
 						(int)Math.ceil(entityBB.maxZ))) {
 					BlockState state = world.getBlockState(pos);
-					if (state.getMaterial() == Material.LAVA
-							&& ((FlowingFluidBlock) state.getBlock()).getFluidState(state).isEntityInside(world, pos, wolf, wolf.posY, FluidTags.LAVA, false)) {
+					if (state.getMaterial() == Material.LAVA)
+							if (((FlowingFluidBlock) state.getBlock()).getFluidState(state).isEntityInside(world, pos, wolf, wolf.posY, FluidTags.LAVA, false)) {
 						// Standing on lava. Check if the block this matched is within the BB the event is asking about
 						//final float height = BlockLiquid.getBlockLiquidHeight(state, world, pos);
 						AxisAlignedBB blockBB = new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);

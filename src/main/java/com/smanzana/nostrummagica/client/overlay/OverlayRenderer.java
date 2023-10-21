@@ -541,7 +541,6 @@ public class OverlayRenderer extends AbstractGui {
 			
 			final float ratio = ((float) (20 - Math.abs(index)) / 20f);
 			final float rot = ratio * 120.0f;
-			final float drawScale = (10f / GUI_WING_SIZE);
 			
 			Minecraft mc = Minecraft.getInstance();
 			mc.getTextureManager().bindTexture(GUI_ICONS);
@@ -1289,7 +1288,7 @@ public class OverlayRenderer extends AbstractGui {
 		if (loreIsDeep != null) {
 			final int u = (160 + (loreIsDeep ? 0 : 32));
 			mc.getTextureManager().bindTexture(GUI_ICONS);
-			blit(8, 8, u, 0, 32, 32, 8, 8, 256, 256);
+			RenderFuncs.drawScaledCustomSizeModalRect(8, 8, u, 0, 32, 32, 8, 8, 256, 256);
 		}
 	}
 	
@@ -1298,7 +1297,7 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		mc.getTextureManager().bindTexture(GUI_ICONS);
-		blit(6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
+		RenderFuncs.drawScaledCustomSizeModalRect(6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
@@ -1307,7 +1306,7 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		mc.getTextureManager().bindTexture(GUI_ICONS);
-		blit(8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
+		RenderFuncs.drawScaledCustomSizeModalRect(8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	

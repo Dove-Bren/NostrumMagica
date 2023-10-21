@@ -62,15 +62,16 @@ public class RuneBagGui {
 			this.bag = bag;
 			this.bagPos = bagPos;
 			
+
+			// Construct player hotbar
+			for (int x = 0; x < 9; x++) {
+				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
+			}
 			// Construct player inventory
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
 					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
 				}
-			}
-			// Construct player hotbar
-			for (int x = 0; x < 9; x++) {
-				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
 			this.bagIDStart = this.inventorySlots.size();

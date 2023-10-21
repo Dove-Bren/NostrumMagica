@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderSprite extends LivingRenderer<EntitySprite, ModelSpriteCore> {
+public class RenderSprite extends MobRenderer<EntitySprite, ModelSpriteCore> {
 
 	//private ModelSpriteArms armModel;
 	

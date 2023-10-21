@@ -205,6 +205,7 @@ public class ModificationTableGui {
 				return new ModificationTableContainer(windowId, player, playerInv, table, table.getPos());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
+				buffer.writeBlockPos(table.getPos());
 			});
 		}
 		
@@ -700,6 +701,7 @@ public class ModificationTableGui {
 			
 		protected void refreshButtons() {
 			this.buttons.clear();
+			this.children.clear();
 			
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
@@ -759,7 +761,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public ToggleButton(int x, int y, boolean val, ModificationGui gui) {
-				super(200, 20, x, y, "", (b) -> {
+				super(x, y, 200, 20, "", (b) -> {
 					gui.onToggleButton((ToggleButton)b);
 				});
 				this.val = val;
@@ -800,7 +802,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public FloatButton(int x, int y, int val, float actual, ModificationGui gui) {
-				super(200, 20, x, y, "", (b) -> {
+				super(x, y, 200, 20, "", (b) -> {
 					gui.onFloatButton((FloatButton) b);
 				});
 				this.val = val;
@@ -875,7 +877,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public SubmitButton(int x, int y, ModificationGui gui) {
-				super(200, 20, x, y, "", (b) -> {
+				super(x, y, 200, 20, "", (b) -> {
 					gui.onSubmitButton();
 				});
 				this.width = LARGE_BUTTON_WIDTH;

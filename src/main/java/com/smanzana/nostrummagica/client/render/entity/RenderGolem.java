@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderGolem<T extends EntityGolem> extends LivingRenderer<T, ModelGolem<T>> {
+public class RenderGolem<T extends EntityGolem> extends MobRenderer<T, ModelGolem<T>> {
 
 	private Map<String, ResourceLocation> texCache;
 	

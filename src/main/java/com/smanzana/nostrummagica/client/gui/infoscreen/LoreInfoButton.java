@@ -74,7 +74,7 @@ public class LoreInfoButton extends InfoButton {
 				Item item = ((Block) lore).asItem();
 				if (item != null)
 					iconStack = new ItemStack(item, 1);
-			} else if (lore instanceof LivingEntity) {
+			} else if (lore instanceof LivingEntity) { int unused; // Need some way to get ent from non-ents?
 				iconEntity = (Entity) lore;
 				if (iconEntity.world == null)
 					iconEntity.world = mc.world;

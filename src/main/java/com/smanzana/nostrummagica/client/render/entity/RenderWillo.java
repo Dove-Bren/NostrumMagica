@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderWillo extends LivingRenderer<EntityWillo, ModelWillo> {
+public class RenderWillo extends MobRenderer<EntityWillo, ModelWillo> {
 
 	private static final ResourceLocation RES_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/entity/willo.png");
 	

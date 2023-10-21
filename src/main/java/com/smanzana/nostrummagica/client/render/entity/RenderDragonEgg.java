@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderDragonEgg extends LivingRenderer<EntityDragonEgg, ModelDragonEgg> {
+public class RenderDragonEgg extends MobRenderer<EntityDragonEgg, ModelDragonEgg> {
 
 	public RenderDragonEgg(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelDragonEgg(), shadowSizeIn);

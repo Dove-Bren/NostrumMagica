@@ -745,7 +745,7 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public int getColor(ItemStack stack, int tintIndex) {
 				EMagicElement element = InfusedGemItem.GetElement(stack);
-				return element.getColor();
+				return 0xFFFFFFFF;//return element.getColor();
 			}
 		};
 		ev.getItemColors().register(tinter, NostrumItems.infusedGemEarth, NostrumItems.infusedGemEnder, NostrumItems.infusedGemFire,

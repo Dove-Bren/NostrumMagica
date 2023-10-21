@@ -1,17 +1,23 @@
 package com.smanzana.nostrummagica.blocks;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
@@ -52,6 +58,26 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
+	
+	@Override
+	@Nullable
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		Direction direction = context.getPlacementHorizontalFacing().getOpposite();
+		BlockPos blockpos = context.getPos();
+		BlockPos blockpos1 = blockpos.offset(direction);
+		return context.getWorld().getBlockState(blockpos1).isReplaceable(context) ? this.getSlaveState(direction) : null;
+	}
+
+	@Override
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+		if (!worldIn.isRemote) {
+			BlockPos blockpos = pos.offset(state.get(HORIZONTAL_FACING));
+			worldIn.setBlockState(blockpos, getMaster(state.get(HORIZONTAL_FACING).getOpposite()), 3);
+			worldIn.notifyNeighbors(pos, Blocks.AIR);
+			state.updateNeighbors(worldIn, pos, 3);
+		}
+	}
 	
 	// public BlockRenderLayer getRenderLayer() ?
 //	@Override

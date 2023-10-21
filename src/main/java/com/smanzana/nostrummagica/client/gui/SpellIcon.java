@@ -7,9 +7,9 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -42,7 +42,7 @@ public class SpellIcon {
 		
 		GlStateManager.enableBlend();
 		GlStateManager.enableAlphaTest();
-		AbstractGui.blit(x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH);
+		RenderFuncs.drawScaledCustomSizeModalRect(x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH);
 		
 		GL11.glPopMatrix();
 	}

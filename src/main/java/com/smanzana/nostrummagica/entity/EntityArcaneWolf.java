@@ -840,6 +840,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 						if (this.getHealth() < ARCANE_WOLF_WARN_HEALTH) {
 							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()));
 						} else {
+							addTrainingXP(200);
 							player.startRiding(this);
 						}
 					} else {

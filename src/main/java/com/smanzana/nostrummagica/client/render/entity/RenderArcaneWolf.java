@@ -6,10 +6,10 @@ import com.smanzana.nostrummagica.client.render.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderArcaneWolf extends LivingRenderer<EntityArcaneWolf, ModelArcaneWolf> {
+public class RenderArcaneWolf extends MobRenderer<EntityArcaneWolf, ModelArcaneWolf> {
 
 	private static final ResourceLocation ARCANE_WOLF_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/arcane_wolf/base.png");
 	
@@ -36,7 +36,7 @@ public class RenderArcaneWolf extends LivingRenderer<EntityArcaneWolf, ModelArca
 			GlStateManager.color3f(f, f, f);
 		}
 		
-		//this.mainModel = new ModelArcaneWolf();
+		this.entityModel = new ModelArcaneWolf();
 		
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 	}

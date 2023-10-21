@@ -9,12 +9,12 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 
-import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderDragonRed<T extends EntityDragonRedBase> extends LivingRenderer<T, ModelDragonRed<T>> {
+public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<T, ModelDragonRed<T>> {
 
 	protected final ModelDragonRed<T> dragonModel;
 	

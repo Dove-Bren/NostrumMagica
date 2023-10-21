@@ -280,7 +280,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	
 	public static void setPieceParam(ItemStack piece, SpellPartParam params) {
 		if (!piece.hasTag())
-			return;
+			piece.setTag(new CompoundNBT());
 		
 		piece.getTag().putFloat(NBT_PARAM_VAL, params.level);
 		piece.getTag().putBoolean(NBT_PARAM_FLIP, params.flip);
@@ -333,7 +333,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		SpellPart part = null;
 		
 		if (!stack.isEmpty() && stack.getItem() instanceof SpellRune) {
-			((SpellRune) stack.getItem()).getSpellPart(stack);
+			part = ((SpellRune) stack.getItem()).getSpellPart(stack);
 		}
 		
 		return part;

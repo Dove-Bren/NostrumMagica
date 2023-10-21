@@ -78,14 +78,14 @@ public class ScrollScreen extends Screen {
 		final int topOffset = (this.height - TEXT_BACK_HEIGHT) / 2;
 		
 		final int titleYOffset = 30;
-		final int iconYOffset = 60;
-		final int listYOffset = 90;
-		final int listXOffset = 30;
+		final int iconYOffset = 45;
+		final int listYOffset = 80;
+		final int listXOffset = 25;
 		
 		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
-		blit(leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		final int nameWidth = this.font.getStringWidth(this.name);
 		this.font.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
@@ -93,10 +93,10 @@ public class ScrollScreen extends Screen {
 		if (this.icon != null) {
 			final int iconLen = 32;
 			final int left = leftOffset + ((TEXT_BACK_WIDTH - iconLen) / 2);
-			RenderFuncs.drawRect(left - 2, iconYOffset - 2, left + iconLen + 2, iconYOffset + iconLen + 2, 0xFF000000);
-			RenderFuncs.drawRect(left, iconYOffset, left + iconLen, iconYOffset + iconLen, 0xFFE2DDCC);
+			RenderFuncs.drawRect(left - 2, topOffset + iconYOffset - 2, left + iconLen + 2, topOffset + iconYOffset + iconLen + 2, 0xFF000000);
+			RenderFuncs.drawRect(left, topOffset + iconYOffset, left + iconLen, topOffset + iconYOffset + iconLen, 0xFFE2DDCC);
 			GlStateManager.color4f(1f, 1f, 1f, 1f);
-			icon.render(Minecraft.getInstance(), left, iconYOffset, iconLen, iconLen);
+			icon.render(Minecraft.getInstance(), left, topOffset + iconYOffset, iconLen, iconLen);
 		}
 		
 		int i = 0;
