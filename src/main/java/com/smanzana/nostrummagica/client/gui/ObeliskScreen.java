@@ -150,9 +150,9 @@ public class ObeliskScreen extends Screen {
 		}
 		
 		// Do buttons
-		centralButton.renderButton(mouseX, mouseY, partialTicks);
+		centralButton.render(mouseX, mouseY, partialTicks);
 		for (DestinationButton butt : floatingButtons) {
-			butt.renderButton(mouseX, mouseY, partialTicks);
+			butt.render(mouseX, mouseY, partialTicks);
 		}
 		
 		if (drawList) {
@@ -178,7 +178,7 @@ public class ObeliskScreen extends Screen {
 		this.font.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
 		
 		for (DestinationButton butt : listButtons) {
-			butt.renderButton(mouseX, mouseY, partialTicks);
+			butt.render(mouseX, mouseY, partialTicks);
 		}
 		
 	}

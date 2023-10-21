@@ -300,9 +300,9 @@ public class NostrumResearch {
 		
 		public Builder reference(Item item) {
 			if (item instanceof InfoScreenIndexed) {
-				return this.reference((InfoScreenIndexed) item, item.getTranslationKey() + ".name");
+				return this.reference((InfoScreenIndexed) item, item.getTranslationKey());
 			} else if (item instanceof ILoreTagged) {
-				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getTranslationKey() + ".name");
+				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getTranslationKey());
 			} else {
 				NostrumMagica.logger.error("Provided item reference does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference");
 				return this;

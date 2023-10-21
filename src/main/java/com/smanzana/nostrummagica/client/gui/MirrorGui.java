@@ -281,7 +281,7 @@ public class MirrorGui extends Screen {
 		float inv = .2f - extra;
 		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		blit(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -291,7 +291,7 @@ public class MirrorGui extends Screen {
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof QuestButton)
-				button.renderButton(mouseX, mouseY, partialTicks);
+				button.render(mouseX, mouseY, partialTicks);
 		}
 	}
 	
@@ -305,7 +305,7 @@ public class MirrorGui extends Screen {
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.disableLighting();
-		blit(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		// DRAW STATS
 		int y = 2;
@@ -366,9 +366,9 @@ public class MirrorGui extends Screen {
 		this.font.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		buttonControl.renderButton(mouseX, mouseY, partialTicks);
-		buttonTechnique.renderButton(mouseX, mouseY, partialTicks);
-		buttonFinesse.renderButton(mouseX, mouseY, partialTicks);
+		buttonControl.render(mouseX, mouseY, partialTicks);
+		buttonTechnique.render(mouseX, mouseY, partialTicks);
+		buttonFinesse.render(mouseX, mouseY, partialTicks);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		int mana = attr.getMana();
@@ -415,12 +415,12 @@ public class MirrorGui extends Screen {
 		float inv = .2f - extra;
 		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		blit(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton)
-				button.renderButton(mouseX, mouseY, partialTicks);
+				button.render(mouseX, mouseY, partialTicks);
 		}
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -438,12 +438,12 @@ public class MirrorGui extends Screen {
 		GlStateManager.disableBlend();
     	GlStateManager.enableAlphaTest();
 		GlStateManager.disableLighting();
-		blit(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchTabButton) {
-				button.renderButton(mouseX, mouseY, partialTicks);
+				button.render(mouseX, mouseY, partialTicks);
 			}
 		}
 		
@@ -483,7 +483,7 @@ public class MirrorGui extends Screen {
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLOUD);
-		blit(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		int y = 0;
 		String str = "Magic Not Yet Unlocked";
@@ -505,7 +505,7 @@ public class MirrorGui extends Screen {
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.disableLighting();
-		blit(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		// DRAW ICONS
@@ -633,8 +633,8 @@ public class MirrorGui extends Screen {
 		
 		if (unlocked) {
 			// Draw major tab buttons
-			tabCharacter.renderButton(mouseX, mouseY, partialTicks);
-			tabResearch.renderButton(mouseX, mouseY, partialTicks);
+			tabCharacter.render(mouseX, mouseY, partialTicks);
+			tabResearch.render(mouseX, mouseY, partialTicks);
 			if (MirrorGui.currentInfoScreen == null) {
 				tabCharacter.drawOverlay(mc, mouseX, mouseY);
 				tabResearch.drawOverlay(mc, mouseX, mouseY);
@@ -773,6 +773,7 @@ public class MirrorGui extends Screen {
 //			button.visible = false;
 //		}
 		this.buttons.clear();
+		this.children.clear();
 		questButtons.clear();
 		researchButtons.clear();
 		
@@ -886,7 +887,7 @@ public class MirrorGui extends Screen {
 				ResearchTabButton button = tabButtons.get(tab);
 				button.x = x;
 				button.y = topOffset + TEXT_BOTTOM_VOFFSET - 1;
-				this.buttons.add(button);
+				addButton(button);
 				x += TEXT_ICON_MINORBUTTON_WIDTH;
 			}
 		}
@@ -963,7 +964,7 @@ public class MirrorGui extends Screen {
 		private List<String> tooltip;
 		
 		public MajorTabButton(MirrorGui gui, String name, ItemStack icon, int parPosX, int parPosY) {
-			super(BUTTON_MAJOR_WIDTH, BUTTON_MAJOR_HEIGHT, parPosX, parPosY, "", (b) -> {
+			super(parPosX, parPosY, BUTTON_MAJOR_WIDTH, BUTTON_MAJOR_HEIGHT, "", (b) -> {
 				gui.onButtonMajorTab(b);
 			});
 			this.icon = icon;
@@ -988,7 +989,7 @@ public class MirrorGui extends Screen {
             	GlStateManager.enableAlphaTest();
             	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                blit(x, y, textureX, textureY,
+                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
         				TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
@@ -1013,7 +1014,7 @@ public class MirrorGui extends Screen {
     static class ImproveButton extends Button {
 		
 		public ImproveButton(MirrorGui gui, int parPosX, int parPosY) {
-			super(12, 12, parPosX, parPosY, "", (b) -> {
+			super(parPosX, parPosY, 12, 12,"", (b) -> {
 				gui.onImproveControl(b);
 			});
 		}
@@ -1032,7 +1033,7 @@ public class MirrorGui extends Screen {
                 
             	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
-                blit(x, y, textureX, textureY,
+                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
         				TEXT_ICON_BUTTON_LENGTH, TEXT_ICON_BUTTON_LENGTH, this.width, this.height, 256, 256);
             }
         }
@@ -1048,7 +1049,7 @@ public class MirrorGui extends Screen {
     private static abstract class GuiObscuredButton extends Button {
 
 		public GuiObscuredButton(int x, int y, int widthIn, int heightIn, String buttonText, Button.IPressable action) {
-			super(widthIn, heightIn, x, y, buttonText, action);
+			super(x, y, widthIn, heightIn, buttonText, action);
 		}
 		
 		// Check if can click
@@ -1084,7 +1085,7 @@ public class MirrorGui extends Screen {
 		
 		public QuestButton(MirrorGui gui, int parPosX, int parPosY,
 				NostrumQuest quest, QuestState state) {
-			super(BUTTON_QUEST_WIDTH, BUTTON_QUEST_HEIGHT, parPosX, parPosY, "", (b) -> {
+			super(parPosX, parPosY, BUTTON_QUEST_WIDTH, BUTTON_QUEST_HEIGHT, "", (b) -> {
 				gui.onButtonQuest(b);
 			});
 			this.quest = quest;
@@ -1180,7 +1181,7 @@ public class MirrorGui extends Screen {
             	GlStateManager.disableLighting();
             	GlStateManager.disableBlend();
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                blit(x, y, textureX, textureY,
+                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
                 		TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256);
                 
                 if (icon != null) {
@@ -1188,7 +1189,7 @@ public class MirrorGui extends Screen {
                 } else {
                 	GlStateManager.enableBlend();
                 	GlStateManager.color4f(1f, 1f, 1f, .8f);
-                	blit(x + 4, y + 5, iconOffset, TEXT_ICON_BUTTON_VOFFSET,
+                	RenderFuncs.drawScaledCustomSizeModalRect(x + 4, y + 5, iconOffset, TEXT_ICON_BUTTON_VOFFSET,
                 		TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256);
                 }
             }
@@ -1337,7 +1338,7 @@ public class MirrorGui extends Screen {
 		private List<String> tooltip;
 		
 		public ResearchTabButton(MirrorGui gui, NostrumResearchTab tab, int parPosX, int parPosY) {
-			super(BUTTON_MINOR_WIDTH, BUTTON_MINOR_HEIGHT, parPosX, parPosY, "", (b) -> {
+			super(parPosX, parPosY, BUTTON_MINOR_WIDTH, BUTTON_MINOR_HEIGHT, "", (b) -> {
 				gui.onButtonResearchTab(b);
 			});
 			this.tab = tab;
@@ -1364,7 +1365,7 @@ public class MirrorGui extends Screen {
             	RenderHelper.disableStandardItemLighting();
             	GlStateManager.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                blit(x, y, textureX, textureY,
+                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
                 		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
@@ -1380,7 +1381,7 @@ public class MirrorGui extends Screen {
                 	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 	RenderHelper.disableStandardItemLighting();
                     mc.getTextureManager().bindTexture(RES_ICONS);
-                    blit(x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_VOFFSET,
+                    RenderFuncs.drawScaledCustomSizeModalRect(x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_VOFFSET,
                     		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 }
             }
@@ -1414,7 +1415,7 @@ public class MirrorGui extends Screen {
 		
 		public ResearchButton(MirrorGui gui, int parPosX, int parPosY,
 				NostrumResearch research, ResearchState state) {
-			super(WidthForSize(research.getSize()), HeightForSize(research.getSize()), parPosX, parPosY, "", (b) -> {
+			super(parPosX, parPosY, WidthForSize(research.getSize()), HeightForSize(research.getSize()), "", (b) -> {
 				gui.onButtonResearch(b);
 			});
 			this.research = research;
@@ -1574,7 +1575,7 @@ public class MirrorGui extends Screen {
             GlStateManager.enableBlend();
             GlStateManager.color4f(1f, 1f, 1f, alpha);
             mc.getTextureManager().bindTexture(RES_ICONS);
-            blit(-(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET, TEXT_ICON_ARROW_VOFFSET,
+            RenderFuncs.drawScaledCustomSizeModalRect(-(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET, TEXT_ICON_ARROW_VOFFSET,
             		TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256);
             GlStateManager.enableDepthTest();
 			GlStateManager.popMatrix();
@@ -1650,7 +1651,7 @@ public class MirrorGui extends Screen {
                 GlStateManager.enableBlend();
                 GlStateManager.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                blit(x, y, textureX, textureY,
+                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
                 		textureW, textureH, this.width, this.height, 256, 256);
                 
                 // Now draw icon
