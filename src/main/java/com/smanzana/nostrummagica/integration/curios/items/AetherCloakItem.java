@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -155,6 +156,8 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 	private static final String NBT_DISPLAY_COLOR_INSIDE = "color_inside";
 	private static final String NBT_DISPLAY_RUNES = "display_runes";
 	private static final String NBT_DISPLAY_COLOR_RUNES = "color_runes";
+	
+	private static final UUID MANA_MOD_ID = UUID.fromString("31125EE0-CF1F-493D-9AAD-CBC923841E26");
 	
 	private static final int MAX_AETHER_MIN = 5000;
 	private static final int MAX_AETHER_MAX = 100000;
@@ -360,7 +363,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			return;
 		}
 		
-		attr.addManaRegenModifier(0.25f);
+		attr.addManaRegenModifier(MANA_MOD_ID, 0.25f);
 	}
 	
 	/**
@@ -373,7 +376,7 @@ public class AetherCloakItem extends AetherItem implements INostrumCurio, ILoreT
 			return;
 		}
 		
-		attr.addManaRegenModifier(-.25f);
+		attr.removeManaRegenModifier(MANA_MOD_ID);
 	}
 
 	/**

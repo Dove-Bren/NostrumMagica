@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.capabilities;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -65,10 +66,15 @@ public interface INostrumMagic {
 	public int getManaBonus(); // flat int bonus
 	public float getManaRegenModifier();
 	public float getManaCostModifier();
-	public void addManaModifier(float modifier);
-	public void addManaRegenModifier(float modifier);
-	public void addManaCostModifer(float modifier);
-	public void addManaBonus(int bonus);
+	
+	public void addManaModifier(UUID id, float modifier);
+	public void addManaRegenModifier(UUID id, float modifier);
+	public void addManaCostModifier(UUID id, float modifier);
+	public void addManaBonus(UUID id, int bonus);
+	public void removeManaModifier(UUID id);
+	public void removeManaRegenModifier(UUID id);
+	public void removeManaCostModifier(UUID id);
+	public void removeManaBonus(UUID id);
 	
 	// Familiars
 	public List<LivingEntity> getFamiliars();
@@ -129,11 +135,7 @@ public interface INostrumMagic {
 			int tech,
 			int finesse,
 			int mana,
-			int reserved_mana,
-			float mod_mana,
-			int bonus_mana,
-			float mod_mana_cost,
-			float mod_mana_regen
+			int reserved_mana
 			);
 	
 	public Map<String, Integer> serializeLoreLevels();
@@ -142,8 +144,17 @@ public interface INostrumMagic {
 	public Map<EMagicElement, Integer> serializeElementMastery();
 	public Map<EMagicElement, Boolean> serializeElementTrials();
 	public Map<EAlteration, Boolean> serializeAlterations();
+	public Map<UUID, Float> getManaModifiers();
+	public Map<UUID, Integer> getManaBonusModifiers();
+	public Map<UUID, Float> getManaCostModifiers();
+	public Map<UUID, Float> getManaRegenModifiers();
 	public void deserializeLore(String key, Integer level);
 	public void deserializeSpells(String crc);
+	public void setModifierMaps(Map<UUID, Float> modifiers_mana,
+			Map<UUID, Integer> modifiers_bonus_mana,
+			Map<UUID, Float> modifiers_cost,
+			Map<UUID, Float> modifiers_regen);
+	
 	// Copy fields out of
 	public void copy(INostrumMagic cap);
 	public void provideEntity(LivingEntity entity);

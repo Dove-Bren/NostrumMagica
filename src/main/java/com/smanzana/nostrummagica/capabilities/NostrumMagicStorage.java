@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.capabilities;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
@@ -14,8 +15,8 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
@@ -43,6 +44,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_MOD_MANA_COST = "mod_mana_cost";
 	private static final String NBT_MOD_MANA_REGEN = "mod_mana_regen";
 	private static final String NBT_MOD_MANA_BONUS = "mod_mana_bonus";
+	private static final String NBT_MOD_INTERNAL_ID = "id";
+	private static final String NBT_MOD_INTERNAL_VALUE = "value";
 	
 	//private static final String NBT_FAMILIARS = "familiars";
 	
@@ -89,10 +92,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.putInt(NBT_FINESSE, instance.getFinesse());
 		nbt.putInt(NBT_MANA, instance.getMana());
 		nbt.putInt(NBT_RESERVED_MANA, instance.getReservedMana());
-		nbt.putFloat(NBT_MOD_MANA, instance.getManaModifier());
-		nbt.putFloat(NBT_MOD_MANA_COST, instance.getManaCostModifier());
-		nbt.putFloat(NBT_MOD_MANA_REGEN, instance.getManaRegenModifier());
-		nbt.putInt(NBT_MOD_MANA_BONUS, instance.getManaBonus());
 		
 		CompoundNBT compound = new CompoundNBT();
 		{
@@ -135,6 +134,62 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			}
 		}
 		nbt.put(NBT_ELEMENT_TRIALS, compound);
+		
+		list = new ListNBT();
+		{
+			Map<UUID, Float> map = instance.getManaModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundNBT();
+				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA, list);
+		
+		list = new ListNBT();
+		{
+			Map<UUID, Float> map = instance.getManaCostModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundNBT();
+				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA_COST, list);
+		
+		list = new ListNBT();
+		{
+			Map<UUID, Float> map = instance.getManaRegenModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundNBT();
+				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA_REGEN, list);
+		
+		list = new ListNBT();
+		{
+			Map<UUID, Integer> map = instance.getManaBonusModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundNBT();
+				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putInt(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA_BONUS, list);
 		
 		list = new ListNBT();
 		for (SpellShape shape : instance.getShapes()) {
@@ -257,11 +312,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInt(NBT_TECH),
 			tag.getInt(NBT_FINESSE),
 			tag.getInt(NBT_MANA),
-			tag.getInt(NBT_RESERVED_MANA),
-			tag.getFloat(NBT_MOD_MANA),
-			tag.getInt(NBT_MOD_MANA_BONUS),
-			tag.getFloat(NBT_MOD_MANA_COST),
-			tag.getFloat(NBT_MOD_MANA_REGEN));
+			tag.getInt(NBT_RESERVED_MANA)
+			);
 			
 		// LORE
 		CompoundNBT compound = tag.getCompound(NBT_LORELEVELS);
@@ -441,6 +493,66 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 					dim,
 					BlockPos.fromLong(tag.getLong(NBT_SORCERYPORTAL_POS)));
 		}
+		
+		// Modifiers
+		Map<UUID, Float> modMana = new HashMap<>();
+		Map<UUID, Integer> modManaFlat = new HashMap<>();
+		Map<UUID, Float> modManaCost = new HashMap<>();
+		Map<UUID, Float> modManaRegen = new HashMap<>();
+		
+		if (tag.contains(NBT_MOD_MANA, NBT.TAG_LIST)) {
+			ListNBT tagList = tag.getList(NBT_MOD_MANA, NBT.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundNBT subtag = tagList.getCompound(i);
+				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modMana.put(id, val);
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_MOD_MANA_BONUS, NBT.TAG_LIST)) {
+			ListNBT tagList = tag.getList(NBT_MOD_MANA_BONUS, NBT.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundNBT subtag = tagList.getCompound(i);
+				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				int val = subtag.getInt(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modManaFlat.put(id, val);
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_MOD_MANA_COST, NBT.TAG_LIST)) {
+			ListNBT tagList = tag.getList(NBT_MOD_MANA_COST, NBT.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundNBT subtag = tagList.getCompound(i);
+				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modManaCost.put(id, val);
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_MOD_MANA_REGEN, NBT.TAG_LIST)) {
+			ListNBT tagList = tag.getList(NBT_MOD_MANA_REGEN, NBT.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundNBT subtag = tagList.getCompound(i);
+				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modManaRegen.put(id, val);
+				}
+			}
+		}
+		
+		instance.setModifierMaps(modMana, modManaFlat, modManaCost, modManaRegen);
 	}
 
 }

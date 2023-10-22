@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.curios.items.INostrumCurio;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -19,7 +19,6 @@ import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -92,10 +91,10 @@ public class NostrumMagic implements INostrumMagic {
 	private int mana;
 	//private int maxMana; // We calculate max instead of storing it
 	private int reservedMana; // Mana deducted from max cause it's being actively used for an ongoing effect
-	private float modMana; // Additional % mana
-	private int modManaFlat; // Additiona mana (flat int value)
-	private float modManaCost;
-	private float modManaRegen;
+	private Map<UUID, Float> modMana; // Additional % mana
+	private Map<UUID, Integer> modManaFlat; // Additiona mana (flat int value)
+	private Map<UUID, Float> modManaCost;
+	private Map<UUID, Float> modManaRegen;
 	
 	private int baseMaxMana; // Max mana without mana bonuses
 	
@@ -146,6 +145,11 @@ public class NostrumMagic implements INostrumMagic {
 		sorceryPortalDim = DimensionType.OVERWORLD;
 		sorceryPortalPos = null;
 		enhancedTeleport = false;
+		
+		modMana = new HashMap<>();
+		modManaFlat = new HashMap<>();
+		modManaCost = new HashMap<>();
+		modManaRegen = new HashMap<>();
 	}
 
 	@Override
@@ -574,7 +578,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int researchpoints, int control, int tech, int finesse,
-			int mana, int reservedMana, float modMana, int manaBonus, float modManaCost, float modManaRegen) {
+			int mana, int reservedMana) {
 		this.unlocked = unlocked;
 		this.level = level;
 		this.xp = xp;
@@ -587,10 +591,10 @@ public class NostrumMagic implements INostrumMagic {
 		this.mana = mana;
 		this.reservedMana = reservedMana;
 		this.baseMaxMana = LevelCurves.maxMana(this.level);
-		this.modMana = modMana;
-		this.modManaCost = modManaCost;
-		this.modManaRegen = modManaRegen;
-		this.modManaFlat = manaBonus;
+		this.modMana = new HashMap<>();
+		this.modManaCost = new HashMap<>();
+		this.modManaRegen = new HashMap<>();
+		this.modManaFlat = new HashMap<>();
 	}
 
 	@Override
@@ -632,14 +636,23 @@ public class NostrumMagic implements INostrumMagic {
 	public void deserializeSpells(String crc) {
 		this.spellCRCs.add(crc);
 	}
+	
+	@Override
+	public void setModifierMaps(Map<UUID, Float> modifiers_mana, Map<UUID, Integer> modifiers_bonus_mana,
+			Map<UUID, Float> modifiers_cost, Map<UUID, Float> modifiers_regen) {
+		this.modMana = modifiers_mana;
+		this.modManaFlat = modifiers_bonus_mana;
+		this.modManaCost = modifiers_cost;
+		this.modManaRegen = modifiers_regen;
+	}
 
 	@Override
 	public void copy(INostrumMagic cap) {
 		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
 		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getResearchPoints(),
-				cap.getControl(), cap.getTech(), cap.getFinesse(), cap.getMana(), cap.getReservedMana(),
-				cap.getManaModifier(), cap.getManaBonus(), cap.getManaCostModifier(), cap.getManaRegenModifier());
+				cap.getControl(), cap.getTech(), cap.getFinesse(), cap.getMana(), cap.getReservedMana()
+				);
 		
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
@@ -660,6 +673,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.bindingComponent = cap.getBindingComponent();
 		this.spellKnowledge = cap.getSpellKnowledge();
 		this.enhancedTeleport = cap.hasEnhancedTeleport();
+		this.setModifierMaps(cap.getManaModifiers(), cap.getManaBonusModifiers(), cap.getManaCostModifiers(), cap.getManaRegenModifiers());
 	}
 	
 	@Override
@@ -684,43 +698,51 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void addManaModifier(float modifier) {
-		this.modMana += modifier;
-	}
-	
-	@Override
-	public void addManaBonus(int mana) {
-		this.modManaFlat += mana;
-	}
-
-	@Override
-	public void addManaRegenModifier(float modifier) {
-		this.modManaRegen += modifier;
-	}
-
-	@Override
-	public void addManaCostModifer(float modifier) {
-		this.modManaCost += modifier;
-	}
-
-	@Override
 	public float getManaModifier() {
-		return this.modMana;
+		float sum = 0f;
+		for (Float mod : this.modMana.values()) {
+			if (mod == null) {
+				continue;
+			}
+			sum += mod;
+		}
+		return sum;
 	}
 	
 	@Override
 	public int getManaBonus() {
-		return this.modManaFlat;
+		int sum = 0;
+		for (Integer mod : this.modManaFlat.values()) {
+			if (mod == null) {
+				continue;
+			}
+			sum += mod;
+		}
+		return sum;
 	}
 
 	@Override
 	public float getManaRegenModifier() {
-		return this.modManaRegen;
+		float sum = 0f;
+		for (Float mod : this.modManaRegen.values()) {
+			if (mod == null) {
+				continue;
+			}
+			sum += mod;
+		}
+		return sum;
 	}
 
 	@Override
 	public float getManaCostModifier() {
-		return this.modManaCost;
+		float sum = 0f;
+		for (Float mod : this.modManaCost.values()) {
+			if (mod == null) {
+				continue;
+			}
+			sum += mod;
+		}
+		return sum;
 	}
 
 	@Override
@@ -953,33 +975,99 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void refresh(ServerPlayerEntity player) {
-		if (NostrumMagica.instance.curios.isEnabled()) {
-			NostrumMagica.instance.curios.forEachCurio(player, (stack) -> {
-				if (stack.getItem() instanceof INostrumCurio) {
-					((INostrumCurio) stack.getItem()).onUnequipped(stack, player);
-				}
-				return false;
-			});
-		}
-		
-		this.modMana = 0;
-		this.modManaCost = 0;
-		this.modManaFlat = 0;
-		this.modManaRegen = 0;
-		
-		// Reapply quests
-		for (String string : this.completedQuests) {
-			NostrumQuest quest = NostrumQuest.lookup(string);
-			quest.grantReward(player);
-		}
-		
-		if (NostrumMagica.instance.curios.isEnabled()) {
-			NostrumMagica.instance.curios.forEachCurio(player, (stack) -> {
-				if (stack.getItem() instanceof INostrumCurio) {
-					((INostrumCurio) stack.getItem()).onEquipped(stack, player);
-				}
-				return false;
-			});
-		}
+//		// Capture current mana to avoid having to always regen bonus
+//		final int startingMana = this.getMana();
+//		
+//		
+//		if (NostrumMagica.instance.curios.isEnabled()) {
+//			NostrumMagica.instance.curios.forEachCurio(player, (stack) -> {
+//				if (stack.getItem() instanceof INostrumCurio) {
+//					((INostrumCurio) stack.getItem()).onUnequipped(stack, player);
+//				}
+//				return false;
+//			});
+//		}
+//		
+//		this.modMana = 0;
+//		this.modManaCost = 0;
+//		this.modManaFlat = 0;
+//		this.modManaRegen = 0;
+//		
+//		// Reapply quests
+//		for (String string : this.completedQuests) {
+//			NostrumQuest quest = NostrumQuest.lookup(string);
+//			quest.grantReward(player);
+//		}
+//		
+//		if (NostrumMagica.instance.curios.isEnabled()) {
+//			NostrumMagica.instance.curios.forEachCurio(player, (stack) -> {
+//				if (stack.getItem() instanceof INostrumCurio) {
+//					((INostrumCurio) stack.getItem()).onEquipped(stack, player);
+//				}
+//				return false;
+//			});
+//		}
+//		
+//		this.setMana(startingMana); // Will get clamped
+	}
+
+	@Override
+	public void addManaModifier(UUID id, float modifier) {
+		modMana.put(id, modifier);
+	}
+
+	@Override
+	public void addManaRegenModifier(UUID id, float modifier) {
+		modManaRegen.put(id, modifier);
+	}
+
+	@Override
+	public void addManaCostModifier(UUID id, float modifier) {
+		modManaCost.put(id, modifier);
+	}
+
+	@Override
+	public void addManaBonus(UUID id, int bonus) {
+		modManaFlat.put(id, bonus);
+	}
+
+	@Override
+	public void removeManaModifier(UUID id) {
+		modMana.remove(id);
+	}
+
+	@Override
+	public void removeManaRegenModifier(UUID id) {
+		modManaRegen.remove(id);
+	}
+
+	@Override
+	public void removeManaCostModifier(UUID id) {
+		modManaCost.remove(id);
+	}
+
+	@Override
+	public void removeManaBonus(UUID id) {
+		modManaFlat.remove(id);
+	}
+
+	@Override
+	public Map<UUID, Float> getManaModifiers() {
+		return this.modMana;
+	}
+
+	@Override
+	public Map<UUID, Integer> getManaBonusModifiers() {
+		return this.modManaFlat;
+	}
+
+	@Override
+	public Map<UUID, Float> getManaCostModifiers() {
+		return this.modManaCost;
+	}
+
+	@Override
+	public Map<UUID, Float> getManaRegenModifiers() {
+		return this.modManaRegen;
 	}
 }

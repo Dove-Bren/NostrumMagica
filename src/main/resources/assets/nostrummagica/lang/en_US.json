@@ -792,10 +792,10 @@
     "gambit.frequent.name": "Frequently",
     "gambit.frequent.desc": "Dragon will only attempt to cast once %1$severy 20 seconds%2$s",
 
-    "element": "Element",
-    "shape": "Shape",
-    "trigger": "Trigger",
-    "alteration": "Alteration",
+    "element.name": "Element",
+    "shape.name": "Shape",
+    "trigger.name": "Trigger",
+    "alteration.name": "Alteration",
 
     "level.name": "Level",
     "level.desc": "Your current level|As you increase your level, you gain more mana as well as ability points you can invest in Technique, Finesse, or Control. These together allow you to cast more powerful spells.",

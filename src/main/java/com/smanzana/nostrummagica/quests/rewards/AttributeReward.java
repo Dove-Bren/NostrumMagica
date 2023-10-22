@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.quests.rewards;
 
+import java.util.UUID;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
@@ -28,15 +30,18 @@ public class AttributeReward implements IReward {
 		if (attr == null)
 			return;
 		
+		// Hacky. We never expect to undo and redo these anymore.
+		UUID id = UUID.randomUUID();
+		
 		switch (type) {
 		case COST:
-			attr.addManaCostModifer(modifier);
+			attr.addManaCostModifier(id, modifier);
 			break;
 		case MANA:
-			attr.addManaModifier(modifier);
+			attr.addManaModifier(id, modifier);
 			break;
 		case REGEN:
-			attr.addManaRegenModifier(modifier);
+			attr.addManaRegenModifier(id, modifier);
 			break;
 		}
 	}

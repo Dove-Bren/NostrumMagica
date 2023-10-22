@@ -1,8 +1,11 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.Validate;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -12,12 +15,15 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -51,6 +57,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	private float manaRegenModifier;
 	private float manaCostModifier;
 	private float castEfficiency;
+	private UUID attribID;
 	
 	private final String desckey;
 	
@@ -63,25 +70,29 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		this.requiresMagic = true;
 		return this;
 	}
-
+	
+	public NostrumCurio attrID(UUID id) {
+		this.attribID = id;
+		return this;
+	}
 
 	public NostrumCurio manaBonus(int manaBonus) {
+		Validate.notNull(this.attribID);
 		this.manaBonus = manaBonus;
 		return this;
 	}
 
-
 	public NostrumCurio manaRegenModifier(float manaRegenModifier) {
+		Validate.notNull(this.attribID);
 		this.manaRegenModifier = manaRegenModifier;
 		return this;
 	}
 
-
 	public NostrumCurio manaCostModifier(float manaCostModifier) {
+		Validate.notNull(this.attribID);
 		this.manaCostModifier = manaCostModifier;
 		return this;
 	}
-
 
 	public NostrumCurio castEfficiency(float castEfficiency) {
 		this.castEfficiency = castEfficiency;
@@ -156,9 +167,14 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 			return;
 		}
 		
-		attr.addManaBonus(this.manaBonus);
-		attr.addManaRegenModifier(this.manaRegenModifier);
-		attr.addManaCostModifer(this.manaCostModifier);
+		if (this.manaBonus != 0) attr.addManaBonus(this.attribID, this.manaBonus);
+		if (this.manaRegenModifier != 0) attr.addManaRegenModifier(this.attribID, this.manaRegenModifier);
+		if (this.manaCostModifier != 0) attr.addManaCostModifier(this.attribID, this.manaCostModifier);
+		
+		if (entity instanceof ServerPlayerEntity) {
+			NetworkHandler.sendTo(
+					new StatSyncMessage(attr), (ServerPlayerEntity) entity);
+		}
 		
 	}
 
@@ -169,9 +185,14 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 			return;
 		}
 		
-		attr.addManaBonus(-this.manaBonus);
-		attr.addManaRegenModifier(-this.manaRegenModifier);
-		attr.addManaCostModifer(-this.manaCostModifier);
+		attr.removeManaBonus(this.attribID);
+		attr.removeManaRegenModifier(this.attribID);
+		attr.removeManaCostModifier(this.attribID);
+		
+		if (entity instanceof ServerPlayerEntity) {
+			NetworkHandler.sendTo(
+					new StatSyncMessage(attr), (ServerPlayerEntity) entity);
+		}
 	}
 
 	@Override
