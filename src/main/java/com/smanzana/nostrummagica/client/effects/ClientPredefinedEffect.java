@@ -31,7 +31,7 @@ public class ClientPredefinedEffect {
 		switch (type) {
 		case SOUL_DAGGER_STAB:
 			effect = new ClientEffectMirrored(offset,
-					new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-8f/24f), (8f/24f), (-12f/24f)),
+					new ClientEffectFormFlat(ClientEffectIcon.ARROW_SLASH, (-8f/24f), (8f/24f), (-12f/24f)),
 					duration, 5);
 			
 			final float scale;

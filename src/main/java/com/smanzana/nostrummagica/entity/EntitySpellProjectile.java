@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.DamagingProjectileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
@@ -26,7 +26,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-public class EntitySpellProjectile extends FireballEntity {
+public class EntitySpellProjectile extends DamagingProjectileEntity {
 	
 	public static final String ID = "spell_projectile";
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, MagicElementDataSerializer.instance);
@@ -56,7 +56,7 @@ public class EntitySpellProjectile extends FireballEntity {
 			World world,
 			double fromX, double fromY, double fromZ, Vec3d direction,
 			float speedFactor, double maxDistance) {
-		super(world, fromX, fromY, fromZ, 0, 0, 0);
+		super(NostrumEntityTypes.spellProjectile, fromX, fromY, fromZ, 0, 0, 0, world);
 		Vec3d accel = getAccel(direction, speedFactor);
 		this.accelerationX = accel.x;
 		this.accelerationY = accel.y;

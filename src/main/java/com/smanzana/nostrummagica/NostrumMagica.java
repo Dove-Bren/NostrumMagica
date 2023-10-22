@@ -165,6 +165,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -2654,7 +2655,8 @@ public class NostrumMagica {
 			throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
 		}
 
-		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getSavedData()
+		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getServer().getWorld(DimensionType.OVERWORLD)
+				.getSavedData()
 				.getOrCreate(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
 
 		// TODO I think this is automatic now?
@@ -2668,7 +2670,7 @@ public class NostrumMagica {
 	}
 
 	private void initSpellRegistry(World world) {
-		spellRegistry = (SpellRegistry) ((ServerWorld) world).getSavedData().getOrCreate(SpellRegistry::new,
+		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(SpellRegistry::new,
 				SpellRegistry.DATA_NAME);
 
 		// TODO I think this is automatic now?
@@ -2679,7 +2681,7 @@ public class NostrumMagica {
 	}
 
 	private void initPetSoulRegistry(World world) {
-		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getSavedData().getOrCreate(PetSoulRegistry::new,
+		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(PetSoulRegistry::new,
 				PetSoulRegistry.DATA_NAME);
 
 		// TODO I think this is automatic now?
@@ -2690,7 +2692,7 @@ public class NostrumMagica {
 	}
 
 	private void initPetCommandManager(World world) {
-		petCommandManager = (PetCommandManager) ((ServerWorld) world).getSavedData().getOrCreate(PetCommandManager::new,
+		petCommandManager = (PetCommandManager) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(PetCommandManager::new,
 				PetCommandManager.DATA_NAME);
 
 		// TODO I think this is automatic now?

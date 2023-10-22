@@ -674,6 +674,71 @@ public final class RenderFuncs {
 //		GlStateManager.enableTexture2D();
 //    }
 	
+	public static final void renderSpaceQuad(BufferBuilder buffer, double relX, double relY, double relZ,
+			double radius,
+			float red, float green, float blue, float alpha) {
+		// Billboard no rot
+		buffer.pos(relX - radius, relY - radius, relZ)
+			.tex(0, 0)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		buffer.pos(relX - radius, relY + radius, relZ)
+			.tex(0, 1)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		buffer.pos(relX + radius, relY + radius, relZ)
+			.tex(1, 1)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		buffer.pos(relX + radius, relY - radius, relZ)
+			.tex(1, 0)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+	}
+	
+	public static final void renderSpaceQuad(BufferBuilder buffer, double relX, double relY, double relZ,
+			double rX, double rXZ, double rZ, double rYZ, double rXY,
+			double radius,
+			float red, float green, float blue, float alpha
+			) {
+		
+		buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
+			.tex(0, 0)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
+			.tex(0, 1)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
+			.tex(1, 1)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
+			.tex(1, 0)
+			.color(red, green, blue, alpha)
+			.normal(0, 0, 1).endVertex();
+		
+		{
+			buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
+				.tex(0, 0)
+				.color(red, green, blue, alpha)
+				.normal(0, 0, -1).endVertex();
+			buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
+				.tex(0, 1)
+				.color(red, green, blue, alpha)
+				.normal(0, 0, -1).endVertex();
+			buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
+				.tex(1, 1)
+				.color(red, green, blue, alpha)
+				.normal(0, 0, -1).endVertex();
+			buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
+				.tex(1, 0)
+				.color(red, green, blue, alpha)
+				.normal(0, 0, -1).endVertex();
+		}
+	}
+	
 	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
 		return MathHelper.func_219805_h(partialTicks, prevYawOffset, yawOffset);
 	}

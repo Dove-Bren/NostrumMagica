@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
 import com.smanzana.nostrummagica.client.effects.ClientEffectEchoed;
 import com.smanzana.nostrummagica.client.effects.ClientEffectFormBasic;
+import com.smanzana.nostrummagica.client.effects.ClientEffectFormFlat;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
 import com.smanzana.nostrummagica.client.effects.ClientEffectMajorSphere;
 import com.smanzana.nostrummagica.client.effects.ClientEffectMirrored;
@@ -171,7 +172,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -717,11 +717,14 @@ public class ClientProxy extends CommonProxy {
 		
 		// Register models that don't have an item/block associate with them
 		
-		// Wish i could do this, but this doesn't use different kind of loaders and only works for json.
+		// I want to do this, but
+		// 1) it only uses the JSON loaders, and
+		// 2) it puts things in the registry with the original ResourceLocation, even though
+		// there is no accessor that takes it.
 //		for (ClientEffectIcon icon: ClientEffectIcon.values()) {
-//			ModelLoader.addSpecialModel(new ResourceLocation(
-//					NostrumMagica.MODID, "effect/" + icon.getModelKey()
-//					));
+//			ModelLoader.addSpecialModel(new ModelResourceLocation(new ResourceLocation(
+//					NostrumMagica.MODID, "effect/" + icon.getModelKey()), "")
+//					);
 //    	}
     	
 //		    	for (String key : new String[] {"orb_cloudy", "orb_scaled"}) {
@@ -1548,17 +1551,30 @@ public class ClientProxy extends CommonProxy {
 	public void onModelBake(ModelBakeEvent event) {
 		for (ClientEffectIcon icon : ClientEffectIcon.values()) {
 			if (!icon.getModelKey().endsWith(".obj")) {
-				continue;
-			}
-			
-			//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
-			final String modelLoc = "effect/" + icon.getKey();
-			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, modelLoc + ".obj"), "Failed to get obj model for " + modelLoc);
-			
-			if (model != null && model instanceof OBJModel) {
-				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, modelLoc)), bakedModel);
+				// json
+//				final String modelLoc = "effect/" + icon.getModelKey();
+//				IUnbakedModel model = event.getModelLoader().getUnbakedModel(new ResourceLocation(NostrumMagica.MODID, modelLoc));
+//				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, modelLoc), "Failed to get json model for " + modelLoc);
+//				
+//				HashSet<String> missingTextureErrors = new HashSet<>();
+//				
+//				if (model != null && model != ModelLoaderRegistry.getMissingModel()) {
+//					model.getTextures(event.getModelLoader()::getUnbakedModel, missingTextureErrors);
+//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, modelLoc)), bakedModel);
+//				} else {
+//					model.getClass();
+//				}
+			} else {
+				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
+				final String modelLoc = "effect/" + icon.getKey();
+				IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, modelLoc + ".obj"), "Failed to get obj model for " + modelLoc);
+				
+				if (model != null && model instanceof OBJModel) {
+					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+					// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, modelLoc)), bakedModel);
+				}
 			}
 		}
 		
@@ -1741,7 +1757,7 @@ public class ClientProxy extends CommonProxy {
 			renderer.registerEffect(new SpellComponentWrapper(element),
 					(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 						ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vec3d(0, 0, 0),
-								new ClientEffectFormBasic(ClientEffectIcon.TING1, 0, 0, 0),
+								new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 								500L, 5);
 						
 						if (target != null)
@@ -1803,7 +1819,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING3, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							500L, 6);
 					
 					if (target != null) {
@@ -1826,7 +1842,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(HealthTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
 					if (target != null)
@@ -1845,7 +1861,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(ManaTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
 					if (target != null)
@@ -1864,7 +1880,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(FoodTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
 					if (target != null)
@@ -1883,7 +1899,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(ProximityTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 1000L, 5);
 					
 					if (flavor != null && flavor.isElement()) {
@@ -1914,7 +1930,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.INFLICT),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.ARROWD, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 							3L * 500L, 6);
 					
 					if (flavor != null && flavor.isElement()) {
@@ -1938,7 +1954,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RESIST),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.ARROWU, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.ARROWU, 0, 0, 0),
 							3L * 500L, 6);
 					
 					if (flavor != null && flavor.isElement()) {
@@ -1963,7 +1979,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.getPositionVector() : targetPos, 
 							new ClientEffectMirrored(new Vec3d(0,0,0),
-							new ClientEffectFormBasic(ClientEffectIcon.TING3, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							2L * 1000L, 4), 2L * 1000L, 5, .2f);
 					
 					if (flavor != null && flavor.isElement()) {
@@ -1996,7 +2012,7 @@ public class ClientProxy extends CommonProxy {
 						isShield = true;
 					} else {
 						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-								new ClientEffectFormBasic(ClientEffectIcon.TING5, 0, 0, 0),
+								new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 								3L * 500L, 10);
 					}
 					
@@ -2028,7 +2044,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.ENCHANT),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).add(0, 1, 0),
-							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							3L * 500L, 6, new Vec3d(1, 0, 0));
 					
 					if (flavor != null && flavor.isElement()) {
@@ -2053,7 +2069,7 @@ public class ClientProxy extends CommonProxy {
 					// TODO physical breaks stuff. Lots of particles. Should we return null here?
 					
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							1L * 500L, 6);
 					
 					if (flavor != null && flavor.isElement()) {
@@ -2078,7 +2094,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.SUMMON),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
-							new ClientEffectFormBasic(ClientEffectIcon.TING1, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							1L * 500L, 6);
 					
 					if (flavor != null && flavor.isElement()) {
@@ -2105,7 +2121,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RUIN),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).add(0, 1, 0),
-							new ClientEffectFormBasic(ClientEffectIcon.TING4, 0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 500L, 6, new Vec3d(.5, .5, 0));
 					
 					if (flavor != null && flavor.isElement()) {

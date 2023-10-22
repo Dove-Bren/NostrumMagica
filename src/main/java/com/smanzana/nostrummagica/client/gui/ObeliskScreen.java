@@ -134,7 +134,7 @@ public class ObeliskScreen extends Screen {
 		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
-		double time = (float) ((double) System.currentTimeMillis() / 15000);
+		double time = (float) ((double) System.currentTimeMillis() / 15000.0);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
 		
 		RenderFuncs.drawScaledCustomSizeModalRect(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);

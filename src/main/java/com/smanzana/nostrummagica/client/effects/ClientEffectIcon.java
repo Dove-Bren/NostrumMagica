@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.effects;
 
 public enum ClientEffectIcon {
 
-	SHIELD("shield", false),
+	SHIELD("shield", true),
 	TING1("ting1", false),
 	TING2("ting2", false),
 	TING3("ting3", false),

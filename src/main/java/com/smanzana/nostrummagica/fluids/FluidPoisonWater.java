@@ -53,7 +53,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 				new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_still"), // same visually whether unbreakable or not
 				new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_flowing")
 				).overlay(new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_overlay"))
-				.color(0xAF1D452F)
+				.color(0xCF1D452F)
 			));
 		this.bUnbreakable = bUnbreakable;
 	}
@@ -124,7 +124,8 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	
 	@Override
 	public BlockState getBlockState(IFluidState state) {
-		return NostrumBlocks.poisonWaterBlock.getDefaultState().with(FlowingFluidBlock.LEVEL, Integer.valueOf(getLevelFromState(state)));
+		Block block = this.bUnbreakable ? NostrumBlocks.unbreakablePoisonWaterBlock : NostrumBlocks.poisonWaterBlock;
+		return block.getDefaultState().with(FlowingFluidBlock.LEVEL, Integer.valueOf(getLevelFromState(state)));
 	}
 	
 	@Override

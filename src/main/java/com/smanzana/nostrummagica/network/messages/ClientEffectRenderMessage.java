@@ -5,11 +5,13 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -23,15 +25,16 @@ public class ClientEffectRenderMessage {
 	public static void handle(ClientEffectRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().runAsync(() -> {
+			final World world = NostrumMagica.instance.proxy.getPlayer().world;
 			LivingEntity caster, target;
 			caster = target = null;
 			
 			if (message.caster != null) {
-				caster = NostrumMagica.instance.proxy.getPlayer().world.getPlayerByUuid(message.caster);
+				caster = world.getPlayerByUuid(message.caster);
 			}
 			
 			if (message.target != null) {
-				target = caster = NostrumMagica.instance.proxy.getPlayer().world.getPlayerByUuid(message.target);
+				target = Entities.FindLiving(world, message.target);
 			}
 			
 			if (message.component == null) {
