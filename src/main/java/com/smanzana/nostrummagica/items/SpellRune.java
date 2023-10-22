@@ -570,7 +570,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			}
 			int count = getNestedElementCount(stack);
 			if (count != 0) {
-				tooltip.add(new StringTextComponent("Power ").applyTextStyle(TextFormatting.DARK_GREEN));
+				tooltip.add(new StringTextComponent("Power " + count).applyTextStyle(TextFormatting.DARK_GREEN));
 			}
 			EAlteration alteration = getNestedAlteration(stack);
 			if (alteration != null) {

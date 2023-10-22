@@ -849,7 +849,7 @@ public class SpellCreationGui {
 	}
 	
 	private static boolean isValidChar(int codepoint) {
-		return Character.isAlphabetic(codepoint);
+		return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint);
 		
 //		// utility function for me <3
 //		return keyCode == 14 // backspace
