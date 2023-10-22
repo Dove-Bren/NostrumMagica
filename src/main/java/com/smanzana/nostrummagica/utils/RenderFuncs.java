@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.utils;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
@@ -118,19 +119,33 @@ public final class RenderFuncs {
 	private static final Random RenderModelRandom = new Random();
 	
 	public static void RenderModelWithColor(IBakedModel model, int color, BufferBuilder buffer, Vector3f offset, Matrix4f transform) {
-		RenderRandom(RenderModelRandom);
 		GlStateManager.pushMatrix();
 
 		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
-		// TODO provide blockstate?
-		for (Direction enumfacing : Direction.values()) {
-			renderQuads(model.getQuads((BlockState) null, enumfacing, RenderModelRandom, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
-					transform, 1f, color);
-		}
+//		// TODO provide blockstate?
+//		for (Direction enumfacing : Direction.values()) {
+//			renderQuads(model.getQuads((BlockState) null, enumfacing, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
+//					transform, 1f, color);
+//		}
+//		
+//		renderQuads(model.getQuads((BlockState) null, null, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
+//				transform, 1f, color);
 		
-		renderQuads(model.getQuads((BlockState) null, null, RenderModelRandom, EmptyModelData.INSTANCE), offset, new VertexBufferConsumer(buffer), buffer,
-				transform, 1f, color);
+		for(Direction side : Direction.values()) {
+			List<BakedQuad> quads = model.getQuads(null, side, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE);
+			if(!quads.isEmpty()) 
+				for(BakedQuad quad : quads) {
+					//buffer.addVertexData(quad.getVertexData());
+					LightUtil.renderQuadColor(buffer, quad, color);
+				}
+		}
+		List<BakedQuad> quads = model.getQuads(null, null, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE);
+		if(!quads.isEmpty()) {
+			for(BakedQuad quad : quads) 
+				//buffer.addVertexData(quad.getVertexData());
+				LightUtil.renderQuadColor(buffer, quad, color);
+		}
 
 		GlStateManager.popMatrix();
 	}

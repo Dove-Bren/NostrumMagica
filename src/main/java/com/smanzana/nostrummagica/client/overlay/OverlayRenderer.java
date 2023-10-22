@@ -53,7 +53,6 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -82,7 +81,6 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
-import net.minecraftforge.client.event.RenderBlockOverlayEvent.OverlayType;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -1512,16 +1510,19 @@ public class OverlayRenderer extends AbstractGui {
 	@SubscribeEvent
 	public void onBlockOverlay(RenderBlockOverlayEvent event) {
 		
-		// Forge overlays aren't set up. Have to do it manually. (Some copied from EnderIO)
-		if (!event.isCanceled() && event.getOverlayType() == OverlayType.WATER) {
-			final PlayerEntity player = event.getPlayer();
-			// the event has the wrong BlockPos (entity center instead of eyes)
-			final BlockPos blockpos = new BlockPos(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-			final BlockState state = player.world.getBlockState(blockpos);
-			final Block block = state.getBlock();
-
-			int unused; // Check! Need to render fluid overlay manually?
-//			if (block instanceof FluidBlock && ((BlockFluidBase) block).getFluid() != null) {
+//		// Forge overlays aren't set up. Have to do it manually. (Some copied from EnderIO)
+//		if (!event.isCanceled() && event.getOverlayType() == OverlayType.WATER) {
+//			final PlayerEntity player = event.getPlayer();
+//			// the event has the wrong BlockPos (entity center instead of eyes)
+//			final BlockPos blockpos = new BlockPos(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+//			final BlockState state = player.world.getBlockState(blockpos);
+//			final Block block = state.getBlock();
+//			final IFluidState fluidState = state.getFluidState();
+//
+//			if (block instanceof PoisonWaterBlock || (fluidState != null && fluidState.getFluid() instanceof FluidPoisonWater)) {
+//				
+//				
+//				
 //				BlockFluidBase fblock = (BlockFluidBase) block;
 //				Vec3d fogColor = fblock.getFogColor(player.world, blockpos, state, player,
 //						player.world.getFogColor(event.getRenderPartialTicks()),
@@ -1558,7 +1559,7 @@ public class OverlayRenderer extends AbstractGui {
 //					event.setCanceled(true);
 //				}
 //			}
-		}
+//		}
 	}
 	
 }

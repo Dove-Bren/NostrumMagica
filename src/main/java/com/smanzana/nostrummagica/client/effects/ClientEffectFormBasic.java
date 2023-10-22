@@ -1,12 +1,13 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -31,8 +32,8 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 		BlockRendererDispatcher renderer = Minecraft.getInstance().getBlockRendererDispatcher();
 		
 		this.model = renderer.getBlockModelShapes().getModelManager()
-				.getModel(new ModelResourceLocation(
-				NostrumMagica.MODID + ":effects/" + key, "normal"));
+				.getModel(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(
+				NostrumMagica.MODID + ":effect/" + key)));
 	}
 	
 	public ClientEffectFormBasic(ClientEffectIcon icon, double x, double y, double z) {

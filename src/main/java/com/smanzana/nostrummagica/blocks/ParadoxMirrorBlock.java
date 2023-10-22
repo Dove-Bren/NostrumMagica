@@ -77,7 +77,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		//return this.getDefaultState().with(FACING, placer.getHorizontalFacing().getOpposite());
-		Direction side = context.getPlacementHorizontalFacing();
+		Direction side = context.getPlacementHorizontalFacing().getOpposite();
 		if (!this.canPlaceAt(context.getWorld(), context.getPos(), side)) {
 			// Rotate and find it
 			for (int i = 0; i < 3; i++) {

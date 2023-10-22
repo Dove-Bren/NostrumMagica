@@ -69,6 +69,7 @@ public class NostrumMagicaFlower extends BushBlock {
 		super(Block.Properties.create(Material.PLANTS)
 				.sound(SoundType.PLANT)
 				.tickRandomly()
+				.doesNotBlockMovement()
 				);
 		this.type = type;
 	}

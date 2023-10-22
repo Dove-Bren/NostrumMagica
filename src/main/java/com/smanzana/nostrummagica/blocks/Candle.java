@@ -51,7 +51,7 @@ public class Candle extends ContainerBlock {
 	protected static final VoxelShape CANDLE_AABB = Block.makeCuboidShape(16 * 0.4375D, 16 * 0.0D, 16 * 0.4375D, 16 * 0.5625D, 16 * 0.5D, 16 * 0.5625D);
 	protected static final VoxelShape CANDLE_E_AABB = Block.makeCuboidShape(16 * 0.0D, 16 * 0.35D, 16 * 0.4375D, 16 * 0.25D, 16 * 0.85D, 16 * 0.5625D);
 	protected static final VoxelShape CANDLE_N_AABB = Block.makeCuboidShape(16 * 0.4375D, 16 * 0.35D, 16 * 0.75D, 16 * 0.5625D, 16 * 0.85D, 16D);
-	protected static final VoxelShape CANDLE_W_AABB = Block.makeCuboidShape(16 * 0.75D, 16 * 0.35D, 16 * 0.4375D, 1D, 16 * 0.85D, 16 * 0.5625D);
+	protected static final VoxelShape CANDLE_W_AABB = Block.makeCuboidShape(16 * 0.75D, 16 * 0.35D, 16 * 0.4375D, 16D, 16 * 0.85D, 16 * 0.5625D);
 	protected static final VoxelShape CANDLE_S_AABB = Block.makeCuboidShape(16 * 0.4375D, 16 * 0.35D, 0D, 16 * 0.5625D, 16 * 0.85D, 16 * 0.25D);
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", new Predicate<Direction>() {
@@ -90,8 +90,13 @@ public class Candle extends ContainerBlock {
 		Direction[] adirection = context.getNearestLookingDirections();
 		
 		for(Direction direction : adirection) {
+			direction = direction.getOpposite();
 			if (FACING.getAllowedValues().contains(direction)) {
-				Direction direction1 = direction.getOpposite(); // TODO this didn't used to be opposite?
+				Direction direction1 = direction;
+//				if (Direction.Plane.HORIZONTAL.test(direction1)) {
+//					direction1 = direction1.getOpposite();
+//				}
+				//.getOpposite(); // TODO this didn't used to be opposite?
 				blockstate = blockstate.with(FACING, direction1);
 				if (blockstate.isValidPosition(iworldreader, blockpos)) {
 					return blockstate;

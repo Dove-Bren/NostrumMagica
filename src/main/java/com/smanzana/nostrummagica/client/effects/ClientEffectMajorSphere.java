@@ -22,8 +22,8 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		
 		private static IBakedModel MODEL_CLOUDY;
 		private static IBakedModel MODEL_SCALY;
-		private static ModelResourceLocation LOC_CLOUDY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_cloudy"));
-		private static ModelResourceLocation LOC_SCALY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effects/orb_scaled"));
+		private static ModelResourceLocation LOC_CLOUDY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effect/orb_cloudy"));
+		private static ModelResourceLocation LOC_SCALY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effect/orb_scaled"));
 
 		private float scale;
 		private boolean cloudy;
@@ -35,6 +35,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		
 		@Override
 		public void draw(Minecraft mc, float partialTicks, int color) {
+			
 			final IBakedModel model;
 			if (cloudy) {
 				if (MODEL_CLOUDY == null) {

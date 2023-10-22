@@ -79,7 +79,7 @@ public class ClientEffectRenderer {
 		GlStateManager.pushMatrix();
 		Minecraft mc = Minecraft.getInstance();
 		
-		Vec3d playerOffset = mc.player.getEyePosition(event.getPartialTicks()).add(0, -mc.player.getEyeHeight(), 0);
+		Vec3d playerOffset = mc.player.getEyePosition(event.getPartialTicks());
 		//Vec3d playerOffset = mc.thePlayer.getPositionVector();
 		GlStateManager.translated(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		

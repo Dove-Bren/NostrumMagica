@@ -376,6 +376,8 @@
 	
 	"item.nostrummagica.poison_water_bucket": "Poison Water Bucket",
 	"item.nostrummagica.poison_water_unbreakable_bucket": "Unbreakable Poison Water Bucket",
+	
+	"curios.identifier.pendant": "Pendant",
 
     "effect.nostrummagica.potions-frostbite": "Frostbite",
     "effect.nostrummagica.potions-shieldphysical": "Physical Ward",
@@ -605,16 +607,16 @@
     "info.armor.set_status": "%1$s Set Bonus %3$s(%2$d/4)%4$s",
     "info.armor.set_total": "%1$s Set Bonus %2$s(Complete)%3$s",
 
-    "info.armor.set_bonus.fire.0": "Reduced Flame Duration",
-    "info.armor.set_bonus.fire.1": "Halved Flame Duration",
-    "info.armor.set_bonus.fire.2": "Flame Immunity",
-    "info.armor.set_bonus.fire.3": "Lava Immunity|Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.earth.3": "Growth Aura|Shatter Punch|Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.ender.3": "Teleport Boost|Ender Dash|Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.physical.3": "Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.ice.3": "Snow Traveler|Blizzard Caller|Elytra Gliding|Mana Jump",
-    "info.armor.set_bonus.lightning.3": "Lightning Channeling|Elytra Gliding|Mana Jump",
-    "info.armor.set_bonus.wind.3": "Swift Sprint|Tornado Caller|Elytra Gliding|Mana Jump",
+    "info.armor.set_bonus.fire.novice": "Reduced Flame Duration",
+    "info.armor.set_bonus.fire.adept": "Halved Flame Duration",
+    "info.armor.set_bonus.fire.master": "Flame Immunity",
+    "info.armor.set_bonus.fire.true": "Lava Immunity|Dragon Gliding|Mana Jump",
+    "info.armor.set_bonus.earth.true": "Growth Aura|Shatter Punch|Dragon Gliding|Mana Jump",
+    "info.armor.set_bonus.ender.true": "Teleport Boost|Ender Dash|Dragon Gliding|Mana Jump",
+    "info.armor.set_bonus.physical.true": "Dragon Gliding|Mana Jump",
+    "info.armor.set_bonus.ice.true": "Snow Traveler|Blizzard Caller|Elytra Gliding|Mana Jump",
+    "info.armor.set_bonus.lightning.true": "Lightning Channeling|Elytra Gliding|Mana Jump",
+    "info.armor.set_bonus.wind.true": "Swift Sprint|Tornado Caller|Elytra Gliding|Mana Jump",
 
     "info.armor.wing_upgrade": "Dragon Wing Upgrade",
 

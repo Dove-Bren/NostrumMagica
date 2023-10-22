@@ -384,7 +384,7 @@
     {
         "sounds":
         [
-            "minecraft:item.armor.equip_generic"
+            "nostrummagica:ui/equip_curio"
         ]
     },
     

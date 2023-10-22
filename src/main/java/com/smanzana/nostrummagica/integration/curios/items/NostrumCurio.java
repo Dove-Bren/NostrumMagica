@@ -97,7 +97,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 			return;
 		}
 		
-		final String trans = "item." + this.desckey + ".desc";
+		final String trans = "item." + NostrumMagica.MODID + "." + this.desckey + ".desc";
 		
 		if (!I18n.hasKey(trans)) {
 			return;

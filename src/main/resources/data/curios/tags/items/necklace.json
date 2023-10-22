@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "nostrummagica:ribbon_small",
+    "nostrummagica:ribbon_medium",
+    "nostrummagica:ribbon_large",
+    "nostrummagica:ribbon_fierce",
+    "nostrummagica:ribbon_kind"
+  ]
+}

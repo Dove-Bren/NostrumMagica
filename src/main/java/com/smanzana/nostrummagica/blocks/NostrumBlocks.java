@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.blocks;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
@@ -157,6 +159,10 @@ public class NostrumBlocks {
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
     	block.setRegistryName(registryName);
     	registry.register(block);
+    	
+    	if (block instanceof ILoreTagged) {
+    		LoreRegistry.instance().register((ILoreTagged)block);
+    	}
     }
     
     @SubscribeEvent

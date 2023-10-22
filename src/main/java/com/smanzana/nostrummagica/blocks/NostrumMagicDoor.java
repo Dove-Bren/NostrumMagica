@@ -34,7 +34,7 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
-	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 6.4D, 1D, 1D, 9.6D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 6.4D, 16D, 16D, 9.6D);
 
 	public NostrumMagicDoor() {
 		this(Block.Properties.create(Material.ROCK)

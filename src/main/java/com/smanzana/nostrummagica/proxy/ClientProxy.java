@@ -106,7 +106,6 @@ import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
-import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -172,6 +171,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -280,7 +280,6 @@ public class ClientProxy extends CommonProxy {
 		final CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
 		CommandInfoScreenGoto.register(dispatcher);
 		CommandDebugEffect.register(dispatcher);
-		int unused; // Does just overriding work? lol
 	}
 	
 	@SubscribeEvent
@@ -715,6 +714,44 @@ public class ClientProxy extends CommonProxy {
 //				NostrumMagica.logger.warn("Failed to load effect " + key);
 //			}	
 //		}
+		
+		// Register models that don't have an item/block associate with them
+		
+		// Wish i could do this, but this doesn't use different kind of loaders and only works for json.
+//		for (ClientEffectIcon icon: ClientEffectIcon.values()) {
+//			ModelLoader.addSpecialModel(new ResourceLocation(
+//					NostrumMagica.MODID, "effect/" + icon.getModelKey()
+//					));
+//    	}
+    	
+//		    	for (String key : new String[] {"orb_cloudy", "orb_scaled"}) {
+//		    		IModel model;
+//					try {
+//						model = ModelLoaderRegistry.getModel(new ResourceLocation(
+//								NostrumMagica.MODID, "effect/" + key + ".obj"
+//								));
+//						IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
+//			    				(location) -> {return Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(location.toString());});
+//			    		event.getModelRegistry().putObject(
+//			    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + key, "normal"),
+//			    				bakedModel);
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//						NostrumMagica.logger.warn("Failed to load effect " + key);
+//					}	
+//		    	}
+    	
+//		    	MimicBlockBakedModel model = new MimicBlockBakedModel();
+//		    	for (Direction facing : Direction.values()) {
+//		    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
+//		    				model);
+//		    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
+//		    				model);
+//		    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
+//		    				model);
+//		    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
+//		    				model);
+//		    	}
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -739,17 +776,6 @@ public class ClientProxy extends CommonProxy {
 		};
 		ev.getItemColors().register(tinter, NostrumItems.essenceEarth, NostrumItems.essenceEnder, NostrumItems.essenceFire,
 				NostrumItems.essenceIce, NostrumItems.essenceLightning, NostrumItems.essencePhysical, NostrumItems.essenceWind
-				);
-		
-		tinter = new IItemColor() {
-			@Override
-			public int getColor(ItemStack stack, int tintIndex) {
-				EMagicElement element = InfusedGemItem.GetElement(stack);
-				return 0xFFFFFFFF;//return element.getColor();
-			}
-		};
-		ev.getItemColors().register(tinter, NostrumItems.infusedGemEarth, NostrumItems.infusedGemEnder, NostrumItems.infusedGemFire,
-				NostrumItems.infusedGemIce, NostrumItems.infusedGemLightning, NostrumItems.infusedGemUnattuned, NostrumItems.infusedGemWind
 				);
 	}
 	
@@ -931,44 +957,6 @@ public class ClientProxy extends CommonProxy {
 				return new RenderPlantBossBramble(manager);
 			}
 		});
-		
-		// Register models that don't have an item/block associate with them
-		
-		
-		for (ClientEffectIcon icon: ClientEffectIcon.values()) {
-			ModelLoader.addSpecialModel(new ResourceLocation(
-					NostrumMagica.MODID, "effect/" + icon.getModelKey()
-					));
-    	}
-    	
-//    	for (String key : new String[] {"orb_cloudy", "orb_scaled"}) {
-//    		IModel model;
-//			try {
-//				model = ModelLoaderRegistry.getModel(new ResourceLocation(
-//						NostrumMagica.MODID, "effect/" + key + ".obj"
-//						));
-//				IBakedModel bakedModel = model.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, 
-//	    				(location) -> {return Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(location.toString());});
-//	    		event.getModelRegistry().putObject(
-//	    				new ModelResourceLocation(NostrumMagica.MODID + ":effects/" + key, "normal"),
-//	    				bakedModel);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				NostrumMagica.logger.warn("Failed to load effect " + key);
-//			}	
-//    	}
-    	
-//    	MimicBlockBakedModel model = new MimicBlockBakedModel();
-//    	for (Direction facing : Direction.values()) {
-//    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
-//    				model);
-//    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_DOOR), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
-//    				model);
-//    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase() + ",unbreakable=false"),
-//    				model);
-//    		event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(NostrumMagica.MODID, MimicBlock.ID_FACADE), "facing=" + facing.name().toLowerCase() + ",unbreakable=true"),
-//    				model);
-//    	}
 	}
 	
 	@SubscribeEvent

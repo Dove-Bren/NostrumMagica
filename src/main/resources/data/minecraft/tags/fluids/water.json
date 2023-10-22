@@ -1,0 +1,9 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:poison_water",
+		"nostrummagica:poison_water_flowing",
+		"nostrummagica:poison_water_unbreakable",
+		"nostrummagica:poison_water_unbreakable_flower"
+	]
+}

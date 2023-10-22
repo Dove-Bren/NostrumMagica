@@ -53,7 +53,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 				new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_still"), // same visually whether unbreakable or not
 				new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_flowing")
 				).overlay(new ResourceLocation(NostrumMagica.MODID, "block/" + ID_BASE + "_overlay"))
-				.color(0xFF1D452F)
+				.color(0xAF1D452F)
 			));
 		this.bUnbreakable = bUnbreakable;
 	}
@@ -61,7 +61,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.SOLID;
+		return BlockRenderLayer.TRANSLUCENT;
 	}
 	
 	@Override
