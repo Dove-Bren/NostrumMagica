@@ -89,6 +89,6 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(ItemDuctTileEntity::new, NostrumBlocks.itemDuct).build(null), ID_ItemDuctTileEntity);
 		register(registry, TileEntityType.Builder.create(ParadoxMirrorTileEntity::new, NostrumBlocks.paradoxMirror).build(null), ID_ParadoxMirrorTileEntity);
 		register(registry, TileEntityType.Builder.create(ManaArmorerTileEntity::new, NostrumBlocks.manaArmorerBlock).build(null), ID_ManaArmorerTileEntity);
-		register(registry, TileEntityType.Builder.create(MimicBlockTileEntity::new, NostrumBlocks.mimicDoor, NostrumBlocks.mimicFacade).build(null), ID_MimicBlockTileEntity);
+		register(registry, TileEntityType.Builder.create(MimicBlockTileEntity::new, NostrumBlocks.mimicDoor, NostrumBlocks.mimicFacade, NostrumBlocks.mimicDoorUnbreakable, NostrumBlocks.mimicFacadeUnbreakable).build(null), ID_MimicBlockTileEntity);
     }
 }

@@ -27,7 +27,6 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -80,27 +79,33 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 		return state;
 	}
 	
-	public static BooleanProperty UNBREAKABLE = BooleanProperty.create("unbreakable");
-
 	public static final String ID_DOOR = "mimic_door";
+	public static final String ID_DOOR_UNBREAKABLE = "mimic_door_unbreakable";
 	public static final String ID_FACADE = "mimic_facade";
+	public static final String ID_FACADE_UNBREAKABLE = "mimic_facade_unbreakable";
 	
 	private final boolean isDoor;
+	private final boolean isUnbreakable;
 	
-	public MimicBlock(boolean isDoor) {
+	public MimicBlock(boolean isDoor, boolean isUnbreakable) {
 		super(Block.Properties.create(Material.GLASS)
-				.hardnessAndResistance(1.0f)
+				.hardnessAndResistance(isUnbreakable ? -1.0F : 1.0f, isUnbreakable ? 3600000.8F : 1.0f)
 				.variableOpacity()
 				);
 		
 		this.isDoor = isDoor;
+		this.isUnbreakable = isUnbreakable;
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
+	public boolean isUnbreakable() {
+		return this.isUnbreakable;
+	}
+	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FACING).add(UNBREAKABLE);
+		builder.add(FACING);
 	}
 	
 	@Override
@@ -118,10 +123,10 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 		return createNewTileEntity(world);
 	}
 	
-	@Override
-	public float getBlockHardness(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
-		return blockState.get(UNBREAKABLE) ? -1f : super.getBlockHardness(blockState, worldIn, pos);
-	}
+//	@Override
+//	public float getBlockHardness(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
+//		return blockState.get(UNBREAKABLE) ? -1f : super.getBlockHardness(blockState, worldIn, pos);
+//	}
 	
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {

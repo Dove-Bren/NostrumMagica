@@ -44,7 +44,9 @@ public class NostrumBlocks {
 	@ObjectHolder(ManiCrystal.ID_VANI) public static ManiCrystal vaniCrystalBlock;
 	@ObjectHolder(ManiOre.ID) public static ManiOre maniOre;
 	@ObjectHolder(MimicBlock.ID_FACADE) public static MimicBlock mimicFacade;
+	@ObjectHolder(MimicBlock.ID_FACADE_UNBREAKABLE) public static MimicBlock mimicFacadeUnbreakable;
 	@ObjectHolder(MimicBlock.ID_DOOR) public static MimicBlock mimicDoor;
+	@ObjectHolder(MimicBlock.ID_DOOR_UNBREAKABLE) public static MimicBlock mimicDoorUnbreakable;
 	@ObjectHolder(ModificationTable.ID) public static ModificationTable modificationTable;
 	@ObjectHolder(NostrumMagicaFlower.ID_MIDNIGHT_IRIS) public static NostrumMagicaFlower midnightIris;
 	@ObjectHolder(NostrumMagicaFlower.ID_CRYSTABLOOM) public static NostrumMagicaFlower crystabloom;
@@ -106,7 +108,9 @@ public class NostrumBlocks {
     	//registerBlockItem(vaniCrystalBlock, vaniCrystalBlock.getRegistryName(), registry);
     	registerBlockItem(maniOre, maniOre.getRegistryName(), registry);
     	registerBlockItem(mimicFacade, mimicFacade.getRegistryName(), registry);
+    	registerBlockItem(mimicFacadeUnbreakable, mimicFacadeUnbreakable.getRegistryName(), registry);
     	registerBlockItem(mimicDoor, mimicDoor.getRegistryName(), registry);
+    	registerBlockItem(mimicDoorUnbreakable, mimicDoorUnbreakable.getRegistryName(), registry);
     	registerBlockItem(modificationTable, modificationTable.getRegistryName(), registry);
     	//registerBlockItem(midnightIris, midnightIris.getRegistryName(), registry);
     	//registerBlockItem(crystabloom, crystabloom.getRegistryName(), registry);
@@ -192,8 +196,10 @@ public class NostrumBlocks {
     	registerBlock(new ManiCrystal(1), ManiCrystal.ID_KANI, registry);
     	registerBlock(new ManiCrystal(2), ManiCrystal.ID_VANI, registry);
     	registerBlock(new ManiOre(), ManiOre.ID, registry);
-    	registerBlock(new MimicBlock(false), MimicBlock.ID_FACADE, registry);
-    	registerBlock(new MimicBlock(true), MimicBlock.ID_DOOR, registry);
+    	registerBlock(new MimicBlock(false, false), MimicBlock.ID_FACADE, registry);
+    	registerBlock(new MimicBlock(false, true), MimicBlock.ID_FACADE_UNBREAKABLE, registry);
+    	registerBlock(new MimicBlock(true, false), MimicBlock.ID_DOOR, registry);
+    	registerBlock(new MimicBlock(true, true), MimicBlock.ID_DOOR_UNBREAKABLE, registry);
     	registerBlock(new ModificationTable(), ModificationTable.ID, registry);
     	registerBlock(new NostrumMagicaFlower(NostrumMagicaFlower.Type.MIDNIGHT_IRIS), NostrumMagicaFlower.ID_MIDNIGHT_IRIS, registry);
     	registerBlock(new NostrumMagicaFlower(NostrumMagicaFlower.Type.CRYSTABLOOM), NostrumMagicaFlower.ID_CRYSTABLOOM, registry);
