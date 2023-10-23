@@ -64,13 +64,13 @@ public class RoomEnd2 extends StaticRoom {
 				"XXXXXXXXXX",
 				"XXXXXXXXXX",
 				"XXXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				'C', new StaticBlockState(Blocks.RED_CARPET),
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				' ', null,
 				'M', new StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.GOLEM_PHYSICAL)),
-				'O', withChest ? null : NostrumBlocks.dungeonBlock);
+				'O', withChest ? null : NostrumBlocks.lightDungeonBlock);
 		
 		this.withChest = withChest;
 	}

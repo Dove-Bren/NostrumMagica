@@ -65,15 +65,8 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		
 		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size() + " rituals");
 		
-//		// Hide our cool wrapper to outputs
-//		IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();
-//		for (RitualOutcomeWrapper wrapper : ritualOutcomes) {
-//			blacklist.addIngredientToBlacklist(wrapper);
-//		}
-		//blacklist.addIngredientToBlacklist(new ItemStack(DungeonBlock.instance()));
-		//blacklist.addIngredientToBlacklist(new ItemStack(NostrumSingleSpawner.instance()));
-		int unused; // hmmm above doesn't work? is block registering right?
-		
+		// Hide our cool wrapper to outputs
+		registry.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
 	}
 	
 	@Override

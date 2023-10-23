@@ -77,7 +77,7 @@ public class RoomHallway extends StaticRoom {
 				"XXXXX",
 				"XXXXX",
 				"XXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
 				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
 				'C', new StaticBlockState(net.minecraft.block.Blocks.RED_CARPET),

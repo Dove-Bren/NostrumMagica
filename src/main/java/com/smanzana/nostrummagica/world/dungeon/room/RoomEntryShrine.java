@@ -289,7 +289,7 @@ public class RoomEntryShrine extends StaticRoom {
 				"           ",
 				"           ",
 				"           ",
-				'B', NostrumBlocks.dungeonBlock,
+				'B', NostrumBlocks.lightDungeonBlock,
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				'l', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.SOUTH)),

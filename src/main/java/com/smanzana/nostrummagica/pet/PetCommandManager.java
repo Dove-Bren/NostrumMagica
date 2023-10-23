@@ -93,8 +93,6 @@ public class PetCommandManager extends WorldSavedData {
 	public PetCommandManager(String name) {
 		super(name);
 		this.playerSettings = new HashMap<>();
-		
-		int unused; // This probably needs to register for events?
 	}
 	
 	@Override

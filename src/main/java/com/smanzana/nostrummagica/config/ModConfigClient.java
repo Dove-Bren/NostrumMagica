@@ -27,7 +27,7 @@ public class ModConfigClient {
 		CONTROL_DASH_DOUBLEPRESS(ModConfig.Category.CONTROL, "ender_dash_double_press", true, "Activate Ender Dash on movement key double-press"),
 		;
 		
-		private ModConfig.Category Category;
+		//private ModConfig.Category Category;
 		
 		private String key;
 		
@@ -38,7 +38,7 @@ public class ModConfigClient {
 		private ForgeConfigSpec.ConfigValue<?> configField;
 		
 		private Key(ModConfig.Category Category, String key, Object def, String desc) {
-			this.Category = Category;
+			//this.Category = Category;
 			this.key = key;
 			this.desc = desc;
 			

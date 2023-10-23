@@ -105,7 +105,7 @@ public class DragonStartRoom extends StaticRoom implements ISpellComponentRoom {
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				' ', null,
 				'G', Blocks.GLOWSTONE,
 				'B', Blocks.BOOKSHELF,

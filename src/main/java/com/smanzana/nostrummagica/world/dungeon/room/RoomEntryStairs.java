@@ -42,7 +42,7 @@ public class RoomEntryStairs extends StaticRoom {
 				"B   B",
 				"B RBB",
 				"BBBBB",
-				'B', NostrumBlocks.dungeonBlock,
+				'B', NostrumBlocks.lightDungeonBlock,
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				' ', null,
 				'U', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.NORTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),

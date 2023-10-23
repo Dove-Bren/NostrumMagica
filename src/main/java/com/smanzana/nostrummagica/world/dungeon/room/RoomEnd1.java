@@ -65,7 +65,7 @@ public class RoomEnd1 extends StaticRoom {
 				"XXXXXXXXX",
 				"XXXXXXXXX",
 				"XXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				'C', new StaticBlockState(Blocks.RED_CARPET),
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),

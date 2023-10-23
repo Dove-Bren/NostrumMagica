@@ -297,6 +297,8 @@ public class NostrumMagica {
 		//curios.postInit();
 		//enderIO.postInit();
 		musica.postInit();
+		
+		proxy.registerWorldGen();
 
 		initFinished = true;
 

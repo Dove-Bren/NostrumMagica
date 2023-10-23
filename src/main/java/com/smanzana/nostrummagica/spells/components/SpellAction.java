@@ -638,7 +638,7 @@ public class SpellAction {
 				// Try to go through blocks and see if it's in there
 				Iterator<Block> it = blocks.iterator();
 				Block next = it.next();
-				while (Item.getItemFromBlock(next) != item) { // TODO this only works for vanilla? That ok?
+				while (next.asItem() != item) { // TODO this only works for vanilla? That ok?
 					if (!it.hasNext()) {
 						next = null;
 						break;
@@ -654,7 +654,7 @@ public class SpellAction {
 							it = blocks.iterator();
 						next = it.next();
 					}
-					stack = new ItemStack(Item.getItemFromBlock(next), 1);
+					stack = new ItemStack(next, 1);
 				}
 			}
 			

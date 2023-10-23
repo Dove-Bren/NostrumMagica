@@ -21,7 +21,6 @@ import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMe
 import com.smanzana.nostrummagica.network.messages.PetCommandMessage;
 import com.smanzana.nostrummagica.network.messages.PetCommandSettingsSyncMessage;
 import com.smanzana.nostrummagica.network.messages.PetGUIControlMessage;
-import com.smanzana.nostrummagica.network.messages.PetGUIOpenMessage;
 import com.smanzana.nostrummagica.network.messages.PetGUISyncMessage;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
@@ -97,7 +96,6 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, LoreMessage.class, LoreMessage::encode, LoreMessage::decode, LoreMessage::handle);
 		syncChannel.registerMessage(discriminator++, RuneBagToggleMessage.class, RuneBagToggleMessage::encode, RuneBagToggleMessage::decode, RuneBagToggleMessage::handle);
 		syncChannel.registerMessage(discriminator++, PetGUIControlMessage.class, PetGUIControlMessage::encode, PetGUIControlMessage::decode, PetGUIControlMessage::handle);
-		syncChannel.registerMessage(discriminator++, PetGUIOpenMessage.class, PetGUIOpenMessage::encode, PetGUIOpenMessage::decode, PetGUIOpenMessage::handle);
 		syncChannel.registerMessage(discriminator++, PetGUISyncMessage.class, PetGUISyncMessage::encode, PetGUISyncMessage::decode, PetGUISyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, MagicEffectUpdate.class, MagicEffectUpdate::encode, MagicEffectUpdate::decode, MagicEffectUpdate::handle);
 		syncChannel.registerMessage(discriminator++, ClientPurchaseResearchMessage.class, ClientPurchaseResearchMessage::encode, ClientPurchaseResearchMessage::decode, ClientPurchaseResearchMessage::handle);

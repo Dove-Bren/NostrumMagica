@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.LadderBlock;
+import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.Direction;
@@ -53,6 +54,10 @@ public abstract class StaticRoom implements IDungeonRoom {
 				Direction cur = state.get(WallTorchBlock.HORIZONTAL_FACING);
 				cur = rotate(cur, rotation);
 				state = state.with(WallTorchBlock.HORIZONTAL_FACING, cur);
+			} else if (block instanceof RedstoneWallTorchBlock) {
+				Direction cur = state.get(RedstoneWallTorchBlock.FACING);
+				cur = rotate(cur, rotation);
+				state = state.with(RedstoneWallTorchBlock.FACING, cur);
 			} else if (block instanceof LadderBlock) {
 				Direction cur = state.get(LadderBlock.FACING);
 				cur = rotate(cur, rotation);

@@ -19,7 +19,7 @@ public class ModConfigCommon {
 		BAG_VACUUM_ON_SNEAK(ModConfig.Category.SERVER, "bag_sneak_vacuum", false, "If true, sneaking does NOT bypass the vacuum feature of rune and reagent bags. Useful when used with mods that change what sneaking means for EntityItems."),
 		;
 		
-		private ModConfig.Category Category;
+		//private ModConfig.Category Category;
 		
 		private String key;
 		
@@ -30,7 +30,7 @@ public class ModConfigCommon {
 		private ForgeConfigSpec.ConfigValue<?> configField;
 		
 		private Key(ModConfig.Category Category, String key, Object def, String desc) {
-			this.Category = Category;
+			//this.Category = Category;
 			this.key = key;
 			this.desc = desc;
 			

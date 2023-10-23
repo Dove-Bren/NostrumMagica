@@ -207,7 +207,7 @@ public class RoomEntryDragon extends StaticRoom {
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",
-				'B', NostrumBlocks.dungeonBlock,
+				'B', NostrumBlocks.lightDungeonBlock,
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),

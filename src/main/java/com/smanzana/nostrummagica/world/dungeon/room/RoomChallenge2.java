@@ -263,7 +263,7 @@ public class RoomChallenge2 extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				' ', null,
 				'(', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.EAST)), // EAST
 				')', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.WEST)), // NORTH 

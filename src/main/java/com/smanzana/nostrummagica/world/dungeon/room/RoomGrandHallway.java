@@ -482,7 +482,7 @@ public class RoomGrandHallway extends StaticRoom {
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				')', new StaticBlockState(Blocks.VINE.getDefaultState().with(VineBlock.EAST, true)),
 				'L', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
 				'R', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),

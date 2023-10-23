@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.world;
 
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.util.ResourceLocation;
@@ -15,14 +12,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 // Taken almost exactly from https://github.com/Vazkii/Botania/blob/e38556d265fcf43273c99ea1299a35400bf0c405/src/main/java/vazkii/botania/common/core/loot/LootHandler.java
 public final class NostrumLootHandler {
-
-	private static final List<String> TABLES = ImmutableList.of(
-			"inject/abandoned_mineshaft", "inject/desert_pyramid",
-			"inject/nether_bridge", "inject/igloo_chest",
-			"inject/jungle_temple", "inject/simple_dungeon",
-			"inject/stronghold_corridor", "inject/end_city_treasure",
-			"inject/village_blacksmith"
-			);
 
 	public NostrumLootHandler() {
 		MinecraftForge.EVENT_BUS.register(this);

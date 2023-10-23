@@ -233,7 +233,7 @@ public class RoomPortal extends StaticRoom {
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				'D', new StaticBlockState(NostrumBlocks.dungeonBlock),
 				'P', NostrumBlocks.sorceryPortalSpawner,
 				'C', new StaticBlockState(Blocks.RED_CARPET),

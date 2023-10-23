@@ -306,7 +306,7 @@ public class RoomJail1 extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				' ', null,
 				'L', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.SOUTH)),
 				'B', Blocks.BOOKSHELF,

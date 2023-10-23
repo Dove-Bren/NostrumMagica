@@ -209,7 +209,7 @@ public class RoomTee1 extends StaticRoom {
 				"XXXXXXXXX",
 				"XXXXXXXXX",
 				"XXXXXXXXX",
-				'X', NostrumBlocks.dungeonBlock,
+				'X', NostrumBlocks.lightDungeonBlock,
 				' ', null,
 				'L', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.NORTH)),
 				'B', Blocks.IRON_BARS,

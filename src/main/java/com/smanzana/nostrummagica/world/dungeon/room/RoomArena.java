@@ -20,7 +20,7 @@ public class RoomArena extends StaticRoom {
 		final int maxY = 10;
 		final int maxZ = 40;
 		
-		final StaticBlockState wall = new StaticRoom.StaticBlockState(NostrumBlocks.dungeonBlock.getDefaultState());
+		final StaticBlockState wall = new StaticRoom.StaticBlockState(NostrumBlocks.lightDungeonBlock.getDefaultState());
 		final StaticBlockState lava = new StaticRoom.StaticBlockState(Blocks.LAVA.getDefaultState());
 		final StaticBlockState spawner = new StaticRoom.StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.DRAGON_RED));
 		final StaticBlockState obsidian = new StaticRoom.StaticBlockState(Blocks.OBSIDIAN.getDefaultState());
@@ -76,7 +76,7 @@ public class RoomArena extends StaticRoom {
 		
 		
 		
-//				'X', NostrumBlocks.dungeonBlock,
+//				'X', NostrumBlocks.lightDungeonBlock,
 //				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
 //				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
 //				'C', new StaticBlockState(Blocks.RED_CARPET),
