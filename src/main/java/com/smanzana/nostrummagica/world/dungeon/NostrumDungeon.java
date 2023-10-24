@@ -1,8 +1,13 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.Validate;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -144,9 +149,9 @@ public class NostrumDungeon {
 		doorRooms.clear();
 	}
 	
-	public void spawn(IWorld world, DungeonExitPoint start) {
-		starting.spawn(this, world, start);
-		
+	// Generates a dungeon, and returns a list of all the instances that were generated.
+	// These can be used to spawn the dungeon in the world.
+	public List<DungeonRoomInstance> generate(DungeonExitPoint start) {
 		// Calculate caches
 		if (endRooms.isEmpty()) {
 			for (IDungeonRoom room : rooms) {
@@ -166,76 +171,145 @@ public class NostrumDungeon {
 		
 		if (contRooms.isEmpty()) {
 			NostrumMagica.logger.error("No continuation rooms found in dungeon. Aborting spawn...");
-			return;
+			return new ArrayList<>();
 		}
 		
-		// Clear out puzzle info
-//		doorPoints = new LinkedList<>();
-//		keyPoints = new LinkedList<>();
+		Path startPath = new Path(new DungeonRoomInstance(start, this.starting, false)); // Note: false means starting won't ever have key
 		
-		// Select a subpath to have the ending and another to have the key
-		int index = rand.nextInt(starting.getNumExits());
-		int key = rand.nextInt(starting.getNumExits());
-		if (index == key)
-			key = (key + 1) % starting.getNumExits();
-		IDungeonRoom inEnd;
-
-		int shrineroom = index;
-		List<DungeonExitPoint> exits = starting.getExits(start);
-		for (DungeonExitPoint exit : exits) {
-			inEnd = null;
+		startPath.generateChildren(rand, pathLen + rand.nextInt(pathRand), ending);
+		
+		return startPath.getInstances();
+	}
+	
+	// Generates and then spawns a dungeon in the world.
+	public void spawn(IWorld world, DungeonExitPoint start) {
+		List<DungeonRoomInstance> dungeonInstances = generate(start);
+		
+		// Iterate and spawn instances
+		// TODO I used to make sure to spawn the 'end room' last so it didn't get stomped.
+		// Do that again? Or inforce bounds checking? Its not that expensive.
+		for (DungeonRoomInstance instance : dungeonInstances) {
+			instance.spawn(this, world);
+		}
+		
+//		
+//		starting.spawn(this, world, start);
+//		
+//		
+//		
+//		// Clear out puzzle info
+////		doorPoints = new LinkedList<>();
+////		keyPoints = new LinkedList<>();
+//		
+//		// Select a subpath to have the ending and another to have the key
+//		int index = rand.nextInt(starting.getNumExits());
+//		int key = rand.nextInt(starting.getNumExits());
+//		if (index == key)
+//			key = (key + 1) % starting.getNumExits();
+//		IDungeonRoom inEnd;
+//
+//		int shrineroom = index;
+//		List<DungeonExitPoint> exits = starting.getExits(start);
+//		for (DungeonExitPoint exit : exits) {
+//			inEnd = null;
+//			
+//
+//			if (index == 0) {
+//				; // Skip this one, so we can do it last outside the loop
+//			} else {
+//				
+//				Path path = new Path(null, pathLen + rand.nextInt(pathRand));
+//				if (key == 0) {
+//					if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
+//						path.hasKey();
+//				}
+//				
+//				path.spawn(world, exit, inEnd);
+//			}
+//			index -= 1;
+//			key -= 1;
+//		}
+//		
+//		{
+//			DungeonExitPoint last = exits.get(shrineroom);
+//			Path path = new Path(null, pathLen + rand.nextInt(pathRand));
+//			inEnd = ending;
+//			if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
+//				path.hasDoor();
+//			
+//			path.spawn(world, last, inEnd);
+//		}
+		
+	}
+	
+	public static class DungeonRoomInstance {
+		private final DungeonExitPoint entry;
+		private final IDungeonRoom template;
+		private final boolean hasKey; // whether the key should be in this room
+		
+		public DungeonRoomInstance(DungeonExitPoint entry, IDungeonRoom template, boolean hasKey) {
+			this.entry = entry;
+			this.template = template;
+			this.hasKey = hasKey;
+		}
+		
+		public void spawn(NostrumDungeon dungeon, IWorld world) {
+			// Spawn room template
+			template.spawn(dungeon, world, this.entry);
 			
-
-			if (index == 0) {
-				; // Skip this one, so we can do it last outside the loop
-			} else {
-				
-				Path path = new Path(null, pathLen + rand.nextInt(pathRand));
-				if (key == 0) {
-					if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
-						path.hasKey();
-				}
-				
-				path.spawn(world, exit, inEnd);
+			// If we have a key, do special key placement
+			if (this.hasKey) {
+				spawnKey(world, template.getKeyLocation(this.entry));
 			}
-			index -= 1;
-			key -= 1;
 		}
-		
-		{
-			DungeonExitPoint last = exits.get(shrineroom);
-			Path path = new Path(null, pathLen + rand.nextInt(pathRand));
-			inEnd = ending;
-			if (!keyRooms.isEmpty() && !doorRooms.isEmpty())
-				path.hasDoor();
+
+		private void spawnKey(IWorld world, DungeonExitPoint keyLocation) {
+			NonNullList<ItemStack> loot = NonNullList.withSize(27, ItemStack.EMPTY);
+			for (int i = 0; i < 27; i++) {
+				if (rand.nextFloat() < .2) {
+					loot.set(i, new ItemStack(Items.ARROW, rand.nextInt(3) + 1));
+				} else if (rand.nextFloat() < .5) {
+					loot.set(i, ReagentItem.CreateStack(
+							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
+							rand.nextInt(10) + 1));
+				} else if (rand.nextFloat() < .5) {
+					loot.set(i, ReagentItem.CreateStack(
+							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
+							rand.nextInt(20) + 1));
+				}
+			}
 			
-			path.spawn(world, last, inEnd);
+			loot.set(rand.nextInt(27), new ItemStack(Items.GOLDEN_APPLE)); // FIXME should be key
+			LootUtil.createLoot(world, keyLocation.getPos(), keyLocation.getFacing(),
+					loot);
 		}
-		
 	}
 	
 	private class Path {
 		
-		private int remaining;
-		
-		// Head info
-//		private IDungeonRoom firstRoom;
-//		private List<Path> children;
-//		private Path parent;
+		private List<Path> children;
+		//private final Path parent;
 		private boolean hasKey; // whether this path will have a key when spawned
 		private boolean hasDoor; // Whether the door should be spawned on this path
 		
+		private DungeonRoomInstance myRoom;
 		
 //		private int doorKey; // if is a door room, set to the key that's needed to unlock
 //		// If is a key supporting room, set to the key that we have. -1 is none
 //		private int numKeys; // Number of key-supporting rooms we have to have
 		
-		public Path(Path parent, int remaining) {
-			this.remaining = remaining;
+		public Path(Path parent) {
+//			this.remaining = remaining;
 //			this.parent = parent;
 //			this.firstRoom = room;
 			this.hasKey = false;
 			this.hasDoor = false;
+			this.children = new ArrayList<>();
+		}
+		
+		public Path(DungeonRoomInstance startingRoom) {
+			this((Path) null);
+			this.myRoom = startingRoom;
 		}
 		
 		public void hasKey() {
@@ -282,11 +356,30 @@ public class NostrumDungeon {
 //			return null;
 //		}
 		
-		public void spawn(IWorld world, DungeonExitPoint entry, IDungeonRoom ending) {
-			spawn(world, entry, remaining, ending);
+		protected @Nonnull IDungeonRoom pickRandomContRoom(Random rand) {
+			return contRooms.get(rand.nextInt(contRooms.size()));
 		}
 		
-		private void spawn(IWorld world, DungeonExitPoint entry, int remaining, IDungeonRoom ending) {
+		protected @Nonnull IDungeonRoom pickRandomEndRoom(Random rand) {
+			if (endRooms.isEmpty()) {
+				return rooms.get(rand.nextInt(rooms.size()));
+			} else {
+				return endRooms.get(rand.nextInt(endRooms.size()));
+			}
+		}
+		
+		protected @Nonnull IDungeonRoom pickRandomKeyRoom(Random rand) {
+			return keyRooms.get(rand.nextInt(keyRooms.size()));
+		}
+		
+		protected @Nonnull IDungeonRoom pickRandomDoorRoom(Random rand) {
+			return doorRooms.get(rand.nextInt(doorRooms.size()));
+		}
+		
+		// Fill out this path, including a room for this node and spawning any children that are needed.
+		protected void generate(Random rand, int remaining, DungeonExitPoint entry, IDungeonRoom ending) {
+			Validate.isTrue(this.myRoom == null); // If room is already set, only generate children!
+			
 			/*
 			 * 0) If remaining is 0, spawn end if we have it. Otherwise, if we
 			 *    somehow still have the key, spawn a keyroom. Otherwise, try to
@@ -296,107 +389,90 @@ public class NostrumDungeon {
 			 *    roll for key first. Otherwise place regular >0 door room.
 			 */
 			if (remaining == 0) {
+				// Terminal
 				if (ending != null) {
-					ending.spawn(self, world, entry);
-					return;
-				}
-				
-
-				IDungeonRoom selected = null;
-				if (hasKey && !hasDoor) {
-					// If we have both, just drop it. We missed our chance
-					// Since we're here, though, we get to spawn a key
-					selected = keyRooms.get(rand.nextInt(keyRooms.size()));
-					hasKey = false;
-				} else if (endRooms.isEmpty()) {
-					selected = rooms.get(rand.nextInt(rooms.size()));
+					this.myRoom = new DungeonRoomInstance(entry, ending, false);
+				} else if (this.hasKey) {
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(rand), true);
 				} else {
-					selected = endRooms.get(rand.nextInt(endRooms.size()));
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(rand), false);
 				}
-				
-				selected.spawn(self, world, entry);
-				return;
 			} else {
 				// If we have door or key, try those first
 				// If we have both, roll for key first
 				// Do not do door if we have both and key didn'tt succeed
-				IDungeonRoom selected = null;
-				boolean doingKey = false;
+				myRoom = null;
 				if (hasKey) {
 					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						selected = keyRooms.get(rand.nextInt(keyRooms.size()));
+						myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(rand), true);
 						hasKey = false;
-						doingKey = true;
 					}
 				} else if (hasDoor) {
 					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						selected = doorRooms.get(rand.nextInt(doorRooms.size()));
+						myRoom = new DungeonRoomInstance(entry, pickRandomDoorRoom(rand), false);
 						hasDoor = false;
 					}
 				}
 				
-				if (selected == null) {
-					selected = contRooms.get(rand.nextInt(contRooms.size()));
+				if (myRoom == null) {
+					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(rand), false);
 				}
 				
-				selected.spawn(self, world, entry);
-				if (doingKey)
-					spawnKey(world, selected.getKeyLocation(null));
-				
-				// Select a subpath to have the ending
-				int keyI = -1;
-				int doorI = -1;
-				IDungeonRoom inEnd;
-				
-				if (hasKey) {
-					keyI = rand.nextInt(selected.getNumExits());
-				}
-				if (hasDoor || ending != null) {
-					doorI = rand.nextInt(selected.getNumExits());
-				}
-				
-				if (keyI != -1 && doorI != -1 && keyI == doorI) {
-					doorI = (doorI + 1) % selected.getNumExits();
-				}
-				
-				for (DungeonExitPoint exit : selected.getExits(entry)) {
-					Path path = new Path(this, remaining - 1);
-					inEnd = null;
-					if (doorI == 0) {
-						if (hasDoor)
-							path.hasDoor();
-						inEnd = ending; // just set to null again if we don't have one 
-					}
-					if (keyI == 0) {
-						path.hasKey();
-					}
-					
-					path.spawn(world, exit, inEnd);
-					keyI -= 1;
-					doorI -= 1;
-				}
+				this.generateChildren(rand, remaining - 1, ending);
 			}
 		}
-
-		private void spawnKey(IWorld world, DungeonExitPoint keyLocation) {
-			NonNullList<ItemStack> loot = NonNullList.withSize(27, ItemStack.EMPTY);
-			for (int i = 0; i < 27; i++) {
-				if (rand.nextFloat() < .2) {
-					loot.set(i, new ItemStack(Items.ARROW, rand.nextInt(3) + 1));
-				} else if (rand.nextFloat() < .5) {
-					loot.set(i, ReagentItem.CreateStack(
-							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
-							rand.nextInt(10) + 1));
-				} else if (rand.nextFloat() < .5) {
-					loot.set(i, ReagentItem.CreateStack(
-							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
-							rand.nextInt(20) + 1));
-				}
+		
+		// Fill out this path's children
+		protected void generateChildren(Random rand, int remaining, IDungeonRoom ending) {
+			// Select a subpath to have the ending
+			int keyI = -1;
+			int doorI = -1;
+			IDungeonRoom inEnd;
+			
+			if (hasKey) {
+				keyI = rand.nextInt(myRoom.template.getNumExits());
+			}
+			if (hasDoor || ending != null) {
+				doorI = rand.nextInt(myRoom.template.getNumExits());
 			}
 			
-			loot.set(rand.nextInt(27), new ItemStack(Items.GOLDEN_APPLE)); // FIXME should be key
-			LootUtil.createLoot(world, keyLocation.getPos(), keyLocation.getFacing(),
-					loot);
+			if (keyI != -1 && doorI != -1 && keyI == doorI) {
+				doorI = (doorI + 1) % myRoom.template.getNumExits();
+			}
+
+			// Add subpaths based on doors
+			for (DungeonExitPoint door : myRoom.template.getExits(myRoom.entry)) {
+				Path path = new Path(this);
+				inEnd = null;
+				if (doorI == 0) {
+					if (hasDoor)
+						path.hasDoor();
+					inEnd = ending; // just set to null again if we don't have one 
+				}
+				if (keyI == 0) {
+					path.hasKey();
+				}
+				
+				// TODO evaluate making 'remaining' be random to be like 1-remaining
+				path.generate(rand, remaining, door, inEnd);
+				keyI -= 1;
+				doorI -= 1;
+				this.children.add(path);
+			}
+		}
+		
+		public List<DungeonRoomInstance> getInstances() {
+			return getInstances(new ArrayList<>());
+		}
+		
+		public List<DungeonRoomInstance> getInstances(@Nonnull List<DungeonRoomInstance> list) {
+			list.add(this.myRoom);
+			
+			for (Path child : this.children) {
+				child.getInstances(list);
+			}
+			
+			return list;
 		}
 	}
 	

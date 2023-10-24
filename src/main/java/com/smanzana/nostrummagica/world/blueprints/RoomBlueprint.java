@@ -47,6 +47,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.registry.Registry;
@@ -850,6 +851,10 @@ public class RoomBlueprint {
 	}
 	
 	public void spawn(IWorld world, BlockPos at, Direction direction) {
+		this.spawn(world, at, direction, null);
+	}
+	
+	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable AxisAlignedBB bounds) {
 		
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
@@ -943,6 +948,10 @@ public class RoomBlueprint {
 				// IWorld pos is simply chunk position + inner loop offset
 				// (j is data y, so offset to world y)
 				cursor.setPos(chunkOffsetX + i, j + origin.getY(), chunkOffsetZ + k);
+				
+				if (bounds != null && !bounds.contains(cursor.getX(), cursor.getY(), cursor.getZ())) {
+					continue;
+				}
 				
 				// Find data position by applying rotation to transform x and z coords into u and v data coords
 				unit = applyRotation(new BlockPos(1, 0, 1), dataDir);
