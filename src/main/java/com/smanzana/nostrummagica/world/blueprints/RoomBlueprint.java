@@ -6,30 +6,50 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.Candle;
+import com.smanzana.nostrummagica.blocks.ManiCrystal;
+import com.smanzana.nostrummagica.blocks.MimicBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
+import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
+import com.smanzana.nostrummagica.utils.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.DirectionalBlock;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.LadderBlock;
 import net.minecraft.block.RedstoneDiodeBlock;
+import net.minecraft.block.RedstoneWallTorchBlock;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.state.properties.BedPart;
+import net.minecraft.state.properties.Half;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -42,7 +62,16 @@ public class RoomBlueprint {
 	
 	public static class BlueprintBlock {
 		
+		private static Map<String, Block> BLOCK_CACHE = new HashMap<>();
 		private static Map<BlockState, BlueprintBlock> BLUEPRINT_CACHE = new HashMap<>();
+		
+		private static @Nullable Block CHECK_BLOCK_CACHE(String name) {
+			return BLOCK_CACHE.get(name);
+		}
+		
+		private static void SET_BLOCK_CACHE(String name, @Nonnull Block block) {
+			BLOCK_CACHE.put(name, block);
+		}
 		
 		private static BlueprintBlock CHECK_BLUEPRINT_CACHE(BlockState state) {
 			return BLUEPRINT_CACHE.get(state);
@@ -99,6 +128,211 @@ public class RoomBlueprint {
 			tileEntityData.putString("id", newID);
 		}
 		
+		private static Map<Block, Map<Integer, BlockState>> OldMetaMap = null;
+		
+		private static final @Nullable BlockState GetBlockStateFromOldMeta(Block block, int meta) {
+			if (OldMetaMap == null) {
+				OldMetaMap = new HashMap<>();
+				InitOldMetaBlockStates();
+			}
+			
+			Map<Integer, BlockState> innerMap = OldMetaMap.get(block);
+			if (innerMap == null) {
+				return null;
+			}
+			
+			return innerMap.get(Integer.valueOf(meta));
+		}
+		
+		private static final void SetOldMetaBlockState(Block block, int meta, BlockState state) {
+			Map<Integer, BlockState> innerMap = OldMetaMap.get(block);
+			if (innerMap == null) {
+				innerMap = new HashMap<>();
+				OldMetaMap.put(block, innerMap);
+			}
+			
+			innerMap.put(Integer.valueOf(meta), state);
+		}
+		
+		private static final void InitOldMetaBlockStates() {
+			// Has to be called later so that Mod blocks can be filled in
+			
+			// Note: bed color was in TE, so just assuming red for all (first 2 bits are SWNE)
+			SetOldMetaBlockState(Blocks.RED_BED, 0, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.FOOT).with(BedBlock.HORIZONTAL_FACING, Direction.SOUTH)); // SOUTH
+			SetOldMetaBlockState(Blocks.RED_BED, 1, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.FOOT).with(BedBlock.HORIZONTAL_FACING, Direction.WEST)); // WEST
+			SetOldMetaBlockState(Blocks.RED_BED, 2, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.FOOT).with(BedBlock.HORIZONTAL_FACING, Direction.NORTH)); // NORTH
+			SetOldMetaBlockState(Blocks.RED_BED, 3, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.FOOT).with(BedBlock.HORIZONTAL_FACING, Direction.EAST)); // EAST
+			SetOldMetaBlockState(Blocks.RED_BED, 8, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.HEAD).with(BedBlock.HORIZONTAL_FACING, Direction.SOUTH)); // HEAD, SOUTH 
+			SetOldMetaBlockState(Blocks.RED_BED, 9, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.HEAD).with(BedBlock.HORIZONTAL_FACING, Direction.WEST)); // HEAD, WEST
+			SetOldMetaBlockState(Blocks.RED_BED, 10, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.HEAD).with(BedBlock.HORIZONTAL_FACING, Direction.NORTH)); // HEAD, NORTH
+			SetOldMetaBlockState(Blocks.RED_BED, 11, Blocks.RED_BED.getDefaultState().with(BedBlock.PART, BedPart.HEAD).with(BedBlock.HORIZONTAL_FACING, Direction.EAST)); // HEAD, EAST
+			SetOldMetaBlockState(Blocks.RED_CARPET, 14, Blocks.RED_CARPET.getDefaultState());
+			
+			// Chest meta is NSWE (0 and 1 are up and down)
+			SetOldMetaBlockState(Blocks.CHEST, 2, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.CHEST, 3, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.CHEST, 4, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.CHEST, 5, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.LADDER, 2, Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.LADDER, 3, Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.LADDER, 4, Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.LADDER, 5, Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.LAVA, 1, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 1));
+			SetOldMetaBlockState(Blocks.LAVA, 2, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 2));
+			SetOldMetaBlockState(Blocks.LAVA, 3, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 3));
+			SetOldMetaBlockState(Blocks.LAVA, 8, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 8));
+			SetOldMetaBlockState(Blocks.LAVA, 9, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 9));
+			SetOldMetaBlockState(Blocks.LAVA, 10, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 10));
+			SetOldMetaBlockState(Blocks.LAVA, 11, Blocks.LAVA.getDefaultState().with(FlowingFluidBlock.LEVEL, 11));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 0, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 1, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 2, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 3, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 4, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 5, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 6, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.NETHER_BRICK_STAIRS, 7, Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 0, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 1, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 2, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 3, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 4, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 5, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 6, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.QUARTZ_STAIRS, 7, Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.REDSTONE_TORCH, 1, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.REDSTONE_TORCH, 2, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.REDSTONE_TORCH, 3, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.REDSTONE_TORCH, 4, Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.REDSTONE_TORCH, 5, Blocks.REDSTONE_TORCH.getDefaultState());
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 0, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 1, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 2, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 3, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 4, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 5, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 6, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.STONE_BRICK_STAIRS, 7, Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.HALF, Half.TOP).with(StairsBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.STONE_SLAB, 5, Blocks.SMOOTH_STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM)); // var5 SMOOTH STONE bottom
+			SetOldMetaBlockState(Blocks.STONE_SLAB, 7, Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM)); // var7 QUARTZ bottom
+			SetOldMetaBlockState(Blocks.STONE_SLAB, 13, Blocks.SMOOTH_STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP)); // SMOOTH STONE top
+			SetOldMetaBlockState(Blocks.STONE, 6, Blocks.POLISHED_ANDESITE.getDefaultState());
+			SetOldMetaBlockState(Blocks.STONE_BRICKS, 1, Blocks.MOSSY_STONE_BRICKS.getDefaultState());
+			SetOldMetaBlockState(Blocks.TORCH, 1, Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.EAST));
+			SetOldMetaBlockState(Blocks.TORCH, 2, Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.WEST));
+			SetOldMetaBlockState(Blocks.TORCH, 3, Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.SOUTH));
+			SetOldMetaBlockState(Blocks.TORCH, 4, Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.NORTH));
+			SetOldMetaBlockState(Blocks.TORCH, 5, Blocks.TORCH.getDefaultState());
+			SetOldMetaBlockState(Blocks.WATER, 1, Blocks.WATER.getDefaultState().with(FlowingFluidBlock.LEVEL, 1));
+			SetOldMetaBlockState(Blocks.WATER, 8, Blocks.WATER.getDefaultState().with(FlowingFluidBlock.LEVEL, 8));
+			SetOldMetaBlockState(Blocks.WATER, 9, Blocks.WATER.getDefaultState().with(FlowingFluidBlock.LEVEL, 9));
+			SetOldMetaBlockState(Blocks.WHITE_WOOL, 11, Blocks.BLUE_WOOL.getDefaultState());
+			SetOldMetaBlockState(Blocks.WHITE_WOOL, 13, Blocks.GREEN_WOOL.getDefaultState());
+			SetOldMetaBlockState(Blocks.WHITE_WOOL, 14, Blocks.RED_WOOL.getDefaultState());
+			SetOldMetaBlockState(Blocks.WHITE_WOOL, 15, Blocks.BLACK_WOOL.getDefaultState());
+			SetOldMetaBlockState(NostrumBlocks.lightDungeonBlock, 1, NostrumBlocks.dungeonBlock.getDefaultState());
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 0, NostrumBlocks.logicDoor.getSlaveState(Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 1, NostrumBlocks.logicDoor.getMaster(Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 2, NostrumBlocks.logicDoor.getSlaveState(Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 3, NostrumBlocks.logicDoor.getMaster(Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 4, NostrumBlocks.logicDoor.getSlaveState(Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 5, NostrumBlocks.logicDoor.getMaster(Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 6, NostrumBlocks.logicDoor.getSlaveState(Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.logicDoor, 7, NostrumBlocks.logicDoor.getMaster(Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 0, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.DOWN));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 1, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.UP));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 2, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 3, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 4, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 5, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 8, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.DOWN));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 9, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.UP));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 10, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 11, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 12, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 13, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.EAST));
+			// Note: Lying and saying all said unbreakable. Sorcery breakable ones are fine. Some in plant room are 'breakable' on accident.
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 3, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 4, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 5, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 8, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.DOWN));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 10, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 11, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 12, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 13, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 2, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 3, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 4, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 10, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 12, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 13, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.candle, 5, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.NORTH).with(Candle.LIT, true)); // 010 2
+			SetOldMetaBlockState(NostrumBlocks.candle, 7, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.SOUTH).with(Candle.LIT, true)); // 011 3
+			SetOldMetaBlockState(NostrumBlocks.candle, 9, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.WEST).with(Candle.LIT, true)); // 100 4
+			SetOldMetaBlockState(NostrumBlocks.candle, 11, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.EAST).with(Candle.LIT, true)); // 101 5
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 0, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_EARTH));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 1, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_ENDER));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 2, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_FIRE));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 3, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_ICE));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 4, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_LIGHTNING));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 5, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_PHYSICAL));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 6, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_WIND));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 7, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.DRAGON_RED));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 8, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.PLANT_BOSS));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 0, NostrumBlocks.progressionDoor.getSlaveState(Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 1, NostrumBlocks.progressionDoor.getMaster(Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 2, NostrumBlocks.progressionDoor.getSlaveState(Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 3, NostrumBlocks.progressionDoor.getMaster(Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 4, NostrumBlocks.progressionDoor.getSlaveState(Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 5, NostrumBlocks.progressionDoor.getMaster(Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 6, NostrumBlocks.progressionDoor.getSlaveState(Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 7, NostrumBlocks.progressionDoor.getMaster(Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.sorceryPortal, 0, NostrumBlocks.sorceryPortal.getSlaveState());
+			SetOldMetaBlockState(NostrumBlocks.sorceryPortal, 1, NostrumBlocks.sorceryPortal.getMaster());
+		}
+		
+		private static Map<String, Block> OldBlockNameMap_1_12_2 = null;
+		
+		private static final @Nullable Block FindBlockWithOldName(String name) {
+			if (OldBlockNameMap_1_12_2 == null) {
+				OldBlockNameMap_1_12_2 = new HashMap<>();
+				InitOldBlockNames();
+			}
+			return OldBlockNameMap_1_12_2.get(name);
+		}
+		
+		private static final void InitOldBlockNames() {
+			OldBlockNameMap_1_12_2.put("minecraft:bed", Blocks.RED_BED);
+			OldBlockNameMap_1_12_2.put("minecraft:carpet", Blocks.RED_CARPET);
+			OldBlockNameMap_1_12_2.put("minecraft:nether_brick", Blocks.NETHER_BRICKS);
+			OldBlockNameMap_1_12_2.put("minecraft:red_nether_brick", Blocks.RED_NETHER_BRICKS);
+			OldBlockNameMap_1_12_2.put("minecraft:stonebrick", Blocks.STONE_BRICKS);
+			OldBlockNameMap_1_12_2.put("minecraft:web", Blocks.COBWEB);
+			OldBlockNameMap_1_12_2.put("minecraft:wool", Blocks.WHITE_WOOL);
+			OldBlockNameMap_1_12_2.put("nostrummagica:dungeon_block", NostrumBlocks.lightDungeonBlock);
+			OldBlockNameMap_1_12_2.put("nostrummagica:mani_crystal", NostrumBlocks.maniCrystalBlock);
+		}
+		
+		private static Map<String, String> OldTENameMap_1_12_2 = null;
+		
+		private static final @Nullable String FindTileEntityWithOldName(String name) {
+			if (OldTENameMap_1_12_2 == null) {
+				OldTENameMap_1_12_2 = new HashMap<>();
+				InitOldTENames();
+			}
+			return OldTENameMap_1_12_2.get(name);
+		}
+		
+		private static final void InitOldTENames() {
+			OldTENameMap_1_12_2.put("nostrum_altar_te", TileEntityType.getId(NostrumTileEntities.AltarTileEntityType).toString());
+			OldTENameMap_1_12_2.put("nostrum_mob_spawner_te", TileEntityType.getId(NostrumTileEntities.SingleSpawnerTileEntityType).toString());
+			OldTENameMap_1_12_2.put("nostrum_symbol_te", TileEntityType.getId(NostrumTileEntities.SymbolTileEntityType).toString());
+			OldTENameMap_1_12_2.put("progression_door", TileEntityType.getId(NostrumTileEntities.ProgressionDoorTileEntityType).toString());
+			OldTENameMap_1_12_2.put("sorcery_portal", TileEntityType.getId(NostrumTileEntities.SorceryPortalTileEntityType).toString());
+			OldTENameMap_1_12_2.put("switch_block_tile_entity", TileEntityType.getId(NostrumTileEntities.SwitchBlockTileEntityType).toString());
+			OldTENameMap_1_12_2.put("teleport_rune", TileEntityType.getId(NostrumTileEntities.TeleportRuneTileEntityType).toString());
+		}
+		
 		public static final String NBT_BLOCK = "block_id";
 		public static final String NBT_BLOCK_TYPE = "block_type";
 		public static final String NBT_BLOCK_STATE = "block_meta";
@@ -129,35 +363,73 @@ public class RoomBlueprint {
 			case 2:
 				// Was block name + (int) meta saving.
 				// No more meta, so this doesn't work anymore
-//				String type = nbt.getString(NBT_BLOCK_TYPE);
-//				if (!type.isEmpty()) {
-//					Block block = CHECK_CACHE(type);
-//					if (block == null) {
-//						block = Block.getBlockFromName(type);
-//						SET_CACHE(type, block);
-//					}
-//					if (block != null) {
+				String type = nbt.getString(NBT_BLOCK_TYPE).toLowerCase();
+				if (!type.isEmpty()) {
+					Block block = CHECK_BLOCK_CACHE(type);
+					if (block == null) {
+						block = Registry.BLOCK.getValue(new ResourceLocation(type)).orElse(null);
+						
+						// Another chance with manual fixup
+						if (block == null) {
+							block = FindBlockWithOldName(type);
+						}
+						
+						SET_BLOCK_CACHE(type, block);
+					}
+					if (block != null) {
+						int meta = nbt.getInt(NBT_BLOCK_STATE);
+						if (meta == 0) {
+							// Good
+							state = block.getDefaultState();
+						} else {
+							// Try to use version update map
+							state = GetBlockStateFromOldMeta(block, meta);
+							if (state == null) {
+								NostrumMagica.logger.warn("Found blockstate (block=" + type + ", meta=" + meta + ") that we can't parse! Using default, but that's probably wrong!");
+								state = block.getDefaultState();
+							}
+						}
 //						Integer meta = nbt.getInt(NBT_BLOCK_STATE);
 //						state = CHECK_BLOCKSTATE_CACHE(block, meta);
 //						if (state == null) {
 //							state = block.getStateFromMeta(meta);
 //							SET_BLOCKSTATE_CACHE(block, meta, state);
 //						}
-//					}
-//				}
-//				
-//				// Prevent air from getting in
-//				if (state != null && state.getBlock() == Blocks.AIR) {
-//					state = null;
-//				}
-//				
-//				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
-//					teData = nbt.getCompound(NBT_TILE_ENTITY);
-//				}
-//				break;
+					}
+					else
+					{
+						NostrumMagica.logger.warn("Couldn't find block for type: " + type);
+					}
+				}
+				
+				// Prevent air from getting in
+				if (state != null && state.getBlock() == Blocks.AIR) {
+					state = null;
+				}
+				
+				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
+					teData = nbt.getCompound(NBT_TILE_ENTITY);
+					
+					// Detect missing ones
+					final String id = teData.getString("id").toLowerCase();
+					if (id != null) {
+						Optional<TileEntityType<?>> teType = Registry.BLOCK_ENTITY_TYPE.getValue(new ResourceLocation(id));
+						if (!teType.isPresent()) {
+							
+							// Try to fix up
+							String otherID = FindTileEntityWithOldName(id);
+							if (otherID != null && Registry.BLOCK_ENTITY_TYPE.getValue(new ResourceLocation(otherID)).isPresent()) {
+								teData.putString("id", otherID);
+							} else {
+								NostrumMagica.logger.warn("Can't find tile entity with id: " + id);
+							}
+						}
+					}
+				}
+				break;
 				// throw new RuntimeException("Blueprint block doesn't understand version " + version); TODO do this
-				state = null;
-				teData = null;
+//				state = null;
+//				teData = null;
 			case 3:
 				state = NBTUtil.readBlockState(nbt.getCompound(NBT_BLOCKSTATE_TAG));
 				
@@ -538,6 +810,7 @@ public class RoomBlueprint {
 		} else {
 			BlockState placeState = block.getSpawnState(direction);
 			if (placeState != null) {
+				// TODO: add fluid state support
 				world.setBlockState(at, placeState, 2);
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
@@ -566,7 +839,8 @@ public class RoomBlueprint {
 				}
 			} else {
 				world.getWorld().removeTileEntity(at);
-				world.removeBlock(at, false);
+				//world.removeBlock(at, false);
+				world.setBlockState(at, Blocks.AIR.getDefaultState(), 2);
 			}
 		}
 	}
@@ -903,7 +1177,7 @@ public class RoomBlueprint {
 		
 		public static BlueprintSavedTE fromNBT(CompoundNBT nbt) {
 			long pos = nbt.getLong(NBT_POS);
-			return new BlueprintSavedTE(nbt.getCompound(NBT_DATA), BlockPos.fromLong(pos));
+			return new BlueprintSavedTE(nbt.getCompound(NBT_DATA), WorldUtil.blockPosFromLong1_12_2(pos));
 		}
 	}
 	
@@ -952,11 +1226,14 @@ public class RoomBlueprint {
 			int listCount = list.size();
 			for (int i = 0; i < listCount; i++) {
 				CompoundNBT tag = (CompoundNBT) list.getCompound(i);
-				doors.add(DungeonExitPoint.fromNBT(tag));
+				DungeonExitPoint door;
+				door = DungeonExitPoint.fromNBT(tag);
+				doors.add(door);
 			}
 			
 			if (nbt.contains(NBT_ENTRY)) {
-				entry = DungeonExitPoint.fromNBT(nbt.getCompound(NBT_ENTRY));
+				CompoundNBT tag = nbt.getCompound(NBT_ENTRY);
+				entry = DungeonExitPoint.fromNBT(tag);
 			}
 			
 			if (!NostrumMagica.initFinished) {

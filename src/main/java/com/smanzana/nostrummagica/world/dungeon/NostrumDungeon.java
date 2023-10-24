@@ -7,15 +7,18 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.utils.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class NostrumDungeon {
 	
@@ -47,13 +50,22 @@ public class NostrumDungeon {
 		
 		public CompoundNBT toNBT() {
 			CompoundNBT tag = new CompoundNBT();
-			tag.putLong(NBT_POS, this.pos.toLong());
+			tag.put(NBT_POS, NBTUtil.writeBlockPos(pos));
 			tag.putByte(NBT_DIR, (byte) facing.getHorizontalIndex());
 			return tag;
 		}
 		
 		public static DungeonExitPoint fromNBT(CompoundNBT nbt) {
-			BlockPos pos = BlockPos.fromLong(nbt.getLong(NBT_POS));
+			final BlockPos pos;
+			
+			if (nbt.contains(NBT_POS, NBT.TAG_LONG)) {
+				// Legacy
+				// 1.13/1.14 changed BlockPos.fromLong, so have to use old version
+				pos = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_POS));
+			} else {
+				pos = NBTUtil.readBlockPos(nbt.getCompound(NBT_POS));
+			}
+			
 			Direction facing = Direction.byHorizontalIndex(nbt.getByte(NBT_DIR));
 			return new DungeonExitPoint(pos, facing);
 		}

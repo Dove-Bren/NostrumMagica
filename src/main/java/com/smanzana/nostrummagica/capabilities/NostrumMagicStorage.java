@@ -491,7 +491,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			DimensionType dim = DimensionType.byName(ResourceLocation.tryCreate(dimName));
 			instance.setSorceryPortalLocation(
 					dim,
-					BlockPos.fromLong(tag.getLong(NBT_SORCERYPORTAL_POS)));
+					BlockPos.fromLong(tag.getLong(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
 		}
 		
 		// Modifiers

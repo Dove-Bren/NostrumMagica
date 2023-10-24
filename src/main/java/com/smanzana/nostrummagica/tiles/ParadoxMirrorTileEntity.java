@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.tiles;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -94,7 +96,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		if (!nbt.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
 			linkedPosition = null;
 		} else {
-			linkedPosition = BlockPos.fromLong(nbt.getLong(NBT_LINKED_POS));
+			linkedPosition = BlockPos.fromLong(nbt.getLong(NBT_LINKED_POS)); // Warning: can break if save used across game versions
 		}
 	}
 	

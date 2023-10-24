@@ -25,6 +25,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
@@ -276,7 +277,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 				tag = new CompoundNBT();
 			}
 			
-			tag.putLong(NBT_LINKED_POS, linkedPos.toLong());
+			tag.put(NBT_LINKED_POS, NBTUtil.writeBlockPos(linkedPos));
 			drop.setTag(tag);
 		}
 		
@@ -321,10 +322,10 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		if (stack.isEmpty() || !stack.hasTag() || !stack.getTag().contains(NBT_LINKED_POS, NBT.TAG_LONG))
+		if (stack.isEmpty() || !stack.hasTag() || !stack.getTag().contains(NBT_LINKED_POS, NBT.TAG_COMPOUND))
 			return;
 		
-		BlockPos pos = BlockPos.fromLong(stack.getTag().getLong(NBT_LINKED_POS));
+		BlockPos pos = NBTUtil.readBlockPos(stack.getTag().getCompound(NBT_LINKED_POS));
 		
 		if (pos == null)
 			return;

@@ -3,8 +3,10 @@ package com.smanzana.nostrummagica.entity;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
@@ -398,7 +400,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	public void readAdditional(CompoundNBT compound) {
 		super.readAdditional(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
-			setHome(BlockPos.fromLong(compound.getLong("home")));
+			setHome(BlockPos.fromLong(compound.getLong("home"))); // Warning: can break if save used across game versions
 		} else {
 			setHome(null);
 		}

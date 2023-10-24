@@ -69,7 +69,7 @@ public class NostrumSingleSpawner extends ContainerBlock {
 	}
 	
 	public static final int SPAWN_DIST_SQ = 900; // 30^2 
-	protected static final EnumProperty<Type> MOB = EnumProperty.create("mob", Type.class);
+	public static final EnumProperty<Type> MOB = EnumProperty.create("mob", Type.class);
 
 	public static final String ID = "nostrum_spawner";
 	

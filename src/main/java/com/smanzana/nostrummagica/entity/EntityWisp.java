@@ -3,8 +3,10 @@ package com.smanzana.nostrummagica.entity;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -322,7 +324,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 	public void readAdditional(CompoundNBT compound) {
 		super.readAdditional(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
-			setHome(BlockPos.fromLong(compound.getLong("home")));
+			setHome(BlockPos.fromLong(compound.getLong("home"))); // Warning: can break if save used across game versions
 		}
 	}
 	

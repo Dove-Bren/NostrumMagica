@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.Map;
+import java.util.UUID;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -84,7 +87,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 		super.read(compound);
 		
 		if (compound.contains(NBT_TARGET, NBT.TAG_LONG)) {
-			target = BlockPos.fromLong(compound.getLong(NBT_TARGET));
+			target = BlockPos.fromLong(compound.getLong(NBT_TARGET)); // Warning: can break if save used across game versions
 		} else {
 			target = null;
 		}

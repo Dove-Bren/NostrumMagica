@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -120,7 +121,7 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 		}
 		
 		if (nbt.contains(NBT_TRIGGER_OFFSET)) {
-			this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_TRIGGER_OFFSET));
+			this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_TRIGGER_OFFSET)); // Warning: can break if save used across game versions
 		}
 	}
 	

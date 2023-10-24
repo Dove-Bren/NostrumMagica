@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.utils;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IBlockReader;
@@ -103,5 +104,17 @@ public class WorldUtil {
 		return Math.abs(pos1.getX() - pos2.getX())
 				+ Math.abs(pos1.getY() - pos2.getY())
 				+ Math.abs(pos1.getZ() - pos2.getZ());
+	}
+	
+	private static final int NUM_X_BITS = 1 + MathHelper.log2(MathHelper.smallestEncompassingPowerOfTwo(30000000));
+	private static final int NUM_Z_BITS = NUM_X_BITS;
+	private static final int NUM_Y_BITS = 64 - NUM_X_BITS - NUM_Z_BITS;
+	private static final int Y_SHIFT = 0 + NUM_Z_BITS;
+	private static final int X_SHIFT = Y_SHIFT + NUM_Y_BITS;
+	public static final BlockPos blockPosFromLong1_12_2(long serialized) {
+		int i = (int)(serialized << 64 - X_SHIFT - NUM_X_BITS >> 64 - NUM_X_BITS);
+		int j = (int)(serialized << 64 - Y_SHIFT - NUM_Y_BITS >> 64 - NUM_Y_BITS);
+		int k = (int)(serialized << 64 - NUM_Z_BITS >> 64 - NUM_Z_BITS);
+		return new BlockPos(i, j, k);
 	}
 }

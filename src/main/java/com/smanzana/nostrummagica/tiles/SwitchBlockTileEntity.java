@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.Map;
+import java.util.UUID;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
@@ -73,7 +76,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 				break;
 			}
 		}
-		this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_OFFSET));
+		this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_OFFSET)); // Warning: can break if save used across game versions
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
 	}
 	
