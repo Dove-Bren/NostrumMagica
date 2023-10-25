@@ -44,7 +44,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 public class RoomLectern extends StaticRoom {
 	
 	public RoomLectern() {
-		super(-18, -1, 0, 2, 4, 6,
+		super("RoomLectern", -18, -1, 0, 2, 4, 6,
 				// Floor
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",

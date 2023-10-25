@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -26,9 +27,10 @@ public class LoadedRoom implements IDungeonRoom {
 	
 	private RoomBlueprint blueprint;
 	private List<DungeonExitPoint> chestsRelative;
+	private final String registryID;
 	
-	public LoadedRoom(RoomBlueprint blueprint) {
-		this.blueprint = blueprint;
+	public LoadedRoom(DungeonRoomRecord blueprintRecord) {
+		this.blueprint = blueprintRecord.blueprint;
 		
 		if (blueprint == null) {
 			throw new RuntimeException("Blueprint null when creating LoadedRoom. Wrong room name looked up, or too early?");
@@ -42,6 +44,10 @@ public class LoadedRoom implements IDungeonRoom {
 				chestsRelative.add(new DungeonExitPoint(offset, state.get(ChestBlock.FACING)));
 			}
 		});
+		
+		// Save consistent unique ID this room can be looked up later as and register as such
+		this.registryID = "LoadedRoom_" + blueprintRecord.name;
+		IDungeonRoom.Register(registryID, this);
 	}
 	
 	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
@@ -161,5 +167,10 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public boolean hasTraps() {
 		return true;
+	}
+	
+	@Override
+	public String getRoomID() {
+		return this.registryID;
 	}
 }

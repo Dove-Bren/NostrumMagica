@@ -26,7 +26,7 @@ public class RoomEntryDragon extends StaticRoom {
 	
 	public RoomEntryDragon(boolean dark) {
 		
-		super(-5, 0, -5, 5, 14, 5,
+		super("RoomEntryDragon", -5, 0, -5, 5, 14, 5,
 				// Floor
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",

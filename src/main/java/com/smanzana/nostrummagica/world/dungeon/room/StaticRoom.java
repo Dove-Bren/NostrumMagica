@@ -102,8 +102,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 	private int locMaxY;
 	private int locMaxZ;
 	private StaticBlockState blocks[][][];
+	private final String ID;
 	
-	public StaticRoom(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+	public StaticRoom(String ID, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 		this.locMinX = minX;
 		this.locMinY = minY;
 		this.locMinZ = minZ;
@@ -127,6 +128,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 			locMinZ = locMaxZ;
 			locMaxZ = s;
 		}
+		
+		this.ID = ID;
+		IDungeonRoom.Register(this.ID, this);
 	}
 	
 	/**
@@ -142,9 +146,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 	 * layer. Then, series of characters followed by IBlockStates or Blocks.
 	 * It's like registering a recipe in GameRegistry
 	 */
-	public StaticRoom(int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+	public StaticRoom(String ID, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
 			Object ... args) {
-		this(minX, minY, minZ, maxX, maxY, maxZ);
+		this(ID, minX, minY, minZ, maxX, maxY, maxZ);
 		
 		int s = locMaxX - locMinX;
 		blocks = new StaticBlockState[s + 1][][];
@@ -367,5 +371,10 @@ public abstract class StaticRoom implements IDungeonRoom {
 	
 	protected void applyBlockOverrides(IWorld world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
 		
+	}
+	
+	@Override
+	public String getRoomID() {
+		return this.ID;
 	}
 }

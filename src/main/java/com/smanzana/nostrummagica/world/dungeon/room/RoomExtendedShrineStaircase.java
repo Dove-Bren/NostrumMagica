@@ -26,6 +26,8 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 	public RoomExtendedShrineStaircase(SpellComponentWrapper component, boolean dark) {
 		stairs = new RoomEntryStairs(dark);
 		shrine = new RoomEntryShrine(component, dark);
+		
+		IDungeonRoom.Register(this.getRoomID(), this);
 	}
 	
 	@Override
@@ -122,5 +124,10 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 	@Override
 	public boolean hasTraps() {
 		return false;
+	}
+
+	@Override
+	public String getRoomID() {
+		return "RoomExtendedShrineStaircase"; // Would need to incorporate component type and uniqify itself?
 	}
 }

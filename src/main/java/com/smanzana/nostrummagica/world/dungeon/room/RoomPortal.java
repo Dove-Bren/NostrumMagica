@@ -16,7 +16,7 @@ public class RoomPortal extends StaticRoom {
 	
 	public RoomPortal() {
 		// end up providing the type of shrine!
-		super(-7, -1, 0, 7, 10, 16,
+		super("RoomPortal", -7, -1, 0, 7, 10, 16,
 				// Floor
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",

@@ -18,7 +18,7 @@ public class RoomEnd2 extends StaticRoom {
 	private boolean withChest;
 	
 	public RoomEnd2(boolean withChest) {
-		super(-2, -1, 0, 7, 3, 7,
+		super("RoomEnd2", -2, -1, 0, 7, 3, 7,
 				// Floor
 				"XXXXXXXXXX",
 				"XXXXXXXXXX",

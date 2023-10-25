@@ -24,7 +24,7 @@ public class RoomEntryShrine extends StaticRoom {
 	
 	public RoomEntryShrine(SpellComponentWrapper component, boolean dark) {
 		
-		super(-5, 0, -5, 5, 21, 5,
+		super("RoomEntryShrine", -5, 0, -5, 5, 21, 5, // Would have trouble and need to be unique per component and registered?
 				// Floor
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",

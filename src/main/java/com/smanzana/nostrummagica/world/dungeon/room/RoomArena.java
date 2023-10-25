@@ -12,7 +12,7 @@ import net.minecraft.block.Blocks;
 public class RoomArena extends StaticRoom {
 	
 	public RoomArena() {
-		super(-20, -10, 0, 20, 10, 40);
+		super("RoomArena", -20, -10, 0, 20, 10, 40);
 		final int minX = -20;
 		final int minY = -10;
 		final int minZ = 0;

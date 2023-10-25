@@ -25,7 +25,7 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 	
 	public ShrineRoom() {
 		// end up providing the type of shrine!
-		super(-5, -1, 0, 5, 5, 10,
+		super("ShrineRoom", -5, -1, 0, 5, 5, 10,
 				// Floor
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",

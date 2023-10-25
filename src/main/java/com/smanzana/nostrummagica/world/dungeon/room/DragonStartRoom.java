@@ -20,7 +20,7 @@ public class DragonStartRoom extends StaticRoom implements ISpellComponentRoom {
 	
 	public DragonStartRoom() {
 		// End up passing in height to surface?
-		super(-5, -1, -5, 5, 5, 5,
+		super("DragonStartRoom", -5, -1, -5, 5, 5, 5,
 				// Floor
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",

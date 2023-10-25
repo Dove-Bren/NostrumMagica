@@ -26,10 +26,10 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class DungeonRoomRegistry {
 	
-	private static final class DungeonRoomRecord {
-		public RoomBlueprint blueprint;
-		public int weight;
+	public static final class DungeonRoomRecord {
 		public String name;
+		public RoomBlueprint blueprint;
+		protected int weight;
 		
 		public DungeonRoomRecord(String name, RoomBlueprint blueprint, int weight) {
 			this.blueprint = blueprint;
@@ -142,12 +142,22 @@ public class DungeonRoomRegistry {
 	
 	@Nullable
 	public RoomBlueprint getRoom(String roomName) {
-		RoomBlueprint ret = null;
+		DungeonRoomRecord record = getRoomRecord(roomName);
+		if (record != null) {
+			return record.blueprint;
+		} else {
+			return null;
+		}
+	}
+	
+	@Nullable
+	public DungeonRoomRecord getRoomRecord(String roomName) {
+		DungeonRoomRecord ret = null;
 		DungeonRoomList list = map.get(INTERNAL_ALL_NAME);
 		if (list != null) {
 			for (DungeonRoomRecord record : list.recordList) {
 				if (record.name.equalsIgnoreCase(roomName)) {
-					ret = record.blueprint;
+					ret = record;
 					break;
 				}
 			}
@@ -156,18 +166,18 @@ public class DungeonRoomRegistry {
 		return ret;
 	}
 	
-	public List<RoomBlueprint> getAllRooms() {
+	public List<DungeonRoomRecord> getAllRooms() {
 		return this.getAllRooms(INTERNAL_ALL_NAME);
 	}
 	
-	public List<RoomBlueprint> getAllRooms(String tag) {
+	public List<DungeonRoomRecord> getAllRooms(String tag) {
 		DungeonRoomList list = map.get(tag);
-		List<RoomBlueprint> ret;
+		List<DungeonRoomRecord> ret;
 		
 		if (list != null) {
 			ret = new ArrayList<>(list.recordList.size());
 			for (DungeonRoomRecord record : list.recordList) {
-				ret.add(record.blueprint);
+				ret.add(record);
 				// TODO use weight...
 			}
 		} else {

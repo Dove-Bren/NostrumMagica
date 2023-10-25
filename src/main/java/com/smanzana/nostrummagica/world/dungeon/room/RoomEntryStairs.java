@@ -17,7 +17,7 @@ import net.minecraft.util.Direction;
 public class RoomEntryStairs extends StaticRoom {
 	
 	public RoomEntryStairs(boolean dark) {
-		super(-2, 0, -2, 2, 3, 2,
+		super("RoomEntryStairs", -2, 0, -2, 2, 3, 2,
 				// Floor
 				"BBBBB",
 				"B  BB",

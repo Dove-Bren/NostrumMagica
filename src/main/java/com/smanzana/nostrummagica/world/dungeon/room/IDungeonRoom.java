@@ -1,6 +1,10 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -54,5 +58,20 @@ public interface IDungeonRoom {
 	public boolean hasTraps();
 	
 	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start);
+	
+	public String getRoomID();
+	
+	static final Map<String, IDungeonRoom> Registry = new HashMap<>();
+	public static @Nullable IDungeonRoom GetRegisteredRoom(String ID) {
+		return Registry.get(ID);
+	}
+	
+	public static void Register(String ID, IDungeonRoom room) {
+		if (Registry.containsKey(ID)) {
+			throw new RuntimeException("Duplicate dungeon rooms registered");
+		}
+		
+		Registry.put(ID, room);
+	}
 	
 }

@@ -101,7 +101,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator.NostrumDungeonConfig;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.NostrumDungeonConfig;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 
 import net.minecraft.command.CommandSource;

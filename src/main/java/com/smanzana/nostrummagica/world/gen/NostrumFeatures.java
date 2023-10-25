@@ -19,7 +19,7 @@ public class NostrumFeatures {
 	private static final String DUNGEONGEN_ID = "nostrum_shrines";
 	
 	@ObjectHolder(FLOWERGEN_ID) public static NostrumFlowerGenerator flowers;
-	@ObjectHolder(DUNGEONGEN_ID) public static NostrumDungeonGenerator dungeons;
+	@ObjectHolder(DUNGEONGEN_ID) public static NostrumDungeonStructure dungeons;
 	
 	@SubscribeEvent
 	public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
@@ -30,7 +30,7 @@ public class NostrumFeatures {
 		
 		//registry.register(new NostrumFlowerGenerator(NostrumFlowerGenerator.NostrumFlowerConfig::deserialize).setRegistryName(FLOWERGEN_ID));
 		registry.register(new NostrumFlowerGenerator(NoFeatureConfig::deserialize).setRegistryName(FLOWERGEN_ID));
-		registry.register(new NostrumDungeonGenerator(NostrumDungeonGenerator.NostrumDungeonConfig::deserialize).setRegistryName(DUNGEONGEN_ID));
+		registry.register(new NostrumDungeonStructure(NostrumDungeonStructure.NostrumDungeonConfig::deserialize).setRegistryName(DUNGEONGEN_ID));
 	}
 	
 }

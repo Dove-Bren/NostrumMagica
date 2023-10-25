@@ -19,7 +19,7 @@ public class RoomJail1 extends StaticRoom {
 	//19, 10, 25
 	// 
 	public RoomJail1() {
-		super(-4, -1, 0, 14, 9, 24,
+		super("RoomJail1", -4, -1, 0, 14, 9, 24,
 				// Floor
 				"XXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXX",

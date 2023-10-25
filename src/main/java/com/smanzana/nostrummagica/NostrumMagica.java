@@ -137,7 +137,7 @@ import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonGenerator;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientWorld;
@@ -282,7 +282,7 @@ public class NostrumMagica {
 		new NostrumLootHandler();
 		//DungeonRoomRegistry.instance().loadRegistryFromDisk(); Done in feature loading since it's required by that system and this is too late :(
 		//NostrumDimensionMapper.registerDimensions();
-		NostrumDungeonGenerator.initGens();
+		NostrumDungeonStructure.initGens();
 
 		proxy.init();
 		aetheria.init();

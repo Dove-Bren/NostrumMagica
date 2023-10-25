@@ -813,6 +813,8 @@ public class RoomBlueprint {
 			if (placeState != null) {
 				// TODO: add fluid state support
 				world.setBlockState(at, placeState, 2);
+				// TODO: for fences and stuff that should possibly extend
+				// worldIn.getChunk(blockpos).markBlockForPostprocessing(blockpos);
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {

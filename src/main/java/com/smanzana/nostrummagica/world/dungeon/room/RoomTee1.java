@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 public class RoomTee1 extends StaticRoom {
 
 	public RoomTee1() {
-		super(-4, -1, 0, 4, 7, 19,
+		super("RoomTee1", -4, -1, 0, 4, 7, 19,
 				// Floor
 				"XXXXXXXXX",
 				"XXXXXXXXX",

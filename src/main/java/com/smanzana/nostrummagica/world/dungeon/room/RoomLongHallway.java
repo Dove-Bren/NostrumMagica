@@ -16,7 +16,7 @@ public class RoomLongHallway extends StaticRoom {
 	
 	public RoomLongHallway() {
 		// end up providing the type of shrine!
-		super(-2, -1, 0, 2, 3, 20,
+		super("RoomLongHallway", -2, -1, 0, 2, 3, 20,
 				// Floor
 				"XXXXX",
 				"XXXXX",

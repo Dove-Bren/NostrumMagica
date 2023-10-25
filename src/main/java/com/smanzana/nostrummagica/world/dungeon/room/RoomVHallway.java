@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 public class RoomVHallway extends StaticRoom {
 	
 	public RoomVHallway() {
-		super(-4, -11, 0, 1, 3, 5,
+		super("RoomVHallway", -4, -11, 0, 1, 3, 5,
 				// Floor
 				"XXXXXX",
 				"XXXXXX",

@@ -25,6 +25,8 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 	public RoomExtendedDragonStaircase(boolean dark) {
 		stairs = new RoomEntryStairs(dark);
 		entry = new RoomEntryDragon(dark);
+		
+		// Would want to register with IDungeonRoom.Register() but only if this was uniquified instead of created per instance
 	}
 	
 	@Override
@@ -121,5 +123,10 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 	@Override
 	public boolean hasTraps() {
 		return false;
+	}
+
+	@Override
+	public String getRoomID() {
+		return "RoomExtendedDragonStaircase"; // Would want to incorporate dark or not?
 	}
 }

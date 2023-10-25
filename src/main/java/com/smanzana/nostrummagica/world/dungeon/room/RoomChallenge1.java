@@ -19,7 +19,7 @@ public class RoomChallenge1 extends StaticRoom {
 	//25, 13, 24
 	// 
 	public RoomChallenge1() {
-		super(-19, -7, 0, 5, 5, 23,
+		super("RoomChallenge1", -19, -7, 0, 5, 5, 23,
 				// Floor
 				"XXXXXXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXXXXXX",

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
 
@@ -282,6 +283,30 @@ public class NostrumDungeon {
 			loot.set(rand.nextInt(27), new ItemStack(Items.GOLDEN_APPLE)); // FIXME should be key
 			LootUtil.createLoot(world, keyLocation.getPos(), keyLocation.getFacing(),
 					loot);
+		}
+		
+		private static final String NBT_ENTRY = "entry";
+		private static final String NBT_TEMPLATE = "template";
+		private static final String NBT_HASKEY = "hasKey";
+		
+		public @Nonnull CompoundNBT toNBT(@Nullable CompoundNBT tag) {
+			if (tag == null) {
+				tag = new CompoundNBT();
+			}
+			
+			tag.put(NBT_ENTRY, this.entry.toNBT());
+			tag.putString(NBT_TEMPLATE, this.template.getRoomID());
+			tag.putBoolean(NBT_HASKEY, this.hasKey);
+			
+			return tag;
+		}
+		
+		public static DungeonRoomInstance fromNBT(CompoundNBT tag) {
+			final DungeonExitPoint entry = DungeonExitPoint.fromNBT(tag.getCompound(NBT_ENTRY));
+			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(tag.getString(NBT_TEMPLATE));
+			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
+			
+			return new DungeonRoomInstance(entry, template, hasKey);
 		}
 	}
 	

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
 
@@ -22,7 +22,7 @@ public class NostrumLoadedDungeon extends NostrumDungeon {
 		super(starting, ending, minPath, randPath);
 		this.tag = tag;
 		
-		for (RoomBlueprint blueprint : DungeonRoomRegistry.instance().getAllRooms(tag)) {
+		for (DungeonRoomRecord blueprint : DungeonRoomRegistry.instance().getAllRooms(tag)) {
 			this.add(new LoadedRoom(blueprint));
 		}
 	}
