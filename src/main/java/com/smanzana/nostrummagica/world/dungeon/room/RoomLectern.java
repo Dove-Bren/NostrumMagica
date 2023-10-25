@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
@@ -38,7 +40,9 @@ import net.minecraft.state.properties.StairsShape;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class RoomLectern extends StaticRoom {
@@ -336,39 +340,46 @@ public class RoomLectern extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start)
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds)
 	{
-		super.spawn(dungeon, world, start);
+		super.spawn(world, start, bounds);
 		
 		// Fill out lectern!
 		BlockPos offset = new BlockPos(-15, 1, 3);
 		DungeonExitPoint point = NostrumDungeon.asRotated(start, offset, start.getFacing());
 		BlockPos pos = point.getPos();
-		TileEntity ent = world.getTileEntity(pos);
-		if (null == ent)
-		{
-			System.out.println("Could not find lectern! (" + pos.getX() + " " + pos.getY() + " " + pos.getZ());
-			world.setBlockState(pos, Blocks.BEDROCK.getDefaultState(), 2);
-		}
-		else
-		{
-			AltarTileEntity te = (AltarTileEntity) ent;
-			ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
-			Spell spell =  genSpell(world.getRandom());
-			SpellScroll.setSpell(scroll, spell);
-			scroll.setDamage(NostrumMagica.rand.nextInt(10));
-			
-			// Set description
-			CompoundNBT nbt = scroll.getTag();
-			ListNBT list = nbt.getList("Lore", NBT.TAG_STRING);
-			if (null == list)
-				list = new ListNBT();
-			
-			list.add(new StringNBT(spell.getDescription()));
-			nbt.put("Lore", list);
-			scroll.setTag(nbt);
-			
-			te.setItem(scroll);
+		
+		if (bounds == null || bounds.isVecInside(pos)) {
+			TileEntity ent = world.getTileEntity(pos);
+			if (null == ent)
+			{
+				System.out.println("Could not find lectern! (" + pos.getX() + " " + pos.getY() + " " + pos.getZ());
+				world.setBlockState(pos, Blocks.BEDROCK.getDefaultState(), 2);
+			}
+			else
+			{
+				AltarTileEntity te = (AltarTileEntity) ent;
+				ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
+				Spell spell =  genSpell(world.getRandom());
+				SpellScroll.setSpell(scroll, spell);
+				scroll.setDamage(NostrumMagica.rand.nextInt(10));
+				
+				// Set description
+				CompoundNBT nbt = scroll.getTag();
+				ListNBT list = nbt.getList("Lore", NBT.TAG_STRING);
+				if (null == list)
+					list = new ListNBT();
+				
+				list.add(new StringNBT(spell.getDescription()));
+				nbt.put("Lore", list);
+				scroll.setTag(nbt);
+				
+				if (world instanceof WorldGenRegion) {
+					te.setItemNoDirty(scroll);
+				} else {
+					te.setItem(scroll);
+				}
+			}
 		}
 	}
 }

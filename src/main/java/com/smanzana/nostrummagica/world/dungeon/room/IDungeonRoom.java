@@ -6,9 +6,9 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
 public interface IDungeonRoom {
@@ -20,7 +20,7 @@ public interface IDungeonRoom {
 	 * @param world
 	 * @return
 	 */
-	public boolean canSpawnAt(IWorld world, DungeonExitPoint start);
+	public boolean canSpawnAt(IWorld world, DungeonExitPoint start); // TODO ! Some of these checks might spill into other chunks!
 	
 	/**
 	 * Return the number of exits this room has
@@ -34,6 +34,14 @@ public interface IDungeonRoom {
 	 * @return
 	 */
 	public List<DungeonExitPoint> getExits(DungeonExitPoint start);
+	
+	/**
+	 * Return the bounds of this dungeon room if it were spawned at the
+	 * given position and facing.
+	 * @param entry
+	 * @return
+	 */
+	public MutableBoundingBox getBounds(DungeonExitPoint entry);
 	
 	/**
 	 * Returns the difficulty of the given room, which is used when figuring outa
@@ -57,7 +65,11 @@ public interface IDungeonRoom {
 	
 	public boolean hasTraps();
 	
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds);
+	
+	default public void spawn(IWorld world, DungeonExitPoint start) {
+		spawn(world, start, (MutableBoundingBox) null);
+	}
 	
 	public String getRoomID();
 	
@@ -73,5 +85,5 @@ public interface IDungeonRoom {
 		
 		Registry.put(ID, room);
 	}
-	
+
 }

@@ -73,7 +73,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 		
 		// If it's another mimic block, use what it's mimicking
 		if (state.getBlock() instanceof MimicBlock) {
-			state = getMirrorState(world, pos).orElse(state);
+			state = getMirrorState(state, world, pos).orElse(state);
 		}
 		
 		return state;
@@ -136,11 +136,12 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 			solid = false;
 		} else if (context.getEntity() != null) {
 			final Entity entityIn = context.getEntity();
-			final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
+			//final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
 			Direction side = state.get(FACING);
 			// cant use getCenter cause it's client-side only
 			//Vec3d center = entityBox.getCenter();
-			Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
+			//Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
+			Vec3d center = entityIn.getPositionVector();
 			
 			// XZ motion isn't stored on the server and is handled client-side
 			// Server also resets lastPos in an inconvenient way.
@@ -277,22 +278,22 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 	// Mimiced block attributes
 	@Override
 	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(world, pos, BlockState::getOpacity, () -> super.getOpacity(state, world, pos));
+		return getValue(state, world, pos, BlockState::getOpacity, () -> super.getOpacity(state, world, pos));
 	}
 
 	@Override
 	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(world, pos, BlockState::getAmbientOcclusionLightValue, () -> super.getAmbientOcclusionLightValue(state, world, pos));
+		return getValue(state, world, pos, BlockState::getAmbientOcclusionLightValue, () -> super.getAmbientOcclusionLightValue(state, world, pos));
 	}
 
 	@Override
 	public boolean propagatesSkylightDown(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(world, pos, BlockState::propagatesSkylightDown, () -> super.propagatesSkylightDown(state, world, pos));
+		return getValue(state, world, pos, BlockState::propagatesSkylightDown, () -> super.propagatesSkylightDown(state, world, pos));
 	}
 
 	@Override
 	public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(world, pos, BlockState::isNormalCube, () -> super.isNormalCube(state, world, pos));
+		return getValue(state, world, pos, BlockState::isNormalCube, () -> super.isNormalCube(state, world, pos));
 	}
 
 	@Override
@@ -302,47 +303,47 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 	
 	@Override
     public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return getValue(world, pos, (mirror, reader, pos1) -> mirror.getSoundType(reader, pos1, entity), () -> super.getSoundType(state, world, pos, entity));
+        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getSoundType(reader, pos1, entity), () -> super.getSoundType(state, world, pos, entity));
     }
 
     @Override
     public int getPackedLightmapCoords(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
-        return getValue(world, pos, BlockState::getPackedLightmapCoords, () -> super.getPackedLightmapCoords(state, world, pos));
+        return getValue(state, world, pos, BlockState::getPackedLightmapCoords, () -> super.getPackedLightmapCoords(state, world, pos));
     }
 
     @Nullable
     @Override
     public PathNodeType getAiPathNodeType(BlockState state, IBlockReader world, BlockPos pos, @Nullable MobEntity entity) {
-        return getValue(world, pos, (mirror, reader, pos1) -> mirror.getAiPathNodeType(reader, pos1, entity), () -> super.getAiPathNodeType(state, world, pos, entity));
+        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getAiPathNodeType(reader, pos1, entity), () -> super.getAiPathNodeType(state, world, pos, entity));
     }
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return getValue(worldIn, pos, (mirror, reader, pos1) -> mirror.getShape(reader, pos1, context), () -> super.getShape(state, worldIn, pos, context));
+        return getValue(state, worldIn, pos, (mirror, reader, pos1) -> mirror.getShape(reader, pos1, context), () -> super.getShape(state, worldIn, pos, context));
     }
 
 	@Override
     public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        return getValue(worldIn, pos, BlockState::getRenderShape, () -> super.getRenderShape(state, worldIn, pos));
+        return getValue(state, worldIn, pos, BlockState::getRenderShape, () -> super.getRenderShape(state, worldIn, pos));
     }
 
     @Override
     public VoxelShape getRaytraceShape(BlockState state, IBlockReader world, BlockPos pos) {
-        return getValue(world, pos, BlockState::getRaytraceShape, () -> super.getRaytraceShape(state, world, pos));
+        return getValue(state, world, pos, BlockState::getRaytraceShape, () -> super.getRaytraceShape(state, world, pos));
     }
 
     @Nullable
     @Override
     public RayTraceResult getRayTraceResult(BlockState state, World world, BlockPos pos, Vec3d start, Vec3d end, RayTraceResult original) {
-        return getValue(world, pos, (mirror, reader, pos1) -> mirror.getBlock().getRayTraceResult(mirror, world, pos, start, end, original), () -> super.getRayTraceResult(state, world, pos, start, end, original));
+        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getBlock().getRayTraceResult(mirror, world, pos, start, end, original), () -> super.getRayTraceResult(state, world, pos, start, end, original));
     }
 
     @Override
     public int getLightValue(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
-        int result = getValue(world, pos, BlockState::getLightValue, () -> super.getLightValue(state, world, pos));
+        int result = getValue(state, world, pos, BlockState::getLightValue, () -> super.getLightValue(state, world, pos));
         //This is needed so we can control AO. Try to remove this asap
         if ("net.minecraft.client.renderer.BlockModelRenderer".equals(Thread.currentThread().getStackTrace()[3].getClassName())) {
-            Optional<BlockState> mirrorState = getMirrorState(world, pos);
+            Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
             if(mirrorState.isPresent()) {
                 Boolean isAoModel = DistExecutor.callWhenOn(Dist.CLIENT, () -> () ->
                     Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(mirrorState.get()).isAmbientOcclusion());
@@ -357,7 +358,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
   //Entity#createRunningParticles
     @Override
     public boolean addRunningEffects(BlockState state, World world, BlockPos pos, Entity entity) {
-        Optional<BlockState> mirrorState = getMirrorState(world, pos);
+        Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
         if(mirrorState.isPresent()) {
             BlockState blockstate = mirrorState.get();
             if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
@@ -379,7 +380,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
     public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
         if(target instanceof BlockRayTraceResult) {
             BlockPos pos = ((BlockRayTraceResult) target).getPos();
-            Optional<BlockState> mirrorState = getMirrorState(world, pos);
+            Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
             if(mirrorState.isPresent()) {
                 BlockState blockstate = mirrorState.get();
                 Direction side = ((BlockRayTraceResult) target).getFace();
@@ -417,7 +418,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
     @Override
     @OnlyIn(Dist.CLIENT)
     public boolean addDestroyEffects(BlockState stateIn, World world, BlockPos pos, ParticleManager manager) {
-        Optional<BlockState> mirrorState = getMirrorState(world, pos);
+        Optional<BlockState> mirrorState = getMirrorState(stateIn, world, pos);
         if (mirrorState.isPresent()) {
             if(mirrorState.get().isAir(world, pos)) {
                 return false;
@@ -459,7 +460,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 
     @Override
     public boolean addLandingEffects(BlockState state1, ServerWorld ServerWorld, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-        Optional<BlockState> mirrorState = getMirrorState(ServerWorld, pos);
+        Optional<BlockState> mirrorState = getMirrorState(state2, ServerWorld, pos);
         if(mirrorState.isPresent()) {
             ServerWorld.spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
         }
@@ -468,20 +469,25 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 	
 	
 	
-	public static <T, W extends IBlockReader> T getValue(W reader, BlockPos pos, StateFunction<T, W> function, Supplier<T> defaultValue) {
-        return getMirrorState(reader, pos).map(mirror -> function.getValue(mirror, reader, pos)).orElseGet(defaultValue);
+	public static <T, W extends IBlockReader> T getValue(@Nullable BlockState state, W reader, BlockPos pos, StateFunction<T, W> function, Supplier<T> defaultValue) {
+        return getMirrorState(state, reader, pos).map(mirror -> function.getValue(mirror, reader, pos)).orElseGet(defaultValue);
     }
 
-    public static Optional<BlockState> getMirrorState(IBlockReader world, BlockPos pos) {
-        return getMirrorData(world, pos).map(MimicBlockData::getBlockState);
+    public static Optional<BlockState> getMirrorState(@Nullable BlockState state, IBlockReader world, BlockPos pos) {
+        return getMirrorData(state, world, pos).map(MimicBlockData::getBlockState);
     }
 
-    public static Optional<MimicBlockData> getMirrorData(IBlockReader world, BlockPos pos) {
+    public static Optional<MimicBlockData> getMirrorData(@Nullable BlockState state, IBlockReader world, BlockPos pos) {
         if(world == null || pos == null) {
             return Optional.empty();
         }
+        
+        if (state == null) { // Important: state should be passed in during world gen to avoid a lookup that stalls.
+        	state = world.getBlockState(pos);
+        }
+        
         TileEntity te = world.getTileEntity(pos);
-        return world.getBlockState(pos).getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity ?
+        return state.getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity ?
             Optional.of(((MimicBlockTileEntity) te).getData()) : Optional.empty();
     }
 

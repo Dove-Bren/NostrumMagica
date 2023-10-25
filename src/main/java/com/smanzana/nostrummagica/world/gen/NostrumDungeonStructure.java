@@ -87,10 +87,7 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 //		return Start::new;
 //	}
 
-	public String getStructureName() {
-		return NostrumMagica.MODID + ":OverworldDungeon";
-	}
-
+	@Override
 	public int getSize() {
 		return 8;
 	}
@@ -109,8 +106,9 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 		public void init(ChunkGenerator<?> generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn) {
 			// Pick random Y between 30 and 60 to start
 			final int y = this.rand.nextInt(30) + 30;
-			final int x = (chunkX * 16) + this.rand.nextInt(16);
-			final int z = (chunkZ * 16) + this.rand.nextInt(16);
+			// Center in chunk to try and avoid some 'CanSpawnHere' chunk spillage
+			final int x = (chunkX * 16) + 8;
+			final int z = (chunkZ * 16) + 8;
 			
 			final DungeonExitPoint start = new DungeonExitPoint(new BlockPos(x, y, z), Direction.Plane.HORIZONTAL.random(this.rand));
 			List<DungeonRoomInstance> instances = this.dungeon.generate(start);
@@ -124,13 +122,17 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 		}
 	}
 	
-	protected static class DungeonPiece extends StructurePiece {
+	public static class DungeonPiece extends StructurePiece {
 		
 		protected DungeonRoomInstance instance;
 		
 		public DungeonPiece(DungeonRoomInstance instance) {
 			super(DungeonPieceSerializer.instance, 0);
 			this.instance = instance;
+			
+			this.boundingBox = instance.getBounds();
+			
+			NostrumMagica.logger.info("Generating room " + instance);
 		}
 		
 		@Override
@@ -141,13 +143,20 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 		@Override
 		public boolean addComponentParts(IWorld worldIn, Random randomIn, MutableBoundingBox structureBoundingBoxIn,
 				ChunkPos chunkPosIn) {
+			// Stop gap: is this the overworld?
+			if (worldIn.getDimension().getType() != DimensionType.OVERWORLD) {
+				return false;
+			}
+			
 			instance.spawn(worldIn, structureBoundingBoxIn);
+			return true;
 		}
 		
 	}
 	
-	protected static class DungeonPieceSerializer implements IStructurePieceType {
+	public static class DungeonPieceSerializer implements IStructurePieceType {
 		
+		public static final String PIECE_ID = "nostrummagica:dungeonpiecedynamic";
 		public static final DungeonPieceSerializer instance = new DungeonPieceSerializer();
 		private static final String NBT_DATA = "nostrumdungeondata";
 
@@ -183,6 +192,11 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 					};
 		}
 		
+		@Override
+		public String getStructureName() {
+			return NostrumMagica.MODID + ":OverworldDragonDungeon";
+		}
+		
 	}
 	
 	public static class PortalStructure extends NostrumDungeonStructure {
@@ -193,6 +207,10 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 
 		@Override
 		public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+			if (chunkPosX == 0 && chunkPosZ == 0) {
+				return true;
+			}
+			
 			return rand.nextInt(200*200) < 4;
 		}
 
@@ -202,6 +220,11 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 					-> {
 						return new Start(PORTAL_DUNGEON, parent, i1, i2, biome, bounds, i3, l1);
 					};
+		}
+		
+		@Override
+		public String getStructureName() {
+			return NostrumMagica.MODID + ":OverworldPortalDungeon";
 		}
 		
 	}
@@ -223,6 +246,11 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 					-> {
 						return new Start(PLANTBOSS_DUNGEON, parent, i1, i2, biome, bounds, i3, l1);
 					};
+		}
+		
+		@Override
+		public String getStructureName() {
+			return NostrumMagica.MODID + ":OverworldPlantBossDungeon";
 		}
 		
 	}

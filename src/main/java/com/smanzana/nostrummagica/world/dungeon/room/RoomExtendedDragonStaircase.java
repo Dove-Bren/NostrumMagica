@@ -3,12 +3,13 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 
@@ -52,7 +53,7 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
+	public void spawn(IWorld world, DungeonExitPoint start, MutableBoundingBox bounds) {
 		
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
@@ -73,11 +74,11 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
 		while (cur.getY() < maxY - RoomEntryDragon.LevelsBelow) {
-			stairs.spawn(dungeon, world, new DungeonExitPoint(cur, start.getFacing()));
+			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds);
 			cur = cur.add(0, stairHeight, 0);
 		}
 		
-		entry.spawn(dungeon, world, new DungeonExitPoint(cur, start.getFacing()));
+		entry.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds);
 	}
 	
 	@Override
@@ -128,5 +129,26 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 	@Override
 	public String getRoomID() {
 		return "RoomExtendedDragonStaircase"; // Would want to incorporate dark or not?
+	}
+	
+	@Override
+	public MutableBoundingBox getBounds(DungeonExitPoint start) {
+		// This should repeat what spawn does and find the actual bounds, but that requires querying the world which
+		// this method would like to not do.
+		// So instead, guess based on start to an approximate height of 128.
+		
+		final BlockPos topPos = new BlockPos(start.getPos().getX(), 128, start.getPos().getZ());
+		MutableBoundingBox bounds = entry.getBounds(new DungeonExitPoint(topPos, start.getFacing()));
+		
+		// Add staircase down to actual start
+		final int stairHeight = 4;
+		MutableBlockPos cursor = new MutableBlockPos();
+		cursor.setPos(start.getPos());
+		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
+			cursor.setY(i);
+			bounds.expandTo(stairs.getBounds(new DungeonExitPoint(cursor, start.getFacing())));
+		}
+		
+		return bounds;
 	}
 }

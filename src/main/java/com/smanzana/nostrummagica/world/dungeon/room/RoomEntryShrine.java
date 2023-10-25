@@ -3,9 +3,10 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Blocks;
@@ -15,6 +16,8 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
 // Tiny tight spiral staircase used when creating the entrance to the dungeon
@@ -345,11 +348,12 @@ public class RoomEntryShrine extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
-		super.spawn(dungeon, world, start);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
+		super.spawn(world, start, bounds);
 		
-		if (this.component != null) {
-			NostrumBlocks.symbolBlock.setInWorld(world, start.getPos().add(0, 21, 0), component);
+		final BlockPos pos = start.getPos().add(0, 21, 0);
+		if (this.component != null && (bounds == null || bounds.isVecInside(pos))) {
+			NostrumBlocks.symbolBlock.setInWorld(world, pos, component);
 		}
 	}
 }

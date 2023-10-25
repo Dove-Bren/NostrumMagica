@@ -1182,13 +1182,13 @@
     "ritual.revive_soulbound_pet_wolf.name": "Revive Soulbound Pet",
     "ritual.spawn_soul_dagger.name": "Construct Soul Dagger",
 
-    "enhancement.lower_reagent_cost": "Lower Reagent Cost",
+    "enhancement.lower_reagent_cost.name": "Lower Reagent Cost",
     "enhancement.lower_reagent_cost.desc": "Reduces the amount of reagents used up when casting a spell",
-    "enhancement.lower_mana_cost": "Lower Mana Cost",
+    "enhancement.lower_mana_cost.name": "Lower Mana Cost",
     "enhancement.lower_mana_cost.desc": "Makes casting spells cheaper",
-    "enhancement.xp_bonus": "XP Boost",
+    "enhancement.xp_bonus.name": "XP Boost",
     "enhancement.xp_bonus.desc": "Grants a bonus to XP gained when casting spells",
-    "enhancement.eff_bonus": "Spell Power",
+    "enhancement.eff_bonus.name": "Spell Power",
     "enhancement.eff_bonus.desc": "Amplifies the potency of cast spells",
 
     "enchantment.nostrummagica.nostrum_enchantment_mana_recovery": "Mana Recovery",

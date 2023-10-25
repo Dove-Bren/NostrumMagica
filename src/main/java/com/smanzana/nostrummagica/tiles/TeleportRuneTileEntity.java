@@ -31,18 +31,26 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	 * @param offsetY
 	 * @param offsetZ
 	 */
-	public void setOffset(int offsetX, int offsetY, int offsetZ) {
+	public void setOffset(int offsetX, int offsetY, int offsetZ, boolean isWorldGen) {
 		this.teleOffset = new BlockPos(offsetX, offsetY, offsetZ);
-		flush();
+		flush(isWorldGen);
 	}
 	
-	public void setTargetPosition(BlockPos target) {
+	public void setOffset(int offsetX, int offsetY, int offsetZ) {
+		setOffset(offsetX, offsetY, offsetZ, false);
+	}
+	
+	public void setTargetPosition(BlockPos target, boolean isWorldGen) {
 		if (target == null) {
 			this.teleOffset = null;
 		} else {
 			this.teleOffset = target.subtract(pos);
 		}
-		flush();
+		flush(isWorldGen);
+	}
+	
+	public void setTargetPosition(BlockPos target) {
+		setTargetPosition(target, false);
 	}
 	
 	public @Nullable BlockPos getOffset() {
@@ -84,19 +92,19 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		}
 	}
 	
-	protected void flush() {
-		if (world != null && !world.isRemote) {
+	protected void flush(boolean isWorldGen) {
+		if (!isWorldGen && world != null && !world.isRemote) {
 			BlockState state = world.getBlockState(pos);
 			world.notifyBlockUpdate(pos, state, state, 2);
 		}
 	}
 	
 	@Override
-	public void setSpawnedFromRotation(Direction rotation) {
+	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
 		BlockPos orig = this.getOffset();
 		if (orig != null) {
 			BlockPos out = RoomBlueprint.applyRotation(this.getOffset(), rotation);
-			this.setOffset(out.getX(), out.getY(), out.getZ());
+			this.setOffset(out.getX(), out.getY(), out.getZ(), isWorldGen);
 		} else {
 			System.out.println("Null offset?");
 		}

@@ -294,7 +294,6 @@ public class DungeonRoomRegistry {
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
-				NostrumMagica.logger.info("============= " + file.getName());
 				loadFromNBT(nbt, true);
 			}
 			
@@ -333,7 +332,6 @@ public class DungeonRoomRegistry {
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
-				NostrumMagica.logger.info("============= " + name);
 				loadFromNBT(nbt, true);
 			}
 			
@@ -377,7 +375,6 @@ public class DungeonRoomRegistry {
 					}
 					startTime = System.currentTimeMillis();
 					
-					NostrumMagica.logger.info("============= " + dir.getName() + "/" + subfile.getName());
 					root = loadFromNBT(nbt, true);
 					
 					time = System.currentTimeMillis() - startTime;
@@ -414,7 +411,6 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				NostrumMagica.logger.info("============= " + dir.getName() + "/" + subfile.getName());
 				RoomBlueprint blueprint = loadFromNBT(nbt, false);
 				
 				time = System.currentTimeMillis() - startTime;
@@ -468,7 +464,6 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				NostrumMagica.logger.info("============= " + compName + "/" + fileNames[i]);
 				RoomBlueprint blueprint = loadFromNBT(nbt, root == null);
 				
 				time = System.currentTimeMillis() - startTime;

@@ -36,8 +36,8 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
-		return true;
+	public boolean hasTileEntity(BlockState state) {
+		return isMaster(state);
 	}
 	
 	@Override

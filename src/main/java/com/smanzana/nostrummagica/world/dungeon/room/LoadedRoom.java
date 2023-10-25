@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -16,6 +18,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
 /**
@@ -47,7 +50,11 @@ public class LoadedRoom implements IDungeonRoom {
 		
 		// Save consistent unique ID this room can be looked up later as and register as such
 		this.registryID = "LoadedRoom_" + blueprintRecord.name;
-		IDungeonRoom.Register(registryID, this);
+		
+		// Same as static room, being lazy and assuming children know what they're talking about.
+		if (IDungeonRoom.GetRegisteredRoom(registryID) == null) {
+			IDungeonRoom.Register(registryID, this);
+		}
 	}
 	
 	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
@@ -78,13 +85,17 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
 		// See note about dungeon vs blueprint facing in @getExits
-		blueprint.spawn(world, start.getPos(), start.getFacing());
+		blueprint.spawn(world, start.getPos(), start.getFacing(), bounds);
 		
 		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
 		for (NostrumDungeon.DungeonExitPoint lootSpot : loots) {
+			if (bounds != null && !bounds.isVecInside(lootSpot.getPos())) {
+				continue; // Will come back for you later <3
+			}
+			
 			LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
 		}
 	}
@@ -157,6 +168,28 @@ public class LoadedRoom implements IDungeonRoom {
 			ret.add(relative);
 		}
 		return ret;
+	}
+	
+	@Override
+	public MutableBoundingBox getBounds(DungeonExitPoint entry) {
+		BlockPos dims = blueprint.getAdjustedDimensions(entry.getFacing());
+		BlockPos offset = blueprint.getAdjustedOffset(entry.getFacing());
+		
+		int minX = entry.getPos().getX() - offset.getX();
+		int minY = entry.getPos().getY() - offset.getY();
+		int minZ = entry.getPos().getZ() - offset.getZ();
+		int maxX = minX + dims.getX();
+		int maxY = minY + dims.getY();
+		int maxZ = minZ + dims.getZ();
+		
+		// Have to figure out real min/max ourselves
+		return new MutableBoundingBox(
+				Math.min(minX, maxX),
+				Math.min(minY, maxY),
+				Math.min(minZ, maxY),
+				Math.max(maxX, minX),
+				Math.max(maxY, minY),
+				Math.max(maxZ, minZ));
 	}
 
 	@Override

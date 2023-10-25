@@ -104,8 +104,14 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	public void setOffset(BlockPos newOffset) {
+		setOffset(newOffset, false);
+	}
+	
+	public void setOffset(BlockPos newOffset, boolean isWorldGen) {
 		this.triggerOffset = newOffset.toImmutable();
-		dirty();
+		if (!isWorldGen) {
+			dirty();
+		}
 	}
 	
 	public void offsetTo(BlockPos targ) {
@@ -172,7 +178,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public void setSpawnedFromRotation(Direction rotation) {
+	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
 		this.setOffset(RoomBlueprint.applyRotation(this.getOffset(), rotation));
 	}
 }

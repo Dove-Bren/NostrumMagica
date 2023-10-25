@@ -23,6 +23,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -190,7 +191,7 @@ public class NostrumDungeon {
 		// TODO I used to make sure to spawn the 'end room' last so it didn't get stomped.
 		// Do that again? Or inforce bounds checking? Its not that expensive.
 		for (DungeonRoomInstance instance : dungeonInstances) {
-			instance.spawn(this, world);
+			instance.spawn(world);
 		}
 		
 //		
@@ -253,14 +254,25 @@ public class NostrumDungeon {
 			this.template = template;
 			this.hasKey = hasKey;
 		}
+
+		public MutableBoundingBox getBounds() {
+			return template.getBounds(this.entry);
+		}
 		
-		public void spawn(NostrumDungeon dungeon, IWorld world) {
+		public void spawn(IWorld world) {
+			spawn(world, null);
+		}
+		
+		public void spawn(IWorld world, MutableBoundingBox bounds) {
 			// Spawn room template
-			template.spawn(dungeon, world, this.entry);
+			template.spawn(world, this.entry, bounds);
 			
 			// If we have a key, do special key placement
 			if (this.hasKey) {
-				spawnKey(world, template.getKeyLocation(this.entry));
+				DungeonExitPoint keyLoc = template.getKeyLocation(this.entry);
+				if (bounds == null || bounds.isVecInside(keyLoc.pos)) {
+					spawnKey(world, keyLoc);
+				}
 			}
 		}
 
@@ -283,6 +295,11 @@ public class NostrumDungeon {
 			loot.set(rand.nextInt(27), new ItemStack(Items.GOLDEN_APPLE)); // FIXME should be key
 			LootUtil.createLoot(world, keyLocation.getPos(), keyLocation.getFacing(),
 					loot);
+		}
+		
+		@Override
+		public String toString() {
+			return "[" + this.entry.pos + "] " + this.template.getRoomID() + ": " + this.getBounds();
 		}
 		
 		private static final String NBT_ENTRY = "entry";

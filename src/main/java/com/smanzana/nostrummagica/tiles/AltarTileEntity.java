@@ -36,6 +36,12 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 		dirty();
 	}
 	
+	public void setItemNoDirty(@Nonnull ItemStack stack) {
+		// Set the item without marking the TE as dirty. Useful during world gen, where
+		// the chunk is going to be saved after generation anyways.
+		this.stack = stack;
+	}
+	
 	public boolean isHidingItem() {
 		return hideItem;
 	}

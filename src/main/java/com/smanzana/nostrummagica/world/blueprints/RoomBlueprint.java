@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableSet;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
@@ -32,6 +33,7 @@ import net.minecraft.block.DirectionalBlock;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.LadderBlock;
+import net.minecraft.block.PaneBlock;
 import net.minecraft.block.RedstoneDiodeBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.SlabBlock;
@@ -47,11 +49,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.util.Constants.NBT;
 
 /**
@@ -804,7 +807,34 @@ public class RoomBlueprint {
 		return false;
 	}
 	
+	private static final boolean isFixupBlock(BlueprintBlock block) {
+		// Like StructurePiece's "BLOCKS_NEEDING_POSTPROCESSING" array; some blocks need their
+		// states fixed up after placing. Things like fences and walls that extend and what not.
+		if (block.state != null) {
+			final Block base = block.state.getBlock();
+			if (VANILLA_BLOCKS_NEEDING_POSTPROCESSING.contains(base)) {
+				return true;
+			}
+			
+			// Some main cases I know of
+			if (base instanceof PaneBlock) {
+				return true;
+			}
+			
+			if (base instanceof StairsBlock) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	// Copied from StructurePiece
+	private static final Set<Block> VANILLA_BLOCKS_NEEDING_POSTPROCESSING = ImmutableSet.<Block>builder().add(Blocks.NETHER_BRICK_FENCE).add(Blocks.TORCH).add(Blocks.WALL_TORCH).add(Blocks.OAK_FENCE).add(Blocks.SPRUCE_FENCE).add(Blocks.DARK_OAK_FENCE).add(Blocks.ACACIA_FENCE).add(Blocks.BIRCH_FENCE).add(Blocks.JUNGLE_FENCE).add(Blocks.LADDER).add(Blocks.IRON_BARS).build();
+	
 	protected void placeBlock(IWorld world, BlockPos at, Direction direction, BlueprintBlock block) {
+		
+		final boolean worldGen = (world instanceof WorldGenRegion);
 		
 		if (spawnerFunc != null) {
 			spawnerFunc.spawnBlock(world, at, direction, block);
@@ -813,8 +843,9 @@ public class RoomBlueprint {
 			if (placeState != null) {
 				// TODO: add fluid state support
 				world.setBlockState(at, placeState, 2);
-				// TODO: for fences and stuff that should possibly extend
-				// worldIn.getChunk(blockpos).markBlockForPostprocessing(blockpos);
+				if (worldGen && isFixupBlock(block)) {
+					world.getChunk(at).markBlockForPostprocessing(at);
+				}
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
@@ -831,17 +862,17 @@ public class RoomBlueprint {
 					}
 					
 					if (te != null) {
-						world.getWorld().setTileEntity(at, te);
+						world.getChunk(at).addTileEntity(at, te);
+						//world.getWorld().setTileEntity(at, te);
 						if (te instanceof IOrientedTileEntity) {
 							// Let tile ent respond to rotation
-							((IOrientedTileEntity) te).setSpawnedFromRotation(direction);
+							((IOrientedTileEntity) te).setSpawnedFromRotation(direction, worldGen);
 						}
 					} else {
 						NostrumMagica.logger.error("Could not deserialize TileEntity with id \"" + tileEntityData.getString("id") + "\"");
 					}
 				}
 			} else {
-				world.getWorld().removeTileEntity(at);
 				//world.removeBlock(at, false);
 				world.setBlockState(at, Blocks.AIR.getDefaultState(), 2);
 			}
@@ -853,10 +884,10 @@ public class RoomBlueprint {
 	}
 	
 	public void spawn(IWorld world, BlockPos at, Direction direction) {
-		this.spawn(world, at, direction, null);
+		this.spawn(world, at, direction, (MutableBoundingBox) null);
 	}
 	
-	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable AxisAlignedBB bounds) {
+	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds) {
 		
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
@@ -951,7 +982,7 @@ public class RoomBlueprint {
 				// (j is data y, so offset to world y)
 				cursor.setPos(chunkOffsetX + i, j + origin.getY(), chunkOffsetZ + k);
 				
-				if (bounds != null && !bounds.contains(cursor.getX(), cursor.getY(), cursor.getZ())) {
+				if (bounds != null && !bounds.isVecInside(cursor)) {
 					continue;
 				}
 				

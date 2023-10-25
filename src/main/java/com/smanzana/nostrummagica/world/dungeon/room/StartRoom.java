@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -14,6 +16,7 @@ import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
 public class StartRoom extends StaticRoom implements ISpellComponentRoom {
@@ -190,11 +193,11 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
-		super.spawn(dungeon, world, start);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
+		super.spawn(world, start, bounds);
 		
 		RoomExtendedShrineStaircase stairs = new RoomExtendedShrineStaircase(component, false);
 		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
-		stairs.spawn(dungeon, world, adj);
+		stairs.spawn(world, adj, bounds);
 	}
 }

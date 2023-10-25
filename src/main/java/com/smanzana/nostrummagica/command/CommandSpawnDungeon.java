@@ -6,11 +6,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.DungeonGen;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Direction;
 
 public class CommandSpawnDungeon {
 
@@ -23,36 +25,37 @@ public class CommandSpawnDungeon {
 					.then(Commands.argument("type", StringArgumentType.string())
 							.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "type")))
 							)
-					.executes(ctx -> execute(ctx))
 				);
 	}
 	
-	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		DungeonGen[] types = DungeonGen.values();
-		DungeonGen type = types[rand.nextInt(types.length)];
-		
-		return execute(context, type);
-	}
-	
 	private static final int execute(CommandContext<CommandSource> context, final String typeName) throws CommandSyntaxException {
-		DungeonGen type = null;
-		try {
-			type = DungeonGen.valueOf(typeName.toUpperCase());
-		} catch (Exception e) {
-			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create(); 
+		
+		final String[] names = {};
+		final NostrumDungeon[] dungeons = {};
+		
+		NostrumDungeon dungeon = null;
+		for (int i = 0; i < names.length; i++) {
+			final String name = names[i];
+			if (name.equalsIgnoreCase(typeName)) {
+				dungeon = dungeons[i];
+				break;
+			}
 		}
 		
-		return execute(context, type);
+		if (dungeon == null) {
+			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create(); 
+		} else {
+			return execute(context, dungeon);
+		}
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, final DungeonGen type) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSource> context, final NostrumDungeon dungeon) throws CommandSyntaxException {
 		if (CommandSpawnDungeon.rand == null) {
 			CommandSpawnDungeon.rand = new Random();
 		}
 		
 		ServerPlayerEntity player = context.getSource().asPlayer();
-		
-		type.getGenerator().generate(player.world, rand, player.getPosition());
+		dungeon.spawn(player.world, new DungeonExitPoint(player.getPosition(), Direction.fromAngle(player.rotationYaw)));
 		
 		return 0;
 	}

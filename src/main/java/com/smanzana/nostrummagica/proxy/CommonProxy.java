@@ -209,10 +209,20 @@ public class CommonProxy {
 		for(Biome biome : ForgeRegistries.BIOMES) {
 			// Filter this list maybe?
 			biome.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Biome.createDecoratedFeature(NostrumFeatures.flowers, IFeatureConfig.NO_FEATURE_CONFIG, Placement.COUNT_HEIGHTMAP_32, new FrequencyConfig(1)));
-			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.dungeons, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
 			
 			biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(Feature.ORE, new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.maniOre.getDefaultState(), 9), Placement.COUNT_RANGE, new CountRangeConfig(20, 0, 0, 240)));
 			biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(Feature.ORE, new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.essenceOre.getDefaultState(), 3), Placement.COUNT_RANGE, new CountRangeConfig(10, 20, 20, 60)));
+			
+			//  Have to add structures as structures AND features.
+			// Vanilla adds all structs as features and then only some as structures to turn them on for different biomes.
+			// Adding as struct makes the world generate starts and the logical part. Adding as features makes them actually place in the world.
+			biome.addStructure(NostrumFeatures.portalDungeon, new NostrumDungeonConfig());
+			biome.addStructure(NostrumFeatures.dragonDungeon, new NostrumDungeonConfig());
+			biome.addStructure(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig());
+			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.portalDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.dragonDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+			
 		}
 	}
     

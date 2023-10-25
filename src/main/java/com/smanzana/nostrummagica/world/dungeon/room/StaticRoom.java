@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
@@ -21,6 +23,7 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 
@@ -130,7 +133,12 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 		
 		this.ID = ID;
-		IDungeonRoom.Register(this.ID, this);
+		
+		// Out of laziness, just gonna allow dupes assuming all static rooms with the same name
+		// are EXACT copies and that all children that call with the same name kn ow what they're doing.
+		if (IDungeonRoom.GetRegisteredRoom(this.ID) == null) { 
+			IDungeonRoom.Register(this.ID, this);
+		}
 	}
 	
 	/**
@@ -218,7 +226,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(NostrumDungeon dungeon, IWorld world, DungeonExitPoint start) {
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
 		Set<IChunk> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
@@ -258,6 +266,11 @@ public abstract class StaticRoom implements IDungeonRoom {
 			BlockPos pos = new BlockPos(x + start.getPos().getX(),
 					j + start.getPos().getY(),
 					z + start.getPos().getZ());
+			
+			// Bounds check!
+			if (bounds != null && !bounds.isVecInside(pos)) {
+				continue;
+			}
 			
 			if (CommandTestConfig.level != 1) {
 				if (!chunks.contains(world.getChunk(pos))) {
@@ -376,5 +389,14 @@ public abstract class StaticRoom implements IDungeonRoom {
 	@Override
 	public String getRoomID() {
 		return this.ID;
+	}
+	
+	@Override
+	public MutableBoundingBox getBounds(DungeonExitPoint entry) {
+		// TODO stash and store these
+		DungeonExitPoint corner1 = NostrumDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
+		DungeonExitPoint corner2 = NostrumDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
+		
+		return new MutableBoundingBox(corner1.getPos(), corner2.getPos());
 	}
 }

@@ -19,6 +19,6 @@ public interface IOrientedTileEntity {
 	 * Consider using RoomBlueprint.applyRotation to transform offsets.
 	 * @param rotation
 	 */
-	public void setSpawnedFromRotation(Direction rotation);
+	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen);
 	
 }
