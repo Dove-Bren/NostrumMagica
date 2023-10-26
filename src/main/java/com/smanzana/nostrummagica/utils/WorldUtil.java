@@ -1,10 +1,20 @@
 package com.smanzana.nostrummagica.utils;
 
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableSet;
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.PaneBlock;
+import net.minecraft.block.StairsBlock;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -117,4 +127,41 @@ public class WorldUtil {
 		int k = (int)(serialized << 64 - NUM_Z_BITS >> 64 - NUM_Z_BITS);
 		return new BlockPos(i, j, k);
 	}
+	
+	/**
+	 * Check if this block is one we know has state that should be re-evaluated after it's placed as part
+	 * of worldgen. For example, iron bars and fences so they can connect to what generates around them.
+	 * @param block
+	 * @return
+	 */
+	public static final boolean blockNeedsGenFixup(@Nullable Block block) {
+		// Like StructurePiece's "BLOCKS_NEEDING_POSTPROCESSING" array; some blocks need their
+		// states fixed up after placing. Things like fences and walls that extend and what not.
+		if (block != null) {
+			if (VANILLA_BLOCKS_NEEDING_POSTPROCESSING.contains(block)) {
+				return true;
+			}
+			
+			// Some main cases I know of
+			if (block instanceof PaneBlock) {
+				return true;
+			}
+			
+			if (block instanceof StairsBlock) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public static final boolean blockNeedsGenFixup(@Nullable BlockState state) {
+		if (state != null) {
+			return blockNeedsGenFixup(state.getBlock());
+		} 
+		return false;
+	}
+	
+	// Copied from StructurePiece
+	private static final Set<Block> VANILLA_BLOCKS_NEEDING_POSTPROCESSING = ImmutableSet.<Block>builder().add(Blocks.NETHER_BRICK_FENCE).add(Blocks.TORCH).add(Blocks.WALL_TORCH).add(Blocks.OAK_FENCE).add(Blocks.SPRUCE_FENCE).add(Blocks.DARK_OAK_FENCE).add(Blocks.ACACIA_FENCE).add(Blocks.BIRCH_FENCE).add(Blocks.JUNGLE_FENCE).add(Blocks.LADDER).add(Blocks.IRON_BARS).build();
 }

@@ -12,7 +12,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableSet;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
@@ -33,7 +32,6 @@ import net.minecraft.block.DirectionalBlock;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.LadderBlock;
-import net.minecraft.block.PaneBlock;
 import net.minecraft.block.RedstoneDiodeBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.SlabBlock;
@@ -542,6 +540,10 @@ public class RoomBlueprint {
 						Direction cur = placeState.get(WallTorchBlock.HORIZONTAL_FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.with(WallTorchBlock.HORIZONTAL_FACING, cur);
+					} else if (block instanceof RedstoneWallTorchBlock) {
+						Direction cur = placeState.get(RedstoneWallTorchBlock.FACING);
+						cur = rotate(cur, facing);
+						placeState = placeState.with(RedstoneWallTorchBlock.FACING, cur);
 					} else if (block instanceof LadderBlock) {
 						Direction cur = placeState.get(LadderBlock.FACING);
 						cur = rotate(cur, facing);
@@ -589,6 +591,8 @@ public class RoomBlueprint {
 				
 			} else if (block instanceof WallTorchBlock) {
 				ret = state.get(WallTorchBlock.HORIZONTAL_FACING);
+			} else if (block instanceof RedstoneWallTorchBlock) {
+				ret = state.get(RedstoneWallTorchBlock.FACING);
 			} else if (block instanceof LadderBlock) {
 				ret = state.get(LadderBlock.FACING);
 			} else if (block instanceof StairsBlock) {
@@ -807,31 +811,6 @@ public class RoomBlueprint {
 		return false;
 	}
 	
-	private static final boolean isFixupBlock(BlueprintBlock block) {
-		// Like StructurePiece's "BLOCKS_NEEDING_POSTPROCESSING" array; some blocks need their
-		// states fixed up after placing. Things like fences and walls that extend and what not.
-		if (block.state != null) {
-			final Block base = block.state.getBlock();
-			if (VANILLA_BLOCKS_NEEDING_POSTPROCESSING.contains(base)) {
-				return true;
-			}
-			
-			// Some main cases I know of
-			if (base instanceof PaneBlock) {
-				return true;
-			}
-			
-			if (base instanceof StairsBlock) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	// Copied from StructurePiece
-	private static final Set<Block> VANILLA_BLOCKS_NEEDING_POSTPROCESSING = ImmutableSet.<Block>builder().add(Blocks.NETHER_BRICK_FENCE).add(Blocks.TORCH).add(Blocks.WALL_TORCH).add(Blocks.OAK_FENCE).add(Blocks.SPRUCE_FENCE).add(Blocks.DARK_OAK_FENCE).add(Blocks.ACACIA_FENCE).add(Blocks.BIRCH_FENCE).add(Blocks.JUNGLE_FENCE).add(Blocks.LADDER).add(Blocks.IRON_BARS).build();
-	
 	protected void placeBlock(IWorld world, BlockPos at, Direction direction, BlueprintBlock block) {
 		
 		final boolean worldGen = (world instanceof WorldGenRegion);
@@ -843,7 +822,7 @@ public class RoomBlueprint {
 			if (placeState != null) {
 				// TODO: add fluid state support
 				world.setBlockState(at, placeState, 2);
-				if (worldGen && isFixupBlock(block)) {
+				if (worldGen && WorldUtil.blockNeedsGenFixup(block.state)) {
 					world.getChunk(at).markBlockForPostprocessing(at);
 				}
 				

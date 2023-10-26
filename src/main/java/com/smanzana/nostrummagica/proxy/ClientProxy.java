@@ -13,6 +13,8 @@ import org.lwjgl.glfw.GLFW;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.MimicBlock;
+import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBase;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -36,6 +38,7 @@ import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
+import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -147,10 +150,14 @@ import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -177,6 +184,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -780,6 +788,26 @@ public class ClientProxy extends CommonProxy {
 		ev.getItemColors().register(tinter, NostrumItems.essenceEarth, NostrumItems.essenceEnder, NostrumItems.essenceFire,
 				NostrumItems.essenceIce, NostrumItems.essenceLightning, NostrumItems.essencePhysical, NostrumItems.essenceWind
 				);
+	}
+	
+	@SubscribeEvent
+	public void registerColorHandlers(ColorHandlerEvent.Block event) {
+		IBlockColor tinter = new IBlockColor() {
+			@Override
+			public int getColor(BlockState state, IEnviromentBlockReader world, BlockPos pos, int tintIndex) {
+				BlockState mimickedState = MimicBlock.getMirrorState(state, world, pos).orElse(null);
+				
+				if (mimickedState != null) {
+					return event.getBlockColors().getColor(mimickedState, world, pos, tintIndex);
+				} else {
+					return -1;
+				}
+			}
+			
+		};
+		
+		event.getBlockColors().register(tinter, NostrumBlocks.mimicDoor, NostrumBlocks.mimicDoorUnbreakable, NostrumBlocks.mimicFacade,
+				NostrumBlocks.mimicFacadeUnbreakable);
 	}
 	
 	private void registerEntityRenderers() {
@@ -1711,6 +1739,19 @@ public class ClientProxy extends CommonProxy {
 				//event.getModelRegistry().put(new ModelResourceLocation("minecraft:item/stick", "inventory"), bakedModel);
 			}
     	}
+    	
+    	// Mimic blocks special model
+    	putMimicBlockModel(event.getModelRegistry(), NostrumBlocks.mimicDoor);
+    	putMimicBlockModel(event.getModelRegistry(), NostrumBlocks.mimicDoorUnbreakable);
+    	putMimicBlockModel(event.getModelRegistry(), NostrumBlocks.mimicFacade);
+    	putMimicBlockModel(event.getModelRegistry(), NostrumBlocks.mimicFacadeUnbreakable);
+	}
+	
+	private static void putMimicBlockModel(Map<ResourceLocation, IBakedModel> registry, Block block) {
+		for (BlockState state : block.getStateContainer().getValidStates()) {
+			ModelResourceLocation loc = BlockModelShapes.getModelLocation(state);
+			registry.put(loc, new MimicBlockBakedModel(registry.get(loc))); // Put a new mimic model wrapped around the default one
+		}
 	}
 	
 	private static void initDefaultEffects(ClientEffectRenderer renderer) {

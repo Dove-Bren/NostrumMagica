@@ -186,7 +186,7 @@ public class LoadedRoom implements IDungeonRoom {
 		return new MutableBoundingBox(
 				Math.min(minX, maxX),
 				Math.min(minY, maxY),
-				Math.min(minZ, maxY),
+				Math.min(minZ, maxZ),
 				Math.max(maxX, minX),
 				Math.max(maxY, minY),
 				Math.max(maxZ, minZ));

@@ -353,6 +353,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		super.registerAttributes();
         this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.00D);
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(18.0D);
         this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);

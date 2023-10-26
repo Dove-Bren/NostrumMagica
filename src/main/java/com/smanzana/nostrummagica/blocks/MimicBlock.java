@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -12,6 +13,7 @@ import com.smanzana.nostrummagica.tiles.MimicBlockTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DirectionalBlock;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -31,6 +33,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -66,14 +69,27 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 	
 	public static final ModelProperty<MimicBlockData> MIMIC_MODEL_PROPERTY = new ModelProperty<>();
 	
-	public static @Nonnull BlockState GetMimickedState(World world, BlockPos myPos) {
-		// Mimic blocks mimic what's below them.
-		BlockPos pos = myPos.down();
+	public static @Nonnull BlockState GetMimickedState(Direction mimicFacing, World world, BlockPos myPos) {
+		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
+		final Function<BlockPos, BlockPos> moveCursor;
+		if (mimicFacing.getAxis() == Axis.Y) {
+			moveCursor = (pos) -> pos.north();
+		} else {
+			moveCursor = (pos) -> pos.down();
+		}
+		
+		BlockPos pos = moveCursor.apply(myPos);
 		BlockState state = world.getBlockState(pos);
 		
-		// If it's another mimic block, use what it's mimicking
-		if (state.getBlock() instanceof MimicBlock) {
-			state = getMirrorState(state, world, pos).orElse(state);
+		// If it's another mimic block, look below it.
+		// I want to just say "getMirrorState" but that doesn't always work? logic puzzle.
+		while (state.getBlock() instanceof MimicBlock) {
+			pos = moveCursor.apply(pos);
+			if (pos.getY() <= 0) {
+				state = Blocks.AIR.getDefaultState();
+			} else {
+				state = world.getBlockState(pos);
+			}
 		}
 		
 		return state;
@@ -203,7 +219,7 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		//Direction enumfacing = Direction.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return this.getDefaultState()
-				.with(FACING,context.getNearestLookingDirection())
+				.with(FACING,context.getNearestLookingDirection().getOpposite())
 				;
 	}
 	
@@ -487,8 +503,20 @@ public class MimicBlock extends DirectionalBlock implements ITileEntityProvider 
         }
         
         TileEntity te = world.getTileEntity(pos);
-        return state.getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity ?
-            Optional.of(((MimicBlockTileEntity) te).getData()) : Optional.empty();
+        if (state.getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity) {
+        	
+        	MimicBlockData data = ((MimicBlockTileEntity) te).getData();
+        	if (data.getBlockState() != null && !(data.getBlockState().getBlock() instanceof MimicBlock)) {
+        		return Optional.of(data);
+        	} else {
+        		if (data.getBlockState() != null) {
+        			NostrumMagica.logger.warn("Mimic block is mimicking another mimic block? Cascade did not work.");
+        		}
+        		return Optional.empty();
+        	}
+        } else {
+        	return Optional.empty();
+        }
     }
 
     private interface StateFunction<T, W extends IBlockReader> {
