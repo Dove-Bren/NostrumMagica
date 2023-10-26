@@ -831,7 +831,7 @@ public class NostrumMagica {
 
 					@Override
 					public String getEntityName() {
-						return "entity.nostrummagica.entity_koid.name";
+						return "entity.nostrummagica.entity_koid";
 					}
 				}, 5)));
 

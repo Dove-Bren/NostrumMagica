@@ -3,10 +3,8 @@ package com.smanzana.nostrummagica.entity;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;

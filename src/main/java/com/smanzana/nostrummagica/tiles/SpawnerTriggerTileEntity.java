@@ -9,14 +9,17 @@ import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.WorldUtil;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 	
@@ -100,7 +103,7 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 		nbt = super.write(nbt);
 		
 		if (triggerOffset != null) {
-			nbt.putLong(NBT_TRIGGER_OFFSET, triggerOffset.toLong());
+			nbt.put(NBT_TRIGGER_OFFSET, NBTUtil.writeBlockPos(triggerOffset));
 		}
 		if (entity != null) {
 			nbt.putUniqueId(NBT_ENTITY_ID, entity.getUniqueID());
@@ -119,8 +122,11 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 			this.unlinkedEntID = nbt.getUniqueId(NBT_ENTITY_ID);
 		}
 		
-		if (nbt.contains(NBT_TRIGGER_OFFSET)) {
-			this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_TRIGGER_OFFSET)); // Warning: can break if save used across game versions
+		if (nbt.contains(NBT_TRIGGER_OFFSET, NBT.TAG_LONG)) {
+			// Legacy!
+			this.triggerOffset = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_TRIGGER_OFFSET));
+		} else if (nbt.contains(NBT_TRIGGER_OFFSET)) {
+			this.triggerOffset = NBTUtil.readBlockPos(nbt.getCompound(NBT_TRIGGER_OFFSET));
 		}
 	}
 	

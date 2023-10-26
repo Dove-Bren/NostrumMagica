@@ -6,18 +6,21 @@ import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.WorldUtil;
 import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEntity, IOrientedTileEntity {
 	
@@ -56,7 +59,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		nbt = super.write(nbt);
 		
 		nbt.putInt(NBT_TYPE, this.type.ordinal());
-		nbt.putLong(NBT_OFFSET, this.triggerOffset.toLong());
+		nbt.put(NBT_OFFSET, NBTUtil.writeBlockPos(this.triggerOffset));
 		nbt.putBoolean(NBT_TRIGGERED, this.triggered);
 		
 		return nbt;
@@ -73,7 +76,12 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 				break;
 			}
 		}
-		this.triggerOffset = BlockPos.fromLong(nbt.getLong(NBT_OFFSET)); // Warning: can break if save used across game versions
+		
+		if (nbt.contains(NBT_OFFSET, NBT.TAG_LONG)) {
+			this.triggerOffset = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_OFFSET));
+		} else {
+			this.triggerOffset = NBTUtil.readBlockPos(nbt.getCompound(NBT_OFFSET));
+		}
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
 	}
 	
@@ -144,9 +152,9 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		// Create entity here if it doesn't exist
 		BlockPos blockUp = pos.up();
 		if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
-				|| triggerEntity.getDistanceSq(blockUp.getX() + .5, blockUp.getY() + .5, blockUp.getZ() + .5) > 1.5) {
+				|| triggerEntity.getDistanceSq(blockUp.getX() + .5, blockUp.getY(), blockUp.getZ() + .5) > 1.5) {
 			// Entity is dead OR is too far away
-			if (triggerEntity != null && triggerEntity.isAlive()) {
+			if (triggerEntity != null && !triggerEntity.isAlive()) {
 				triggerEntity.remove();
 			}
 			
@@ -179,6 +187,6 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 
 	@Override
 	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
-		this.setOffset(RoomBlueprint.applyRotation(this.getOffset(), rotation));
+		this.setOffset(RoomBlueprint.applyRotation(this.getOffset(), rotation), isWorldGen);
 	}
 }

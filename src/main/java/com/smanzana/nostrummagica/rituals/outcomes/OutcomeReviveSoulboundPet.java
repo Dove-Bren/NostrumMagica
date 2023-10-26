@@ -29,7 +29,7 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 
 			@Override
 			public String getEntityName() {
-				return "entity.nostrummagica.placeholder.soulbound.name";
+				return "entity.nostrummagica.placeholder.soulbound";
 			}
 		}, 1);
 	}

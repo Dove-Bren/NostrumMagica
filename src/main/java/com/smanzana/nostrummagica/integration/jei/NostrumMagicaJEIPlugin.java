@@ -21,6 +21,7 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -65,8 +66,9 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		
 		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size() + " rituals");
 		
+		// JEI wiki says to do this here, but it fires an exception
 		// Hide our cool wrapper to outputs
-		registry.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
+		//registry.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
 	}
 	
 	@Override
@@ -77,6 +79,11 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	@Override
 	public ResourceLocation getPluginUid() {
 		return pluginUID;
+	}
+	
+	@Override
+	public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+		jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
 	}
 	
 }

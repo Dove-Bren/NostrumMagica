@@ -4,10 +4,12 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
+import com.smanzana.nostrummagica.utils.WorldUtil;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntityType;
@@ -84,7 +86,10 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 		super.read(compound);
 		
 		if (compound.contains(NBT_TARGET, NBT.TAG_LONG)) {
-			target = BlockPos.fromLong(compound.getLong(NBT_TARGET)); // Warning: can break if save used across game versions
+			// Legacy!
+			target = WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_TARGET));
+		} else if (compound.contains(NBT_TARGET)) {
+			target = NBTUtil.readBlockPos(compound.getCompound(NBT_TARGET));
 		} else {
 			target = null;
 		}
@@ -95,7 +100,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 		nbt = super.write(nbt);
 		
 		if (target != null) {
-			nbt.putLong(NBT_TARGET, target.toLong());
+			nbt.put(NBT_TARGET, NBTUtil.writeBlockPos(target));
 		}
 		
 		return nbt;

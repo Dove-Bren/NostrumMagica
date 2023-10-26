@@ -30,7 +30,7 @@ public class EntitySwitchTrigger extends MobEntity {
 	
 	@Override
 	public boolean isInvulnerableTo(DamageSource source) {
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -105,6 +105,8 @@ public class EntitySwitchTrigger extends MobEntity {
 	@Override
 	public void livingTick() {
 		super.livingTick();
+		
+		setInvulnerable(false);
 		
 		if (this.isAlive() && !this.dead) {
 			if (!world.isRemote && this.ticksExisted > 20) {

@@ -290,8 +290,8 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 		
 		// Read linked position off of item stack, if present
 		CompoundNBT tag = stack.getTag();
-		if (tag != null && tag.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
-			this.setLinkedPosition(worldIn, pos, BlockPos.fromLong(tag.getLong(NBT_LINKED_POS)));
+		if (tag != null && tag.contains(NBT_LINKED_POS)) {
+			this.setLinkedPosition(worldIn, pos, NBTUtil.readBlockPos(tag.getCompound(NBT_LINKED_POS)));
 		}
 	}
 	

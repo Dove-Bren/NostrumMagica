@@ -2,11 +2,13 @@ package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.utils.WorldUtil;
 import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
@@ -77,7 +79,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		super.write(compound);
 		
 		if (teleOffset != null) {
-			compound.putLong(NBT_OFFSET, teleOffset.toLong());
+			compound.put(NBT_OFFSET, NBTUtil.writeBlockPos(teleOffset));
 		}
 		
 		return compound;
@@ -88,7 +90,10 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		
 		teleOffset = null;
 		if (compound.contains(NBT_OFFSET, NBT.TAG_LONG)) {
-			teleOffset = BlockPos.fromLong(compound.getLong(NBT_OFFSET));
+			// Legacy format! Probably dungeon spawning
+			teleOffset = WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_OFFSET));
+		} else {
+			teleOffset = NBTUtil.readBlockPos(compound.getCompound(NBT_OFFSET));
 		}
 	}
 	

@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -294,7 +295,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		if (instance.getSorceryPortalPos() != null) {
 			nbt.putString(NBT_SORCERYPORTAL_DIM, instance.getSorceryPortalDimension().getRegistryName().toString());
-			nbt.putLong(NBT_SORCERYPORTAL_POS, instance.getSorceryPortalPos().toLong());
+			nbt.put(NBT_SORCERYPORTAL_POS, NBTUtil.writeBlockPos(instance.getSorceryPortalPos()));
 		}
 		
 		return nbt;
@@ -491,7 +492,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			DimensionType dim = DimensionType.byName(ResourceLocation.tryCreate(dimName));
 			instance.setSorceryPortalLocation(
 					dim,
-					BlockPos.fromLong(tag.getLong(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
+					NBTUtil.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
 		}
 		
 		// Modifiers

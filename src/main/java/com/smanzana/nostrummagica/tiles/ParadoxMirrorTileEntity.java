@@ -15,11 +15,13 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.WorldUtil;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -76,7 +78,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		nbt = super.write(nbt);
 		
 		if (linkedPosition != null) {
-			nbt.putLong(NBT_LINKED_POS, linkedPosition.toLong());
+			nbt.put(NBT_LINKED_POS, NBTUtil.writeBlockPos(linkedPosition));
 		}
 		
 		// Could save and load cooldown but client won't use it and I don't care if people save/load over and over to transfer fast
@@ -91,10 +93,13 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		if (nbt == null)
 			return;
 			
-		if (!nbt.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
-			linkedPosition = null;
+		if (nbt.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
+			// Legacy!
+			linkedPosition = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_LINKED_POS));
+		} else if (nbt.contains(NBT_LINKED_POS)) {
+			linkedPosition = NBTUtil.readBlockPos(nbt.getCompound(NBT_LINKED_POS));
 		} else {
-			linkedPosition = BlockPos.fromLong(nbt.getLong(NBT_LINKED_POS)); // Warning: can break if save used across game versions
+			linkedPosition = null;
 		}
 	}
 	

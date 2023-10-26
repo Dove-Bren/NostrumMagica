@@ -109,7 +109,7 @@ public class NostrumSingleSpawner extends ContainerBlock {
 		if (!worldIn.isRemote())
 		{
 			for (PlayerEntity player : ((ServerWorld) worldIn).getPlayers()) {
-				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < SPAWN_DIST_SQ) {
+				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < SPAWN_DIST_SQ) {
 					this.spawn(worldIn, pos, state, rand);
 					worldIn.removeBlock(pos, false);
 					return;
