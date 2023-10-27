@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.entity;
 
 import javax.annotation.Nonnull;
 
-public interface IMultiPartEntityPart {
+public interface IMultiPartEntityPart<T extends IMultiPartEntity> {
 
-	public @Nonnull IMultiPartEntity getParent();
+	public @Nonnull T getParent();
 	
 }

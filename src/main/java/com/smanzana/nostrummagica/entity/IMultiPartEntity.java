@@ -8,7 +8,7 @@ public interface IMultiPartEntity {
 
 	World getWorld();
 
-    boolean attackEntityFromPart(MultiPartEntityPart part, DamageSource source, float damage);
+    boolean attackEntityFromPart(MultiPartEntityPart<?> part, DamageSource source, float damage);
     
     Entity[] getParts();
 	

@@ -9,6 +9,7 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAIAggroTable;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAINearestAttackableTarget;
@@ -19,6 +20,7 @@ import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackTask;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonSummonShadowAttack;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonTakeoffLandTask;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.serializers.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -65,7 +67,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEntity {
 
-	private static enum DragonBodyPartType {
+	public static enum DragonBodyPartType {
 		BODY("body", 2.5f, 3f, Vec3d.ZERO),
 		REAR("rear", 2.5f, 3, new Vec3d(0, 0, -2.5f)),
 		HEAD("head", .5f, 2f, new Vec3d(0, 3.0, 1.5f)),
@@ -226,15 +228,12 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	
 	public EntityDragonRed(EntityType<? extends EntityDragonRed> type, World worldIn) {
 		super(type, worldIn);
-        this.stepHeight = 2;
-        this.ignoreFrustumCheck = true;
-        this.experienceValue = 1000;
-        this.noClip = false;
-        
-        bodyParts = new EnumMap<>(DragonBodyPartType.class);
-        for (DragonBodyPartType partType : DragonBodyPartType.values()) {
-        	bodyParts.put(partType, new DragonBodyPart(partType, this));
-        }
+		this.stepHeight = 2;
+		this.ignoreFrustumCheck = true;
+		this.experienceValue = 1000;
+		this.noClip = false;
+		
+		bodyParts = new EnumMap<>(DragonBodyPartType.class);
 	}
 	
 	public static final float GetBodyWidth() {
@@ -427,6 +426,23 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		this.dataManager.register(DRAGON_PHASE, DragonPhase.GROUNDED_PHASE.ordinal());
 	}
 	
+	protected void spawnBodyParts() {
+		for (DragonBodyPartType partType : DragonBodyPartType.values()) {
+			DragonBodyPart part = new DragonBodyPart(partType, this);
+			bodyParts.put(partType, part);
+			this.world.addEntity(part);
+		}
+	}
+	
+	@Override
+	public void onAddedToWorld() {
+		super.onAddedToWorld();
+		
+		if (!this.world.isRemote()) {
+			spawnBodyParts();
+		}
+	}
+	
 	@Override
 	public boolean canDespawn(double nearestPlayer) {
 		return false;
@@ -573,7 +589,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 //	}
 
 	@Override
-	public boolean attackEntityFromPart(MultiPartEntityPart dragonPart, DamageSource source, float damage) {
+	public boolean attackEntityFromPart(MultiPartEntityPart<?> dragonPart, DamageSource source, float damage) {
 		// could take less or more damage from different sources in different parents
 		return this.attackEntityFrom(source, damage);
 	}
@@ -638,15 +654,35 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		}
 	}
 	
-	protected class DragonBodyPart extends MultiPartEntityPart {
+	public static class DragonBodyPart extends MultiPartEntityPart<EntityDragonRed> {
 		
-		protected final DragonBodyPartType type;
-		protected final EntityDragonRed parent;
+		public static final String ID = EntityDragonRed.ID + ".body_part";
+		
+		protected static final DataParameter<DragonBodyPartType> TYPE = EntityDataManager.createKey(DragonBodyPart.class, RedDragonBodyPartTypeSerializer.instance);
+		protected @Nullable EntityDragonRed parent;
 		
 		public DragonBodyPart(DragonBodyPartType type, EntityDragonRed parent) {
-			super(parent, type.name(), type.getWidth(), type.getHeight());
-			this.type = type;
+			super(NostrumEntityTypes.dragonRedBodyPart, parent, type.name(), type.getWidth(), type.getHeight());
+			this.setType(type);
 			this.parent = parent;
+		}
+		
+		public DragonBodyPart(EntityType<? extends DragonBodyPart> type, World world) {
+			super(type, world, "DragonPart_Client", 2, 2);
+		}
+		
+		@Override
+		public void registerData() {
+			super.registerData();
+			this.dataManager.register(TYPE, DragonBodyPartType.BODY);
+		}
+		
+		public DragonBodyPartType getDragonPart() {
+			return dataManager.get(TYPE);
+		}
+		
+		protected void setType(DragonBodyPartType type) {
+			this.dataManager.set(TYPE, type);
 		}
 	}
 

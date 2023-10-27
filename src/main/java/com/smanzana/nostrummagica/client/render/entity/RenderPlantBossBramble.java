@@ -33,7 +33,7 @@ public class RenderPlantBossBramble extends EntityRenderer<EntityPlantBossBrambl
 		
 		this.bindEntityTexture(entity);
 		
-		final float scale = (entity.getWidth() / 5f); // 5f is width of model before being stretched
+		final float scale = (entity.getBrambleWidth() / 5f); // 5f is width of model before being stretched
 		
 		GlStateManager.pushMatrix();
 		

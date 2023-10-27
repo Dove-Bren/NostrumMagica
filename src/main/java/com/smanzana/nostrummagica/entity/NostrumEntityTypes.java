@@ -44,10 +44,13 @@ public class NostrumEntityTypes {
 	@ObjectHolder(EntityGolemEnder.ID) public static EntityType<EntityGolemEnder> golemEnder;
 	@ObjectHolder(EntityKoid.ID) public static EntityType<EntityKoid> koid;
 	@ObjectHolder(EntityDragonRed.ID) public static EntityType<EntityDragonRed> dragonRed;
+	@ObjectHolder(EntityDragonRed.DragonBodyPart.ID) public static EntityType<EntityDragonRed.DragonBodyPart> dragonRedBodyPart;
 	@ObjectHolder(EntityTameDragonRed.ID) public static EntityType<EntityTameDragonRed> tameDragonRed;
 	@ObjectHolder(EntityShadowDragonRed.ID) public static EntityType<EntityShadowDragonRed> shadowDragonRed;
 	@ObjectHolder(EntityDragonEgg.ID) public static EntityType<EntityDragonEgg> dragonEgg;
 	@ObjectHolder(EntityPlantBoss.ID) public static EntityType<EntityPlantBoss> plantBoss;
+	@ObjectHolder(EntityPlantBoss.PlantBossBody.ID) public static EntityType<EntityPlantBoss.PlantBossBody> plantBossBody;
+	@ObjectHolder(EntityPlantBoss.PlantBossLeafLimb.ID) public static EntityType<EntityPlantBoss.PlantBossLeafLimb> plantBossLeaf;
 	@ObjectHolder(EntityPlantBossBramble.ID) public static EntityType<EntityPlantBossBramble> plantBossBramble;
 	@ObjectHolder(EntitySprite.ID) public static EntityType<EntitySprite> sprite;
 	@ObjectHolder(EntityLux.ID) public static EntityType<EntityLux> lux;
@@ -114,6 +117,11 @@ public class NostrumEntityTypes {
 				.size(EntityDragonRed.GetBodyWidth(), EntityDragonRed.GetBodyHeight())
 				.immuneToFire()
 			.build("").setRegistryName(EntityDragonRed.ID));
+		registry.register(EntityType.Builder.<EntityDragonRed.DragonBodyPart>create(EntityDragonRed.DragonBodyPart::new, EntityClassification.MISC)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+				.size(EntityDragonRed.GetBodyWidth(), EntityDragonRed.GetBodyHeight())
+				.immuneToFire()
+			.build("").setRegistryName(EntityDragonRed.DragonBodyPart.ID));
 		
 		EntityType<EntityTameDragonRed> tameDragonType = EntityType.Builder.<EntityTameDragonRed>create(EntityTameDragonRed::new, EntityClassification.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -138,9 +146,17 @@ public class NostrumEntityTypes {
 				.size(.45f, .5f)
 			.build("").setRegistryName(EntityDragonEgg.ID));
 		registry.register(EntityType.Builder.<EntityPlantBoss>create(EntityPlantBoss::new, EntityClassification.MISC)
-				.size(4.25f /*width 3, but rotates. sqrt(3^2+3^2) = 4.24*/, 4)
+				.size(7, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityPlantBoss.ID));
+		registry.register(EntityType.Builder.<EntityPlantBoss.PlantBossBody>create(EntityPlantBoss.PlantBossBody::new, EntityClassification.MISC)
+				.size(4.25f /*width 3, but rotates. sqrt(3^2+3^2) = 4.24*/, 4)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityPlantBoss.PlantBossBody.ID));
+		registry.register(EntityType.Builder.<EntityPlantBoss.PlantBossLeafLimb>create(EntityPlantBoss.PlantBossLeafLimb::new, EntityClassification.MISC)
+				.size(4, 4)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityPlantBoss.PlantBossLeafLimb.ID));
 		registry.register(EntityType.Builder.<EntityPlantBossBramble>create(EntityPlantBossBramble::new, EntityClassification.MISC)
 				.size(.5f, .75f)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)

@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.PoisonWaterBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -39,6 +41,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -54,6 +57,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
@@ -258,12 +262,13 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	protected static final DataParameter<Float[]> LEAF_PITCHES = EntityDataManager.<Float[]>createKey(EntityPlantBoss.class, FloatArraySerializer.instance);
 	protected static final DataParameter<Optional<EMagicElement>> WEAK_ELEMENT = EntityDataManager.<Optional<EMagicElement>>createKey(EntityPlantBoss.class, OptionalMagicElementDataSerializer.instance);
 	protected static final DataParameter<PlantBossTreeType> TREE_TYPE = EntityDataManager.<PlantBossTreeType>createKey(EntityPlantBoss.class, PlantBossTreeTypeSerializer.instance);
+	protected static final DataParameter<Optional<UUID>> BODY_ID = EntityDataManager.createKey(EntityPlantBoss.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	
 	private final ServerBossInfo bossInfo = (ServerBossInfo) new ServerBossInfo(this.getDisplayName(), BossInfo.Color.GREEN, BossInfo.Overlay.NOTCHED_10).setDarkenSky(true);
 	private final PlantBossLeafLimb[] limbs;
-	private final PlantBossBody body;
-	private final MultiPartEntityPart[] parts;
+	private final MultiPartEntityPart<EntityPlantBoss>[] parts;
 	protected float eyeHeight;
+	private @Nullable PlantBossBody bodyCache = null;
 	
 	private Map<BattleState, BattleStateTask> stateTasks;
 	
@@ -283,6 +288,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	protected int curlDuration = 0;
 	protected boolean curlLeaveFrontOpen;
 	
+	@SuppressWarnings("unchecked")
 	public EntityPlantBoss(EntityType<? extends EntityPlantBoss> type, World worldIn) {
 		super(type, worldIn);
         this.ignoreFrustumCheck = true;
@@ -290,15 +296,8 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
         this.entityCollisionReduction = 1f;
 		
         this.parts = new MultiPartEntityPart[NumberOfLeaves + 1];
-        body = new PlantBossBody(this);
-        parts[0] = body;
-        
 		this.limbs = new PlantBossLeafLimb[NumberOfLeaves];
-		for (int i = 0; i < NumberOfLeaves; i++) {
-			limbs[i] = new PlantBossLeafLimb(this, i);
-			parts[i+1] = limbs[i];
-		}
-		
+        
 		this.aggroTable = new AggroTable<>((ent) -> {
 			return EntityPlantBoss.this.getEntitySenses().canSee(ent);
 		});
@@ -347,6 +346,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		this.dataManager.register(LEAF_PITCHES, new Float[NumberOfLeaves]);
 		this.dataManager.register(WEAK_ELEMENT, Optional.empty());
 		this.dataManager.register(TREE_TYPE, PlantBossTreeType.NORMAL);
+		this.dataManager.register(BODY_ID, Optional.empty());
 	}
 	
 	@Override
@@ -393,13 +393,39 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
     	super.writeAdditional(compound);
 	}
 	
+	protected void spawnLimbs() {
+        bodyCache = new PlantBossBody(this);
+        parts[0] = bodyCache;
+        dataManager.set(BODY_ID, Optional.of(bodyCache.getUniqueID()));
+		
+		for (int i = 0; i < NumberOfLeaves; i++) {
+			limbs[i] = new PlantBossLeafLimb(this, i);
+			parts[i+1] = limbs[i];
+		}
+		
+		// Add children to world
+		for (MultiPartEntityPart<EntityPlantBoss> part : this.parts) {
+			this.world.addEntity(part);
+		}
+	}
+	
+	protected void searchForBody() {
+		Optional<UUID> bodyID = this.dataManager.get(BODY_ID);
+		if (bodyID.isPresent()) {
+			Entity e = Entities.FindEntity(this.world, bodyID.get());
+			if (e != null && e instanceof PlantBossBody) {
+				bodyCache = (PlantBossBody) e;
+			}
+		}
+	}
+	
 	protected void positionLeaves(PlantBossLeafLimb[] limbs) {
 		for (PlantBossLeafLimb limb : limbs) {
-			final float yawProg = ((float) limb.index / (float) limbs.length); // 0 to 1
+			final float yawProg = ((float) limb.getLeafIndex() / (float) limbs.length); // 0 to 1
 			final double limbRot = Math.PI * 2 * yawProg
 								//+ (this.rotationYawHead * Math.PI / 180.0) // don't rotate
 								;
-			final double radius = this.getBody().getWidth() * (limb.index % 2 == 0 ? 1.25 : 1.5);
+			final double radius = this.getBody().getWidth() * (limb.getLeafIndex() % 2 == 0 ? 1.25 : 1.5);
 			
 			final double x = this.posX
 					+ Math.cos(limbRot) * radius;
@@ -408,7 +434,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			final float pitch = calcTargetLeafPitch(limb);
 			limb.setLocationAndAngles(x, posY, z, yawProg * 360f, pitch);
 			
-			this.setLeafPitch(limb.index, pitch);
+			this.setLeafPitch(limb.getLeafIndex(), pitch);
 		}
 	}
 	
@@ -416,7 +442,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		// 0 unless curling/curled.
 		final float pitch;
 		if (this.curlTicks == 0
-				|| (this.curlLeaveFrontOpen && limb.index == 2) // front leaf and want it down
+				|| (this.curlLeaveFrontOpen && limb.getLeafIndex() == 2) // front leaf and want it down
 				) {
 			// not curling
 			pitch = 0;
@@ -467,27 +493,40 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	@Override
+	public void onAddedToWorld() {
+		super.onAddedToWorld();
+		
+		if (!this.world.isRemote()) {
+			spawnLimbs();
+		}
+	}
+	
+	@Override
 	public void tick() {
 		super.tick();
 		
 		this.aggroTable.decayTick();
 		
+//		for (MultiPartEntityPart part : this.parts) {
+//			part.tick();
+//		}
+		
 		this.rotationYawHead += .1f;
 		
 		curlTick();
 		
-		getBody().setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
-		
 		if (this.world.isRemote) {
+			if (this.bodyCache == null) {
+				searchForBody();
+			}
 			this.clientTick();
 		} else {
+			getBody().setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
 			positionLeaves(limbs);
 			this.tickStateMachine();
 		}
 		
-		for (MultiPartEntityPart part : this.parts) {
-			part.tick();
-		}
+		
 	}
 	
 	protected void tickStateMachine() {
@@ -629,8 +668,8 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 //	}
 	
 	@Override
-	public boolean attackEntityFromPart(MultiPartEntityPart plantPart, DamageSource source, float damage) {
-		if (plantPart == this.body || this.getWeakElement() != null) {
+	public boolean attackEntityFromPart(MultiPartEntityPart<?> plantPart, DamageSource source, float damage) {
+		if (plantPart == this.bodyCache || this.getWeakElement() != null) {
 			return this.attackEntityFrom(source, damage);
 		} else {
 			return false; // Leaves take no damage
@@ -643,7 +682,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			return false;
 		}
 		
-		amount = Math.min(amount, 10f);
+		//amount = Math.min(amount, 10f);
 		
 		if (this.getWeakElement() != null) {
 			// Only let attacks of the right element through
@@ -682,7 +721,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	@Override
 	public boolean canBeCollidedWith() {
-		return true;
+		return false; // Wants parts to be collided with, not main entity
 		//return super.canBeCollidedWith();
 	}
 	
@@ -724,8 +763,9 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		}
 	}
 	
-	public PlantBossBody getBody() {
-		return this.body;
+	// Can be null on client when still looking for matching body piece
+	public @Nullable PlantBossBody getBody() {
+		return this.bodyCache;
 	}
 	
 	public EMagicElement getTreeElement() {
@@ -946,9 +986,16 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		return this.dataManager.get(WEAK_ELEMENT).orElse(null);
 	}
 	
-	public static class PlantBossBody extends MultiPartEntityPart {
+	public static class PlantBossBody extends MultiPartEntityPart<EntityPlantBoss> {
+		
+		public static final String ID = EntityPlantBoss.ID + ".body";
+		
+		public PlantBossBody(EntityType<? extends PlantBossBody> type, World world) {
+			super(type, world, "PlantBoss_Body", 3, 3);
+		}
+		
 		public PlantBossBody(EntityPlantBoss parent) {
-			super(parent, "PlantBoss_Body", 3, 3);
+			super(NostrumEntityTypes.plantBossBody, parent, "PlantBoss_Body", 3, 3);
 		}
 	}
 	
@@ -986,27 +1033,45 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			break;
 		}
 		
+		NostrumMagica.logger.info("Spawning bramble at " + start);
+		
 		EntityPlantBossBramble bramble = new EntityPlantBossBramble(NostrumEntityTypes.plantBossBramble, world, this, width);
 		bramble.setPosition(start.getX() + .5, start.getY(), start.getZ() + .5);
 		bramble.setMotion(side, dist);
 		world.addEntity(bramble);
 	}
 	
-	public static class PlantBossLeafLimb extends MultiPartEntityPart {
+	public static class PlantBossLeafLimb extends MultiPartEntityPart<EntityPlantBoss> {
+		
+		public static final String ID = EntityPlantBoss.ID + ".leaf";
+		
+		protected static final DataParameter<Integer> INDEX = EntityDataManager.createKey(PlantBossLeafLimb.class, DataSerializers.VARINT);
 
-		protected final int index;
-		protected final EntityPlantBoss plant;
+		protected EntityPlantBoss plant;
 		protected float effectivePitch;
 		
+		public PlantBossLeafLimb(EntityType<?> type, World world) {
+			super(type, world, "PlantBoss_Leaf_Client", 4, 4f / 16f);
+			this.plant = null;
+		}
+		
 		public PlantBossLeafLimb(EntityPlantBoss parent, int index) {
-			super(parent, "PlantBoss_Leaf_" + index, 4, 4f / 16f);
-			this.index = index;
+			super(NostrumEntityTypes.plantBossLeaf, parent, "PlantBoss_Leaf_" + index, 4, 4f / 16f);
 			this.effectivePitch = 0f;
 			this.plant = parent;
+			this.setLeafIndex(index);
+		}
+		
+		public int getLeafIndex() {
+			return this.dataManager.get(INDEX);
+		}
+		
+		protected void setLeafIndex(int index) {
+			this.dataManager.set(INDEX, index);
 		}
 		
 		public float getYawOffset() {
-			final float yawProg = ((float) index / (float) EntityPlantBoss.NumberOfLeaves); // 0 to 1
+			final float yawProg = ((float) getLeafIndex() / (float) EntityPlantBoss.NumberOfLeaves); // 0 to 1
 			
 			return yawProg * 360f;
 		}
@@ -1052,16 +1117,31 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		public void tick() {
 			super.tick();
 			
-			// If pitch has changed in parent data manager, act on it!
-			final float pitch = plant.getLeafPitch(this.index); 
-			if (pitch != this.effectivePitch) {
-				this.setPitch(pitch);
+			if (this.world != null && world.isRemote) {
+				if (this.plant == null) {
+					this.plant = this.getParent(); // Look up parent by ID
+				}
 			}
+			
+			// If pitch has changed in parent data manager, act on it!
+			if (this.plant != null) {
+				final float pitch = plant.getLeafPitch(this.getLeafIndex()); 
+				if (pitch != this.effectivePitch) {
+					this.setPitch(pitch);
+				}
+			}
+			// else count down and disappear self?
 		}
 		
 		@Override
 		public boolean canBeCollidedWith() {
 			return true;
+		}
+		
+		@Override
+		protected void registerData() {
+			super.registerData();
+			super.dataManager.register(INDEX, 0);
 		}
 	}
 	

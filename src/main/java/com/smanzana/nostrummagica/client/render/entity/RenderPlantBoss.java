@@ -5,10 +5,8 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossLeafLimb;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -61,6 +59,10 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 	}
 	
 	protected void renderTrimming(EntityPlantBoss plant, float partialTicks) {
+		if (plant.getBody() == null) {
+			return;
+		}
+		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
 		GlStateManager.pushMatrix();
@@ -121,6 +123,9 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 	}
 	
 	protected void renderHeadTree(EntityPlantBoss plant, float ageInTicks) {
+		if (plant.getBody() == null) {
+			return;
+		}
 		
 		final PlantBossTreeType treeType = plant.getTreeType();
 		
@@ -218,6 +223,9 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 	@Override
 	protected void renderModel(EntityPlantBoss plant, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
 		super.renderModel(plant, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
+		if (plant.getBody() == null) {
+			return;
+		}
 		
 		// Render top of main body as 4 double-sided quads
 		renderTrimming(plant, ageInTicks);
@@ -226,23 +234,23 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 		renderHeadTree(plant, ageInTicks);
 		
 		// Also render leaf models. Do it here so I don't have to repeat all the rotations and scaling
-		GlStateManager.pushMatrix();
-		final float existingRotation = RenderFuncs.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
-		GlStateManager.rotatef((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
-		GlStateManager.translatef(0, plant.getBody().getHeight()/2, 0);
-		for (int i = 0; i < leafModels.length; i++) {
-			PlantBossLeafLimb leaf = plant.getLeafLimb(i);
-			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().getWidth();
-			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
-			
-			GlStateManager.pushMatrix();
-			GlStateManager.rotatef(180 + leaf.getYawOffset(), 0, 1, 0);
-			GlStateManager.translated(offset, -.001 * i, 0);
-			GlStateManager.rotatef(-leaf.getPitch(), 0, 0, 1);
-			leafModels[i].render(leaf, 0f, 0f, ageInTicks, 0f, 0f, scaleFactor);
-			GlStateManager.popMatrix();
-		}
-		GlStateManager.popMatrix();
+//		GlStateManager.pushMatrix();
+//		final float existingRotation = RenderFuncs.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, ageInTicks % 1);
+//		GlStateManager.rotatef((180.0F - existingRotation), 0, 1, 0); // undo existing rotation
+//		GlStateManager.translatef(0, plant.getBody().getHeight()/2, 0);
+//		for (int i = 0; i < leafModels.length; i++) {
+//			PlantBossLeafLimb leaf = plant.getLeafLimb(i);
+//			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().getWidth();
+//			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
+//			
+//			GlStateManager.pushMatrix();
+//			GlStateManager.rotatef(180 + leaf.getYawOffset(), 0, 1, 0);
+//			GlStateManager.translated(offset, -.001 * i, 0);
+//			GlStateManager.rotatef(-leaf.getPitch(), 0, 0, 1);
+//			leafModels[i].render(leaf, 0f, 0f, ageInTicks, 0f, 0f, scaleFactor);
+//			GlStateManager.popMatrix();
+//		}
+//		GlStateManager.popMatrix();
 	}
 	
 	@Override
