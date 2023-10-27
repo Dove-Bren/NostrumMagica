@@ -23,7 +23,7 @@ public class DragonAINearestAttackableTarget<T extends LivingEntity> extends Nea
 	}
 
 	protected AxisAlignedBB getTargetableArea(double targetDistance) {
-		return this.goalOwner.getBoundingBox().expand(targetDistance,
+		return this.goalOwner.getBoundingBox().grow(targetDistance,
 				((EntityDragonRedBase) this.goalOwner).isFlying() ? 32 : 12.0D, targetDistance);
 	}
 	

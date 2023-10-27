@@ -196,7 +196,7 @@ public class RayTrace {
             Entity entity1 = (Entity)list.get(j);
             
             float f1 = entity1.getCollisionBorderSize();
-            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().expand((double)f1, (double)f1, (double)f1);
+            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f1, (double)f1, (double)f1);
             Optional<Vec3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
 
             if (axisalignedbb.contains(fromPos))
@@ -299,7 +299,7 @@ public class RayTrace {
             Entity entity1 = (Entity)list.get(j);
             
             float f1 = entity1.getCollisionBorderSize();
-            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().expand((double)f1, (double)f1, (double)f1);
+            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f1, (double)f1, (double)f1);
             Optional<Vec3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
 
             if (axisalignedbb.contains(fromPos))

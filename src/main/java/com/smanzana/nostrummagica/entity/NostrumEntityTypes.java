@@ -138,7 +138,7 @@ public class NostrumEntityTypes {
 				.size(.45f, .5f)
 			.build("").setRegistryName(EntityDragonEgg.ID));
 		registry.register(EntityType.Builder.<EntityPlantBoss>create(EntityPlantBoss::new, EntityClassification.MISC)
-				.size(7, 4)
+				.size(4.25f /*width 3, but rotates. sqrt(3^2+3^2) = 4.24*/, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityPlantBoss.ID));
 		registry.register(EntityType.Builder.<EntityPlantBossBramble>create(EntityPlantBossBramble::new, EntityClassification.MISC)

@@ -61,7 +61,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         if (trace != null && trace.getType() != RayTraceResult.Type.MISS) {
         	if (trace.getType() == RayTraceResult.Type.ENTITY) {
         		Entity entityHit = ((EntityRayTraceResult) trace).getEntity();
-        		this.target = trace.getHitVec().add(0D, entityHit.getHeight() / 2.0, 0D);
+        		this.target = entityHit.getPositionVec().add(0D, entityHit.getHeight() / 2.0, 0D);
         	} else if (!piercing) { // !piercing cause piercing just wants max dist if no entity being looked at
         		this.target = trace.getHitVec();
         	}

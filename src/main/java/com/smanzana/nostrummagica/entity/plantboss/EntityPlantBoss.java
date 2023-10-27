@@ -49,6 +49,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
@@ -681,7 +682,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	@Override
 	public boolean canBeCollidedWith() {
-		return false;
+		return true;
 		//return super.canBeCollidedWith();
 	}
 	
@@ -740,7 +741,24 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	protected @Nullable LivingEntity getRandomTarget() {
-		return aggroTable.getMainTarget();
+		@Nullable LivingEntity target = aggroTable.getMainTarget();
+		if (target == null) {
+			// Just try nearby entities
+			AxisAlignedBB searchBox = this.getBoundingBox().grow(16, 8, 16);
+			List<Entity> ents = this.world.getEntitiesInAABBexcluding(this, searchBox, (e) -> {
+				return (e instanceof LivingEntity)
+						&& (!(e instanceof PlayerEntity) || !((PlayerEntity) e).isCreative())
+						&& (this.canEntityBeSeen(e));
+				});
+			
+			if (ents.isEmpty()) {
+				target = null;
+			} else {
+				target = (LivingEntity) ents.get(this.rand.nextInt(ents.size()));
+			}
+		}
+		
+		return target;
 	}
 	
 	protected List<LivingEntity> getAllTargets() {
@@ -1039,6 +1057,11 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			if (pitch != this.effectivePitch) {
 				this.setPitch(pitch);
 			}
+		}
+		
+		@Override
+		public boolean canBeCollidedWith() {
+			return true;
 		}
 	}
 	
