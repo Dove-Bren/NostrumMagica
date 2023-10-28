@@ -40,6 +40,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.Rarity;
@@ -48,6 +49,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -148,6 +150,25 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 			}
 		} else {
 			tooltip.add(new StringTextComponent("[Hold Shift]"));			
+		}
+	}
+	
+	@Override
+	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			items.add(addCapacity(new ItemStack(this), 10));
+			items.add(setLevel(setLevel(setLevel(setLevel(
+					new ItemStack(this),
+					EMagicElement.PHYSICAL, 1),
+					EMagicElement.FIRE, 2),
+					EMagicElement.WIND, 2),
+					EMagicElement.ENDER, 2));
+			items.add(setLevel(setLevel(setLevel(setLevel(
+					new ItemStack(this),
+					EMagicElement.PHYSICAL, 1),
+					EMagicElement.ICE, 2),
+					EMagicElement.EARTH, 2),
+					EMagicElement.LIGHTNING, 2));
 		}
 	}
 	

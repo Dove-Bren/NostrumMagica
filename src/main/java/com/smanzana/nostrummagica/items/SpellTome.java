@@ -37,6 +37,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
@@ -997,6 +998,19 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_TOMES;
+	}
+	
+	@Override
+	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			ItemStack stack = new ItemStack(this);
+			setCapacity(stack, 5);
+			items.add(stack);
+			
+			stack = new ItemStack(this);
+			setCapacity(stack, 10);
+			items.add(stack);
+		}
 	}
 	
 	/**

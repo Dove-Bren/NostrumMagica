@@ -11,10 +11,12 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrap
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -220,9 +222,56 @@ public class SpellPlate extends Item implements ILoreTagged {
 		
 		return enhancements;
 	}
+	
+	public static void setCapacity(ItemStack stack, int capacity) {
+		CompoundNBT tag = stack.getTag();
+		if (tag == null) {
+			tag = new CompoundNBT();
+		}
+		
+		tag.putInt(NBT_CAPACITY, capacity);
+		
+		stack.setTag(tag);
+	}
+	
+	public static void setEnhancements(ItemStack stack, List<SpellTomeEnhancementWrapper> enhancements) {
+		CompoundNBT tag = stack.getTag();
+		if (tag == null) {
+			tag = new CompoundNBT();
+		}
+		
+		if (enhancements != null && enhancements.size() > 0) {
+			ListNBT list = new ListNBT();
+			for (SpellTomeEnhancementWrapper enhance : enhancements) {
+				CompoundNBT subtag = new CompoundNBT();
+				subtag.putString(NBT_ENHANCEMENT_TYPE, enhance.getEnhancement().getTitleKey());
+				subtag.putInt(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
+				list.add(subtag);
+			}
+			
+			tag.put(NBT_ENHANCEMENTS, list);
+		} else {
+			tag.remove(NBT_ENHANCEMENTS);
+		}
+		
+		stack.setTag(tag);
+	}
 
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
+	}
+	
+	@Override
+	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			ItemStack stack = new ItemStack(this);
+			setCapacity(stack, 5);
+			items.add(stack);
+			
+			stack = new ItemStack(this);
+			setCapacity(stack, 10);
+			items.add(stack);
+		}
 	}
 }

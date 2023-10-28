@@ -4,6 +4,9 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 public class EnchantedIceArmor extends EnchantedArmor {
 
@@ -30,6 +33,20 @@ public class EnchantedIceArmor extends EnchantedArmor {
 	
 	public EnchantedIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.ICE, slot, type, properties);
+	}
+	
+	@Override
+	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			items.add(new ItemStack(this));
+			
+			// Add an upgraded copy of true chestplates
+			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.TRUE) {
+				ItemStack stack = new ItemStack(this);
+				EnchantedArmor.SetHasWingUpgrade(stack, true);
+				items.add(stack);
+			}
+		}
 	}
 	
 }

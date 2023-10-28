@@ -9,9 +9,11 @@ import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -150,6 +152,18 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_TOMES;
+	}
+	
+	@Override
+	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.isInGroup(group)) {
+			for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
+				items.add(Create(enhancement, 1));
+				if (enhancement.getMaxLevel() != 1) {
+					items.add(Create(enhancement, enhancement.getMaxLevel()));
+				}
+			}
+		}
 	}
 	
 	public static int getLevel(ItemStack stack) {
