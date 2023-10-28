@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
@@ -28,8 +29,9 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 
 	protected EntitySize size;
 	protected int orphanTicks;
+	protected @Nullable T parentCache = null;
 	
-	public MultiPartEntityPart(EntityType<?> type, @Nonnull IMultiPartEntity parent, String name, float width, float height) {
+	public MultiPartEntityPart(EntityType<?> type, @Nonnull T parent, String name, float width, float height) {
 		super(type, parent.getWorld());
 		
 		this.init(parent, name);
@@ -43,9 +45,11 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 		this.setSize(width, height);
 	}
 	
-	public void init(@Nonnull IMultiPartEntity parent, String partName) {
+	public void init(@Nonnull T parent, String partName) {
 		this.dataManager.set(PARENT_ID, Optional.of(((Entity) parent).getUniqueID()));
 		this.dataManager.set(PART_NAME, partName);
+		
+		parentCache = parent;
 	}
 	
 	public String getPartName() {
@@ -57,19 +61,34 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Override
 	public @Nullable T getParent() {
-		T parent = null;
-		UUID parentID = getParentID();
-		if (parentID != null && this.world != null) {
-			Entity e = Entities.FindEntity(this.world, parentID);
-			try {
-				parent = (T) e;
-			} catch (Exception exception) {
-				parent = null;
+		if (parentCache == null) {
+			UUID parentID = getParentID();
+			if (parentID != null && this.world != null) {
+				Entity e = Entities.FindEntity(this.world, parentID);
+				try {
+					parentCache = (T) e;
+				} catch (Exception exception) {
+					parentCache = null;
+				}
+			}
+			
+			if (parentCache != null) {
+				// Found parent for the first time!
+				if (world.isRemote()) {
+					// Try to attach to parent
+					if (!parentCache.attachClientEntity(this)) {
+						// Parent claims we're not theirs.
+						NostrumMagica.logger.warn("MultiPartEntity part failed to attach. Removing " + this);
+						parentCache = null;
+						this.remove();
+					}
+				}
 			}
 		}
 		
-		return parent;
+		return parentCache;
 	}
 	
 	@Override

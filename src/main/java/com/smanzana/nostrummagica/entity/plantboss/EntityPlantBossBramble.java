@@ -18,6 +18,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -167,7 +169,7 @@ public class EntityPlantBossBramble extends Entity {
 		if (entity != this.plant && !entity.equals(this.plant)) {
 			entity.removePotionEffect(NostrumEffects.rooted);
 			entity.attackEntityAsMob(this);
-			entity.attackEntityFrom(new EntityDamageSource("mob", this), 6f);
+			entity.attackEntityFrom(new BrambleDamageSource(this.plant), 6f);
 			entity.knockBack(this, 1f, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
 		}
 	}
@@ -229,5 +231,18 @@ public class EntityPlantBossBramble extends Entity {
 	@Override
 	public IPacket<?> createSpawnPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
+	}
+	
+	public static class BrambleDamageSource extends EntityDamageSource {
+		
+		public BrambleDamageSource(EntityPlantBoss parent) {
+			super("plantboss.bramble", parent);
+		}
+		
+		@Override
+		public ITextComponent getDeathMessage(LivingEntity entityLivingBaseIn) {
+	        String untranslated = "death.attack.plantboss.bramble";
+	        return new TranslationTextComponent(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.damageSourceEntity.getDisplayName()});
+	    }
 	}
 }

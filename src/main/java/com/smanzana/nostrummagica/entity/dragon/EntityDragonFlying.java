@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -220,6 +221,12 @@ public abstract class EntityDragonFlying extends EntityDragon {
 				this.wingFlapProgress += WING_FLAP_PER_TICK * this.wingFlapSpeed;
 			}
 		}
+	}
+	
+	@Override
+	protected void registerAttributes() {
+		super.registerAttributes();
+		this.getAttributes().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
 	}
 
 }

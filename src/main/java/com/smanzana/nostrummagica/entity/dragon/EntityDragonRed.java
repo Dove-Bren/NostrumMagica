@@ -6,8 +6,10 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
+import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
@@ -412,6 +414,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	protected void registerAttributes() {
 		super.registerAttributes();
         this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(3D);
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
@@ -430,6 +433,8 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		for (DragonBodyPartType partType : DragonBodyPartType.values()) {
 			DragonBodyPart part = new DragonBodyPart(partType, this);
 			bodyParts.put(partType, part);
+			
+			part.setPosition(this.posX, this.posY, this.posZ);
 			this.world.addEntity(part);
 		}
 	}
@@ -437,10 +442,6 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	@Override
 	public void onAddedToWorld() {
 		super.onAddedToWorld();
-		
-		if (!this.world.isRemote()) {
-			spawnBodyParts();
-		}
 	}
 	
 	@Override
@@ -481,6 +482,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		for (DragonBodyPartType type : DragonBodyPartType.values()) {
 			DragonBodyPart part = this.bodyParts.get(type);
 			
+			if (part == null) {
+				continue; // Client, and hasn't attached yet?
+			}
+			
 			Vec3d offset = type.getPartOffset();
 			part.setLocationAndAngles(
 					this.posX + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
@@ -494,6 +499,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	@Override
 	public void tick() {
 		super.tick();
+		
+		if (!this.world.isRemote() && this.bodyParts.get(DragonBodyPartType.BODY) == null) {
+			spawnBodyParts();
+		}
 		
 		DragonPhase phase = this.getPhase();
 		if (phase == DragonPhase.GROUNDED_PHASE) {
@@ -634,6 +643,19 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		return super.canBeCollidedWith();
 	}
 	
+	@Override
+	public boolean attachClientEntity(IMultiPartEntityPart<?> part) {
+		DragonBodyPart bodyPart = (DragonBodyPart) part;
+		if (this.bodyParts.containsKey(bodyPart.getDragonPart())) {
+			NostrumMagica.logger.warn("Got client attach event for dragon part [" + bodyPart.getDragonPart().name + "] but already have one?");
+		} else {
+			this.bodyParts.put(bodyPart.getDragonPart(), bodyPart);
+			return true;
+		}
+		
+		return false;
+	}
+	
 	private class DragonSpellAttackTask extends EntitySpellAttackTask<EntityDragonRed> {
 
 		public DragonSpellAttackTask(EntityDragonRed entity, int delay, int odds, boolean needsTarget, Predicate<EntityDragonRed> predicate,
@@ -683,6 +705,16 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		
 		protected void setType(DragonBodyPartType type) {
 			this.dataManager.set(TYPE, type);
+		}
+		
+		@Override
+		protected void readAdditional(CompoundNBT compound) {
+			super.readAdditional(compound);
+		}
+
+		@Override
+		protected void writeAdditional(CompoundNBT compound) {
+			super.writeAdditional(compound);
 		}
 	}
 

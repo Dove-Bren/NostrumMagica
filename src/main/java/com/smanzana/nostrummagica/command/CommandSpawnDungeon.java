@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -30,8 +31,8 @@ public class CommandSpawnDungeon {
 	
 	private static final int execute(CommandContext<CommandSource> context, final String typeName) throws CommandSyntaxException {
 		
-		final String[] names = {};
-		final NostrumDungeon[] dungeons = {};
+		final String[] names = {"dragon", "portal", "plantboss"};
+		final NostrumDungeon[] dungeons = {NostrumDungeonStructure.DRAGON_DUNGEON, NostrumDungeonStructure.PORTAL_DUNGEON, NostrumDungeonStructure.PLANTBOSS_DUNGEON};
 		
 		NostrumDungeon dungeon = null;
 		for (int i = 0; i < names.length; i++) {
