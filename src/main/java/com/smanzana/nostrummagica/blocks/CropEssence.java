@@ -1,13 +1,22 @@
 package com.smanzana.nostrummagica.blocks;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropsBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -15,6 +24,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameterSets;
+import net.minecraft.world.storage.loot.LootParameters;
 
 public class CropEssence extends CropsBlock {
 
@@ -52,31 +64,41 @@ public class CropEssence extends CropsBlock {
 		return AABB[((Integer)state.get(this.getAgeProperty())).intValue()];
 	}
 	
-//	protected ItemStack getRandomEssence(Random rand) {
-//		EMagicElement elem = EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
-//		return EssenceItem.getEssence(elem, 1);
-//	}
-//
-//    @Override
-//    public void getDrops(NonNullList<ItemStack> ret, IWorldReader world, BlockPos pos, BlockState state, int fortune) {
-//        final int age = getAge(state);
-//        Random rand = world instanceof World ? ((World)world).rand : NostrumMagica.rand;
-//
-//        int cropCount = 0;
-//        if (age >= getMaxAge()) {
-//        	cropCount = 1 + rand.nextInt(2) + fortune;
-//        }
-//        if (cropCount != 0) {
-//        	for (int i = 0; i < cropCount; i++) {
-//        		ret.add(getRandomEssence(rand));
-//        	}
-//        }
-//        
-//        int seedCount = 1;
-//        if (age >= getMaxAge() && rand.nextBoolean() && rand.nextBoolean()) {
-//        	seedCount += 1 + (fortune / 3);
-//        }
-//        
-//        ret.add(getSeeds(seedCount));
-//    }
+	protected ItemStack getRandomEssence(Random rand) {
+		EMagicElement elem = EMagicElement.getRandom(rand);
+		return EssenceItem.getEssence(elem, 1);
+	}
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+		final LootContext context = builder.withParameter(LootParameters.BLOCK_STATE, state).build(LootParameterSets.BLOCK);
+		final List<ItemStack> loot = new ArrayList<>();
+        final int age = getAge(state);
+        final int fortune;
+		if (context.has(LootParameters.TOOL)) {
+			fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, context.get(LootParameters.TOOL));
+		} else {
+			 fortune = 0;
+		}
+        
+        final Random rand = context.getRandom();
+
+        int cropCount = 0;
+        if (age >= getMaxAge()) {
+        	cropCount = 1 + rand.nextInt(2) + fortune;
+        }
+        if (cropCount != 0) {
+        	for (int i = 0; i < cropCount; i++) {
+        		loot.add(getRandomEssence(rand));
+        	}
+        }
+        
+        int seedCount = 1;
+        if (age >= getMaxAge() && rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) {
+        	seedCount += 1 + (fortune / 3);
+        }
+        
+        loot.add(new ItemStack(this.getSeedsItem(), seedCount));
+        return loot;
+    }
 }

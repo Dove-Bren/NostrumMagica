@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "nostrummagica:active_hopper"
+          "name": "nostrummagica:crystal_large"
         }
       ],
       "conditions": [

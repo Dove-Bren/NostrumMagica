@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.BlockRenderLayer;
@@ -167,6 +168,11 @@ public class ManiCrystal extends Block {
 //	public boolean isTranslucent(BlockState state) {
 //		return true;
 //	}
+	
+	@Override
+	public BlockState getStateForPlacement(BlockItemUseContext context) {
+		return this.getDefaultState().with(FACING, context.getFace());
+	}
 	
 	@Override
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld world, BlockPos pos, BlockPos facingPos) {

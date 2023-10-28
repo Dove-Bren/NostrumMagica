@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.spells;
 
+import java.util.Random;
+
 import javax.annotation.Nullable;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -74,5 +76,9 @@ public enum EMagicElement {
 		}
 		
 		return null;
+	}
+	
+	public static EMagicElement getRandom(Random rand) {
+		return EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
 	}
 }

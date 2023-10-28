@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 
@@ -19,20 +20,21 @@ public class CommandSpawnDungeon {
 
 	private static Random rand = null;
 	
+	private static final String[] names = {"dragon", "portal", "plantboss"};
+	private static final NostrumDungeon[] dungeons = {NostrumDungeonStructure.DRAGON_DUNGEON, NostrumDungeonStructure.PORTAL_DUNGEON, NostrumDungeonStructure.PLANTBOSS_DUNGEON};
+	
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("NostrumSpawnDungeon")
 					.requires(s -> s.hasPermissionLevel(2))
 					.then(Commands.argument("type", StringArgumentType.string())
+							.suggests((ctx, sb) -> ISuggestionProvider.suggest(names, sb))
 							.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "type")))
 							)
 				);
 	}
 	
 	private static final int execute(CommandContext<CommandSource> context, final String typeName) throws CommandSyntaxException {
-		
-		final String[] names = {"dragon", "portal", "plantboss"};
-		final NostrumDungeon[] dungeons = {NostrumDungeonStructure.DRAGON_DUNGEON, NostrumDungeonStructure.PORTAL_DUNGEON, NostrumDungeonStructure.PLANTBOSS_DUNGEON};
 		
 		NostrumDungeon dungeon = null;
 		for (int i = 0; i < names.length; i++) {

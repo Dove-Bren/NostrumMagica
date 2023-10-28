@@ -269,8 +269,13 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		// ItemStack should carry NBT about linked position
 		ItemStack drop = new ItemStack(this);
+		BlockPos linkedPos = null;
 		
-		BlockPos linkedPos = getLinkedPosition(builder.getWorld(), builder.get(LootParameters.POSITION));
+		TileEntity te = builder.get(LootParameters.BLOCK_ENTITY);
+		if (te != null && te instanceof ParadoxMirrorTileEntity) {
+			linkedPos = ((ParadoxMirrorTileEntity) te).getLinkedPosition();
+		}
+		
 		if (linkedPos != null) {
 			CompoundNBT tag = drop.getTag();
 			if (tag == null) {

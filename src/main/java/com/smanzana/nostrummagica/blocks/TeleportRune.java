@@ -50,7 +50,7 @@ public class TeleportRune extends ContainerBlock  {
 	
 	public TeleportRune() {
 		super(Block.Properties.create(Material.CARPET)
-				.hardnessAndResistance(5.0f, 5.0f)
+				.hardnessAndResistance(0.5f, 5.0f)
 				.sound(SoundType.STONE)
 				.tickRandomly()
 				);

@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "nostrummagica:active_hopper"
+          "name": "nostrummagica:mimic_facade"
         }
       ],
       "conditions": [

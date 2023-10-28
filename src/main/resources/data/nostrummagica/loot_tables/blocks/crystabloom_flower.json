@@ -5,9 +5,9 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "minecraft:item",
-          "name": "nostrummagica:active_hopper"
-        }
+		  "type": "minecraft:item",
+		  "name": "nostrummagica:reagent_crystabloom"
+		}
       ],
       "conditions": [
         {

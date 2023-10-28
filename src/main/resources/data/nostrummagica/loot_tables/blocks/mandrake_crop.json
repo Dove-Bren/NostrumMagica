@@ -12,17 +12,27 @@
               "conditions": [
                 {
                   "condition": "minecraft:block_state_property",
-                  "block": "minecraft:wheat",
+                  "block": "nostrummagica:mandrake_crop",
                   "properties": {
                     "age": "7"
                   }
                 }
               ],
-              "name": "minecraft:wheat"
+			  "functions": [
+				{
+				  "function": "minecraft:apply_bonus",
+				  "enchantment": "minecraft:fortune",
+				  "formula": "minecraft:binomial_with_bonus_count",
+				  "parameters": {
+					"extra": 3,
+					"probability": 0.5714286
+				  }
+				}],
+              "name": "nostrummagica:reagent_mandrake_root"
             },
             {
               "type": "minecraft:item",
-              "name": "minecraft:wheat_seeds"
+              "name": "nostrummagica:reagentseed_mandrake"
             }
           ]
         }
@@ -33,24 +43,13 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:apply_bonus",
-              "enchantment": "minecraft:fortune",
-              "formula": "minecraft:binomial_with_bonus_count",
-              "parameters": {
-                "extra": 3,
-                "probability": 0.5714286
-              }
-            }
-          ],
-          "name": "minecraft:wheat_seeds"
+          "name": "nostrummagica:reagentseed_mandrake"
         }
       ],
       "conditions": [
         {
           "condition": "minecraft:block_state_property",
-          "block": "minecraft:wheat",
+          "block": "nostrummagica:mandrake_crop",
           "properties": {
             "age": "7"
           }

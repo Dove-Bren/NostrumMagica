@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "nostrummagica:altar_item"
+          "name": "nostrummagica:teleport_rune"
         }
       ],
       "conditions": [

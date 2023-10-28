@@ -24,6 +24,7 @@ public class ChalkBlock extends Block {
 		super(Block.Properties.create(Material.CARPET)
 				.hardnessAndResistance(.01f)
 				.lightValue(1)
+				.noDrops()
 				);
 	}
 	
