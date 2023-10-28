@@ -422,7 +422,7 @@ public class OverlayRenderer extends AbstractGui {
 					GlStateManager.disableTexture();
 					//GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 					GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-					GlStateManager.color4f(.3f, 0, .3f, .3f);
+					GlStateManager.color4f(.3f, 0, .3f, .2f);
 					final double depth = -91D;
 					bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
 					bufferbuilder.pos(0, event.getWindow().getScaledHeight(), depth).endVertex();

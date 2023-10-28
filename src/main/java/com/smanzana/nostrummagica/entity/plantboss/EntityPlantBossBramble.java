@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.entity.plantboss;
 
 import java.util.List;
 
+import com.smanzana.nostrummagica.effects.NostrumEffects;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -163,6 +165,7 @@ public class EntityPlantBossBramble extends Entity {
 	
 	protected void onImpact(LivingEntity entity) {
 		if (entity != this.plant && !entity.equals(this.plant)) {
+			entity.removePotionEffect(NostrumEffects.rooted);
 			entity.attackEntityAsMob(this);
 			entity.attackEntityFrom(new EntityDamageSource("mob", this), 6f);
 			entity.knockBack(this, 1f, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));

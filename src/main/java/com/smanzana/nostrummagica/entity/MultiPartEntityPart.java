@@ -97,6 +97,12 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 		compound.putString("name", this.getPartName());
 		compound.putUniqueId("parentID", getParentID());
 	}
+	
+	@Override
+	public boolean writeUnlessRemoved(CompoundNBT compound) {
+		// Don't save! We generate each time
+		return false;
+	}
 
 	@Override
 	public IPacket<?> createSpawnPacket() {

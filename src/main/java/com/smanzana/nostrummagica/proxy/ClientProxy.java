@@ -53,6 +53,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBoss;
+import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBody;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBramble;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossLeaf;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
@@ -986,6 +987,13 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public EntityRenderer<? super EntityPlantBossBramble> createRenderFor(EntityRendererManager manager) {
 				return new RenderPlantBossBramble(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBoss.PlantBossBody.class, new IRenderFactory<EntityPlantBoss.PlantBossBody>() {
+			@Override
+			public EntityRenderer<? super EntityPlantBoss.PlantBossBody> createRenderFor(EntityRendererManager manager) {
+				return new RenderPlantBossBody(manager);
 			}
 		});
 	}

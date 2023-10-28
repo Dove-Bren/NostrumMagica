@@ -3,11 +3,10 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
@@ -60,20 +59,25 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 		GlStateManager.pushMatrix();
 		
 		// Offset to body center
-		Vec3d cameraOffsetToParent = plant.getPositionVec().subtract(Minecraft.getInstance().getRenderViewEntity().getEyePosition(partialTicks));
+		Vec3d cameraOffsetToParent = plant.getPositionVec().subtract(
+				TileEntityRendererDispatcher.staticPlayerX,
+				TileEntityRendererDispatcher.staticPlayerY,
+				TileEntityRendererDispatcher.staticPlayerZ
+				);
 		GlStateManager.translated(cameraOffsetToParent.x, cameraOffsetToParent.y, cameraOffsetToParent.z);
 		
 		// Standard transformations that LivingRenderer does
 		GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
 		GlStateManager.translatef(0.0F, -1.501F, 0.0F);
 		
-		final float existingRotation = RenderFuncs.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, entity.ticksExisted % 1);
-		GlStateManager.rotatef((180.0F + existingRotation), 0, 1, 0); // undo existing rotation
+		//final float existingRotation = RenderFuncs.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, entity.ticksExisted % 1);
+		//GlStateManager.rotatef((180.0F + existingRotation), 0, 1, 0); // undo existing rotation
 		GlStateManager.translatef(0, plant.getBody().getHeight()/2, 0);
 		//for (int i = 0; i < leafModels.length; i++) {
 		final int i = entity.getLeafIndex();
 			//EntityPlantBoss.PlantBossLeafLimb leaf = plant.getLeafLimb(i);
-			final double offsetCenter = (i % 2 == 0 ? 1.25 : 1.5) * plant.getBody().getWidth();
+			final double offsetRadius = (entity.getPitch() >= 85f) ? 1.25 : 1;
+			final double offsetCenter = (i % 2 == 0 ? offsetRadius : offsetRadius * 1.25) * plant.getBody().getWidth();
 			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
 			
 			GlStateManager.pushMatrix();

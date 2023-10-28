@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.DungeonBlock;
 import com.smanzana.nostrummagica.blocks.PoisonWaterBlock;
+import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.AggroTable;
@@ -405,6 +406,8 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		
 		// Add children to world
 		for (MultiPartEntityPart<EntityPlantBoss> part : this.parts) {
+			// Need to make sure to set a near-ish position for the entities or they may not be added tto the world
+			part.setPosition(this.posX, this.posY, this.posZ);
 			this.world.addEntity(part);
 		}
 	}
@@ -480,6 +483,27 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 				).color(this.getTreeElement().getColor()));
 	}
 	
+	protected void spawnWardParticles(int count) {
+		NostrumParticles.WARD.spawn(this.world, new NostrumParticles.SpawnParams(
+				count * 10,
+				this.posX, this.posY + (this.getHeight() / 2), this.posZ, this.getWidth() * 1.5,
+				40, 10,
+				new Vec3d(0, 0, 0), Vec3d.ZERO
+				));
+	}
+	
+	protected void spawnWardParticles(@Nonnull Vec3d at, int count) {
+		// Calculate vector away from ent to where it got attacked
+		Vec3d bounceDir = at.subtract(this.getPositionVec()).normalize();
+		
+		NostrumParticles.WARD.spawn(this.world, new NostrumParticles.SpawnParams(
+				count * 5,
+				at.x, at.y, at.z, .25,
+				10, 5,
+				bounceDir.scale(.01), new Vec3d(.0025, .0025, .0025)
+				));
+	}
+	
 	protected void clientTick() {
 		if (this.getTreeType() == PlantBossTreeType.ELEMENTAL) {
 			spawnTreeParticles();
@@ -497,7 +521,8 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		super.onAddedToWorld();
 		
 		if (!this.world.isRemote()) {
-			spawnLimbs();
+			// Can't spawn here, as chunk we're in may not be finished loading
+			//spawnLimbs();
 		}
 	}
 	
@@ -521,6 +546,10 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			}
 			this.clientTick();
 		} else {
+			if (this.getBody() == null) {
+				spawnLimbs();
+			}
+			
 			getBody().setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
 			positionLeaves(limbs);
 			this.tickStateMachine();
@@ -672,7 +701,8 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		if (plantPart == this.bodyCache || this.getWeakElement() != null) {
 			return this.attackEntityFrom(source, damage);
 		} else {
-			return false; // Leaves take no damage
+			// Leaves take no damage
+			return true; 
 		}
 	}
 	
@@ -682,7 +712,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			return false;
 		}
 		
-		//amount = Math.min(amount, 10f);
+		amount = Math.min(amount, 10f);
 		
 		if (this.getWeakElement() != null) {
 			// Only let attacks of the right element through
@@ -694,7 +724,15 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			}
 			
 			if (element != this.getWeakElement()) {
-				return false;
+				if (!world.isRemote()) {
+					if (source.getDamageLocation() != null) {
+						 spawnWardParticles(source.getDamageLocation(), 1);
+					} else {
+						spawnWardParticles(1);
+					}
+				}
+				
+				return true;
 			}
 		}
 		
@@ -730,9 +768,27 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		return false;
 	}
 	
+	public boolean isPartOfMe(Entity ent) {
+		for (Entity part : this.getParts()) {
+			if (part != null && part.equals(ent)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	@Override
 	protected void collideWithEntity(Entity entityIn) {
-		return; // Don't push others away
+		if (entityIn == this || isPartOfMe(entityIn)) {
+			return;
+		}
+		
+		if (entityIn instanceof PlayerEntity && ((PlayerEntity) entityIn).isSpectator()) {
+			return;
+		}
+		
+		pushEntity(entityIn);
 	}
 	
 	public @Nullable PlantBossLeafLimb getLeafLimb(int index) {
@@ -936,6 +992,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	protected boolean isArenaBlock(BlockState state) {
 		return isPillarBlock(state)
+				|| state.getBlock() instanceof TeleportRune // Since main arena has one hidden underneath
 				|| state.getBlock() instanceof PoisonWaterBlock
 				|| isArenaBlock(state.getFluidState())
 				;
@@ -957,6 +1014,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		}
 		
 		this.eyeHeight = height;
+		this.recalculateSize(); // Prompts final parent field to refresh
 	}
 	
 	protected void curlLeaves(int curlLength, boolean leaveFrontOpen) {
@@ -984,6 +1042,15 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	public @Nullable EMagicElement getWeakElement() {
 		return this.dataManager.get(WEAK_ELEMENT).orElse(null);
+	}
+	
+	protected void pushEntity(Entity e) {
+		Vec3d awayDir = e.getPositionVec().subtract(this.getPositionVec());
+		double dist = awayDir.lengthSquared();
+		double force = Math.min(.1, Math.max(.5, .1 * (16.0 / dist)));
+		
+		awayDir = awayDir.normalize().scale(force);
+		e.addVelocity(awayDir.x, awayDir.y, awayDir.z);
 	}
 	
 	public static class PlantBossBody extends MultiPartEntityPart<EntityPlantBoss> {
@@ -1032,8 +1099,6 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			dist = dx + 2;
 			break;
 		}
-		
-		NostrumMagica.logger.info("Spawning bramble at " + start);
 		
 		EntityPlantBossBramble bramble = new EntityPlantBossBramble(NostrumEntityTypes.plantBossBramble, world, this, width);
 		bramble.setPosition(start.getX() + .5, start.getY(), start.getZ() + .5);
