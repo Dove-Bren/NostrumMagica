@@ -18,6 +18,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOrbitEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIPanicGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
@@ -356,6 +358,31 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	public float getBrightness(float partialTicks)
 	{
 		return 1.0F;
+	}
+	
+	@Override
+	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
+		super.dropSpecialItems(source, looting, recentlyHitIn);
+		
+		if (recentlyHitIn) {
+			// In panic mode, drop elemental gems.
+			// In aggro mode, roll for mani gem.
+			if (this.getStatus() == WilloStatus.PANIC) {
+				final int count = 1 + (int) (Math.floor((float) looting / 2f));
+				this.entityDropItem(InfusedGemItem.getGem(this.getElement(), count));
+			} else if (this.getStatus() == WilloStatus.AGGRO) {
+				final float fltCount = .25f + (looting * .375f); // .25, .625, 1, 1.375
+				final int whole = (int) fltCount;
+				final float frac = fltCount - whole;
+				
+				if (whole > 0) {
+					this.entityDropItem(new ItemStack(NostrumItems.crystalSmall));
+				}
+				if (this.rand.nextFloat() < frac) {
+					this.entityDropItem(new ItemStack(NostrumItems.crystalSmall));
+				}
+			}
+		}
 	}
 	
 //	@Override

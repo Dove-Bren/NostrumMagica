@@ -5,6 +5,8 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
+import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -264,6 +266,23 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
     {
         return 15728880;
     }
+	
+	@Override
+	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
+		super.dropSpecialItems(source, looting, recentlyHitIn);
+		
+		// Drop essence item and maybe gem, since that's harder to express in a loot table
+		if (recentlyHitIn) {
+			int count = this.rand.nextInt(2);
+			count += looting;
+			
+			this.entityDropItem(EssenceItem.getEssence(this.getElement(), count), 0);
+			
+			if (this.rand.nextFloat() < (.01f + .02f * looting)) {
+				this.entityDropItem(InfusedGemItem.getGem(this.getElement(), 1));
+			}
+		}
+	}
 
 //    @Override
 //	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {

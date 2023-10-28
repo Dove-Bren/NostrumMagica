@@ -365,6 +365,11 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 		return 1.0F;
 	}
 	
+	@Override
+	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
+		super.dropSpecialItems(source, looting, recentlyHitIn);
+	}
+	
 //	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
 //		if (wasRecentlyHit && this.getHome() == null) {
 //			int chance = 1 + (2 * lootingModifier);
