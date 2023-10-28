@@ -145,8 +145,9 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
             super(dragon);
             this.parentEntity = dragon;
         }
-
-//        public void onUpdateMoveHelper() {
+        
+//        @Override
+//        public void tick() {
 ////        	if (this.action == MovementController.Action.STRAFE)
 ////    		{
 ////    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();

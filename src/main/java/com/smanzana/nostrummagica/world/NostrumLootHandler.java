@@ -22,11 +22,14 @@ public final class NostrumLootHandler {
 
 	@SubscribeEvent
 	public void lootLoad(LootTableLoadEvent evt) {
-		String prefix = "minecraft:chests/";
-		String name = evt.getName().toString();
+		// Imagine this just looking at the prefix and then seeing if there's an 'inject' in the data folder.
+		// Can't find an easy way to check if there's a file there or not though, so leaving hardcoded.
+		
+		String prefixChest = "chests/";
+		String path = evt.getName().getPath();
 
-		if (name.startsWith(prefix)) {
-			String file = name.substring(name.indexOf(prefix) + prefix.length());
+		if (path.startsWith(prefixChest)) {
+			String file = path.substring(path.indexOf(prefixChest) + prefixChest.length());
 			switch (file) {
 			case "abandoned_mineshaft":
 			case "desert_pyramid":
@@ -37,9 +40,21 @@ public final class NostrumLootHandler {
 			case "stronghold_corridor":
 			case "end_city_treasure":
 			case "village_blacksmith":
-				evt.getTable().addPool(getInjectPool(file));
+				evt.getTable().addPool(getInjectPool(prefixChest + file));
 				break;
 			default: break;
+			}
+		}
+		
+
+		String prefixBlock = "blocks/";
+		if (path.startsWith(prefixBlock)) {
+			String file = path.substring(path.indexOf(prefixBlock) + prefixBlock.length());
+			
+			// For leaves, we have to be kinda generic.
+			// This is clearly not the best
+			if (file.toLowerCase().contains("_leaves")) {
+				evt.getTable().addPool(getInjectPool(prefixBlock + "leaves"));
 			}
 		}
 	}

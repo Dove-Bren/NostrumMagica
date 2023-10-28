@@ -722,6 +722,8 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onBlockDrops(HarvestDropsEvent event) {
+		
+		// This event isn't fired anymore. No sky ash?
 		if (event.isCanceled()) {
 			return;
 		}

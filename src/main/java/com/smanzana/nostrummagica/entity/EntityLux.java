@@ -163,7 +163,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				if (tempted.getDistanceSq(player) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
-					tempted.getMoveHelper().setMoveTo(player.posX, player.posY, player.posZ, 0.3D);
+					tempted.getMoveHelper().setMoveTo(player.posX, player.posY, player.posZ, 1D);
 				}
 			}
 		});
@@ -208,7 +208,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	protected void registerAttributes()
 	{
 		super.registerAttributes();
-		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.15D);
+		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D);
 		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(4.0D);
 		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.0D);
 		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
@@ -387,7 +387,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	protected void setHome(BlockPos home) {
 		this.dataManager.set(HOME, Optional.ofNullable(home));
-		this.setHomePosAndDistance(home == null ? BlockPos.ZERO : home, (int) LUX_HOME_DISTANCE_SQ);
+		this.setHomePosAndDistance(home, (int) LUX_HOME_DISTANCE_SQ);
 	}
 	
 	public BlockPos getHome() {
@@ -490,7 +490,8 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			this.parentEntity = wisp;
 		}
 
-		public void onUpdateMoveHelper() {
+		@Override
+		public void tick() {
 			if (this.action == MovementController.Action.MOVE_TO) {
 				double d0 = this.posX - this.parentEntity.posX;
 				double d1 = this.posY - this.parentEntity.posY;
@@ -499,18 +500,19 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 				d3 = (double)MathHelper.sqrt(d3);
 				
-				if (Math.abs(d3) < .01) {
+				if (Math.abs(d3) < .1) {
 					this.parentEntity.setMotion(Vec3d.ZERO);
 					this.action = MovementController.Action.WAIT;
 					return;
 				} else if (courseChangeCooldown-- <= 0) {
-					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+					final double moveSpeed = (basespeed * this.speed * .3f);
+					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 					//speed *= 3f;
 					this.parentEntity.setMotion(
-							(d0 / d3) * basespeed * speed,
-							(d1 / d3) * basespeed  * speed,
-							(d2 / d3) * basespeed  * speed
+							(d0 / d3) * moveSpeed,
+							(d1 / d3) * moveSpeed,
+							(d2 / d3) * moveSpeed
 							);
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
@@ -542,7 +544,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				}
 
 				float f1 = 0.16277136F / (f * f * f);
-				this.moveRelative(this.onGround ? 0.1F * f1 : 0.02F, how);
+				this.moveRelative(this.onGround ? 0.1F * f1 : 0.03F, how);
 				f = 0.91F;
 
 				if (this.onGround) {
@@ -584,6 +586,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	static class AIRandomFly extends Goal {
 		private final EntityLux parentEntity;
+		private int cooldownTicks;
 
 		public AIRandomFly(EntityLux wisp) {
 			this.parentEntity = wisp;
@@ -596,7 +599,12 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		public boolean shouldExecute() {
 			MovementController MovementController = this.parentEntity.getMoveHelper();
 
-			if (!MovementController.isUpdating()) {
+			if (cooldownTicks > 0) {
+				if (!MovementController.isUpdating()) {
+					cooldownTicks--;
+				}
+				return false;
+			} else if (!MovementController.isUpdating()) {
 				return true;
 			} else {
 				double d0 = MovementController.getX() - this.parentEntity.posX;
@@ -653,7 +661,9 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					continue;
 				}
 				
-				this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 0.3D);
+				this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 1D);
+				cooldownTicks = this.parentEntity.getRNG().nextInt(20 * 5) + 40;
+				break;
 			}
 		}
 	}
@@ -754,12 +764,15 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 							roostPos.getX() + .5,
 							roostPos.getY() - (parentEntity.getHeight()),
 							roostPos.getZ() + .5,
-							0.3D);
+							1D);
 				}
 				
 				return true;
 			}
 			
+			if (roostPos != null) {
+				lastAttemptTicks = -1;
+			}
 			return false;
 		}
 
@@ -776,7 +789,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 						roostPos.getX() + .5,
 						roostPos.getY() - (parentEntity.getHeight()),
 						roostPos.getZ() + .5,
-						0.3D);
+						1D);
 			}
 		}
 		
@@ -784,7 +797,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		public void resetTask() {
 			super.resetTask();
 			roostPos = null;
-			lastAttemptTicks = -1;
+//			lastAttemptTicks = -1; Only reset on success
 			lastWakeTicks = -1;
 			parentEntity.stopRoosting();
 		}
@@ -861,7 +874,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			
 			targetPos = this.getNearbyFeature(parentEntity);
 			if (targetPos != null) {
-				parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
+				parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
 			} else {
 				running = false;
 			}
@@ -878,7 +891,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		public void tick() {
 			if (running && targetPos != null) {
 				if (!parentEntity.moveController.isUpdating()) {
-					parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, .3);
+					parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
 				}
 				
 				if (parentEntity.getPositionVector().squareDistanceTo(
