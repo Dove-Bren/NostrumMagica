@@ -128,6 +128,7 @@ import net.minecraft.world.gen.placement.FrequencyConfig;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -208,6 +209,15 @@ public class CommonProxy {
 	public void registerWorldGen() {
 		// Note: features registered in NostrumFeatures
 		for(Biome biome : ForgeRegistries.BIOMES) {
+			
+			if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)) {
+				continue;
+			}
+			
+			if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)) {
+				continue;
+			}
+			
 			// Filter this list maybe?
 			biome.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Biome.createDecoratedFeature(NostrumFeatures.flowers, IFeatureConfig.NO_FEATURE_CONFIG, Placement.COUNT_HEIGHTMAP_32, new FrequencyConfig(1)));
 			
