@@ -53,8 +53,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		this.element = element;
 	}
 	
-	
-	public static ItemStack getCharm(EMagicElement element, int count) {
+	public static Item getCharmItem(EMagicElement element) {
 		MagicCharm item = null;
 		switch (element) {
 		case EARTH:
@@ -79,8 +78,11 @@ public class MagicCharm extends Item implements ILoreTagged {
 			item = NostrumItems.magicCharmWind;
 			break;
 		}
-		
-		return new ItemStack(item, count);
+		return item;
+	}
+	
+	public static ItemStack getCharm(EMagicElement element, int count) {
+		return new ItemStack(getCharmItem(element), count);
 	}
 	
 	@Override

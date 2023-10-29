@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
+import com.smanzana.nostrummagica.utils.PortingUtil;
 import com.smanzana.nostrummagica.utils.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -341,6 +342,7 @@ public class RoomBlueprint {
 		public static final String NBT_TILE_ENTITY = "te_data";
 		public static final String NBT_BLOCKSTATE_TAG = "blockstate";
 		
+		@SuppressWarnings("deprecation")
 		public static BlueprintBlock fromNBT(byte version, CompoundNBT nbt) {
 			BlockState state = null;
 			CompoundNBT teData = null;
@@ -427,6 +429,9 @@ public class RoomBlueprint {
 							}
 						}
 					}
+					
+					// Fixup tile entities we know broke
+					teData = PortingUtil.fixupTileEntity_12_2(teData);
 				}
 				break;
 				// throw new RuntimeException("Blueprint block doesn't understand version " + version); TODO do this
@@ -847,8 +852,11 @@ public class RoomBlueprint {
 					}
 					
 					if (te != null) {
-						world.getChunk(at).addTileEntity(at, te);
-						//world.getWorld().setTileEntity(at, te);
+						if (worldGen) {
+							world.getChunk(at).addTileEntity(at, te);
+						} else {
+							world.getWorld().setTileEntity(at, te);
+						}
 						if (te instanceof IOrientedTileEntity) {
 							// Let tile ent respond to rotation
 							((IOrientedTileEntity) te).setSpawnedFromRotation(direction, worldGen);

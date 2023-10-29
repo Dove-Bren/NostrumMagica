@@ -31,7 +31,7 @@ public class EssenceItem extends Item implements ILoreTagged {
     	return item.element;
     }
     
-    public static ItemStack getEssence(EMagicElement element, int count) {
+    public static Item getEssenceItem(EMagicElement element) {
     	Item essence = null;
     	switch (element) {
 		case EARTH:
@@ -57,7 +57,11 @@ public class EssenceItem extends Item implements ILoreTagged {
 			break;
     	}
     	
-    	return new ItemStack(essence, count);
+    	return essence;
+    }
+    
+    public static ItemStack getEssence(EMagicElement element, int count) {
+    	return new ItemStack(getEssenceItem(element), count);
     }
     
 	@Override

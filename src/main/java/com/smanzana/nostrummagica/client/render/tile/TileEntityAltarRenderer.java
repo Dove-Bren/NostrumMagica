@@ -21,7 +21,7 @@ public class TileEntityAltarRenderer extends TileEntityRenderer<AltarTileEntity>
 		if (item.isEmpty() || te.isHidingItem())
 			return;
 		
-		float rot = (float) (2.0 * ((double) System.currentTimeMillis() / 50.0)); // Copied into ClientEffectRitual
+		float rot = 360f * (float) ((double)(te.getWorld().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
 		float scale = .75f;
 		float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0)));
 		

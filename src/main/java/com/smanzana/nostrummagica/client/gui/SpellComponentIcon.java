@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
+import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
@@ -151,6 +152,7 @@ public class SpellComponentIcon {
 			; // actually is 0 0
 		} else if (trigger instanceof ProximityTrigger) {
 			u = 1;
+		} else if (trigger instanceof ProjectileTrigger) {
 			u = 2;
 		} else if (trigger instanceof BeamTrigger) {
 			u = 3;
@@ -211,7 +213,7 @@ public class SpellComponentIcon {
 		height = uWidthTrigger;
 		
 		model = new ResourceLocation(NostrumMagica.MODID,
-				"textures/models/symbol/" + trigger.getTriggerKey().toLowerCase() + ".png");
+				"textures/models/symbol/trigger_" + trigger.getTriggerKey().toLowerCase() + ".png");
 	}
 	
 	public SpellComponentIcon(SpellShape shape) {
@@ -232,7 +234,7 @@ public class SpellComponentIcon {
 
 		
 		model = new ResourceLocation(NostrumMagica.MODID,
-				"textures/models/symbol/" + shape.getShapeKey().toLowerCase() + ".png");
+				"textures/models/symbol/shape_" + shape.getShapeKey().toLowerCase() + ".png");
 	}
 	
 	public void draw(AbstractGui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {

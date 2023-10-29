@@ -35,7 +35,7 @@ public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntit
 		else
 			icon = SpellComponentIcon.get(comp.getElement());
 		ResourceLocation textLoc = icon.getModelLocation();
-		float rot = 2.0f * (System.currentTimeMillis() / 50);
+		float rot = 2.0f * (float)((double) te.getWorld().getGameTime() / 2.5);
 		float scale = te.getScale();
 		BufferBuilder wr = Tessellator.getInstance().getBuffer();
 		

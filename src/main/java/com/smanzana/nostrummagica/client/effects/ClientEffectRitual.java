@@ -121,7 +121,7 @@ public class ClientEffectRitual extends ClientEffect {
 		final float scale = .75f;
 		//final float rotPeriod = .5f;
 		//final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
-		final float rot = (float) (2.0 * ((double) System.currentTimeMillis() / 50.0));
+		float rot = 360f * (float) ((double)(mc.world.getGameTime() % 200) / 200.0);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.translated(pos.x, pos.y, pos.z);
