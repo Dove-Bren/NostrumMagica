@@ -2804,8 +2804,8 @@ public class NostrumMagica {
 		
 		// Multiparts aren't living but may have living parents!
 		if (entityOrSubEntity instanceof IMultiPartEntityPart) {
-			if (((IMultiPartEntityPart) entityOrSubEntity).getParent() instanceof LivingEntity) {
-				return (LivingEntity) ((IMultiPartEntityPart) entityOrSubEntity).getParent();
+			if (((IMultiPartEntityPart<?>) entityOrSubEntity).getParent() instanceof LivingEntity) {
+				return (LivingEntity) ((IMultiPartEntityPart<?>) entityOrSubEntity).getParent();
 			}
 		}
 		

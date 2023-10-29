@@ -15,7 +15,7 @@ public class CommandCreateGeotoken  {
 	
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
-				Commands.literal("creategeotoken")
+				Commands.literal("spawngeotoken")
 					.requires(s -> s.hasPermissionLevel(2))
 					.executes(ctx -> execute(ctx))
 				);

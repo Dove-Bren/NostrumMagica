@@ -17,7 +17,7 @@ public class CommandSetManaArmor {
 	
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
-				Commands.literal("NostrumManaArmor")
+				Commands.literal("nostrummanaarmor")
 					.requires(s -> s.hasPermissionLevel(2))
 						.then(Commands.argument("engaged", BoolArgumentType.bool())
 								.then(Commands.argument("cost", IntegerArgumentType.integer(0))

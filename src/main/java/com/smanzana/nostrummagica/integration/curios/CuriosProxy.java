@@ -3,17 +3,13 @@ package com.smanzana.nostrummagica.integration.curios;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
-import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrummagica.integration.curios.items.DragonWingPendantItem;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
@@ -24,9 +20,6 @@ import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
-import com.smanzana.nostrummagica.utils.Ingredients;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -266,64 +259,6 @@ public class CuriosProxy {
 					}, Lists.newArrayList("Upgrades the elytra on the Corrupted Armors to dragon wings")));
 			RitualRegistry.instance().addRitual(recipe);
 		}
-		
-		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			recipe = RitualRecipe.createTier3("shield_ring_small",
-					new ItemStack(NostrumCurios.ringShieldSmall),
-					EMagicElement.EARTH,
-					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-					Ingredient.fromItems(NostrumCurios.ringSilver),
-					new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(SelfTrigger.instance())), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
-					new RRequirementResearch("shield_rings"),
-					new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringShieldSmall)));
-			RitualRegistry.instance().addRitual(recipe);
-			
-			recipe = RitualRecipe.createTier3("shield_ring_large",
-					new ItemStack(NostrumCurios.ringShieldLarge),
-					EMagicElement.EARTH,
-					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-					Ingredient.fromItems(NostrumCurios.ringShieldSmall),
-					new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), silver, Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
-					new RRequirementResearch("shield_rings"),
-					new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringShieldLarge)));
-			RitualRegistry.instance().addRitual(recipe);
-			
-			recipe = RitualRecipe.createTier3("elude_cape_small",
-					new ItemStack(NostrumCurios.eludeCape),
-					EMagicElement.WIND,
-					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.MANDRAKE_ROOT},
-					Ingredient.fromTag(ItemTags.WOOL),
-					new Ingredient[] {Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall), Ingredients.MatchNBT(SpellRune.getRune(DamagedTrigger.instance())), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.fromTag(NostrumItemTags.Items.CrystalSmall)},
-					new RRequirementResearch("elude_capes"),
-					new OutcomeSpawnItem(new ItemStack(NostrumCurios.eludeCape)));
-			RitualRegistry.instance().addRitual(recipe);
-			
-			recipe = RitualRecipe.createTier3("aether_cloak",
-					new ItemStack(NostrumCurios.aetherCloak),
-					EMagicElement.ICE,
-					new ReagentType[] {ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SKY_ASH},
-					Ingredient.fromItems(APIProxy.AetherBatterySmallBlock),
-					new Ingredient[] {Ingredient.fromItems(APIProxy.AetherGemItem), Ingredient.fromItems(NostrumCurios.eludeCape), Ingredient.fromTag(NostrumItemTags.Items.CrystalLarge), Ingredient.fromItems(APIProxy.AetherGemItem)},
-					new RRequirementResearch("aether_cloaks"),
-					new OutcomeSpawnItem(new ItemStack(NostrumCurios.aetherCloak)));
-			RitualRegistry.instance().addRitual(recipe);
-			
-			ItemStack casterCloak = new ItemStack(NostrumCurios.aetherCloak);
-			AetherCloakItem.GetItem().setAetherCaster(casterCloak, true);
-			recipe = RitualRecipe.createTier3("aether_cloak_caster_upgrade",
-					casterCloak,
-					EMagicElement.FIRE,
-					new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
-					Ingredient.fromItems(NostrumCurios.aetherCloak),
-					new Ingredient[] {Ingredient.fromItems(APIProxy.PassivePendantItem), Ingredient.fromTag(NostrumItemTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.fromItems(APIProxy.PassivePendantItem)},
-					new RRequirementResearch("aether_cloaks"),
-					new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
-						if (!item.isEmpty() && item.getItem() instanceof AetherCloakItem) {
-							((AetherCloakItem) item.getItem()).setAetherCaster(item, true);
-						}
-					}, Lists.newArrayList("Allows using aether from the cloak in place of reagents")));
-			RitualRegistry.instance().addRitual(recipe);
-		}
 	}
 	
 	private void registerCurioResearch() {
@@ -377,29 +312,6 @@ public class CuriosProxy {
 			.reference("ritual::wing_upgrade_armor_wind", "ritual.wing_upgrade_armor_wind.name")
 			.reference("ritual::wing_upgrade_armor_lightning", "ritual.wing_upgrade_armor_lightning.name")
 		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 2, true, new ItemStack(NostrumCurios.dragonWingPendant));
-		
-		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			NostrumResearch.startBuilding()
-				.parent("rings")
-				.hiddenParent("kani")
-				.hiddenParent("aether_gem")
-				.reference("ritual::shield_ring_small", "ritual.shield_ring_small.name")
-				.reference("ritual::shield_ring_large", "ritual.shield_ring_large.name")
-			.build("shield_rings", NostrumResearchTab.OUTFITTING, Size.NORMAL, -4, -1, true, new ItemStack(NostrumCurios.ringShieldSmall));
-
-			NostrumResearch.startBuilding()
-				.parent("belts")
-				.hiddenParent("shield_rings")
-				.reference("ritual::elude_cape_small", "ritual.elude_cape_small.name")
-			.build("elude_capes", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 0, true, new ItemStack(NostrumCurios.eludeCape));
-			
-			NostrumResearch.startBuilding()
-				.parent("elude_capes")
-				.reference("ritual::aether_cloak", "ritual.aether_cloak.name")
-				.reference("ritual::aether_cloak_caster_upgrade", "ritual.aether_cloak_caster_upgrade.name")
-			.build("aether_cloaks", NostrumResearchTab.OUTFITTING, Size.NORMAL, -6, 1, true, new ItemStack(NostrumCurios.aetherCloak));
-			
-		}
 	}
 	
 	private void registerLore() {

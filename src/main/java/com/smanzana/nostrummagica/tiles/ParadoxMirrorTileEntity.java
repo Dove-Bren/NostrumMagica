@@ -7,13 +7,13 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.WorldUtil;
 
@@ -125,12 +125,12 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 
 	@Override
-	public boolean canAcceptAetherInfuse(AetherInfuserTileEntity source, int maxAether) {
+	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
 		return this.isInCooldown();
 	}
 
 	@Override
-	public int acceptAetherInfuse(AetherInfuserTileEntity source, int maxAether) {
+	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
 		
 		// take one aether point and reduce time by up to 4 ticks.  That means -5 ticks per tick or 5x as fast
 		if (maxAether > 0) {

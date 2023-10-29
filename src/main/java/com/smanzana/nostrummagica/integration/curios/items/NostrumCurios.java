@@ -2,10 +2,7 @@ package com.smanzana.nostrummagica.integration.curios.items;
 
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.item.Item;
@@ -34,11 +31,7 @@ public class NostrumCurios {
 	@ObjectHolder(NostrumCurio.ID_RING_SILVER_TRUE) public static NostrumCurio ringTrueSilver;
 	@ObjectHolder(NostrumCurio.ID_RING_SILVER_CORRUPTED) public static NostrumCurio ringCorruptedSilver;
 	@ObjectHolder(FloatGuardItem.ID) public static FloatGuardItem floatGuard;
-	@ObjectHolder(ShieldRingItem.ID_SMALL) public static @Nullable ShieldRingItem ringShieldSmall; // Requires Aether
-	@ObjectHolder(ShieldRingItem.ID_LARGE) public static @Nullable ShieldRingItem ringShieldLarge; // Requires Aether
-	@ObjectHolder(EludeCloakItem.ID) public static @Nullable EludeCloakItem eludeCape; // Requires Aether
 	@ObjectHolder(DragonWingPendantItem.ID) public static DragonWingPendantItem dragonWingPendant;
-	@ObjectHolder(AetherCloakItem.ID) public static @Nullable Item aetherCloak; // Requires Aether
 	
 	private static final UUID attrIDSmallRibbon = UUID.fromString("E7811342-711C-11EE-B962-0242AC120002");
 	private static final UUID attrIDMediumRibbon = UUID.fromString("E78115E0-711C-11EE-B962-0242AC120002");
@@ -157,13 +150,6 @@ public class NostrumCurios {
 		
 		registry.register(new FloatGuardItem().setRegistryName(FloatGuardItem.ID));
 		registry.register(new DragonWingPendantItem().setRegistryName(DragonWingPendantItem.ID));
-		
-		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			registry.register(new ShieldRingItem(2, ShieldRingItem.ID_SMALL).setRegistryName(ShieldRingItem.ID_SMALL));
-			registry.register(new ShieldRingItem(4, ShieldRingItem.ID_LARGE).setRegistryName(ShieldRingItem.ID_LARGE));
-			registry.register(new EludeCloakItem().setRegistryName(EludeCloakItem.ID));
-			registry.register(new AetherCloakItem().setRegistryName(AetherCloakItem.ID));
-		}
 	}
 
 	public static void registerLore() {
@@ -182,13 +168,6 @@ public class NostrumCurios {
 		LoreRegistry.instance().register(ringCorruptedSilver);
 		LoreRegistry.instance().register(floatGuard);
 		LoreRegistry.instance().register(dragonWingPendant);
-		
-		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			LoreRegistry.instance().register(ringShieldSmall);
-			LoreRegistry.instance().register(ringShieldLarge);
-			LoreRegistry.instance().register(eludeCape);
-			LoreRegistry.instance().register((ILoreTagged) aetherCloak); // Requires Aether
-		}
 	}
 	
 }

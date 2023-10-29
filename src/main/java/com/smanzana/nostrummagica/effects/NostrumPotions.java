@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.effects;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.integration.aetheria.items.AetherResourceType;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
 
 import net.minecraft.item.ItemStack;
@@ -78,16 +77,6 @@ public enum NostrumPotions {
     	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
     			Ingredient.fromTag(Tags.Items.DUSTS_GLOWSTONE),
     			MakePotion(NostrumPotions.MANAREGEN_STRONG.getType()));
-    	
-    	if (NostrumMagica.instance.aetheria.isEnabled()) {
-    		BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN_STRONG.getType()),
-        			Ingredient.fromStacks(NostrumMagica.instance.aetheria.getResourceItem(AetherResourceType.FLOWER_MANDRAKE, 1)),
-        			MakePotion(NostrumPotions.MANAREGEN_REALLY_STRONG.getType()));
-    		
-    		BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN_STRONG.getType()),
-        			Ingredient.fromStacks(NostrumMagica.instance.aetheria.getResourceItem(AetherResourceType.FLOWER_GINSENG, 1)),
-        			MakePotion(NostrumPotions.MANAREGEN_STRONG_AND_LONG.getType()));
-    	}
 	}
 	
 	public static final ItemStack MakePotion(Potion potion) {

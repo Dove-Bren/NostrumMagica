@@ -1,11 +1,7 @@
 package com.smanzana.nostrummagica.integration.aetheria;
 
-import com.smanzana.nostrummagica.client.render.tile.TileEntityAetherInfuserRenderer;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
-
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 //
@@ -42,6 +38,8 @@ public class AetheriaClientProxy extends AetheriaProxy {
 		return true;
 	}
 	
+	private int unused; // cleanup
+	
 	@SubscribeEvent
 	public void registerAllModels(ModelRegistryEvent event) {
 		// All of this handled because each item has its own ID?
@@ -68,6 +66,6 @@ public class AetheriaClientProxy extends AetheriaProxy {
 	
 	@SubscribeEvent
 	public void clientSetup(FMLClientSetupEvent event) {
-		ClientRegistry.bindTileEntitySpecialRenderer(AetherInfuserTileEntity.class, new TileEntityAetherInfuserRenderer());
+		//ClientRegistry.bindTileEntitySpecialRenderer(AetherInfuserTileEntity.class, new TileEntityAetherInfuserRenderer());
 	}
 }

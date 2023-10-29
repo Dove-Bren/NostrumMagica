@@ -29,7 +29,6 @@ public class NostrumContainers {
 	@ObjectHolder(ReagentBagGui.BagContainer.ID) public static ContainerType<ReagentBagGui.BagContainer> ReagentBag;
 	@ObjectHolder(RuneBagGui.BagContainer.ID) public static ContainerType<RuneBagGui.BagContainer> RuneBag;
 	@ObjectHolder(SpellCreationGui.SpellCreationContainer.ID) public static ContainerType<SpellCreationGui.SpellCreationContainer> SpellCreation;
-	@ObjectHolder(WispBlockGui.WispBlockContainer.ID) public static ContainerType<WispBlockGui.WispBlockContainer> WispBlock;
 	@ObjectHolder(PetGUI.PetContainer.ID) public static ContainerType<PetGUI.PetContainer<?>> PetGui;
 	
 	
@@ -48,7 +47,7 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(PetGUI.PetContainer::FromNetwork).setRegistryName(PetGUI.PetContainer.ID));
 		
 		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			registry.register(IForgeContainerType.create(WispBlockGui.WispBlockContainer::FromNetwork).setRegistryName(WispBlockGui.WispBlockContainer.ID));
+			
 		}
 	}
 	
@@ -62,7 +61,7 @@ public class NostrumContainers {
 		ScreenManager.registerFactory(ReagentBag, ReagentBagGui.BagGui::new);
 		ScreenManager.registerFactory(RuneBag, RuneBagGui.BagGui::new);
 		ScreenManager.registerFactory(SpellCreation, SpellCreationGui.SpellGui::new);
-		ScreenManager.registerFactory(WispBlock, WispBlockGui.WispBlockGuiContainer::new);
+		
 		ScreenManager.registerFactory(PetGui, new PetGUIFactory());
 	}
 	

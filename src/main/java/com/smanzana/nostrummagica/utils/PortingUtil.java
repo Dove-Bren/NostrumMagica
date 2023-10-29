@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EnchantedWeapon;
@@ -250,9 +251,9 @@ public class PortingUtil {
 			submap.put(11, NostrumCurios.ringTrueSilver);
 			submap.put(12, NostrumCurios.ringCorruptedSilver);
 			submap.put(13, NostrumCurios.floatGuard);
-			submap.put(14, NostrumCurios.ringShieldSmall);
-			submap.put(15, NostrumCurios.ringShieldLarge);
-			submap.put(16, NostrumCurios.eludeCape);
+			submap.put(14, AetheriaProxy.ringShieldSmall);
+			submap.put(15, AetheriaProxy.ringShieldLarge);
+			submap.put(16, AetheriaProxy.eludeCape);
 			submap.put(17, NostrumCurios.dragonWingPendant);
 		}
 		ItemMap1_12_2.put(id, submap);

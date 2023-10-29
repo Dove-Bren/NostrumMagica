@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "nostrummagica:shield_ring_small",
-    "nostrummagica:shield_ring_large",
     "nostrummagica:ring_gold",
     "nostrummagica:ring_gold_true",
     "nostrummagica:ring_gold_corrupted",

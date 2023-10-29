@@ -73,7 +73,6 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntitySymbolRenderer;
-import com.smanzana.nostrummagica.client.render.tile.TileEntityWispBlockRenderer;
 import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -107,8 +106,6 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlockTileEntity;
-import com.smanzana.nostrummagica.integration.curios.items.AetherCloakItem;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
@@ -303,9 +300,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(NostrumPortalTileEntityBase.class, new TileEntityPortalRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class, new TileEntityProgressionDoorRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ManaArmorerTileEntity.class, new TileEntityManaArmorerRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(WispBlockTileEntity.class, new TileEntityWispBlockRenderer());
-		
-		
 	}
 	
 //	private void registerItemVariants(ModelRegistryEvent event) {
@@ -1640,19 +1634,6 @@ public class ClientProxy extends CommonProxy {
 				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
 				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
 				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(loc), bakedModel);
-			}
-		}
-		
-		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			for (ModelResourceLocation loc : AetherCloakItem.AllCapeModels) {
-				ResourceLocation modelLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
-				IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(modelLoc, "Failed to get obj model for " + modelLoc);
-				
-				if (model != null && model instanceof OBJModel) {
-					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-					// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-					event.getModelRegistry().put(loc, bakedModel);
-				}
 			}
 		}
 		

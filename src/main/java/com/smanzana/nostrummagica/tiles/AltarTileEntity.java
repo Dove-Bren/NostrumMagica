@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.blocks.IAetherInfusableTileEntity;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.AetherInfuserTileEntity;
-import com.smanzana.nostrummagica.items.IAetherInfuserLens;
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
+import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
@@ -197,12 +197,12 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public boolean canAcceptAetherInfuse(AetherInfuserTileEntity source, int maxAether) {
+	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
 		return !stack.isEmpty() && stack.getItem() instanceof IAetherInfuserLens;
 	}
 
 	@Override
-	public int acceptAetherInfuse(AetherInfuserTileEntity source, int maxAether) {
+	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
 		final IAetherInfuserLens infusable = ((IAetherInfuserLens) stack.getItem());
 		final int leftover;
 		if (infusable.canAcceptAetherInfuse(stack, pos, source, maxAether)) {

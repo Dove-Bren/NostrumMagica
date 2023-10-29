@@ -16,10 +16,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
-import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
-import com.smanzana.nostrummagica.integration.aetheria.blocks.WispBlock;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -406,19 +403,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 	}
 	
 	protected Spell getSpellToUse() {
-		ItemStack scroll = ItemStack.EMPTY;
-		BlockPos homePos = this.getHome();
-		if (homePos != null) {
-			if (NostrumMagica.instance.aetheria.isEnabled()) {
-				scroll = ((WispBlock) AetheriaProxy.BlockWisp).getScroll(world, homePos); // ENCAPSULATION LEAK
-			}
-		}
-		
 		@Nullable Spell spell = null;
-		
-		if (!scroll.isEmpty()) {
-			spell = SpellScroll.getSpell(scroll);
-		}
 		
 		if (spell == null) {
 			// Use a random spell

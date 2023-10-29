@@ -23,7 +23,7 @@ public class CommandEnhanceTome {
 	
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
-				Commands.literal("enhancetome")
+				Commands.literal("nostrumenhance")
 					.requires(s -> s.hasPermissionLevel(2))
 					.then(Commands.argument("enhancement", StringArgumentType.string())
 						.then(Commands.argument("level", IntegerArgumentType.integer(0, 10))

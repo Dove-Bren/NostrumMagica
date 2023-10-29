@@ -25,7 +25,7 @@ public class CommandSpawnDungeon {
 	
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
-				Commands.literal("NostrumSpawnDungeon")
+				Commands.literal("spawndungeon")
 					.requires(s -> s.hasPermissionLevel(2))
 					.then(Commands.argument("type", StringArgumentType.string())
 							.suggests((ctx, sb) -> ISuggestionProvider.suggest(names, sb))
