@@ -44,6 +44,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	
 	public ProgressionDoorTileEntity level(int level) {
 		this.requiredLevel = level;
+		this.dirty();
 		return this;
 	}
 	

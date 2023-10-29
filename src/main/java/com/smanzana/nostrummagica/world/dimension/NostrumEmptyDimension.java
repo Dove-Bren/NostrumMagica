@@ -95,6 +95,8 @@ public class NostrumEmptyDimension {
 	
 	public static class EmptyDimension extends Dimension {
 		
+		protected static final Map<DimensionType, DimensionListener> listeners = new HashMap<>();
+		
 		protected Vec3d skyColor;
 		protected Vec3d fogColor;
 		
@@ -104,6 +106,10 @@ public class NostrumEmptyDimension {
 			this.nether = false;
 			this.skyColor = new Vec3d(.2D, 0D, .2D);
 			fogColor = new Vec3d(.2, .2, .2);
+			
+			if (!listeners.containsKey(typeIn)) {
+				listeners.put(typeIn, new DimensionListener(typeIn));
+			}
 		}
 		
 		protected void onWorldAttached() {
@@ -455,10 +461,22 @@ public class NostrumEmptyDimension {
 			}
 			
 			if (entityIn instanceof ServerPlayerEntity) {
+				ServerPlayerEntity player = ((ServerPlayerEntity) entityIn);
+				
+				player.teleport(this.world,
+						pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5,
+						Direction.NORTH.getHorizontalAngle(),
+						0
+						);
+//				player.rotationYaw = Direction.NORTH.getHorizontalAngle();
+//				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
+//				player.setMotion(Vec3d.ZERO);
+//				player.fallDistance = 0;
+				
 				try {
 					Field field = ObfuscationReflectionHelper.findField(ServerPlayerEntity.class, "field_184851_cj"); //"invulnerableDimensionChange");
 					field.setAccessible(true);
-					FieldUtils.writeField(field, ((ServerPlayerEntity) entityIn), true);
+					FieldUtils.writeField(field, player, true);
 				} catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -468,9 +486,8 @@ public class NostrumEmptyDimension {
 					((ServerPlayerEntity) entityIn).setGameType(GameType.SURVIVAL);
 				}
 				
-				((ServerPlayerEntity)entityIn).connection.setPlayerLocation(pos.getX() + .5, pos.getY(), pos.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
 			} else {
-				entityIn.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+				entityIn.changeDimension(this.world.dimension.getType());
 			}
 			
 			return true;
@@ -524,7 +541,7 @@ public class NostrumEmptyDimension {
 		public void onTeleport(EntityTravelToDimensionEvent event) {
 			if (event.getDimension() == dim) {
 				Entity ent = event.getEntity();
-				Boolean marker = teleportingMarker.get(ent.getUniqueID());
+				Boolean marker = teleportingMarker.get(ent.getUniqueID()); // how is this recursing?
 				if (marker != null && marker){
 					return;
 				}

@@ -241,10 +241,10 @@ public class GolemTask extends Goal {
         	if (updateCooldown > 0 && !golem.getNavigator().noPath())
     			return true;
 			
-        	golem.getNavigator().clearPath();
+        	//golem.getNavigator().clearPath();
 			success = golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
 			if (success) {
-				updateCooldown = 5;
+				updateCooldown = 15;
 			}
 		} else if (range) {
 			

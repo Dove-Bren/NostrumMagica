@@ -71,7 +71,7 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(SpellTableEntity::new, NostrumBlocks.spellTable).build(null), ID_SpellTableEntity);
 		register(registry, TileEntityType.Builder.create(SingleSpawnerTileEntity::new, NostrumBlocks.singleSpawner).build(null), ID_SingleSpawnerTileEntity);
 		register(registry, TileEntityType.Builder.create(SpawnerTriggerTileEntity::new, NostrumBlocks.triggerSpawner).build(null), ID_SpawnerTriggerTileEntity);
-		register(registry, TileEntityType.Builder.create(SymbolTileEntity::new, NostrumBlocks.symbolBlock).build(null), ID_SymbolTileEntity);
+		register(registry, TileEntityType.Builder.create(SymbolTileEntity::new, NostrumBlocks.symbolBlock, NostrumBlocks.shrineBlock).build(null), ID_SymbolTileEntity);
 		register(registry, TileEntityType.Builder.create(AltarTileEntity::new, NostrumBlocks.altar).build(null), ID_AltarTileEntity);
 		register(registry, TileEntityType.Builder.create(CandleTileEntity::new, NostrumBlocks.candle).build(null), ID_CandleTileEntity);
 		register(registry, TileEntityType.Builder.create(NostrumObeliskEntity::new, NostrumBlocks.obelisk).build(null), ID_NostrumObeliskEntity);

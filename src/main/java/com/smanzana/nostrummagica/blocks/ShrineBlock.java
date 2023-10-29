@@ -31,6 +31,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -42,6 +44,7 @@ public class ShrineBlock extends SymbolBlock {
 	
 	public static final String ID = "shrine_block";
 	private static final BooleanProperty EXHAUSTED = BooleanProperty.create("exhausted");
+	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
 	
 	public ShrineBlock() {
 		super();
@@ -85,6 +88,11 @@ public class ShrineBlock extends SymbolBlock {
 	@OnlyIn(Dist.CLIENT)
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
+	}
+	
+	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return ALTAR_AABB;
 	}
 	
 	@Override

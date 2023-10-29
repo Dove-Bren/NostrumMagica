@@ -70,7 +70,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 			return;
 		}
 		
-		entityIn.setPortal(entityIn.getPosition());
+		//entityIn.setPortal(entityIn.getPosition());
 		if (worldIn.getDimension().getType() != NostrumDimensions.EmptyDimension) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
 			if (attr != null) {

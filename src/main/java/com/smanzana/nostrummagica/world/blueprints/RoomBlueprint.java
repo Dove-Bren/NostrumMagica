@@ -380,26 +380,20 @@ public class RoomBlueprint {
 					}
 					if (block != null) {
 						int meta = nbt.getInt(NBT_BLOCK_STATE);
-						if (meta == 0) {
-							// Good
-							state = block.getDefaultState();
-						} else {
-							// Try to use version update map
-							state = GetBlockStateFromOldMeta(block, meta);
-							if (state == null) {
+						
+						// Always try a lookup even with a meta of 0 in case defaults have changed
+						state = GetBlockStateFromOldMeta(block, meta);
+						if (state == null) {
+							if (meta != 0) {
+								// Concerning, since the meta was expressing _something_
 								NostrumMagica.logger.warn("Found blockstate (block=" + type + ", meta=" + meta + ") that we can't parse! Using default, but that's probably wrong!");
-								state = block.getDefaultState();
 							}
+							
+							// Whether meta was 0 and we don't have an override because the current default is still good or not,
+							// use default state for this block.
+							state = block.getDefaultState();
 						}
-//						Integer meta = nbt.getInt(NBT_BLOCK_STATE);
-//						state = CHECK_BLOCKSTATE_CACHE(block, meta);
-//						if (state == null) {
-//							state = block.getStateFromMeta(meta);
-//							SET_BLOCKSTATE_CACHE(block, meta, state);
-//						}
-					}
-					else
-					{
+					} else {
 						NostrumMagica.logger.warn("Couldn't find block for type: " + type);
 					}
 				}
@@ -412,8 +406,14 @@ public class RoomBlueprint {
 				if (state != null && nbt.contains(NBT_TILE_ENTITY)) {
 					teData = nbt.getCompound(NBT_TILE_ENTITY);
 					
+					String id = teData.getString("id");
+					// Fix casing
+					if (!id.equals(id.toLowerCase())) {
+						id = id.toLowerCase();
+						teData.putString("id", id);
+					}
+					
 					// Detect missing ones
-					final String id = teData.getString("id").toLowerCase();
 					if (id != null) {
 						Optional<TileEntityType<?>> teType = Registry.BLOCK_ENTITY_TYPE.getValue(new ResourceLocation(id));
 						if (!teType.isPresent()) {
@@ -822,8 +822,14 @@ public class RoomBlueprint {
 			if (placeState != null) {
 				// TODO: add fluid state support
 				world.setBlockState(at, placeState, 2);
-				if (worldGen && WorldUtil.blockNeedsGenFixup(block.state)) {
-					world.getChunk(at).markBlockForPostprocessing(at);
+				if (WorldUtil.blockNeedsGenFixup(block.state)) {
+					if (worldGen) {
+						world.getChunk(at).markBlockForPostprocessing(at);
+					} else {
+						BlockState blockstate = world.getBlockState(at);
+						BlockState blockstate1 = Block.getValidBlockForPosition(blockstate, world, at);
+						world.setBlockState(at, blockstate1, 20);
+					}
 				}
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
