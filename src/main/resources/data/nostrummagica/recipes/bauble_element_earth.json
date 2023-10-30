@@ -1,0 +1,17 @@
+{
+  "type": "nostrummagica:bauble_color",
+  "display": {
+	  "item": "nostrummagica:dragon_wing_pendant",
+	  "nbt": {
+		  "element": "EARTH"
+	  }
+  },
+  "ingredients": [
+    {
+      "item": "nostrummagica:dragon_wing_pendant"
+    },
+    {
+      "tag": "nostrummagica:essence/earth"
+    }
+  ]
+}
