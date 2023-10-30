@@ -1,6 +1,0 @@
-{
-    "parent": "item/handheld",
-    "textures": {
-        "layer0": "nostrummagica:item/shield_ring_large"
-    }
-}
