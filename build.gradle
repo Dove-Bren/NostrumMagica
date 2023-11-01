@@ -152,11 +152,17 @@ processResources
     //}
 }
 
-task srcJar(type: Jar) {
-    from(sourceSets.main.java)
+task sourcesJar(type: Jar) {
     classifier = 'sources'
-    archiveName = "${baseName} ${version}-sources.${extension}"
+    from sourceSets.main.allJava
 }
+
+task deobfJar(type: Jar) {
+    classifier = 'deobf'
+    from sourceSets.main.output
+}
+
+tasks.build.dependsOn sourcesJar, deobfJar
 
 
 //task coreJar(type: Jar) {

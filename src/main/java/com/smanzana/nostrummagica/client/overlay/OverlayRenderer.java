@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.pet.PetPlacementMode;
 import com.smanzana.nostrummagica.pet.PetTargetMode;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.Transmutation;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
@@ -1308,6 +1309,14 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
+	private void renderTransmutableIcon() {
+		Minecraft mc = Minecraft.getInstance();
+		GlStateManager.enableBlend();
+		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		mc.getTextureManager().bindTexture(GUI_ICONS);
+		RenderFuncs.drawScaledCustomSizeModalRect(8, 8, 224, 32, 32, 32, 8, 8, 256, 256);
+	}
+	
 	@SubscribeEvent
 	public void onTooltipRender(RenderTooltipEvent.PostBackground event) {
 		ItemStack stack = event.getStack();
@@ -1354,7 +1363,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Enchantable?
 		if (SpellAction.isEnchantable(stack)) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translatef(event.getX() + event.getWidth() - 8, event.getY() + event.getHeight() - 24, 50);
+			GlStateManager.translatef(event.getX() + event.getWidth() - 8, event.getY() - 16, 50);
 			renderEnchantableIcon();
 			GlStateManager.popMatrix();
 		}
@@ -1364,6 +1373,14 @@ public class OverlayRenderer extends AbstractGui {
 			GlStateManager.pushMatrix();
 			GlStateManager.translatef(event.getX() - 15, event.getY() + event.getHeight() - 8, 50);
 			renderConfigurableIcon();
+			GlStateManager.popMatrix();
+		}
+		
+		// Transmutable?
+		if (Transmutation.IsTransmutable(stack.getItem())) {
+			GlStateManager.pushMatrix();
+			GlStateManager.translatef(event.getX() - 15, event.getY() - 16, 50);
+			renderTransmutableIcon();
 			GlStateManager.popMatrix();
 		}
 	}

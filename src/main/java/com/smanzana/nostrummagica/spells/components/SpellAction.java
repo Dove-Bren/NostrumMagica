@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.spells.components;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -10,7 +9,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
@@ -36,6 +34,7 @@ import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.NostrumItemTags;
+import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
@@ -514,103 +513,19 @@ public class SpellAction {
 	
 	private static class TransmuteEffect implements SpellEffect {
 		
-		private static Set<Item> items;
 		
-		private static Set<Block> blocks;
-		
-		private static boolean initted = false;
-		private static final void init() {
-			if (initted)
-				return;
-			
-			initted = true;
-			
-			items = Sets.newLinkedHashSet();
-			items.add(Items.BEEF);
-			items.add(Items.APPLE);
-			items.add(Items.POTATO);
-			items.add(Items.IRON_HELMET);
-			items.add(Items.ENDER_PEARL);
-			items.add(Items.CARROT);
-			items.add(Items.BREAD);
-			items.add(Items.COMPASS);
-			items.add(Items.BRICK);
-			items.add(Items.BONE);
-			items.add(Items.EMERALD);
-			items.add(Items.COAL);
-			items.add(Items.EGG);
-			items.add(Items.GOLD_INGOT);
-			items.add(Items.REDSTONE);
-			items.add(Items.BOOK);
-			items.add(Items.QUARTZ);
-			items.add(Items.CHAINMAIL_CHESTPLATE);
-			items.add(Items.NETHER_WART);
-			items.add(Items.IRON_INGOT);
-			items.add(Items.DIAMOND_AXE);
-			items.add(Items.DIAMOND_PICKAXE);
-			items.add(Items.MELON_SEEDS);
-			items.add(Items.SUGAR_CANE);
-			items.add(Items.PRISMARINE_CRYSTALS);
-			items.add(Items.BREWING_STAND);
-			items.add(Items.ENDER_EYE);
-			items.add(Items.DIAMOND);
-			items.add(Items.CHAINMAIL_BOOTS);
-			items.add(Items.WOODEN_SWORD);
-			items.add(Items.GLOWSTONE_DUST);
-			items.add(Items.CLAY_BALL);
-			items.add(Items.CLOCK);
-			items.add(Items.COMPARATOR);
-			items.add(Items.COOKIE);
-			items.add(Items.EXPERIENCE_BOTTLE);
-			items.add(Items.FEATHER);
-			items.add(Items.SPIDER_EYE);
-			items.add(Items.STRING);
-			
-			blocks = Sets.newLinkedHashSet();
-					
-			blocks.add(Blocks.BOOKSHELF);
-			blocks.add(Blocks.CACTUS);
-			blocks.add(Blocks.COAL_ORE);
-			blocks.add(Blocks.END_STONE);
-			blocks.add(Blocks.DIRT);
-			blocks.add(Blocks.ICE);
-			blocks.add(Blocks.NOTE_BLOCK);
-			blocks.add(Blocks.NETHERRACK);
-			blocks.add(Blocks.SAND);
-			blocks.add(Blocks.IRON_BARS);
-			blocks.add(Blocks.DROPPER);
-			blocks.add(Blocks.MOSSY_COBBLESTONE);
-			blocks.add(Blocks.STONE);
-			blocks.add(Blocks.NETHERRACK);
-			blocks.add(Blocks.OAK_LOG);
-			blocks.add(Blocks.PUMPKIN);
-			blocks.add(Blocks.NETHER_QUARTZ_ORE);
-			blocks.add(Blocks.OAK_PLANKS);
-			blocks.add(Blocks.QUARTZ_STAIRS);
-			blocks.add(Blocks.OAK_FENCE);
-			blocks.add(Blocks.ACACIA_FENCE);
-			blocks.add(Blocks.REDSTONE_ORE);
-			blocks.add(Blocks.LAPIS_ORE);
-			blocks.add(Blocks.CRAFTING_TABLE);
-			blocks.add(Blocks.GOLD_ORE);
-			blocks.add(Blocks.GRAVEL);
-			blocks.add(Blocks.TERRACOTTA);
-			blocks.add(Blocks.IRON_ORE);
-		}
 		
 		private int level;
 		
 		public TransmuteEffect(int level) {
 			this.level = level;
-			
-			TransmuteEffect.init();
 		}
 		
 		@Override
 		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			ItemStack inhand = entity.getHeldItemMainhand();
 			boolean offhand = false;
-			if (inhand.isEmpty()) {
+			if (inhand.isEmpty() || inhand.getItem() instanceof SpellScroll) {
 				inhand = entity.getHeldItemOffhand();
 				offhand = true;
 			}
@@ -619,44 +534,9 @@ public class SpellAction {
 				return false;
 			
 			Item item = inhand.getItem();
-			ItemStack stack = ItemStack.EMPTY;
-			if (items.contains(item)) {
-				Iterator<Item> it = items.iterator();
-				Item next = it.next();
-				while (next != item)
-					next = it.next();
-				
-				// Now calculate offset
-				int hop = 4 - (level > 3 ? 3 : level);
-				for (int i = 0; i < hop; i++) {
-					if (!it.hasNext())
-						it = items.iterator();
-					next = it.next();
-				}
-				stack = new ItemStack(next, 1);
-			} else {
-				// Try to go through blocks and see if it's in there
-				Iterator<Block> it = blocks.iterator();
-				Block next = it.next();
-				while (next.asItem() != item) { // TODO this only works for vanilla? That ok?
-					if (!it.hasNext()) {
-						next = null;
-						break;
-					}
-					next = it.next();
-				}
-				
-				if (next != null) {
-					// Now calculate offset
-					int hop = 4 - (level > 3 ? 3 : level);
-					for (int i = 0; i < hop; i++) {
-						if (!it.hasNext())
-							it = blocks.iterator();
-						next = it.next();
-					}
-					stack = new ItemStack(next, 1);
-				}
-			}
+			Item newItem = Transmutation.GetTransmutationResult(item, level);
+			
+			ItemStack stack = newItem == null ? ItemStack.EMPTY : new ItemStack(newItem);
 			
 			if (stack.isEmpty()) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
@@ -691,27 +571,15 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			Block block = world.getBlockState(pos).getBlock();
-			if (!blocks.contains(block)) {
+			Block outBlock = Transmutation.GetTransmutationResult(block, level);
+			if (outBlock == null) {
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 				return false;
 			} else {
 				NostrumMagicaSounds.CAST_CONTINUE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			}
 			
-			Iterator<Block> it = blocks.iterator();
-			Block next = it.next();
-			while (next != block)
-				next = it.next();
-			
-			// Now calculate offset
-			int hop = 4 - (level > 3 ? 3 : level);
-			for (int i = 0; i < hop; i++) {
-				next = it.next();
-				if (!it.hasNext())
-					it = blocks.iterator();
-			}
-			
-			world.setBlockState(pos, next.getDefaultState());
+			world.setBlockState(pos, outBlock.getDefaultState());
 			return true;
 		}
 	}

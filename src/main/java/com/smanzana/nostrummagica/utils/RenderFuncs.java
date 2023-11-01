@@ -21,6 +21,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -737,6 +738,27 @@ public final class RenderFuncs {
 				.color(red, green, blue, alpha)
 				.normal(0, 0, -1).endVertex();
 		}
+	}
+	
+	public static final void renderSpaceQuadFacingCamera(BufferBuilder buffer, ActiveRenderInfo renderInfo,
+			double relX, double relY, double relZ,
+			double radius,
+			float red, float green, float blue, float alpha) {
+		float rotationX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
+		float rotationYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
+		float rotationXY = -rotationYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+		float rotationXZ = rotationX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+		float rotationZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
+		
+		//f, f4, f1, f2, f3
+		//float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ
+		// double rX, double rXZ, double rZ, double rYZ, double rXY
+		
+		renderSpaceQuad(buffer, relX, relY, relZ,
+				rotationX, rotationXZ, rotationZ, rotationYZ, rotationXY,
+				radius,
+				red, green, blue, alpha
+				);
 	}
 	
 	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
