@@ -1376,7 +1376,8 @@
     "info.nostrumwelcome.text": "Welcome to Nostrum Magica! Press [%s] to get started!",
 
     "nei.category.ritual.name": "Nostrum Ritual",
-	"nei.category.transmutation.name": "Nostrum Transmutation",
+	"nei.category.transmutation.item.name": "Nostrum Transmutation",
+	"nei.category.transmutation.block.name": "Nostrum World Transmutation",
 	
     "info.jei.recipe.ritual.invalid": "%1$sWarning!%2$s|You haven't unlocked the ability to perform this ritual",
 	"info.jei.recipe.transmute.unknown": "Undiscovered Catalyst",

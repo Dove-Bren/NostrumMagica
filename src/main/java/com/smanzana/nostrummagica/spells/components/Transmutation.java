@@ -356,16 +356,37 @@ public class Transmutation {
 			return this.revealedRecipe == source.isRevealed(player, this.jumpLevel);
 		}
 		
-		public static final List<TransmutationRecipe> GetAll() {
+		public static final List<TransmutationRecipe> GetItemRecipes() {
 			init(GetSeedToUse());
 			
 			// Get all sources first
-			List<TransmutationSource> sources = TransmutationSource.GetAll();
+			List<ItemTransmutationSource> sources = TransmutationSource.GetItems();
 			
 			// For each source, create six recipes:
 			// A revealed and unrevealed one for all three jump levels
 			List<TransmutationRecipe> recipes = new ArrayList<>(sources.size() * 6);
 			for (TransmutationSource source : sources) {
+				for (int i = 1; i <= 3; i++) {
+					final ItemStack result = source.findResult(i);
+					
+					recipes.add(new TransmutationRecipe(result, source, i, true));
+					recipes.add(new TransmutationRecipe(result, source, i, false));
+				}
+			}
+			
+			return recipes;
+		}
+		
+		public static final List<TransmutationRecipe> GetBlocksRecipes() {
+			init(GetSeedToUse());
+			
+			// Get all sources first
+			List<BlockTransmutationSource> sources = TransmutationSource.GetBlocks();
+			
+			// For each source, create six recipes:
+			// A revealed and unrevealed one for all three jump levels
+			List<TransmutationRecipe> recipes = new ArrayList<>(sources.size() * 6);
+			for (BlockTransmutationSource source : sources) {
 				for (int i = 1; i <= 3; i++) {
 					final ItemStack result = source.findResult(i);
 					
@@ -405,18 +426,38 @@ public class Transmutation {
 		}
 		public abstract Item findResultItem(int jumpLevel);
 		
+		public static final List<ItemTransmutationSource> GetItems() {
+			init(GetSeedToUse());
+			
+			List<ItemTransmutationSource> sources = new ArrayList<>(128);
+			for (ItemTransmutationSource item : Transmutation.items) {
+				sources.add(item);
+			}
+			
+			return sources;
+		}
+		
+		public static final List<BlockTransmutationSource> GetBlocks() {
+			init(GetSeedToUse());
+			
+			List<BlockTransmutationSource> sources = new ArrayList<>(128);
+			for (BlockTransmutationSource item : Transmutation.blocks) {
+				sources.add(item);
+			}
+			
+			return sources;
+		}
+		
 		public static final List<TransmutationSource> GetAll() {
 			init(GetSeedToUse());
 			
 			List<TransmutationSource> sources = new ArrayList<>(128);
-			for (TransmutationSource item : Transmutation.items) {
+			for (ItemTransmutationSource item : Transmutation.items) {
 				sources.add(item);
 			}
-			
-			// Don't return blocks here...
-//			for (Block block : Transmutation.blocks) {
-//				sources.add(new BlockTransmutationSource(block));
-//			}
+			for (BlockTransmutationSource item : Transmutation.blocks) {
+				sources.add(item);
+			}
 			
 			return sources;
 		}
@@ -435,7 +476,7 @@ public class Transmutation {
 
 		@Override
 		public String getName() {
-			return "transmute_source." + item.getRegistryName().toString();
+			return "transmute_source.item." + item.getRegistryName().toString();
 		}
 
 		@Override
@@ -470,7 +511,7 @@ public class Transmutation {
 
 		@Override
 		public String getName() {
-			return "transmute_source." + block.getRegistryName().toString();
+			return "transmute_source.block." + block.getRegistryName().toString();
 		}
 
 		@Override

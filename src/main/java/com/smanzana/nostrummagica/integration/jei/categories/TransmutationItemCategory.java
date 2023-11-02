@@ -26,7 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 
-public class TransmutationCategory implements IRecipeCategory<TransmutationRecipe> {
+public class TransmutationItemCategory implements IRecipeCategory<TransmutationRecipe> {
 
 	private static final ResourceLocation TEXT_BACK = new ResourceLocation(NostrumMagica.MODID, "textures/gui/nei/transmute.png");
 	private static final int BACK_WIDTH = 99;
@@ -34,16 +34,26 @@ public class TransmutationCategory implements IRecipeCategory<TransmutationRecip
 	private static final int ICON_HOFFSET = 0;
 	private static final int ICON_VOFFSET = 64;
 	
-	public static final ResourceLocation UID = new ResourceLocation(NostrumMagica.MODID, "transmutation_recipe");
+	public static final ResourceLocation UID_ITEMS = new ResourceLocation(NostrumMagica.MODID, "transmutation_item_recipe");
+	public static final ResourceLocation UID_BLOCKS = new ResourceLocation(NostrumMagica.MODID, "transmutation_block_recipe");
 	
 	private String title;
 	private IDrawable background;
 	private IDrawable icon;
+	private final ResourceLocation UID;
 	
-	public TransmutationCategory(IGuiHelper guiHelper) {
-		title = I18n.format("nei.category.transmutation.name", (Object[]) null);
+	public TransmutationItemCategory(IGuiHelper guiHelper, boolean blocks) {
 		background = guiHelper.drawableBuilder(TEXT_BACK, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(0, 0, 0, 0).build();
-		icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET, ICON_VOFFSET, 16, 16).build();
+		
+		if (blocks) {
+			title = I18n.format("nei.category.transmutation.block.name", (Object[]) null);
+			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET + 16, ICON_VOFFSET, 16, 16).build();
+			UID = UID_BLOCKS;
+		} else {
+			title = I18n.format("nei.category.transmutation.item.name", (Object[]) null);
+			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET, ICON_VOFFSET, 16, 16).build();
+			UID = UID_ITEMS;
+		}
 	}
 	
 	@Override

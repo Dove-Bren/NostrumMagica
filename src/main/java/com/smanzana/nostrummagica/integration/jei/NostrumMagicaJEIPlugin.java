@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.integration.jei;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
-import com.smanzana.nostrummagica.integration.jei.categories.TransmutationCategory;
+import com.smanzana.nostrummagica.integration.jei.categories.TransmutationItemCategory;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIHelper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRenderer;
@@ -44,7 +45,9 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	private static NostrumMagicaJEIPlugin lastCreated = null;
 	
 	private List<RitualOutcomeWrapper> ritualOutcomes;
-	private List<TransmutationRecipe> transmuteRecipes;
+	private List<TransmutationSource> transmuteSources;
+	private List<TransmutationRecipe> transmuteItemRecipes;
+	private List<TransmutationRecipe> transmuteBlockRecipes;
 	private IJeiRuntime runtime = null;
 	
 	public NostrumMagicaJEIPlugin() {
@@ -79,9 +82,10 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		{
 			TransmuteSourceJEIHelper helper = new TransmuteSourceJEIHelper();
 			TransmuteSourceJEIRenderer renderer = new TransmuteSourceJEIRenderer();
+			transmuteSources = new ArrayList<>(TransmutationSource.GetAll());
 			
 			ingredientRegistry.register(TransmuteSourceIngredientType.instance,
-					TransmutationSource.GetAll(),
+					transmuteSources,
 					helper,
 					renderer);
 		}
@@ -90,7 +94,8 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registry) {
 		registry.addRecipeCategories(new RitualRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
-		registry.addRecipeCategories(new TransmutationCategory(registry.getJeiHelpers().getGuiHelper()));
+		registry.addRecipeCategories(new TransmutationItemCategory(registry.getJeiHelpers().getGuiHelper(), false));
+		registry.addRecipeCategories(new TransmutationItemCategory(registry.getJeiHelpers().getGuiHelper(), true));
 	}
 	
 	@Override
@@ -101,10 +106,14 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		
 		
 		NostrumMagica.logger.info("Registering transmutations with JEI...");
-		transmuteRecipes = TransmutationRecipe.GetAll();
-		Collections.shuffle(transmuteRecipes, new Random(442)); // Shuffle so the same input isn't grouped together :P
-		registry.addRecipes(transmuteRecipes, TransmutationCategory.UID);
-		NostrumMagica.logger.info("Registered " + (transmuteRecipes.size()/2) + " transmutations");
+		transmuteItemRecipes = TransmutationRecipe.GetItemRecipes();
+		Collections.shuffle(transmuteItemRecipes, new Random(442)); // Shuffle so the same input isn't grouped together :P
+		registry.addRecipes(transmuteItemRecipes, TransmutationItemCategory.UID_ITEMS);
+		
+		transmuteBlockRecipes = TransmutationRecipe.GetBlocksRecipes();
+		Collections.shuffle(transmuteBlockRecipes, new Random(442)); // Shuffle so the same input isn't grouped together :P
+		registry.addRecipes(transmuteBlockRecipes, TransmutationItemCategory.UID_BLOCKS);
+		NostrumMagica.logger.info("Registered " + ((transmuteBlockRecipes.size() + transmuteItemRecipes.size())/2) + " transmutations");
 		
 		
 		// JEI wiki says to do this here, but it fires an exception
@@ -135,11 +144,19 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		// Hide and unhide transmutation recipes based on whether a player has seen a given
 		if (runtime != null) {
 			IRecipeManager manager = runtime.getRecipeManager();
-			for (TransmutationRecipe recipe : transmuteRecipes) {
+			for (TransmutationRecipe recipe : transmuteItemRecipes) {
 				if (recipe.isRevealed(player)) {
-					manager.unhideRecipe(recipe, TransmutationCategory.UID);
+					manager.unhideRecipe(recipe, TransmutationItemCategory.UID_ITEMS);
 				} else {
-					manager.hideRecipe(recipe, TransmutationCategory.UID);
+					manager.hideRecipe(recipe, TransmutationItemCategory.UID_ITEMS);
+				}
+			}
+
+			for (TransmutationRecipe recipe : transmuteBlockRecipes) {
+				if (recipe.isRevealed(player)) {
+					manager.unhideRecipe(recipe, TransmutationItemCategory.UID_BLOCKS);
+				} else {
+					manager.hideRecipe(recipe, TransmutationItemCategory.UID_BLOCKS);
 				}
 			}
 		}
