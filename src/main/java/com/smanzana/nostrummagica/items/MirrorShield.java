@@ -10,6 +10,7 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.ISpellActionListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener.SpellActionListenerData;
@@ -74,7 +75,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumItemTags.Items.CrystalMedium.contains(repair.getItem());
+			return NostrumTags.Items.CrystalMedium.contains(repair.getItem());
 		}
     }
 	

@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.ITameableEntity;
@@ -113,7 +114,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && NostrumItemTags.Items.CrystalMedium.contains(repair.getItem());
+        return !repair.isEmpty() && NostrumTags.Items.CrystalMedium.contains(repair.getItem());
     }
 
 	@Override

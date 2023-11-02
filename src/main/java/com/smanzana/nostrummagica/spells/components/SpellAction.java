@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
@@ -33,11 +34,11 @@ import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
+import com.smanzana.nostrummagica.spells.components.Transmutation.TransmuteResult;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
@@ -534,15 +535,21 @@ public class SpellAction {
 				return false;
 			
 			Item item = inhand.getItem();
-			Item newItem = Transmutation.GetTransmutationResult(item, level);
+			TransmuteResult<Item> result = Transmutation.GetTransmutationResult(item, level);
 			
-			ItemStack stack = newItem == null ? ItemStack.EMPTY : new ItemStack(newItem);
-			
-			if (stack.isEmpty()) {
+			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
 				return false;
-			} else {
-				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
+			}
+			
+			ItemStack stack = new ItemStack(result.output);
+			NostrumMagicaSounds.CAST_CONTINUE.play(entity);
+			
+			// Award knowledge
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			attr.giveTransmuteKnowledge(result.source.getName(), level);
+			if (caster instanceof ServerPlayerEntity) {
+				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) caster);
 			}
 			
 			if (entity instanceof PlayerEntity) {
@@ -558,8 +565,6 @@ public class SpellAction {
 					inhand.split(1);
 					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
 				}
-				
-				
 			} else {
 				// MobEntity has held item in slot 0
 				entity.setHeldItem(Hand.MAIN_HAND, stack);
@@ -571,15 +576,23 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			Block block = world.getBlockState(pos).getBlock();
-			Block outBlock = Transmutation.GetTransmutationResult(block, level);
-			if (outBlock == null) {
+			TransmuteResult<Block> result = Transmutation.GetTransmutationResult(block, level);
+			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 				return false;
-			} else {
-				NostrumMagicaSounds.CAST_CONTINUE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			}
 			
-			world.setBlockState(pos, outBlock.getDefaultState());
+			NostrumMagicaSounds.CAST_CONTINUE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+
+			// Award knowledge
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			attr.giveTransmuteKnowledge(result.source.getName(), level);
+			
+			if (caster instanceof ServerPlayerEntity) {
+				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) caster);
+			}
+			
+			world.setBlockState(pos, result.output.getDefaultState());
 			return true;
 		}
 	}
@@ -1052,7 +1065,7 @@ public class SpellAction {
 			// Main hand attempt
 			if (inhand != null) {
 				Item item = inhand.getItem();
-				if (NostrumItemTags.Items.InfusedGemVoid.contains(item)) {
+				if (NostrumTags.Items.InfusedGemVoid.contains(item)) {
 					int count = (int) Math.pow(2, level - 1);
 					addedItem = InfusedGemItem.getGem(element, count);
 				} else if (item instanceof EssenceItem) {
@@ -1660,7 +1673,7 @@ public class SpellAction {
 	
 	public static final boolean isEnchantable(ItemStack stack) {
 		Item item = stack.getItem();
-		if (NostrumItemTags.Items.InfusedGemVoid.contains(stack.getItem())) {
+		if (NostrumTags.Items.InfusedGemVoid.contains(stack.getItem())) {
 			return true;
 		} else if (item instanceof EssenceItem && ((EssenceItem) stack.getItem()).getElement() != EMagicElement.PHYSICAL) {
 			return true;

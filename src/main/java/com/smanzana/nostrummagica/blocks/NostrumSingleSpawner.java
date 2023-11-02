@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
@@ -13,7 +14,6 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.tiles.SingleSpawnerTileEntity;
 
 import net.minecraft.block.Block;
@@ -240,7 +240,7 @@ public class NostrumSingleSpawner extends ContainerBlock {
 				}
 				
 				worldIn.setBlockState(pos, state.with(MOB, type));
-			} else if (NostrumItemTags.Items.DragonWing.contains(heldItem.getItem())) {
+			} else if (NostrumTags.Items.DragonWing.contains(heldItem.getItem())) {
 				worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
 				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));

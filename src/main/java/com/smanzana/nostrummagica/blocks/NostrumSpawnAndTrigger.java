@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tiles.SpawnerTriggerTileEntity;
@@ -107,7 +107,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 				}
 				
 				worldIn.setBlockState(pos, state.with(MOB, type));
-			} else if (NostrumItemTags.Items.DragonWing.contains(heldItem.getItem())) {
+			} else if (NostrumTags.Items.DragonWing.contains(heldItem.getItem())) {
 				worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
 			} if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);

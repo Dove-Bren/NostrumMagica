@@ -642,8 +642,8 @@ public final class RenderFuncs {
 		tessellator.draw();
 	}
 	
-	public static void drawRect(int minX, int minY, int maxX, int maxY, int colorRGBA) {
-		AbstractGui.fill(minX, minY, maxX, maxY, colorRGBA);
+	public static void drawRect(int minX, int minY, int maxX, int maxY, int colorARGB) {
+		AbstractGui.fill(minX, minY, maxX, maxY, colorARGB);
 	}
 
 	// Called fillGradient

@@ -7,6 +7,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -84,7 +85,7 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumItemTags.Items.CrystalSmall.contains(repair.getItem());
+			return NostrumTags.Items.CrystalSmall.contains(repair.getItem());
 		}
     }
 

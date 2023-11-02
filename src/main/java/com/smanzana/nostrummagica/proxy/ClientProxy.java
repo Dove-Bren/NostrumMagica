@@ -106,6 +106,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
+import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
 import com.smanzana.nostrummagica.items.EnchantedArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
@@ -185,8 +186,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.event.InputEvent.MouseScrollEvent;
@@ -205,6 +204,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -926,6 +926,10 @@ public class ClientProxy extends CommonProxy {
 			if (mc.currentScreen instanceof MirrorGui) {
 				((MirrorGui) mc.currentScreen).refresh();
 			}
+			
+			if (ModList.get().isLoaded("jei")) {
+				NostrumMagicaJEIPlugin.RefreshTransmuteRecipes(player);
+			}
 		} else {
 			// Stash them
 			overrides = override;
@@ -946,6 +950,10 @@ public class ClientProxy extends CommonProxy {
 		existing.copy(overrides);
 		
 		overrides = null;
+		
+		if (ModList.get().isLoaded("jei")) {
+			NostrumMagicaJEIPlugin.RefreshTransmuteRecipes(mc.player);
+		}
 	}
 	
 	@Override

@@ -18,10 +18,46 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 
 public interface INostrumMagic {
+	
+	public static class TransmuteKnowledge {
+		public final String key;
+		public final int level;
+		
+		public TransmuteKnowledge(String key, int level) {
+			this.key = key;
+			this.level = level;
+		}
+		
+		public CompoundNBT toNBT() {
+			CompoundNBT tag = new CompoundNBT();
+			tag.putString("key", key);
+			tag.putInt("level", level);
+			return tag;
+		}
+		
+		public static TransmuteKnowledge fromNBT(CompoundNBT tag) {
+			return new TransmuteKnowledge(tag.getString("key"), tag.getInt("level"));
+		}
+		
+		@Override
+		public int hashCode() {
+			return key.hashCode() * 67 + Integer.hashCode(level);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof TransmuteKnowledge) {
+				return ((TransmuteKnowledge) o).key.equals(key) && ((TransmuteKnowledge) o).level == level;
+			}
+			
+			return false;
+		}
+	}
 
 	// Unlock
 	public boolean isUnlocked();
@@ -124,6 +160,10 @@ public interface INostrumMagic {
 	public void unlockEnhancedTeleport();
 	public boolean hasEnhancedTeleport();
 	
+	// Transmute knowledge
+	public void giveTransmuteKnowledge(String key, int level);
+	public boolean hasTransmuteKnowledge(String key, int level);
+	
 	// Serialization/Deserialization. Do not call.
 	public void deserialize(
 			boolean unlocked,
@@ -148,12 +188,14 @@ public interface INostrumMagic {
 	public Map<UUID, Integer> getManaBonusModifiers();
 	public Map<UUID, Float> getManaCostModifiers();
 	public Map<UUID, Float> getManaRegenModifiers();
+	public Map<TransmuteKnowledge, Boolean> getTransmuteKnowledge();
 	public void deserializeLore(String key, Integer level);
 	public void deserializeSpells(String crc);
 	public void setModifierMaps(Map<UUID, Float> modifiers_mana,
 			Map<UUID, Integer> modifiers_bonus_mana,
 			Map<UUID, Float> modifiers_cost,
 			Map<UUID, Float> modifiers_regen);
+	public void setTransmuteKnowledge(Map<TransmuteKnowledge, Boolean> map);
 	
 	// Copy fields out of
 	public void copy(INostrumMagic cap);

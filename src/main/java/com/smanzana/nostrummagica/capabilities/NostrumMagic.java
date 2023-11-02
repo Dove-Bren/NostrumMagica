@@ -121,6 +121,7 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
 	private DimensionType sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
+	private Map<TransmuteKnowledge, Boolean> transmuteKnowledge;
 	
 	private LivingEntity entity;
 	
@@ -145,6 +146,7 @@ public class NostrumMagic implements INostrumMagic {
 		sorceryPortalDim = DimensionType.OVERWORLD;
 		sorceryPortalPos = null;
 		enhancedTeleport = false;
+		transmuteKnowledge = new HashMap<>();
 		
 		modMana = new HashMap<>();
 		modManaFlat = new HashMap<>();
@@ -466,6 +468,17 @@ public class NostrumMagic implements INostrumMagic {
 		
 		return !spellCRCs.add(CRC);
 	}
+	
+	@Override
+	public boolean hasTransmuteKnowledge(String key, int level) {
+		Boolean val = transmuteKnowledge.get(new TransmuteKnowledge(key, level));
+		return val != null && val;
+	}
+	
+	@Override
+	public void giveTransmuteKnowledge(String key, int level) {
+		transmuteKnowledge.put(new TransmuteKnowledge(key, level), true);
+	}
 
 	@Override
 	public List<SpellShape> getShapes() {
@@ -645,6 +658,16 @@ public class NostrumMagic implements INostrumMagic {
 		this.modManaCost = modifiers_cost;
 		this.modManaRegen = modifiers_regen;
 	}
+	
+	@Override
+	public void setTransmuteKnowledge(Map<TransmuteKnowledge, Boolean> map) {
+		this.transmuteKnowledge = new HashMap<>(map);
+	}
+	
+	@Override
+	public Map<TransmuteKnowledge, Boolean> getTransmuteKnowledge() {
+		return this.transmuteKnowledge;
+	}
 
 	@Override
 	public void copy(INostrumMagic cap) {
@@ -672,7 +695,8 @@ public class NostrumMagic implements INostrumMagic {
 		this.bindingSpell = cap.getBindingSpell();
 		this.bindingComponent = cap.getBindingComponent();
 		this.spellKnowledge = cap.getSpellKnowledge();
-		this.enhancedTeleport = cap.hasEnhancedTeleport();
+		this.enhancedTeleport = cap.hasEnhancedTeleport(); 
+		this.transmuteKnowledge = cap.getTransmuteKnowledge();
 		this.setModifierMaps(cap.getManaModifiers(), cap.getManaBonusModifiers(), cap.getManaCostModifiers(), cap.getManaRegenModifiers());
 	}
 	

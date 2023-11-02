@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -90,7 +91,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 	
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && NostrumItemTags.Items.CrystalSmall.contains(repair.getItem());
+        return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
     }
 
 	@Override

@@ -17,11 +17,11 @@ import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFlierDiveTask;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIOrbitEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.GenericTemptGoal;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -155,7 +155,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			@Override
 			protected boolean isTempting(ItemStack stack) {
 				return !stack.isEmpty()
-						&& (NostrumItemTags.Items.ReagentCrystabloom.contains(stack.getItem()) || NostrumItemTags.Items.ReagentBlackPearl.contains(stack.getItem()));
+						&& (NostrumTags.Items.ReagentCrystabloom.contains(stack.getItem()) || NostrumTags.Items.ReagentBlackPearl.contains(stack.getItem()));
 			}
 			
 			@Override

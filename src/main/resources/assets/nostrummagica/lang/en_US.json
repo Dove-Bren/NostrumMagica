@@ -324,14 +324,6 @@
     "item.nostrummagica.modifiers.dragonslot.body": "When on body:",
     "item.nostrummagica.modifiers.dragonslot.helm": "When on helm:",
 
-    "item.nostrummagica.aether_cloak.runed": "Runed",
-    "item.nostrummagica.aether_cloak.wings": "Display Wings",
-    "item.nostrummagica.aether_cloak.trimmed": "Trimmed Design",
-    "item.nostrummagica.aether_cloak.color.outside": "Outside Dyed %s",
-    "item.nostrummagica.aether_cloak.color.inside": "Inside Dyed %s",
-    "item.nostrummagica.aether_cloak.color.runes": "Rune Color %s",
-    "item.nostrummagica.aether_cloak.spender": "Aether Caster",
-
     "item.nostrummagica.dragon_soul_item": "Dragon Soul Ember",
     "item.nostrummagica.arcane_wolf_soul_item": "Arcane Wolf Soul Flower",
     "item.nostrummagica.soul_dagger": "Soul Dagger",
@@ -1384,7 +1376,10 @@
     "info.nostrumwelcome.text": "Welcome to Nostrum Magica! Press [%s] to get started!",
 
     "nei.category.ritual.name": "Nostrum Ritual",
-    "info.jei.recipe.ritual.invalid": "%1$sWarning!%2$s|You haven't unlocked the ability to perform this ritual..name",
+	"nei.category.transmutation.name": "Nostrum Transmutation",
+	
+    "info.jei.recipe.ritual.invalid": "%1$sWarning!%2$s|You haven't unlocked the ability to perform this ritual",
+	"info.jei.recipe.transmute.unknown": "Undiscovered Catalyst",
 
     "lore.mirror_shield": "Mirror Shields",
     "lore.true_mirror_shield": "True Mirror Shields",

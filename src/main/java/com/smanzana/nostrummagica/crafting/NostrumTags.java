@@ -1,13 +1,15 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.crafting;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 
-public class NostrumItemTags {
+public class NostrumTags {
 
 	public static final class Items {
 		private static final String TAG_RUNE = "rune";
@@ -104,6 +106,8 @@ public class NostrumItemTags {
 		
 		private static final String TAG_SILVER_INGOT = "ingots/silver";
 		
+		private static final String TAG_TRANSMUTABLE_ITEM = "transmutable/item";
+		
 		public static final Tag<Item> RuneAny = tag(TAG_RUNE);
 		
 		public static final Tag<Item> Reagent = tag(TAG_REAGENT);
@@ -196,8 +200,21 @@ public class NostrumItemTags {
 		
 		public static final Tag<Item> SilverIngot = new ItemTags.Wrapper(new ResourceLocation("forge", TAG_SILVER_INGOT));
 		
+		public static final Tag<Item> TransmutableItem = tag(TAG_TRANSMUTABLE_ITEM);
+		
 		private static Tag<Item> tag(String path) {
 			return new ItemTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));
+		}
+	}
+	
+	public static final class Blocks {
+		
+		private static final String TAG_TRANSMUTABLE_BLOCK = "transmutable/block";
+		
+		public static final Tag<Block> TransmutableBlock = tag(TAG_TRANSMUTABLE_BLOCK);
+		
+		private static Tag<Block> tag(String path) {
+			return new BlockTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));
 		}
 	}
 }

@@ -3,9 +3,11 @@ package com.smanzana.nostrummagica.capabilities;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -78,6 +80,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_SORCERYPORTAL_DIM = "sorcery_portal_dim";
 	private static final String NBT_SORCERYPORTAL_POS = "sorcery_portal_pos";
+	
+	private static final String NBT_TRANSMUTE_KNOWLEDGE = "transmute_knowledge";
 	
 	@Override
 	public INBT writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side) {
@@ -297,6 +301,16 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			nbt.putString(NBT_SORCERYPORTAL_DIM, instance.getSorceryPortalDimension().getRegistryName().toString());
 			nbt.put(NBT_SORCERYPORTAL_POS, NBTUtil.writeBlockPos(instance.getSorceryPortalPos()));
 		}
+		
+		list = new ListNBT();
+		for (Entry<TransmuteKnowledge, Boolean> entry : instance.getTransmuteKnowledge().entrySet()) {
+			if (entry.getValue() == null || !entry.getValue()) {
+				continue;
+			}
+			CompoundNBT subtag = entry.getKey().toNBT();
+			list.add(subtag);
+		}
+		nbt.put(NBT_TRANSMUTE_KNOWLEDGE, list);
 		
 		return nbt;
 	}
@@ -554,6 +568,16 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		instance.setModifierMaps(modMana, modManaFlat, modManaCost, modManaRegen);
+		
+		if (tag.contains(NBT_TRANSMUTE_KNOWLEDGE, NBT.TAG_LIST)) {
+			ListNBT tagList = tag.getList(NBT_TRANSMUTE_KNOWLEDGE, NBT.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundNBT subtag = tagList.getCompound(i);
+				TransmuteKnowledge knowledge = TransmuteKnowledge.fromNBT(subtag);
+				instance.giveTransmuteKnowledge(knowledge.key, knowledge.level);
+			}
+		}
 	}
 
 }

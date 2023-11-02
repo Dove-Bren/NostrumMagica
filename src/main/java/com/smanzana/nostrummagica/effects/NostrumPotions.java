@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.effects;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.NostrumItemTags;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -67,7 +67,7 @@ public enum NostrumPotions {
 	protected static final void registerPotionMixes() {
 		// Mana regen potion
     	BrewingRecipeRegistry.addRecipe(new PotionIngredient(Potions.THICK),
-    			Ingredient.fromTag(NostrumItemTags.Items.ReagentManiDust),
+    			Ingredient.fromTag(NostrumTags.Items.ReagentManiDust),
     			MakePotion(NostrumPotions.MANAREGEN.getType()));
     	
     	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
