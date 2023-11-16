@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.tiles;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 
 import net.minecraft.block.BlockState;
@@ -8,6 +10,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,9 +21,13 @@ public class MimicBlockTileEntity extends TileEntity {
 	
 	protected final MimicBlock.MimicBlockData data;
 	
-	public MimicBlockTileEntity() {
-		super(NostrumTileEntities.MimicBlockTileEntityType);
+	protected MimicBlockTileEntity(TileEntityType<? extends MimicBlockTileEntity> type) {
+		super(type);
 		this.data = new MimicBlock.MimicBlockData();
+	}
+	
+	public MimicBlockTileEntity() {
+		this(NostrumTileEntities.MimicBlockTileEntityType);
 	}
 
 	public MimicBlock.MimicBlockData getData() {
@@ -46,12 +53,16 @@ public class MimicBlockTileEntity extends TileEntity {
 		this.handleUpdateTag(pkt.getNbtCompound());
 	}
 	
+	protected @Nonnull BlockState refreshState() {
+		return ((MimicBlock) getBlockState().getBlock()).getMimickedState(getBlockState(), getWorld(), getPos());
+	}
+	
 	@Override
 	public void handleUpdateTag(CompoundNBT tag) {
 		super.handleUpdateTag(tag);
 		
 		// Server told us something's changed (or we just loaded)
-		BlockState newState = MimicBlock.GetMimickedState(getBlockState().get(MimicBlock.FACING), getWorld(), getPos());
+		BlockState newState = refreshState();
 		if (!newState.equals(getData().getBlockState())) {
 			setDataBlock(newState);
 			signalBlockUpdate(); // Is this okay?
@@ -64,7 +75,7 @@ public class MimicBlockTileEntity extends TileEntity {
 			return;
 		}
 		
-		BlockState newState = MimicBlock.GetMimickedState(getBlockState().get(MimicBlock.FACING), getWorld(), getPos());
+		BlockState newState = refreshState();
 		if (!newState.equals(getData().getBlockState())) {
 			setDataBlock(newState);
 			signalBlockUpdate();

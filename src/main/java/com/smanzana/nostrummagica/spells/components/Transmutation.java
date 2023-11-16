@@ -128,11 +128,11 @@ public class Transmutation {
 	}
 	
 	public static final boolean IsTransmutable(Item item) {
-		return GetTransmutationResult(item, 0) != null;
+		return GetTransmutationResult(item, 0).valid;
 	}
 	
 	public static final boolean IsTransmutable(Block block) {
-		return GetTransmutationResult(block, 0) != null;
+		return GetTransmutationResult(block, 0).valid;
 	}
 	
 	protected static final long GetSeedToUse() {

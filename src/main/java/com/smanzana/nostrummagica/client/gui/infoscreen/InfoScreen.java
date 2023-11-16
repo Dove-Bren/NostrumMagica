@@ -287,7 +287,7 @@ public class InfoScreen extends StackableScreen {
 	
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double dx) {
-		this.handleMouseScroll(dx > 0 ? 1 : 0, (int) mouseX, (int) mouseY);
+		this.handleMouseScroll(dx > 0 ? 1 : -1, (int) mouseX, (int) mouseY);
 		return true;
 	}
 	

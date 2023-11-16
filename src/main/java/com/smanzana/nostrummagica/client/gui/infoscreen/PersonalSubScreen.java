@@ -308,11 +308,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			mc.fontRenderer.drawString(text, drawX, drawY, color);
 			drawY += 15;
 			
-			text = String.format("%+05.1f%%", attr.getManaModifier() * 100f);
+			text = String.format("%+5.1f%%", attr.getManaModifier() * 100f);
 			mc.fontRenderer.drawString(text, drawX, drawY, color);
 			drawY += 15;
 			
-			text = String.format("%+05.1f%%", attr.getManaCostModifier() * 100f);
+			text = String.format("%+5.1f%%", attr.getManaCostModifier() * 100f);
 			mc.fontRenderer.drawString(text, drawX, drawY, color);
 			drawY += 15;
 			

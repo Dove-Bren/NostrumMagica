@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.network.messages;
 
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -40,22 +42,23 @@ public class CandleIgniteMessage {
 	
 	private final int dimensionID;
 	private final BlockPos pos;
-	private final ReagentType type;
+	private final @Nullable ReagentType type;
 	
-	public CandleIgniteMessage(int dimension, BlockPos pos, ReagentType type) {
+	public CandleIgniteMessage(int dimension, BlockPos pos, @Nullable ReagentType type) {
 		this.dimensionID = dimension;
 		this.pos = pos;
 		this.type = type;
 	}
 
 	public static CandleIgniteMessage decode(PacketBuffer buf) {
-		return new CandleIgniteMessage(buf.readInt(), buf.readBlockPos(), buf.readEnumValue(ReagentType.class));
+		return new CandleIgniteMessage(buf.readInt(), buf.readBlockPos(), buf.readBoolean() ? buf.readEnumValue(ReagentType.class) : null);
 	}
 
 	public static void encode(CandleIgniteMessage msg, PacketBuffer buf) {
 		buf.writeInt(msg.dimensionID);
 		buf.writeBlockPos(msg.pos);
-		buf.writeEnumValue(msg.type);
+		buf.writeBoolean(msg.type != null);
+		if (msg.type != null) buf.writeEnumValue(msg.type);
 	}
 
 }

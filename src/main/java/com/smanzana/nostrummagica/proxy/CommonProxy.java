@@ -154,9 +154,6 @@ public class CommonProxy {
 		
 		NetworkHandler.getInstance();
 		
-		// Fluids registered with blocks
-		//registerFluids();
-		
     	registerShapes();
     	registerTriggers();
     	
@@ -279,17 +276,6 @@ public class CommonProxy {
 		}
     }
     
-    // Just have data files now.
-//    @SubscribeEvent
-//    public void registerCustomRecipes(RegistryEvent.Register<IRecipe> event) {
-//    	RecipeProvider p;
-//    	
-//    	final IForgeRegistry<IRecipe> registry = event.getRegistry();
-//    	
-//    	registry.register(new SpellRune.RuneRecipe());
-//    	registry.register(new SpellTomePageCombineRecipe());
-//    }
-    
     @SubscribeEvent
     public void registerDataSerializers(RegistryEvent.Register<DataSerializerEntry> event) {
     	final IForgeRegistry<DataSerializerEntry> registry = event.getRegistry();
@@ -307,36 +293,6 @@ public class CommonProxy {
     	registry.register(new DataSerializerEntry(OptionalParticleDataSerializer.instance).setRegistryName("nostrum.serial.particle_opt"));
     	registry.register(new DataSerializerEntry(RedDragonBodyPartTypeSerializer.instance).setRegistryName("nostrum.serial.red_dragon.body_part_type"));
     }
-    
-//    @SubscribeEvent
-//    public void registerFluids(RegistryEvent.Register<Fluid> event) {
-//    	for (NostrumFluids fluid : NostrumFluids.values()) {
-//    		FluidRegistry.registerFluid(fluid.getFluid());
-//    	}
-//    	
-//    	NostrumFluids.POISON_WATER.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
-//			@Override
-//			public boolean isReplaceable() {
-//				return true;
-//			}
-//			
-//			@Override
-//			public boolean blocksMovement() {
-//				return true; // so our liquids are not replaced by water
-//			}
-//		}, false));
-//    	NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid().setBlock(new FluidPoisonWaterBlock((FluidPoisonWater) NostrumFluids.POISON_WATER_UNBREAKABLE.getFluid(), new MaterialLiquid(MapColor.GREEN_STAINED_HARDENED_CLAY) {
-//			@Override
-//			public boolean isReplaceable() {
-//				return false;
-//			}
-//			
-//			@Override
-//			public boolean blocksMovement() {
-//				return true; // so our liquids are not replaced by water
-//			}
-//		}, true));
-//    }
     
     public void syncPlayer(ServerPlayerEntity player) {
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

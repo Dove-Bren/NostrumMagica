@@ -45,10 +45,6 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(RuneBagGui.BagContainer::FromNetwork).setRegistryName(RuneBagGui.BagContainer.ID));
 		registry.register(IForgeContainerType.create(SpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(SpellCreationGui.SpellCreationContainer.ID));
 		registry.register(IForgeContainerType.create(PetGUI.PetContainer::FromNetwork).setRegistryName(PetGUI.PetContainer.ID));
-		
-		if (NostrumMagica.instance.aetheria.isEnabled()) {
-			
-		}
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

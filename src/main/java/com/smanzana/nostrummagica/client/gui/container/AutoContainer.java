@@ -21,7 +21,9 @@ public abstract class AutoContainer extends Container {
 	public AutoContainer(ContainerType<? extends AutoContainer> type, int windowId, @Nullable IAutoContainerInventory inventory) {
 		super(type, windowId);
 		this.inventory = inventory;
-		this.trackIntArray(inventory);
+		if (inventory != null) {
+			this.trackIntArray(inventory);
+		}
 	}
 	
 	@Override
