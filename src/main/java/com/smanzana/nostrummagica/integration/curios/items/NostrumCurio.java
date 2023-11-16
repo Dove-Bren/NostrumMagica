@@ -221,6 +221,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		return HashMultimap.create();
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public boolean hasRender(ItemStack stack, LivingEntity living) {
 		return false;

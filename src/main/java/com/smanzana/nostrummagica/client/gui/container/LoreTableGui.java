@@ -125,7 +125,6 @@ public class LoreTableGui {
 			
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final LoreTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
 			return new LoreTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf));
 		}

@@ -88,7 +88,6 @@ public class RuneBagGui {
 			}
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final BagContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			final int slot = buffer.readVarInt();
 			ItemStack stack = playerInv.getStackInSlot(slot);

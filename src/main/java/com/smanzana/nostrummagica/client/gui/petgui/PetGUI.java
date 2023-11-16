@@ -123,7 +123,6 @@ public class PetGUI {
 			}
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final PetContainer<?> FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			// Just gonna let this crash if it fails instead of making a 'dummy pet'
 			final UUID petID = buffer.readUniqueId();

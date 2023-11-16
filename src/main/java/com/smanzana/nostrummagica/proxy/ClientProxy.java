@@ -36,8 +36,20 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierS
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
+import com.smanzana.nostrummagica.client.gui.ObeliskScreen;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
+import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
+import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
+import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
+import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
+import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
+import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
+import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
+import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIContainer;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
@@ -153,6 +165,8 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
@@ -173,6 +187,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -289,6 +304,7 @@ public class ClientProxy extends CommonProxy {
 		CommandDebugEffect.register(dispatcher);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public void clientSetup(FMLClientSetupEvent event) {
 		OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
@@ -300,7 +316,29 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(NostrumPortalTileEntityBase.class, new TileEntityPortalRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class, new TileEntityProgressionDoorRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ManaArmorerTileEntity.class, new TileEntityManaArmorerRenderer());
+		
+		ScreenManager.registerFactory(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
+		ScreenManager.registerFactory(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
+		ScreenManager.registerFactory(NostrumContainers.ModificationTable, ModificationTableGui.ModificationGui::new);
+		ScreenManager.registerFactory(NostrumContainers.Putter, PutterBlockGui.PutterBlockGuiContainer::new);
+		ScreenManager.registerFactory(NostrumContainers.ReagentBag, ReagentBagGui.BagGui::new);
+		ScreenManager.registerFactory(NostrumContainers.RuneBag, RuneBagGui.BagGui::new);
+		ScreenManager.registerFactory(NostrumContainers.SpellCreation, SpellCreationGui.SpellGui::new);
+		
+		ScreenManager.registerFactory(NostrumContainers.PetGui, new PetGUIFactory());
 	}
+	
+	// To get around bounds matching. D:
+	protected static class PetGUIFactory<T extends IEntityPet> implements ScreenManager.IScreenFactory<PetGUI.PetContainer<T>, PetGUI.PetGUIContainer<T>> {
+
+			@Override
+			public PetGUIContainer<T> create(PetContainer<T> c, PlayerInventory p,
+					ITextComponent n) {
+				return new PetGUI.PetGUIContainer<T>(c, p, n);
+			}
+	}
+	
+
 	
 	@SubscribeEvent
 	public void registerAllModels(ModelRegistryEvent event) {
@@ -988,6 +1026,22 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openSpellScreen(Spell spell) {
 		Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
+	}
+	
+	@Override
+	public void openMirrorScreen() {
+		final PlayerEntity player = getPlayer();
+		if (player.world.isRemote()) {
+			Minecraft.getInstance().displayGuiScreen((Screen) new MirrorGui(player));
+		}
+	}
+	
+	@Override
+	public void openObeliskScreen(World world, BlockPos pos) {
+		if (world.isRemote()) {
+			NostrumObeliskEntity te = (NostrumObeliskEntity) world.getTileEntity(pos);
+			Minecraft.getInstance().displayGuiScreen(new ObeliskScreen(te));
+		}
 	}
 	
 	@Override

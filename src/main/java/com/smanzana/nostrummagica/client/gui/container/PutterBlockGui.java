@@ -64,7 +64,6 @@ public class PutterBlockGui {
 			this.putter = putter;
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final PutterBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new PutterBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

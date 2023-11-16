@@ -202,7 +202,7 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 		@Override
 		public BaubleColorRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
 			// I think I can just piggy back off of shapeless recipe serializer
-			ResourceLocation fakeRecipeId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + "#FAKE");
+			ResourceLocation fakeRecipeId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + ".fake");
 			ShapelessRecipe base = IRecipeSerializer.CRAFTING_SHAPELESS.read(fakeRecipeId, buffer);
 			
 			return new BaubleColorRecipe(recipeId, base.getGroup(), base.getRecipeOutput(), base.getIngredients());

@@ -195,7 +195,6 @@ public class ModificationTableGui {
 			validate();
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final ModificationTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
 			return new ModificationTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf), buf.readBlockPos());
 		}

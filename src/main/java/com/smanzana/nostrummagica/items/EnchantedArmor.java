@@ -96,15 +96,16 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
 	
 	public static enum Type {
@@ -484,7 +485,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 
 	// TODO: move?
 	@OnlyIn(Dist.CLIENT)
-	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels = null;
+	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels;
 	
 	public EnchantedArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
 		super(ArmorMaterial.IRON, slot, builder.maxDamage(calcArmorDurability(slot, element, type)));
@@ -506,8 +507,6 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				}
 			}
 		}
-		
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 //	@Override
@@ -1689,6 +1688,24 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return false;
 	}
 	
+	protected static boolean HasElytra(LivingEntity entity) {
+		EnchantedArmor piece = getChestPiece(entity);
+		if (piece == null) {
+			return false;
+		}
+		
+		return piece.hasElytra(entity);
+	}
+	
+	protected static @Nullable EnchantedArmor getChestPiece(LivingEntity entity) {
+		ItemStack chestpiece = entity.getItemStackFromSlot(EquipmentSlotType.CHEST);
+		if (chestpiece.isEmpty() || !(chestpiece.getItem() instanceof EnchantedArmor)) {
+			return null;
+		}
+		
+		return (EnchantedArmor) chestpiece.getItem();
+	}
+	
 	private static final int EARTH_SCAN_RANGE_XZ = 21;
 	private static final int EARTH_SCAN_RANGE_Y = 3;
 	private static final List<BlockPos> EARTH_SCAN_POS = new ArrayList<>(EARTH_SCAN_RANGE_XZ * EARTH_SCAN_RANGE_XZ * EARTH_SCAN_RANGE_Y);
@@ -1722,6 +1739,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return false;
 	}
 	
+	protected static boolean HasManaJump(LivingEntity entity) {
+		EnchantedArmor piece = getChestPiece(entity);
+		return piece == null ? false : piece.hasManaJump(entity);
+	}
+	
 	protected boolean hasWindTornado(LivingEntity entity) {
 		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.WIND) {
 			// Check if full set is available and if we have enough mana
@@ -1734,6 +1756,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return false;
 	}
 	
+	protected static boolean HasWindTornado(LivingEntity entity) {
+		EnchantedArmor piece = getChestPiece(entity);
+		return piece == null ? false : piece.hasWindTornado(entity);
+	}
+	
 	protected boolean hasEnderDash(LivingEntity entity) {
 		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.ENDER) {
 			// Check if full set is available and if we have enough mana
@@ -1744,6 +1771,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			return (4 == getSetPieces(entity)); 
 		}
 		return false;
+	}
+	
+	protected static boolean HasEnderDash(LivingEntity entity) {
+		EnchantedArmor piece = getChestPiece(entity);
+		return piece == null ? false : piece.hasEnderDash(entity);
 	}
 	
 	protected boolean hasDragonFlight(LivingEntity entity) {
@@ -1766,7 +1798,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return false;
 	}
 	
-	protected void consumeManaJump(LivingEntity entity) {
+	protected static boolean HasDragonFlight(LivingEntity entity) {
+		EnchantedArmor piece = getChestPiece(entity);
+		return piece == null ? false : piece.hasDragonFlight(entity);
+	}
+	
+	protected static void consumeManaJump(LivingEntity entity) {
 		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
@@ -1777,7 +1814,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 	}
 	
-	protected void consumeWindTornado(LivingEntity entity) {
+	protected static void consumeWindTornado(LivingEntity entity) {
 		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
@@ -1788,7 +1825,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 	}
 	
-	protected void consumeWindJumpWhirlwind(LivingEntity entity) {
+	protected static void consumeWindJumpWhirlwind(LivingEntity entity) {
 		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
@@ -1799,7 +1836,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 	}
 	
-	protected void consumeEnderDash(LivingEntity entity) {
+	protected static void consumeEnderDash(LivingEntity entity) {
 		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
@@ -1810,7 +1847,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 	}
 	
-	protected void consumeDragonFlight(LivingEntity entity) {
+	protected static void consumeDragonFlight(LivingEntity entity) {
 		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
 			return;
 		}
@@ -1821,14 +1858,14 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 	}
 	
-	private boolean jumpPressedEarly = false; // For telling whether jump remains pressed or released and pressed again
-	private boolean lastTickGround = false; // For checking if the player just jumped this tick
-	private boolean backPressedEarly = false;
-	private long lastBackMSecs = -1;
-	private boolean leftPressedEarly = false;
-	private long lastLeftMSecs = -1;
-	private boolean rightPressedEarly = false;
-	private long lastRightMSecs = -1;
+	private static boolean jumpPressedEarly = false; // For telling whether jump remains pressed or released and pressed again
+	private static boolean lastTickGround = false; // For checking if the player just jumped this tick
+	private static boolean backPressedEarly = false;
+	private static long lastBackMSecs = -1;
+	private static boolean leftPressedEarly = false;
+	private static long lastLeftMSecs = -1;
+	private static boolean rightPressedEarly = false;
+	private static long lastRightMSecs = -1;
 	
 	private static KeyBinding bindingEnderLeft;
 	private static KeyBinding bindingEnderRight;
@@ -1855,18 +1892,18 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		
 	}
 	
-	protected void clientDashSide(LivingEntity ent, boolean right) {
-		this.consumeEnderDash(ent);
+	protected static  void clientDashSide(LivingEntity ent, boolean right) {
+		consumeEnderDash(ent);
 		NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_SIDE, right, 0));
 	}
 	
-	protected void clientDashBack(LivingEntity ent) {
-		this.consumeEnderDash(ent);
+	protected static void clientDashBack(LivingEntity ent) {
+		consumeEnderDash(ent);
 		NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.ENDER_DASH_BACK, false, 0));
 	}
 	
 	@SubscribeEvent
-	public void onKey(KeyInputEvent event) {
+	public static void onKey(KeyInputEvent event) {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		if (bindingEnderLeft.isPressed()) {
 			clientDashSide(player, false);
@@ -1886,7 +1923,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
-	public void onClientTick(TickEvent.ClientTickEvent event) {
+	public static void onClientTick(TickEvent.ClientTickEvent event) {
 		Minecraft mc = Minecraft.getInstance();
 		final ClientPlayerEntity player = mc.player;
 		if (player == null) {
@@ -1952,7 +1989,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		// Start flying
 		if (!flying && hasJump && !player.onGround && player.getMotion().y < 0 && !player.abilities.isFlying) {
 			// Does this armor support flying?
-			if (this.hasElytra(player)) {
+			if (HasElytra(player)) {
 				SetArmorFlying(player, true);
 				SendUpdates(player, null);
 				hasJump = false; // Consumed
@@ -1963,8 +2000,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		final double MANA_JUMP_AMT = flying ? .6 : .4;
 		if (hasJump && flying && !player.onGround && !lastTickGround && !player.abilities.isFlying && player.getMotion().y < MANA_JUMP_AMT) {
 			// Does this armor have mana jump?
-			if (this.hasManaJump(player)) {
-				this.consumeManaJump(player);
+			if (HasManaJump(player)) {
+				consumeManaJump(player);
 				player.setMotion(player.getMotion().add(0, MANA_JUMP_AMT, 0));
 				hasJump = false; // Consumed
 				NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
@@ -1974,7 +2011,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		// Dragon flying
 		if (flying && !player.onGround && !player.abilities.isFlying && player.movementInput.forwardKeyDown) {
 			// Does this armor have dragon flying?
-			if (this.hasDragonFlight(player)) {
+			if (HasDragonFlight(player)) {
 				// Check if magnitude of flying is low and if so, boost it with magic
 				final double curMagnitudeSq = (player.getMotion().x * player.getMotion().x + player.getMotion().y * player.getMotion().y + player.getMotion().z * player.getMotion().z);
 				if (curMagnitudeSq < .4) {
@@ -1995,7 +2032,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 					final float vertScale = (dx == 0 && dy == 0 && dz == 0 ? 0f : (float) (dy / (dx + dy + dz)));
 					final boolean deduct = vertScale == 0f ? false : (random.nextFloat() < vertScale * 3);
 					if (deduct) {
-						this.consumeDragonFlight(player);
+						consumeDragonFlight(player);
 						NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.DRAGON_FLIGHT_TICK, deduct, 0));
 					}
 				}
@@ -2006,27 +2043,27 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		if (!flying && !player.abilities.isFlying) {
 			// just for testing
 			if (doubleBack) {
-				if (this.hasWindTornado(player)) {
-					this.consumeWindTornado(player);
+				if (HasWindTornado(player)) {
+					consumeWindTornado(player);
 					NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_TORNADO, true, 0));
 					return;
 				}
 				
-				if (ModConfig.config.doubleEnderDash() && this.hasEnderDash(player)) {
+				if (ModConfig.config.doubleEnderDash() && HasEnderDash(player)) {
 					clientDashBack(player);
 					return;
 				}
 			}
 			
 			if (doubleLeft) {
-				if (ModConfig.config.doubleEnderDash() && this.hasEnderDash(player)) {
+				if (ModConfig.config.doubleEnderDash() && HasEnderDash(player)) {
 					clientDashSide(player, false);
 					return;
 				}
 			}
 			
 			if (doubleRight) {
-				if (ModConfig.config.doubleEnderDash() && this.hasEnderDash(player)) {
+				if (ModConfig.config.doubleEnderDash() && HasEnderDash(player)) {
 					clientDashSide(player, true);
 					return;
 				}
@@ -2037,7 +2074,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	@SubscribeEvent
-	public void onTrack(PlayerEvent.StartTracking event) {
+	public static void onTrack(PlayerEvent.StartTracking event) {
 		// Server-side. A player has started tr acking an entity. Send the 'start' state of their armor, if any
 		// TODO if there was more than flying, we'd want to iterate every possible type and send updates for each
 		// (which would clear an entity's old state if something was active when they left and they just came back)
@@ -2334,7 +2371,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		case JUMP:
 			// Deduct mana
 			if (!ent.world.isRemote) {
-				armor.consumeManaJump(ent);
+				EnchantedArmor.consumeManaJump(ent);
 			}
 			break;
 		case ENDER_DASH_BACK:
@@ -2343,7 +2380,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
 				Vec3d dir = fakeLook.scale(-1);
 				if (DoEnderDash(ent, dir)) {
-					armor.consumeEnderDash(ent);
+					EnchantedArmor.consumeEnderDash(ent);
 				} else {
 					if (ent instanceof PlayerEntity) {
 						NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
@@ -2357,13 +2394,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
 				final Vec3d dir = fakeLook.rotateYaw((float) ((Math.PI / 2) * (data ? -1 : 1)));
 				if (DoEnderDash(ent, dir)) {
-					armor.consumeEnderDash(ent);
+					consumeEnderDash(ent);
 				}
 			}
 			break;
 		case WIND_TORNADO:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
-				armor.consumeWindTornado(ent);
+				consumeWindTornado(ent);
 				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, ent.world, ent.posX, ent.posY, ent.posZ);
 				cloud.setOwner(ent);
 				
@@ -2465,7 +2502,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			// Deduct mana
 			if (data) {
 				if (!ent.world.isRemote) {
-					armor.consumeDragonFlight(ent);
+					EnchantedArmor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
 						if (ent instanceof PlayerEntity) {
@@ -2481,7 +2518,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		case WIND_JUMP_WHIRLWIND:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				PlayerEntity playerIn = (PlayerEntity) ent;
-				armor.consumeWindJumpWhirlwind(ent);
+				EnchantedArmor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
 				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
 				if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
@@ -2494,20 +2531,15 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	@SubscribeEvent
-	public void onJump(LivingJumpEvent event) {
+	public static void onJump(LivingJumpEvent event) {
 		// Full true/corrupt sets give jump boost
 		if (event.isCanceled()) {
 			return;
 		}
 
 		LivingEntity ent = event.getEntityLiving();
-		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
-		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
-			return;
-		}
-		
-		EnchantedArmor armor = (EnchantedArmor) chestplate.getItem();
-		if (armor.getType() == Type.TRUE && armor == this && armor.getSetPieces(ent) == 4) {
+		EnchantedArmor armor = getChestPiece(ent);
+		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			Vec3d motion = ent.getMotion();
 			ent.setMotion(motion.x, motion.y + armor.jumpBoost, motion.z);
@@ -2515,20 +2547,16 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	@SubscribeEvent
-	public void onJump(LivingFallEvent event) {
+	public static void onJump(LivingFallEvent event) {
 		// Full true/corrupt sets give jump boost
 		if (event.isCanceled()) {
 			return;
 		}
 
 		LivingEntity ent = event.getEntityLiving();
-		@Nonnull ItemStack chestplate = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
-		if (chestplate.isEmpty() || !(chestplate.getItem() instanceof EnchantedArmor)) {
-			return;
-		}
 		
-		EnchantedArmor armor = (EnchantedArmor) chestplate.getItem();
-		if (armor.getType() == Type.TRUE && armor == this && armor.getSetPieces(ent) == 4) {
+		EnchantedArmor armor = getChestPiece(ent);
+		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			final float amt = (float) (armor.jumpBoost / .1f);
 			event.setDistance(Math.max(0f, event.getDistance() - amt));

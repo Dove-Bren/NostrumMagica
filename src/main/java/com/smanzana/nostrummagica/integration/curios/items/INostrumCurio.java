@@ -36,6 +36,7 @@ public interface INostrumCurio {
 	
 	public Multimap<String, AttributeModifier> getEquippedAttributeModifiers(ItemStack stack);
 
+	@OnlyIn(Dist.CLIENT)
 	public boolean hasRender(ItemStack stack, LivingEntity living);
 
 	@OnlyIn(Dist.CLIENT)

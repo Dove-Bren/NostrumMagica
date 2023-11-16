@@ -216,7 +216,6 @@ public class SpellCreationGui {
 			
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static final SpellCreationContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			return new SpellCreationContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}

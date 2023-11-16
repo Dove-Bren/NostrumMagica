@@ -349,6 +349,14 @@ public class CommonProxy {
 	public void openSpellScreen(Spell spell) {
 		; // Nothing on server side
 	}
+	
+	public void openMirrorScreen() {
+		; // Nothing on server side
+	}
+	
+	public void openObeliskScreen(World world, BlockPos pos) {
+		; // Nothing on server side
+	}
 
 	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
 		NetworkHandler.sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);

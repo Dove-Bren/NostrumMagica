@@ -11,24 +11,25 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRenderItem, IColorableCurio {
 	
 	public static final String ID = "dragon_wing_pendant";
 
 	public DragonWingPendantItem() {
 		super(NostrumCurios.PropCurio(), ID);
-		
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@SubscribeEvent
-	public void onJump(LivingJumpEvent event) {
+	public static void onJump(LivingJumpEvent event) {
 		// Dragonwing Pendant gives boost
 		if (event.isCanceled()) {
 			return;
@@ -55,7 +56,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 	}
 	
 	@SubscribeEvent
-	public void onFall(LivingFallEvent event) {
+	public static void onFall(LivingFallEvent event) {
 		// Dragonwing Pendant gives jump boost and reduces fall damage
 		if (event.isCanceled()) {
 			return;
@@ -81,6 +82,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		}
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
 		return true;

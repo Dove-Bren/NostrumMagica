@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.ObeliskScreen;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.Corner;
@@ -19,7 +18,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
@@ -40,7 +38,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.fml.DistExecutor;
 
 /**
  * Obelisk block. If tile, has tile entity (and is master or slave).
@@ -262,11 +259,7 @@ public class NostrumObelisk extends ContainerBlock {
 		if (!worldIn.isRemote()) {
 			worldIn.notifyBlockUpdate(pos, state, state, 2);
 		} else {
-			DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> {
-				NostrumObeliskEntity te = (NostrumObeliskEntity) worldIn.getTileEntity(pos);
-				Minecraft.getInstance().displayGuiScreen(new ObeliskScreen(te));
-				return 0;
-			});
+			NostrumMagica.instance.proxy.openObeliskScreen(worldIn, pos);
 		}
 		return true;
 	}

@@ -60,7 +60,6 @@ public class ActiveHopperGui {
 			this.hopper = hopper;
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public static ActiveHopperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
 			return new ActiveHopperContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buf));
 		}
