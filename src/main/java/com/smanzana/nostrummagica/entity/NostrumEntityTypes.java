@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.entity;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
@@ -23,14 +22,13 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.monster.ZombiePigmanEntity;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -103,7 +101,7 @@ public class NostrumEntityTypes {
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityGolemEnder.ID));
 		
-		EntityType<EntityKoid> koidType = EntityType.Builder.<EntityKoid>create(EntityKoid::new, EntityClassification.MISC)
+		EntityType<EntityKoid> koidType = EntityType.Builder.<EntityKoid>create(EntityKoid::new, EntityClassification.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(0.8F, 1F)
 			.build("");
@@ -112,8 +110,9 @@ public class NostrumEntityTypes {
 		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
 		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
 		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY));
-		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		addSpawn(koidType, EntityClassification.MONSTER, 12, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
 		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY));
+		EntitySpawnPlacementRegistry.register(koidType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		
 		registry.register(EntityType.Builder.<EntityDragonRed>create(EntityDragonRed::new, EntityClassification.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -126,7 +125,7 @@ public class NostrumEntityTypes {
 				.immuneToFire()
 			.build("").setRegistryName(EntityDragonRed.DragonBodyPart.ID));
 		
-		EntityType<EntityTameDragonRed> tameDragonType = EntityType.Builder.<EntityTameDragonRed>create(EntityTameDragonRed::new, EntityClassification.MISC)
+		EntityType<EntityTameDragonRed> tameDragonType = EntityType.Builder.<EntityTameDragonRed>create(EntityTameDragonRed::new, EntityClassification.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(6F * .4F, 4.6F * .6F)
 				.immuneToFire()
@@ -134,7 +133,7 @@ public class NostrumEntityTypes {
 		tameDragonType.setRegistryName(EntityTameDragonRed.ID);
 		registry.register(tameDragonType);
 		addSpawn(tameDragonType, EntityClassification.MONSTER, 2, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		EntitySpawnPlacementRegistry.register(tameDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::func_223324_d);
+		EntitySpawnPlacementRegistry.register(tameDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ZombiePigmanEntity::func_223324_d);
 		
 		EntityType<EntityShadowDragonRed> shadowRedDragonType = EntityType.Builder.<EntityShadowDragonRed>create(EntityShadowDragonRed::new, EntityClassification.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -143,8 +142,8 @@ public class NostrumEntityTypes {
 			.build("");
 		shadowRedDragonType.setRegistryName(EntityShadowDragonRed.ID);
 		registry.register(shadowRedDragonType);
-		addSpawn(shadowRedDragonType, EntityClassification.MONSTER, 5, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		EntitySpawnPlacementRegistry.register(shadowRedDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::func_223324_d);
+		addSpawn(shadowRedDragonType, EntityClassification.MONSTER, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		EntitySpawnPlacementRegistry.register(shadowRedDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ZombiePigmanEntity::func_223324_d);
 		
 		registry.register(EntityType.Builder.<EntityDragonEgg>create(EntityDragonEgg::new, EntityClassification.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -167,16 +166,15 @@ public class NostrumEntityTypes {
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(EntityPlantBossBramble.ID));
 		
-		EntityType<EntitySprite> spriteType = EntityType.Builder.<EntitySprite>create(EntitySprite::new, EntityClassification.MISC)
+		EntityType<EntitySprite> spriteType = EntityType.Builder.<EntitySprite>create(EntitySprite::new, EntityClassification.MONSTER)
 				.size(1F, 1.75F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("");
 		spriteType.setRegistryName(EntitySprite.ID);
 		registry.register(spriteType);
-		addSpawn(spriteType, EntityClassification.MONSTER, 15, 1, 3, ForgeRegistries.BIOMES.getValues().stream().filter( (biome) -> {
-		return !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
-				&& BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER);
-			}).collect(Collectors.toList()));
+		addSpawn(spriteType, EntityClassification.MONSTER, 3, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		addSpawn(spriteType, EntityClassification.MONSTER, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
+		EntitySpawnPlacementRegistry.register(spriteType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		
 		EntityType<EntityLux> luxType = EntityType.Builder.<EntityLux>create(EntityLux::new, EntityClassification.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -198,7 +196,8 @@ public class NostrumEntityTypes {
 		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
 		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY));
 		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY));
-		addSpawn(wispType, EntityClassification.MONSTER, 2, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		addSpawn(wispType, EntityClassification.MONSTER, 5, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		EntitySpawnPlacementRegistry.register(wispType, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWisp::canSpawnExtraCheck);
 		
 		EntityType<EntityWillo> willoType = EntityType.Builder.<EntityWillo>create(EntityWillo::new, EntityClassification.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)

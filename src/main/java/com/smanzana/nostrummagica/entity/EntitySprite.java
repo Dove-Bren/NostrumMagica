@@ -52,6 +52,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -122,7 +123,7 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
         super.registerAttributes();
         this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(40.0D);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+		this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
         this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0D);
     }
 
@@ -438,6 +439,11 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	
 	@Override
 	public float getBlockPathWeight(BlockPos pos, IWorldReader worldIn) {
+		if (worldIn.getDimension().getType() == DimensionType.THE_NETHER) {
+			NostrumMagica.logger.warn("Checking " + pos);
+			return 0; // Nether is very bright
+		}
+		
 		// most monsters do 0.5 - worldIn.getBrightness(pos);
 		final float tolerance;
 		if (worldIn.getBlockState(pos).getMaterial() == Material.ORGANIC) { // ORGANIC is what grass blocks use

@@ -67,6 +67,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.NetherBiome;
@@ -571,6 +572,15 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 			});
 			
 			return wisps.size() < 20;
+		}
+	}
+	
+	public static boolean canSpawnExtraCheck(EntityType<EntityWisp> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
+		if (world.getDimension().getType() == DimensionType.THE_NETHER) {
+			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(30) == 0;// && canSpawnOn(type, world, reason, pos, rand);
+		} else {
+			return true;
 		}
 	}
 	

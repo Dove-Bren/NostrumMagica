@@ -17,7 +17,7 @@ import net.minecraft.world.server.ServerWorld;
 public class Entities {
 
 	public static @Nullable Entity FindEntity(World world, UUID id) {
-		if (world instanceof ClientWorld) {
+		if (world.isRemote() && world instanceof ClientWorld) {
 			Iterable<Entity> entities = ((ClientWorld)world).getAllEntities();
 			for (Entity ent : entities) {
 				if (ent.getUniqueID().equals(id)) {

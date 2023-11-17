@@ -2036,8 +2036,8 @@ public class NostrumMagica {
 				.lore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE))).reference("ritual::rune.physical", "ritual.rune.physical.name")
 				.reference("ritual::rune.single", "ritual.rune.single.name")
 				.reference("ritual::rune.inflict", "ritual.rune.inflict.name")
-				.reference("ritual::rune.trigger_touch", "ritual.rune.trigger_touch.name")
-				.reference("ritual::rune.trigger_self", "ritual.rune.trigger_self.name").build("spellrunes",
+				.reference("ritual::rune.touch", "ritual.rune.touch.name")
+				.reference("ritual::rune.self", "ritual.rune.self.name").build("spellrunes",
 						NostrumResearchTab.MYSTICISM, Size.GIANT, 0, 0, true,
 						SpellRune.getRune(SingleShape.instance()));
 

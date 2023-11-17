@@ -27,7 +27,8 @@ public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntit
 
 		ItemStack item = itemCache.get(te.getReagentType());
 		
-		float rot = 2.0f * (System.currentTimeMillis() / 50 + partialTicks);
+		float rot = 360f * (float) ((double)(te.getWorld().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
+		//float rot = 2.0f * (System.currentTimeMillis() / 50 + partialTicks);
 		float scale = .75f;
 		
 		GlStateManager.pushMatrix();

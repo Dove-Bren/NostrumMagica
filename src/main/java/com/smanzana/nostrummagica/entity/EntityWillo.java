@@ -1027,7 +1027,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	public static boolean canSpawnExtraCheck(EntityType<EntityWillo> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
 		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
 		if (world.getDimension().getType() == DimensionType.THE_NETHER) {
-			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(10) == 0 && canSpawnOn(type, world, reason, pos, rand);
+			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(35) == 0 && canSpawnOn(type, world, reason, pos, rand);
 		} else {
 			return true;
 		}
