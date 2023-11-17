@@ -424,6 +424,11 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 		return spell;
 	}
 	
+	@Override
+	public int getMaxSpawnedInChunk() {
+		return 1;
+	}
+	
 	// Adapted from the wisp move helper
 	static protected class WispMoveHelper extends MovementController {
 		private final EntityWisp parentEntity;

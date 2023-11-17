@@ -121,10 +121,10 @@ public class ClientEffectRenderMessage {
 			targetPos = null;
 		}
 		
-		component = SpellComponentWrapper.fromKeyString(buf.readString());
+		component = SpellComponentWrapper.fromKeyString(buf.readString(32767));
 		
 		if (buf.readBoolean()) {
-			flavor = SpellComponentWrapper.fromKeyString(buf.readString());
+			flavor = SpellComponentWrapper.fromKeyString(buf.readString(32767));
 		} else {
 			flavor = null;
 		}

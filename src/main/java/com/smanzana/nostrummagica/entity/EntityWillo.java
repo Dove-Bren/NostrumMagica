@@ -78,6 +78,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -1021,5 +1022,14 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
 		dataManager.set(ELEMENT, elem);
 		return super.onInitialSpawn(world, difficulty, reason, livingdata, dataTag);
+	}
+	
+	public static boolean canSpawnExtraCheck(EntityType<EntityWillo> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
+		if (world.getDimension().getType() == DimensionType.THE_NETHER) {
+			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(10) == 0 && canSpawnOn(type, world, reason, pos, rand);
+		} else {
+			return true;
+		}
 	}
 }

@@ -75,7 +75,7 @@ public class SpellCraftMessage {
 	}
 
 	public static SpellCraftMessage decode(PacketBuffer buf) {
-		return new SpellCraftMessage(buf.readString(), buf.readBlockPos(), buf.readVarInt());
+		return new SpellCraftMessage(buf.readString(32767), buf.readBlockPos(), buf.readVarInt());
 	}
 
 	public static void encode(SpellCraftMessage msg, PacketBuffer buf) {

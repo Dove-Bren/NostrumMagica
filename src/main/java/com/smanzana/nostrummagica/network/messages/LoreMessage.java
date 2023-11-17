@@ -65,7 +65,7 @@ public class LoreMessage {
 		INostrumMagic stats = CAPABILITY.getDefaultInstance();
 		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readCompoundTag());
 		
-		final String loreID = buf.readString();
+		final String loreID = buf.readString(32767);
 		ILoreTagged lore = LoreRegistry.instance().lookup(loreID);
 		if (lore == null) {
 			throw new DecoderException("Failed to find lore based on " + loreID);

@@ -54,7 +54,7 @@ public class ClientUpdateQuestMessage {
 	}
 
 	public static ClientUpdateQuestMessage decode(PacketBuffer buf) {
-		final String id = buf.readString();
+		final String id = buf.readString(32767);
 		NostrumQuest quest = NostrumQuest.lookup(id);
 		if (quest == null) {
 			throw new DecoderException("Could not find Nostrum quest matching " + id);
