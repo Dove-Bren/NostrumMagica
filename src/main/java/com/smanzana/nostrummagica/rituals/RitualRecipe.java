@@ -31,8 +31,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class RitualRecipe implements InfoScreenIndexed {
+public class RitualRecipe extends ForgeRegistryEntry<RitualRecipe> implements InfoScreenIndexed {
 	
 	public static final class RitualMatchInfo {
 		public boolean matched;
@@ -81,13 +82,14 @@ public class RitualRecipe implements InfoScreenIndexed {
 	
 	private @Nonnull ItemStack icon;
 	
-	public static RitualRecipe createTier1(String titleKey,
+	public static RitualRecipe createTier1(String registryName,
+			String titleKey,
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType reagent,
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
-		RitualRecipe recipe = new RitualRecipe(titleKey, element, 0);
+		RitualRecipe recipe = new RitualRecipe(registryName, titleKey, element, 0);
 		
 		recipe.types[0] = reagent;
 		recipe.hook = outcome;
@@ -99,7 +101,17 @@ public class RitualRecipe implements InfoScreenIndexed {
 		return recipe;
 	}
 	
-	public static RitualRecipe createTier2(String titleKey,
+	public static RitualRecipe createTier1(String titleKey,
+			@Nonnull ItemStack icon,
+			EMagicElement element,
+			ReagentType reagent,
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
+		return createTier1(titleKey, titleKey, icon, element, reagent, requirement, outcome);
+	}
+	
+	public static RitualRecipe createTier2(String registryName,
+			String titleKey,
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
@@ -110,7 +122,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 			throw new RuntimeException("Center item of tier 2 ritual cannot be empty!");
 		}
 		
-		RitualRecipe recipe = new RitualRecipe(titleKey, element, 1);
+		RitualRecipe recipe = new RitualRecipe(registryName, titleKey, element, 1);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
 			recipe.types[i] = reagents[i];
@@ -131,6 +143,17 @@ public class RitualRecipe implements InfoScreenIndexed {
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
+			@Nonnull Ingredient center, 
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
+		return createTier2(titleKey, titleKey, icon, element, reagents, center, requirement, outcome);
+	}
+
+	@Deprecated
+	public static RitualRecipe createTier2(String titleKey,
+			@Nonnull ItemStack icon,
+			EMagicElement element,
+			ReagentType[] reagents,
 			@Nonnull ItemStack center, 
 			IRitualRequirement requirement,
 			IRitualOutcome outcome) {
@@ -144,7 +167,8 @@ public class RitualRecipe implements InfoScreenIndexed {
 				);
 	}
 	
-	public static RitualRecipe createTier3(String titleKey,
+	public static RitualRecipe createTier3(String registryName,
+			String titleKey,
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
@@ -156,7 +180,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 			throw new RuntimeException("Center item of tier 3 ritual cannot be empty!");
 		}
 		
-		RitualRecipe recipe = new RitualRecipe(titleKey, element, 2);
+		RitualRecipe recipe = new RitualRecipe(registryName, titleKey, element, 2);
 		
 		for (int i = 0; i < 4 && i < reagents.length; i++) {
 			recipe.types[i] = reagents[i];
@@ -183,6 +207,18 @@ public class RitualRecipe implements InfoScreenIndexed {
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType[] reagents,
+			@Nonnull Ingredient center,
+			@Nonnull Ingredient extras[],
+			IRitualRequirement requirement,
+			IRitualOutcome outcome) {
+		return createTier3(titleKey, titleKey, icon, element, reagents, center, extras, requirement, outcome);
+	}
+	
+	@Deprecated
+	public static RitualRecipe createTier3(String titleKey,
+			@Nonnull ItemStack icon,
+			EMagicElement element,
+			ReagentType[] reagents,
 			@Nonnull ItemStack center,
 			@Nonnull ItemStack extras[],
 			IRitualRequirement requirement,
@@ -205,7 +241,7 @@ public class RitualRecipe implements InfoScreenIndexed {
 				);
 	}
 	
-	private RitualRecipe(String nameKey, EMagicElement element, int tier) {
+	private RitualRecipe(String registryName, String nameKey, EMagicElement element, int tier) {
 		this.tier = tier;
 		this.element = element;
 		this.titleKey = nameKey;
@@ -219,6 +255,8 @@ public class RitualRecipe implements InfoScreenIndexed {
 		if (tier == 2) {
 			this.extraItems = NonNullList.withSize(4, Ingredient.EMPTY);
 		}
+		
+		this.setRegistryName(registryName);
 	}
 	
 	protected static RitualMatchInfo Capture(World world, BlockPos center, RitualRecipe recipe) {
