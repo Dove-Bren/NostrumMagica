@@ -88,7 +88,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	private static final String NBT_PARAM_FLIP = "param_flip"; // shapes/triggers
 	
 	protected SpellRune() {
-		super(NostrumItems.PropUnstackable());
+		super(NostrumItems.PropBase());
 	}
 	
 	public abstract SpellComponentWrapper getComponent();

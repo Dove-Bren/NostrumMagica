@@ -342,8 +342,8 @@ public class SpellCreationGui {
 								while (!inventory.getStackInSlot(index).isEmpty())
 									index++;
 								
-								inventory.setInventorySlotContents(index, cur.copy());
-								cur = ItemStack.EMPTY;
+								inventory.setInventorySlotContents(index, cur.split(1));
+								//cur = ItemStack.EMPTY;
 								this.validate();
 							}
 						}
