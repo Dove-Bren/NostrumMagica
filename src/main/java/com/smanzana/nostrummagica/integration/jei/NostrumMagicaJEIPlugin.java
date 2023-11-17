@@ -33,9 +33,19 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.network.play.ClientPlayNetHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TagsUpdatedEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 
 @JeiPlugin
 public class NostrumMagicaJEIPlugin implements IModPlugin {
@@ -52,6 +62,32 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	public NostrumMagicaJEIPlugin() {
 		lastCreated = this;
+		
+		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	@SubscribeEvent
+	public void onTagsUpdated(TagsUpdatedEvent event) {
+		// This is so so so so so stupid. JEI responds to recipes being updated, which
+		// is done right before tags are sent down from the server. So all recipes with tags
+		// don't get updated?
+		
+		if (this != lastCreated) {
+			return;
+		}
+		
+		NostrumMagica.logger.warn("Forcing JEI reload after receiving tag update :(");
+		
+		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+			Ingredient.invalidateAll();
+			@Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			if (player != null && player.world.isRemote() && player instanceof AbstractClientPlayerEntity) {
+				ClientPlayNetHandler handler = Minecraft.getInstance().getConnection();
+				ForgeHooksClient.onRecipesUpdated(handler.getRecipeManager());
+			}
+		});
+		
+		
 	}
 	
 	@Override

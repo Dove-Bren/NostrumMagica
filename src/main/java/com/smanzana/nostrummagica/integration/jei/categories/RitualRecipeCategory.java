@@ -138,25 +138,25 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	
 	@Override
 	public void setIngredients(RitualRecipe ritual, IIngredients ingredients) {
-		List<List<ItemStack>> stackInputs = new ArrayList<>();
+		List<Ingredient> stackInputs = new ArrayList<>();
 		
 		// Add flavor gem
-		stackInputs.add(Lists.newArrayList(InfusedGemItem.getGem(ritual.getElement(), 1)));
-		ItemStack reagent2, reagent3, reagent4;
+		stackInputs.add(Ingredient.fromItems(InfusedGemItem.getGemItem(ritual.getElement())));
+		Ingredient reagent2, reagent3, reagent4;
 		ReagentType reagents[] = ritual.getTypes();
-		stackInputs.add(Lists.newArrayList(ReagentItem.CreateStack(reagents[0], 1)));
+		stackInputs.add(Ingredient.fromItems(ReagentItem.GetItem(reagents[0])));
 		if (reagents.length > 1) {
-			reagent2 = ReagentItem.CreateStack(reagents[1], 1);
-			reagent3 = ReagentItem.CreateStack(reagents[2], 1);
-			reagent4 = ReagentItem.CreateStack(reagents[3], 1);
+			reagent2 = Ingredient.fromItems(ReagentItem.GetItem(reagents[1]));
+			reagent3 = Ingredient.fromItems(ReagentItem.GetItem(reagents[2]));
+			reagent4 = Ingredient.fromItems(ReagentItem.GetItem(reagents[3]));
 		} else {
-			reagent2 = reagent3 = reagent4 = null;
+			reagent2 = reagent3 = reagent4 = Ingredient.EMPTY;
 		}
-		stackInputs.add(Lists.newArrayList(reagent2));
-		stackInputs.add(Lists.newArrayList(reagent3));
-		stackInputs.add(Lists.newArrayList(reagent4));
+		stackInputs.add(reagent2);
+		stackInputs.add(reagent3);
+		stackInputs.add(reagent4);
 		
-		stackInputs.add(Lists.newArrayList(ritual.getCenterItem().getMatchingStacks()));
+		stackInputs.add(ritual.getCenterItem());
 		NonNullList<Ingredient> extras = ritual.getExtraItems();
 		Ingredient extra1, extra2, extra3, extra4;
 		extra1 = extra2 = extra3 = extra4 = Ingredient.EMPTY;
@@ -171,10 +171,10 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 			if (len > 3)
 				extra4 = extras.get(3);
 		}
-		stackInputs.add(Lists.newArrayList(extra1.getMatchingStacks()));
-		stackInputs.add(Lists.newArrayList(extra2.getMatchingStacks()));
-		stackInputs.add(Lists.newArrayList(extra3.getMatchingStacks()));
-		stackInputs.add(Lists.newArrayList(extra4.getMatchingStacks()));
+		stackInputs.add(extra1 == null ? Ingredient.EMPTY : extra1);
+		stackInputs.add(extra2 == null ? Ingredient.EMPTY : extra2);
+		stackInputs.add(extra3 == null ? Ingredient.EMPTY : extra3);
+		stackInputs.add(extra4 == null ? Ingredient.EMPTY : extra4);
 		
 //		if (ritual.getCenterItem() != Ingredient.EMPTY && !ritual.getCenterItem().hasNoMatchingItems()) {
 //			stackInputs.add(Lists.newArrayList(ritual.getCenterItem().getMatchingStacks()));
@@ -187,7 +187,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 //			}
 //		}
 //		
-		ingredients.setInputLists(VanillaTypes.ITEM, stackInputs);
+		ingredients.setInputIngredients(stackInputs);
 		if (ritual.getOutcome() instanceof IItemRitualOutcome) {
 			ingredients.setOutput(VanillaTypes.ITEM, ((IItemRitualOutcome) ritual.getOutcome()).getResult());
 		} else {
