@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -124,7 +125,7 @@ public class RuneBagGui {
 					}
 				} else {
 					// shift-click in player inventory
-					ItemStack leftover = inventory.addItem(stack);
+					ItemStack leftover = Inventories.addItem(inventory, stack);
 					slot.putStack(leftover);
 				}
 			}

@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.ElementSpellRune;
+import com.smanzana.nostrummagica.items.SpellRune.PackedShapeSpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.TriggerSpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -599,6 +600,7 @@ public class NostrumItems {
 	    	}
 	    	for (SpellShape type : SpellShape.getAllShapes()) {
 	    		registerRune(registry, new ShapeSpellRune(type));
+	    		registerPackedRune(registry, new PackedShapeSpellRune(type));
 	    	}
 	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
 	    		registerRune(registry, new TriggerSpellRune(type));
@@ -610,6 +612,12 @@ public class NostrumItems {
 		rune.setRegistryName(rune.makeRegistryName());
 		register(registry, rune); // Register item and lore
 		SpellRune.SetRuneForType(rune.getComponent(), rune);
+	}
+	
+	private static void registerPackedRune(IForgeRegistry<Item> registry, PackedShapeSpellRune rune) {
+		rune.setRegistryName(rune.makeRegistryName());
+		register(registry, rune); // Register item and lore
+		SpellRune.SetPackedRuneForShape(rune.getShape(), rune);
 	}
 	
 	public static SpellRune GetRune(SpellComponentWrapper type) {

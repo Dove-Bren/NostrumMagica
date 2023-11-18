@@ -147,7 +147,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	
 	public static class RuneInventory extends Inventory {
 
-		private static final int MAX_COUNT = 1;
+		private static final int MAX_COUNT = 64;
 		
 		private @Nonnull ItemStack stack;
 		
@@ -167,22 +167,23 @@ public class RuneBag extends Item implements ILoreTagged {
 	     * Return what won't fit.
 	     */
 	    public @Nonnull ItemStack addItem(ItemStack stack) {
-	    	ItemStack itemstack = stack.copy();
-
-	    	if (!(stack.getItem() instanceof SpellRune))
-	    		return itemstack;
-
-	    	for (int i = 0; i < this.getSizeInventory(); ++i) {
-	            ItemStack itemstack1 = this.getStackInSlot(i);
-
-	            if (itemstack1.isEmpty()) {
-	                this.setInventorySlotContents(i, itemstack);
-	                this.markDirty();
-	                return ItemStack.EMPTY;
-	            }
-	        }
-
-	        return itemstack;
+	    	return Inventories.addItem(this, stack);
+//	    	ItemStack itemstack = stack.copy();
+//
+//	    	if (!(stack.getItem() instanceof SpellRune))
+//	    		return itemstack;
+//
+//	    	for (int i = 0; i < this.getSizeInventory(); ++i) {
+//	            ItemStack itemstack1 = this.getStackInSlot(i);
+//
+//	            if (itemstack1.isEmpty()) {
+//	                this.setInventorySlotContents(i, itemstack);
+//	                this.markDirty();
+//	                return ItemStack.EMPTY;
+//	            }
+//	        }
+//
+//	        return itemstack;
 	    }
 
 	    @Override

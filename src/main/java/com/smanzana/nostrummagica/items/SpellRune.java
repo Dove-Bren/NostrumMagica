@@ -46,6 +46,16 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return TypeMap.get(type);
 	}
 	
+	protected static final Map<SpellShape, PackedShapeSpellRune> PackedTypeMap = new HashMap<>();
+	
+	public static final void SetPackedRuneForShape(SpellShape shape, PackedShapeSpellRune rune) {
+		PackedTypeMap.put(shape, rune);
+	}
+	
+	public static final @Nullable PackedShapeSpellRune GetPackedRuneForType(SpellShape shape) {
+		return PackedTypeMap.get(shape);
+	}
+	
 //	@OnlyIn(Dist.CLIENT)
 //	public static class ModelMesher implements ItemMeshDefinition {
 //
@@ -145,6 +155,18 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return getRune(new SpellComponentWrapper(trigger));
 	}
 	
+	public static ItemStack getRune(SpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+		PackedShapeSpellRune rune = GetPackedRuneForType(shape);
+		ItemStack stack = new ItemStack(rune);
+		
+		rune.setNestedElement(stack, element, elementCount);
+		if (alteration != null) {
+			rune.setNestedAlteration(stack, alteration);
+		}
+		
+		return stack;
+	}
+	
 	/**
 	 * Get [count] runes that matches the spell part handed in.
 	 * Produces [count] copies of the part in a single rune. For example,
@@ -156,22 +178,17 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	 */
 	public static ItemStack getRune(SpellPart part) {
 		ItemStack stack;
-		if (part.isTrigger())
+		if (part.isTrigger()) {
 			stack = getRune(part.getTrigger());
-		else
-			stack = getRune(part.getShape());
+		} else {
+			stack = getRune(part.getShape(), part.getElement(), part.getElementCount(), part.getAlteration());
+		}
 		
 		CompoundNBT nbt = stack.getTag();
 		
 		if (part.getParam() != null) {
 			nbt.putFloat(NBT_PARAM_VAL, part.getParam().level);
 			nbt.putBoolean(NBT_PARAM_FLIP, part.getParam().flip);
-		}
-		
-		if (!part.isTrigger()) {
-			ShapeSpellRune shapeRune = (ShapeSpellRune) stack.getItem();
-			shapeRune.setNestedElement(stack, part.getElement(), part.getElementCount());
-			shapeRune.setNestedAlteration(stack, part.getAlteration());
 		}
 		
 		return stack;
@@ -284,6 +301,10 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		piece.getTag().putFloat(NBT_PARAM_VAL, params.level);
 		piece.getTag().putBoolean(NBT_PARAM_FLIP, params.flip);
+	}
+	
+	public static boolean isPackedShape(ItemStack stack) {
+		return !stack.isEmpty() && stack.getItem() instanceof PackedShapeSpellRune;
 	}
 	
 	public static boolean isShape(ItemStack stack) {
@@ -463,9 +484,6 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			tooltip.add(new StringTextComponent("Element").applyTextStyle(TextFormatting.DARK_GRAY));
-			int count = 1; //getPieceElementCount(stack); TODO
-			if (count != 0)
-				tooltip.add(new StringTextComponent("Power " + count).applyTextStyle(TextFormatting.DARK_GREEN));
 			
 		}
 		
@@ -532,12 +550,9 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 	}
 	
-	public static final class ShapeSpellRune extends SpellRune {
+	public static class ShapeSpellRune extends SpellRune {
 		
 		protected static final String ID_FIX = "shape_";
-		private static final String NBT_SHAPE_ALTERATION = "shape_alteration"; // shapes
-		private static final String NBT_SHAPE_ELEMENT = "shape_element"; // shapes
-		private static final String NBT_ELEMENT_COUNT = "e_count"; // shapes
 		
 		protected final SpellShape shape;
 
@@ -553,6 +568,58 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		public SpellComponentWrapper getComponent() {
 			return new SpellComponentWrapper(shape);
+		}
+		
+		@Override
+		public String makeRegistryName() {
+			return SpellRune.ID_PREFIX + ID_FIX + this.shape.getShapeKey();
+		}
+		
+		@Override
+		@OnlyIn(Dist.CLIENT)
+		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+			tooltip.add(new StringTextComponent("Shape Piece").applyTextStyle(TextFormatting.DARK_RED));
+			SpellPartParam params = getPieceParam(stack);
+			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
+			if (comp.getShape().supportsBoolean() && params.flip) {
+				tooltip.add(new StringTextComponent(comp.getShape().supportedBooleanName() + ": On"));
+			}
+			if (comp.getShape().supportedFloats() != null) {
+				float[] vals = comp.getShape().supportedFloats();
+				if (params.level != 0f && params.level != vals[0])
+					tooltip.add(new StringTextComponent(comp.getShape().getDisplayName() + ": " + params.level));
+			}
+		}
+		
+		@Override
+		protected NonNullList<ItemStack> decompose(ItemStack rune, @Nonnull NonNullList<ItemStack> output) {
+			output.add(rune); // Nothing to do for base shape pieces
+			return output;
+		}
+		
+		@Override
+		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
+			return null;
+		}
+		
+		@Override
+		protected boolean isSpellReady(ItemStack stack) {
+			return false;
+		}
+	}
+	
+	public static final class PackedShapeSpellRune extends ShapeSpellRune {
+		
+		protected static final String ID_FIX = "packed_shape_";
+		private static final String NBT_SHAPE_ALTERATION = "shape_alteration"; // shapes
+		private static final String NBT_SHAPE_ELEMENT = "shape_element"; // shapes
+		private static final String NBT_ELEMENT_COUNT = "e_count"; // shapes
+		
+		protected final SpellShape shape;
+
+		public PackedShapeSpellRune(SpellShape shape) {
+			super(shape);
+			this.shape = shape;
 		}
 		
 		@Override
@@ -596,15 +663,13 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			@Nullable EAlteration alt = getNestedAlteration(rune);
 			if (alt != null) {
 				output.add(getRune(alt));
-				setNestedAlteration(rune, null);
 			}
 			@Nullable EMagicElement elem = getNestedElement(rune);
 			if (elem != null) {
 				int elemCount = getNestedElementCount(rune);
 				output.add(getRune(elem, elemCount));
-				setNestedElement(rune, null, 0);
 			}
-			output.add(rune); // Elem and alt are stripped away at this point if they were present
+			output.add(getRune(this.getShape()));
 			
 			return output;
 		}
@@ -631,20 +696,19 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		@Override
 		protected boolean isSpellReady(ItemStack stack) {
-			// For shapes, we ALSO need an element
-			return null != getNestedElement(stack);
+			return true;
 		}
 		
 		public SpellShape getShape(ItemStack stack) {
 			return this.shape;
 		}
 		
-		public @Nullable EMagicElement getNestedElement(ItemStack stack) {
+		public EMagicElement getNestedElement(ItemStack stack) {
 			if (!stack.hasTag())
-				return null;
+				return EMagicElement.PHYSICAL;
 			
 			if (!stack.getTag().contains(NBT_SHAPE_ELEMENT, NBT.TAG_STRING))
-				return null;
+				return EMagicElement.PHYSICAL;
 			
 			try {
 				return EMagicElement.valueOf(stack.getTag().getString(NBT_SHAPE_ELEMENT).toUpperCase());
@@ -655,8 +719,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		public int getNestedElementCount(ItemStack stack) {
-			if (!stack.hasTag())
-				return 0;
+			if (!stack.hasTag() || !stack.getTag().contains(NBT_ELEMENT_COUNT))
+				return 1;
 			
 			return stack.getTag().getInt(NBT_ELEMENT_COUNT);
 		}

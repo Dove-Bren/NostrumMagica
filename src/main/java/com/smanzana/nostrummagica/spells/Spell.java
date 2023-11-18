@@ -239,7 +239,6 @@ public class Spell {
 						final @Nullable LivingEntity centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
 						final @Nullable BlockPos centerBP = (locations == null || locations.isEmpty() ? null : locations.get(0));
 						if (centerEnt != null || centerBP != null) {
-							@SuppressWarnings("null")
 							final Vec3d centerPos = (centerEnt == null ? new Vec3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().add(0, centerEnt.getHeight() / 2, 0));
 							final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
 									param.level == 0f ? shape.supportedFloats()[0] : param.level));

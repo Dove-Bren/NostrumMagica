@@ -331,7 +331,7 @@ public class SpellCreationGui {
 							if (wrapper.isTrigger()) {
 								// Can always add triggers
 								add = true;
-							} else if (wrapper.isShape()) {
+							} else if (SpellRune.isPackedShape(cur)) {
 								// Must have a trigger in first slot already
 								if (!inventory.getStackInSlot(inventory.getRuneSlotIndex()).isEmpty())
 									add = true;
@@ -436,21 +436,19 @@ public class SpellCreationGui {
 				}
 				if (!SpellRune.isSpellWorthy(stack)) {
 					spellErrorStrings.add(prefix + "Rune in slot " + (i) + " is not allowed.");
-					if (SpellRune.isShape(stack)) {
-						spellErrorStrings.add(prefix + "  -> Shapes must have an element attached to them.");
-					} else {
-						spellErrorStrings.add(prefix + "  -> Elements and Alterations must be combined with a Shape first.");
-					}
+					
+					// This builds on the assumption that the two spellworthy types are triggers and packed shapes
+					spellErrorStrings.add(prefix + "  -> Shapes, Elements, and Alterations must be combined into a Packed Shape first.");
 					return null;
 				}
-				if (SpellRune.isShape(stack)) {
+				if (SpellRune.isPackedShape(stack)) {
 					flag = true;
 					break;
 				}
 			}
 			
 			if (!flag) {
-				spellErrorStrings.add(prefix + "Must have at least one spell shape");
+				spellErrorStrings.add(prefix + "Must have at least one packed spell shape");
 				return null;
 			}
 			
@@ -464,6 +462,7 @@ public class SpellCreationGui {
 				
 				part = SpellRune.getPart(stack);
 				if (part == null) {
+					 int unused; // Eval
 					spellErrorStrings.add(prefix + "Unfinished spell part in slot " + (i + 1));
 					if (SpellRune.isShape(stack))
 						spellErrorStrings.add(prefix + " -> Spell parts must have an element");
@@ -901,7 +900,7 @@ public class SpellCreationGui {
 				return false;
 			
 			boolean trigger = SpellRune.isTrigger(stack);
-			if (!trigger && !SpellRune.isShape(stack))
+			if (!trigger && !SpellRune.isPackedShape(stack))
 				return false;
 			
 			return (prev != null || trigger);
