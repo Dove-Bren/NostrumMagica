@@ -440,7 +440,6 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	@Override
 	public float getBlockPathWeight(BlockPos pos, IWorldReader worldIn) {
 		if (worldIn.getDimension().getType() == DimensionType.THE_NETHER) {
-			NostrumMagica.logger.warn("Checking " + pos);
 			return 0; // Nether is very bright
 		}
 		

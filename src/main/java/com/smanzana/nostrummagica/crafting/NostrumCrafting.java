@@ -17,7 +17,7 @@ public class NostrumCrafting {
 	@ObjectHolder(BaubleColorRecipe.Serializer.ID) public static BaubleColorRecipe.Serializer baubleColorSerializer;
 	@ObjectHolder(ShapedWithRemainingRecipe.Serializer.ID) public static ShapedWithRemainingRecipe.Serializer shapedWithRemainingSerializer;
 	@ObjectHolder(SpellTomePageCombineRecipe.SERIALIZER_ID) public static SpecialRecipeSerializer<SpellTomePageCombineRecipe> spellTomePageCombineSerializer;
-	@ObjectHolder(RuneCombineRecipe.SERIALIZER_ID) public static SpecialRecipeSerializer<RuneCombineRecipe> runeCombineSerializer;
+	//@ObjectHolder(RuneCombineRecipe.SERIALIZER_ID) public static SpecialRecipeSerializer<RuneCombineRecipe> runeCombineSerializer;
 	
 	@SubscribeEvent
 	public static void registerSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
@@ -28,7 +28,7 @@ public class NostrumCrafting {
 		
 		registry.register(new SpecialRecipeSerializer<SpellTomePageCombineRecipe>(SpellTomePageCombineRecipe::new)
 				.setRegistryName(SpellTomePageCombineRecipe.SERIALIZER_ID));
-		registry.register(new SpecialRecipeSerializer<RuneCombineRecipe>(RuneCombineRecipe::new)
-				.setRegistryName(RuneCombineRecipe.SERIALIZER_ID));
+//		registry.register(new SpecialRecipeSerializer<RuneCombineRecipe>(RuneCombineRecipe::new)
+//				.setRegistryName(RuneCombineRecipe.SERIALIZER_ID));
 	}
 }

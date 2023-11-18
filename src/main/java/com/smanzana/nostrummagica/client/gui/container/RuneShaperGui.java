@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -25,6 +27,8 @@ import com.smanzana.nostrummagica.tiles.RuneShaperEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.ContainerUtil.NoisySlot;
+import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.resources.I18n;
@@ -158,8 +162,171 @@ public class RuneShaperGui {
 						slot.putStack(ItemStack.EMPTY);
 						slot.onTake(playerIn, cur);
 					}
+				} else if (slot.inventory == this.resultInv) {
+					// Trying to shift-click result slot
+					
+					// Remember each stack we're taking from for convenience
+					List<Integer> takeSlots = new ArrayList<>(8);
+					
+					int craftCount = shaper.getStackInSlot(0).getCount(); // Start at shape count, and min everything
+					takeSlots.add(0);
+					
+					for (int i = 1; i <= 4; i++) {
+						ItemStack elemStack = shaper.getStackInSlot(i);
+						if (!elemStack.isEmpty()) {
+							craftCount = Math.min(craftCount, elemStack.getCount());
+							takeSlots.add(i);
+						}
+					}
+					
+					{
+						ItemStack alterationStack = shaper.getStackInSlot(5);
+						if (!alterationStack.isEmpty()) {
+							craftCount = Math.min(craftCount, alterationStack.getCount());
+							takeSlots.add(5);
+						}
+					}
+					
+					ItemStack result = getOutput();
+					result.setCount(craftCount);
+					for (Integer idx : takeSlots) {
+						shaper.decrStackSize(idx, craftCount);
+					}
+					
+					result = Inventories.addItem(playerIn.inventory, result);
+					if (!result.isEmpty()) {
+						playerIn.dropItem(result, false);
+					}
+					this.refreshOutput();
+					
 				} else {
 					// Trying to add an item
+					if (SpellRune.isShape(cur) && !SpellRune.isPackedShape(cur)) {
+						// Shape piece, so only care about first slot
+						ItemStack existingStack = shaper.getStackInSlot(0);
+						
+						if (existingStack.isEmpty() || ItemStacks.stacksMatch(existingStack, cur)) {
+							int room = cur.getMaxStackSize();
+							if (!existingStack.isEmpty()) {
+								room -= existingStack.getCount();
+							}
+							
+							if (room > 0) {
+								final ItemStack taken;
+								final ItemStack remaining;
+								if (existingStack.isEmpty()) {
+									shaper.setInventorySlotContents(0, cur);
+									taken = cur;
+									remaining = ItemStack.EMPTY;
+								} else {
+									final int amt = room >= cur.getCount() ? cur.getCount() : room;
+									existingStack.setCount(existingStack.getCount() + amt);
+									shaper.setInventorySlotContents(0, existingStack); // generate change event
+									taken = cur.split(amt);
+									remaining = cur;
+								}
+								
+								slot.putStack(remaining);
+								slot.onTake(playerIn, taken);
+								this.refreshOutput();
+							}
+						}
+					} else if (SpellRune.isElement(cur)) {
+						// Have 4 slots to try. Was going to try and spread elements out, but it's too much work.
+						// Just allow dragging and let players do it the way they already know how.
+						for (int i = 1; i <= 4 && !cur.isEmpty(); i++) {
+							ItemStack existingStack = shaper.getStackInSlot(i);
+							
+							if (existingStack.isEmpty() || ItemStacks.stacksMatch(existingStack, cur)) {
+								int room = cur.getMaxStackSize();
+								if (!existingStack.isEmpty()) {
+									room -= existingStack.getCount();
+								}
+								
+								if (room > 0) {
+									final ItemStack taken;
+									if (existingStack.isEmpty()) {
+										shaper.setInventorySlotContents(i, cur);
+										taken = cur;
+										cur = ItemStack.EMPTY;
+									} else {
+										final int amt = room >= cur.getCount() ? cur.getCount() : room;
+										existingStack.setCount(existingStack.getCount() + amt);
+										shaper.setInventorySlotContents(i, existingStack); // generate change event
+										taken = cur.split(amt);
+									}
+									
+									slot.putStack(cur);
+									slot.onTake(playerIn, taken);
+									this.refreshOutput();
+								}
+							}
+						}
+						
+						
+//						// Have 4 slots to try, and want to opt to fill them first and spread
+//						// out across them...
+//						
+//						// First see if it matches the existing element, if any, and find how many stacks there are
+//						int sum = 0;
+//						EMagicElement existingElement = null;
+//						for (int i = 1; i <= 4; i++) {
+//							ItemStack elemStack = shaper.getStackInSlot(i);
+//							if (elemStack.isEmpty() || !SpellRune.isElement(elemStack)) {
+//								continue;
+//							}
+//							
+//							ElementSpellRune rune = (ElementSpellRune) elemStack.getItem();
+//							EMagicElement slotElem = rune.getElement();
+//							
+//							if (existingElement != null && existingElement != slotElem) {
+//								return ItemStack.EMPTY;
+//							}
+//							
+//							sum += elemStack.getCount();
+//						}
+//						
+//						// Something tricky: if one stack has 50 and the other's have 1 and we are adding 3,
+//						// we shouldn't pull down the 50 and instead add 1 to each of the other slots...
+//						
+//						// At this point, elements line up and stuff. Find out how many each stack should have
+//						// when you include this stack
+//						sum += cur.getCount();
+//						
+//						final int cntEach = 
+					} else if (SpellRune.isAlteration(cur)) {
+						// Like shape, but with alteration slot
+						ItemStack existingStack = shaper.getStackInSlot(5);
+						
+						if (existingStack.isEmpty() || ItemStacks.stacksMatch(existingStack, cur)) {
+							int room = cur.getMaxStackSize();
+							if (!existingStack.isEmpty()) {
+								room -= existingStack.getCount();
+							}
+							
+							if (room > 0) {
+								final ItemStack taken;
+								final ItemStack remaining;
+								if (existingStack.isEmpty()) {
+									shaper.setInventorySlotContents(5, cur);
+									taken = cur;
+									remaining = ItemStack.EMPTY;
+								} else {
+									final int amt = room >= cur.getCount() ? cur.getCount() : room;
+									existingStack.setCount(existingStack.getCount() + amt);
+									shaper.setInventorySlotContents(5, existingStack); // generate change event
+									taken = cur.split(amt);
+									remaining = cur;
+								}
+								
+								slot.putStack(remaining);
+								slot.onTake(playerIn, taken);
+								this.refreshOutput();
+							}
+						}
+					}
+					
+					
 //					Slot mainSlot = this.getSlot(0);
 //					if (!mainSlot.getHasStack()) {
 //						if (mainSlot.isItemValid(cur))
@@ -180,7 +347,7 @@ public class RuneShaperGui {
 		
 		@Override
 		public boolean canDragIntoSlot(Slot slotIn) {
-			return slotIn.inventory != this.shaper; // It's NOT bag inventory
+			return slotIn.inventory != this.resultInv; // not in output slot
 		}
 		
 		@Override
@@ -290,7 +457,8 @@ public class RuneShaperGui {
 			for (int i = 0; i < shaper.getSizeInventory(); i++) {
 				shaper.decrStackSize(i, 1);
 			}
-			
+
+			this.refreshOutput();
 			return output;
 		}
 	}
