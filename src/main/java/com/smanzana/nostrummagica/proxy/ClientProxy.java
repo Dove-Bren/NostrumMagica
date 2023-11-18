@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
 import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
+import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
@@ -304,7 +305,7 @@ public class ClientProxy extends CommonProxy {
 		CommandDebugEffect.register(dispatcher);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SubscribeEvent
 	public void clientSetup(FMLClientSetupEvent event) {
 		OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
@@ -324,8 +325,8 @@ public class ClientProxy extends CommonProxy {
 		ScreenManager.registerFactory(NostrumContainers.ReagentBag, ReagentBagGui.BagGui::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneBag, RuneBagGui.BagGui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreation, SpellCreationGui.SpellGui::new);
-		
 		ScreenManager.registerFactory(NostrumContainers.PetGui, new PetGUIFactory());
+		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
 	}
 	
 	// To get around bounds matching. D:

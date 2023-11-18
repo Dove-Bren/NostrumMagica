@@ -462,7 +462,6 @@ public class SpellCreationGui {
 				
 				part = SpellRune.getPart(stack);
 				if (part == null) {
-					 int unused; // Eval
 					spellErrorStrings.add(prefix + "Unfinished spell part in slot " + (i + 1));
 					if (SpellRune.isShape(stack))
 						spellErrorStrings.add(prefix + " -> Spell parts must have an element");

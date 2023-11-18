@@ -69,6 +69,7 @@ public class NostrumBlocks {
 	@ObjectHolder(SymbolBlock.ID) public static SymbolBlock symbolBlock;
 	@ObjectHolder(TeleportRune.ID) public static TeleportRune teleportRune;
 	@ObjectHolder(TemporaryTeleportationPortal.ID) public static TemporaryTeleportationPortal temporaryTeleportationPortal;
+	@ObjectHolder(RuneShaper.ID) public static RuneShaper runeShaper;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -133,6 +134,7 @@ public class NostrumBlocks {
     	registerBlockItem(symbolBlock, symbolBlock.getRegistryName(), registry);
     	registerBlockItem(teleportRune, teleportRune.getRegistryName(), registry);
     	//registerBlockItem(temporaryTeleportationPortal, temporaryTeleportationPortal.getRegistryName(), registry);
+    	registerBlockItem(runeShaper, runeShaper.getRegistryName(), registry);
     	
 
 //    	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -222,6 +224,7 @@ public class NostrumBlocks {
     	registerBlock(new SymbolBlock(), SymbolBlock.ID, registry);
     	registerBlock(new TeleportRune(), TeleportRune.ID, registry);
     	registerBlock(new TemporaryTeleportationPortal(), TemporaryTeleportationPortal.ID, registry);
+    	registerBlock(new RuneShaper(), RuneShaper.ID, registry);
     }
     
 }

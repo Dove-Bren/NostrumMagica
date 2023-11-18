@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "particle": "nostrummagica:block/rune_shaper_side",
+        "down": "nostrummagica:block/rune_shaper_side",
+        "up": "nostrummagica:block/rune_shaper_top",
+        "north": "nostrummagica:block/rune_shaper_side",
+        "east": "nostrummagica:block/rune_shaper_side",
+        "south": "nostrummagica:block/rune_shaper_side",
+        "west": "nostrummagica:block/rune_shaper_side"
+    }
+}

@@ -36,6 +36,7 @@ public class NostrumTileEntities {
 	private static final String ID_ParadoxMirrorTileEntity = "paradox_mirror_te";
 	private static final String ID_ManaArmorerTileEntity = "mana_armorer";
 	private static final String ID_MimicBlockTileEntity = "mimic_block_te";
+	private static final String ID_RuneShaper = "rune_shaper_te";
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableEntity> SpellTableEntityType;
 	@ObjectHolder(ID_SingleSpawnerTileEntity) public static TileEntityType<SingleSpawnerTileEntity> SingleSpawnerTileEntityType;
@@ -59,6 +60,7 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_ParadoxMirrorTileEntity) public static TileEntityType<ParadoxMirrorTileEntity> ParadoxMirrorTileEntityType;
 	@ObjectHolder(ID_ManaArmorerTileEntity) public static TileEntityType<ManaArmorerTileEntity> ManaArmorerTileEntityType;
 	@ObjectHolder(ID_MimicBlockTileEntity) public static TileEntityType<MimicBlockTileEntity> MimicBlockTileEntityType;
+	@ObjectHolder(ID_RuneShaper) public static TileEntityType<RuneShaperEntity> RuneShaperEntityType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -90,5 +92,6 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(ParadoxMirrorTileEntity::new, NostrumBlocks.paradoxMirror).build(null), ID_ParadoxMirrorTileEntity);
 		register(registry, TileEntityType.Builder.create(ManaArmorerTileEntity::new, NostrumBlocks.manaArmorerBlock).build(null), ID_ManaArmorerTileEntity);
 		register(registry, TileEntityType.Builder.create(MimicBlockTileEntity::new, NostrumBlocks.mimicDoor, NostrumBlocks.mimicFacade, NostrumBlocks.mimicDoorUnbreakable, NostrumBlocks.mimicFacadeUnbreakable).build(null), ID_MimicBlockTileEntity);
+		register(registry, TileEntityType.Builder.create(RuneShaperEntity::new, NostrumBlocks.runeShaper).build(null), ID_RuneShaper);
     }
 }

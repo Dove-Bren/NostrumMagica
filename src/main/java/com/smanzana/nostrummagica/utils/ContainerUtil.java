@@ -14,6 +14,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerProvider;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIntArray;
@@ -83,5 +85,26 @@ public class ContainerUtil {
 		default int get(int index) { return this.getField(index); }
 		
 		default void set(int index, int val) { this.setField(index, val); }
+	}
+	
+	public static class NoisySlot extends Slot {
+		
+		protected final @Nonnull Consumer<NoisySlot> listener;
+		
+		public NoisySlot(IInventory inventoryIn, int index, int xPosition, int yPosition, @Nonnull Consumer<NoisySlot> listener) {
+			super(inventoryIn, index, xPosition, yPosition);
+			this.listener = listener;
+		}
+		
+		@Override
+		public void onSlotChanged() {
+			super.onSlotChanged();
+			listener.accept(this);
+		}
+		
+		@Override
+		public boolean isItemValid(ItemStack stack) {
+			return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
+		}
 	}
 }
