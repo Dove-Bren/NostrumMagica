@@ -105,10 +105,12 @@ public class WorldKeyItem extends Item {
 			if (playerIn.isSneaking()) {
 				NostrumWorldKey key = getKey(stack);
 				holder.setWorldKey(key);
+				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)));
 			} else {
 				if (holder.hasWorldKey()) {
 					NostrumWorldKey key = holder.getWorldKey();
 					setKey(stack, key);
+					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)));
 				} else {
 					playerIn.sendMessage(new StringTextComponent("No key to take"));
 				}
@@ -118,8 +120,11 @@ public class WorldKeyItem extends Item {
 		
 		if (te instanceof ChestTileEntity) {
 			// Convert chests to locked chests
-			if (!LockedChestEntity.LockChest(worldIn, pos)) {
+			final NostrumWorldKey key = this.getKey(stack);
+			if (!LockedChestEntity.LockChest(worldIn, pos, key)) {
 				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"));
+			} else {
+				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8))); 
 			}
 		}
 		

@@ -15,12 +15,14 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public class LockedChestEntity extends TileEntity implements ITickableTileEntity, IInventory, IWorldKeyHolder {
@@ -30,7 +32,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 	
 	private final Inventory inventory;
 	private NostrumWorldKey lockKey;
-	//private int ticksExisted;
+	private int ticksExisted;
 	
 	public LockedChestEntity() {
 		super(NostrumTileEntities.LockedChestEntityType);
@@ -61,14 +63,37 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 			return;
 		
 		Inventories.deserializeInventory(inventory, nbt.get(NBT_INV));
+		lockKey = NostrumWorldKey.fromNBT(nbt.getCompound(NBT_LOCK));
+	}
+	
+	@Override
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+	}
+
+	@Override
+	public CompoundNBT getUpdateTag() {
+		return this.write(new CompoundNBT());
+	}
+	
+	@Override
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+		super.onDataPacket(net, pkt);
+		handleUpdateTag(pkt.getNbtCompound());
 	}
 
 	@Override
 	public void tick() {
-		//ticksExisted++;
+		ticksExisted++;
 		
 		if (world != null && !world.isRemote()) {
-			
+			if (ticksExisted % 20 == 0) {
+				boolean worldUnlockable = world.getBlockState(pos).get(LockedChest.UNLOCKABLE);
+				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().consumeKey(lockKey); 
+				if (worldUnlockable != tileUnlockable) {
+					world.setBlockState(pos, world.getBlockState(pos).with(LockedChest.UNLOCKABLE, tileUnlockable), 3);
+				}
+			}
 		}
 	}
 	
@@ -78,7 +103,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 				) {
 			unlock();
 		} else {
-			player.sendMessage(new StringTextComponent("The chest is locked by magical means"));
+			player.sendMessage(new TranslationTextComponent("info.locked_chest.nokey"));
 			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		}
 	}
@@ -181,7 +206,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 		this.dirty();
 	}
 	
-	public static final boolean LockChest(World world, BlockPos pos) {
+	public static final boolean LockChest(World world, BlockPos pos, NostrumWorldKey key) {
 		TileEntity te = world.getTileEntity(pos);
 		if (te instanceof ChestTileEntity) {
 			ChestTileEntity chest = (ChestTileEntity) te;
@@ -196,6 +221,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 			
 			LockedChestEntity lockedChest = (LockedChestEntity) world.getTileEntity(pos);
 			lockedChest.setContents(invCopy);
+			lockedChest.setWorldKey(key);
 			return true;
 		} else {
 			return false;

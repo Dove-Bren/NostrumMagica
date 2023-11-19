@@ -1,8 +1,19 @@
 {
+	"forge_marker": 1,
+	"defaults": {
+		"model": "nostrummagica:block/locked_chest"
+	},
     "variants": {
-        "facing=north": {"model": "nostrummagica:block/locked_chest"},
-        "facing=east": { "model": "nostrummagica:block/locked_chest", "y": 90 },
-        "facing=south": { "model": "nostrummagica:block/locked_chest", "y": 180 },
-        "facing=west": { "model": "nostrummagica:block/locked_chest", "y": 270 }
+		"facing": {
+			"north": {  },
+			"east": { "y": 90 },
+			"south": { "y": 180 },
+			"west": { "y": 270 }
+		},
+        "unlockable": {
+            "true": {},
+            "false": {}
+        }
+
     }
 }

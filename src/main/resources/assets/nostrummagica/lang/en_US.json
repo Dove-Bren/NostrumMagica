@@ -567,6 +567,7 @@
     "info.mana_armorer.busy": "The Mana Armorer is busy with another entity!",
     "info.mana_armorer.locked": "You do not possess enough magic power to use the mana armorer at this time.",
     "info.mana_armorer.already_have": "You already have mana armor",
+	"info.locked_chest.nokey": "The chest is locked by magical means",
 
     "info.armor.set_status": "%1$s Set Bonus %3$s(%2$d/4)%4$s",
     "info.armor.set_total": "%1$s Set Bonus %2$s(Complete)%3$s",

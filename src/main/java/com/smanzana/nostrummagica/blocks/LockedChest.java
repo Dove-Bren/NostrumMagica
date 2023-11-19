@@ -13,6 +13,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
@@ -29,6 +30,7 @@ public class LockedChest extends HorizontalBlock {
 	
 	public static final String ID = "locked_chest";
 	public static DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static BooleanProperty UNLOCKABLE = BooleanProperty.create("unlockable");
 	protected static final VoxelShape SHAPE = Block.makeCuboidShape(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
 	
 	public LockedChest() {
@@ -37,11 +39,13 @@ public class LockedChest extends HorizontalBlock {
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
 				);
+		
+		this.setDefaultState(this.getDefaultState().with(UNLOCKABLE, false));
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
+		builder.add(FACING, UNLOCKABLE);
 	}
 	
 	@Override

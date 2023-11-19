@@ -7,13 +7,19 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.LockedChest;
+import com.smanzana.nostrummagica.items.WorldKeyItem;
 import com.smanzana.nostrummagica.tiles.LockedChestEntity;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
@@ -30,15 +36,22 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final Direction direction = te.getBlockState().get(LockedChest.FACING);
 		float rot = direction.getHorizontalAngle() + 90f;
 		
-		final double glowPeriod = 60;
-		final double glowProg = ((ticks % glowPeriod) / glowPeriod); 
-		final float glow = .15f * (float) Math.sin(glowProg * 2 * Math.PI);
+		final float glow;
+		if (te.getBlockState().get(LockedChest.UNLOCKABLE)) {
+			final double glowPeriod = 20;
+			final double glowProg = ((ticks % glowPeriod) / glowPeriod);
+			glow = .15f * (float) Math.sin(glowProg * 2 * Math.PI);
+		} else {
+			final double glowPeriod = 60;
+			final double glowProg = ((ticks % glowPeriod) / glowPeriod); 
+			glow = .5f + (.15f * (float) Math.sin(glowProg * 2 * Math.PI));
+		}
 
 		GlStateManager.disableCull();
 		GlStateManager.disableLighting();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.color4f(1f, 0f, 0f, .75f + glow);
+		GlStateManager.color4f(1f, 0f, 0f, .25f + glow);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.rotatef(rot, 0, -1, 0); // Rotate arm that's centered in the block
@@ -168,6 +181,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	public void render(LockedChestEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
 		
 		final double ticks = te.getWorld().getGameTime() + partialTicks;
+		final Minecraft mc = Minecraft.getInstance();
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.translated(x + .5, y + .5, z + .5);
@@ -179,6 +193,39 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		// Draw lock icon
 		this.renderLock(te, ticks);
 
+		
+		// Draw lock info
+		if (mc.player.isCreative())
+		{
+			final String lockStr;
+			boolean matches = false;
+			if (te.hasWorldKey()) {
+				NostrumWorldKey key = te.getWorldKey();
+				lockStr = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
+				
+				final ItemStack held = mc.player.getHeldItemMainhand();
+				if ((held.getItem() instanceof WorldKeyItem && key.equals(((WorldKeyItem) held.getItem()).getKey(held)))) {
+					matches = true;
+				}
+			} else {
+				lockStr = "No lock info found";
+			}
+			
+			GlStateManager.scaled(8, 8, 8);
+			ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
+			float viewerYaw = renderInfo.getYaw();
+			float viewerPitch = renderInfo.getPitch();
+			float yOffset = 1.4f;
+			int i = 0;
+			
+			if (matches) {
+				final double matchWigglePeriod = 20;
+				final double matchWiggleProg = 1 - ((ticks % matchWigglePeriod) / matchWigglePeriod);
+				yOffset += (float) (.05 * Math.sin(2 * Math.PI * matchWiggleProg));
+			}
+			
+			GameRenderer.drawNameplate(mc.fontRenderer, lockStr, (float)0, (float)0 + yOffset, (float)0, i, viewerYaw, viewerPitch, false);
+		}
 
 		GlStateManager.popMatrix();
 		
