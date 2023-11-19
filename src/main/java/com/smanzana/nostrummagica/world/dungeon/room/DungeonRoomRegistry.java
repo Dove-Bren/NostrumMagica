@@ -86,7 +86,7 @@ public class DungeonRoomRegistry {
 	}
 	
 	private static final String INTERNAL_ALL_NAME = "all";
-	private static final String ROOM_ROOT_NAME = "root.dat";
+	private static final String ROOM_ROOT_NAME = "root.gat";
 	private static final String ROOM_COMPRESSED_EXT = "gat";
 	private static final String ROOM_ROOT_NAME_COMP = "root." + ROOM_COMPRESSED_EXT;
 	
@@ -615,8 +615,8 @@ public class DungeonRoomRegistry {
 		} catch (IOException e) {
 			e.printStackTrace();
 			
-			System.out.println("Failed to write out serialized file " + saveFile.toString());
-			NostrumMagica.logger.error("Failed to write room to " + saveFile.toString());
+			System.out.println("Failed to write out serialized file " + saveFile.getAbsolutePath());
+			NostrumMagica.logger.error("Failed to write room to " + saveFile.getAbsolutePath());
 			success = false;
 		}
 		
@@ -643,7 +643,7 @@ public class DungeonRoomRegistry {
 					// Root room has extra info and needs to be identified
 					fileName = ROOM_ROOT_NAME;
 				} else {
-					fileName = name + "_" + i + ".dat";
+					fileName = name + "_" + i + "." + ROOM_COMPRESSED_EXT;
 				}
 				
 				File outFile = new File(baseDir, fileName);

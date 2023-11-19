@@ -576,11 +576,11 @@ public class RoomBlueprint {
 		}
 		
 		public boolean isDoorIndicator() {
-			return state != null && state.getBlock() instanceof RedstoneDiodeBlock;
+			return state != null && state.getBlock() == Blocks.REPEATER;
 		}
 		
 		public boolean isEntry() {
-			return state != null && state.getBlock() instanceof ComparatorBlock;
+			return state != null && state.getBlock() == Blocks.COMPARATOR;
 		}
 		
 		public Direction getFacing() {
@@ -686,6 +686,11 @@ public class RoomBlueprint {
 		for (int j = 0; j < height; j++)
 		for (int k = 0; k < length; k++) {
 			cursor.setPos(pos1.getX() + i, pos1.getY() + j, pos1.getZ() + k);
+			
+			if (cursor.getX() == 120320 && cursor.getZ() == 673280) {
+				NostrumMagica.logger.info(".");
+			}
+			
 			BlueprintBlock block = new BlueprintBlock(world, cursor);
 			
 			// Maybe check for blocks th at actually indicate entries and exits

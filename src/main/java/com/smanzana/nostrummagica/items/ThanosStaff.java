@@ -1,11 +1,13 @@
 package com.smanzana.nostrummagica.items;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -37,6 +39,8 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 	public static final String ID = "thanos_staff";
 	private static final String NBT_XP = "absorbed_xp";
 	
+	protected static UUID THANOSTAFF_POTENCY_UUID = UUID.fromString("d46057a6-872d-45d5-9d09-9cb1f0daf62e");
+	
 	public ThanosStaff() {
 		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
 		
@@ -59,6 +63,10 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
             multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
             multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
         }
+        
+        if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
+			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(THANOSTAFF_POTENCY_UUID, "Potency modifier", 15, AttributeModifier.Operation.ADDITION));
+		}
 
         return multimap;
     }
@@ -117,7 +125,6 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("Magic Potency Bonus: 15%"));
 		tooltip.add(new StringTextComponent("Reagent Cost Discount: 5%"));
 	}
 	
