@@ -18,6 +18,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -34,13 +35,16 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	private boolean triggered;
 	private LivingEntity triggerEntity;
 	
-	public SwitchBlockTileEntity() {
-		super(NostrumTileEntities.SwitchBlockTileEntityType);
-		
+	protected SwitchBlockTileEntity(TileEntityType<? extends SwitchBlockTileEntity> tileType) {
+		super(tileType);
 		type = SwitchType.ANY;
 		triggerOffset = new BlockPos(0, -2, 0);
 		triggerEntity = null;
 		triggered = false;
+	}
+	
+	public SwitchBlockTileEntity() {
+		this(NostrumTileEntities.SwitchBlockTileEntityType);
 	}
 	
 	public SwitchBlockTileEntity(SwitchBlockTileEntity.SwitchType type, BlockPos pos) {
@@ -101,7 +105,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
-	private void dirty() {
+	protected void dirty() {
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
 		markDirty();
 	}
@@ -164,20 +168,24 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
+	protected void doTriggerInternal() {
+		
+		BlockPos triggerPos = this.getPos().add(this.getOffset());
+		BlockState state = world.getBlockState(triggerPos);
+		if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
+			return;
+		}
+		
+		((ITriggeredBlock) state.getBlock()).trigger(world, triggerPos, state, this.getPos());
+	}
+	
 	public void trigger(boolean isMagic) {
 		if (!this.triggered) {
 			if (type == SwitchType.ANY || isMagic) {
 				this.triggered = true;
 				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 				this.dirty();
-				
-				BlockPos triggerPos = this.getPos().add(this.getOffset());
-				BlockState state = world.getBlockState(triggerPos);
-				if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
-					return;
-				}
-				
-				((ITriggeredBlock) state.getBlock()).trigger(world, triggerPos, state, this.getPos());
+				doTriggerInternal();
 			} else {
 				// Wrong input type
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);

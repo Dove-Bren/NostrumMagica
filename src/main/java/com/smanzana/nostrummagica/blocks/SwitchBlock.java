@@ -55,21 +55,6 @@ public class SwitchBlock extends Block {
 		return SWITCH_BLOCK_AABB;
 	}
 	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
-//        return false;
-//    }
-	
 	@Override
 	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
 		return 0;
@@ -101,12 +86,6 @@ public class SwitchBlock extends Block {
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new SwitchBlockTileEntity();
 	}
-	
-//	@Override
-//	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-//		super.breakBlock(world, pos, state);
-//		world.removeTileEntity(pos);
-//	}
 	
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {

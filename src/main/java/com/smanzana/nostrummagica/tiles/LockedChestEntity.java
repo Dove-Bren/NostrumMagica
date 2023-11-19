@@ -89,7 +89,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 		if (world != null && !world.isRemote()) {
 			if (ticksExisted % 20 == 0) {
 				boolean worldUnlockable = world.getBlockState(pos).get(LockedChest.UNLOCKABLE);
-				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().consumeKey(lockKey); 
+				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(lockKey); 
 				if (worldUnlockable != tileUnlockable) {
 					world.setBlockState(pos, world.getBlockState(pos).with(LockedChest.UNLOCKABLE, tileUnlockable), 3);
 				}
