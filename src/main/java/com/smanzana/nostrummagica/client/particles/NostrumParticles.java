@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.util.math.Vec3d;
@@ -15,6 +16,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumParticles {
@@ -76,12 +78,17 @@ public enum NostrumParticles {
 	
 	public static void Spawn(NostrumParticles type, World world, SpawnParams params) {
 		if (!world.isRemote) {
-			NetworkHandler.sendToDimension(new SpawnNostrumParticleMessage(type, params),
-					world.getDimension().getType());
+			NetworkHandler.sendToAllAround(new SpawnNostrumParticleMessage(type, params),
+					new TargetPoint(params.spawnX, params.spawnY, params.spawnZ, 50, world.getDimension().getType())
+					);
 		} else {
-			INostrumParticleFactory<?> factory = type.getFactory();
-			if (factory != null) {
-				factory.createParticle(world, params);
+			final Minecraft mc = Minecraft.getInstance();
+			if (mc.gameRenderer.getActiveRenderInfo().getProjectedView().squareDistanceTo(params.spawnX, params.spawnY, params.spawnZ)
+					<  50 * 50) {
+				INostrumParticleFactory<?> factory = type.getFactory();
+				if (factory != null) {
+					factory.createParticle(world, params);
+				}
 			}
 		}
 	}

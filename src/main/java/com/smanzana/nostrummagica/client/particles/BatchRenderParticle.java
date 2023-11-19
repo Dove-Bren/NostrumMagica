@@ -57,13 +57,18 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	
 	@Override
 	public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-		renderParams.rotX = rotationX;
-		renderParams.rotXZ = rotationXZ;
-		renderParams.rotZ = rotationZ;
-		renderParams.rotYZ = rotationYZ;
-		renderParams.rotXY = rotationXY;
 		
-		ParticleBatchRenderer.instance().queueParticle(this);
+		// Just don't render if too far away
+		final double maxDistSQ = 60 * 60;
+		if (entityIn.getProjectedView().squareDistanceTo(posX, posY, posZ) < maxDistSQ) {
+			renderParams.rotX = rotationX;
+			renderParams.rotXZ = rotationXZ;
+			renderParams.rotZ = rotationZ;
+			renderParams.rotYZ = rotationYZ;
+			renderParams.rotXY = rotationXY;
+			
+			ParticleBatchRenderer.instance().queueParticle(this);
+		}
 	}
 	
 	@Override
