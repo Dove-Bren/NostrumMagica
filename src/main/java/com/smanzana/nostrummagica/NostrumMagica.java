@@ -134,6 +134,7 @@ import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
@@ -210,6 +211,7 @@ public class NostrumMagica {
 	private static NostrumDimensionMapper serverDimensionMapper;
 	private static PetSoulRegistry petSoulRegistry;
 	private static PetCommandManager petCommandManager;
+	private static NostrumKeyRegistry worldKeys;
 
 	public static boolean initFinished = false;
 	
@@ -2649,6 +2651,17 @@ public class NostrumMagica {
 		}
 		return petCommandManager;
 	}
+	
+	public NostrumKeyRegistry getWorldKeys() {
+		if (worldKeys == null) {
+			if (proxy.isServer()) {
+				throw new RuntimeException("Accessing WorldKeys before a world has been loaded!");
+			} else {
+				worldKeys = new NostrumKeyRegistry();
+			}
+		}
+		return worldKeys;
+	}
 
 	/**
 	 * Finds (or creates) the offset for a player in the sorcery dimension
@@ -2714,6 +2727,11 @@ public class NostrumMagica {
 //			world.getMapStorage().setData(PetCommandManager.DATA_NAME, petCommandManager);
 //		}
 	}
+	
+	private void initWorldKeys(World world) {
+		worldKeys = (NostrumKeyRegistry) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(NostrumKeyRegistry::new,
+				NostrumKeyRegistry.DATA_NAME);
+	}
 
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
@@ -2741,6 +2759,7 @@ public class NostrumMagica {
 			getDimensionMapper(world);
 			initPetSoulRegistry(world);
 			initPetCommandManager(world);
+			initWorldKeys(world);
 		}
 	}
 

@@ -70,6 +70,7 @@ public class NostrumBlocks {
 	@ObjectHolder(TeleportRune.ID) public static TeleportRune teleportRune;
 	@ObjectHolder(TemporaryTeleportationPortal.ID) public static TemporaryTeleportationPortal temporaryTeleportationPortal;
 	@ObjectHolder(RuneShaper.ID) public static RuneShaper runeShaper;
+	@ObjectHolder(LockedChest.ID) public static LockedChest lockedChest;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -225,6 +226,7 @@ public class NostrumBlocks {
     	registerBlock(new TeleportRune(), TeleportRune.ID, registry);
     	registerBlock(new TemporaryTeleportationPortal(), TemporaryTeleportationPortal.ID, registry);
     	registerBlock(new RuneShaper(), RuneShaper.ID, registry);
+    	registerBlock(new LockedChest(), LockedChest.ID, registry);
     }
     
 }

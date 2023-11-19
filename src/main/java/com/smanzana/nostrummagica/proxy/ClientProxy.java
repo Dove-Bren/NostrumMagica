@@ -81,6 +81,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderWillo;
 import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityManaArmorerRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
@@ -155,6 +156,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.tiles.CandleTileEntity;
+import com.smanzana.nostrummagica.tiles.LockedChestEntity;
 import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
@@ -317,6 +319,7 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntitySpecialRenderer(NostrumPortalTileEntityBase.class, new TileEntityPortalRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class, new TileEntityProgressionDoorRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(ManaArmorerTileEntity.class, new TileEntityManaArmorerRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(LockedChestEntity.class, new TileEntityLockedChestRenderer());
 		
 		ScreenManager.registerFactory(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
@@ -1128,6 +1131,10 @@ public class ClientProxy extends CommonProxy {
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "entity/dragonflightwing"));
 		
+		event.addSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/block/chain_link"));
+		event.addSprite(new ResourceLocation(
+				NostrumMagica.MODID, "models/block/lock_plate"));
 
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/mist_bad"));

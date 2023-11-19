@@ -338,6 +338,8 @@
 	"item.nostrummagica.poison_water_bucket": "Poison Water Bucket",
 	"item.nostrummagica.poison_water_unbreakable_bucket": "Unbreakable Poison Water Bucket",
 	
+	"item.nostrummagica.world_key": "World Key",
+	
 	"curios.identifier.pendant": "Pendant",
 
     "effect.nostrummagica.potions-frostbite": "Frostbite",
@@ -403,6 +405,7 @@
     "block.nostrummagica.mana_armorer": "Mana Armorer",
 	"block.nostrummagica.symbol_block": "Symbol Block",
 	"block.nostrummagica.rune_shaper": "Rune Shaper",
+	"block.nostrummagica.locked_chest": "Locked Chest",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

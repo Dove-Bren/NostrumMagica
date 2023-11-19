@@ -290,6 +290,7 @@ public class NostrumItems {
 	@ObjectHolder(ThanoPendant.ID) public static ThanoPendant thanoPendant;
 	@ObjectHolder(ThanosStaff.ID) public static ThanosStaff thanosStaff;
 	@ObjectHolder(WarlockSword.ID) public static WarlockSword warlockSword;
+	@ObjectHolder(WorldKeyItem.ID) public static WorldKeyItem worldKey;
 	
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -589,6 +590,7 @@ public class NostrumItems {
     	register(registry, new ThanoPendant().setRegistryName(ThanoPendant.ID));
     	register(registry, new ThanosStaff().setRegistryName(ThanosStaff.ID));
     	register(registry, new WarlockSword().setRegistryName(WarlockSword.ID));
+    	register(registry, new WorldKeyItem().setRegistryName(WorldKeyItem.ID));
     	
     	// Generate and register spell runes
     	{
