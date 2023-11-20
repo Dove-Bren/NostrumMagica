@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBase;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
 import com.smanzana.nostrummagica.client.effects.ClientEffectEchoed;
@@ -900,24 +901,26 @@ public class ClientProxy extends CommonProxy {
 	    			elem = EMagicElement.PHYSICAL;
 	    		int level = part.getElementCount();
 	    		
-	    		if (level == 1) {
-	    			Boolean know = att.getKnownElements().get(elem);
-	    			if (know == null || !know) {
-	    				player.sendMessage(new TranslationTextComponent(
-								"info.spell.no_mastery", new Object[] {elem.getName()}));
-	    				System.out.println("LOUD NO MASTERY"); // TODO remove
+	    		final ElementalMastery neededMastery;
+				switch (level) {
+				case 0:
+				case 1:
+					neededMastery = ElementalMastery.NOVICE;
+					break;
+				case 2:
+					neededMastery = ElementalMastery.ADEPT;
+					break;
+				case 3:
+				default:
+					neededMastery = ElementalMastery.MASTER;
+					break;
+				}
+				
+				final ElementalMastery currentMastery = att.getElementalMastery(elem);
+				if (!currentMastery.isGreaterOrEqual(neededMastery)) {
+					player.sendMessage(new TranslationTextComponent(
+							"info.spell.low_mastery", neededMastery.name().toLowerCase(), elem.getName(), currentMastery.name().toLowerCase()));
 						NostrumMagicaSounds.CAST_FAIL.play(player);
-						return;
-	    			}
-				} else {
-		    		Integer mast = att.getElementMastery().get(elem);
-		    		int mastery = (mast == null ? 0 : mast);
-		    		if (mastery < level) {
-		    			player.sendMessage(new TranslationTextComponent(
-							"info.spell.low_mastery", new Object[] {elem.getName(), level, mastery}));
-						NostrumMagicaSounds.CAST_FAIL.play(player);
-						return;
-		    		}
 				}
 	    	}
 			

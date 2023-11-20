@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
@@ -31,22 +32,18 @@ public abstract class ShrineTrial {
 	}
 	
 	public boolean canTake(PlayerEntity entityPlayer, INostrumMagic attr) {
-		Boolean bool = attr.getKnownElements().get(this.element);
-		if (bool == null || !bool)
-			return false;
+		final ElementalMastery mastery = attr.getElementalMastery(this.element);
 		
-		Integer mastery = attr.getElementMastery().get(this.element);
-		if (mastery != null && mastery > 2)
-			return false;
-		
-		return !attr.hasTrial(this.element);
+		return !attr.hasTrial(this.element) // Can't already have this trial
+				&& mastery.isGreaterOrEqual(ElementalMastery.NOVICE) // Have to have at least novice
+				&& !mastery.isGreaterOrEqual(ElementalMastery.MASTER); // Can't be master or better
 	}
 	
 	public void start(PlayerEntity player, INostrumMagic attr) {
 		attr.startTrial(this.element);
 		
-		Integer mastery = attr.getElementMastery().get(this.element);
-		if (mastery == null || mastery == 1) {
+		final ElementalMastery mastery = attr.getElementalMastery(this.element);
+		if (mastery == ElementalMastery.NOVICE) {
 			if (!player.world.isRemote) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
 				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}));
@@ -61,18 +58,29 @@ public abstract class ShrineTrial {
 		if (attr == null)
 			return;
 		
-		Integer mastery = attr.getElementMastery().get(this.element);
-		if (mastery == null)
-			mastery = 0;
-		
-		mastery = mastery + 1;
+		final ElementalMastery currentMastery = attr.getElementalMastery(this.element);
+		final ElementalMastery newMastery;
+		switch (currentMastery) {
+		case MASTER:
+		default:
+			newMastery = currentMastery; // Shouldn't have gotten here
+			break;
+		case UNKNOWN:
+		case NOVICE:
+			newMastery = ElementalMastery.ADEPT;
+			break;
+		case ADEPT:
+			newMastery = ElementalMastery.MASTER;
+			break;
+		}
 		
 		attr.endTrial(element);
-		attr.setElementMastery(this.element, mastery);
+		attr.setElementalMastery(this.element, newMastery);
 		
 		if (!player.world.isRemote) {
 			NostrumMagicaSounds.LEVELUP.play(player);
-			player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
+			// Message done in attr
+			//player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 		}
 			

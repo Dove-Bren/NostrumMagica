@@ -33,7 +33,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -105,8 +104,7 @@ public class NostrumMagic implements INostrumMagic {
 	
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
-	private Map<EMagicElement, Boolean> knownElements;
-	private Map<EMagicElement, Integer> elementalMastery;
+	private Map<EMagicElement, ElementalMastery> elementalMastery;
 	private Map<EMagicElement, Boolean> elementTrials;
 	private List<SpellShape> shapes; // list of shape keys
 	private List<SpellTrigger> triggers; // list of trigger keys
@@ -130,7 +128,6 @@ public class NostrumMagic implements INostrumMagic {
 		//familiars = new LinkedList<>();
 		loreLevels = new HashMap<>();
 		spellCRCs = new HashSet<>();
-		knownElements = new EnumMap<>(EMagicElement.class);
 		elementalMastery = new EnumMap<>(EMagicElement.class);
 		elementTrials = new EnumMap<>(EMagicElement.class);
 		shapes = new LinkedList<>();
@@ -172,7 +169,7 @@ public class NostrumMagic implements INostrumMagic {
 			bindingSpell = null;
 			bindingComponent = null;
 			
-			this.setElementMastery(EMagicElement.PHYSICAL, 1);
+			this.setElementalMastery(EMagicElement.PHYSICAL, ElementalMastery.NOVICE);
 			this.completeResearch("origin");
 			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
@@ -489,15 +486,35 @@ public class NostrumMagic implements INostrumMagic {
 	public List<SpellTrigger> getTriggers() {
 		return triggers;
 	}
-
-	@Override
+	
 	public Map<EMagicElement, Boolean> getKnownElements() {
-		return knownElements;
+		Map<EMagicElement, Boolean> map = new EnumMap<>(EMagicElement.class);
+		for (EMagicElement element : EMagicElement.values()) {
+			map.put(element, getElementalMastery(element) != ElementalMastery.UNKNOWN);
+		}
+		return map;
 	}
-
-	@Override
-	public Map<EMagicElement, Integer> getElementMastery() {
-		return elementalMastery;
+	
+	public boolean setElementalMastery(EMagicElement element, ElementalMastery mastery) {
+		elementalMastery.put(element, mastery);
+		
+		if (mastery != ElementalMastery.UNKNOWN) {
+			if (this.entity != null && !this.entity.world.isRemote
+					&& this.entity instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) this.entity;
+				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()));
+			}
+			
+			// Old and unneeded?
+			doUnlockCheck();
+		}
+		
+		return true;
+	}
+	
+	public ElementalMastery getElementalMastery(EMagicElement element) {
+		ElementalMastery mastery = elementalMastery.get(element);
+		return mastery == null ? ElementalMastery.UNKNOWN : mastery;
 	}
 
 	@Override
@@ -520,72 +537,41 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public boolean learnElement(EMagicElement element) {
-		Boolean old = knownElements.put(element, Boolean.TRUE);
-		if (old == null || !old) {
-			// Learned for the first time
-			// TODO effect
-			if (this.entity != null && !this.entity.world.isRemote
-					&& this.entity instanceof PlayerEntity) {
-				PlayerEntity player = (PlayerEntity) this.entity;
-				player.sendMessage(new StringTextComponent("The forces of "
-						+ element.getName() + " have been unlocked!"));
-			}
-			
-			// Edit: Start at mastery 1 instead of 0
-			this.setElementMastery(element, 1);
-
-			doUnlockCheck();
-		}
-		
-		return old == null || !old;
-	}
-
-	@Override
-	public void setElementMastery(EMagicElement element, int level) {
-		Boolean known = knownElements.get(element);
-		if (known == null || !known)
-			learnElement(element);
-		
-		elementalMastery.put(element, level);
-	}
-
-	@Override
 	public void unlockAlteration(EAlteration alteration) {
 		alterations.put(alteration, Boolean.TRUE);
 		doUnlockCheck();
 	}
 	
 	private void doUnlockCheck() {
-		if (this.unlocked)
-			return;
-		
-		// Unlock (ritual of discovery) if at least one shape and trigger
-		// and an element have been 'discovered'.
-		
-		if (shapes.isEmpty() || triggers.isEmpty())
-			return;
-		
-		boolean found = false;
-		for (EMagicElement e : EMagicElement.values()) {
-			if (knownElements.get(e) != null
-					&& knownElements.get(e)) {
-				found = true;
-				break;
-			}
-		}
-		
-		if (!found)
-			return;
-		
-		unlock();
-		// TODO effects
-		if (this.entity != null && !this.entity.world.isRemote
-				&& this.entity instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) this.entity;
-			player.sendMessage(new StringTextComponent(
-					"Magic Unlocked"));
-		}
+//		if (this.unlocked)
+//			return;
+//		
+//		// Unlock (ritual of discovery) if at least one shape and trigger
+//		// and an element have been 'discovered'.
+//		
+//		if (shapes.isEmpty() || triggers.isEmpty())
+//			return;
+//		
+//		boolean found = false;
+//		for (EMagicElement e : EMagicElement.values()) {
+//			if (knownElements.get(e) != null
+//					&& knownElements.get(e)) {
+//				found = true;
+//				break;
+//			}
+//		}
+//		
+//		if (!found)
+//			return;
+//		
+//		unlock();
+//		// TODO effects
+//		if (this.entity != null && !this.entity.world.isRemote
+//				&& this.entity instanceof PlayerEntity) {
+//			PlayerEntity player = (PlayerEntity) this.entity;
+//			player.sendMessage(new StringTextComponent(
+//					"Magic Unlocked"));
+//		}
 		
 	}
 
@@ -621,12 +607,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public Map<EMagicElement, Boolean> serializeKnownElements() {
-		return this.knownElements;
-	}
-
-	@Override
-	public Map<EMagicElement, Integer> serializeElementMastery() {
+	public Map<EMagicElement, ElementalMastery> serializeElementMastery() {
 		return this.elementalMastery;
 	}
 	
@@ -679,7 +660,6 @@ public class NostrumMagic implements INostrumMagic {
 		
 		this.loreLevels = cap.serializeLoreLevels();
 		this.spellCRCs = cap.serializeSpellHistory();
-		this.knownElements = cap.serializeKnownElements();
 		this.elementalMastery = cap.serializeElementMastery();
 		this.elementTrials = cap.serializeElementTrials();
 		this.alterations = cap.serializeAlterations();

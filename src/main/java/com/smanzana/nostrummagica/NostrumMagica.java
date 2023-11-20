@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
@@ -2518,16 +2519,24 @@ public class NostrumMagica {
 			if (elem == null)
 				elem = EMagicElement.PHYSICAL;
 			int level = part.getElementCount();
+			
+			final ElementalMastery neededMastery;
+			switch (level) {
+			case 0:
+			case 1:
+				neededMastery = ElementalMastery.NOVICE;
+				break;
+			case 2:
+				neededMastery = ElementalMastery.ADEPT;
+				break;
+			case 3:
+			default:
+				neededMastery = ElementalMastery.MASTER;
+				break;
+			}
 
-			if (level == 1) {
-				Boolean know = attr.getKnownElements().get(elem);
-				if (know == null || !know)
-					return false;
-			} else {
-				Integer mast = attr.getElementMastery().get(elem);
-				int mastery = (mast == null ? 0 : mast);
-				if (mastery < level)
-					return false;
+			if (!attr.getElementalMastery(elem).isGreaterOrEqual(neededMastery)) {
+				return false;
 			}
 		}
 

@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -48,8 +49,7 @@ public class CommandUnlockAll {
 			attr.unlockAlteration(alt);
 		}
 		for (EMagicElement elem : EMagicElement.values()) {
-			attr.learnElement(elem);
-			attr.setElementMastery(elem, 3);
+			attr.setElementalMastery(elem, ElementalMastery.MASTER);
 		}
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)

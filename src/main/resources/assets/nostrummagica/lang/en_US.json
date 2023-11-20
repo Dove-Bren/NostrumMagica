@@ -573,6 +573,9 @@
     "info.mana_armorer.already_have": "You already have mana armor",
 	"info.locked_chest.nokey": "The chest is locked by magical means",
 	"info.world_key.gotkey": "A magic lock somewhere can now be unlocked!",
+	"info.element_mastery.novice": "The forces of %1$s have been unlocked!",
+	"info.element_mastery.adept": "You're now an Adept of %1$s!",
+	"info.element_mastery.master": "You've become a Master of %1$s",
 
     "info.armor.set_status": "%1$s Set Bonus %3$s(%2$d/4)%4$s",
     "info.armor.set_total": "%1$s Set Bonus %2$s(Complete)%3$s",

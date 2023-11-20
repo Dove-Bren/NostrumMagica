@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
@@ -59,7 +60,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_LORELEVELS = "lore";
 	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
-	private static final String NBT_KNOWN_ELEMENTS = "known_elements";
 	private static final String NBT_MASTERED_ELEMENTS = "mastered_elements";
 	private static final String NBT_ELEMENT_TRIALS = "element_trials";
 	private static final String NBT_SHAPES = "shapes"; // list of shape keys
@@ -115,18 +115,9 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		compound = new CompoundNBT();
 		{
-			Map<EMagicElement, Boolean> map = instance.serializeKnownElements();
+			Map<EMagicElement, ElementalMastery> map = instance.serializeElementMastery();
 			for (EMagicElement key : map.keySet()) {
-				compound.putBoolean(key.name(), map.get(key));
-			}
-		}
-		nbt.put(NBT_KNOWN_ELEMENTS, compound);
-		
-		compound = new CompoundNBT();
-		{
-			Map<EMagicElement, Integer> map = instance.serializeElementMastery();
-			for (EMagicElement key : map.keySet()) {
-				compound.putInt(key.name(), map.get(key));
+				compound.put(key.name(), map.get(key).toNBT());
 			}
 		}
 		nbt.put(NBT_MASTERED_ELEMENTS, compound);
@@ -343,35 +334,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			instance.deserializeSpells(list.getString(i));
 		}
 		
-		// KNOWNELEMENTS
-		compound = tag.getCompound(NBT_KNOWN_ELEMENTS);
-		for (String key : compound.keySet()) {
-			boolean val = compound.getBoolean(key);
-			if (val) {
-				EMagicElement elem = EMagicElement.valueOf(key);
-				instance.learnElement(elem);
-			}
-		}
-		
 		// ELEMENTS
 		compound = tag.getCompound(NBT_MASTERED_ELEMENTS);
 		for (String key : compound.keySet()) {
-			int val = compound.getInt(key);
-			if (val != 0) {
-				EMagicElement elem = EMagicElement.valueOf(key);
-				instance.setElementMastery(elem, val);
-			}
-		}
-		
-		// PATCH #1: Known implies mastery 1
-		for (EMagicElement elem : EMagicElement.values()) {
-			Boolean known = instance.getKnownElements().get(elem);
-			if (known != null && known) {
-				Integer mastery = instance.getElementMastery().get(elem);
-				if (mastery == null || mastery <= 0) {
-					instance.setElementMastery(elem, 1);
-				}
-			}
+			EMagicElement elem = EMagicElement.valueOf(key);
+			instance.setElementalMastery(elem, ElementalMastery.fromNBT(compound.get(key)));
 		}
 		
 		compound = tag.getCompound(NBT_ELEMENT_TRIALS);

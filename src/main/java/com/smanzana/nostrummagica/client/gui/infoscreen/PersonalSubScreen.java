@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -377,10 +378,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			float alpha;
 			GlStateManager.enableBlend();
 			GlStateManager.enableAlphaTest();
-			Map<EMagicElement, Integer> elementMaster = attr.getElementMastery();
 			Map<EMagicElement, Boolean> elementKnow = attr.getKnownElements();
 			for (EMagicElement elem : EMagicElement.values()) {
-				Integer mastery = elementMaster.get(elem);
+				ElementalMastery mastery = attr.getElementalMastery(elem);
 				Boolean know = elementKnow.get(elem);
 				if (know != null && know)
 					alpha = known;
@@ -393,7 +393,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				SpellComponentIcon.get(elem).draw(mc.currentScreen, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth);
 				
 				if (mastery != null) {
-					mc.fontRenderer.drawString(mastery + "", drawX + 1, drawY + 1, 0xFFFFFFFF);
+					mc.fontRenderer.drawString(mastery + "", drawX + 1, drawY + 1, 0xFFFFFFFF); int unused; // improve
 				}
 				
 				drawX += 5 + iconWidth;

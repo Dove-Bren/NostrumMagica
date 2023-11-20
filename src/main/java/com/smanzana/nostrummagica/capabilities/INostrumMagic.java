@@ -19,6 +19,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -56,6 +58,40 @@ public interface INostrumMagic {
 			}
 			
 			return false;
+		}
+	}
+	
+	public static enum ElementalMastery {
+		UNKNOWN,
+		NOVICE,
+		ADEPT,
+		MASTER;
+		
+		private ElementalMastery() {
+			
+		}
+		
+		public INBT toNBT() {
+			return new StringNBT(this.name());
+		}
+		
+		public static ElementalMastery fromNBT(INBT nbt) {
+			try {
+				return ElementalMastery.valueOf(
+						((StringNBT) nbt).getString().toUpperCase()
+					);
+			} catch (Exception e) {
+				return ElementalMastery.NOVICE;
+			}
+		}
+		
+		public String getTranslationKey() {
+			return this.name().toLowerCase();
+		}
+		
+		public boolean isGreaterOrEqual(ElementalMastery other) {
+			// Cheat and use ordinals
+			return this.ordinal() >= other.ordinal();
 		}
 	}
 
@@ -141,12 +177,13 @@ public interface INostrumMagic {
 	public void addShape(SpellShape shape);
 	public List<SpellTrigger> getTriggers();
 	public void addTrigger(SpellTrigger trigger);
-	public Map<EMagicElement, Boolean> getKnownElements();
-	public boolean learnElement(EMagicElement element);
-	public Map<EMagicElement, Integer> getElementMastery();
-	public void setElementMastery(EMagicElement element, int level);
 	public Map<EAlteration, Boolean> getAlterations();
 	public void unlockAlteration(EAlteration alteration);
+	
+	// Elemental mastery
+	public Map<EMagicElement, Boolean> getKnownElements();
+	public boolean setElementalMastery(EMagicElement element, ElementalMastery mastery);
+	public ElementalMastery getElementalMastery(EMagicElement element);
 	
 	// Element Trials
 	public void startTrial(EMagicElement element);
@@ -180,8 +217,7 @@ public interface INostrumMagic {
 	
 	public Map<String, Integer> serializeLoreLevels();
 	public Set<String> serializeSpellHistory();
-	public Map<EMagicElement, Boolean> serializeKnownElements();
-	public Map<EMagicElement, Integer> serializeElementMastery();
+	public Map<EMagicElement, ElementalMastery> serializeElementMastery();
 	public Map<EMagicElement, Boolean> serializeElementTrials();
 	public Map<EAlteration, Boolean> serializeAlterations();
 	public Map<UUID, Float> getManaModifiers();

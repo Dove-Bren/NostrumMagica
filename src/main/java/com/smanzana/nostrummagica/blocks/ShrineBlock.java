@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.items.MasteryOrb;
@@ -137,9 +138,12 @@ public class ShrineBlock extends SymbolBlock {
 		if (component.isElement()) {
 			// Elements either grant knowledge (if the player hasn't unlocked
 			// magic yet) OR start a trial/advance mastery
-			if (attr.learnElement(component.getElement())) {
+			final EMagicElement element = component.getElement();
+			
+			if (attr.getElementalMastery(element) == ElementalMastery.UNKNOWN
+					&& attr.setElementalMastery(element, ElementalMastery.NOVICE)) {
 				// Just learned!
-				final int color = 0x80000000 | (0x00FFFFFF & component.getElement().getColor());
+				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
 				DoEffect(pos, playerIn, color);
 			}
 			
@@ -152,9 +156,9 @@ public class ShrineBlock extends SymbolBlock {
 				return false;
 			}
 			
-			ShrineTrial trial = ShrineTrial.getTrial(component.getElement());
+			ShrineTrial trial = ShrineTrial.getTrial(element);
 			if (trial == null) {
-				NostrumMagica.logger.error("No trial found for element " + component.getElement().name());
+				NostrumMagica.logger.error("No trial found for element " + element.name());
 				return false;
 			} else {
 				if (trial.canTake(playerIn, attr)) {
