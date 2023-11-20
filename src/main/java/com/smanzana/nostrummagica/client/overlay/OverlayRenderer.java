@@ -17,7 +17,6 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.DungeonAir;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
-import com.smanzana.nostrummagica.blocks.ToggleLogicDoor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectAnimated;

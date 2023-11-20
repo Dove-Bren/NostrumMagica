@@ -18,7 +18,6 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
-import com.smanzana.nostrummagica.blocks.TeleportRune;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -44,6 +43,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.tiles.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.block.BlockState;
@@ -1036,7 +1036,7 @@ public class PlayerListener {
 			}
 			
 			NostrumPortal.tick();
-			TeleportRune.tick();
+			TeleportRuneTileEntity.tickChargeMap();
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
 				EnchantedArmor.ServerWorldTick(world);
 			}
@@ -1050,7 +1050,7 @@ public class PlayerListener {
 		if (event.phase == Phase.START) {
 			if (!Minecraft.getInstance().isIntegratedServerRunning() && Minecraft.getInstance().player != null) {
 				NostrumPortal.tick();
-				TeleportRune.tick();
+				//TeleportRune.tick();
 			}
 		}
 	}
