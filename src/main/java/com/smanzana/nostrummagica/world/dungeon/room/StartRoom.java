@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -193,11 +194,11 @@ public class StartRoom extends StaticRoom implements ISpellComponentRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
-		super.spawn(world, start, bounds);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+		super.spawn(world, start, bounds, dungeonID);
 		
 		RoomExtendedShrineStaircase stairs = new RoomExtendedShrineStaircase(component, false);
 		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
-		stairs.spawn(world, adj, bounds);
+		stairs.spawn(world, adj, bounds, dungeonID);
 	}
 }

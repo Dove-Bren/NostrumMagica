@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.UUID;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -13,7 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 
-public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements IWorldKeyHolder {
+public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements IWorldKeyHolder, IUniqueDungeonTileEntity {
 	
 	private NostrumWorldKey key;
 	
@@ -74,10 +76,25 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
-		NostrumParticles.FILLED_ORB.spawn(world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 				30, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 1,
 				50, 10,
-				Vec3d.ZERO, new Vec3d(.0125, .0125, .0125)
-				).gravity(-.1f));
+				Vec3d.ZERO, new Vec3d(.1, .1, .1)
+				).gravity(-.075f));
+	}
+	
+	@Override
+	public void onDungeonSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+		// TODO: should this use dungeon ID? Or even let it be configurable?
+		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
+		// will want unique-per-room keys?
+		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
+		// that's wrong?
+		final NostrumWorldKey newKey = this.key.mutateWithID(roomID);
+		if (isWorldGen) {
+			this.key = newKey;
+		} else {
+			this.setWorldKey(newKey);
+		}
 	}
 }

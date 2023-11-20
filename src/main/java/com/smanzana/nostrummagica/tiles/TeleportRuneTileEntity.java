@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.tiles;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.utils.WorldUtil;
-import com.smanzana.nostrummagica.world.blueprints.IOrientedTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.BlockState;

@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -53,7 +54,7 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, MutableBoundingBox bounds) {
+	public void spawn(IWorld world, DungeonExitPoint start, MutableBoundingBox bounds, UUID dungeonID) {
 		
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
@@ -74,11 +75,11 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
 		while (cur.getY() < maxY - RoomEntryDragon.LevelsBelow) {
-			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds);
+			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
 			cur = cur.add(0, stairHeight, 0);
 		}
 		
-		entry.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds);
+		entry.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
 	}
 	
 	@Override

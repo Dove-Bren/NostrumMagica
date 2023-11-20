@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -65,10 +66,10 @@ public interface IDungeonRoom {
 	
 	public boolean hasTraps();
 	
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID);
 	
 	default public void spawn(IWorld world, DungeonExitPoint start) {
-		spawn(world, start, (MutableBoundingBox) null);
+		spawn(world, start, (MutableBoundingBox) null, UUID.randomUUID());
 	}
 	
 	public String getRoomID();

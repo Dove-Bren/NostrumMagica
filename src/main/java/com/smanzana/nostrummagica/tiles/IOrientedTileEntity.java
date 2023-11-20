@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.world.blueprints;
+package com.smanzana.nostrummagica.tiles;
 
 import net.minecraft.util.Direction;
 

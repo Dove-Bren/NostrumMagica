@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -265,7 +266,8 @@ public class NostrumDungeon {
 		
 		public void spawn(IWorld world, MutableBoundingBox bounds) {
 			// Spawn room template
-			template.spawn(world, this.entry, bounds);
+			UUID id = UUID.randomUUID();
+			template.spawn(world, this.entry, bounds, id);
 			
 			// If we have a key, do special key placement
 			if (this.hasKey) {

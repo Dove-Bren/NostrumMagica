@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -278,7 +279,7 @@ public class RoomEntryDragon extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
-		super.spawn(world, start, bounds);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+		super.spawn(world, start, bounds, dungeonID);
 	}
 }

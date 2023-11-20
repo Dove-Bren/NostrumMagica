@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.command;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -73,7 +74,7 @@ public class CommandReadRoom {
 				if (nbt != null) {
 					RoomBlueprint blueprint = RoomBlueprint.fromNBT((CompoundNBT) nbt.get("blueprint"));
 					if (blueprint != null) {
-						blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing);
+						blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing, UUID.randomUUID());
 					} else {
 						context.getSource().sendFeedback(new StringTextComponent("Room failed to load"), true);
 					}

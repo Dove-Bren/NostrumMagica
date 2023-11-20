@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -340,9 +341,9 @@ public class RoomLectern extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds)
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID)
 	{
-		super.spawn(world, start, bounds);
+		super.spawn(world, start, bounds, dungeonID);
 		
 		// Fill out lectern!
 		BlockPos offset = new BlockPos(-15, 1, 3);

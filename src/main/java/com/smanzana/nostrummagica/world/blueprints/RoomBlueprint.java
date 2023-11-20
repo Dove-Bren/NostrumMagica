@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,6 +19,8 @@ import com.smanzana.nostrummagica.blocks.ManiCrystal;
 import com.smanzana.nostrummagica.blocks.MimicOnesidedBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.tiles.IOrientedTileEntity;
+import com.smanzana.nostrummagica.tiles.IUniqueDungeonTileEntity;
 import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
 import com.smanzana.nostrummagica.utils.PortingUtil;
 import com.smanzana.nostrummagica.utils.WorldUtil;
@@ -607,6 +610,29 @@ public class RoomBlueprint {
 		}
 	}
 	
+	public static final class SpawnContext {
+		
+		public final IWorld world;
+		public final BlockPos at;
+		public final Direction direction;
+		public final @Nullable MutableBoundingBox bounds;
+		public final UUID globalID;
+		public final UUID roomID;
+		
+		public SpawnContext(IWorld world, BlockPos pos, Direction direction, @Nullable MutableBoundingBox bounds, UUID globalID, UUID roomID) {
+			this.world = world;
+			this.at = pos;
+			this.direction = direction;
+			this.bounds = bounds;
+			this.globalID = globalID;
+			this.roomID = roomID;
+		}
+		
+		public SpawnContext(IWorld world, BlockPos pos, Direction direction, @Nullable MutableBoundingBox bounds, UUID globalID) {
+			this(world, pos, direction, bounds, globalID, UUID.randomUUID());
+		}
+	}
+	
 	public static final String NBT_DIMS = "dimensions";
 	public static final String NBT_WHOLE_DIMS = "master_dimensions";
 	public static final String NBT_BLOCK_LIST = "blocks";
@@ -821,24 +847,24 @@ public class RoomBlueprint {
 		return false;
 	}
 	
-	protected void placeBlock(IWorld world, BlockPos at, Direction direction, BlueprintBlock block) {
+	protected void placeBlock(SpawnContext context, BlockPos at, Direction direction, BlueprintBlock block) {
 		
-		final boolean worldGen = (world instanceof WorldGenRegion);
+		final boolean worldGen = (context.world instanceof WorldGenRegion);
 		
 		if (spawnerFunc != null) {
-			spawnerFunc.spawnBlock(world, at, direction, block);
+			spawnerFunc.spawnBlock(context, at, direction, block);
 		} else {
 			BlockState placeState = block.getSpawnState(direction);
 			if (placeState != null) {
 				// TODO: add fluid state support
-				world.setBlockState(at, placeState, 2);
+				context.world.setBlockState(at, placeState, 2);
 				if (WorldUtil.blockNeedsGenFixup(block.state)) {
 					if (worldGen) {
-						world.getChunk(at).markBlockForPostprocessing(at);
+						context.world.getChunk(at).markBlockForPostprocessing(at);
 					} else {
-						BlockState blockstate = world.getBlockState(at);
-						BlockState blockstate1 = Block.getValidBlockForPosition(blockstate, world, at);
-						world.setBlockState(at, blockstate1, 20);
+						BlockState blockstate = context.world.getBlockState(at);
+						BlockState blockstate1 = Block.getValidBlockForPosition(blockstate, context.world, at);
+						context.world.setBlockState(at, blockstate1, 20);
 					}
 				}
 				
@@ -858,13 +884,16 @@ public class RoomBlueprint {
 					
 					if (te != null) {
 						if (worldGen) {
-							world.getChunk(at).addTileEntity(at, te);
+							context.world.getChunk(at).addTileEntity(at, te);
 						} else {
-							world.getWorld().setTileEntity(at, te);
+							context.world.getWorld().setTileEntity(at, te);
 						}
 						if (te instanceof IOrientedTileEntity) {
 							// Let tile ent respond to rotation
 							((IOrientedTileEntity) te).setSpawnedFromRotation(direction, worldGen);
+						}
+						if (te instanceof IUniqueDungeonTileEntity) {
+							((IUniqueDungeonTileEntity) te).onDungeonSpawn(context.globalID, context.roomID, worldGen);
 						}
 					} else {
 						NostrumMagica.logger.error("Could not deserialize TileEntity with id \"" + tileEntityData.getString("id") + "\"");
@@ -872,20 +901,22 @@ public class RoomBlueprint {
 				}
 			} else {
 				//world.removeBlock(at, false);
-				world.setBlockState(at, Blocks.AIR.getDefaultState(), 2);
+				context.world.setBlockState(at, Blocks.AIR.getDefaultState(), 2);
 			}
 		}
 	}
 	
-	public void spawn(IWorld world, BlockPos at) {
-		this.spawn(world, at, Direction.NORTH);
+	public void spawn(IWorld world, BlockPos at, UUID globalID) {
+		this.spawn(world, at, Direction.NORTH, globalID);
 	}
 	
-	public void spawn(IWorld world, BlockPos at, Direction direction) {
-		this.spawn(world, at, direction, (MutableBoundingBox) null);
+	public void spawn(IWorld world, BlockPos at, Direction direction, UUID globalID) {
+		this.spawn(world, at, direction, (MutableBoundingBox) null, globalID);
 	}
 	
-	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds) {
+	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds, UUID globalID) {
+		
+		SpawnContext context = new SpawnContext(world, at, direction, bounds, globalID);
 		
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
@@ -1018,7 +1049,7 @@ public class RoomBlueprint {
 					secondPassBlocks.add(block);
 					secondPassPos.add(new BlockPos(cursor));
 				} else {
-					placeBlock(world, cursor, modDir, block);
+					placeBlock(context, cursor, modDir, block);
 				}
 			}
 			
@@ -1026,7 +1057,7 @@ public class RoomBlueprint {
 			for (int i = 0; i < secondPassBlocks.size(); i++) {
 				BlockPos secondPos = secondPassPos.get(i);
 				BlueprintBlock block = secondPassBlocks.get(i);
-				placeBlock(world, secondPos, modDir, block);
+				placeBlock(context, secondPos, modDir, block);
 			}
 			
 			world.getChunk(cursor).setModified(true);
@@ -1655,7 +1686,7 @@ public class RoomBlueprint {
 	
 	public static interface IBlueprintSpawner {
 		
-		public void spawnBlock(IWorld world, BlockPos pos, Direction direction, BlueprintBlock block);
+		public void spawnBlock(SpawnContext context, BlockPos pos, Direction direction, BlueprintBlock block);
 	}
 	
 }

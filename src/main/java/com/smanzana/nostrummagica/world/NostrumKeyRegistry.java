@@ -42,6 +42,20 @@ public class NostrumKeyRegistry extends WorldSavedData {
 			this(UUID.randomUUID());;//, 0xFF000000 | NostrumMagica.rand.nextInt());
 		}
 		
+		/**
+		 * Takes another UUID and creates a new, unique key based on this key and the
+		 * other ID passed in.
+		 * This is intended to be deterministic such that two NostrumWorldKeys with the same underlying
+		 * ID can be mutated with the same second id and produce equal new keys.
+		 * @param id
+		 * @return
+		 */
+		public NostrumWorldKey mutateWithID(UUID id) {
+			final long most = this.id.getMostSignificantBits() ^ id.getMostSignificantBits();
+			final long least = this.id.getLeastSignificantBits() ^ id.getLeastSignificantBits();
+			return new NostrumWorldKey(new UUID(least, most));
+		}
+		
 		public CompoundNBT asNBT() {
 			CompoundNBT nbt = new CompoundNBT();
 			nbt.putUniqueId(NBT_ID, id);

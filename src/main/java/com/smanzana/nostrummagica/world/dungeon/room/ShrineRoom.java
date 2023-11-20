@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -175,8 +176,8 @@ public class ShrineRoom extends StaticRoom implements ISpellComponentRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
-		super.spawn(world, start, bounds);
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+		super.spawn(world, start, bounds, dungeonID);
 		
 		BlockPos pos = NostrumDungeon.asRotated(start, new BlockPos(blockXOffset, 1, blockZOffset), Direction.NORTH).getPos();
 		if (bounds == null || bounds.isVecInside(pos)) {

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -231,7 +232,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		Set<IChunk> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation

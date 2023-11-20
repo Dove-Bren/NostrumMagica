@@ -403,6 +403,7 @@ public class NostrumEmptyDimension {
 			}
 			
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn((PlayerEntity) entityIn);
+			final UUID dungeonID = entityIn.getUniqueID(); // Use entity UUID as dungeon ID?
 			
 //			for (int i = -5; i <= 5; i++) {
 //				for (int j = -5; j <= 5; j++) {
@@ -411,11 +412,11 @@ public class NostrumEmptyDimension {
 //				}
 //			}
 			long startTime = System.currentTimeMillis();
-			lobbyBlueprint.spawn(world, spawn);
+			lobbyBlueprint.spawn(world, spawn, dungeonID);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
 			
 			startTime = System.currentTimeMillis();
-			wholeBlueprint.spawn(world, spawn);
+			wholeBlueprint.spawn(world, spawn, dungeonID);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
 			
 			return true;

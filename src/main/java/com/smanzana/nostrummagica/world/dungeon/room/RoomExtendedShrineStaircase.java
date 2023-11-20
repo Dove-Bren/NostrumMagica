@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -11,8 +12,8 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
 
@@ -56,7 +57,7 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
@@ -77,11 +78,11 @@ public class RoomExtendedShrineStaircase implements IDungeonRoom {
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
 		while (cur.getY() + stairHeight < maxY) {
-			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds);
+			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
 			cur = cur.add(0, stairHeight, 0);
 		}
 		
-		shrine.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds);
+		shrine.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
 	}
 	
 	@Override

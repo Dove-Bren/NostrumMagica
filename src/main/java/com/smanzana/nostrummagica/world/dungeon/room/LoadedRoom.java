@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -85,9 +86,9 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds) {
+	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		// See note about dungeon vs blueprint facing in @getExits
-		blueprint.spawn(world, start.getPos(), start.getFacing(), bounds);
+		blueprint.spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID);
 		
 		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())

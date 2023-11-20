@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.UUID;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.LockedChest;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
@@ -28,7 +30,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public class LockedChestEntity extends TileEntity implements ITickableTileEntity, IInventory, IWorldKeyHolder {
+public class LockedChestEntity extends TileEntity implements ITickableTileEntity, IInventory, IWorldKeyHolder, IUniqueDungeonTileEntity {
 
 	private static final String NBT_INV = "inventory";
 	private static final String NBT_LOCK = "lockkey";
@@ -217,6 +219,21 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 	public void setWorldKey(NostrumWorldKey key) {
 		this.lockKey = key;
 		this.dirty();
+	}
+	
+	@Override
+	public void onDungeonSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+		// TODO: should this use dungeon ID? Or even let it be configurable?
+		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
+		// will want unique-per-room keys?
+		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
+		// that's wrong?
+		final NostrumWorldKey newKey = this.lockKey.mutateWithID(roomID);
+		if (isWorldGen) {
+			this.lockKey = newKey;
+		} else {
+			this.setWorldKey(newKey);
+		}
 	}
 	
 	public static final boolean LockChest(World world, BlockPos pos, NostrumWorldKey key) {
