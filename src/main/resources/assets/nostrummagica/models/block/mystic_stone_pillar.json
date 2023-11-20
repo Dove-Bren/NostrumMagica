@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/stone_pillar",
+    "textures": {
+        "pillar": "nostrummagica:block/mystic_stone_pillar"
+    }
+}

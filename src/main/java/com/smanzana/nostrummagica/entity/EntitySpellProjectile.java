@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
+import com.smanzana.nostrummagica.blocks.MysticAnchor;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
@@ -10,6 +11,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -128,7 +130,16 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 		if (result.getType() == RayTraceResult.Type.MISS) {
 			; // Do nothing
 		} else if (result.getType() == RayTraceResult.Type.BLOCK) {
-			trigger.onProjectileHit(new BlockPos(result.getHitVec()));
+			BlockPos pos = RayTrace.blockPosFromResult(result);
+			trigger.onProjectileHit(pos);
+			
+			// Proc mystic anchors if we hit one
+			if (world.isAirBlock(pos)) pos = pos.down();
+			BlockState state = world.getBlockState(pos);
+			if (state.getBlock() instanceof MysticAnchor) {
+				state.onEntityCollision(world, pos, this);
+			}
+			
 			this.remove();
 		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
 			Entity entityHit = RayTrace.entFromRaytrace(result);
