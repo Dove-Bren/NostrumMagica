@@ -433,6 +433,7 @@
     "entity.nostrummagica.entity_internal_spellsaucer_cycler": "Spell Saucer",
     "entity.nostrummagica.entity_internal_spellsaucer_": "Spell Saucer",
     "entity.nostrummagica.entity_switch_trigger": "Mystic Trigger",
+	"entity.nostrummagica.entity_key_switch_trigger": "Mystic Key",
     "entity.nostrummagica.nostrum_lightning": "Lightning Bolt",
     "entity.nostrummagica.nostrum_hookshot": "Hookshot Anchor",
     "entity.nostrummagica.entity_wisp": "Wisp",

@@ -67,6 +67,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(EntitySpellBullet.ID) public static EntityType<EntitySpellBullet> spellBullet;
 	@ObjectHolder(EntitySpellMortar.ID) public static EntityType<EntitySpellMortar> spellMortar;
 	@ObjectHolder(EntityAreaEffect.ID) public static EntityType<EntityAreaEffect> areaEffect;
+	@ObjectHolder(EntityKeySwitchTrigger.ID) public static EntityType<EntityKeySwitchTrigger> keySwitchTrigger;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -236,6 +237,10 @@ public class NostrumEntityTypes {
 				.size(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntitySwitchTrigger.ID));
+		registry.register(EntityType.Builder.<EntityKeySwitchTrigger>create(EntityKeySwitchTrigger::new, EntityClassification.MISC)
+				.size(.8f, 1.8f)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityKeySwitchTrigger.ID));
 		registry.register(EntityType.Builder.<NostrumTameLightning>create(NostrumTameLightning::new, EntityClassification.MISC)
 				.size(0, 0)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)

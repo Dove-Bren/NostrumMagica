@@ -135,8 +135,10 @@ public class WorldKeyItem extends Item {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
 		
-		if (playerIn.isSneaking()) {
+		if (!worldIn.isRemote() && playerIn.isSneaking()) {
 			clearKey(itemStackIn);
+			final NostrumWorldKey key = this.getKey(itemStackIn);
+			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)));
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		

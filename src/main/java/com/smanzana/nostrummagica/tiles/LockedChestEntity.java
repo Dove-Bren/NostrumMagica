@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.tiles;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.LockedChest;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
@@ -22,6 +24,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -113,6 +116,16 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 		this.world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing), 3);
 		fillChestEntity(world.getTileEntity(pos));
 		
+		final double flySpeed = .125;
+		NostrumParticles.WARD.spawn(world, new SpawnParams(
+				50, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .75,
+				40, 10,
+				new Vec3d(0, .1, 0), new Vec3d(flySpeed, flySpeed / 2, flySpeed)
+				).gravity(.075f));
+		NostrumMagicaSounds.LORE.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+		
+		//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
+		//Vec3d velocity, Vec3d velocityJitter
 	}
 	
 	protected void fillChestEntity(TileEntity entity) {
@@ -217,7 +230,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 				invCopy.setInventorySlotContents(i, chest.removeStackFromSlot(i));
 			}
 			
-			world.setBlockState(pos, NostrumBlocks.lockedChest.getDefaultState().with(ChestBlock.FACING, facing), 3);
+			world.setBlockState(pos, NostrumBlocks.lockedChest.getDefaultState().with(LockedChest.FACING, facing), 3);
 			
 			LockedChestEntity lockedChest = (LockedChestEntity) world.getTileEntity(pos);
 			lockedChest.setContents(invCopy);

@@ -63,6 +63,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRedPart;
 import com.smanzana.nostrummagica.client.render.entity.RenderGolem;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
+import com.smanzana.nostrummagica.client.render.entity.RenderKeySwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
@@ -94,6 +95,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
+import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
@@ -511,6 +513,12 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public EntityRenderer<? super EntitySwitchTrigger> createRenderFor(EntityRendererManager manager) {
 				return new RenderSwitchTrigger(manager);
+			}
+		});			
+		RenderingRegistry.registerEntityRenderingHandler(EntityKeySwitchTrigger.class, new IRenderFactory<EntityKeySwitchTrigger>() {
+			@Override
+			public EntityRenderer<? super EntityKeySwitchTrigger> createRenderFor(EntityRendererManager manager) {
+				return new RenderKeySwitchTrigger(manager);
 			}
 		});
 		RenderingRegistry.registerEntityRenderingHandler(NostrumTameLightning.class, new IRenderFactory<NostrumTameLightning>() {
@@ -1135,6 +1143,8 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "models/block/chain_link"));
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/block/lock_plate"));
+		event.addSprite(new ResourceLocation(
+				NostrumMagica.MODID, "textures/block/key_cage"));
 
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/mist_bad"));

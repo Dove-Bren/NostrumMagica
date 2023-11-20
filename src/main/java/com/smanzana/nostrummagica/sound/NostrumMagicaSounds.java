@@ -34,7 +34,7 @@ public enum NostrumMagicaSounds {
 	CAST_CONTINUE("spell.cast.continue", SoundCategory.AMBIENT),
 	CAST_FAIL("spell.cast.fail", SoundCategory.AMBIENT),
 	LEVELUP("player.levelup", SoundCategory.AMBIENT),
-	LORE("player.lore.get", SoundCategory.AMBIENT),
+	LORE("player.lore.get", SoundCategory.AMBIENT, .5f),
 	UI_TICK("ui.tick", SoundCategory.AMBIENT, .4f),
 	SUCCESS_QUEST("ui.success.quest", SoundCategory.AMBIENT),
 	SUCCESS_RESEARCH("ui.success.research", SoundCategory.AMBIENT),

@@ -162,10 +162,15 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 				triggerEntity.remove();
 			}
 			
-			triggerEntity = new EntitySwitchTrigger(NostrumEntityTypes.switchTrigger, this.world);
-			triggerEntity.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			triggerEntity = makeTriggerEntity(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			world.addEntity(triggerEntity);
 		}
+	}
+	
+	protected EntitySwitchTrigger makeTriggerEntity(double x, double y, double z) {
+		EntitySwitchTrigger ent = new EntitySwitchTrigger(NostrumEntityTypes.switchTrigger, this.world);
+		ent.setPosition(x, y, z);
+		return ent;
 	}
 	
 	protected void doTriggerInternal() {
