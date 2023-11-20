@@ -93,12 +93,12 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 		});
 	}
 	
-	private static interface IDoorWalker {
+	protected static interface IDoorWalker {
 		// Called when visiting a door block. Return true to stop walking and return current pos.
 		public boolean walk(BlockPos pos, BlockState state);
 	}
 	
-	private BlockPos walkDoor(World world, BlockPos start, BlockState startState, IDoorWalker walkFunc) {
+	protected BlockPos walkDoor(World world, BlockPos start, BlockState startState, IDoorWalker walkFunc) {
 		Set<BlockPos> visited = new HashSet<>();
 		List<BlockPos> next = new LinkedList<>();
 		
@@ -168,11 +168,6 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
-	
-//	@Override
-//	public int getLightOpacity(BlockState state, IBlockAccess world, BlockPos pos) {
-//		return 16;
-//	}
 	
 	@Override
 	public boolean isSolid(BlockState state) {

@@ -32,7 +32,8 @@ public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
 		
 		return false;
 	}
-	
+
+	@Override
 	public void trigger(World world, BlockPos pos, BlockState state, BlockPos triggerPos) {
 		this.clearDoor(world, pos, state);
 	}

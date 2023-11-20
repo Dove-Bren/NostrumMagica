@@ -408,6 +408,7 @@
 	"block.nostrummagica.locked_chest": "Locked Chest",
 	"block.nostrummagica.key_switch_block": "Key Switch",
 	"block.nostrummagica.mystic_anchor": "Mystic Anchor",
+	"block.nostrummagica.toggle_logic_door": "Logic Door (Toggleable)",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

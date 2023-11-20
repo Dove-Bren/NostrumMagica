@@ -1,0 +1,22 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "nostrummagica:block/logic_door"
+    },
+    "variants": {
+        "facing": {
+            "north": {},
+            "south": {},
+            "east": {"y"=90},
+            "west": {"y"=90}
+        },
+        "master": {
+            "true": {},
+            "false": {}
+        },
+		"toggled": {
+			"false": {},
+			"true": {"model": "nostrummagica:block/none"}
+		}
+    }
+}
