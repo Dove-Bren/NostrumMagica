@@ -3,14 +3,18 @@ package com.smanzana.nostrummagica.blocks;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchTriggerType;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ClockItem;
 import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.SwordItem;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -118,11 +122,41 @@ public class SwitchBlock extends Block {
 					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
 				}
 			}
+			return true;
+		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof SwordItem) {
+			TileEntity te = worldIn.getTileEntity(pos);
+			if (te != null) {
+				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
+				ent.setHitType(ent.getSwitchHitType() == SwitchBlockTileEntity.SwitchHitType.ANY ? SwitchBlockTileEntity.SwitchHitType.MAGIC : SwitchBlockTileEntity.SwitchHitType.ANY);
+				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+			}
+			return true;
 		} else if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
-				ent.setType(ent.getSwitchType() == SwitchBlockTileEntity.SwitchType.ANY ? SwitchBlockTileEntity.SwitchType.MAGIC : SwitchBlockTileEntity.SwitchType.ANY);
+				ent.setTriggerType(SwitchTriggerType.ONE_TIME);
+				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+			}
+			return true;
+		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ClockItem) {
+			TileEntity te = worldIn.getTileEntity(pos);
+			if (te != null) {
+				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
+				if (ent.getSwitchTriggerType() == SwitchTriggerType.TIMED) {
+					ent.setCooldownTicks(ent.getTotalCooldownTicks() + 10);
+				} else {
+					ent.setTriggerType(SwitchTriggerType.TIMED);
+					ent.setCooldownTicks(20);
+				}
+				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+			}
+			return true;
+		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.LEVER) {
+			TileEntity te = worldIn.getTileEntity(pos);
+			if (te != null) {
+				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
+				ent.setTriggerType(SwitchTriggerType.REPEATABLE);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
 			return true;

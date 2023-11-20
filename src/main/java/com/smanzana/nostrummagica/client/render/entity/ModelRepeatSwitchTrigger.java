@@ -11,21 +11,20 @@ import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchHitType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
+public class ModelRepeatSwitchTrigger extends ModelSwitchTrigger {
 	
 	private static final double width = .45;
-	private static final double height = .8;
+	private static final double height = .45;
 	private static final double spinIdle = 3.0; // seconds per turn
 	private static final double spinActivated = 1.0;
 	
 	private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ice.png");
 	private static final ResourceLocation CAGE_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/block/spawner.png");
 
-	public ModelSwitchTrigger() {
+	public ModelRepeatSwitchTrigger() {
 		;
 	}
 	

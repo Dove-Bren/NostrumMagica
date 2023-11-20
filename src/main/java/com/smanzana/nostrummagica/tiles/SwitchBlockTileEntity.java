@@ -24,46 +24,69 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEntity, IOrientedTileEntity {
 	
-	public static enum SwitchType {
+	public static enum SwitchHitType {
 		ANY,
 		MAGIC,
 	}
 	
-	private SwitchBlockTileEntity.SwitchType type;
+	public static enum SwitchTriggerType {
+		ONE_TIME,
+		REPEATABLE,
+		TIMED,
+	}
+	
+	private static final long REPEAT_COOLDOWN_TICKS = 20;
+	
+	private SwitchBlockTileEntity.SwitchHitType hitType;
+	private SwitchBlockTileEntity.SwitchTriggerType triggerType;
 	private BlockPos triggerOffset;
-	private boolean triggered;
+	private long triggerWorldTicks;
+	private long cooldownTicks;
 	private LivingEntity triggerEntity;
 	
 	protected SwitchBlockTileEntity(TileEntityType<? extends SwitchBlockTileEntity> tileType) {
 		super(tileType);
-		type = SwitchType.ANY;
+		hitType = SwitchHitType.ANY;
+		triggerType = SwitchTriggerType.ONE_TIME;
 		triggerOffset = new BlockPos(0, -2, 0);
 		triggerEntity = null;
-		triggered = false;
+		triggerWorldTicks = 0;
+		cooldownTicks = 0;
 	}
 	
 	public SwitchBlockTileEntity() {
 		this(NostrumTileEntities.SwitchBlockTileEntityType);
 	}
 	
-	public SwitchBlockTileEntity(SwitchBlockTileEntity.SwitchType type, BlockPos pos) {
+	public SwitchBlockTileEntity(SwitchBlockTileEntity.SwitchHitType type, BlockPos pos) {
 		this();
 		
-		this.type = type;
+		this.hitType = type;
 		this.triggerOffset = pos;
 	}
 	
-	private static final String NBT_TYPE = "switch_type";
+	public SwitchBlockTileEntity(SwitchBlockTileEntity.SwitchHitType hitType, SwitchBlockTileEntity.SwitchTriggerType triggerType, BlockPos pos) {
+		this();
+		
+		this.hitType = hitType;
+		this.triggerType = triggerType;
+	}
+	
+	private static final String NBT_HIT_TYPE = "switch_type";
+	private static final String NBT_TRIGGER_TYPE = "switch_trigger_type";
 	private static final String NBT_OFFSET = "switch_offset";
-	private static final String NBT_TRIGGERED = "triggered";
+	private static final String NBT_TRIGGER_TICKS = "trigger_ticks";
+	private static final String NBT_COOOLDOWN_TICKS = "trigger_cooldown_ticks";
 	
 	@Override
 	public CompoundNBT write(CompoundNBT nbt) {
 		nbt = super.write(nbt);
 		
-		nbt.putInt(NBT_TYPE, this.type.ordinal());
+		nbt.putInt(NBT_HIT_TYPE, this.hitType.ordinal());
+		nbt.putInt(NBT_TRIGGER_TYPE, this.triggerType.ordinal());
 		nbt.put(NBT_OFFSET, NBTUtil.writeBlockPos(this.triggerOffset));
-		nbt.putBoolean(NBT_TRIGGERED, this.triggered);
+		nbt.putLong(NBT_TRIGGER_TICKS, this.triggerWorldTicks);
+		nbt.putLong(NBT_COOOLDOWN_TICKS, cooldownTicks);
 		
 		return nbt;
 	}
@@ -72,10 +95,18 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	public void read(CompoundNBT nbt) {
 		super.read(nbt);
 		
-		int ord = nbt.getInt(NBT_TYPE);
-		for (SwitchBlockTileEntity.SwitchType type : SwitchType.values()) {
+		int ord = nbt.getInt(NBT_HIT_TYPE);
+		for (SwitchBlockTileEntity.SwitchHitType type : SwitchHitType.values()) {
 			if (type.ordinal() == ord) {
-				this.type = type;
+				this.hitType = type;
+				break;
+			}
+		}
+		
+		ord = nbt.getInt(NBT_TRIGGER_TYPE);
+		for (SwitchBlockTileEntity.SwitchTriggerType type : SwitchTriggerType.values()) {
+			if (type.ordinal() == ord) {
+				this.triggerType = type;
 				break;
 			}
 		}
@@ -85,7 +116,9 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		} else {
 			this.triggerOffset = NBTUtil.readBlockPos(nbt.getCompound(NBT_OFFSET));
 		}
-		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
+		
+		this.triggerWorldTicks = nbt.getLong(NBT_TRIGGER_TICKS);
+		this.cooldownTicks = nbt.getLong(NBT_COOOLDOWN_TICKS);
 	}
 	
 	@Override
@@ -109,8 +142,21 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		markDirty();
 	}
 	
-	public void setType(SwitchBlockTileEntity.SwitchType type) {
-		this.type = type;
+	public SwitchBlockTileEntity.SwitchHitType getSwitchHitType() {
+		return this.hitType;
+	}
+	
+	public void setHitType(SwitchBlockTileEntity.SwitchHitType type) {
+		this.hitType = type;
+		dirty();
+	}
+	
+	public SwitchBlockTileEntity.SwitchTriggerType getSwitchTriggerType() {
+		return this.triggerType;
+	}
+	
+	public void setTriggerType(SwitchBlockTileEntity.SwitchTriggerType type) {
+		this.triggerType = type;
 		dirty();
 	}
 	
@@ -129,12 +175,27 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		this.setOffset(targ.subtract(this.getPos()));
 	}
 	
-	public SwitchBlockTileEntity.SwitchType getSwitchType() {
-		return this.type;
-	}
-	
 	public BlockPos getOffset() {
 		return this.triggerOffset;
+	}
+	
+	public void setCooldownTicks(long cooldown) {
+		this.cooldownTicks = cooldown;
+		this.dirty();
+	}
+	
+	public long getTotalCooldownTicks() {
+		return this.cooldownTicks;
+	}
+	
+	public long getCurrentCooldownTicks() {
+		if (isTriggered()) {
+			final long worldTicks = world.getGameTime();
+			final long elapsed = worldTicks - this.triggerWorldTicks;
+			return Math.max(0, this.getTotalCooldownTicks() - elapsed);
+		}
+		
+		return 0;
 	}
 	
 	@Nullable
@@ -143,7 +204,29 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	public boolean isTriggered() {
-		return this.triggered;
+		return this.triggerWorldTicks != 0;
+	}
+	
+	protected void oneTimeTick(long gameTicks) {
+		; // Nothing to do
+	}
+	
+	protected void repeatableTick(long gameTicks) {
+		// Stay triggered for a while and then become triggerable again
+		if (this.triggerWorldTicks != 0 && gameTicks - this.triggerWorldTicks >= REPEAT_COOLDOWN_TICKS) {
+			this.triggerWorldTicks = 0;
+			this.dirty();
+		}
+	}
+	
+	protected void timedTick(long gameTicks) {
+		// Stay triggered for the duration of the timer. At the end, trigger again, and then become
+		// triggerable again
+		if (this.triggerWorldTicks != 0 && gameTicks - this.triggerWorldTicks >= this.getTotalCooldownTicks()) {
+			this.doTriggerInternal();
+			this.triggerWorldTicks = 0;
+			this.dirty();
+		}
 	}
 	
 	@Override
@@ -163,6 +246,20 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 			
 			triggerEntity = makeTriggerEntity(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			world.addEntity(triggerEntity);
+		}
+		
+		// Do tick logic based on type
+		final long gameTicks = world.getGameTime();
+		switch (this.triggerType) {
+		case ONE_TIME:
+			oneTimeTick(gameTicks);
+			break;
+		case REPEATABLE:
+			repeatableTick(gameTicks);
+			break;
+		case TIMED:
+			timedTick(gameTicks);
+			break;
 		}
 	}
 	
@@ -184,9 +281,9 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	public void trigger(boolean isMagic) {
-		if (!this.triggered) {
-			if (type == SwitchType.ANY || isMagic) {
-				this.triggered = true;
+		if (!this.isTriggered()) {
+			if (hitType == SwitchHitType.ANY || isMagic) {
+				this.triggerWorldTicks = world.getGameTime();
 				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 				this.dirty();
 				doTriggerInternal();
