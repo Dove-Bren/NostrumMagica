@@ -12,9 +12,12 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.server.ServerWorld;
 
 public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements IWorldKeyHolder, IUniqueDungeonTileEntity {
 	
@@ -93,6 +96,12 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 	protected void doTriggerInternal() {
 		NostrumMagica.instance.getWorldKeys().addKey(getWorldKey());
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
+
+		for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers((p) -> {
+			return p.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < 900;
+		})) {
+			player.sendMessage(new TranslationTextComponent("info.world_key.gotkey"));
+		}
 		
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(

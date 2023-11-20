@@ -72,6 +72,7 @@ public class NostrumBlocks {
 	@ObjectHolder(RuneShaper.ID) public static RuneShaper runeShaper;
 	@ObjectHolder(LockedChest.ID) public static LockedChest lockedChest;
 	@ObjectHolder(KeySwitchBlock.ID) public static KeySwitchBlock keySwitch;
+	@ObjectHolder(MysticAnchor.ID) public static MysticAnchor mysticAnchor;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -138,6 +139,7 @@ public class NostrumBlocks {
     	//registerBlockItem(temporaryTeleportationPortal, temporaryTeleportationPortal.getRegistryName(), registry);
     	registerBlockItem(runeShaper, runeShaper.getRegistryName(), registry);
     	registerBlockItem(keySwitch, keySwitch.getRegistryName(), registry);
+    	registerBlockItem(mysticAnchor, mysticAnchor.getRegistryName(), registry);
     	
 
 //    	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -230,6 +232,7 @@ public class NostrumBlocks {
     	registerBlock(new RuneShaper(), RuneShaper.ID, registry);
     	registerBlock(new LockedChest(), LockedChest.ID, registry);
     	registerBlock(new KeySwitchBlock(), KeySwitchBlock.ID, registry);
+    	registerBlock(new MysticAnchor(), MysticAnchor.ID, registry);
     }
     
 }

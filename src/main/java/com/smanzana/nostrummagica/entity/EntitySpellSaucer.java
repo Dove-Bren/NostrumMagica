@@ -4,9 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.blocks.MysticAnchor;
 import com.smanzana.nostrummagica.utils.Entities;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IProjectile;
@@ -103,7 +107,14 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 			boolean canImpact = this.canImpact(pos);
 			Vector vec = new Vector().set((int) result.getHitVec().x, (int) result.getHitVec().y, (int) result.getHitVec().z);
 			if (canImpact && (dieOnImpact || !this.hasBeenHit(vec))) {
-				trigger.onProjectileHit(new BlockPos(result.getHitVec()));
+				trigger.onProjectileHit(pos);
+				
+				// Proc mystic anchors if we hit one
+				if (world.isAirBlock(pos)) pos = pos.down();
+				BlockState state = world.getBlockState(pos);
+				if (state.getBlock() instanceof MysticAnchor) {
+					state.onEntityCollision(world, pos, this);
+				}
 				
 				if (dieOnImpact) {
 					this.remove();
@@ -280,5 +291,9 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 					+ Math.round(y * 1000) * 13397
 					+ Math.round(z * 1000) * 68329);
 		}
+	}
+	
+	public @Nullable LivingEntity getShooter() {
+		return this.shootingEntity;
 	}
 }
