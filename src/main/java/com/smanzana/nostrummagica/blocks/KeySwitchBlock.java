@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeItem;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -44,45 +45,17 @@ public class KeySwitchBlock extends SwitchBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote || !playerIn.isCreative()) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isRemote || !player.isCreative()) {
 			return false;
 		}
-		
-		//ItemStack heldItem = playerIn.getHeldItem(hand);
-		
-//		if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
-//			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-//			if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
-//				TileEntity te = worldIn.getTileEntity(pos);
-//				if (te != null) {
-//					KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) te;
-//					ent.offsetTo(heldPos);
-//					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-//				}
-//			}
-//			return true;
-//		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof EnderEyeItem) {
-//			TileEntity te = worldIn.getTileEntity(pos);
-//			if (te != null) {
-//				KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) te;
-//				BlockPos loc = ent.getOffset().toImmutable().add(pos);
-//				BlockState atState = worldIn.getBlockState(loc);
-//				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
-//					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
-//				} else {
-//					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
-//				}
-//			}
-//		} else if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
-//			TileEntity te = worldIn.getTileEntity(pos);
-//			if (te != null) {
-//				KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) te;
-//				ent.setType(ent.getSwitchType() == KeySwitchBlockTileEntity.SwitchType.ANY ? KeySwitchBlockTileEntity.SwitchType.MAGIC : KeySwitchBlockTileEntity.SwitchType.ANY);
-//				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-//			}
-//			return true;
-//		}
+
+		if (player.isCreative() && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof DyeItem) {
+			KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) worldIn.getTileEntity(pos);
+			DyeItem dye = (DyeItem) player.getHeldItemMainhand().getItem();
+			ent.setColor(dye.getDyeColor());
+			return true;
+		}
 		
 		return false;
 	}

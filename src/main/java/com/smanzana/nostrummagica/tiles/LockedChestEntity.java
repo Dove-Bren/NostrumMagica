@@ -17,6 +17,7 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -34,15 +35,18 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 
 	private static final String NBT_INV = "inventory";
 	private static final String NBT_LOCK = "lockkey";
+	private static final String NBT_COLOR = "color";
 	
 	private final Inventory inventory;
 	private NostrumWorldKey lockKey;
+	private DyeColor color;
 	private int ticksExisted;
 	
 	public LockedChestEntity() {
 		super(NostrumTileEntities.LockedChestEntityType);
 		inventory = new Inventory(27);
 		lockKey = new NostrumWorldKey();
+		color = DyeColor.RED;
 	}
 	
 	private void dirty() {
@@ -56,6 +60,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 		
 		nbt.put(NBT_INV, Inventories.serializeInventory(inventory));
 		nbt.put(NBT_LOCK, lockKey.asNBT());
+		nbt.putString(NBT_COLOR, color.name());
 		
 		return nbt;
 	}
@@ -69,6 +74,11 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 		
 		Inventories.deserializeInventory(inventory, nbt.get(NBT_INV));
 		lockKey = NostrumWorldKey.fromNBT(nbt.getCompound(NBT_LOCK));
+		try {
+			color = DyeColor.valueOf(nbt.getString(NBT_COLOR).toUpperCase());
+		} catch (Exception e) {
+			color = DyeColor.RED;
+		}
 	}
 	
 	@Override
@@ -219,6 +229,15 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 	public void setWorldKey(NostrumWorldKey key) {
 		this.lockKey = key;
 		this.dirty();
+	}
+	
+	public void setColor(DyeColor color) {
+		this.color = color;
+		this.dirty();
+	}
+	
+	public DyeColor getColor() {
+		return this.color;
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
@@ -62,7 +63,14 @@ public class LockedChest extends HorizontalBlock {
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote()) {
 			LockedChestEntity chest = (LockedChestEntity) worldIn.getTileEntity(pos);
-			chest.attemptUnlock(player);
+			
+			// Creative players can dye it
+			if (player.isCreative() && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof DyeItem) {
+				DyeItem dye = (DyeItem) player.getHeldItemMainhand().getItem();
+				chest.setColor(dye.getDyeColor());
+			} else {
+				chest.attemptUnlock(player);
+			}
 		}
 		
 		return true;

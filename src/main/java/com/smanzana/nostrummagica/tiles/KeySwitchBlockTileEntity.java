@@ -12,16 +12,19 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.item.DyeColor;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
 
 public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements IWorldKeyHolder, IUniqueDungeonTileEntity {
 	
 	private NostrumWorldKey key;
+	private DyeColor color;
 	
 	public KeySwitchBlockTileEntity() {
 		super(NostrumTileEntities.KeySwitchTileEntityType);
 		key = new NostrumWorldKey();
+		color = DyeColor.RED;
 	}
 	
 	public KeySwitchBlockTileEntity(NostrumWorldKey key) {
@@ -30,12 +33,14 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 	}
 	
 	private static final String NBT_KEY = "switch_key";
+	private static final String NBT_COLOR = "color";
 	
 	@Override
 	public CompoundNBT write(CompoundNBT nbt) {
 		nbt = super.write(nbt);
 		
 		nbt.put(NBT_KEY, this.key.asNBT());
+		nbt.putString(NBT_COLOR, this.color.name());
 		
 		return nbt;
 	}
@@ -45,6 +50,20 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 		super.read(nbt);
 		
 		this.key = NostrumWorldKey.fromNBT(nbt.getCompound(NBT_KEY));
+		try {
+			this.color = DyeColor.valueOf(nbt.getString(NBT_COLOR).toUpperCase());
+		} catch (Exception e) {
+			this.color = DyeColor.RED;
+		}
+	}
+	
+	public void setColor(DyeColor color) {
+		this.color = color;
+		this.dirty();
+	}
+	
+	public DyeColor getColor() {
+		return this.color;
 	}
 	
 	@Override
@@ -77,10 +96,10 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 		
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-				30, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 1,
+				30, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5, 0,
 				50, 10,
-				Vec3d.ZERO, new Vec3d(.1, .1, .1)
-				).gravity(-.075f));
+				Vec3d.ZERO, new Vec3d(.075, .05, .075)
+				).gravity(-.1f).color(this.getColor().getColorValue() | 0xAA000000));
 	}
 	
 	@Override

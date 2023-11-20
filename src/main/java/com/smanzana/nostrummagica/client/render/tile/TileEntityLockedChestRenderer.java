@@ -46,12 +46,17 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 			final double glowProg = ((ticks % glowPeriod) / glowPeriod); 
 			glow = .5f + (.15f * (float) Math.sin(glowProg * 2 * Math.PI));
 		}
+		
+		final int colorRGB = te.getColor().getColorValue();
+		final float red = ((float) ((colorRGB >> 16) & 0xFF) / 255f);
+		final float green = ((float) ((colorRGB >> 8) & 0xFF) / 255f);
+		final float blue = ((float) ((colorRGB >> 0) & 0xFF) / 255f);
 
 		GlStateManager.disableCull();
 		GlStateManager.disableLighting();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.color4f(1f, 0f, 0f, .25f + glow);
+		GlStateManager.color4f(red, green, blue, .25f + glow);
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.rotatef(rot, 0, -1, 0); // Rotate arm that's centered in the block
