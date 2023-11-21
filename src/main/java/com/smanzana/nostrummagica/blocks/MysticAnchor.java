@@ -29,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
 /**
  * Block that, when hit with an arrow or spell etc. teleports the shooter to nearby the block
@@ -44,6 +45,8 @@ public class MysticAnchor extends Block {
 	public MysticAnchor() {
 		super(Block.Properties.create(Material.ROCK)
 				.sound(SoundType.STONE)
+				.harvestLevel(1)
+				.harvestTool(ToolType.PICKAXE)
 				);
 	}
 	
@@ -101,6 +104,14 @@ public class MysticAnchor extends Block {
 			final Vec3d vecToEnt = entity.getPositionVec().subtract(new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)).normalize();
 			final Direction dirToEnt = Direction.getFacingFromVector(vecToEnt.getX(), vecToEnt.getY(), vecToEnt.getZ());
 			BlockPos toPos = findTeleportSpot(world, pos, dirToEnt);
+			
+			// Special sauce to allow in sorcery dimension
+			{
+				entity.lastTickPosX = entity.prevPosX = toPos.getX() + .5;
+				entity.lastTickPosY = entity.prevPosY = toPos.getY() + .005;
+				entity.lastTickPosZ = entity.prevPosZ = toPos.getZ() + .5;
+			}
+			
 			entity.setPositionAndUpdate(toPos.getX() + .5, toPos.getY(), toPos.getZ() + .5);
 			((ServerWorld) world).spawnParticle(ParticleTypes.PORTAL, toPos.getX() + .5, toPos.getY() + NostrumMagica.rand.nextDouble() * 2.0D, toPos.getZ() + .5, 30, NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian(), .1);
 		}

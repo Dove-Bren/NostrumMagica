@@ -810,6 +810,17 @@ public class NostrumMagica {
 						Ingredient.fromItems(NostrumItems.resourceToken) },
 				new RRequirementResearch("geotokens"), new OutcomeConstructGeotoken(4)));
 
+		// Mystic Anchor
+		registry.register(RitualRecipe.createTier3("mystic_anchor", new ItemStack(NostrumBlocks.mysticAnchor),
+						EMagicElement.ENDER, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT,
+								ReagentType.MANDRAKE_ROOT, ReagentType.GRAVE_DUST },
+						Ingredient.fromTag(Tags.Items.OBSIDIAN),
+						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumTags.Items.SpriteCore),
+								Ingredient.fromItems(Items.ENDER_PEARL),
+								Ingredient.fromTag(NostrumTags.Items.Rose) },
+						new RRequirementResearch("mystic_anchor"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mysticAnchor))));
+
 		// Tele to obelisk -- tier 2. Position gem, reagents
 		registry
 				.register(RitualRecipe.createTier2("teleport_obelisk", new ItemStack(Items.ENDER_PEARL),
@@ -2170,6 +2181,11 @@ public class NostrumMagica {
 				.quest("lvly").reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
 				.build("paradox_mirrors", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 0, true,
 						new ItemStack(NostrumBlocks.paradoxMirror));
+
+		NostrumResearch.startBuilding().parent("geogems").hiddenParent("teleportrune").lore(NostrumItems.positionCrystal)
+				.reference("ritual::mystic_anchor", "ritual.mystic_anchor.name")
+				.build("mystic_anchor", NostrumResearchTab.TINKERING, Size.NORMAL, 4, 0, true,
+						new ItemStack(NostrumBlocks.mysticAnchor));
 
 		NostrumResearch.startBuilding().hiddenParent("rituals").hiddenParent("magic_token")
 				.reference("ritual::putter", "ritual.putter.name").build("putter", NostrumResearchTab.TINKERING,
