@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class SymbolTileEntity extends TileEntity {
@@ -20,10 +21,14 @@ public class SymbolTileEntity extends TileEntity {
 	private SpellShape shape;
 	private float scale;
 	
-	public SymbolTileEntity() {
-		super(NostrumTileEntities.SymbolTileEntityType);
+	protected SymbolTileEntity(TileEntityType<? extends SymbolTileEntity> type) {
+		super(type);
 		setElement(EMagicElement.PHYSICAL);
 		this.scale = 1.0f;
+	}
+	
+	public SymbolTileEntity() {
+		this(NostrumTileEntities.SymbolTileEntityType);
 	}
 	
 	public SymbolTileEntity(float scale) {
@@ -33,6 +38,10 @@ public class SymbolTileEntity extends TileEntity {
 	
 	public float getScale() {
 		return scale;
+	}
+	
+	protected void setScale(float scale) {
+		this.scale = scale;
 	}
 	
 	@Override
@@ -189,7 +198,7 @@ public class SymbolTileEntity extends TileEntity {
 		handleUpdateTag(pkt.getNbtCompound());
 	}
 	
-	private void dirty() {
+	protected void dirty() {
 		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
 		markDirty();
 	}

@@ -9,7 +9,7 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialEarth extends ShrineTrial {
+public class TrialEarth extends WorldTrial {
 
 	public TrialEarth() {
 		super(EMagicElement.EARTH);

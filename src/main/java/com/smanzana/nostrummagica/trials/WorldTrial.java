@@ -13,21 +13,21 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public abstract class ShrineTrial {
+public abstract class WorldTrial {
 
-	private static Map<EMagicElement, ShrineTrial> shrineTrials = new EnumMap<>(EMagicElement.class);
+	private static Map<EMagicElement, WorldTrial> shrineTrials = new EnumMap<>(EMagicElement.class);
 	
-	public static ShrineTrial getTrial(EMagicElement element) {
+	public static WorldTrial getTrial(EMagicElement element) {
 		return shrineTrials.get(element);
 	}
 	
-	public static void setTrial(EMagicElement element, ShrineTrial trial) {
+	public static void setTrial(EMagicElement element, WorldTrial trial) {
 		shrineTrials.put(element, trial);
 	}
 	
 	protected EMagicElement element;
 	
-	public ShrineTrial(EMagicElement element) {
+	public WorldTrial(EMagicElement element) {
 		this.element = element;
 	}
 	

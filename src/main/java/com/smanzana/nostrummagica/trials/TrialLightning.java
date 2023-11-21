@@ -9,7 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialLightning extends ShrineTrial {
+public class TrialLightning extends WorldTrial {
 
 	public TrialLightning() {
 		super(EMagicElement.LIGHTNING);

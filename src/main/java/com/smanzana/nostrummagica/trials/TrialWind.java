@@ -9,7 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialWind extends ShrineTrial {
+public class TrialWind extends WorldTrial {
 
 	public TrialWind() {
 		super(EMagicElement.WIND);

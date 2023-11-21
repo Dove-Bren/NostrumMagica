@@ -126,7 +126,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
-import com.smanzana.nostrummagica.trials.ShrineTrial;
+import com.smanzana.nostrummagica.trials.WorldTrial;
 import com.smanzana.nostrummagica.trials.TrialEarth;
 import com.smanzana.nostrummagica.trials.TrialEnder;
 import com.smanzana.nostrummagica.trials.TrialFire;
@@ -1915,13 +1915,13 @@ public class NostrumMagica {
 	}
 
 	private static void registerDefaultTrials() {
-		ShrineTrial.setTrial(EMagicElement.FIRE, new TrialFire());
-		ShrineTrial.setTrial(EMagicElement.ICE, new TrialIce());
-		ShrineTrial.setTrial(EMagicElement.WIND, new TrialWind());
-		ShrineTrial.setTrial(EMagicElement.EARTH, new TrialEarth());
-		ShrineTrial.setTrial(EMagicElement.ENDER, new TrialEnder());
-		ShrineTrial.setTrial(EMagicElement.LIGHTNING, new TrialLightning());
-		ShrineTrial.setTrial(EMagicElement.PHYSICAL, new TrialPhysical());
+		WorldTrial.setTrial(EMagicElement.FIRE, new TrialFire());
+		WorldTrial.setTrial(EMagicElement.ICE, new TrialIce());
+		WorldTrial.setTrial(EMagicElement.WIND, new TrialWind());
+		WorldTrial.setTrial(EMagicElement.EARTH, new TrialEarth());
+		WorldTrial.setTrial(EMagicElement.ENDER, new TrialEnder());
+		WorldTrial.setTrial(EMagicElement.LIGHTNING, new TrialLightning());
+		WorldTrial.setTrial(EMagicElement.PHYSICAL, new TrialPhysical());
 	}
 
 	private void registerDefaultResearch() {

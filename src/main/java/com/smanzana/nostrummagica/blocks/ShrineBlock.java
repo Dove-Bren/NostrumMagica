@@ -5,7 +5,6 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -17,7 +16,6 @@ import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
-import com.smanzana.nostrummagica.trials.ShrineTrial;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -127,17 +125,16 @@ public class ShrineBlock extends SymbolBlock {
 		SymbolTileEntity tile = (SymbolTileEntity) te;
 		SpellComponentWrapper component = tile.getComponent();
 		
-		// Check for binding first
-		if (attr.isBinding()) {
-			if (attr.getBindingComponent().equals(component)) {
-				attr.completeBinding(null);
-				return true;
-			}
-		}
+//		// Check for binding first
+//		if (attr.isBinding()) {
+//			if (attr.getBindingComponent().equals(component)) {
+//				attr.completeBinding(null);
+//				return true;
+//			}
+//		}
 		
 		if (component.isElement()) {
-			// Elements either grant knowledge (if the player hasn't unlocked
-			// magic yet) OR start a trial/advance mastery
+			// Shrine blocks grant novice mastery of their elements
 			final EMagicElement element = component.getElement();
 			
 			if (attr.getElementalMastery(element) == ElementalMastery.UNKNOWN
@@ -147,27 +144,7 @@ public class ShrineBlock extends SymbolBlock {
 				DoEffect(pos, playerIn, color);
 			}
 			
-			if (!attr.isUnlocked()) {
-				return true;
-			}
-
-			// Make sure we have an orb first
-			if (heldItem.isEmpty() || !(heldItem.getItem() instanceof MasteryOrb)) {
-				return false;
-			}
-			
-			ShrineTrial trial = ShrineTrial.getTrial(element);
-			if (trial == null) {
-				NostrumMagica.logger.error("No trial found for element " + element.name());
-				return false;
-			} else {
-				if (trial.canTake(playerIn, attr)) {
-					trial.start(playerIn, attr);
-					heldItem.split(1);
-				}
-				
-				return true;
-			}
+			return true;
 		}
 		
 		if (component.isTrigger()) {

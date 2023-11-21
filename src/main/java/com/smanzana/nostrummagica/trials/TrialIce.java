@@ -15,7 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialIce extends ShrineTrial {
+public class TrialIce extends WorldTrial {
 
 	public TrialIce() {
 		super(EMagicElement.ICE);

@@ -10,7 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialFire extends ShrineTrial {
+public class TrialFire extends WorldTrial {
 
 	public TrialFire() {
 		super(EMagicElement.FIRE);

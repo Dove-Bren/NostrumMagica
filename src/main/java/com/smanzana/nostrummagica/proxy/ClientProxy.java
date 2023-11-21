@@ -1147,7 +1147,7 @@ public class ClientProxy extends CommonProxy {
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "models/block/lock_plate"));
 		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "textures/block/key_cage"));
+				NostrumMagica.MODID, "block/key_cage"));
 
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/mist_bad"));

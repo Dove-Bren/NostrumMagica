@@ -10,7 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialEnder extends ShrineTrial {
+public class TrialEnder extends WorldTrial {
 
 	public TrialEnder() {
 		super(EMagicElement.ENDER);

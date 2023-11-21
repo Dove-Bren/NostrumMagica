@@ -74,6 +74,7 @@ public class NostrumBlocks {
 	@ObjectHolder(KeySwitchBlock.ID) public static KeySwitchBlock keySwitch;
 	@ObjectHolder(MysticAnchor.ID) public static MysticAnchor mysticAnchor;
 	@ObjectHolder(ToggleLogicDoor.ID) public static ToggleLogicDoor toggleDoor;
+	@ObjectHolder(TrialBlock.ID) public static TrialBlock trialBlock;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -236,6 +237,7 @@ public class NostrumBlocks {
     	registerBlock(new KeySwitchBlock(), KeySwitchBlock.ID, registry);
     	registerBlock(new MysticAnchor(), MysticAnchor.ID, registry);
     	registerBlock(new ToggleLogicDoor(), ToggleLogicDoor.ID, registry);
+    	registerBlock(new TrialBlock(), TrialBlock.ID, registry);
     }
     
 }
