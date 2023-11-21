@@ -6,6 +6,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.TrialBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -18,13 +22,16 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.server.ServerWorld;
 
 public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableTileEntity {
 	
-	// Track of currently running trial ticks. -1 when no trial is happening.
 	private @Nullable CombatTrial activeTrial;
 	private @Nullable PlayerEntity activeTrialPlayer;
+	
+	// Tracks ticks after a trial is started, used for delaying startup and effects
+	private int trialTicks;
 	
 	public TrialBlockTileEntity() {
 		super(NostrumTileEntities.TrialBlockEntityType);
@@ -33,6 +40,7 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 		
 		activeTrial = null;
 		activeTrialPlayer = null;
+		trialTicks = 0;
 	}
 	
 	@Override
@@ -107,6 +115,13 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 	
 	protected void playStartEffects(PlayerEntity player) {
 		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.BLOCKS, 1f, 2f);
+		
+		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+				100,
+				pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, .1,
+				60, 10,
+				new Vec3d(0, .1, 0), new Vec3d(.1, .1, .1)
+				).gravity(.05f).color(this.getElement().getColor()));
 	}
 	
 	protected void awardTrialRewards(PlayerEntity player) {
@@ -141,20 +156,26 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 			PlayerEntity stoppedPlayer = activeTrialPlayer;
 			activeTrial = null;
 			activeTrialPlayer = null;
+			trialTicks = 0;
 			
 			stoppedTrial.endTrial();
 			onTrialEnd(stoppedTrial, stoppedPlayer, success);
 		}
 	}
 	
+	protected void actuallyStartTrial(CombatTrial trial) {
+		trial.startTrial();
+		playStartEffects(activeTrialPlayer);
+	}
+	
 	protected void startTrial(CombatTrial trial, PlayerEntity player) {
 		if (!isTrialActive()) {
 			this.activeTrial = trial;
 			this.activeTrialPlayer = player;
+			this.trialTicks = -20 * 3;
 			
 			if (this.activeTrial != null) {
-				trial.startTrial();
-				playStartEffects(activeTrialPlayer);
+				
 			} else {
 				// Failed to create!
 				NostrumMagica.logger.warn("Failed to create trial! Trial creation failed.");
@@ -162,8 +183,40 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 		}
 	}
 	
+	protected void spawnStartupWarning() {
+		((ServerWorld) world).addLightningBolt(
+				(new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5))
+				);
+	}
+	
+	protected void trialStartupTick() {
+		if (Math.abs(this.trialTicks) % 20 == 0) {
+			spawnStartupWarning();
+		}
+		
+		NostrumParticles.FILLED_ORB.spawn(world, new SpawnParams(
+				(60 - this.trialTicks) / 10,
+				pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, 5,
+				40, 10,
+				new Vec3d(pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5)
+				).color(this.getElement().getColor()));
+	}
+	
+	protected boolean isStartingUp() {
+		return this.isTrialActive() && this.trialTicks < 0;
+	}
+	
 	protected void trialTick() {
-		this.activeTrial.trialTick();
+		if (isStartingUp()) {
+			trialStartupTick();
+		} else {
+			if (this.trialTicks == 0) {
+				// Just started
+				this.actuallyStartTrial(this.activeTrial);
+			}
+			this.activeTrial.trialTick();
+		}
+		trialTicks++;
 	}
 	
 	@Override

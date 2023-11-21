@@ -124,6 +124,8 @@ public class TrialBlock extends SymbolBlock {
 					if (!playerIn.isCreative()) {
 						heldItem.split(1);
 					}
+				} else {
+					playerIn.sendMessage(new TranslationTextComponent("info.trial.already_have"));
 				}
 				
 				return true;

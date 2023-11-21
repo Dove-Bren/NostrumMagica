@@ -580,6 +580,7 @@
 	"info.trial.fail": "You have failed the trial",
 	"info.trial.none": "You have nothing left to master for this element",
 	"info.trial.weak": "You must gain more knowledge of the element before you can undertake this trial",
+	"info.trial.already_have": "You are already undergoing the Adept trial for this element",
 
     "info.armor.set_status": "%1$s Set Bonus %3$s(%2$d/4)%4$s",
     "info.armor.set_total": "%1$s Set Bonus %2$s(Complete)%3$s",
