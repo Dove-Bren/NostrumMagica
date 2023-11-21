@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -39,16 +40,20 @@ public class ToggleLogicDoor extends LogicDoor {
 		return state.get(TOGGLED);
 	}
 	
-	public BlockState getUntoggled() {
-		return this.getDefaultState().with(TOGGLED, false);
+	public BlockState getStateWith(Direction direction, boolean toggled) {
+		return this.getDefaultState().with(TOGGLED, toggled).with(HORIZONTAL_FACING, direction);
 	}
 	
-	public BlockState getToggled() {
-		return this.getDefaultState().with(TOGGLED, true);
+	public BlockState getUntoggled(Direction direction) {
+		return getStateWith(direction, false);
+	}
+	
+	public BlockState getToggled(Direction direction) {
+		return getStateWith(direction, true);
 	}
 	
 	protected void toggle(World world, BlockPos pos, BlockState state) {
-		final BlockState newState = (isToggled(state) ? getUntoggled() : getToggled());
+		final BlockState newState = (isToggled(state) ? getUntoggled(state.get(HORIZONTAL_FACING)) : getToggled(state.get(HORIZONTAL_FACING)));
 		this.walkDoor(world, pos, state, (walkPos, walkState) -> {
 			world.setBlockState(walkPos, newState, 3);
 			return false; // Keep walking
