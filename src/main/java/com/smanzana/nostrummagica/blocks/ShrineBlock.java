@@ -142,6 +142,10 @@ public class ShrineBlock extends SymbolBlock {
 				// Just learned!
 				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
 				DoEffect(pos, playerIn, color);
+			} else {
+				if (playerIn.world.isRemote) {
+					playerIn.sendMessage(new TranslationTextComponent("info.shrine.seektrial"));
+				}
 			}
 			
 			return true;

@@ -179,7 +179,7 @@ public class SymbolTileEntity extends TileEntity {
 		
 		this.scale = nbt.getFloat(NBT_SCALE);
 		if (Math.abs(scale) < 0.01)
-			this.scale = 5.0f;
+			this.scale = 1.0f;
 	}
 	
 	@Override

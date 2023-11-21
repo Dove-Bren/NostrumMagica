@@ -70,7 +70,7 @@ public class SymbolBlock extends ContainerBlock {
 	
 	@Override
 	public TileEntity createNewTileEntity(IBlockReader world) {
-		SymbolTileEntity ent = new SymbolTileEntity(5.0f);
+		SymbolTileEntity ent = new SymbolTileEntity(1.0f);
 		return ent;
 	}
 	
