@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import java.util.function.Function;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
@@ -65,14 +66,88 @@ public class MimicOnesidedBlock extends MimicBlock {
 		builder.add(FACING);
 	}
 	
+	protected Vec3d getEntEffectiveMotion(Entity entityIn) {
+		// XZ motion isn't stored on the server and is handled client-side
+		// Server also resets lastPos in an inconvenient way.
+		final double dx;
+		final double dz;
+		if (entityIn instanceof PlayerEntity) {
+			dx = entityIn.world.isRemote()
+					? (entityIn.getMotion().x)
+					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+			dz = entityIn.world.isRemote()
+					? (entityIn.getMotion().z)
+					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+		} else {
+			dx = entityIn.getMotion().x;
+			dz = entityIn.getMotion().z;
+		}
+		
+//				final double dx = worldIn.isRemote
+//						? (entityIn.getMotion().x)
+//						: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+//				final double dz = worldIn.isRemote
+//						? (entityIn.getMotion().z)
+//						: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+		
+		return new Vec3d(dx, entityIn.getMotion().y, dz);
+	}
+	
+	protected Vec3d getEntEffectivePos(Entity entityIn, @Nullable Vec3d motion) {
+		//final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
+		
+		// cant use getCenter cause it's client-side only
+		//Vec3d center = entityBox.getCenter();
+		//Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
+		Vec3d center = entityIn.getPositionVector();
+		
+		if (motion == null) {
+			motion = getEntEffectiveMotion(entityIn);
+		}
+		
+		
+		// Offset center back to old position to prevent sneaking back inside!
+		center = center.add(-motion.x, 0, -motion.z);
+		return center;
+	}
+	
+	// 120286 130 673212
+	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
 		if (context != ISelectionContext.dummy()) {
 			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
 				// Hide if looking at from the right way
+				final Vec3d center = getEntEffectivePos(context.getEntity(), null);
+				final Direction side = state.get(FACING);
+				final boolean blocks;
 				
-				//return VoxelShapes.empty();
+				switch (side) {
+				case DOWN:
+					blocks = center.y < pos.getY();
+					break;
+				case EAST:
+					blocks = center.x > pos.getX() + 1;
+					break;
+				case NORTH:
+					blocks = center.z < pos.getZ();
+					break;
+				case SOUTH:
+					blocks = center.z > pos.getZ();
+					break;
+				case UP:
+				default:
+					blocks = center.y > pos.getY();
+					break;
+				case WEST:
+					blocks = center.x < pos.getX();
+					break;
+				}
+				
+				if (!blocks) {
+					return VoxelShapes.empty();
+				}
 			}
 		}
 		
@@ -87,58 +162,29 @@ public class MimicOnesidedBlock extends MimicBlock {
 			solid = false;
 		} else if (context.getEntity() != null) {
 			final Entity entityIn = context.getEntity();
-			//final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
+			final Vec3d motion = this.getEntEffectiveMotion(entityIn);
+			final Vec3d center = this.getEntEffectivePos(entityIn, motion);
 			Direction side = state.get(FACING);
-			// cant use getCenter cause it's client-side only
-			//Vec3d center = entityBox.getCenter();
-			//Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
-			Vec3d center = entityIn.getPositionVector();
-			
-			// XZ motion isn't stored on the server and is handled client-side
-			// Server also resets lastPos in an inconvenient way.
-			final double dx;
-			final double dz;
-			if (entityIn instanceof PlayerEntity) {
-				dx = entityIn.world.isRemote()
-						? (entityIn.getMotion().x)
-						: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
-				dz = entityIn.world.isRemote()
-						? (entityIn.getMotion().z)
-						: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
-			} else {
-				dx = entityIn.getMotion().x;
-				dz = entityIn.getMotion().z;
-			}
-			
-//			final double dx = worldIn.isRemote
-//					? (entityIn.getMotion().x)
-//					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
-//			final double dz = worldIn.isRemote
-//					? (entityIn.getMotion().z)
-//					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
-			
-			// Offset center back to old position to prevent sneaking back inside!
-			center = center.add(-dx, 0, -dz);
 			
 			switch (side) {
 			case DOWN:
-				solid = center.y < pos.getY() && entityIn.getMotion().y >= 0;
+				solid = center.y < pos.getY() && motion.y >= 0;
 				break;
 			case EAST:
-				solid = center.x > pos.getX() + 1 && dx <= 0;
+				solid = center.x > pos.getX() + 1 && motion.x <= 0;
 				break;
 			case NORTH:
-				solid = center.z < pos.getZ() && dz >= 0;
+				solid = center.z < pos.getZ() && motion.z >= 0;
 				break;
 			case SOUTH:
-				solid = center.z > pos.getZ() + 1 && dz <= 0;
+				solid = center.z > pos.getZ() + 1 && motion.z <= 0;
 				break;
 			case UP:
 			default:
-				solid = center.y > pos.getY() + 1 && entityIn.getMotion().y <= 0;
+				solid = center.y > pos.getY() + 1 && motion.y <= 0;
 				break;
 			case WEST:
-				solid = center.x < pos.getX() && dx >= 0;
+				solid = center.x < pos.getX() && motion.x >= 0;
 				break;
 			}
 		}
