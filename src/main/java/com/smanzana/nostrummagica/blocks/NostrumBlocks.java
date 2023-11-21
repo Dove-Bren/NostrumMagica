@@ -75,6 +75,7 @@ public class NostrumBlocks {
 	@ObjectHolder(MysticAnchor.ID) public static MysticAnchor mysticAnchor;
 	@ObjectHolder(ToggleLogicDoor.ID) public static ToggleLogicDoor toggleDoor;
 	@ObjectHolder(TrialBlock.ID) public static TrialBlock trialBlock;
+	@ObjectHolder(TriggerRepeater.ID) public static TriggerRepeater triggerRepeater;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -143,6 +144,7 @@ public class NostrumBlocks {
     	registerBlockItem(keySwitch, keySwitch.getRegistryName(), registry);
     	registerBlockItem(mysticAnchor, mysticAnchor.getRegistryName(), registry);
     	registerBlockItem(toggleDoor, toggleDoor.getRegistryName(), registry);
+    	registerBlockItem(triggerRepeater, triggerRepeater.getRegistryName(), registry);
     	
 
 //    	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -238,6 +240,7 @@ public class NostrumBlocks {
     	registerBlock(new MysticAnchor(), MysticAnchor.ID, registry);
     	registerBlock(new ToggleLogicDoor(), ToggleLogicDoor.ID, registry);
     	registerBlock(new TrialBlock(), TrialBlock.ID, registry);
+    	registerBlock(new TriggerRepeater(), TriggerRepeater.ID, registry);
     }
     
 }

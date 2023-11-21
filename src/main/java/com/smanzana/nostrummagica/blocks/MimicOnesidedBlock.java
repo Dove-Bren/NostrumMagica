@@ -66,6 +66,20 @@ public class MimicOnesidedBlock extends MimicBlock {
 	}
 	
 	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
+		if (context != ISelectionContext.dummy()) {
+			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
+				// Hide if looking at from the right way
+				
+				//return VoxelShapes.empty();
+			}
+		}
+		
+		return super.getShape(state, worldIn, pos, context);
+	}
+	
+	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		boolean solid = false;
 		

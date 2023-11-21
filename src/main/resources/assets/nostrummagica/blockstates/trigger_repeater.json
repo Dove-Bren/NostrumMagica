@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "nostrummagica:block/trigger_repeater" }
+    }
+}

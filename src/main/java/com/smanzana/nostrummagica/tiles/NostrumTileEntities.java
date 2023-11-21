@@ -40,6 +40,7 @@ public class NostrumTileEntities {
 	private static final String ID_LockedChest = "locked_chest_te";
 	private static final String ID_KeySwitch = "key_switch_te";
 	private static final String ID_TrialBlockTileEntity = "trial_block_te";
+	private static final String ID_TriggerRepeaterTileEntity = "trigger_repeater_te";
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableEntity> SpellTableEntityType;
 	@ObjectHolder(ID_SingleSpawnerTileEntity) public static TileEntityType<SingleSpawnerTileEntity> SingleSpawnerTileEntityType;
@@ -67,6 +68,7 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_LockedChest) public static TileEntityType<LockedChestEntity> LockedChestEntityType;
 	@ObjectHolder(ID_KeySwitch) public static TileEntityType<KeySwitchBlockTileEntity> KeySwitchTileEntityType;
 	@ObjectHolder(ID_TrialBlockTileEntity) public static TileEntityType<TrialBlockTileEntity> TrialBlockEntityType;
+	@ObjectHolder(ID_TriggerRepeaterTileEntity) public static TileEntityType<TriggerRepeaterEntity> TriggerRepeaterTileEntityType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -102,5 +104,6 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(LockedChestEntity::new, NostrumBlocks.lockedChest).build(null), ID_LockedChest);
 		register(registry, TileEntityType.Builder.create(KeySwitchBlockTileEntity::new, NostrumBlocks.keySwitch).build(null), ID_KeySwitch);
 		register(registry, TileEntityType.Builder.create(TrialBlockTileEntity::new, NostrumBlocks.trialBlock).build(null), ID_TrialBlockTileEntity);
+		register(registry, TileEntityType.Builder.create(TriggerRepeaterEntity::new, NostrumBlocks.triggerRepeater).build(null), ID_TriggerRepeaterTileEntity);
     }
 }
