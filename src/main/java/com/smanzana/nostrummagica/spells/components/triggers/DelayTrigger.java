@@ -79,7 +79,7 @@ public class DelayTrigger extends SpellTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
-		return new DelayTriggerInstance(state, Math.max((int) supportedFloats()[0], (int) params.level));
+		return new DelayTriggerInstance(state, Math.max(20 * (int) supportedFloats()[0], (int) params.level));
 	}
 
 	@Override
