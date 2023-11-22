@@ -25,6 +25,6 @@ public class CombatTrialPhysical extends CombatTrialStaged {
 	protected static boolean isSpawnSuggestion(BlockState state) {
 		final Block block = state.getBlock();
 		return block == Blocks.IRON_TRAPDOOR
-				|| block == Blocks.IRON_BARS;
+				|| block == Blocks.IRON_BLOCK;
 	}
 }

@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
@@ -291,6 +292,9 @@ public class NostrumItems {
 	@ObjectHolder(ThanosStaff.ID) public static ThanosStaff thanosStaff;
 	@ObjectHolder(WarlockSword.ID) public static WarlockSword warlockSword;
 	@ObjectHolder(WorldKeyItem.ID) public static WorldKeyItem worldKey;
+	@ObjectHolder(FillItem.ID_AIR_ALL) public static FillItem fillDungeonAir;
+	@ObjectHolder(FillItem.ID_WATER_ALL) public static FillItem fillWater;
+	@ObjectHolder(FillItem.ID_WATER_DOWN) public static FillItem fillWaterLevel;
 	
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -591,6 +595,9 @@ public class NostrumItems {
     	register(registry, new ThanosStaff().setRegistryName(ThanosStaff.ID));
     	register(registry, new WarlockSword().setRegistryName(WarlockSword.ID));
     	register(registry, new WorldKeyItem().setRegistryName(WorldKeyItem.ID));
+    	register(registry, new FillItem(() -> NostrumBlocks.dungeonAir.getDefaultState(), false).setRegistryName(FillItem.ID_AIR_ALL));
+    	register(registry, new FillItem(() -> Blocks.WATER.getDefaultState(), false).setRegistryName(FillItem.ID_WATER_ALL));
+    	register(registry, new FillItem(() -> Blocks.WATER.getDefaultState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
     	
     	// Generate and register spell runes
     	{

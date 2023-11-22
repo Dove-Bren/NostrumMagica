@@ -25,6 +25,6 @@ public class CombatTrialLightning extends CombatTrialStaged {
 	protected static boolean isSpawnSuggestion(BlockState state) {
 		final Block block = state.getBlock();
 		return block == Blocks.POLISHED_ANDESITE
-				|| block == Blocks.OBSIDIAN;
+				|| block == Blocks.DARK_PRISMARINE;
 	}
 }

@@ -339,6 +339,9 @@
 	"item.nostrummagica.poison_water_unbreakable_bucket": "Unbreakable Poison Water Bucket",
 	
 	"item.nostrummagica.world_key": "World Key",
+	"item.nostrummagica.fill_tool_air": "Fill Dungeon Air",
+	"item.nostrummagica.fill_tool_water": "Fill Water",
+	"item.nostrummagica.fill_tool_water_level": "Fill Water Level",
 	
 	"curios.identifier.pendant": "Pendant",
 
