@@ -281,7 +281,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	public void trigger(boolean isMagic) {
-		if (!this.isTriggered()) {
+		if (!this.isTriggered() && !this.world.isRemote()) {
 			if (hitType == SwitchHitType.ANY || isMagic) {
 				this.triggerWorldTicks = world.getGameTime();
 				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
