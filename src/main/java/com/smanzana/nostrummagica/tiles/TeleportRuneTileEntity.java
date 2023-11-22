@@ -211,7 +211,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	
 	protected static final void setEntityInCooldown(Entity ent) {
 		synchronized(EntityChargeMap) {
-			EntityChargeMap.put(ent.getUniqueID(), -20);
+			EntityChargeMap.put(ent.getUniqueID(), -40);
 		}
 	}
 	

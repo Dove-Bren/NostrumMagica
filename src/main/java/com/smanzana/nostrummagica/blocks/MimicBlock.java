@@ -106,11 +106,15 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 		return BlockRenderLayer.CUTOUT;
 	}
 	
+	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
+		return myPos.equals(fromPos.up());
+	}
+	
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
 		
-		if (pos.equals(fromPos.up())) {
+		if (shouldRefreshFromNeighbor(state, worldIn, pos, fromPos)) {
 			// Block below changed, so refresh tile entity
 			MimicBlockTileEntity te = (MimicBlockTileEntity) worldIn.getTileEntity(pos);
 			te.updateBlock();

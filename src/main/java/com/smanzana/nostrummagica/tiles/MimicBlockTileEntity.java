@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.blocks.MimicBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
@@ -40,7 +41,13 @@ public class MimicBlockTileEntity extends TileEntity {
 	
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return super.getUpdateTag();
+		CompoundNBT tag = super.getUpdateTag();
+		
+		if (this.getData().mimicState != null) {
+			tag.put("nested_state", NBTUtil.writeBlockState(this.getData().mimicState));
+		}
+		
+		return tag;
 	}
 	
 	@Override
@@ -61,8 +68,15 @@ public class MimicBlockTileEntity extends TileEntity {
 	public void handleUpdateTag(CompoundNBT tag) {
 		super.handleUpdateTag(tag);
 		
-		// Server told us something's changed (or we just loaded)
-		BlockState newState = refreshState();
+		final BlockState newState;
+		
+		if (tag.contains("nested_state")) {
+			newState = NBTUtil.readBlockState(tag.getCompound("nested_state"));
+		} else {
+			// Server told us something's changed (or we just loaded)
+			newState = refreshState();
+		}
+		
 		if (!newState.equals(getData().getBlockState())) {
 			setDataBlock(newState);
 			signalBlockUpdate(); // Is this okay?

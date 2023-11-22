@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.tiles.DelayLoadedMimicBlockTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,6 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
@@ -251,6 +253,16 @@ public class MimicOnesidedBlock extends MimicBlock {
 	}
 	
 	@Override
+	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
+		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
+		Direction mimicFacing = state.get(FACING);
+		final BlockPos samplePos = (mimicFacing.getAxis() == Axis.Y
+				? myPos.north()
+				: myPos.down());
+		return samplePos.equals(fromPos);
+	}
+	
+	@Override
 	public @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos) {
 		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
 		Direction mimicFacing = mimicBlockState.get(FACING);
@@ -276,5 +288,14 @@ public class MimicOnesidedBlock extends MimicBlock {
 		}
 		
 		return state;
+	}
+	
+	@Override
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+		if (state.get(FACING).getAxis() == Axis.Y) {
+			return new DelayLoadedMimicBlockTileEntity();
+		}
+		
+		return super.createTileEntity(state, world);
 	}
 }
