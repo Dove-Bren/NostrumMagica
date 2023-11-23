@@ -24,17 +24,23 @@ public class WallTrigger extends TriggerAreaTrigger {
 		
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
+		private static final int BLOCK_HEIGHT = 3;
 
 		private boolean northsouth;
 		private float radius;
 		
+		// For blocks
+		private BlockPos minPos;
+		private BlockPos maxPos;
+		
+		// For entities, who have width
 		private double minX;
-		private double minZ;
 		private double maxX;
+		private double minZ;
 		private double maxZ;
 		
-		public WallTriggerInstance(SpellState state, World world, Vec3d pos, boolean northsouth, float radius, boolean continuous) {
-			super(state, world, new Vec3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, continuous, false);
+		public WallTriggerInstance(SpellState state, World world, Vec3d pos, boolean northsouth, float radius, boolean ignoreBlocks) {
+			super(state, world, new Vec3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, true, !ignoreBlocks);
 			this.radius = radius;
 			this.northsouth = northsouth;
 		}
@@ -42,17 +48,35 @@ public class WallTrigger extends TriggerAreaTrigger {
 		@Override
 		public void init(LivingEntity caster) {
 			// Figure out bounds
+			
+			final int minBlockX;
+			final int maxBlockX;
+			final int minBlockZ;
+			final int maxBlockZ;
 			if (this.northsouth) {
-				this.minX = Math.floor(pos.x) -.25;
-				this.maxX = minX + 1.5;
-				this.minZ = Math.floor(pos.z) - radius;
-				this.maxZ = minZ + 1 + (radius * 2);
+				minX = Math.floor(pos.x) -.25;
+				maxX = minX + 1.5;
+				minZ = Math.floor(pos.z) - radius;
+				maxZ = minZ + 1 + (radius * 2);
+				
+				minBlockX = (int) Math.floor(pos.x);
+				maxBlockX = (int) Math.floor(pos.x);
+				minBlockZ = (int) Math.floor(Math.floor(pos.z) - radius);
+				maxBlockZ = (int) Math.floor(Math.floor(pos.z) + radius);
 			} else {
-				this.minX = Math.floor(pos.x) - radius;
-				this.maxX = minX + 1 + (radius * 2);
-				this.minZ = Math.floor(pos.z) -.25;
-				this.maxZ = minZ + 1.5;
+				minX = Math.floor(pos.x) - radius;
+				maxX = minX + 1 + (radius * 2);
+				minZ = Math.floor(pos.z) -.25;
+				maxZ = minZ + 1.5;
+				
+				minBlockX = (int) Math.floor(Math.floor(pos.x) - radius);
+				maxBlockX = (int) Math.floor(Math.floor(pos.x) + radius);
+				minBlockZ = (int) Math.floor(pos.z);
+				maxBlockZ = (int) Math.floor(pos.z);
 			}
+			
+			this.minPos = new BlockPos(minBlockX, pos.y, minBlockZ);
+			this.maxPos = new BlockPos(maxBlockX, pos.y + BLOCK_HEIGHT, maxBlockZ);
 			
 			super.init(caster); // Inits listening and stuff
 		}
@@ -61,19 +85,24 @@ public class WallTrigger extends TriggerAreaTrigger {
 		protected boolean isInArea(LivingEntity entity) {
 			return entity.posX >= this.minX && entity.posX <= this.maxX
 					&& entity.posZ >= this.minZ && entity.posZ <= this.maxZ
-					&& entity.posY >= Math.floor(this.pos.y) && entity.posY <= Math.floor(this.pos.y) + 2;
+					&& (entity.posY + entity.getHeight()) >= Math.floor(this.pos.y) && entity.posY <= Math.floor(this.pos.y) + BLOCK_HEIGHT;
 		}
 
 		@Override
 		protected boolean isInArea(World world, BlockPos pos) {
-			return false;
+			return pos.getX() <= this.maxPos.getX()
+					&& pos.getX() >= this.minPos.getX()
+					&& pos.getZ() <= this.maxPos.getZ()
+					&& pos.getZ() >= this.minPos.getZ()
+					&& pos.getY() <= this.maxPos.getY()
+					&& pos.getY() >= this.minPos.getY();
 		}
 
 		@Override
 		protected void doEffect() {
 			final double diffX = maxX - minX;
 			final double diffZ = maxZ - minZ;
-			for (int i = 0; i < radius + 1; i++) {
+			for (int i = 0; i < radius/2 + 1; i++) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
 						minX + NostrumMagica.rand.nextFloat() * diffX,
@@ -83,6 +112,24 @@ public class WallTrigger extends TriggerAreaTrigger {
 						40, 10, // lifetime + jitter
 						new Vec3d(0, .05, 0), null
 						).color(getState().getNextElement().getColor()));
+			}
+			
+			if (NostrumMagica.rand.nextBoolean()) {
+				// corners
+				
+				for (int x : new int[] {this.minPos.getX(), this.maxPos.getX() + 1})
+				for (int z : new int[] {this.minPos.getZ(), this.maxPos.getZ() + 1})
+				{
+					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+							1,
+							x,
+							Math.floor(pos.y),
+							z,
+							0, // pos + posjitter
+							40, 10, // lifetime + jitter
+							new Vec3d(0, .05, 0), null
+							).color(getState().getNextElement().getColor()));
+				}
 			}
 		}
 	}
@@ -121,8 +168,15 @@ public class WallTrigger extends TriggerAreaTrigger {
 		final double dx = Math.abs(state.getCaster().posX - pos.x);
 		final boolean northsouth = dz < dx;
 		
+		// Blindly guess if trigger put us in a wall but above us isn't that t he player
+		// wants us up one
+		BlockPos blockPos = new BlockPos(pos);
+		if (!world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up())) {
+			pos = pos.add(0, 1, 0);
+		}
+		
 		return new WallTriggerInstance(state, world, pos,
-				northsouth, Math.max(supportedFloats()[0], params.level), !params.flip);
+				northsouth, Math.max(supportedFloats()[0], params.level), params.flip);
 	}
 
 	@Override

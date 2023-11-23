@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -54,26 +56,69 @@ public class FieldTrigger extends TriggerAreaTrigger {
 
 		@Override
 		protected void doEffect() {
-			for (int i = 0; i < radius + 1; i++) {
+			for (int i = 0; i < radius/2 + 1; i++) {
+//				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+//						2,
+//						origin.x,
+//						origin.y, // technically correct but visually sucky cause 50% will be underground
+//						origin.z,
+//						radius,
+//						20, 0, // lifetime + jitter
+//						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
+//						).color(getState().getNextElement().getColor()));
+//				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
+//						2,
+//						origin.x,
+//						origin.y, // technically correct but visually sucky cause 50% will be underground
+//						origin.z,
+//						radius,
+//						20, 0, // lifetime + jitter
+//						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
+//						).color(getState().getNextElement().getColor()));
+				
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-						2,
+						1,
 						origin.x,
-						origin.y, // technically correct but visually sucky cause 50% will be underground
+						origin.y + .5,
 						origin.z,
-						radius,
-						20, 0, // lifetime + jitter
-						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
-						).color(getState().getNextElement().getColor()));
-				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
-						2,
-						origin.x,
-						origin.y, // technically correct but visually sucky cause 50% will be underground
-						origin.z,
-						radius,
-						20, 0, // lifetime + jitter
-						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
-						).color(getState().getNextElement().getColor()));
+						0,
+						60, 10, // lifetime + jitter
+						origin
+						).color(getState().getNextElement().getColor())
+						.setTargetBehavior(TargetBehavior.ORBIT)
+						.setOrbitRadius(((NostrumMagica.rand.nextFloat() * .5f) + .5f) * radius));
 			}
+			
+			// Spawn a border one
+			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+					1,
+					origin.x,
+					origin.y + .5,
+					origin.z,
+					0,
+					60, 10, // lifetime + jitter
+					origin
+					).color(getState().getNextElement().getColor())
+					.setTargetBehavior(TargetBehavior.ORBIT)
+					.setOrbitRadius(radius));
+			
+			
+			// Looks very cool
+//			final int slices = 10;
+//			final double radPerSlice = (Math.PI * 2) / slices;
+//			//for (int i = 0; i < slices; i++) {
+//			{
+//				final double rot = i * radPerSlice;
+//				Vec3d borderPos = origin.add(Math.cos(rot) * radius, 0, Math.sin(rot) * radius);
+//				
+//				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+//						1,
+//						borderPos.x, borderPos.y + .25, borderPos.z,
+//						0,
+//						20, 0, // lifetime + jitter
+//						new Vec3d(0, .05, 0), Vec3d.ZERO
+//						).color(getState().getNextElement().getColor()));
+//			}
 		}
 	}
 
@@ -107,6 +152,14 @@ public class FieldTrigger extends TriggerAreaTrigger {
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
 			SpellPartParam params) {
+		
+		// Blindly guess if trigger put us in a wall but above us isn't that t he player
+		// wants us up one
+		BlockPos blockPos = new BlockPos(pos);
+		if (!world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up())) {
+			pos = pos.add(0, 1, 0);
+		}
+		
 		return new FieldTriggerInstance(state, world, pos,
 				Math.max(supportedFloats()[0], params.level), !params.flip);
 	}
@@ -128,7 +181,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 
 	@Override
 	public float[] supportedFloats() {
-		return new float[] {1f, 1.5f, 2f, 3f, 4f};
+		return new float[] {1.5f, 2f, 2.5f, 3f, 4f};
 	}
 
 	public static NonNullList<ItemStack> costs = null;

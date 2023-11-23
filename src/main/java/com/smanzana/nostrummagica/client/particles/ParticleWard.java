@@ -5,7 +5,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
@@ -23,7 +23,7 @@ public class ParticleWard extends BatchRenderParticle {
 	protected Vec3d targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
-	protected EntityBehavior entityBehavior;
+	protected TargetBehavior entityBehavior;
 	
 	public ParticleWard(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
@@ -86,7 +86,7 @@ public class ParticleWard extends BatchRenderParticle {
 		this.dieOnTarget = die;
 	}
 	
-	public void setEntityBehavior(EntityBehavior behavior) {
+	public void setEntityBehavior(TargetBehavior behavior) {
 		this.entityBehavior = behavior;
 	}
 	
@@ -146,11 +146,11 @@ public class ParticleWard extends BatchRenderParticle {
 			if (targetEntity.isAlive()) {
 				final float period;
 				Vec3d offset;
-				if (this.entityBehavior == EntityBehavior.JOIN) {
+				if (this.entityBehavior == TargetBehavior.JOIN) {
 					period = 20f;
 					offset = targetPos == null ? Vec3d.ZERO : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period))
 							.add(0, targetEntity.getHeight()/2, 0);
-				} else if (this.entityBehavior == EntityBehavior.ORBIT) {
+				} else if (this.entityBehavior == TargetBehavior.ORBIT) {
 					period = 20f;
 					//randPeriodOffset = ?
 					offset = (new Vec3d(targetEntity.getWidth() * 2, 0, 0)).rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period))
@@ -209,7 +209,7 @@ public class ParticleWard extends BatchRenderParticle {
 					particle.setGravityStrength(params.gravityStrength);
 				}
 				particle.dieOnTarget(params.dieOnTarget);
-				particle.setEntityBehavior(params.entityBehavior);
+				particle.setEntityBehavior(params.targetBehavior);
 				Minecraft mc = Minecraft.getInstance();
 				mc.particles.addEffect(particle);
 			}

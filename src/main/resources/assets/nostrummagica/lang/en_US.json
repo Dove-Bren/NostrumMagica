@@ -1390,7 +1390,7 @@
     "modification.vortex_blade.bool.name":"Hit Blocks",
     "modification.vortex_blade.float.name":"Duration (Seconds)",
     "modification.projectile.bool.name":"Hit Allies",
-    "modification.wall.bool.name":"Only Hit Once",
+    "modification.wall.bool.name":"Ignore Blocks",
     "modification.wall.float.name":"Radius",
     "modification.seeking_bullet.bool.name":"Ignore Allies",
     "modification.mortar.bool.name":"Arcless",

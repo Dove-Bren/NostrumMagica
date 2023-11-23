@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.block.BlockState;
@@ -270,7 +270,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				40, 20,
 				entity.getEntityId()
 				).color(0xFF5511FF)
-				.setEntityBehavior(EntityBehavior.JOIN));
+				.setTargetBehavior(TargetBehavior.JOIN));
 		
 		NostrumParticles.WARD.spawn(entity.world, new SpawnParams(
 				100,

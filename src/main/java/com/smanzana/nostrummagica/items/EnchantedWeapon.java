@@ -10,7 +10,7 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
@@ -754,7 +754,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 					.gravity(gravity)
 					.color(color)
 					.dieOnTarget(false)
-					.setEntityBehavior(EntityBehavior.ORBIT)
+					.setTargetBehavior(TargetBehavior.ORBIT)
 			);
 	}
 }

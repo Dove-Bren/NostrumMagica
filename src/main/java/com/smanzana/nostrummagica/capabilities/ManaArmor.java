@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.EntityBehavior;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.Entity;
@@ -121,7 +121,7 @@ public class ManaArmor implements IManaArmor {
 				//hurtEntity.getEntityId()
 				)
 					.color(0x602244FF)
-					.setEntityBehavior(EntityBehavior.ORBIT));
+					.setTargetBehavior(TargetBehavior.ORBIT));
 	}
 	
 	protected boolean deductCost(Entity hurtEntity, DamageSource source, float originalAmount, float finalAmount) {

@@ -95,9 +95,9 @@ public enum NostrumParticles {
 	
 	public static class SpawnParams {
 		
-		public static enum EntityBehavior {
-			JOIN, // Fly towards and into the entity (x, y + h/2, z)
-			ORBIT, // Fly towards and then orbit the entity (r = w*2)
+		public static enum TargetBehavior {
+			JOIN, // Fly towards and into the target (ent: x, y + h/2, z, pos: x, y, z)
+			ORBIT, // Fly towards and then orbit the entity (r = w*2 by default for ents, 1 for pos)
 		}
 		
 		// Required params
@@ -120,7 +120,8 @@ public enum NostrumParticles {
 		public @Nullable Integer color; // ARGB
 		public boolean dieOnTarget;
 		public float gravityStrength;
-		public EntityBehavior entityBehavior;
+		public TargetBehavior targetBehavior;
+		public float orbitRadius;
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 				Vec3d velocity, Vec3d velocityJitter) {
@@ -138,7 +139,8 @@ public enum NostrumParticles {
 			this.targetEntID = null;
 			this.dieOnTarget = false;
 			this.gravityStrength = 0f;
-			this.entityBehavior = EntityBehavior.JOIN;
+			this.orbitRadius = 0f;
+			this.targetBehavior = TargetBehavior.JOIN;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -157,7 +159,8 @@ public enum NostrumParticles {
 			this.velocityJitter = null;
 			this.dieOnTarget = false;
 			this.gravityStrength = 0f;
-			this.entityBehavior = EntityBehavior.JOIN;
+			this.orbitRadius = 0f;
+			this.targetBehavior = TargetBehavior.JOIN;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
@@ -176,7 +179,8 @@ public enum NostrumParticles {
 			this.velocityJitter = null;
 			this.dieOnTarget = false;
 			this.gravityStrength = 0f;
-			this.entityBehavior = EntityBehavior.JOIN;
+			this.orbitRadius = 0f;
+			this.targetBehavior = TargetBehavior.JOIN;
 		}
 		
 		public SpawnParams color(int color) {
@@ -202,8 +206,13 @@ public enum NostrumParticles {
 			return this;
 		}
 		
-		public SpawnParams setEntityBehavior(EntityBehavior behavior) {
-			this.entityBehavior = behavior;
+		public SpawnParams setTargetBehavior(TargetBehavior behavior) {
+			this.targetBehavior = behavior;
+			return this;
+		}
+		
+		public SpawnParams setOrbitRadius(float radius) {
+			this.orbitRadius = radius;
 			return this;
 		}
 		
@@ -220,7 +229,8 @@ public enum NostrumParticles {
 		private static final String NBT_TARGET_ENT_ID = "target_ent_id";
 		private static final String NBT_DIE_ON_TARGET = "die_on_target";
 		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
-		private static final String NBT_ENTITY_BEHAVIOR = "entity_behavior";
+		private static final String NBT_TARGET_BEHAVIOR = "target_behavior";
+		private static final String NBT_ORBIT_RADIUS = "orbit_radius";
 		
 		public static CompoundNBT WriteNBT(SpawnParams params, @Nullable CompoundNBT tag) {
 			if (tag == null) {
@@ -235,7 +245,8 @@ public enum NostrumParticles {
 			tag.putInt(NBT_LIFETIME, params.lifetime);
 			tag.putInt(NBT_LIFETIME_JITTER, params.lifetimeJitter);
 			tag.putBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
-			tag.putInt(NBT_ENTITY_BEHAVIOR, params.entityBehavior.ordinal());
+			tag.putInt(NBT_TARGET_BEHAVIOR, params.targetBehavior.ordinal());
+			tag.putFloat(NBT_ORBIT_RADIUS, params.orbitRadius);
 			
 			if (params.velocity != null) {
 				CompoundNBT subtag = new CompoundNBT();
@@ -352,14 +363,15 @@ public enum NostrumParticles {
 				params.gravity(tag.getFloat(NBT_GRAVITY_STRENGTH));
 			}
 			
-			if (tag.contains(NBT_ENTITY_BEHAVIOR, NBT.TAG_INT)) {
-				final int ord = tag.getInt(NBT_ENTITY_BEHAVIOR);
-				if (ord < EntityBehavior.values().length) {
-					params.entityBehavior = EntityBehavior.values()[ord];
+			if (tag.contains(NBT_TARGET_BEHAVIOR, NBT.TAG_INT)) {
+				final int ord = tag.getInt(NBT_TARGET_BEHAVIOR);
+				if (ord < TargetBehavior.values().length) {
+					params.targetBehavior = TargetBehavior.values()[ord];
 				} else {
-					params.entityBehavior = EntityBehavior.JOIN;
+					params.targetBehavior = TargetBehavior.JOIN;
 				}
 			}
+			params.orbitRadius = tag.getFloat(NBT_ORBIT_RADIUS);
 			
 			return params;
 		}
