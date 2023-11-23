@@ -396,6 +396,22 @@
         ]
     },
 	
+	"ambient.tick":
+	{
+		"sounds":
+        [
+            "nostrummagica:entity/tick"
+        ]
+	},
+	
+	"ambient.tock":
+	{
+		"sounds":
+        [
+            "nostrummagica:entity/tock"
+        ]
+	},
+	
 	"music.dungeon1.intro":
 	{
 		"stream": true,

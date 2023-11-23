@@ -219,13 +219,47 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
+	protected long getTickTockPeriod() {
+		// If total time is large, use 1 second period. Otherwise, half second
+		// OR base it on current time left!
+		final long remainingTime = this.getCurrentCooldownTicks();
+		
+		return remainingTime <= 3 * 20 ? 10 : 20;
+	}
+	
 	protected void timedTick(long gameTicks) {
 		// Stay triggered for the duration of the timer. At the end, trigger again, and then become
 		// triggerable again
-		if (this.triggerWorldTicks != 0 && gameTicks - this.triggerWorldTicks >= this.getTotalCooldownTicks()) {
+		final long elapsedTicks = gameTicks - this.triggerWorldTicks;
+		if (this.triggerWorldTicks != 0 && elapsedTicks >= this.getTotalCooldownTicks()) {
 			this.doTriggerInternal();
 			this.triggerWorldTicks = 0;
 			this.dirty();
+			
+			NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+		}
+		
+		// Play tick or tock if still going
+		
+		final long period = getTickTockPeriod();
+		if (this.triggerWorldTicks != 0 && elapsedTicks % period == 0) {
+			// Figure out if it's a tick (first, third, etc.) or tock (second, fourth, etc.)
+			final boolean tick = elapsedTicks % (period * 2) < period;
+			// elapsed % 2* period < period
+			
+			// period of 10
+			// 0 < period YES
+			// 10 < period NO
+			// 0 ....
+			
+			// period of 20 then 20 after 3 seconds (6 sec timer)
+			// 0 < period  YES   // 0
+			// 20 < period NO    // 20
+			// 0 < period YES    // 40
+			// 10 < period NO    // 50
+			
+			final NostrumMagicaSounds sound = tick ? NostrumMagicaSounds.TICK : NostrumMagicaSounds.TOCK;
+			sound.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		}
 	}
 	
