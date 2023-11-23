@@ -52,11 +52,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
+import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class NostrumEmptyDimension {
@@ -610,6 +612,13 @@ public class NostrumEmptyDimension {
 				event.setCanceled(true);
 			}
 			
+		}
+		
+		@SubscribeEvent
+		public void onMobGrief(EntityMobGriefingEvent event) {
+			if (event.getEntity().world.getDimension().getType() == dim) {
+				event.setResult(Result.DENY);
+			}
 		}
 	}
 	
