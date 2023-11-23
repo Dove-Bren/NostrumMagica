@@ -53,7 +53,8 @@ public class NostrumBlocks {
 	@ObjectHolder(NostrumMirrorBlock.ID) public static NostrumMirrorBlock mirrorBlock;
 	@ObjectHolder(NostrumObelisk.ID) public static NostrumObelisk obelisk;
 	@ObjectHolder(NostrumSingleSpawner.ID) public static NostrumSingleSpawner singleSpawner;
-	@ObjectHolder(NostrumSpawnAndTrigger.ID) public static NostrumSpawnAndTrigger triggerSpawner;
+	@ObjectHolder(NostrumMatchSpawner.ID) public static NostrumMatchSpawner matchSpawner;
+	@ObjectHolder(NostrumTriggeredMatchSpawner.ID) public static NostrumTriggeredMatchSpawner triggeredMatchSpawner;
 	@ObjectHolder(ObeliskPortal.ID) public static ObeliskPortal obeliskPortal;
 	@ObjectHolder(ParadoxMirrorBlock.ID) public static ParadoxMirrorBlock paradoxMirror;
 	@ObjectHolder(PoisonWaterBlock.ID_BREAKABLE) public static PoisonWaterBlock poisonWaterBlock;
@@ -124,7 +125,8 @@ public class NostrumBlocks {
     	//registerBlockItem(mirrorBlock, mirrorBlock.getRegistryName(), registry);
     	//registerBlockItem(obelisk, obelisk.getRegistryName(), registry);
     	registerBlockItem(singleSpawner, singleSpawner.getRegistryName(), registry);
-    	registerBlockItem(triggerSpawner, triggerSpawner.getRegistryName(), registry);
+    	registerBlockItem(matchSpawner, matchSpawner.getRegistryName(), registry);
+    	registerBlockItem(triggeredMatchSpawner, triggeredMatchSpawner.getRegistryName(), registry);
     	//registerBlockItem(obeliskPortal, obeliskPortal.getRegistryName(), registry);
     	registerBlockItem(paradoxMirror, paradoxMirror.getRegistryName(), registry);
     	//registerBlockItem(poisonWaterBlock, poisonWaterBlock.getRegistryName(), registry);
@@ -218,7 +220,8 @@ public class NostrumBlocks {
     	registerBlock(new NostrumMirrorBlock(), NostrumMirrorBlock.ID, registry);
     	registerBlock(new NostrumObelisk(), NostrumObelisk.ID, registry);
     	registerBlock(new NostrumSingleSpawner(), NostrumSingleSpawner.ID, registry);
-    	registerBlock(new NostrumSpawnAndTrigger(), NostrumSpawnAndTrigger.ID, registry);
+    	registerBlock(new NostrumMatchSpawner(), NostrumMatchSpawner.ID, registry);
+    	registerBlock(new NostrumTriggeredMatchSpawner(), NostrumTriggeredMatchSpawner.ID, registry);
     	registerBlock(new ObeliskPortal(), ObeliskPortal.ID, registry);
     	registerBlock(new ParadoxMirrorBlock(), ParadoxMirrorBlock.ID, registry);
     	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.poisonWater;}, false), PoisonWaterBlock.ID_BREAKABLE, registry);

@@ -80,6 +80,7 @@ public class NostrumSingleSpawner extends ContainerBlock {
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(4)
 				.noDrops()
+				.doesNotBlockMovement()
 				);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(MOB, Type.GOLEM_PHYSICAL));

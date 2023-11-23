@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ITriggeredBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
-import com.smanzana.nostrummagica.blocks.NostrumSpawnAndTrigger;
+import com.smanzana.nostrummagica.blocks.NostrumMatchSpawner;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.utils.WorldUtil;
 
@@ -17,11 +18,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
+public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity {
 	
 	private static final String NBT_ENTITY_ID = "entity_id";
 	private static final String NBT_TRIGGER_OFFSET = "trigger_offset";
@@ -31,8 +33,12 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 	
 	private UUID unlinkedEntID;
 	
-	public SpawnerTriggerTileEntity() {
-		super(NostrumTileEntities.SpawnerTriggerTileEntityType);
+	protected MatchSpawnerTileEntity(TileEntityType<? extends MatchSpawnerTileEntity> type) {
+		super(type);
+	}
+	
+	public MatchSpawnerTileEntity() {
+		this(NostrumTileEntities.MatchSpawnerTileEntityType);
 	}
 	
 	public void setTriggerOffset(BlockPos offset) {
@@ -48,7 +54,11 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 		return triggerOffset;
 	}
 	
-	protected void trigger(BlockState state) {
+	/**
+	 * Trigger target trigger block, presumably because the match has ended
+	 * @param state
+	 */
+	protected void doTrigger(BlockState state) {
 		
 		if (triggerOffset != null) {
 			state = world.getBlockState(pos.add(this.triggerOffset));
@@ -57,6 +67,28 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 			}
 			triggerOffset = null;
 		}
+	}
+	
+	protected void updateBlockState() {
+		world.setBlockState(pos, this.getBlockState().with(NostrumMatchSpawner.TRIGGERED, true), 3);
+	}
+	
+	protected void spawnMatch(BlockState state) {
+		entity = NostrumBlocks.matchSpawner.spawn(world, pos, state, NostrumMagica.rand);
+		//world.notifyBlockUpdate(pos, state, state, 2);
+		//world.addBlockEvent(pos, state.getBlock(), 9, 0);
+		updateBlockState();
+		this.markDirty();
+	}
+	
+	protected boolean shouldSpawnMatch(BlockState state) {
+		for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
+			if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < NostrumMatchSpawner.SPAWN_DIST_SQ) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -76,23 +108,20 @@ public class SpawnerTriggerTileEntity extends SingleSpawnerTileEntity {
 			
 			if (entity == null && ticksExisted > 20 * 15) {
 				// Give up
+				NostrumMagica.logger.warn("Trigger spawner failed to find spawned entity and is giving up.");
 				unlinkedEntID = null;
-				this.trigger(state);
+				this.doTrigger(state);
 				world.removeBlock(pos, false);
 			}
 		} else if (entity == null) {
-			for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
-				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < NostrumSpawnAndTrigger.SPAWN_DIST_SQ) {
-					entity = NostrumBlocks.triggerSpawner.spawn(world, pos, state, NostrumMagica.rand);
-					world.notifyBlockUpdate(pos, state, state, 2);
-					world.addBlockEvent(pos, state.getBlock(), 9, 0);
-					this.markDirty();
-					return;
-				}
+			if (shouldSpawnMatch(state)) {
+				spawnMatch(state);
+				return;
 			}
 		} else {
 			if (!entity.isAlive()) {
-				this.trigger(state);
+				NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+				this.doTrigger(state);
 				world.removeBlock(pos, false);
 			}
 		}

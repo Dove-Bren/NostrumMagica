@@ -1,16 +1,19 @@
 package com.smanzana.nostrummagica.blocks;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.tiles.SpawnerTriggerTileEntity;
+import com.smanzana.nostrummagica.tiles.MatchSpawnerTileEntity;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -27,25 +30,35 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
+public class NostrumMatchSpawner extends NostrumSingleSpawner {
 	
 	public static final String ID = "nostrum_spawner_trigger";
+
+	public static final BooleanProperty TRIGGERED = BooleanProperty.create("triggered");
 	
-	public NostrumSpawnAndTrigger() {
+	public NostrumMatchSpawner() {
 		super();
+		
+		this.setDefaultState(this.getDefaultState().with(TRIGGERED, false));
+	}
+	
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		super.fillStateContainer(builder);
+		builder.add(TRIGGERED);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public boolean isSideInvisible(BlockState blockState, BlockState adjacentState, Direction side) {
-		if (NostrumMagica.instance.proxy.getPlayer().isCreative()) {
-			return true; // I guess just only in creative?
-//			TileEntity te = blockAccess.getTileEntity(pos);
-//			if (te != null && te instanceof SpawnerTriggerTileEntity) {
-//				SpawnerTriggerTileEntity ent = ((SpawnerTriggerTileEntity) te);
-//				return (ent.getSpawnedEntity() == null && ent.getUnlinkedEntID() == null);
-//			}
-		}
+//		if (!NostrumMagica.instance.proxy.getPlayer().isCreative()) {
+//			return true; // I guess just only in creative?
+////			TileEntity te = blockAccess.getTileEntity(pos);
+////			if (te != null && te instanceof SpawnerTriggerTileEntity) {
+////				SpawnerTriggerTileEntity ent = ((SpawnerTriggerTileEntity) te);
+////				return (ent.getSpawnedEntity() == null && ent.getUnlinkedEntID() == null);
+////			}
+//		}
 		return false;
 	}
 	
@@ -56,7 +69,7 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new SpawnerTriggerTileEntity();
+		return new MatchSpawnerTileEntity();
 	}
 	
 	@Override
@@ -70,11 +83,11 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
-		if (te == null || !(te instanceof SpawnerTriggerTileEntity)) {
+		if (te == null || !(te instanceof MatchSpawnerTileEntity)) {
 			return true;
 		}
 		
-		SpawnerTriggerTileEntity ent = (SpawnerTriggerTileEntity) te;
+		MatchSpawnerTileEntity ent = (MatchSpawnerTileEntity) te;
 		
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
@@ -109,7 +122,9 @@ public class NostrumSpawnAndTrigger extends NostrumSingleSpawner {
 				worldIn.setBlockState(pos, state.with(MOB, type));
 			} else if (NostrumTags.Items.DragonWing.contains(heldItem.getItem())) {
 				worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
-			} if (heldItem.getItem() instanceof PositionCrystal) {
+			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
+				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));
+			} else if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 				if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
 					ent.setTriggerPosition(heldPos.getX(), heldPos.getY(), heldPos.getZ());

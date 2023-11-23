@@ -45,6 +45,7 @@ public class MysticAnchor extends Block {
 	public MysticAnchor() {
 		super(Block.Properties.create(Material.ROCK)
 				.sound(SoundType.STONE)
+				.hardnessAndResistance(1.5f)
 				.harvestLevel(1)
 				.harvestTool(ToolType.PICKAXE)
 				);

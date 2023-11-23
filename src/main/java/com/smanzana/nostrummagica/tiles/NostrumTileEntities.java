@@ -16,7 +16,8 @@ public class NostrumTileEntities {
 	
 	private static final String ID_SpellTableEntity = "spell_table";
 	private static final String ID_SingleSpawnerTileEntity = "nostrum_mob_spawner_te";
-	private static final String ID_SpawnerTriggerTileEntity = "nostrum_mob_spawner_trigger_te";
+	private static final String ID_MatchSpawnerTileEntity = "nostrum_mob_spawner_trigger_te";
+	private static final String ID_TriggeredMatchSpawnerTileEntity = "triggered_match_spawner_te";
 	private static final String ID_SymbolTileEntity = "nostrum_symbol_te";
 	private static final String ID_AltarTileEntity = "nostrum_altar_te";
 	private static final String ID_CandleTileEntity = "nostrum_candle_te";
@@ -45,7 +46,8 @@ public class NostrumTileEntities {
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableEntity> SpellTableEntityType;
 	@ObjectHolder(ID_SingleSpawnerTileEntity) public static TileEntityType<SingleSpawnerTileEntity> SingleSpawnerTileEntityType;
-	@ObjectHolder(ID_SpawnerTriggerTileEntity) public static TileEntityType<SpawnerTriggerTileEntity> SpawnerTriggerTileEntityType;
+	@ObjectHolder(ID_MatchSpawnerTileEntity) public static TileEntityType<MatchSpawnerTileEntity> MatchSpawnerTileEntityType;
+	@ObjectHolder(ID_TriggeredMatchSpawnerTileEntity) public static TileEntityType<TriggeredMatchSpawnerTileEntity> TriggeredMatchSpawnerTileEntityType;
 	@ObjectHolder(ID_SymbolTileEntity) public static TileEntityType<SymbolTileEntity> SymbolTileEntityType;
 	@ObjectHolder(ID_AltarTileEntity) public static TileEntityType<AltarTileEntity> AltarTileEntityType;
 	@ObjectHolder(ID_CandleTileEntity) public static TileEntityType<CandleTileEntity> CandleTileEntityType;
@@ -82,7 +84,8 @@ public class NostrumTileEntities {
 		
 		register(registry, TileEntityType.Builder.create(SpellTableEntity::new, NostrumBlocks.spellTable).build(null), ID_SpellTableEntity);
 		register(registry, TileEntityType.Builder.create(SingleSpawnerTileEntity::new, NostrumBlocks.singleSpawner).build(null), ID_SingleSpawnerTileEntity);
-		register(registry, TileEntityType.Builder.create(SpawnerTriggerTileEntity::new, NostrumBlocks.triggerSpawner).build(null), ID_SpawnerTriggerTileEntity);
+		register(registry, TileEntityType.Builder.create(MatchSpawnerTileEntity::new, NostrumBlocks.matchSpawner).build(null), ID_MatchSpawnerTileEntity);
+		register(registry, TileEntityType.Builder.create(TriggeredMatchSpawnerTileEntity::new, NostrumBlocks.triggeredMatchSpawner).build(null), ID_TriggeredMatchSpawnerTileEntity);
 		register(registry, TileEntityType.Builder.create(SymbolTileEntity::new, NostrumBlocks.symbolBlock, NostrumBlocks.shrineBlock).build(null), ID_SymbolTileEntity);
 		register(registry, TileEntityType.Builder.create(AltarTileEntity::new, NostrumBlocks.altar).build(null), ID_AltarTileEntity);
 		register(registry, TileEntityType.Builder.create(CandleTileEntity::new, NostrumBlocks.candle).build(null), ID_CandleTileEntity);
