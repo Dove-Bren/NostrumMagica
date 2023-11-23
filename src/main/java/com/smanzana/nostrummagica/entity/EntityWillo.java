@@ -1016,11 +1016,15 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		}
 	}
 	
+	public void setElement(EMagicElement element) {
+		dataManager.set(ELEMENT, element);
+	}
+	
 	@Override
 	@Nullable
 	public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
-		dataManager.set(ELEMENT, elem);
+		setElement(elem);
 		return super.onInitialSpawn(world, difficulty, reason, livingdata, dataTag);
 	}
 	

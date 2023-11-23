@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -66,7 +67,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	}
 	
 	protected void startStage(CombatTrialStage stage) {
-		stage.spawnStage(world, center);
+		stage.spawnStage(world, center, this.focusedPlayer);
 	}
 	
 	protected void advanceStage() {
@@ -151,11 +152,11 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	}
 	
 	protected static interface TrialMobProvider {
-		public LivingEntity provideEntity(World world);
+		public MobEntity provideEntity(World world);
 	}
 	
 	protected static interface TrialSpawnProvider {
-		public BlockPos provideSpawn(World world, BlockPos center, LivingEntity entity);
+		public BlockPos provideSpawn(World world, BlockPos center, MobEntity entity);
 	}
 	
 	protected static class CombatTrialStage {
@@ -163,43 +164,48 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		protected final TrialMobProvider provider;
 		protected final TrialSpawnProvider spawnFinder;
 		protected final int numEntities;
-		protected final List<LivingEntity> stageEntities;
+		protected final List<MobEntity> stageEntities;
+		protected final @Nullable PlayerEntity focusPlayer;
 		
-		public CombatTrialStage(TrialMobProvider provider, TrialSpawnProvider spawnFinder, int numEntities) {
+		public CombatTrialStage(@Nullable PlayerEntity focusPlayer, TrialMobProvider provider, TrialSpawnProvider spawnFinder, int numEntities) {
 			stageEntities = new ArrayList<>();
 			this.provider = provider;
 			this.spawnFinder = spawnFinder;
 			this.numEntities = numEntities;
+			this.focusPlayer = focusPlayer;
 		}
 		
-		public void spawnStage(World world, BlockPos center) {
+		public void spawnStage(World world, BlockPos center, @Nullable PlayerEntity focusPlayer) {
 			for (int i = 0; i < numEntities; i++) {
-				stageEntities.add(spawnOneEntity(world, center));
+				stageEntities.add(spawnOneEntity(world, center, focusPlayer));
 			}
 		}
 		
-		protected LivingEntity spawnOneEntity(World world, BlockPos center) {
-			final LivingEntity ent = genEntity(world);
+		protected MobEntity spawnOneEntity(World world, BlockPos center, @Nullable PlayerEntity focusPlayer) {
+			final MobEntity ent = genEntity(world);
 			final BlockPos spawn = findSpawnPos(world, center, ent);
 			ent.setPosition(spawn.getX() + .5, spawn.getY(), spawn.getZ() + .5);
 			world.addEntity(ent);
+			if (focusPlayer != null) {
+				ent.setAttackTarget(focusPlayer);
+			}
 			CombatTrial.playSpawnEffects(center, ent);
 			return ent;
 		}
 		
-		protected BlockPos findSpawnPos(World world, BlockPos center, LivingEntity ent) {
+		protected BlockPos findSpawnPos(World world, BlockPos center, MobEntity ent) {
 			return this.spawnFinder.provideSpawn(world, center, ent);
 		}
 		
-		protected LivingEntity genEntity(World world) {
+		protected MobEntity genEntity(World world) {
 			return this.provider.provideEntity(world);
 		}
 		
 		protected boolean isComplete() {
 			// Clean up dead entities, and then return if list is empty
-			Iterator<LivingEntity> it = this.stageEntities.iterator();
+			Iterator<MobEntity> it = this.stageEntities.iterator();
 			while (it.hasNext()) {
-				LivingEntity ent = it.next();
+				MobEntity ent = it.next();
 				if (ent == null || !ent.isAlive()) {
 					it.remove();
 				}
@@ -209,7 +215,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		}
 		
 		public void stopStage() {
-			for (LivingEntity ent : this.stageEntities) {
+			for (MobEntity ent : this.stageEntities) {
 				ent.remove();
 			}
 		}
@@ -217,18 +223,18 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	
 	protected static class RandomPoolMobProvider implements TrialMobProvider {
 
-		protected final List<EntityType<? extends LivingEntity>> types;
+		protected final List<EntityType<? extends MobEntity>> types;
 		
 		@SafeVarargs
-		public RandomPoolMobProvider(EntityType<? extends LivingEntity> ... types) {
+		public RandomPoolMobProvider(EntityType<? extends MobEntity> ... types) {
 			this.types = new ArrayList<>(types.length);
-			for (EntityType<? extends LivingEntity> type : types) {
+			for (EntityType<? extends MobEntity> type : types) {
 				this.types.add(type);
 			}
 		}
 		
 		@Override
-		public LivingEntity provideEntity(World world) {
+		public MobEntity provideEntity(World world) {
 			return types.get(NostrumMagica.rand.nextInt(types.size())).create(world);
 		}
 	}
@@ -241,7 +247,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		}
 		
 		@Override
-		public BlockPos provideSpawn(World world, BlockPos center, LivingEntity entity) {
+		public BlockPos provideSpawn(World world, BlockPos center, MobEntity entity) {
 			if (this.spawnCandidates.isEmpty()) {
 				return CombatTrialStaged.findRandomSpawnPos(world, center, entity);
 			} else {

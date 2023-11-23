@@ -21,9 +21,9 @@ import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
@@ -79,7 +79,6 @@ import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
-import com.smanzana.nostrummagica.quests.rewards.TriggerReward;
 import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
@@ -118,15 +117,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.AtFeetTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.AuraTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.CasterTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
-import com.smanzana.nostrummagica.trials.WorldTrial;
 import com.smanzana.nostrummagica.trials.TrialEarth;
 import com.smanzana.nostrummagica.trials.TrialEnder;
 import com.smanzana.nostrummagica.trials.TrialFire;
@@ -134,6 +125,7 @@ import com.smanzana.nostrummagica.trials.TrialIce;
 import com.smanzana.nostrummagica.trials.TrialLightning;
 import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
+import com.smanzana.nostrummagica.trials.WorldTrial;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
@@ -1583,8 +1575,8 @@ public class NostrumMagica {
 				wrapAttribute(AwardType.REGEN, 0.0050f));
 		new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 1, 0, 0, new String[] { "lvl1" }, null, null,
 				wrapAttribute(AwardType.COST, -0.005f));
-		new NostrumQuest("lvl2", QuestType.REGULAR, 3, 0, 0, 0, new String[] { "lvl2-fin", "lvl2-con" }, null, null,
-				new IReward[] { new TriggerReward(AtFeetTrigger.instance()) });
+//		new NostrumQuest("lvl2", QuestType.REGULAR, 3, 0, 0, 0, new String[] { "lvl2-fin", "lvl2-con" }, null, null,
+//				new IReward[] { new TriggerReward(AtFeetTrigger.instance()) });
 		new NostrumQuest("lvl3", QuestType.CHALLENGE, 4, 0, 0, 0, new String[] { "lvl2-fin", "lvl2-con" }, null,
 				new ObjectiveRitual("magic_token"), wrapAttribute(AwardType.MANA, 0.005f));
 		new NostrumQuest("lvl4", QuestType.CHALLENGE, 5, 0, 0, 0, new String[] { "lvl3" }, null,
@@ -1615,8 +1607,8 @@ public class NostrumMagica {
 		// LVL main tree
 		new NostrumQuest("lvl7", QuestType.CHALLENGE, 7, 0, 0, 0, new String[] { "lvl6-con", "lvl6-fin" }, null,
 				new ObjectiveRitual("kani"), wrapAttribute(AwardType.MANA, 0.020f));
-		new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[] { "lvl7" }, null, null,
-				new IReward[] { new TriggerReward(FieldTrigger.instance()) });
+//		new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[] { "lvl7" }, null, null,
+//				new IReward[] { new TriggerReward(FieldTrigger.instance()) });
 		new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[] { "lvl7" }, null, null,
 				wrapAttribute(AwardType.COST, -0.005f));
 		new NostrumQuest("lvl8-fin5", QuestType.REGULAR, 8, 0, 0, 5, new String[] { "lvl7" }, null, null,
@@ -1631,8 +1623,8 @@ public class NostrumMagica {
 				wrapAttribute(AwardType.COST, -0.050f));
 		new NostrumQuest("lvl10", QuestType.REGULAR, 10, 0, 0, 0, new String[] { "lvl8-con3", "lvl8-fin3" }, null, null,
 				wrapAttribute(AwardType.MANA, 0.100f));
-		new NostrumQuest("lvl12", QuestType.REGULAR, 12, 0, 0, 0, new String[] { "lvl10" }, null, null,
-				new IReward[] { new TriggerReward(AuraTrigger.instance()) });
+//		new NostrumQuest("lvl12", QuestType.REGULAR, 12, 0, 0, 0, new String[] { "lvl10" }, null, null,
+//				new IReward[] { new TriggerReward(AuraTrigger.instance()) });
 
 		new NostrumQuest("con1", QuestType.REGULAR, 0, 1, // Control
 				0, // Technique
@@ -1687,10 +1679,10 @@ public class NostrumMagica {
 				new String[] { "con1-tec2" }, null,
 				new ObjectiveSpellCast().numElems(3).requiredElement(EMagicElement.LIGHTNING),
 				wrapAttribute(AwardType.MANA, 0.030f));
-		new NostrumQuest("con2-tec3", QuestType.CHALLENGE, 0, 2, // Control
-				3, // Technique
-				0, // Finesse
-				new String[] { "con1-tec2" }, null, null, new IReward[] { new TriggerReward(WallTrigger.instance()) });
+//		new NostrumQuest("con2-tec3", QuestType.CHALLENGE, 0, 2, // Control
+//				3, // Technique
+//				0, // Finesse
+//				new String[] { "con1-tec2" }, null, null, new IReward[] { new TriggerReward(WallTrigger.instance()) });
 		new NostrumQuest("con1-tec5", QuestType.REGULAR, 0, 1, // Control
 				5, // Technique
 				0, // Finesse
@@ -1700,11 +1692,11 @@ public class NostrumMagica {
 				1, // Technique
 				0, // Finesse
 				new String[] { "start" }, null, null, wrapAttribute(AwardType.MANA, 0.01f));
-		new NostrumQuest("tec3", QuestType.CHALLENGE, 0, 0, // Control
-				3, // Technique
-				0, // Finesse
-				new String[] { "con1-tec2", "fin1-tec2" }, null, null,
-				new IReward[] { new TriggerReward(SeekingBulletTrigger.instance()) });
+//		new NostrumQuest("tec3", QuestType.CHALLENGE, 0, 0, // Control
+//				3, // Technique
+//				0, // Finesse
+//				new String[] { "con1-tec2", "fin1-tec2" }, null, null,
+//				new IReward[] { new TriggerReward(SeekingBulletTrigger.instance()) });
 		new NostrumQuest("tec7", QuestType.CHALLENGE, 0, 0, // Control
 				7, // Technique
 				0, // Finesse
@@ -1729,10 +1721,10 @@ public class NostrumMagica {
 				0, // Technique
 				7, // Finesse
 				new String[] { "fin5" }, null, null, wrapAttribute(AwardType.REGEN, 0.075f));
-		new NostrumQuest("fin2-tec1", QuestType.CHALLENGE, 0, 0, // Control
-				1, // Technique
-				2, // Finesse
-				new String[] { "fin1" }, null, null, new IReward[] { new TriggerReward(CasterTrigger.instance()) });
+//		new NostrumQuest("fin2-tec1", QuestType.CHALLENGE, 0, 0, // Control
+//				1, // Technique
+//				2, // Finesse
+//				new String[] { "fin1" }, null, null, new IReward[] { new TriggerReward(CasterTrigger.instance()) });
 		new NostrumQuest("fin5-tec2", QuestType.CHALLENGE, 0, 0, // Control
 				2, // Technique
 				5, // Finesse
@@ -1762,12 +1754,12 @@ public class NostrumMagica {
 				5, // Technique
 				1, // Finesse
 				new String[] { "fin1-tec3", "tec3" }, null, null, wrapAttribute(AwardType.REGEN, 0.050f));
-		new NostrumQuest("fin2-tec3", QuestType.REGULAR, 0, 0, // Control
-				3, // Technique
-				2, // Finesse
-				new String[] { "fin1-tec3", "fin2-tec5" }, null, null,
-				new IReward[] { new TriggerReward(MortarTrigger.instance()) });
-		;
+//		new NostrumQuest("fin2-tec3", QuestType.REGULAR, 0, 0, // Control
+//				3, // Technique
+//				2, // Finesse
+//				new String[] { "fin1-tec3", "fin2-tec5" }, null, null,
+//				new IReward[] { new TriggerReward(MortarTrigger.instance()) });
+//		;
 		new NostrumQuest("fin3-tec3", QuestType.REGULAR, 0, 0, // Control
 				3, // Technique
 				3, // Finesse
