@@ -28,7 +28,7 @@ public class CommandReadRoom {
 		dispatcher.register(
 				Commands.literal("readroom")
 					.requires(s -> s.hasPermissionLevel(2))
-					.then(Commands.argument("name", StringArgumentType.greedyString())
+					.then(Commands.argument("name", StringArgumentType.string())
 						.then(Commands.argument("direction", EnumArgument.enumArgument(Direction.class))
 								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"), ctx.getArgument("direction", Direction.class)))
 								)

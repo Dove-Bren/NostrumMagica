@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
+import com.smanzana.nostrummagica.blocks.IDirectionalBlock;
+import com.smanzana.nostrummagica.blocks.IHorizontalBlock;
 import com.smanzana.nostrummagica.blocks.ManiCrystal;
 import com.smanzana.nostrummagica.blocks.MimicOnesidedBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
@@ -565,6 +567,16 @@ public class RoomBlueprint {
 						Direction cur = placeState.get(DirectionalBlock.FACING);
 						cur = rotate(cur, facing);
 						placeState = placeState.with(DirectionalBlock.FACING, cur);
+					} else if (block instanceof IHorizontalBlock) {
+						// Only want to rotate horizontally
+						Direction cur = placeState.get(IHorizontalBlock.HORIZONTAL_FACING);
+						cur = rotate(cur, facing);
+						placeState = placeState.with(IHorizontalBlock.HORIZONTAL_FACING, cur);
+					} else if (block instanceof IDirectionalBlock) {
+						// Only want to rotate horizontally
+						Direction cur = placeState.get(IDirectionalBlock.FACING);
+						cur = rotate(cur, facing);
+						placeState = placeState.with(IDirectionalBlock.FACING, cur);
 					}
 				}
 				

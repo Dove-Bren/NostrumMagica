@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -19,14 +20,14 @@ import net.minecraft.world.chunk.IChunk;
  * @author Skyler
  *
  */
-public class RoomExtendedDragonStaircase implements IDungeonRoom {
+public class RoomExtendedEntranceStaircase implements IDungeonRoom {
 
-	private RoomEntryStairs stairs;
-	private IDungeonRoom entry;
+	private final RoomEntryStairs stairs;
+	private final IDungeonRoom entry;
 	
-	public RoomExtendedDragonStaircase(boolean dark) {
+	public RoomExtendedEntranceStaircase(boolean dark, IDungeonRoom entry) {
 		stairs = new RoomEntryStairs(dark);
-		entry = new RoomEntryDragon(dark);
+		this.entry = entry;
 		
 		// Would want to register with IDungeonRoom.Register() but only if this was uniquified instead of created per instance
 	}
@@ -74,7 +75,7 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
-		while (cur.getY() < maxY - RoomEntryDragon.LevelsBelow) {
+		while (cur.getY() < maxY - 17) {
 			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
 			cur = cur.add(0, stairHeight, 0);
 		}
@@ -129,7 +130,7 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
 
 	@Override
 	public String getRoomID() {
-		return "RoomExtendedDragonStaircase"; // Would want to incorporate dark or not?
+		return "RoomExtendedEntranceStaircase"; // Would want to incorporate dark or not?
 	}
 	
 	@Override

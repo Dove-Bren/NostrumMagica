@@ -11,7 +11,6 @@ import com.smanzana.nostrummagica.tiles.DelayLoadedMimicBlockTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.DirectionalBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,14 +34,14 @@ import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class MimicOnesidedBlock extends MimicBlock {
+public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock {
 	
 	public static final String ID_DOOR = "mimic_door";
 	public static final String ID_DOOR_UNBREAKABLE = "mimic_door_unbreakable";
 	public static final String ID_FACADE = "mimic_facade";
 	public static final String ID_FACADE_UNBREAKABLE = "mimic_facade_unbreakable";
 	
-	public static final DirectionProperty FACING = DirectionalBlock.FACING;
+	public static final DirectionProperty FACING = IDirectionalBlock.FACING;
 	
 	private final boolean isDoor;
 	private final boolean isUnbreakable;

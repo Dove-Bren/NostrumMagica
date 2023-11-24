@@ -43,7 +43,7 @@ public class LoadedRoom implements IDungeonRoom {
 		// Find and save chest locations
 		chestsRelative = new ArrayList<>();
 		blueprint.scanBlocks((offset, block) -> {
-			BlockState state = block.getSpawnState(Direction.NORTH); 
+			BlockState state = block.getSpawnState(blueprint.getEntry().getFacing()); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
 				chestsRelative.add(new DungeonExitPoint(offset, state.get(ChestBlock.FACING)));
 			}
@@ -163,12 +163,43 @@ public class LoadedRoom implements IDungeonRoom {
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
-		List<DungeonExitPoint> ret = new ArrayList<>();
-		for (DungeonExitPoint orig : chestsRelative) {
-			final DungeonExitPoint relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
-			ret.add(relative);
+//		// See note about dungeon vs blueprint facing in @getExits
+//		
+//		// Blueprint exits are rotated to the entry entry direction (and have their own rotation too).
+//		final Direction modDir = RoomBlueprint.getModDir(blueprint.getEntry().getFacing().getOpposite(), start.getFacing());
+//		// Door offset and final rotation is what's in exits rotated modDir times
+//		
+//		List<DungeonExitPoint> ret;
+//		if (chestsRelative != null) {
+//			ret = new ArrayList<>(chestsRelative.size());
+//			for (DungeonExitPoint chest : chestsRelative) {
+//				Direction chestDir = chest.getFacing();
+//				int times = (modDir.getHorizontalIndex() + 2) % 4;
+//				while (times-- > 0) {
+//					chestDir = chestDir.rotateY();
+//				}
+//				final DungeonExitPoint fromEntry = new DungeonExitPoint(
+//						RoomBlueprint.applyRotation(chest.getPos(), modDir),
+//						chestDir
+//						);
+//				final DungeonExitPoint relative = new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
+//				ret.add(relative);
+//			}
+//		} else {
+//			ret = new LinkedList<>();
+//		}
+//		return ret;
+		
+		
+		
+		{
+			List<DungeonExitPoint> ret = new ArrayList<>();
+			for (DungeonExitPoint orig : chestsRelative) {
+				final DungeonExitPoint relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
+				ret.add(relative);
+			}
+			return ret;
 		}
-		return ret;
 	}
 	
 	@Override

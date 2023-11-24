@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.LoadedStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
@@ -300,7 +301,8 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 	
 	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
 			"portal",
-			new DragonStartRoom(),
+			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("portal_lobby"),
+					DungeonRoomRegistry.instance().getRoomRecord("portal_entrance")),
 			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_ROOM_NAME))
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
@@ -319,7 +321,8 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 	
 	public static NostrumDungeon PLANTBOSS_DUNGEON = new NostrumLoadedDungeon(
 			"plant_boss",
-			new DragonStartRoom(),
+			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("plantboss_lobby"),
+					DungeonRoomRegistry.instance().getRoomRecord("plantboss_dungeon_entrance")),
 			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_ROOM_NAME))
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
