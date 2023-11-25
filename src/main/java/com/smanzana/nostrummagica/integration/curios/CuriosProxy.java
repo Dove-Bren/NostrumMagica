@@ -14,7 +14,6 @@ import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
@@ -30,10 +29,12 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
@@ -67,7 +68,7 @@ public class CuriosProxy {
 	public void init() {
 		MinecraftForge.EVENT_BUS.register(this);
 		registerCurioQuests();
-		registerCurioRituals();
+		//registerCurioRituals();
 		registerCurioResearch();
 		registerLore();
 	}
@@ -76,7 +77,9 @@ public class CuriosProxy {
 		
 	}
 	
-	private void registerCurioRituals() {
+	@SubscribeEvent
+	public void registerCurioRituals(RegistryEvent.Register<RitualRecipe> event) {
+		final IForgeRegistry<RitualRecipe> registry = event.getRegistry();
 		RitualRecipe recipe;
 		
 		recipe = RitualRecipe.createTier3("small_ribbon",
@@ -87,7 +90,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(ItemTags.WOOL), Ingredient.fromTag(ItemTags.WOOL), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD)},
 				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.smallRibbon)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("mana_ribbon",
 				new ItemStack(NostrumCurios.mediumRibbon),
@@ -97,7 +100,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
 				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.mediumRibbon)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("jeweled_ribbon",
 				new ItemStack(NostrumCurios.largeRibbon),
@@ -107,7 +110,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.GEMS_DIAMOND), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromTag(Tags.Items.GEMS_EMERALD), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND)},
 				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.largeRibbon)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("fierce_ribbon",
 				new ItemStack(NostrumCurios.fierceRibbon),
@@ -117,7 +120,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SlabFierce), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 				new RRequirementResearch("ribbons_enhanced"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.fierceRibbon)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("kind_ribbon",
 				new ItemStack(NostrumCurios.kindRibbon),
@@ -127,7 +130,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SlabKind), Ingredient.fromTag(Tags.Items.GEMS_EMERALD), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
 				new RRequirementResearch("ribbons_enhanced"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.kindRibbon)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("belt_ender",
 				new ItemStack(NostrumCurios.enderBelt),
@@ -137,7 +140,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(NostrumTags.Items.CrystalMedium)},
 				new RRequirementResearch("belts"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.enderBelt)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("belt_lightning",
 				new ItemStack(NostrumCurios.lightningBelt),
@@ -147,7 +150,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(NostrumTags.Items.CrystalMedium)},
 				new RRequirementResearch("belts"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.lightningBelt)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("ring_gold",
 				new ItemStack(NostrumCurios.ringGold),
@@ -157,7 +160,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD)},
 				new RRequirementResearch("rings"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringGold)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("ring_gold_true",
 				new ItemStack(NostrumCurios.ringTrueGold),
@@ -167,7 +170,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.SlabFierce), Ingredient.EMPTY, Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
 				new RRequirementResearch("rings_true"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringTrueGold)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("ring_gold_corrupted",
 				new ItemStack(NostrumCurios.ringCorruptedGold),
@@ -177,7 +180,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.SlabKind), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
 				new RRequirementResearch("rings_corrupted"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringCorruptedGold)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		// Try to use silver, but use iron if no silver is in the modpack
 		Ingredient silver = NostrumTags.Items.SilverIngot.getAllElements().isEmpty()
@@ -192,7 +195,7 @@ public class CuriosProxy {
 				new Ingredient[] {silver, Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver, silver},
 				new RRequirementResearch("rings"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringSilver)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("ring_silver_true",
 				new ItemStack(NostrumCurios.ringTrueSilver),
@@ -202,7 +205,7 @@ public class CuriosProxy {
 				new Ingredient[] {silver, Ingredient.fromTag(NostrumTags.Items.SlabKind), silver, silver},
 				new RRequirementResearch("rings_true"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringTrueSilver)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("ring_silver_corrupted",
 				new ItemStack(NostrumCurios.ringCorruptedSilver),
@@ -212,7 +215,7 @@ public class CuriosProxy {
 				new Ingredient[] {silver, Ingredient.fromTag(NostrumTags.Items.SlabFierce), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver},
 				new RRequirementResearch("rings_corrupted"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringCorruptedSilver)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		recipe = RitualRecipe.createTier3("float_guard",
 				new ItemStack(NostrumCurios.floatGuard),
@@ -222,7 +225,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.SpriteCore)},
 				new RRequirementResearch("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.floatGuard)));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		ItemStack dragonwings = new ItemStack(NostrumCurios.dragonWingPendant);
 		((DragonWingPendantItem) dragonwings.getItem()).setEmbeddedElement(dragonwings, EMagicElement.PHYSICAL);
@@ -234,7 +237,7 @@ public class CuriosProxy {
 				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.DragonWing), Ingredient.fromItems(NostrumCurios.ringGold), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.DragonWing)},
 				new RRequirementResearch("dragon_wing_pendants"),
 				new OutcomeSpawnItem(dragonwings));
-		RitualRegistry.instance().addRitual(recipe);
+		registry.register(recipe);
 		
 		//SetHasWingUpgrade
 		for (EMagicElement elem : new EMagicElement[] {EMagicElement.ICE, EMagicElement.WIND, EMagicElement.LIGHTNING}) {
@@ -257,7 +260,7 @@ public class CuriosProxy {
 							EnchantedArmor.SetHasWingUpgrade(item, true);
 						}
 					}, Lists.newArrayList("Upgrades the elytra on the Corrupted Armors to dragon wings")));
-			RitualRegistry.instance().addRitual(recipe);
+			registry.register(recipe);
 		}
 	}
 	
