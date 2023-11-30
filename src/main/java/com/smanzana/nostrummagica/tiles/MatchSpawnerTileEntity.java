@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.blocks.NostrumMatchSpawner;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.utils.WorldUtil;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -19,11 +20,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity {
+public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements IOrientedTileEntity {
 	
 	private static final String NBT_ENTITY_ID = "entity_id";
 	private static final String NBT_TRIGGER_OFFSET = "trigger_offset";
@@ -42,8 +44,14 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity {
 	}
 	
 	public void setTriggerOffset(BlockPos offset) {
+		setTriggerOffset(offset, false);
+	}
+	
+	public void setTriggerOffset(BlockPos offset, boolean isWorldGen) {
 		triggerOffset = offset;
-		this.markDirty();
+		if (!isWorldGen) {
+			this.markDirty();
+		}
 	}
 	
 	public void setTriggerPosition(int x, int y, int z) {
@@ -165,5 +173,12 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity {
 	
 	public @Nullable Entity getSpawnedEntity() {
 		return entity;
+	}
+
+	@Override
+	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
+		if (this.getTriggerOffset() != null) {
+			this.setTriggerOffset(RoomBlueprint.applyRotation(this.getTriggerOffset(), rotation), isWorldGen);
+		}
 	}
 }

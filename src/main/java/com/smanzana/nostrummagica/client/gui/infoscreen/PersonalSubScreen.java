@@ -367,6 +367,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			final float unknown = .15f;
 			final int iconWidth = 16;
 			int drawX, drawY;
+			String tooltipText = null;
 			
 			drawX = x + 20;
 			drawY = y + 20;
@@ -392,8 +393,10 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.enableBlend();
 				SpellComponentIcon.get(elem).draw(mc.currentScreen, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth);
 				
-				if (mastery != null) {
-					mc.fontRenderer.drawString(mastery + "", drawX + 1, drawY + 1, 0xFFFFFFFF); int unused; // improve
+				if (mouseX >= drawX && mouseY >= drawY
+						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
+					tooltipText = mastery.toString().toUpperCase().substring(0, 1)
+							+ mastery.toString().toLowerCase().substring(1);
 				}
 				
 				drawX += 5 + iconWidth;
@@ -468,6 +471,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			desc = I18n.format("info.growth.name", (Object[])null);
 			len = mc.fontRenderer.getStringWidth(desc);
 			mc.fontRenderer.drawStringWithShadow(desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+			
+			if (tooltipText != null) {
+				GuiUtils.drawHoveringText(Lists.newArrayList(tooltipText), mouseX, mouseY, mc.mainWindow.getScaledWidth(), mc.mainWindow.getScaledHeight(), 200, mc.fontRenderer);
+				RenderHelper.disableStandardItemLighting();
+			}
 		}
 
 		@Override

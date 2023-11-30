@@ -232,6 +232,7 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+@SuppressWarnings("deprecation")
 public class ClientProxy extends CommonProxy {
 	
 	private KeyBinding bindingCast;

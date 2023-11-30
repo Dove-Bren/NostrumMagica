@@ -185,11 +185,16 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		CompoundNBT nbt = stack.getTag();
+		if (nbt == null) {
+			nbt = new CompoundNBT();
+		}
 		
 		if (part.getParam() != null) {
 			nbt.putFloat(NBT_PARAM_VAL, part.getParam().level);
 			nbt.putBoolean(NBT_PARAM_FLIP, part.getParam().flip);
 		}
+		
+		stack.setTag(nbt);
 		
 		return stack;
 	}
@@ -667,7 +672,9 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			@Nullable EMagicElement elem = getNestedElement(rune);
 			if (elem != null) {
 				int elemCount = getNestedElementCount(rune);
-				output.add(getRune(elem, elemCount));
+				ItemStack elemRune = getRune(elem, 0);
+				elemRune.setCount(elemCount);
+				output.add(elemRune);
 			}
 			output.add(getRune(this.getShape()));
 			
