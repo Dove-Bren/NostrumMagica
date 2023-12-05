@@ -617,7 +617,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void onMouse(MouseScrollEvent event) {
-		int wheel = event.getMouseY() < 0 ? -1 : event.getMouseY() > 0 ? 1 : 0;
+		int wheel = event.getScrollDelta() < 0 ? -1 : event.getScrollDelta() > 0 ? 1 : 0;
 		if (wheel != 0) {
 			final Minecraft mc = Minecraft.getInstance();
 			if (!NostrumMagica.getMagicWrapper(mc.player)
