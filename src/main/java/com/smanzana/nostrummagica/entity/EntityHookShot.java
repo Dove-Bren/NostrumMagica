@@ -403,7 +403,7 @@ public class EntityHookShot extends Entity {
 			// If shooter wants fetch, don't hook to blocks
 			
 			// Make sure type of hookshot supports material
-			BlockState state = world.getBlockState(new BlockPos(result.getHitVec()));
+			BlockState state = world.getBlockState(RayTrace.blockPosFromResult(result));
 			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getHookshotType(), state)) {
 				this.remove();
 				return;
