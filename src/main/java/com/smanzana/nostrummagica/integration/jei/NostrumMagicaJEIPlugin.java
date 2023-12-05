@@ -61,9 +61,16 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	private IJeiRuntime runtime = null;
 	
 	public NostrumMagicaJEIPlugin() {
+		if (lastCreated != null) {
+			lastCreated.discardRefs();
+		}
 		lastCreated = this;
 		
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	protected void discardRefs() {
+		runtime = null; // Avoid keeping whole runtime alive
 	}
 	
 	@SubscribeEvent
