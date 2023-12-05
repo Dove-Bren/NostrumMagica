@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.ElementSpellRune;
@@ -22,7 +23,10 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.tiles.RuneShaperEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
@@ -468,6 +472,9 @@ public class RuneShaperGui {
 
 		private final RuneShaperContainer container;
 		
+		private @Nullable SpellAction lastAction = null;
+		private @Nullable SpellActionProperties lastProps = null;
+		
 		public RuneShaperGuiContainer(RuneShaperContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
 			this.container = container;
@@ -478,6 +485,16 @@ public class RuneShaperGui {
 		@Override
 		public void init() {
 			super.init();
+		}
+		
+		protected void drawAffectEntity() {
+			SpellComponentIcon.get(SingleShape.instance())
+				.draw(this, this.font, 0, 0, 12, 12);
+		}
+		
+		protected void drawAffectBlock() {
+			SpellComponentIcon.get(ProximityTrigger.instance())
+				.draw(this, this.font, 0, 0, 12, 12);
 		}
 		
 		@Override
@@ -540,12 +557,17 @@ public class RuneShaperGui {
 							: elementLevel <= 2 ? " II"
 							: " III";
 					
-					SpellAction action = getAction(element, alteration);
-					name = I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
-					desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+					lastAction = getAction(element, alteration);
+					name = I18n.format("effect." + lastAction.getName() + ".name", (Object[]) null) + suffix;
+					desc = I18n.format("effect." + lastAction.getName() + ".desc", (Object[]) null);
+					
+					lastProps = lastAction.getProperties();
+					
 				} else {
 					name = "Unknown Effect";
 					desc = "You haven't seen this effect before. Make a spell with it to find out what it does!";
+					lastProps = null;
+					lastAction = null;
 				}
 				
 				int len = mc.fontRenderer.getStringWidth(name);
@@ -558,14 +580,56 @@ public class RuneShaperGui {
 						verticalMargin + PANEL_VOFFSET + 5 + 15,
 						PANEL_WIDTH - 20,
 						0xFFA0A0A0);
+				
+				if (lastProps != null) {
+					GlStateManager.pushMatrix();
+					GlStateManager.translated(horizontalMargin + PANEL_WIDTH - (30), verticalMargin + PANEL_VOFFSET - 3, 0); // duped in foreground
+					if (lastProps.affectsEntity) {
+						GlStateManager.color4f(1f, 1f, 1f, 1f);
+					} else {
+						GlStateManager.color4f(.3f, .3f, .3f, .4f);
+					}
+					drawAffectEntity();
+					
+					GlStateManager.translated(12 + 4, 0, 0);
+					if (lastProps.affectsBlock) {
+						GlStateManager.color4f(1f, 1f, 1f, 1f);
+					} else {
+						GlStateManager.color4f(.3f, .3f, .3f, .4f);
+					}
+					drawAffectBlock();
+					
+					
+					GlStateManager.popMatrix();
+				}
 			}
 		}
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			//int horizontalMargin = (width - xSize) / 2;
-			//int verticalMargin = (height - ySize) / 2;
+			final int horizontalMargin = (width - xSize) / 2;
+			final int verticalMargin = (height - ySize) / 2;
 			
+			if (lastAction != null) {
+				final int xAffectEntMin = horizontalMargin + PANEL_WIDTH - (30);
+				final int xAffectEntMax = xAffectEntMin + 12;
+				final int xAffectBlockMin = xAffectEntMax + 4;
+				final int xAffectBlockMax = xAffectBlockMin + 12;
+				final int yAffectMin = verticalMargin + PANEL_VOFFSET - 3;
+				final int yAffectMax = yAffectMin + 12;
+				
+				if (lastProps.affectsEntity
+						&& mouseX >= xAffectEntMin && mouseX <= xAffectEntMax
+						&& mouseY >= yAffectMin && mouseY <= yAffectMax) {
+					final String s = I18n.format("info.affects_entities");
+					this.renderTooltip(s, mouseX - horizontalMargin, mouseY - verticalMargin);
+				} else if (lastProps.affectsBlock
+						&& mouseX >= xAffectBlockMin && mouseX <= xAffectBlockMax
+						&& mouseY >= yAffectMin && mouseY <= yAffectMax) {
+					final String s = I18n.format("info.affects_blocks");
+					this.renderTooltip(s, mouseX - horizontalMargin, mouseY - verticalMargin);
+				}
+			}
 		}
 		
 		private static final Map<EAlteration, Map<EMagicElement, SpellAction>> actionCache = new HashMap<>();

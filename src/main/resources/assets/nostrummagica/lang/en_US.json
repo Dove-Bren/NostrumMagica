@@ -764,6 +764,9 @@
 
     "info.respawn_soulbound_pet.fail.baditem": "The soul item is missing a soul to respawn!",
     "info.respawn_soulbound_dragon.fail.mana": "The Dragon Soul Ember must be charged with mana first!",
+	
+	"info.affects_entities": "Affects Entities",
+	"info.affects_blocks": "Affects Blocks",
 
     "gambit.always.name": "Always",
     "gambit.always.desc": "Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana",
@@ -1116,11 +1119,6 @@
     "ritual.ring_silver_true.name": "Craft True Silver Ring",
     "ritual.ring_silver_corrupted.name": "Craft Corrupted Silver Ring",
     "ritual.float_guard.name": "Craft Float Guard",
-    "ritual.shield_ring_small.name": "Craft Shield Ring",
-    "ritual.shield_ring_large.name": "Craft Strong Shield Ring",
-    "ritual.elude_cape_small.name": "Craft Elusion Cloak",
-    "ritual.aether_cloak.name": "Craft Aether Cloak",
-    "ritual.aether_cloak_caster_upgrade.name": "Aether Caster Upgrade",
     "ritual.create_dragon_wing_pendant.name": "Create Dragonwing Pendant",
     "ritual.wing_upgrade_armor_ice.name": "Upgrade Corrupted Armor (Wings)",
     "ritual.wing_upgrade_armor_wind.name": "Upgrade Corrupted Armor (Wings)",

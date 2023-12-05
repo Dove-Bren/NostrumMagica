@@ -207,7 +207,7 @@ public class Spell {
 					
 
 					if (first && next != null) {
-						final boolean harmful = action.isHarmful();
+						final boolean harmful = action.getProperties().isHarmful;
 						
 						if (!affectedEnts.isEmpty())
 						for (LivingEntity affected : affectedEnts) {

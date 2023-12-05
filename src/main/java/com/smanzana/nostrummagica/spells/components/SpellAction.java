@@ -84,14 +84,58 @@ import net.minecraftforge.common.ToolType;
 
 public class SpellAction {
 	
+	public static class SpellActionProperties {
+		public final boolean isHarmful;
+		public final boolean affectsEntity;
+		public final boolean affectsBlock;
+		
+		protected SpellActionProperties(SpellAction action) {
+			boolean isHarmful = false;
+			boolean affectsEntity = false;
+			boolean affectsBlock = false;
+			
+			for (SpellEffect effect : action.effects) {
+				if (!isHarmful && effect.isHarmful()) {
+					isHarmful = true;
+				}
+				
+				if (!affectsEntity && effect.affectsEntities()) {
+					affectsEntity = true;
+				}
+				
+				if (!affectsBlock && effect.affectsBlocks()) {
+					affectsBlock = true;
+				}
+			}
+			
+			
+			this.isHarmful = isHarmful;
+			this.affectsEntity = affectsEntity;
+			this.affectsBlock = affectsBlock;
+		}
+	}
+	
 	private static interface SpellEffect {
 		public boolean apply(LivingEntity caster, LivingEntity entity, float eff);
 		public boolean apply(LivingEntity caster, World world, BlockPos block, float eff);
+		
+		public default boolean isHarmful() {
+			return false;
+		}
+		
+		public boolean affectsEntities();
+		public boolean affectsBlocks();
 	}
 	
 	private static abstract class NegativeSpellEffect implements SpellEffect {
 		
+		@Override
 		public boolean isHarmful() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
 			return true;
 		}
 		
@@ -165,6 +209,11 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
 	}
 	
 	private class HealEffect implements SpellEffect {
@@ -200,6 +249,16 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private class HealFoodEffect implements SpellEffect {
@@ -233,6 +292,16 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private class HealManaEffect implements SpellEffect {
@@ -259,6 +328,16 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
 		}
 	}
 	
@@ -297,6 +376,16 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private class DispelEffect implements SpellEffect {
@@ -327,6 +416,16 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
 		}
 	}
 	
@@ -444,6 +543,16 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Do nothing
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private class PushEffect extends NegativeSpellEffect {
@@ -511,11 +620,19 @@ public class SpellAction {
 			
 			return any;
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
 	}
 	
 	private static class TransmuteEffect implements SpellEffect {
-		
-		
 		
 		private int level;
 		
@@ -596,6 +713,16 @@ public class SpellAction {
 			world.setBlockState(pos, result.output.getDefaultState());
 			return true;
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private static class BurnEffect extends NegativeSpellEffect {
@@ -648,6 +775,15 @@ public class SpellAction {
 			return false;
 		}
 		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private static class LightningEffect extends NegativeSpellEffect {
@@ -714,6 +850,15 @@ public class SpellAction {
 			return true;
 		}
 		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
 	}
 	
 	private static class SummonEffect implements SpellEffect {
@@ -855,6 +1000,16 @@ public class SpellAction {
 			
 			return golem;
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
 	}
 	
 	private static class SwapEffect extends NegativeSpellEffect {
@@ -901,6 +1056,16 @@ public class SpellAction {
 			caster.fallDistance = 0;
 			return true;
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private static class PropelEffect implements SpellEffect {
@@ -929,6 +1094,16 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			return false; // Doesn't mean anything
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
 		}
 	}
 	
@@ -1026,6 +1201,16 @@ public class SpellAction {
 			return true;
 		}
 		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
+		
 	}
 	
 	private static class EnchantEffect implements SpellEffect {
@@ -1115,6 +1300,15 @@ public class SpellAction {
 			return false;
 		}
 		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private static class GrowEffect implements SpellEffect {
@@ -1173,6 +1367,16 @@ public class SpellAction {
 			
 			return worked;
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
 	}
 	
 	private static class BurnArmorEffect extends NegativeSpellEffect {
@@ -1217,6 +1421,16 @@ public class SpellAction {
 			return false;
 		}
 		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
+		
 	}
 	
 	private static class WallEffect implements SpellEffect {
@@ -1248,6 +1462,16 @@ public class SpellAction {
 				
 		}
 		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
+		
 	}
 
 	private static class CursedIce implements SpellEffect {
@@ -1270,6 +1494,16 @@ public class SpellAction {
 			NostrumMagicaSounds.DAMAGE_ICE.play(world, block.getX(), block.getY(), block.getZ());
 			return true;
 			
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
 		}
 	}
 	
@@ -1365,6 +1599,16 @@ public class SpellAction {
 			NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
 			return true;
 		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
 	}
 	
 	private static class BreakEffect implements SpellEffect {
@@ -1449,6 +1693,16 @@ public class SpellAction {
 			}
 			
 			return true;
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
 		}
 		
 	}
@@ -1560,18 +1814,22 @@ public class SpellAction {
 		return affected;
 	}
 	
-	/**
-	 * Check and return whether any obviously harmful effects are in this action
-	 * @return
-	 */
-	public boolean isHarmful() {
-		for (SpellEffect e : effects) {
-			if (e instanceof NegativeSpellEffect && ((NegativeSpellEffect) e).isHarmful()) {
-				return true;
-			}
-		}
-		
-		return false;
+//	/**
+//	 * Check and return whether any obviously harmful effects are in this action
+//	 * @return
+//	 */
+//	public boolean isHarmful() {
+//		for (SpellEffect e : effects) {
+//			if (e instanceof NegativeSpellEffect && ((NegativeSpellEffect) e).isHarmful()) {
+//				return true;
+//			}
+//		}
+//		
+//		return false;
+//	}
+	
+	public SpellActionProperties getProperties() {
+		return new SpellActionProperties(this);
 	}
 	
 	public static final float calcDamage(LivingEntity caster, LivingEntity target, float base, EMagicElement element) {
