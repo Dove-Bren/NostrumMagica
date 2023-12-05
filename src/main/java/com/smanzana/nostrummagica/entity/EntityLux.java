@@ -107,6 +107,16 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.setHome(homePos);
 	}
 	
+	@Override
+	public boolean isWithinHomeDistanceFromPosition(BlockPos pos) {
+		// MobEntity version assumes if distances is not -1 that home is not null
+		if (this.getHome() == null) {
+			return true;
+		} else {
+			return super.isWithinHomeDistanceFromPosition(pos);
+		}
+	}
+	
 //	public EntityLux(EntityType<? extends EntityLux> type, World worldIn, LivingEntity owner) {
 //		this(type, worldIn);
 //		this.setOwner(owner);

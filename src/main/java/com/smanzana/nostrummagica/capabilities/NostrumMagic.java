@@ -33,6 +33,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -543,35 +544,34 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	private void doUnlockCheck() {
-//		if (this.unlocked)
-//			return;
-//		
-//		// Unlock (ritual of discovery) if at least one shape and trigger
-//		// and an element have been 'discovered'.
-//		
-//		if (shapes.isEmpty() || triggers.isEmpty())
-//			return;
-//		
-//		boolean found = false;
-//		for (EMagicElement e : EMagicElement.values()) {
-//			if (knownElements.get(e) != null
-//					&& knownElements.get(e)) {
-//				found = true;
-//				break;
-//			}
-//		}
-//		
-//		if (!found)
-//			return;
-//		
-//		unlock();
-//		// TODO effects
-//		if (this.entity != null && !this.entity.world.isRemote
-//				&& this.entity instanceof PlayerEntity) {
-//			PlayerEntity player = (PlayerEntity) this.entity;
-//			player.sendMessage(new StringTextComponent(
-//					"Magic Unlocked"));
-//		}
+		if (this.unlocked)
+			return;
+		
+		// Unlock (ritual of discovery) if at least one shape and trigger
+		// and an element have been 'discovered'.
+		
+		if (shapes.isEmpty() || triggers.isEmpty())
+			return;
+		
+		boolean found = false;
+		for (EMagicElement e : EMagicElement.values()) {
+			if (this.getElementalMastery(e) != null && this.getElementalMastery(e).isGreaterOrEqual(ElementalMastery.NOVICE)) {
+				found = true;
+				break;
+			}
+		}
+		
+		if (!found)
+			return;
+		
+		unlock();
+		// TODO effects
+		if (this.entity != null && !this.entity.world.isRemote
+				&& this.entity instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) this.entity;
+			player.sendMessage(new StringTextComponent(
+					"Magic Unlocked"));
+		}
 		
 	}
 

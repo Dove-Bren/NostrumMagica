@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FarmlandBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -1141,6 +1142,10 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			if (world.isAirBlock(block)) {
 				block = block.add(0, -1, 0);
+			}
+			
+			if (world.getBlockState(block).getBlock() instanceof FarmlandBlock) {
+				block = block.up();
 			}
 			
 			if (world.isAirBlock(block)) {

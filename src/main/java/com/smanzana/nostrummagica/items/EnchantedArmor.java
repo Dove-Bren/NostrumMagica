@@ -1710,7 +1710,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	private static final int EARTH_SCAN_RANGE_Y = 3;
 	private static final List<BlockPos> EARTH_SCAN_POS = new ArrayList<>(EARTH_SCAN_RANGE_XZ * EARTH_SCAN_RANGE_XZ * EARTH_SCAN_RANGE_Y);
 	
-	{
+	static {
 		final int xzRadius = (EARTH_SCAN_RANGE_XZ/2); // int div
 		final int yRadius = (EARTH_SCAN_RANGE_Y/2); // int div
 		for (int x = -xzRadius; x <= xzRadius; x++)

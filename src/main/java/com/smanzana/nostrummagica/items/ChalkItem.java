@@ -57,7 +57,7 @@ public class ChalkItem extends Item implements ILoreTagged {
 		final Direction facing = context.getFace();
 		
 		ItemStack stack = context.getItem();
-        if (facing == Direction.UP && player.canPlayerEdit(pos.offset(facing), facing, stack) && Block.func_220064_c(world, pos.down()) && world.isAirBlock(pos.up())) {
+        if (facing == Direction.UP && player.canPlayerEdit(pos.offset(facing), facing, stack) && Block.func_220064_c(world, pos) && world.isAirBlock(pos.up())) {
         	world.setBlockState(pos.up(), NostrumBlocks.chalk.getDefaultState());
         	ItemStacks.damageItem(stack, player, context.getHand(), 1);
             return ActionResultType.SUCCESS;

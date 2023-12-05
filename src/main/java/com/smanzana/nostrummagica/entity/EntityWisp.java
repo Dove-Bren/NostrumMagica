@@ -364,6 +364,16 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 	}
 	
 	@Override
+	public boolean isWithinHomeDistanceFromPosition(BlockPos pos) {
+		// MobEntity version assumes if distances is not -1 that home is not null
+		if (this.getHome() == null) {
+			return true;
+		} else {
+			return super.isWithinHomeDistanceFromPosition(pos);
+		}
+	}
+	
+	@Override
 	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
 		super.dropSpecialItems(source, looting, recentlyHitIn);
 	}

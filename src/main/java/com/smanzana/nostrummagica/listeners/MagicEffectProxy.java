@@ -429,7 +429,9 @@ public class MagicEffectProxy {
 					|| effect == SpecialEffect.CONTINGENCY_HEALTH
 					|| effect == SpecialEffect.CONTINGENCY_MANA
 					|| effect == SpecialEffect.CONTINGENCY_FOOD) {
-				override.amt = NostrumMagica.instance.proxy.getPlayer().ticksExisted;
+				if (override != null) {
+					override.amt = NostrumMagica.instance.proxy.getPlayer().ticksExisted;
+				}
 			}
 			
 			map.put(effect, override);
