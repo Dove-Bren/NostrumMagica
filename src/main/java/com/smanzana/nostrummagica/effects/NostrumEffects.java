@@ -26,6 +26,10 @@ public class NostrumEffects {
 	@ObjectHolder(NostrumTransformationEffect.ID) public static NostrumTransformationEffect nostrumTransformation;
 	@ObjectHolder(PhysicalShieldEffect.ID) public static PhysicalShieldEffect physicalShield;
 	@ObjectHolder(RootedEffect.ID) public static RootedEffect rooted;
+	@ObjectHolder(RendEffect.ID) public static RendEffect rend;
+	@ObjectHolder(MagicRendEffect.ID) public static MagicRendEffect magicRend;
+	@ObjectHolder(SublimationEffect.ID) public static SublimationEffect sublimation;
+	@ObjectHolder(HealResistEffect.ID) public static HealResistEffect healResist;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -44,5 +48,9 @@ public class NostrumEffects {
     	registry.register(new NostrumTransformationEffect().setRegistryName(NostrumTransformationEffect.ID));
     	registry.register(new PhysicalShieldEffect().setRegistryName(PhysicalShieldEffect.ID));
     	registry.register(new RootedEffect().setRegistryName(RootedEffect.ID));
+    	registry.register(new RendEffect().setRegistryName(RendEffect.ID));
+    	registry.register(new MagicRendEffect().setRegistryName(MagicRendEffect.ID));
+    	registry.register(new SublimationEffect().setRegistryName(SublimationEffect.ID));
+    	registry.register(new HealResistEffect().setRegistryName(HealResistEffect.ID));
     }
 }

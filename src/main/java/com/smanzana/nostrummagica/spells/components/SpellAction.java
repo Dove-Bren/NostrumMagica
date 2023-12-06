@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
@@ -237,6 +238,11 @@ public class SpellAction {
 					EntityTameDragonRed dragon = (EntityTameDragonRed) entity;
 					if (dragon.isTamed() && dragon.getOwner() == caster) {
 						dragon.addBond(1f);
+					}
+				} else if (entity instanceof EntityArcaneWolf) {
+					EntityArcaneWolf wolf = (EntityArcaneWolf) entity;
+					if (wolf.isTamed() && wolf.getOwner() == caster) {
+						wolf.addBond(1f);
 					}
 				}
 			}
