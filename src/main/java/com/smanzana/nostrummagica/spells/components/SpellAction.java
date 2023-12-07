@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spells.components;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -40,6 +41,8 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import com.smanzana.nostrummagica.spells.components.Transmutation.TransmuteResult;
+import com.smanzana.nostrummagica.utils.HarvestUtil;
+import com.smanzana.nostrummagica.utils.HarvestUtil.ITreeWalker;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
@@ -445,6 +448,17 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+			
+			// Can be disabled via disruption effect
+			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.disruption);
+			if (effect != null && effect.getDuration() > 0) {
+				if (effect.getAmplifier() > 0) {
+					// Damage, too
+					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
+				}
+				
+				return false;
+			}
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
@@ -1029,6 +1043,25 @@ public class SpellAction {
 			if (caster == null || entity == null)
 				return false;
 			
+			// Can be disabled via disruption effect
+			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.disruption);
+			if (effect != null && effect.getDuration() > 0) {
+				if (effect.getAmplifier() > 0) {
+					// Damage, too
+					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
+				}
+				return false;
+			}
+			
+			effect = caster.getActivePotionEffect(NostrumEffects.disruption);
+			if (effect != null && effect.getDuration() > 0) {
+				if (effect.getAmplifier() > 0) {
+					// Damage, too
+					caster.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
+				}
+				return false;
+			}
+			
 			Vec3d pos = caster.getPositionVector();
 			float pitch = caster.rotationPitch;
 			float yaw = caster.rotationYawHead;
@@ -1058,6 +1091,16 @@ public class SpellAction {
 		
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
+			// Can be disabled via disruption effect
+			EffectInstance effect = caster.getActivePotionEffect(NostrumEffects.disruption);
+			if (effect != null && effect.getDuration() > 0) {
+				if (effect.getAmplifier() > 0) {
+					// Damage, too
+					caster.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
+				}
+				return false;
+			}
+			
 			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 			caster.fallDistance = 0;
 			return true;
@@ -1123,6 +1166,16 @@ public class SpellAction {
 		
 		@Override
 		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
+			// Can be disabled via disruption effect
+			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.disruption);
+			if (effect != null && effect.getDuration() > 0) {
+				if (effect.getAmplifier() > 0) {
+					// Damage, too
+					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
+				}
+				return false;
+			}
+			
 			if (caster != entity && entity instanceof MobEntity) {
 				// Make sure they want to attack you if you do it
 				entity.setRevengeTarget(caster);
@@ -1342,6 +1395,12 @@ public class SpellAction {
 		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
 			if (world.isAirBlock(block)) {
 				block = block.add(0, -1, 0);
+			}
+			
+			// Since farmland is smaller than a block, standing on it means the block below you (at feet trigger) is
+			// the block below the farmland. So try and step up if we're in that specific case.
+			if (world.getBlockState(block.up()).getBlock() instanceof FarmlandBlock) {
+				block = block.up();
 			}
 			
 			if (world.getBlockState(block).getBlock() instanceof FarmlandBlock) {
@@ -1748,6 +1807,171 @@ public class SpellAction {
 //		
 //	}
 	
+	private static class HarvestEffect implements SpellEffect {
+
+		// Level 1 harvests like normal.
+		// Level 2+ harvests all connected.
+		// Level 3 uses tool in the caster's hand
+		private int level;
+		
+		public HarvestEffect(int level) {
+			this.level = level;
+		}
+		
+		@Override
+		public boolean apply(LivingEntity caster, LivingEntity entity, float eff) {
+			return apply(caster, entity.world, entity.getPosition().add(0, -1, 0), eff);
+		}
+		
+		protected boolean isTool(@Nullable PlayerEntity player, ItemStack stack) {
+			if (stack.isEmpty()) {
+				return false;
+			}
+			
+			Set<ToolType> classes = stack.getItem().getToolTypes(stack);
+			for (ToolType cla : classes) {
+				// Required harvest level >= iron so throw-away levels like wood and stone don't count
+				if (cla == ToolType.AXE
+						&& stack.getItem().getHarvestLevel(stack, cla, player, null) >= 2) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		protected boolean harvestCropBlock(LivingEntity caster, World world, BlockPos block, @Nullable ItemStack tool) {
+			return HarvestUtil.HarvestCrop(world, block);
+		}
+		
+		protected boolean harvestCrop(LivingEntity caster, World world, BlockPos block, @Nullable ItemStack tool, Set<BlockPos> visitted) {
+			if (visitted.contains(block)) {
+				return false;
+			}
+			
+			visitted.add(block);
+			if (harvestCropBlock(caster, world, block, tool)) {
+				// Try nearby crops now
+				harvestCrop(caster, world, block.north(), tool, visitted);
+				harvestCrop(caster, world, block.east(), tool, visitted);
+				harvestCrop(caster, world, block.south(), tool, visitted);
+				harvestCrop(caster, world, block.west(), tool, visitted);
+				return true;
+			} else {
+				// Not crop or not fully grown
+				return false;
+			}
+		}
+		
+		protected boolean harvestCrop(LivingEntity caster, World world, BlockPos block, @Nullable ItemStack tool, boolean doNearby) {
+			if (doNearby) {
+				return harvestCrop(caster, world, block, tool, new HashSet<>());
+			} else {
+				return harvestCropBlock(caster, world, block, tool);
+			}
+		}
+		
+		protected boolean harvestTreeBlock(LivingEntity caster, World world, BlockPos pos, @Nullable ItemStack tool) {
+			if (tool != null) {
+				((ServerPlayerEntity) caster).interactionManager.tryHarvestBlock(pos);
+			} else {
+				world.destroyBlock(pos, true);
+			}
+			return true;
+		}
+		
+		protected boolean harvestTree(LivingEntity caster, World world, BlockPos pos, @Nullable ItemStack tool, boolean wholeTree) {
+			final class LastNode {
+				@Nullable BlockPos finalPos = null;
+				int maxDepth = -1;
+			};
+			
+			final LastNode node = new LastNode();
+			final ITreeWalker walker;
+			if (wholeTree) {
+				walker = (walkWorld, walkPos, depth, isLeaves) -> {
+					// harvest all non-leaves as we visit them
+					if (!isLeaves) {
+						harvestTreeBlock(caster, walkWorld, walkPos, tool);
+					}
+					return true;
+					// Note: not setting finalPos;
+				};
+			} else {
+				walker = (walkWorld, walkPos, depth, isLeaves) -> {
+					// Take furthest away, based on depth.
+					// Note it's depth first, so this may not be right?
+					if (!isLeaves && depth > node.maxDepth) {
+						node.maxDepth = depth;
+						node.finalPos = walkPos;
+					}
+					return true;
+				};
+			}
+			
+			boolean walked = HarvestUtil.WalkTree(world, pos, walker);
+			
+			if (node.finalPos != null) {
+				harvestTreeBlock(caster, world, node.finalPos, tool);
+			}
+			
+			return walked;
+		}
+
+		@Override
+		public boolean apply(LivingEntity caster, World world, BlockPos block, float eff) {
+			if (world.isAirBlock(block))
+				return false;
+			
+			if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+				return false;
+			}
+			
+			BlockState state = world.getBlockState(block);
+			if (state == null || state.getMaterial().isLiquid())
+				return false;
+			
+			float hardness = state.getBlockHardness(world, block);
+			
+			if (hardness >= 100f || hardness < 0f)
+				return false; // unbreakable?
+			
+			ItemStack tool = null;
+			if (level >= 3 && caster instanceof ServerPlayerEntity) {
+				tool = caster.getHeldItemMainhand();
+				if (!isTool((PlayerEntity) caster, tool)) {
+					tool = caster.getHeldItemOffhand();
+				}
+				if (!isTool((PlayerEntity) caster, tool)) {
+					tool = null;
+				}
+			}
+			
+			final boolean spread = level >= 2;
+			
+			if (HarvestUtil.canHarvestCrop(state)) {
+				return harvestCrop(caster, world, block, tool, spread);
+			} else if (HarvestUtil.canHarvestTree(state)) {
+				return harvestTree(caster, world, block, tool, spread);
+			} else if (HarvestUtil.canHarvestCrop(world.getBlockState(block.up()))) {
+				return harvestCrop(caster, world, block.up(), tool, spread);
+			} else {
+				return false;
+			}
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
+		
+	}
+	
 	private LivingEntity source;
 	private List<SpellEffect> effects;
 	private String nameKey;
@@ -2073,6 +2297,11 @@ public class SpellAction {
 	
 	public SpellAction blockBreak(int level) {
 		effects.add(new BreakEffect(level));
+		return this;
+	}
+	
+	public SpellAction harvest(int level) {
+		effects.add(new HarvestEffect(level));
 		return this;
 	}
 	

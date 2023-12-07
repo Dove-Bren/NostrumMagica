@@ -30,6 +30,8 @@ public class NostrumEffects {
 	@ObjectHolder(MagicRendEffect.ID) public static MagicRendEffect magicRend;
 	@ObjectHolder(SublimationEffect.ID) public static SublimationEffect sublimation;
 	@ObjectHolder(HealResistEffect.ID) public static HealResistEffect healResist;
+	@ObjectHolder(FastFallEffect.ID) public static FastFallEffect fastFall;
+	@ObjectHolder(DisruptionEffect.ID) public static DisruptionEffect disruption;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -52,5 +54,7 @@ public class NostrumEffects {
     	registry.register(new MagicRendEffect().setRegistryName(MagicRendEffect.ID));
     	registry.register(new SublimationEffect().setRegistryName(SublimationEffect.ID));
     	registry.register(new HealResistEffect().setRegistryName(HealResistEffect.ID));
+    	registry.register(new FastFallEffect().setRegistryName(FastFallEffect.ID));
+    	registry.register(new DisruptionEffect().setRegistryName(DisruptionEffect.ID));
     }
 }
