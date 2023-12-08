@@ -1377,6 +1377,35 @@ public class ClientProxy extends CommonProxy {
 		}
 	}
 	
+	private static final ClientEffect doCorruptEffect(LivingEntity source,
+			Vec3d sourcePos,
+			LivingEntity target,
+			Vec3d targetPos,
+			SpellComponentWrapper flavor,
+			boolean negative,
+			float param) {
+		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+				new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
+				3L * 500L, 6);
+		
+		if (flavor != null && flavor.isElement()) {
+			effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+		}
+		
+		if (target != null) {
+			effect.modify(new ClientEffectModifierFollow(target));
+		}
+		
+		effect
+		.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+		.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
+		.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), .3f, 1f))
+		.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+		.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+		;
+		return effect;
+	}
+	
 	private static void initDefaultEffects(ClientEffectRenderer renderer) {
 		
 		renderer.registerEffect(new SpellComponentWrapper(AoEShape.instance()),
@@ -1805,6 +1834,8 @@ public class ClientProxy extends CommonProxy {
 					;
 					return effect;
 				});
+		
+		renderer.registerEffect(new SpellComponentWrapper(EAlteration.CORRUPT), ClientProxy::doCorruptEffect);
 	}
 	
 	@Override

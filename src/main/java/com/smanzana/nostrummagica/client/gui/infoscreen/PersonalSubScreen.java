@@ -395,7 +395,8 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
-					tooltipText = mastery.toString().toUpperCase().substring(0, 1)
+					tooltipText = elem.getName() + ": " 
+							+ mastery.toString().toUpperCase().substring(0, 1)
 							+ mastery.toString().toLowerCase().substring(1);
 				}
 				
@@ -420,6 +421,16 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.color4f(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
 				SpellComponentIcon.get(trigger).draw(mc.currentScreen, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth);
+				
+				if (mouseX >= drawX && mouseY >= drawY
+						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
+					if (knownTriggers.contains(trigger)) {
+						tooltipText = trigger.getDisplayName();
+					} else {
+						tooltipText = "Unknown Trigger";
+					}
+				}
+				
 				drawX += 5 + iconWidth;
 			}
 			
@@ -441,6 +452,16 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.color4f(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
 				SpellComponentIcon.get(shape).draw(mc.currentScreen, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth);
+				
+				if (mouseX >= drawX && mouseY >= drawY
+						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
+					if (knownShapes.contains(shape)) {
+						tooltipText = shape.getDisplayName();
+					} else {
+						tooltipText = "Unknown Shape";
+					}
+				}
+				
 				drawX += 5 + iconWidth;
 			}
 			
@@ -463,6 +484,16 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				GlStateManager.color4f(1f, 1f, 1f, alpha);
 				GlStateManager.enableBlend();
 				SpellComponentIcon.get(alteration).draw(mc.currentScreen, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth);
+				
+				if (mouseX >= drawX && mouseY >= drawY
+						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
+					if (has != null && has) {
+						tooltipText = alteration.getName();
+					} else {
+						tooltipText = "Unknown Alteration";
+					}
+				}
+				
 				drawX += 5 + iconWidth;
 			}
 			

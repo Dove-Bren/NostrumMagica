@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigge
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -239,21 +240,31 @@ public class SpellComponentIcon {
 	
 	public void draw(AbstractGui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
 		GL11.glPushMatrix();
+		
+		
 
-		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		float scaleU = (float) width / (float) this.width;
-		float scaleV = (float) height / (float) this.height;
-		
-		xOffset *= 1f / scaleU;
-		yOffset *= 1f / scaleV;
-		
-		GL11.glScalef(scaleU, scaleV, 0f); // Idk which it is!
-		//GlStateManager.color4f(1f, 1f, 1f, 1f);
-		
-		Minecraft.getInstance().getTextureManager().bindTexture(iconSheet);
-		
-		parent.blit(xOffset, yOffset, offsetU, offsetV,
-				this.width, this.height);
+//		if (useIconSheet)
+//		{
+//		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+//			float scaleU = (float) width / (float) this.width;
+//			float scaleV = (float) height / (float) this.height;
+//			
+//			xOffset *= 1f / scaleU;
+//			yOffset *= 1f / scaleV;
+//			
+//			GL11.glScalef(scaleU, scaleV, 0f); // Idk which it is!
+//			//GlStateManager.color4f(1f, 1f, 1f, 1f);
+//		
+//			Minecraft.getInstance().getTextureManager().bindTexture(iconSheet);
+//		
+//			parent.blit(xOffset, yOffset, offsetU, offsetV,
+//					this.width, this.height);
+//		}
+//		else
+		{
+			Minecraft.getInstance().getTextureManager().bindTexture(this.getModelLocation());
+			RenderFuncs.drawScaledCustomSizeModalRect(xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height);
+		}
 		
 		GL11.glPopMatrix();
 	}

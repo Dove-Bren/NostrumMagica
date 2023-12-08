@@ -669,9 +669,11 @@ public class Spell {
 			return solveSummon(caster, element, elementCount);
 		case SUPPORT:
 			return solveSupport(caster, element, elementCount);
-		default:
-			return null;
+		case CORRUPT:
+			return solveCorrupt(caster, element, elementCount);
 		}
+		
+		return null;
 	}
 	
 	private static final SpellAction solveRuin(LivingEntity caster, EMagicElement element,
@@ -818,6 +820,29 @@ public class Spell {
 	private static final SpellAction solveSummon(LivingEntity caster, EMagicElement element,
 			int elementCount) {
 		return new SpellAction(caster).summon(element, elementCount).name("summon." + element.name().toLowerCase());
+	}
+	
+	private static final SpellAction solveCorrupt(LivingEntity caster, EMagicElement element, int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction(caster).status(NostrumEffects.rend, duration, amp).name("rend");
+		case EARTH:
+			return new SpellAction(caster).harvest(elementCount).name("harvest");
+		case ENDER:
+			return new SpellAction(caster).status(NostrumEffects.disruption, duration, amp).name("disruption");
+		case FIRE:
+			return new SpellAction(caster).status(NostrumEffects.sublimation, duration, amp).name("sublimation");
+		case ICE:
+			return new SpellAction(caster).status(NostrumEffects.healResist, duration, amp).name("healresist");
+		case LIGHTNING:
+			return new SpellAction(caster).status(NostrumEffects.magicRend, duration, amp).name("magicrend");
+		case WIND:
+			return new SpellAction(caster).status(NostrumEffects.fastFall, duration, amp).name("fastfall");
+		}
+		
+		return null;
 	}
 	
 	private static final String NBT_SPELL_NAME = "name";
@@ -981,7 +1006,8 @@ public class Spell {
 						damage = true;
 					if (part.alteration == EAlteration.INFLICT
 							|| part.alteration == EAlteration.RESIST
-							|| part.alteration == EAlteration.SUPPORT)
+							|| part.alteration == EAlteration.SUPPORT
+							|| part.alteration == EAlteration.CORRUPT)
 						status = true;
 					if (part.alteration == EAlteration.RESIST
 							|| part.alteration == EAlteration.SUPPORT

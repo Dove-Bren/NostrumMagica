@@ -558,7 +558,7 @@ public class NostrumMagica {
 					null,
 					new ReagentType[] {
 							ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.GRAVE_DUST },
-					Ingredient.fromStacks(alteration.getReagents().get(0)),
+					Ingredient.fromStacks(alteration.getCraftItem()),
 					IRitualRequirement.AND(new RRequirementAlterationMastery(alteration),
 							new RRequirementResearch("spellrunes")),
 					new OutcomeSpawnItem(SpellRune.getRune(alteration)));
@@ -1607,8 +1607,8 @@ public class NostrumMagica {
 		// LVL main tree
 		new NostrumQuest("lvl7", QuestType.CHALLENGE, 7, 0, 0, 0, new String[] { "lvl6-con", "lvl6-fin" }, null,
 				new ObjectiveRitual("kani"), wrapAttribute(AwardType.MANA, 0.020f));
-//		new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[] { "lvl7" }, null, null,
-//				new IReward[] { new TriggerReward(FieldTrigger.instance()) });
+		new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[] { "lvl7" }, null, null,
+				new IReward[] { new AlterationReward(EAlteration.CORRUPT) });
 		new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[] { "lvl7" }, null, null,
 				wrapAttribute(AwardType.COST, -0.005f));
 		new NostrumQuest("lvl8-fin5", QuestType.REGULAR, 8, 0, 0, 5, new String[] { "lvl7" }, null, null,
