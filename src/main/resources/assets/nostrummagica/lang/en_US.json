@@ -360,7 +360,12 @@
     "effect.nostrummagica.potions-transformation": "Transformation Ready",
     "effect.nostrummagica.potions-mana-regen": "Mana Regen",
 
-    "effect.nostrummagica.potions-mana-regen": "Mana Regen",
+    "effect.nostrummagica.sublimation": "Sublimation",
+	"effect.nostrummagica.rend": "Rend",
+	"effect.nostrummagica.magic_rend": "Magic Rend",
+	"effect.nostrummagica.disruption": "Disruption",
+	"effect.nostrummagica.heal_resist": "Heal Resist",
+	"effect.nostrummagica.fast_fall": "Fast Fall",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 
