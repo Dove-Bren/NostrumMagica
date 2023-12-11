@@ -444,7 +444,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		ItemStack stack = context.getItem();
 		final Hand hand = context.getHand();
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-			Vec3d dir = new Vec3d(pos).add(hitVec.x, 0, hitVec.z).subtract(playerIn.getPositionVector());
+			Vec3d dir = hitVec.subtract(playerIn.getPositionVector());
 			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
