@@ -266,6 +266,15 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 				continue;
 			}
 			
+			// Try to filter out deleted entities (like ones sucked up by hoppers)
+			// or ones with empty itemstacks
+			if (!entity.isAlive()
+					|| entity.getItem() == null
+					|| entity.getItem().isEmpty()
+					) {
+				continue;
+			}
+			
 			return entity;
 		}
 		
