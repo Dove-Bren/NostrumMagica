@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.util.math.BlockPos;
@@ -55,7 +56,7 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 		if (allowed) {
 			return this.getFluid();
 		} else {
-			return null;
+			return Fluids.EMPTY;
 		}
 	}
 	
