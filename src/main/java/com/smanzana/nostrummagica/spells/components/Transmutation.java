@@ -31,7 +31,7 @@ public class Transmutation {
 	
 	private static long inittedSeed = -1;
 	private static final void init(long seed) {
-		if (inittedSeed == seed)
+		if (inittedSeed == seed && items != null && blocks != null) // check lists are there, as -1 (default) is a valid seed too!
 			return;
 		
 		NostrumMagica.logger.info("Creating transmutation list for seed " + seed);
@@ -143,9 +143,11 @@ public class Transmutation {
 			return world.getSeed(); // Not sure if seed is always the same? might change CLIENT list per dimension? lol
 		} else {
 			try {
-				ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD).getSeed();
+				long seed = ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD).getSeed();
+				return seed;
 			} catch (Exception e) {
-				;
+				e.printStackTrace();
+				NostrumMagica.logger.error("Failed to find world seed for generating transmutations");
 			}
 		}
 		
