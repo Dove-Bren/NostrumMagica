@@ -8,8 +8,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
-import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.items.AspectedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MagicCharm;
@@ -205,31 +205,31 @@ public class PortingUtil {
 				}
 				
 				for (int i = 0; i < 4; i++) {
-					if (i < 3 && !EnchantedArmor.isArmorElement(element)) {
+					if (i < 3 && !MagicArmor.isArmorElement(element)) {
 						continue;
 					}
 					
 					id = "nostrummagica:armor_" + slot.name().toLowerCase() + "_" + element.name().toLowerCase() + (i + 1);
-					final EnchantedArmor.Type type = EnchantedArmor.Type.values()[i];
+					final MagicArmor.Type type = MagicArmor.Type.values()[i];
 					
 					submap = new HashMap<>();
-					submap.put(0, EnchantedArmor.get(element, slot, type));
+					submap.put(0, MagicArmor.get(element, slot, type));
 					ItemMap1_12_2.put(id, submap);
 				}
 			}
 		}
 		
 		for (EMagicElement element : EMagicElement.values()) {
-			if (!EnchantedWeapon.isWeaponElement(element)) {
+			if (!AspectedWeapon.isWeaponElement(element)) {
 				continue;
 			}
 			
 			for (int i = 0; i < 3; i++) {
 				id = "nostrummagica:sword_" + element.name().toLowerCase() + (i + 1);
-				final EnchantedWeapon.Type type = EnchantedWeapon.Type.values()[i];
+				final AspectedWeapon.Type type = AspectedWeapon.Type.values()[i];
 				
 				submap = new HashMap<>();
-				submap.put(0, EnchantedWeapon.get(element, type));
+				submap.put(0, AspectedWeapon.get(element, type));
 				ItemMap1_12_2.put(id, submap);
 			}
 		}

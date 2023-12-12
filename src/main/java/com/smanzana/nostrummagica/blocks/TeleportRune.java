@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.tiles.TeleportRuneTileEntity;
@@ -146,7 +146,7 @@ public class TeleportRune extends Block  {
 					break;
 				}
 			}
-			final boolean hasEnderSet = EnchantedArmor.GetSetCount(playerIn, EMagicElement.ENDER, EnchantedArmor.Type.TRUE) == 4;
+			final boolean hasEnderSet = MagicArmor.GetSetCount(playerIn, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4;
 			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1) * (hasEnderSet ? 2 : 1);
 			
 			if (dist > range) {

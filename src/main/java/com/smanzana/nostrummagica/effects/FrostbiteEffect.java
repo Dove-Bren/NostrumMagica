@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.BlockState;
@@ -60,7 +60,7 @@ public class FrostbiteEffect extends Effect {
 		}
 		
 		// If entity has blizzard set, heal instead of harm
-		final int blizzardCount = EnchantedArmor.GetSetCount(entity, EMagicElement.ICE, EnchantedArmor.Type.TRUE);
+		final int blizzardCount = MagicArmor.GetSetCount(entity, EMagicElement.ICE, MagicArmor.Type.TRUE);
 		if (blizzardCount == 4) {
 			entity.heal(1);
 			if (!entity.world.isRemote) {

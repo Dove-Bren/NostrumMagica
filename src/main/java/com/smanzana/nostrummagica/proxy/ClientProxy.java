@@ -124,7 +124,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.NostrumItems;
@@ -280,7 +280,7 @@ public class ClientProxy extends CommonProxy {
 		
 		
     	
-    	EnchantedArmor.ClientInit();
+    	MagicArmor.ClientInit();
     	
     	MinecraftForge.EVENT_BUS.register(this);
 	}

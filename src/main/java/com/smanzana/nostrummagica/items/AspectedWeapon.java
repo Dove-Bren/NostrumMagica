@@ -49,7 +49,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
+public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	
 	public static enum Type {
 		NOVICE,
@@ -225,7 +225,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	private Type type;
 	private EMagicElement element;
 	
-	public EnchantedWeapon(EMagicElement element, Type type) {
+	public AspectedWeapon(EMagicElement element, Type type) {
 		super(ItemTier.DIAMOND,
 				(int) (calcDamage(element, type) - ItemTier.DIAMOND.getAttackDamage()), // Calc desired damage, and subtrace the amt diamond tier is gonna give
 				calcSwingSpeed(element, type),
@@ -291,8 +291,8 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		return offense;
 	}
 	
-	public static EnchantedWeapon get(EMagicElement element, Type type) {
-		EnchantedWeapon item = null;
+	public static AspectedWeapon get(EMagicElement element, Type type) {
+		AspectedWeapon item = null;
 		
 		switch (element) {
 		case EARTH:
@@ -396,7 +396,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 				}
 			}
 			
-		} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, EnchantedArmor.Type.TRUE) == 4) {
+		} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4) {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				// If full set, strike at targetting location (unless sneaking, then strike self)
 				boolean used = false;
@@ -463,7 +463,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 				}
 				playerIn.resetCooldown();
 				return ActionResultType.SUCCESS;
-			} else if (element == EMagicElement.LIGHTNING && EnchantedArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, EnchantedArmor.Type.TRUE) == 4) {
+			} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4) {
 				
 				boolean used = false;
 				if (playerIn.isSneaking()) {
@@ -525,7 +525,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 	}
 	
 	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
-		final int hurricaneCount = EnchantedArmor.GetSetCount(caster, EMagicElement.WIND, EnchantedArmor.Type.TRUE);
+		final int hurricaneCount = MagicArmor.GetSetCount(caster, EMagicElement.WIND, MagicArmor.Type.TRUE);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
@@ -599,7 +599,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
-				EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, -.05f);
+				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, -.05f);
 			//}
 		});
 		if (hurricaneCount >= 4) {
@@ -639,7 +639,7 @@ public class EnchantedWeapon extends SwordItem implements EnchantedEquipment {
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
-				EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA090EE90, -.1f);
+				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA090EE90, -.1f);
 			//}
 		});
 		world.addEntity(cloud);

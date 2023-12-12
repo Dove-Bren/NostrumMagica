@@ -8,9 +8,9 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
-public class EnchantedIceArmor extends EnchantedArmor {
+public class MagicLightningArmor extends MagicArmor {
 
-	public static final String ID_PREFIX = "armor_ice_";
+	public static final String ID_PREFIX = "armor_lightning_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
 	public static final String ID_HELM_ADEPT = ID_PREFIX + "helm_adept";
 	public static final String ID_HELM_MASTER = ID_PREFIX + "helm_master";
@@ -31,8 +31,8 @@ public class EnchantedIceArmor extends EnchantedArmor {
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 	public static final String ID_FEET_TRUE = ID_PREFIX + "feet_true";
 	
-	public EnchantedIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
-		super(EMagicElement.ICE, slot, type, properties);
+	public MagicLightningArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+		super(EMagicElement.LIGHTNING, slot, type, properties);
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ public class EnchantedIceArmor extends EnchantedArmor {
 			// Add an upgraded copy of true chestplates
 			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.TRUE) {
 				ItemStack stack = new ItemStack(this);
-				EnchantedArmor.SetHasWingUpgrade(stack, true);
+				MagicArmor.SetHasWingUpgrade(stack, true);
 				items.add(stack);
 			}
 		}

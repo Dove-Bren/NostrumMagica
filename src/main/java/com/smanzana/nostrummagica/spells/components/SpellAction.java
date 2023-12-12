@@ -33,7 +33,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -476,7 +476,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (EnchantedArmor.GetSetCount(entity, EMagicElement.ENDER, EnchantedArmor.Type.TRUE) == 4) {
+			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4) {
 				// has full ender set
 				efficiency *= 2;
 			}
@@ -1201,7 +1201,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (EnchantedArmor.GetSetCount(entity, EMagicElement.ENDER, EnchantedArmor.Type.TRUE) == 4) {
+			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4) {
 				// has full ender set
 				radius *= 2.0;
 			}

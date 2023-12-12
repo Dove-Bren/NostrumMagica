@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
 import com.smanzana.nostrummagica.integration.curios.items.DragonWingPendantItem;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.research.NostrumResearch;
@@ -241,9 +241,9 @@ public class CuriosProxy {
 		
 		//SetHasWingUpgrade
 		for (EMagicElement elem : new EMagicElement[] {EMagicElement.ICE, EMagicElement.WIND, EMagicElement.LIGHTNING}) {
-			EnchantedArmor armor = EnchantedArmor.get(elem, EquipmentSlotType.CHEST, EnchantedArmor.Type.TRUE);
+			MagicArmor armor = MagicArmor.get(elem, EquipmentSlotType.CHEST, MagicArmor.Type.TRUE);
 			ItemStack upgradedStack = new ItemStack(armor);
-			EnchantedArmor.SetHasWingUpgrade(upgradedStack, true);
+			MagicArmor.SetHasWingUpgrade(upgradedStack, true);
 			
 			recipe = RitualRecipe.createTier3("wing_upgrade_armor_" + elem.name().toLowerCase(),
 					upgradedStack,
@@ -256,8 +256,8 @@ public class CuriosProxy {
 							new RRequirementResearch("enchanted_armor_adv")
 					),
 					new OutcomeModifyCenterItemGeneric((world, player, item, otherItems, centerPos, recipeIn) -> {
-						if (!item.isEmpty() && item.getItem() instanceof EnchantedArmor) {
-							EnchantedArmor.SetHasWingUpgrade(item, true);
+						if (!item.isEmpty() && item.getItem() instanceof MagicArmor) {
+							MagicArmor.SetHasWingUpgrade(item, true);
 						}
 					}, Lists.newArrayList("Upgrades the elytra on the Corrupted Armors to dragon wings")));
 			registry.register(recipe);

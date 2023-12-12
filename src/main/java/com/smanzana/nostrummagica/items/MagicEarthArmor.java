@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 
-public class EnchantedEarthArmor extends EnchantedArmor {
+public class MagicEarthArmor extends MagicArmor {
 
 	public static final String ID_PREFIX = "armor_earth_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
@@ -28,7 +28,7 @@ public class EnchantedEarthArmor extends EnchantedArmor {
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 	public static final String ID_FEET_TRUE = ID_PREFIX + "feet_true";
 	
-	public EnchantedEarthArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public MagicEarthArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.EARTH, slot, type, properties);
 	}
 	

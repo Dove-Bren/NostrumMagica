@@ -106,7 +106,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
+public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
 	
 	public static enum Type {
 		NOVICE(0),
@@ -487,7 +487,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	@OnlyIn(Dist.CLIENT)
 	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels;
 	
-	public EnchantedArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
+	public MagicArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
 		super(ArmorMaterial.IRON, slot, builder.maxDamage(calcArmorDurability(slot, element, type)));
 		
 		this.type = type;
@@ -590,8 +590,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return !offense && NostrumMagica.rand.nextFloat() <= chancePer * (float) (Math.min(2, type.scale) + 1);
 	}
 	
-	public static EnchantedArmor get(EMagicElement element, EquipmentSlotType slot, Type type) {
-		EnchantedArmor armor = null;
+	public static MagicArmor get(EMagicElement element, EquipmentSlotType slot, Type type) {
+		MagicArmor armor = null;
 		
 		switch (element) {
 		case EARTH:
@@ -1107,7 +1107,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
-		if (!(stack.getItem() instanceof EnchantedArmor)) {
+		if (!(stack.getItem() instanceof MagicArmor)) {
 			return null;
 		}
 		
@@ -1138,11 +1138,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		if (entity != null) {
 			for (EquipmentSlotType slot : new EquipmentSlotType[]{EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET}) {
 				ItemStack inSlot = entity.getItemStackFromSlot(slot);
-				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
+				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof MagicArmor)) {
 					continue;
 				}
 				
-				EnchantedArmor item = (EnchantedArmor) inSlot.getItem();
+				MagicArmor item = (MagicArmor) inSlot.getItem();
 				if (item.getElement() == element && item.getType() == type) {
 					count++;
 				}
@@ -1152,7 +1152,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return count;
 	}
 	
-	public static int GetSetPieces(LivingEntity entity, EnchantedArmor armor) {
+	public static int GetSetPieces(LivingEntity entity, MagicArmor armor) {
 		final EMagicElement myElem = armor.getElement();
 		final Type myType = armor.getType();
 		return GetSetCount(entity, myElem, myType);
@@ -1177,8 +1177,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 	}
 	
-	public static List<EnchantedArmor> getAll() {
-		List<EnchantedArmor> list = new LinkedList<>();
+	public static List<MagicArmor> getAll() {
+		List<MagicArmor> list = new LinkedList<>();
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			for (EquipmentSlotType slot : EquipmentSlotType.values())
@@ -1391,7 +1391,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			}
 			
 			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (!inSlot.isEmpty()  && inSlot.getItem() instanceof EnchantedArmor) {
+			if (!inSlot.isEmpty()  && inSlot.getItem() instanceof MagicArmor) {
 				return true;
 			}
 		}
@@ -1429,8 +1429,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				if (!inSlot.isEmpty()) {
 					inSlot = inSlot.copy();
 					
-					if (inSlot.getItem() instanceof EnchantedArmor) {
-						EnchantedArmor armorType = (EnchantedArmor) inSlot.getItem();
+					if (inSlot.getItem() instanceof MagicArmor) {
+						MagicArmor armorType = (MagicArmor) inSlot.getItem();
 						setCount = GetSetPieces(entity, armorType);
 						armorElem = armorType.getElement();
 					} else {
@@ -1456,7 +1456,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				attribMap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
 				
 				if (slot == EquipmentSlotType.CHEST) {
-					boolean has = (inSlot.getItem() instanceof EnchantedArmor) ? ((EnchantedArmor) inSlot.getItem()).hasElytra(entity) : false;
+					boolean has = (inSlot.getItem() instanceof MagicArmor) ? ((MagicArmor) inSlot.getItem()).hasElytra(entity) : false;
 					NostrumElytraWrapper.AddElytraModifier(attribMap,
 							 has ? ARMOR_ELYTRA_MODIFIER : ARMOR_NO_ELYTRA_MODIFIER);
 				}
@@ -1476,8 +1476,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		// Check for world-changing full set bonuses
 		// Note: Cheat and just look at helm. if helm isn't right, full set isn't set anyways
 		@Nonnull ItemStack helm = entity.getItemStackFromSlot(EquipmentSlotType.HEAD);
-		if (!helm.isEmpty() && helm.getItem() instanceof EnchantedArmor) {
-			EnchantedArmor type = (EnchantedArmor) helm.getItem();
+		if (!helm.isEmpty() && helm.getItem() instanceof MagicArmor) {
+			MagicArmor type = (MagicArmor) helm.getItem();
 			final int setCount = GetSetPieces(entity, type);
 			if (setCount == 4) {
 				// Full set!
@@ -1553,11 +1553,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			}
 			
 			@Nonnull ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof EnchantedArmor)) {
+			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof MagicArmor)) {
 				continue;
 			}
 			
-			EnchantedArmor armorType = (EnchantedArmor) inSlot.getItem();
+			MagicArmor armorType = (MagicArmor) inSlot.getItem();
 			final Type inSlotType = armorType.getType();
 			final EMagicElement inSlotElement = armorType.getElement();
 			if (inSlotType != type || inSlotElement != element) {
@@ -1662,7 +1662,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			}
 		}
 		
-		if (EnchantedArmor.GetHasWingUpgrade(stack)) {
+		if (MagicArmor.GetHasWingUpgrade(stack)) {
 			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").applyTextStyle(TextFormatting.GOLD));
 		}
 	}
@@ -1689,7 +1689,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	protected static boolean HasElytra(LivingEntity entity) {
-		EnchantedArmor piece = getChestPiece(entity);
+		MagicArmor piece = getChestPiece(entity);
 		if (piece == null) {
 			return false;
 		}
@@ -1697,13 +1697,13 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		return piece.hasElytra(entity);
 	}
 	
-	protected static @Nullable EnchantedArmor getChestPiece(LivingEntity entity) {
+	protected static @Nullable MagicArmor getChestPiece(LivingEntity entity) {
 		ItemStack chestpiece = entity.getItemStackFromSlot(EquipmentSlotType.CHEST);
-		if (chestpiece.isEmpty() || !(chestpiece.getItem() instanceof EnchantedArmor)) {
+		if (chestpiece.isEmpty() || !(chestpiece.getItem() instanceof MagicArmor)) {
 			return null;
 		}
 		
-		return (EnchantedArmor) chestpiece.getItem();
+		return (MagicArmor) chestpiece.getItem();
 	}
 	
 	private static final int EARTH_SCAN_RANGE_XZ = 21;
@@ -1740,7 +1740,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	protected static boolean HasManaJump(LivingEntity entity) {
-		EnchantedArmor piece = getChestPiece(entity);
+		MagicArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasManaJump(entity);
 	}
 	
@@ -1757,7 +1757,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	protected static boolean HasWindTornado(LivingEntity entity) {
-		EnchantedArmor piece = getChestPiece(entity);
+		MagicArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasWindTornado(entity);
 	}
 	
@@ -1774,7 +1774,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	protected static boolean HasEnderDash(LivingEntity entity) {
-		EnchantedArmor piece = getChestPiece(entity);
+		MagicArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasEnderDash(entity);
 	}
 	
@@ -1783,7 +1783,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
 			if (!hasRightElement) {
 				ItemStack chest = entity.getItemStackFromSlot(EquipmentSlotType.CHEST);
-				hasRightElement = EnchantedArmor.GetHasWingUpgrade(chest);
+				hasRightElement = MagicArmor.GetHasWingUpgrade(chest);
 			}
 			if (hasRightElement) {
 				// Check if full set is available and if we have enough mana
@@ -1799,7 +1799,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	}
 	
 	protected static boolean HasDragonFlight(LivingEntity entity) {
-		EnchantedArmor piece = getChestPiece(entity);
+		MagicArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasDragonFlight(entity);
 	}
 	
@@ -2215,8 +2215,8 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	
 	public static final boolean GetHasWingUpgrade(ItemStack stack) {
 		return !stack.isEmpty()
-				&& stack.getItem() instanceof EnchantedArmor
-				&& ((EnchantedArmor) stack.getItem()).getEquipmentSlot() == EquipmentSlotType.CHEST
+				&& stack.getItem() instanceof MagicArmor
+				&& ((MagicArmor) stack.getItem()).getEquipmentSlot() == EquipmentSlotType.CHEST
 				&& stack.hasTag()
 				&& stack.getTag().getBoolean(NBT_WING_UPGRADE);
 	}
@@ -2357,11 +2357,11 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 	
 	public static final void HandleStateUpdate(ArmorState state, LivingEntity ent, boolean data) {
 		ItemStack chest = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
-		if (chest.isEmpty() || !(chest.getItem() instanceof EnchantedArmor)) {
+		if (chest.isEmpty() || !(chest.getItem() instanceof MagicArmor)) {
 			return;
 		}
 		
-		final EnchantedArmor armor = (EnchantedArmor) chest.getItem();
+		final MagicArmor armor = (MagicArmor) chest.getItem();
 		
 		switch (state) {
 		case FLYING:
@@ -2371,7 +2371,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		case JUMP:
 			// Deduct mana
 			if (!ent.world.isRemote) {
-				EnchantedArmor.consumeManaJump(ent);
+				MagicArmor.consumeManaJump(ent);
 			}
 			break;
 		case ENDER_DASH_BACK:
@@ -2380,7 +2380,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
 				Vec3d dir = fakeLook.scale(-1);
 				if (DoEnderDash(ent, dir)) {
-					EnchantedArmor.consumeEnderDash(ent);
+					MagicArmor.consumeEnderDash(ent);
 				} else {
 					if (ent instanceof PlayerEntity) {
 						NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
@@ -2489,7 +2489,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 				cloud.setIgnoreRadius(true);
 				cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 					final int count = 40;
-					EnchantedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, .65f);
+					AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, .65f);
 				});
 				cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
 				//cloud.setCustomParticleParam1(10);
@@ -2502,7 +2502,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 			// Deduct mana
 			if (data) {
 				if (!ent.world.isRemote) {
-					EnchantedArmor.consumeDragonFlight(ent);
+					MagicArmor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
 						if (ent instanceof PlayerEntity) {
@@ -2518,12 +2518,12 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		case WIND_JUMP_WHIRLWIND:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				PlayerEntity playerIn = (PlayerEntity) ent;
-				EnchantedArmor.consumeWindJumpWhirlwind(ent);
+				MagicArmor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
 				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
 				if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
 					final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
-					EnchantedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, EnchantedWeapon.Type.MASTER);
+					AspectedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, AspectedWeapon.Type.MASTER);
 				}
 			}
 			break;
@@ -2538,7 +2538,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		}
 
 		LivingEntity ent = event.getEntityLiving();
-		EnchantedArmor armor = getChestPiece(ent);
+		MagicArmor armor = getChestPiece(ent);
 		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			Vec3d motion = ent.getMotion();
@@ -2555,7 +2555,7 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 
 		LivingEntity ent = event.getEntityLiving();
 		
-		EnchantedArmor armor = getChestPiece(ent);
+		MagicArmor armor = getChestPiece(ent);
 		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			final float amt = (float) (armor.jumpBoost / .1f);
@@ -2568,15 +2568,15 @@ public class EnchantedArmor extends ArmorItem implements EnchantedEquipment, IDr
 		final boolean flying = player.isElytraFlying();
 		// Maybe should have an interface?
 		if (
-				EnchantedArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.TRUE) == 4
-				|| EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, Type.TRUE) == 4
-				|| EnchantedArmor.GetSetCount(player, EMagicElement.FIRE, Type.TRUE) == 4
-				|| EnchantedArmor.GetSetCount(player, EMagicElement.ENDER, Type.TRUE) == 4
+				MagicArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.TRUE) == 4
+				|| MagicArmor.GetSetCount(player, EMagicElement.EARTH, Type.TRUE) == 4
+				|| MagicArmor.GetSetCount(player, EMagicElement.FIRE, Type.TRUE) == 4
+				|| MagicArmor.GetSetCount(player, EMagicElement.ENDER, Type.TRUE) == 4
 				|| (
-					EnchantedArmor.GetHasWingUpgrade(stack) && (
-						EnchantedArmor.GetSetCount(player, EMagicElement.ICE, Type.TRUE) == 4
-						|| EnchantedArmor.GetSetCount(player, EMagicElement.WIND, Type.TRUE) == 4
-						|| EnchantedArmor.GetSetCount(player, EMagicElement.LIGHTNING, Type.TRUE) == 4
+					MagicArmor.GetHasWingUpgrade(stack) && (
+						MagicArmor.GetSetCount(player, EMagicElement.ICE, Type.TRUE) == 4
+						|| MagicArmor.GetSetCount(player, EMagicElement.WIND, Type.TRUE) == 4
+						|| MagicArmor.GetSetCount(player, EMagicElement.LIGHTNING, Type.TRUE) == 4
 					)
 					
 				)

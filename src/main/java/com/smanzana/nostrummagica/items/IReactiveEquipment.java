@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
-public interface EnchantedEquipment {
+public interface IReactiveEquipment {
 
 	public static final String NBT_ITEM = "nested_item";
 	public static final String NBT_USES = "enchanted_uses";

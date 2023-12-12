@@ -34,7 +34,7 @@ import com.smanzana.nostrummagica.client.render.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.items.IRaytraceOverlay;
@@ -1492,11 +1492,11 @@ public class OverlayRenderer extends AbstractGui {
 		if (event.getPlayer() != mc.player) {
 			// For other players, possibly do armor render ticks
 			for (@Nonnull ItemStack equipStack : event.getPlayer().getArmorInventoryList()) {
-				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof EnchantedArmor)) {
+				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof MagicArmor)) {
 					continue;
 				}
 				
-				((EnchantedArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().world, event.getPlayer());
+				((MagicArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().world, event.getPlayer());
 			}
 		}
 	}

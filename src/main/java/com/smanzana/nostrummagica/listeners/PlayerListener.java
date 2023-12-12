@@ -25,8 +25,8 @@ import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
-import com.smanzana.nostrummagica.items.EnchantedEquipment;
+import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.items.IReactiveEquipment;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentBag;
@@ -543,8 +543,8 @@ public class PlayerListener {
 		if (event.getSource().isFireDamage()) {
 			
 			// lava set ignores fire damage (but not lava). True lava set ignores lava as well
-			final boolean lavaSet = EnchantedArmor.GetSetCount(living, EMagicElement.FIRE, EnchantedArmor.Type.MASTER) == 4;
-			final boolean trueSet = EnchantedArmor.GetSetCount(living, EMagicElement.FIRE, EnchantedArmor.Type.TRUE) == 4;
+			final boolean lavaSet = MagicArmor.GetSetCount(living, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
+			final boolean trueSet = MagicArmor.GetSetCount(living, EMagicElement.FIRE, MagicArmor.Type.TRUE) == 4;
 			final boolean isLava = event.getSource() == DamageSource.LAVA || event.getSource().getDamageType().equalsIgnoreCase("lava");
 			if (lavaSet || trueSet) {
 				final int manaCost = 1; // / 4
@@ -597,10 +597,10 @@ public class PlayerListener {
 				// Defense
 				if (event.getAmount() > 0 && livingTarget != livingSource) {
 					for (ItemStack stack : livingTarget.getEquipmentAndArmor()) {
-						if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
+						if (stack.isEmpty() || !(stack.getItem() instanceof IReactiveEquipment))
 							continue;
 						
-						EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+						IReactiveEquipment ench = (IReactiveEquipment) stack.getItem();
 						if (ench.shouldTrigger(false, stack)) {
 							SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 							if (action != null)
@@ -612,10 +612,10 @@ public class PlayerListener {
 						if (inv != null) {
 							for (int i = 0; i < inv.getSizeInventory(); i++) {
 								ItemStack stack = inv.getStackInSlot(i);
-								if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
+								if (stack.isEmpty() || !(stack.getItem() instanceof IReactiveEquipment))
 									continue;
 								
-								EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+								IReactiveEquipment ench = (IReactiveEquipment) stack.getItem();
 								if (ench.shouldTrigger(false, stack)) {
 									SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 									if (action != null)
@@ -628,10 +628,10 @@ public class PlayerListener {
 		
 				// Offense
 				for (ItemStack stack : livingSource.getEquipmentAndArmor()) {
-					if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
+					if (stack.isEmpty() || !(stack.getItem() instanceof IReactiveEquipment))
 						continue;
 					
-					EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+					IReactiveEquipment ench = (IReactiveEquipment) stack.getItem();
 					if (ench.shouldTrigger(true, stack)) {
 						SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 						if (action != null)
@@ -643,10 +643,10 @@ public class PlayerListener {
 					if (inv != null) {
 						for (int i = 0; i < inv.getSizeInventory(); i++) {
 							ItemStack stack = inv.getStackInSlot(i);
-							if (stack.isEmpty() || !(stack.getItem() instanceof EnchantedEquipment))
+							if (stack.isEmpty() || !(stack.getItem() instanceof IReactiveEquipment))
 								continue;
 							
-							EnchantedEquipment ench = (EnchantedEquipment) stack.getItem();
+							IReactiveEquipment ench = (IReactiveEquipment) stack.getItem();
 							if (ench.shouldTrigger(true, stack)) {
 								SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 								if (action != null)
@@ -1038,7 +1038,7 @@ public class PlayerListener {
 			NostrumPortal.tick();
 			TeleportRuneTileEntity.tickChargeMap();
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
-				EnchantedArmor.ServerWorldTick(world);
+				MagicArmor.ServerWorldTick(world);
 			}
 		} else if (event.phase == Phase.END) {
 			updateTrackedEntities();
@@ -1147,7 +1147,7 @@ public class PlayerListener {
 		
 		LivingEntity living = (LivingEntity) e.getEntity();
 		
-		final boolean hasLightningSet = EnchantedArmor.GetSetCount(living, EMagicElement.LIGHTNING, EnchantedArmor.Type.TRUE) == 4;
+		final boolean hasLightningSet = MagicArmor.GetSetCount(living, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4;
 		if (hasLightningSet) {
 			// Alternate between buff and attack modes
 			EffectInstance boostEffect = living.getActivePotionEffect(NostrumEffects.lightningCharge);
@@ -1188,11 +1188,11 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (EnchantedArmor.GetSetCount(player, EMagicElement.EARTH, EnchantedArmor.Type.TRUE) != 4) {
+		if (MagicArmor.GetSetCount(player, EMagicElement.EARTH, MagicArmor.Type.TRUE) != 4) {
 			return;
 		}
 		
-		if (EnchantedArmor.DoEarthDig(player.world, player, e.getPos(), e.getFace())) {
+		if (MagicArmor.DoEarthDig(player.world, player, e.getPos(), e.getFace())) {
 			attr.addMana(-20);
 			NostrumMagica.instance.proxy.sendMana(player);
 			e.setCanceled(true);

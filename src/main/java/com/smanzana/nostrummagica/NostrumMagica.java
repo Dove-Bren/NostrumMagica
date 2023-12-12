@@ -49,8 +49,8 @@ import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
-import com.smanzana.nostrummagica.items.EnchantedWeapon;
+import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.items.AspectedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicCharm;
@@ -1088,12 +1088,12 @@ public class NostrumMagica {
 
 		// Rituals for base the magic armors
 		for (EMagicElement elem : EMagicElement.values()) {
-			if (!EnchantedArmor.isArmorElement(elem)) {
+			if (!MagicArmor.isArmorElement(elem)) {
 				continue;
 			}
 			
-			for (EnchantedArmor.Type type : EnchantedArmor.Type.values()) {
-				if (type == EnchantedArmor.Type.TRUE) {
+			for (MagicArmor.Type type : MagicArmor.Type.values()) {
+				if (type == MagicArmor.Type.TRUE) {
 					continue; // True armors below
 				}
 				
@@ -1109,20 +1109,20 @@ public class NostrumMagica {
 					String name;
 					String regName;
 					String research;
-					outcome = new ItemStack(EnchantedArmor.get(elem, slot, type));
+					outcome = new ItemStack(MagicArmor.get(elem, slot, type));
 					name = "spawn_enchanted_armor";
 					regName = "spawn_enchanted_armor_" + elem.name().toLowerCase() + "_" + slot.name().toLowerCase() + "_" + type.name().toLowerCase();
 					research = "enchanted_armor";
-					if (type == EnchantedArmor.Type.NOVICE) {
+					if (type == MagicArmor.Type.NOVICE) {
 						input = Ingredient.fromItems(MagicArmorBase.get(slot));
 					} else {
-						input = Ingredient.fromItems(EnchantedArmor.get(elem, slot, type.getPrev()));
+						input = Ingredient.fromItems(MagicArmor.get(elem, slot, type.getPrev()));
 					}
 					
 					essence = Ingredient.fromStacks(EssenceItem.getEssence(elem, 1)); // Would be cool to make this tag...
-					if (type == EnchantedArmor.Type.NOVICE) {
+					if (type == MagicArmor.Type.NOVICE) {
 						gem = Ingredient.fromTag(NostrumTags.Items.CrystalSmall);
-					} else if (type == EnchantedArmor.Type.ADEPT) {
+					} else if (type == MagicArmor.Type.ADEPT) {
 						gem = Ingredient.fromTag(NostrumTags.Items.CrystalMedium);
 					} else {
 						gem = Ingredient.fromTag(NostrumTags.Items.CrystalLarge);
@@ -1146,23 +1146,23 @@ public class NostrumMagica {
 					continue;
 				}
 
-				final boolean isTrue = EnchantedArmor.isArmorElement(elem);
+				final boolean isTrue = MagicArmor.isArmorElement(elem);
 				final Ingredient augment = (isTrue ? Ingredient.fromTag(NostrumTags.Items.SlabKind)
 						: Ingredient.fromTag(NostrumTags.Items.SlabFierce));
 
-				final Ingredient input = Ingredient.fromItems(EnchantedArmor.get(isTrue ? elem : elem.getOpposite(), slot, EnchantedArmor.Type.MASTER));
+				final Ingredient input = Ingredient.fromItems(MagicArmor.get(isTrue ? elem : elem.getOpposite(), slot, MagicArmor.Type.MASTER));
 				final String name = "spawn_enchanted_armor";
-				final String regName = "spawn_enchanted_armor_" + elem.name().toLowerCase() + "_" + slot.name().toLowerCase() + "_" + EnchantedArmor.Type.TRUE.name().toLowerCase();
+				final String regName = "spawn_enchanted_armor_" + elem.name().toLowerCase() + "_" + slot.name().toLowerCase() + "_" + MagicArmor.Type.TRUE.name().toLowerCase();
 				final String research = "enchanted_armor_adv";
 				final Ingredient wings = (isTrue ? Ingredient.fromTag(NostrumTags.Items.DragonWing)
 						: Ingredient.fromStacks(new ItemStack(Items.ELYTRA)));
 				final IRitualOutcome outcome = (isTrue
-						? new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, EnchantedArmor.Type.TRUE)))
-						: new OutcomeSpawnItem(new ItemStack(EnchantedArmor.get(elem, slot, EnchantedArmor.Type.TRUE)),
+						? new OutcomeSpawnItem(new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.TRUE)))
+						: new OutcomeSpawnItem(new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.TRUE)),
 								new ItemStack(Items.ELYTRA)));
 
 				registry
-						.register(RitualRecipe.createTier3(regName, name, new ItemStack(EnchantedArmor.get(elem, slot, EnchantedArmor.Type.TRUE)),
+						.register(RitualRecipe.createTier3(regName, name, new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.TRUE)),
 								elem == EMagicElement.PHYSICAL ? null : elem,
 								new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 										ReagentType.MANI_DUST },
@@ -1175,11 +1175,11 @@ public class NostrumMagica {
 		
 		// Rituals for base the magic weapons
 		for (EMagicElement elem : EMagicElement.values()) {
-			if (!EnchantedWeapon.isWeaponElement(elem)) {
+			if (!AspectedWeapon.isWeaponElement(elem)) {
 				continue;
 			}
 			
-			for (EnchantedWeapon.Type type : EnchantedWeapon.Type.values()) {
+			for (AspectedWeapon.Type type : AspectedWeapon.Type.values()) {
 				ItemStack outcome;
 				Ingredient input;
 				Ingredient gem;
@@ -1188,20 +1188,20 @@ public class NostrumMagica {
 				String regName;
 				String research;
 				
-				outcome = new ItemStack(EnchantedWeapon.get(elem, type));
+				outcome = new ItemStack(AspectedWeapon.get(elem, type));
 				name = "spawn_enchanted_weapon";
 				regName = "spawn_enchanted_weapon_" + elem.name().toLowerCase() + "_" + type.name().toLowerCase();
 				research = "enchanted_weapons";
-				if (type == EnchantedWeapon.Type.NOVICE) {
+				if (type == AspectedWeapon.Type.NOVICE) {
 					input = Ingredient.fromItems(NostrumItems.magicSwordBase);
 				} else {
-					input = Ingredient.fromItems(EnchantedWeapon.get(elem, type.getPrev()));
+					input = Ingredient.fromItems(AspectedWeapon.get(elem, type.getPrev()));
 				}
 				
 				essence = Ingredient.fromStacks(EssenceItem.getEssence(elem, 1)); // Would be cool to make this tag...
-				if (type == EnchantedWeapon.Type.NOVICE) {
+				if (type == AspectedWeapon.Type.NOVICE) {
 					gem = Ingredient.fromTag(NostrumTags.Items.CrystalSmall);
-				} else if (type == EnchantedWeapon.Type.ADEPT) {
+				} else if (type == AspectedWeapon.Type.ADEPT) {
 					gem = Ingredient.fromTag(NostrumTags.Items.CrystalMedium);
 				} else {
 					gem = Ingredient.fromTag(NostrumTags.Items.CrystalLarge);
@@ -1506,10 +1506,10 @@ public class NostrumMagica {
 				new ItemStack(NostrumItems.soulDagger), EMagicElement.FIRE, new ReagentType[] { ReagentType.SKY_ASH,
 						ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT },
 				Ingredient.fromItems(Items.END_CRYSTAL),
-				new Ingredient[] { Ingredient.fromItems(EnchantedWeapon.get(EMagicElement.WIND, EnchantedWeapon.Type.NOVICE)),
-						Ingredient.fromItems(EnchantedWeapon.get(EMagicElement.LIGHTNING, EnchantedWeapon.Type.NOVICE)),
+				new Ingredient[] { Ingredient.fromItems(AspectedWeapon.get(EMagicElement.WIND, AspectedWeapon.Type.NOVICE)),
+						Ingredient.fromItems(AspectedWeapon.get(EMagicElement.LIGHTNING, AspectedWeapon.Type.NOVICE)),
 						Ingredient.fromTag(NostrumTags.Items.SlabFierce),
-						Ingredient.fromItems(EnchantedWeapon.get(EMagicElement.ICE, EnchantedWeapon.Type.NOVICE)) },
+						Ingredient.fromItems(AspectedWeapon.get(EMagicElement.ICE, AspectedWeapon.Type.NOVICE)) },
 				new RRequirementResearch("soul_daggers"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.soulDagger))));
 
@@ -2084,18 +2084,18 @@ public class NostrumMagica {
 		NostrumResearch.startBuilding().parent("enchanted_armor")
 				.reference("ritual::spawn_enchanted_weapon", "ritual.spawn_enchanted_weapon.name")
 				.build("enchanted_weapons", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 1, true,
-						new ItemStack(EnchantedWeapon.get(EMagicElement.WIND, EnchantedWeapon.Type.MASTER)));
+						new ItemStack(AspectedWeapon.get(EMagicElement.WIND, AspectedWeapon.Type.MASTER)));
 
 		NostrumResearch.startBuilding().hiddenParent("rituals").quest("lvl4")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true,
-						new ItemStack(EnchantedArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER)));
+						new ItemStack(MagicArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, MagicArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").hiddenParent("kind_infusion")
 				.hiddenParent("fierce_infusion")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true,
-						new ItemStack(EnchantedArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, EnchantedArmor.Type.MASTER)));
+						new ItemStack(MagicArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, MagicArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").lore(EntityTameDragonRed.TameRedDragonLore.instance())
 				.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")

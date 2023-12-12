@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.EnchantedArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 
@@ -93,8 +93,8 @@ public class SublimationEffect extends Effect {
 				
 				// If we suspect regular fire damage is happening next, set resistant time to 0 so it still happens.
 				// Otherwise, don't reset
-				final boolean lavaSet = EnchantedArmor.GetSetCount(entity, EMagicElement.FIRE, EnchantedArmor.Type.MASTER) == 4;
-				final boolean trueSet = EnchantedArmor.GetSetCount(entity, EMagicElement.FIRE, EnchantedArmor.Type.TRUE) == 4;
+				final boolean lavaSet = MagicArmor.GetSetCount(entity, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
+				final boolean trueSet = MagicArmor.GetSetCount(entity, EMagicElement.FIRE, MagicArmor.Type.TRUE) == 4;
 				if (!entity.isImmuneToFire()
 						&& entity.getActivePotionEffect(Effects.FIRE_RESISTANCE) == null
 						&& !lavaSet && !trueSet) {
