@@ -32,6 +32,8 @@ public class NostrumEffects {
 	@ObjectHolder(HealResistEffect.ID) public static HealResistEffect healResist;
 	@ObjectHolder(FastFallEffect.ID) public static FastFallEffect fastFall;
 	@ObjectHolder(DisruptionEffect.ID) public static DisruptionEffect disruption;
+	@ObjectHolder(RendStrikeEffect.ID) public static RendStrikeEffect rendStrike;
+	@ObjectHolder(SteelSkinEffect.ID) public static SteelSkinEffect steelSkin;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -56,5 +58,7 @@ public class NostrumEffects {
     	registry.register(new HealResistEffect().setRegistryName(HealResistEffect.ID));
     	registry.register(new FastFallEffect().setRegistryName(FastFallEffect.ID));
     	registry.register(new DisruptionEffect().setRegistryName(DisruptionEffect.ID));
+    	registry.register(new RendStrikeEffect().setRegistryName(RendStrikeEffect.ID));
+    	registry.register(new SteelSkinEffect().setRegistryName(SteelSkinEffect.ID));
     }
 }
