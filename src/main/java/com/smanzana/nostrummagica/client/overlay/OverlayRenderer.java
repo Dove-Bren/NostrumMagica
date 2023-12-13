@@ -106,7 +106,7 @@ public class OverlayRenderer extends AbstractGui {
 	private static final int GUI_SHIELD_OFFSETY = 17;
 	private static final int GUI_HOOKSHOT_CROSSHAIR_OFFSETX = 82;
 	private static final int GUI_HOOKSHOT_CROSSHAIR_WIDTH = 10;
-	private static final int GUI_TARGET_CROSSHAIR_OFFSETY = 58;
+	private static final int GUI_TARGET_CROSSHAIR_OFFSETY = 57;
 	private static final int GUI_TARGET_CROSSHAIR_WIDTH = 7;
 	private static final int GUI_CONTINGENCY_ICON_OFFSETX = 22;
 	private static final int GUI_CONTINGENCY_ICON_OFFSETY = 37;
@@ -834,6 +834,8 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.translatef(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
 		
 		GlStateManager.translatef(-GUI_TARGET_CROSSHAIR_WIDTH / 2, -(GUI_TARGET_CROSSHAIR_WIDTH / 2), 0);
+		
+		GlStateManager.translatef(-1, 0, 0);
 		
 		blit(0, 0,
 				0, GUI_TARGET_CROSSHAIR_OFFSETY, GUI_TARGET_CROSSHAIR_WIDTH, GUI_TARGET_CROSSHAIR_WIDTH);
