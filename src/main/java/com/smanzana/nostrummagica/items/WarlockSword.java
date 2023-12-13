@@ -302,15 +302,16 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		
 		// Add magic damage, but only if weapon cooldown is recovered
-		if (!(attacker instanceof PlayerEntity) || ((PlayerEntity)attacker).getCooledAttackStrength(0.5F) > .95) {
+		// Except hitEntity is called after cooldown is checked and reset, so can't actually check
+		//if (!(attacker instanceof PlayerEntity) || ((PlayerEntity)attacker).getCooledAttackStrength(0.5F) > .95) {
+		{
 			Map<EMagicElement, Float> levels = getLevels(stack);
 			for (EMagicElement elem : EMagicElement.values()) {
 				Float level = levels.get(elem);
 				if (level != null && level >= 1f) {
+					target.hurtResistantTime = 0;
 					target.attackEntityFrom(new MagicDamageSource(attacker, elem), 
 							SpellAction.calcDamage(attacker, target, (float) Math.floor(level), elem));
-					target.setInvulnerable(false);
-					target.hurtResistantTime = 0;
 					doEffect(target, elem);
 				}
 			}

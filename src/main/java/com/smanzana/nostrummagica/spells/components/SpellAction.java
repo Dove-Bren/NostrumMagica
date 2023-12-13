@@ -16,7 +16,6 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -33,9 +32,8 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
+import com.smanzana.nostrummagica.items.IEnchantableItem;
 import com.smanzana.nostrummagica.items.MagicArmor;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -1306,21 +1304,28 @@ public class SpellAction {
 
 			ItemStack addedItem = ItemStack.EMPTY;
 			boolean didEmpower = false;
+			boolean consumeInput = false;
 			
 			// Main hand attempt
 			if (inhand != null) {
 				Item item = inhand.getItem();
-				if (NostrumTags.Items.InfusedGemVoid.contains(item)) {
-					int count = (int) Math.pow(2, level - 1);
-					addedItem = InfusedGemItem.getGem(element, count);
-				} else if (item instanceof EssenceItem) {
-					int count = level + 1;
-					double amt = 2 + level;
-					didEmpower = true;
-					caster.removeActivePotionEffect(NostrumEffects.magicBuff);
-					NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
-					entity.addPotionEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, 0));
+				if (item instanceof IEnchantableItem) {
+					IEnchantableItem.Result result = ((IEnchantableItem) item).attemptEnchant(inhand, entity, element, level);
+					didEmpower = result.success;
+					addedItem = result.resultItem;
+					consumeInput = result.consumeInput;
 				}
+//				else if (NostrumTags.Items.InfusedGemVoid.contains(item)) {
+//					int count = (int) Math.pow(2, level - 1);
+//					addedItem = InfusedGemItem.getGem(element, count);
+//				} else if (item instanceof EssenceItem) {
+//					int count = level + 1;
+//					double amt = 2 + level;
+//					didEmpower = true;
+//					caster.removeActivePotionEffect(NostrumEffects.magicBuff);
+//					NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
+//					entity.addPotionEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, 0));
+//				}
 			}
 			
 			if (addedItem.isEmpty() && !didEmpower) {
@@ -1328,14 +1333,17 @@ public class SpellAction {
 			} else {
 				if (entity instanceof PlayerEntity) {
 					PlayerEntity p = (PlayerEntity) entity;
-					if (inhand.getCount() == 1) {
-						if (offhand) {
-							p.inventory.removeStackFromSlot(40);
+					
+					if (consumeInput) {
+						if (inhand.getCount() == 1) {
+							if (offhand) {
+								p.inventory.removeStackFromSlot(40);
+							} else {
+								p.inventory.removeStackFromSlot(p.inventory.currentItem);
+							}
 						} else {
-							p.inventory.removeStackFromSlot(p.inventory.currentItem);
+							inhand.split(1);
 						}
-					} else {
-						inhand.split(1);
 					}
 					if (!addedItem.isEmpty()) {
 						((PlayerEntity) entity).inventory.addItemStackToInventory(addedItem);
@@ -2166,13 +2174,14 @@ public class SpellAction {
 	
 	public static final boolean isEnchantable(ItemStack stack) {
 		Item item = stack.getItem();
-		if (NostrumTags.Items.InfusedGemVoid.contains(stack.getItem())) {
-			return true;
-		} else if (item instanceof EssenceItem && ((EssenceItem) stack.getItem()).getElement() != EMagicElement.PHYSICAL) {
-			return true;
-		}
-		
-		return false;
+//		if (NostrumTags.Items.InfusedGemVoid.contains(stack.getItem())) {
+//			return true;
+//		} else if (item instanceof EssenceItem && ((EssenceItem) stack.getItem()).getElement() != EMagicElement.PHYSICAL) {
+//			return true;
+//		}
+//		
+//		return false;
+		return !stack.isEmpty() && item instanceof IEnchantableItem && ((IEnchantableItem) item).canEnchant(stack);
 	}
 	
 	public SpellAction damage(EMagicElement element, float amount) {

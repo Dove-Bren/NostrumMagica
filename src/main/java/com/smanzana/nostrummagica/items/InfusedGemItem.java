@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,7 +29,7 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class InfusedGemItem extends Item implements ILoreTagged {
+public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableItem {
 
 	public static final String ID_PREFIX = "nostrum_gem_";
 	public static final String MakeID(EMagicElement element) {
@@ -169,5 +170,17 @@ public class InfusedGemItem extends Item implements ILoreTagged {
 			elem = ((InfusedGemItem) stack.getItem()).getElement();
 		}
 		return elem;
+	}
+	
+	@Override
+	public boolean canEnchant(ItemStack stack) {
+		// Only void gems are enchantable
+		return this.element == null || this.element == EMagicElement.PHYSICAL;
+	}
+
+	@Override
+	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
+		int count = (int) Math.pow(2, power - 1);
+		return new Result(true, InfusedGemItem.getGem(element, count));
 	}
 }

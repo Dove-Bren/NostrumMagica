@@ -295,6 +295,7 @@ public class NostrumItems {
 	@ObjectHolder(FillItem.ID_AIR_ALL) public static FillItem fillDungeonAir;
 	@ObjectHolder(FillItem.ID_WATER_ALL) public static FillItem fillWater;
 	@ObjectHolder(FillItem.ID_WATER_DOWN) public static FillItem fillWaterLevel;
+	@ObjectHolder(MageBlade.ID) public static MageBlade mageBlade;
 	
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -598,6 +599,7 @@ public class NostrumItems {
     	register(registry, new FillItem(() -> NostrumBlocks.dungeonAir.getDefaultState(), false).setRegistryName(FillItem.ID_AIR_ALL));
     	register(registry, new FillItem(() -> Blocks.WATER.getDefaultState(), false).setRegistryName(FillItem.ID_WATER_ALL));
     	register(registry, new FillItem(() -> Blocks.WATER.getDefaultState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
+    	register(registry, new MageBlade().setRegistryName(MageBlade.ID));
     	
     	// Generate and register spell runes
     	{

@@ -1,14 +1,18 @@
 package com.smanzana.nostrummagica.items;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.EffectInstance;
 
-public class EssenceItem extends Item implements ILoreTagged {
+public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 
 	public static final String ID_PREFIX = "nostrum_essence_";
 	
@@ -91,5 +95,28 @@ public class EssenceItem extends Item implements ILoreTagged {
 	
 	public EMagicElement getElement() {
 		return this.element;
+	}
+
+	@Override
+	public boolean canEnchant(ItemStack stack) {
+		return true;
+	}
+
+	@Override
+	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
+		final boolean elemMatch = (this.element == element);
+		final int count;
+		final double amt;
+		if (elemMatch) {
+			count = power + 2; // bonus hit count for matching
+			amt = 2 + power; // bonus damage for matching
+		} else {
+			count = power + 1;
+			amt = 2; // non-matching essences don't get bonus damage
+		}
+		entity.removeActivePotionEffect(NostrumEffects.magicBuff);
+		NostrumMagica.magicEffectProxy.applyMagicBuff(entity, this.element, amt, count);
+		entity.addPotionEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
+		return new Result(true, ItemStack.EMPTY);
 	}
 }

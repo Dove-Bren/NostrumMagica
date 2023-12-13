@@ -1,0 +1,68 @@
+{
+	"parent": "item/handheld",
+	"textures": {
+		"layer0": "nostrummagica:item/mage_blade"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -90, -45],
+			"translation": [0, 8, 1.25]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 90, 45],
+			"translation": [0, 8, 1.25]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -45, -60],
+			"translation": [2, -0.5, -0.75]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -70, 30],
+			"translation": [2, -1, -0.5]
+		}
+	},
+    "overrides": [
+        {
+            "predicate": {
+                "element": 1
+            },
+            "model": "nostrummagica:item/mage_blade_physical"
+        },
+		{
+            "predicate": {
+                "element": 2
+            },
+            "model": "nostrummagica:item/mage_blade_lightning"
+        },
+		{
+            "predicate": {
+                "element": 3
+            },
+            "model": "nostrummagica:item/mage_blade_fire"
+        },
+		{
+            "predicate": {
+                "element": 4
+            },
+            "model": "nostrummagica:item/mage_blade_earth"
+        },
+		{
+            "predicate": {
+                "element": 5
+            },
+            "model": "nostrummagica:item/mage_blade_ice"
+        },
+		{
+            "predicate": {
+                "element": 6
+            },
+            "model": "nostrummagica:item/mage_blade_wind"
+        },
+		{
+            "predicate": {
+                "element": 7
+            },
+            "model": "nostrummagica:item/mage_blade_ender"
+        }
+    ]
+}
