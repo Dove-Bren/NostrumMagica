@@ -36,6 +36,7 @@ public class NostrumEffects {
 	@ObjectHolder(SteelSkinEffect.ID) public static SteelSkinEffect steelSkin;
 	@ObjectHolder(SoulDrainEffect.ID) public static SoulDrainEffect soulDrain;
 	@ObjectHolder(SoulVampireEffect.ID) public static SoulVampireEffect soulVampire;
+	@ObjectHolder(LootLuckEffect.ID) public static LootLuckEffect lootLuck;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -64,5 +65,6 @@ public class NostrumEffects {
     	registry.register(new SteelSkinEffect().setRegistryName(SteelSkinEffect.ID));
     	registry.register(new SoulDrainEffect().setRegistryName(SoulDrainEffect.ID));
     	registry.register(new SoulVampireEffect().setRegistryName(SoulVampireEffect.ID));
+    	registry.register(new LootLuckEffect().setRegistryName(LootLuckEffect.ID));
     }
 }
