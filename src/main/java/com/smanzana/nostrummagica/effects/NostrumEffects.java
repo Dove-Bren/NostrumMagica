@@ -34,6 +34,8 @@ public class NostrumEffects {
 	@ObjectHolder(DisruptionEffect.ID) public static DisruptionEffect disruption;
 	@ObjectHolder(RendStrikeEffect.ID) public static RendStrikeEffect rendStrike;
 	@ObjectHolder(SteelSkinEffect.ID) public static SteelSkinEffect steelSkin;
+	@ObjectHolder(SoulDrainEffect.ID) public static SoulDrainEffect soulDrain;
+	@ObjectHolder(SoulVampireEffect.ID) public static SoulVampireEffect soulVampire;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -60,5 +62,7 @@ public class NostrumEffects {
     	registry.register(new DisruptionEffect().setRegistryName(DisruptionEffect.ID));
     	registry.register(new RendStrikeEffect().setRegistryName(RendStrikeEffect.ID));
     	registry.register(new SteelSkinEffect().setRegistryName(SteelSkinEffect.ID));
+    	registry.register(new SoulDrainEffect().setRegistryName(SoulDrainEffect.ID));
+    	registry.register(new SoulVampireEffect().setRegistryName(SoulVampireEffect.ID));
     }
 }
