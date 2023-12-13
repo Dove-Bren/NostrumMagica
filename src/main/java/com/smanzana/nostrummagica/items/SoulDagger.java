@@ -320,6 +320,11 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
 				}
 			}
+			
+			EffectInstance effect = attacker.getActivePotionEffect(NostrumEffects.soulVampire);
+			if (effect != null && effect.getDuration() > 0) {
+				attacker.heal(damage);
+			}
 		}
 		
 		return true;
