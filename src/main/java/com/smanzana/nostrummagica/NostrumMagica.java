@@ -1073,6 +1073,19 @@ public class NostrumMagica {
 						new RRequirementResearch("warlock_sword"),
 						new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(NostrumItems.warlockSword), 10))));
 
+		registry
+				.register(RitualRecipe.createTier3("spawn_mage_blade", new ItemStack(NostrumItems.mageBlade),
+						null, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST,
+								ReagentType.SPIDER_SILK, ReagentType.GRAVE_DUST },
+						Ingredient.fromItems(NostrumItems.magicSwordBase),
+						new Ingredient[] { Ingredient.EMPTY,
+								Ingredient.fromItems(NostrumItems.mageStaff),
+								Ingredient.fromTag(NostrumTags.Items.SlabFierce),
+								Ingredient.EMPTY
+								},
+						new RRequirementResearch("mage_blade"),
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.mageBlade))));
+
 		registry.register(RitualRecipe.createTier3("create_seeking_gem",
 				new ItemStack(NostrumItems.resourceSeekingGem), null,
 				new ReagentType[] {
@@ -2073,13 +2086,18 @@ public class NostrumMagica {
 				.build("thanos_staff", NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 0, true,
 						new ItemStack(NostrumItems.thanosStaff));
 
-		NostrumResearch.startBuilding().parent("mage_staff").parent("enchanted_weapons").hiddenParent("vani")
+		NostrumResearch.startBuilding().parent("mage_staff").parent("mage_blade").hiddenParent("vani")
 				.reference("ritual::spawn_warlock_sword", "ritual.spawn_warlock_sword.name").build("warlock_sword",
 						NostrumResearchTab.OUTFITTING, Size.LARGE, 1, 1, true, new ItemStack(NostrumItems.warlockSword));
 
 		NostrumResearch.startBuilding().parent("thanos_staff").parent("warlock_sword").hiddenParent("vani")
 				.reference("ritual::spawn_soul_dagger", "ritual.spawn_soul_dagger.name").build("soul_daggers",
 						NostrumResearchTab.OUTFITTING, Size.LARGE, 2, 1, true, new ItemStack(NostrumItems.soulDagger));
+		
+		NostrumResearch.startBuilding().parent("enchanted_weapons").hiddenParent("mage_staff")
+				.spellComponent(null, EAlteration.ENCHANT)
+				.reference("ritual::spawn_mage_blade", "ritual.spawn_mage_blade.name").build("mage_blade",
+				NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 1, true, new ItemStack(NostrumItems.mageBlade));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor")
 				.reference("ritual::spawn_enchanted_weapon", "ritual.spawn_enchanted_weapon.name")

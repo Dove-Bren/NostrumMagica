@@ -1154,6 +1154,7 @@
 
     "ritual.spawn_sorcery_portal.name": "Spawn Sorcery Portal",
     "ritual.spawn_warlock_sword.name": "Craft Warlock Blade",
+	"ritual.spawn_mage_blade.name": "Craft Mage Blade",
 
     "ritual.spawn_enchanted_armor.name": "Enchant Armor",
     "ritual.spawn_enchanted_weapon.name": "Enchant Weapon",
@@ -1553,6 +1554,9 @@
     "research.enchanted_weapons.name": "Aspected Weapons",
     "research.enchanted_weapons.desc": "Blades of the elements",
     "research.enchanted_weapons.info": "Much like magic armor, you've discovered a way to create weapons attuned to the elements. The elements that didn't work well for armor -- Wind, Ice, and Lightning -- have turned out to be great for making weapons.|  Each weapon is different. What's more, the weapons have neat effects when used.",
+	"research.mage_blade.name": "Mage Blades",
+	"research.mage_blade.desc": "Enchantable Blades",
+	"research.mage_blade.info": "  Aspected weapons are very useful and have strong effects. Experimenting with the design, you've come up with a way to create a weapon that isn't tied to any one element, and instead can be enchanted with different types!|  Mage blades start out with no element, but are comparable to a diamond sword. If held while casting a spell that does enchanting, though, the blade gains an element of the respective type and does bonus elemental damage in that type. The number of strikes the blade can perform before reverting back depends on the power of the spell.",
     "research.warlock_sword.name": "Warlock Blade",
     "research.warlock_sword.desc": "Ensorcelled blades",
     "research.warlock_sword.info": "Warlock Blades are very powerful weapons. Their raw attack power is on par with a diamond blade, and they provide a modest boost to your magical potency.|  The blades are imbued with a lot of magical energy. However, this energy is unattuned. While fighting elemental enemies (such as golems or koids), your blade will attune to the elements it comes into contact with. As it gains power, it may begin applying magic damage on top of the physical damage it deals.",
