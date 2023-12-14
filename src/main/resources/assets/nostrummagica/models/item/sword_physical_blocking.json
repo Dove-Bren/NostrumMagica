@@ -1,0 +1,15 @@
+{
+	"parent": "nostrummagica:item/sword_physical",
+	"display": {
+		"firstperson_righthand": {
+			"rotation": [-60, 30, 95],
+			"translation": [-11.0, 5.5, 1.0],
+			"scale": [0.68, 0.68, 0.68]
+		},
+		"firstperson_lefthand": {
+			"rotation": [120, -30, 95],
+			"translation": [-11.0, 5.5, 1.0],
+			"scale": [0.68, 0.68, 0.68]
+		}
+	}
+}

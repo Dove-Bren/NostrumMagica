@@ -25,5 +25,13 @@
 		"ground": {
 			"translation": [0, 4, 0]
 		}
-	}
+	},
+    "overrides": [
+        {
+            "predicate": {
+                "blocking": 1
+            },
+            "model": "nostrummagica:item/sword_physical_blocking"
+        }
+    ]
 }

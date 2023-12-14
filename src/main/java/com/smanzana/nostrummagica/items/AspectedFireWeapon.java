@@ -126,11 +126,13 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final ItemStack held = playerIn.getHeldItem(hand);
-		if (playerIn.isSneaking()) {
+		
+		// Don't do when sneaking so players can still use a shield
+		if (!playerIn.isSneaking()) {
 			playerIn.setActiveHand(hand);
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
 		}
-			
+		
 		return new ActionResult<ItemStack>(ActionResultType.PASS, held);
 	}
 	
