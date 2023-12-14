@@ -36,7 +36,7 @@ import net.minecraft.world.World;
  */
 public class SeekingBulletTrigger extends SpellTrigger {
 	
-	public static final float MAX_DIST = 30f * 30f;
+	public static final float MAX_DIST = 30f;
 	
 	public class SeekingBulletTriggerInstance extends SpellTrigger.SpellTriggerInstance {
 

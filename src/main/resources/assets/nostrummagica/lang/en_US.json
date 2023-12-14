@@ -345,6 +345,11 @@
 	"item.nostrummagica.fill_tool_water": "Fill Water",
 	"item.nostrummagica.fill_tool_water_level": "Fill Water Level",
 	
+	"item.nostrummagica.sword_fire": "Flame Rod",
+	"item.nostrummagica.sword_earth": "Earth Pike",
+	"item.nostrummagica.sword_physical": "Deep Metal Axe",
+	"item.nostrummagica.sword_ender": "Ender Rod",
+	
 	"curios.identifier.pendant": "Pendant",
 
     "effect.nostrummagica.potions-frostbite": "Frostbite",
