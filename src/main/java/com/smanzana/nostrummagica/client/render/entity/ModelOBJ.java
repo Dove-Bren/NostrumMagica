@@ -19,7 +19,7 @@ public abstract class ModelOBJ<T extends Entity> extends EntityModel<T> {
 	}
 
 	protected abstract ModelResourceLocation[] getEntityModels();
-	protected abstract boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z, float entityYaw, float partialTicks);
+	protected abstract boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z, float entityYaw, float partialTicks, float scale);
 	//protected IUnbakedModel retexture(int i, UnbakedOBJModel model) {return model.model;}
 	protected int getColor(int i, T entity) {return -1;}
 
@@ -55,8 +55,8 @@ public abstract class ModelOBJ<T extends Entity> extends EntityModel<T> {
 		}
 
 		@Override
-		protected boolean preRender(BufferBuilder buffer) {
-			return ModelOBJ.this.preRender(ent, this.modelIdx, buffer, ent.posX, ent.posY, ent.posZ, ent.rotationYaw, 0);
+		protected boolean preRender(BufferBuilder buffer, float scale) {
+			return ModelOBJ.this.preRender(ent, this.modelIdx, buffer, ent.posX, ent.posY, ent.posZ, ent.rotationYaw, 0, scale);
 		}
 		
 //		@Override

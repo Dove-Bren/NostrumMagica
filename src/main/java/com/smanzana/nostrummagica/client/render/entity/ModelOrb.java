@@ -34,8 +34,8 @@ public class ModelOrb<T extends Entity> extends ModelOBJ<T> {
 
 	@Override
 	protected boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z,
-			float entityYaw, float partialTicks) {
-		GlStateManager.scalef(scale, scale, scale);
+			float entityYaw, float partialTicks, float scaleIn) {
+		GlStateManager.scalef(this.scale, this.scale, this.scale);
 		GlStateManager.rotatef(-90f, 1f, 0f, 0f);
 		return true;
 	}

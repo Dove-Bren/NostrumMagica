@@ -62,6 +62,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRedPart;
+import com.smanzana.nostrummagica.client.render.entity.RenderEnderRodBall;
 import com.smanzana.nostrummagica.client.render.entity.RenderGolem;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
 import com.smanzana.nostrummagica.client.render.entity.RenderKeySwitchTrigger;
@@ -95,6 +96,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
+import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityKoid;
@@ -124,9 +126,9 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
-import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -596,6 +598,13 @@ public class ClientProxy extends CommonProxy {
 			@Override
 			public EntityRenderer<? super EntityPlantBoss.PlantBossBody> createRenderFor(EntityRendererManager manager) {
 				return new RenderPlantBossBody(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityEnderRodBall.class, new IRenderFactory<EntityEnderRodBall>() {
+			@Override
+			public EntityRenderer<? super EntityEnderRodBall> createRenderFor(EntityRendererManager manager) {
+				return new RenderEnderRodBall(manager);
 			}
 		});
 	}

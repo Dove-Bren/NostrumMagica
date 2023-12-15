@@ -30,7 +30,7 @@ public class ModelMagicSaucer<T extends EntitySpellSaucer> extends ModelOBJ<T> {
 
 	@Override
 	protected boolean preRender(T entity, int model, BufferBuilder buffer, double x, double y, double z,
-			float entityYaw, float partialTicks) {
+			float entityYaw, float partialTicks, float scaleIn) {
 		GlStateManager.scalef(.5f, .5f, .5f);
 		GlStateManager.translatef(0, entity.getHeight(), 0);
 		GlStateManager.rotatef(-90f, 1f, 0f, 0f);

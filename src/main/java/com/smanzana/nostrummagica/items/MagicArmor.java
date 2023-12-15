@@ -2376,14 +2376,28 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			break;
 		case ENDER_DASH_BACK:
 			if (!ent.world.isRemote && armor.hasEnderDash(ent)) {
-				final Vec3d realLook = ent.getLookVec();
-				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
-				Vec3d dir = fakeLook.scale(-1);
-				if (DoEnderDash(ent, dir)) {
-					MagicArmor.consumeEnderDash(ent);
+				// If sneaking, attempt to teleport to a rod ball
+				if (ent.isSneaking()) {
+					ItemStack held = ent.getHeldItemMainhand();
+					if (held.isEmpty() || !(held.getItem() instanceof AspectedEnderWeapon)) {
+						held = ent.getHeldItemOffhand();
+					}
+					
+					if (held.isEmpty() || !(held.getItem() instanceof AspectedEnderWeapon)) {
+						;
+					} else {
+						AspectedEnderWeapon.AttemptCasterTeleport(ent, held);
+					}
 				} else {
-					if (ent instanceof PlayerEntity) {
-						NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
+					final Vec3d realLook = ent.getLookVec();
+					final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
+					Vec3d dir = fakeLook.scale(-1);
+					if (DoEnderDash(ent, dir)) {
+						MagicArmor.consumeEnderDash(ent);
+					} else {
+						if (ent instanceof PlayerEntity) {
+							NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
+						}
 					}
 				}
 			}

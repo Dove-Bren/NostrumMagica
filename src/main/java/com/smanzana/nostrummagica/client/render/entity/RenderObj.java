@@ -100,7 +100,7 @@ public class RenderObj extends RendererModel {
 		}
 	}
 
-	protected boolean preRender(BufferBuilder buffer) {
+	protected boolean preRender(BufferBuilder buffer, float scale) {
 		return true;
 	}
 	
@@ -227,7 +227,7 @@ public class RenderObj extends RendererModel {
 		
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 		
-		if (this.preRender(buffer)) {
+		if (this.preRender(buffer, scale)) {
 			renderInternal(scale, compiledList);
 		}
 		

@@ -429,7 +429,7 @@ public class EntityHookShot extends Entity {
 	public boolean writeUnlessRemoved(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
-    }
+	}
 
 	@Override
 	protected void registerData() {

@@ -68,6 +68,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(EntitySpellMortar.ID) public static EntityType<EntitySpellMortar> spellMortar;
 	@ObjectHolder(EntityAreaEffect.ID) public static EntityType<EntityAreaEffect> areaEffect;
 	@ObjectHolder(EntityKeySwitchTrigger.ID) public static EntityType<EntityKeySwitchTrigger> keySwitchTrigger;
+	@ObjectHolder(EntityEnderRodBall.ID) public static EntityType<EntityEnderRodBall> enderRodBall;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -262,6 +263,10 @@ public class NostrumEntityTypes {
 				.size(1f, .25f)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityAreaEffect.ID));
+		registry.register(EntityType.Builder.<EntityEnderRodBall>create(EntityEnderRodBall::new, EntityClassification.MISC)
+				.size(1.5f, 1.5f)
+				.setTrackingRange(128).setUpdateInterval(5).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityEnderRodBall.ID));
 	}
 	
 	private static void addSpawn(EntityType<? extends MobEntity> entityType, EntityClassification classification, int itemWeight, int minGroupCount, int maxGroupCount, Collection<Biome> biomes) {

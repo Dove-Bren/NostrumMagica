@@ -38,7 +38,7 @@ public class ModelSpriteCore extends ModelOBJ<EntitySprite> {
 
 	@Override
 	protected boolean preRender(EntitySprite entity, int model, BufferBuilder buffer, double x, double y, double z,
-			float entityYaw, float partialTicks) {
+			float entityYaw, float partialTicks, float scaleIn) {
 		GlStateManager.scalef(.5f, .5f, .5f);
 		GlStateManager.translatef(0, entity.getHeight(), 0);
 		GlStateManager.rotatef(-90f, 1f, 0f, 0f);

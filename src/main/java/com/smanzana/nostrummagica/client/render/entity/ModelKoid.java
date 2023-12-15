@@ -64,7 +64,7 @@ public class ModelKoid extends ModelOBJ<EntityKoid> {
 
 	@Override
 	protected boolean preRender(EntityKoid entity, int model, BufferBuilder buffer, double x, double y, double z,
-			float entityYaw, float partialTicks) {
+			float entityYaw, float partialTicks, float scaleIn) {
 		GlStateManager.translatef(0, entity.getHeight(), 0);
 		float frac = (entity.ticksExisted + partialTicks) / (20f * 3.0f);
 		GlStateManager.rotatef(360f * frac, 0, 1f, 0);

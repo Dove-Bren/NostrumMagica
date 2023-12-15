@@ -299,6 +299,7 @@ public class NostrumItems {
 	@ObjectHolder(AspectedFireWeapon.ID) public static AspectedFireWeapon flameRod;
 	@ObjectHolder(AspectedPhysicalWeapon.ID) public static AspectedPhysicalWeapon deepMetalAxe;
 	@ObjectHolder(AspectedEarthWeapon.ID) public static AspectedEarthWeapon earthPike;
+	@ObjectHolder(AspectedEnderWeapon.ID) public static AspectedEnderWeapon enderRod;
 	
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -606,6 +607,7 @@ public class NostrumItems {
     	register(registry, new AspectedFireWeapon().setRegistryName(AspectedFireWeapon.ID));
     	register(registry, new AspectedPhysicalWeapon().setRegistryName(AspectedPhysicalWeapon.ID));
     	register(registry, new AspectedEarthWeapon().setRegistryName(AspectedEarthWeapon.ID));
+    	register(registry, new AspectedEnderWeapon().setRegistryName(AspectedEnderWeapon.ID));
     	
     	// Generate and register spell runes
     	{
