@@ -376,7 +376,7 @@
 	"effect.nostrummagica.steel_skin": "Steel Skin",
 	"effect.nostrummagica.soul_drain": "Soul Drain",
 	"effect.nostrummagica.soul_vampire": "Soul Vampire",
-	"effect.nostrummagica.loot_luck": "Loot Luck",
+	"effect.nostrummagica.loot_luck": "Curse of Loss",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 
@@ -432,6 +432,7 @@
 	"block.nostrummagica.toggle_logic_door": "Logic Door (Toggleable)",
 	"block.nostrummagica.trial_block": "Trial Shrine",
 	"block.nostrummagica.trigger_repeater": "Trigger Repeater",
+	"block.nostrummagica.mine_block": "Mine",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

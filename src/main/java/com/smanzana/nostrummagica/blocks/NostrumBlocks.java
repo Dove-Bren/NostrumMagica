@@ -77,6 +77,7 @@ public class NostrumBlocks {
 	@ObjectHolder(ToggleLogicDoor.ID) public static ToggleLogicDoor toggleDoor;
 	@ObjectHolder(TrialBlock.ID) public static TrialBlock trialBlock;
 	@ObjectHolder(TriggerRepeater.ID) public static TriggerRepeater triggerRepeater;
+	@ObjectHolder(MineBlock.ID) public static MineBlock mineBlock;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -244,6 +245,7 @@ public class NostrumBlocks {
     	registerBlock(new ToggleLogicDoor(), ToggleLogicDoor.ID, registry);
     	registerBlock(new TrialBlock(), TrialBlock.ID, registry);
     	registerBlock(new TriggerRepeater(), TriggerRepeater.ID, registry);
+    	registerBlock(new MineBlock(), MineBlock.ID, registry);
     }
     
 }

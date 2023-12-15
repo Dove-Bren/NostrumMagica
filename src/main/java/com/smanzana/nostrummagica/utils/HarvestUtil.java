@@ -23,6 +23,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class HarvestUtil {
@@ -139,6 +140,8 @@ public class HarvestUtil {
 		public boolean visit(World world, BlockPos pos, int depth, boolean isLeaves);
 	}
 	
+	private static final int MAX_TREE = 200;
+	
 	public static boolean WalkTree(World world, BlockPos pos, ITreeWalker walker) {
 //		Set<BlockPos> visitted = new HashSet<>();
 //		return walkTreeDepthFirst(visitted, world, pos, walker, 1);
@@ -171,6 +174,10 @@ public class HarvestUtil {
 				continue;
 			}
 			visitted.add(visit.pos);
+			
+			if (visit.depth > MAX_TREE) {
+				continue;
+			}
 			
 			BlockState state = world.getBlockState(visit.pos);
 			
@@ -292,5 +299,82 @@ public class HarvestUtil {
 //		
 //		return false;
 //	}
+	
+	private static boolean canVeinMine(BlockState state) {
+		return state != null && (
+				Tags.Blocks.ORES.contains(state.getBlock())
+					|| Tags.Blocks.STONE.contains(state.getBlock())
+				);
+	}
+	
+	private static boolean matchesVein(BlockState original, BlockState state) {
+		return state.getBlock() == original.getBlock();
+	}
+	
+	public static interface IVeinWalker {
+		/**
+		 * Visit a part of the vein.
+		 * @param world
+		 * @param pos
+		 * @param state
+		 * @return true to keep walking or false to stop
+		 */
+		public boolean visit(World world, BlockPos pos, int depth, BlockState state);
+	}
+	
+	private static final int MAX_VEIN = 20;
+	
+	public static boolean WalkVein(World world, BlockPos startPos, IVeinWalker walker) {
+		return walkVeinBreadthFirst(world, startPos, walker);
+	}
+	
+	private static boolean walkVeinBreadthFirst(World world, BlockPos startPos, IVeinWalker walker) {
+		final class NextNode {
+			public final BlockPos pos;
+			public final int depth;
+			
+			public NextNode(BlockPos pos, int depth) {
+				this.pos = pos;
+				this.depth = depth;
+			}
+		}
+		
+		Set<BlockPos> visitted = new HashSet<>();
+		List<NextNode> next = new LinkedList<>();
+		
+		next.add(new NextNode(startPos, 1));
+		boolean walked = false;
+		// Make sure to capture original state
+		final BlockState startingState = world.getBlockState(startPos);
+		
+		while (!next.isEmpty()) {
+			NextNode visit = next.remove(0);
+			if (visitted.contains(visit.pos)) {
+				continue;
+			}
+			visitted.add(visit.pos);
+			
+			if (visitted.size() > MAX_VEIN) {
+				continue;
+			}
+			
+			BlockState state = world.getBlockState(visit.pos);
+			boolean isVein = canVeinMine(state) && matchesVein(startingState, state);
+			if (isVein) {
+				if (walker.visit(world, visit.pos, visit.depth, world.getBlockState(visit.pos))) {
+					next.add(new NextNode(visit.pos.east(), visit.depth+1));
+					next.add(new NextNode(visit.pos.west(), visit.depth+1));
+					next.add(new NextNode(visit.pos.north(), visit.depth+1));
+					next.add(new NextNode(visit.pos.south(), visit.depth+1));
+					next.add(new NextNode(visit.pos.up(), visit.depth+1));
+					next.add(new NextNode(visit.pos.down(), visit.depth+1));
+				}
+				
+				walked = true;
+			}
+		}
+		
+		return walked;
+	}
 	
 }
