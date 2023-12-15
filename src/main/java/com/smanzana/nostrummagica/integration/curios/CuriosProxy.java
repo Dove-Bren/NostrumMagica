@@ -314,7 +314,7 @@ public class CuriosProxy {
 			.reference("ritual::wing_upgrade_armor_ice", "ritual.wing_upgrade_armor_ice.name")
 			.reference("ritual::wing_upgrade_armor_wind", "ritual.wing_upgrade_armor_wind.name")
 			.reference("ritual::wing_upgrade_armor_lightning", "ritual.wing_upgrade_armor_lightning.name")
-		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 2, true, new ItemStack(NostrumCurios.dragonWingPendant));
+		.build("dragon_wing_pendants", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 4, true, new ItemStack(NostrumCurios.dragonWingPendant));
 	}
 	
 	private void registerLore() {

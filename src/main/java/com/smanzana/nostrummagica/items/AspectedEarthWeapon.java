@@ -19,6 +19,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
@@ -67,6 +69,15 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 //		}
 
 		return multimap;
+	}
+	
+	@Override
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+		if (enchantment.type == EnchantmentType.WEAPON) {
+			return true;
+		}
+		
+		return super.canApplyAtEnchantingTable(stack, enchantment);
 	}
 	
 	/**

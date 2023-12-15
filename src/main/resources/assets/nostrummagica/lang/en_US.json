@@ -1186,6 +1186,11 @@
     "ritual.upgrade_dragonarmor_helm_diamond.name": "Upgrade To Diamond Dragon Helm",
 
     "ritual.warlock_sword.upgrade.travel.name": "Warlock Blade Ender Travel Upgrade",
+	
+	"ritual.spawn_sword_physical.name": "Create Deep Metal Axe",
+	"ritual.spawn_sword_earth.name": "Create Earth Pike",
+	"ritual.spawn_sword_fire.name": "Create Flame Rod",
+	"ritual.spawn_sword_ender.name": "Create Ender Rod",
 
     "ritual.construct_aether_infuser.name": "Construct Aether Infuser",
     "ritual.make_lens_spread.name": "Make Spread Lens",
@@ -1680,5 +1685,17 @@
     "research.soul_daggers.info": "Soul daggers are an especially curious weapon. They are difficult to craft, and don't boast impressive damage on their own.|  To get the most combat effectiveness out of them, one doesn't slash with them and instead stabs. The magical energies of the blade are such that they slide through the flesh and soul of the creature targetting.|  For most creatures, this means dealing decent damage (base damage + 2), applying a stun effect for a few moments, and even draining some of the creatures mana to absorb yourself.||  And yet, there are other uses of the blade as well. You are scared to think about it to much, but you can feel the capabilities of the blade in your hands. Rather than puncturing the soul for damage and mana, you wonder if there's a way to use the blade more carefully and more cleanly collect pieces of a creature's soul...|  You'll have to inspect the blade closer to find out.",
     "research.wolf_transformation.name": "Arcane Wolves",
     "research.wolf_transformation.desc": "Magical Good Boys",
-    "research.wolf_transformation.info": "The soul-piercing capabilities of the soul dagger are scary, and it's hard imagining using it on anything you care about.|  And yet... you think you have devised a way to use it to help your lovable tamed wolf pet become stronger with the use of magic!||  To transform a tamed wolf into an Arcane Wolf, you must first bring your wolf to your ritual setup and perform the Arcane Wolf Primer ritual. After doing so, your wolf will begin the first part of transforming into a powerful Arcane Wolf. This process will likely be very painful for the wolf, so act quickly.|  After performing the ritual, the wolf's essence will begin to transform, but its body will not. To prevent your wolf from dying, you must ready your soul dagger and piece through the wolf's flesh and free its soul."
+    "research.wolf_transformation.info": "The soul-piercing capabilities of the soul dagger are scary, and it's hard imagining using it on anything you care about.|  And yet... you think you have devised a way to use it to help your lovable tamed wolf pet become stronger with the use of magic!||  To transform a tamed wolf into an Arcane Wolf, you must first bring your wolf to your ritual setup and perform the Arcane Wolf Primer ritual. After doing so, your wolf will begin the first part of transforming into a powerful Arcane Wolf. This process will likely be very painful for the wolf, so act quickly.|  After performing the ritual, the wolf's essence will begin to transform, but its body will not. To prevent your wolf from dying, you must ready your soul dagger and piece through the wolf's flesh and free its soul.",
+	"research.sword_fire.name": "Flame Rods",
+	"research.sword_fire.desc": "Soul Fire Magic",
+	"research.sword_fire.info": "By combining a fire-enchanted mage blade with some gold and a blaze rod, you've created designs for a Flame Rod!|  This rod can be charged up and then released to inflict distant enemies with a damaging Soul Drain effect.|  You suspect the tool could be even more useful with a set True Lava armor...",
+	"research.sword_earth.name": "Earth Pikes",
+	"research.sword_earth.desc": "Digging, Stabbing",
+	"research.sword_earth.info": "You've crafted designs for a truly versatile tool. The Earth pike acts as a pickaxe and an axe, and boast good damage as well.|  You suspect the tool could be even more useful with a set of True Tremor armor...",
+	"research.sword_physical.name": "Deep Metal Axe",
+	"research.sword_physical.desc": "Clang!",
+	"research.sword_physical.info": "Mage blades are cool,  but not quite as cool as using a huge axe!|  The Deep Metal Axe acts as a heavy damaging weapon all by itself. Additionally, you can block with the axe! By blocking blows with it and then retaliating quickly after blocking, you can apply a armor-reducing Rend status affect to enemies!|  You suspect the axe would be even more useful with a True Deep Metal set of armor...",
+	"research.sword_ender.name": "Ender Rod",
+	"research.sword_ender.desc": "Great balls of Ender!",
+	"research.sword_ender.info": "By enhancing a mage blade enchanted with ender, you've created a magic rod. When charged up, the rod can create a point of ender energy at a distant location. Striking an enemy or right-clicking on an entity aftere doing so will teleport them to the ball of ender energy!|  You suspect the tool could be even more useful with a set of True Ender armor..."
 }

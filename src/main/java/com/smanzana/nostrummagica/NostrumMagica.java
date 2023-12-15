@@ -127,6 +127,7 @@ import com.smanzana.nostrummagica.trials.TrialPhysical;
 import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.trials.WorldTrial;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
@@ -1085,6 +1086,54 @@ public class NostrumMagica {
 								},
 						new RRequirementResearch("mage_blade"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.mageBlade))));
+		
+		registry.register(RitualRecipe.createTier3("spawn_sword_fire", new ItemStack(NostrumItems.flameRod),
+				EMagicElement.FIRE, new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.MANI_DUST,
+						ReagentType.SKY_ASH, ReagentType.BLACK_PEARL },
+				Ingredients.MatchMageBlade(EMagicElement.FIRE),
+				new Ingredient[] { Ingredient.EMPTY,
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(Tags.Items.RODS_BLAZE),
+						Ingredient.EMPTY
+						},
+				new RRequirementResearch("sword_fire"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.flameRod))));
+		
+		registry.register(RitualRecipe.createTier3("spawn_sword_ender", new ItemStack(NostrumItems.enderRod),
+				EMagicElement.ENDER, new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.MANI_DUST,
+						ReagentType.SKY_ASH, ReagentType.BLACK_PEARL },
+				Ingredients.MatchMageBlade(EMagicElement.ENDER),
+				new Ingredient[] { Ingredient.EMPTY,
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromItems(Items.END_ROD),
+						Ingredient.EMPTY
+						},
+				new RRequirementResearch("sword_ender"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.enderRod))));
+		
+		registry.register(RitualRecipe.createTier3("spawn_sword_earth", new ItemStack(NostrumItems.earthPike),
+				EMagicElement.EARTH, new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.MANI_DUST,
+						ReagentType.SKY_ASH, ReagentType.BLACK_PEARL },
+				Ingredients.MatchMageBlade(EMagicElement.EARTH),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.OBSIDIAN),
+						Ingredient.fromItems(Items.DIAMOND_SHOVEL),
+						Ingredient.fromItems(Items.DIAMOND_PICKAXE),
+						Ingredient.EMPTY
+						},
+				new RRequirementResearch("sword_earth"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.earthPike))));
+		
+		registry.register(RitualRecipe.createTier3("spawn_sword_physical", new ItemStack(NostrumItems.deepMetalAxe),
+				null, new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.MANI_DUST,
+						ReagentType.SKY_ASH, ReagentType.BLACK_PEARL },
+				Ingredients.MatchMageBlade(EMagicElement.PHYSICAL),
+				new Ingredient[] { Ingredient.EMPTY,
+						Ingredient.fromItems(Items.DIAMOND_AXE),
+						Ingredient.fromItems(Items.SHULKER_SHELL),
+						Ingredient.EMPTY
+						},
+				new RRequirementResearch("sword_physical"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.deepMetalAxe))));
 
 		registry.register(RitualRecipe.createTier3("create_seeking_gem",
 				new ItemStack(NostrumItems.resourceSeekingGem), null,
@@ -2099,6 +2148,22 @@ public class NostrumMagica {
 				.reference("ritual::spawn_mage_blade", "ritual.spawn_mage_blade.name").build("mage_blade",
 				NostrumResearchTab.OUTFITTING, Size.LARGE, 0, 1, true, new ItemStack(NostrumItems.mageBlade));
 
+		NostrumResearch.startBuilding().hiddenParent("mage_blade").hiddenParent("enchanted_armor_adv")
+				.reference("ritual::spawn_sword_fire", "ritual.spawn_sword_fire.name").build("sword_fire",
+				NostrumResearchTab.OUTFITTING, Size.NORMAL, 1, 3, true, new ItemStack(NostrumItems.flameRod));
+		
+		NostrumResearch.startBuilding().hiddenParent("mage_blade").hiddenParent("enchanted_armor_adv")
+			.reference("ritual::spawn_sword_earth", "ritual.spawn_sword_earth.name").build("sword_earth",
+			NostrumResearchTab.OUTFITTING, Size.NORMAL, 2, 3, true, new ItemStack(NostrumItems.earthPike));
+		
+		NostrumResearch.startBuilding().hiddenParent("mage_blade").hiddenParent("enchanted_armor_adv")
+			.reference("ritual::spawn_sword_ender", "ritual.spawn_sword_ender.name").build("sword_ender",
+			NostrumResearchTab.OUTFITTING, Size.NORMAL, 1, 4, true, new ItemStack(NostrumItems.enderRod));
+		
+		NostrumResearch.startBuilding().hiddenParent("mage_blade").hiddenParent("enchanted_armor_adv")
+			.reference("ritual::spawn_sword_physical", "ritual.spawn_sword_physical.name").build("sword_physical",
+			NostrumResearchTab.OUTFITTING, Size.NORMAL, 2, 4, true, new ItemStack(NostrumItems.deepMetalAxe));
+
 		NostrumResearch.startBuilding().parent("enchanted_armor")
 				.reference("ritual::spawn_enchanted_weapon", "ritual.spawn_enchanted_weapon.name")
 				.build("enchanted_weapons", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 1, true,
@@ -2112,12 +2177,12 @@ public class NostrumMagica {
 		NostrumResearch.startBuilding().parent("enchanted_armor").hiddenParent("kind_infusion")
 				.hiddenParent("fierce_infusion")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
-				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 2, true,
+				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true,
 						new ItemStack(MagicArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, MagicArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").lore(EntityTameDragonRed.TameRedDragonLore.instance())
 				.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
-				.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true,
+				.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -2, 4, true,
 						new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").parent(curios.isEnabled() ? "belts" : "origin")

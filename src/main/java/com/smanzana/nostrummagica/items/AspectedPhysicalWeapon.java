@@ -15,7 +15,10 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,6 +39,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,7 +51,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	public static final String ID = "sword_physical";
 	
 	public AspectedPhysicalWeapon() {
-		super(ItemTier.DIAMOND, 6, -3.0F, NostrumItems.PropEquipment().maxDamage(1240));
+		super(ItemTier.DIAMOND, 6, -3.0F, NostrumItems.PropEquipment().maxDamage(1240).addToolType(ToolType.AXE, 3));
 		
 		this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
 			@OnlyIn(Dist.CLIENT)
@@ -58,9 +62,24 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
+	public float getDestroySpeed(ItemStack stack, BlockState state) {
+		if (getToolTypes(stack).stream().anyMatch(e -> state.isToolEffective(e))) return 8.0f; // diamond level
+		return 1.0f;
+	}
+	
+	@Override
 	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		return super.getAttributeModifiers(equipmentSlot);
     }
+	
+	@Override
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+		if (enchantment.type == EnchantmentType.DIGGER) {
+			return true;
+		}
+		
+		return super.canApplyAtEnchantingTable(stack, enchantment);
+	}
 	
 	@Override
 	public String getLoreKey() {
