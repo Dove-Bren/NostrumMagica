@@ -2102,7 +2102,13 @@ public class SpellAction {
 			
 			if (target instanceof EndermanEntity || target instanceof EndermiteEntity
 					|| target instanceof EntityDragon) {
-				ender = true;
+				// Ender status and immunity can be turned off with the disrupt status effect
+				EffectInstance effect = target.getActivePotionEffect(NostrumEffects.disruption);
+				if (effect != null && effect.getDuration() > 0) {
+					ender = false;
+				} else {
+					ender = true;
+				}
 			} else {
 				ender = false;
 			}
