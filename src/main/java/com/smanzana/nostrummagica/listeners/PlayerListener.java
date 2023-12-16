@@ -25,9 +25,9 @@ import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
-import com.smanzana.nostrummagica.items.MagicArmor;
-import com.smanzana.nostrummagica.items.IReactiveEquipment;
 import com.smanzana.nostrummagica.items.HookshotItem;
+import com.smanzana.nostrummagica.items.IReactiveEquipment;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -1115,6 +1115,24 @@ public class PlayerListener {
 					break;
 				} else if (leftover != xp) {
 					xp = leftover;
+				}
+			}
+			// Possibly use baubles
+			IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
+			if (xp != 0)	
+			if (baubles != null) {
+				for (int i = 0; i < baubles.getSizeInventory(); i++) {
+					ItemStack equip = baubles.getStackInSlot(i);
+					if (equip.isEmpty()) {
+						continue;
+					}
+					
+					int leftover = tryThanos(player, equip, xp);
+					if (leftover == 0) {
+						break;
+					} else if (leftover != xp) {
+						xp = leftover;
+					}
 				}
 			}
 			if (xp != 0)
