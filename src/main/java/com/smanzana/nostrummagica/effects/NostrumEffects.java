@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.potion.Effect;
 import net.minecraftforge.event.RegistryEvent;
@@ -37,6 +38,13 @@ public class NostrumEffects {
 	@ObjectHolder(SoulDrainEffect.ID) public static SoulDrainEffect soulDrain;
 	@ObjectHolder(SoulVampireEffect.ID) public static SoulVampireEffect soulVampire;
 	@ObjectHolder(LootLuckEffect.ID) public static LootLuckEffect lootLuck;
+	@ObjectHolder(ElementalEnchantEffect.ID_EARTH) public static ElementalEnchantEffect enchantEarth;
+	@ObjectHolder(ElementalEnchantEffect.ID_ENDER) public static ElementalEnchantEffect enchantEnder;
+	@ObjectHolder(ElementalEnchantEffect.ID_FIRE) public static ElementalEnchantEffect enchantFire;
+	@ObjectHolder(ElementalEnchantEffect.ID_ICE) public static ElementalEnchantEffect enchantIce;
+	@ObjectHolder(ElementalEnchantEffect.ID_LIGHTNING) public static ElementalEnchantEffect enchantLightning;
+	@ObjectHolder(ElementalEnchantEffect.ID_PHYSICAL) public static ElementalEnchantEffect enchantPhysical;
+	@ObjectHolder(ElementalEnchantEffect.ID_WIND) public static ElementalEnchantEffect enchantWind;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -66,5 +74,12 @@ public class NostrumEffects {
     	registry.register(new SoulDrainEffect().setRegistryName(SoulDrainEffect.ID));
     	registry.register(new SoulVampireEffect().setRegistryName(SoulVampireEffect.ID));
     	registry.register(new LootLuckEffect().setRegistryName(LootLuckEffect.ID));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.EARTH).setRegistryName(ElementalEnchantEffect.ID_EARTH));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.ENDER).setRegistryName(ElementalEnchantEffect.ID_ENDER));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.FIRE).setRegistryName(ElementalEnchantEffect.ID_FIRE));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.ICE).setRegistryName(ElementalEnchantEffect.ID_ICE));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.LIGHTNING).setRegistryName(ElementalEnchantEffect.ID_LIGHTNING));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.PHYSICAL).setRegistryName(ElementalEnchantEffect.ID_PHYSICAL));
+    	registry.register(new ElementalEnchantEffect(EMagicElement.WIND).setRegistryName(ElementalEnchantEffect.ID_WIND));
     }
 }

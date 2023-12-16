@@ -377,6 +377,14 @@
 	"effect.nostrummagica.soul_drain": "Soul Drain",
 	"effect.nostrummagica.soul_vampire": "Soul Vampire",
 	"effect.nostrummagica.loot_luck": "Curse of Loss",
+	
+	"effect.nostrummagica.enchant_earth": "Earth Enchantment",
+	"effect.nostrummagica.enchant_ender": "Ender Enchantment",
+	"effect.nostrummagica.enchant_fire": "Fire Enchantment",
+	"effect.nostrummagica.enchant_ice": "Ice Enchantment",
+	"effect.nostrummagica.enchant_lightning": "Lightning Enchantment",
+	"effect.nostrummagica.enchant_physical": "Physical Enchantment",
+	"effect.nostrummagica.enchant_wind": "Wind Enchantment",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 

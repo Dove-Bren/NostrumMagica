@@ -180,7 +180,11 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 
 	@Override
 	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
-		int count = (int) Math.pow(2, power - 1);
-		return new Result(true, InfusedGemItem.getGem(element, count));
+		if (this.element == EMagicElement.PHYSICAL || this.element == null) {
+			int count = (int) Math.pow(2, power - 1);
+			return new Result(true, InfusedGemItem.getGem(element, count));
+		} else {
+			return new Result(false);
+		}
 	}
 }

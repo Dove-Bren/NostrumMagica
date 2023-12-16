@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.effects.ElementalEnchantEffect;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -1299,15 +1300,12 @@ public class SpellAction {
 				offhand = true;
 			}
 			
-			if (inhand.isEmpty())
-				return false;
-
 			ItemStack addedItem = ItemStack.EMPTY;
 			boolean didEmpower = false;
 			boolean consumeInput = false;
 			
 			// Main hand attempt
-			if (inhand != null) {
+			if (!inhand.isEmpty()) {
 				Item item = inhand.getItem();
 				if (item instanceof IEnchantableItem) {
 					IEnchantableItem.Result result = ((IEnchantableItem) item).attemptEnchant(inhand, entity, element, level);
@@ -1329,7 +1327,7 @@ public class SpellAction {
 			}
 			
 			if (addedItem.isEmpty() && !didEmpower) {
-				NostrumMagicaSounds.CAST_FAIL.play(entity);
+				//NostrumMagicaSounds.CAST_FAIL.play(entity);
 			} else {
 				if (entity instanceof PlayerEntity) {
 					PlayerEntity p = (PlayerEntity) entity;
@@ -1358,6 +1356,9 @@ public class SpellAction {
 				}
 				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
 			}
+			
+			// Apply enchant effect
+			entity.addPotionEffect(new EffectInstance(ElementalEnchantEffect.GetForElement(this.element), (int) (20 * 15 * efficiency), level-1));
 			return true;
 			
 		}
