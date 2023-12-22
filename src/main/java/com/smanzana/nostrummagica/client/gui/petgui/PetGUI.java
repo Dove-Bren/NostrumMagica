@@ -163,7 +163,7 @@ public class PetGUI {
 				PetGUI.register(container, key);
 				return container;
 			}, (buffer) -> {
-				buffer.writeUniqueId(pet.getUniqueID());
+				buffer.writeUniqueId(pet.getPetID());
 				buffer.writeVarInt(key);
 				buffer.writeVarInt(sheets.length);
 			});

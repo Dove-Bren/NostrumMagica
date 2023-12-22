@@ -1951,4 +1951,9 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	public CompoundNBT serializeNBT() {
 		return super.serializeNBT();
 	}
+
+	@Override
+	public UUID getPetID() {
+		return this.getUniqueID();
+	}
 }

@@ -1088,6 +1088,24 @@ public class SpellAction {
 			return true;			
 		}
 		
+		protected BlockPos adjustPosition(World world, BlockPos pos) {
+			// Try to avoid putting people in walls or in the flow
+			if (world.isAirBlock(pos)) {
+				return pos;
+			}
+			
+			for (BlockPos attempt : new BlockPos[] {
+				pos.up(), pos.north(), pos.east(), pos.south(), pos.west(), pos.down() 
+			}) {
+				if (world.isAirBlock(attempt)) {
+					return attempt;
+				}
+			}
+			
+			// Is air block and all a round is, too. Go with original?
+			return pos;
+		}
+		
 		@Override
 		public boolean apply(LivingEntity caster, World world, BlockPos pos, float efficiency) {
 			// Can be disabled via disruption effect
@@ -1100,7 +1118,8 @@ public class SpellAction {
 				return false;
 			}
 			
-			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			pos = adjustPosition(world, pos);
+			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 			caster.fallDistance = 0;
 			return true;
 		}

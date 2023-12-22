@@ -21,7 +21,7 @@ public interface IEntityPet extends ITameableEntity {
 	
 	default public void onStopCommand() { if (this instanceof MobEntity) ((MobEntity) this).setAttackTarget(null); };
 	
-	public UUID getUniqueID();
+	public UUID getPetID();
 	
 	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player);
 	

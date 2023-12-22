@@ -616,7 +616,10 @@ public class NostrumEmptyDimension {
 		
 		@SubscribeEvent
 		public void onMobGrief(EntityMobGriefingEvent event) {
-			if (event.getEntity().world.getDimension().getType() == dim) {
+			if (event.getEntity() != null
+					&& event.getEntity().world != null
+					&& event.getEntity().world.getDimension() != null
+					&& event.getEntity().world.getDimension().getType() == dim) {
 				event.setResult(Result.DENY);
 			}
 		}

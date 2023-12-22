@@ -2546,5 +2546,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	public CompoundNBT serializeNBT() {
 		return super.serializeNBT();
 	}
+
+	@Override
+	public UUID getPetID() {
+		return this.getUniqueID();
+	}
 	
 }

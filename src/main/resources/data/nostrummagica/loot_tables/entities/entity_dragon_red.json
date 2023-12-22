@@ -22,6 +22,15 @@
                             }
                         }
                     ],
+                    "name": "nostrummagica:dragon_wing"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
                     "name": "nostrummagica:dragon_egg_part"
                 }
             ]
