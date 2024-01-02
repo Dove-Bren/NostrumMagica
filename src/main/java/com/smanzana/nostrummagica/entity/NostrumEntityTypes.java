@@ -134,7 +134,7 @@ public class NostrumEntityTypes {
 			.build("");
 		tameDragonType.setRegistryName(EntityTameDragonRed.ID);
 		registry.register(tameDragonType);
-		addSpawn(tameDragonType, EntityClassification.MONSTER, 2, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		addSpawn(tameDragonType, EntityClassification.MONSTER, 4, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
 		EntitySpawnPlacementRegistry.register(tameDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ZombiePigmanEntity::func_223324_d);
 		
 		EntityType<EntityShadowDragonRed> shadowRedDragonType = EntityType.Builder.<EntityShadowDragonRed>create(EntityShadowDragonRed::new, EntityClassification.MONSTER)
@@ -144,7 +144,7 @@ public class NostrumEntityTypes {
 			.build("");
 		shadowRedDragonType.setRegistryName(EntityShadowDragonRed.ID);
 		registry.register(shadowRedDragonType);
-		addSpawn(shadowRedDragonType, EntityClassification.MONSTER, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		addSpawn(shadowRedDragonType, EntityClassification.MONSTER, 15, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
 		EntitySpawnPlacementRegistry.register(shadowRedDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ZombiePigmanEntity::func_223324_d);
 		
 		registry.register(EntityType.Builder.<EntityDragonEgg>create(EntityDragonEgg::new, EntityClassification.MISC)
@@ -174,7 +174,7 @@ public class NostrumEntityTypes {
 			.build("");
 		spriteType.setRegistryName(EntitySprite.ID);
 		registry.register(spriteType);
-		addSpawn(spriteType, EntityClassification.MONSTER, 3, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
+		addSpawn(spriteType, EntityClassification.MONSTER, 15, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
 		addSpawn(spriteType, EntityClassification.MONSTER, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
 		EntitySpawnPlacementRegistry.register(spriteType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		
