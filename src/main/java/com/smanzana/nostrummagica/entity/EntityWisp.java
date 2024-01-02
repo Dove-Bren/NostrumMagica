@@ -927,6 +927,20 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 
 	@Override
 	public boolean attemptEnchant(Entity entity, EMagicElement element, int power) {
+		@Nullable EntityType<?> specialType = getSpecialTransformType(this.getElement(), element);
+		if (specialType != null) {
+			// Transform into the given entity
+			Entity ent = specialType.create(world);
+			ent.copyLocationAndAnglesFrom(this);
+			if (this.hasCustomName()) {
+				ent.setCustomName(this.getCustomName());
+				ent.setCustomNameVisible(this.isCustomNameVisible());
+			}
+			world.addEntity(ent);
+			this.remove();
+			return true;
+		}
+		
 		if (element == this.getElement()) {
 			// Get a buff
 			this.addPotionEffect(new EffectInstance(NostrumEffects.magicBoost, 20 * 30, Math.max(0, power - 1)));
@@ -934,5 +948,19 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			this.setElement(element);
 		}
 		return true;
+	}
+	
+	protected static @Nullable EntityType<?> getSpecialTransformType(EMagicElement from, EMagicElement to) {
+		// Fire -> Ender = Sprite
+		if (EMagicElement.FIRE == from && EMagicElement.ENDER == to) {
+			return NostrumEntityTypes.sprite;
+		}
+		
+		// Earth -> Wind = Lux
+		if (EMagicElement.EARTH == from && EMagicElement.WIND == to) {
+			return NostrumEntityTypes.lux;
+		}
+		
+		return null;
 	}
 }
