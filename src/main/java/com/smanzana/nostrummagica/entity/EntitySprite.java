@@ -82,6 +82,7 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
         effectCooldown = 20 * 5;
+        this.experienceValue = 10;
     }
 
     @Override

@@ -109,6 +109,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.moveController = new WispMoveHelper(this);
+		this.experienceValue = 20;
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}

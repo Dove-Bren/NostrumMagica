@@ -100,6 +100,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.moveController = new WispMoveHelper(this);
+		this.experienceValue = 5;
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 		perilTicks = 0;
@@ -110,6 +111,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		this(type, worldIn);
 		this.setHomePosAndDistance(homePos, (int) MAX_WISP_DISTANCE_SQ);
 		this.setHome(homePos);
+		this.experienceValue = 0;
 	}
 	
 	protected void registerGoals() {
