@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.effects.ElementalEnchantEffect;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.IEnchantableEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
@@ -1302,6 +1303,11 @@ public class SpellAction {
 		
 		@Override
 		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
+			// If entity is special enchantable entity, try to use that
+			if (entity instanceof IEnchantableEntity && ((IEnchantableEntity) entity).canEnchant(entity, element, level)) {
+				return ((IEnchantableEntity) entity).attemptEnchant(entity, element, level);
+			}
+			
 			// Different effect if non-player casts: just give magic buff
 			if (!(caster instanceof PlayerEntity)) {
 				int count = level + 1;

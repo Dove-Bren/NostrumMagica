@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.entity;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -14,6 +16,7 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIStayHomeTask;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.items.EssenceItem;
@@ -57,6 +60,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -76,7 +80,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityWisp extends GolemEntity implements ILoreSupplier {
+public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantableEntity {
 	
 	public static final String ID = "entity_wisp";
 	
@@ -87,10 +91,10 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 	public static final String LoreKey = "nostrum__wisp";
 	
 	private int idleCooldown;
-	private Spell defaultSpell;
-	private @Nullable Spell lastSpell;
 	private int perilTicks;
 	private @Nullable BlockPos perilLoc;
+
+	private Spell defaultSpell;
 	
 	public EntityWisp(EntityType<? extends EntityWisp> type, World worldIn) {
 		super(type, worldIn);
@@ -99,6 +103,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 		perilTicks = 0;
+		this.pickElement();
 	}
 	
 	public EntityWisp(EntityType<? extends EntityWisp> type, World worldIn, BlockPos homePos) {
@@ -413,24 +418,27 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 		return this.dataManager.get(ELEMENT);
 	}
 	
+	protected void setElement(EMagicElement element) {
+		this.dataManager.set(ELEMENT, element);
+	}
+	
+	protected void pickElement() {
+		// Pick a random element
+		EMagicElement elem = EMagicElement.getRandom(getRNG());
+		this.setElement(elem);
+	}
+	
+	protected Spell getDefaultSpell() {
+		init();
+		return getRandSpell(getRNG(), this.getElement());
+	}
+	
 	protected Spell getSpellToUse() {
-		@Nullable Spell spell = null;
-		
-		if (spell == null) {
-			// Use a random spell
-			init();
-			if (this.defaultSpell == null) {
-				this.defaultSpell = defaultSpells.get(rand.nextInt(defaultSpells.size()));
-				this.dataManager.set(ELEMENT, defaultSpell.getPrimaryElement());
-			}
-			
-			spell = this.defaultSpell;
+		if (this.defaultSpell == null || this.defaultSpell.getPrimaryElement() != this.getElement()) {
+			this.defaultSpell = getDefaultSpell();
 		}
 		
-		if (spell != lastSpell) {
-			lastSpell = spell;
-			this.dataManager.set(ELEMENT, spell.getPrimaryElement());
-		}
+		Spell spell = this.defaultSpell;
 		
 		return spell;
 	}
@@ -639,7 +647,26 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 		}
 	}
 	
-	private static List<Spell> defaultSpells;
+	private static Map<EMagicElement, List<Spell>> defaultSpells;
+	
+	private static @Nullable Spell getRandSpell(Random rand, EMagicElement element) {
+		List<Spell> list = defaultSpells.get(element);
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
+		
+		return list.get(rand.nextInt(list.size()));
+	}
+	
+	private static void putSpell(Spell spell, EMagicElement element) {
+		List<Spell> list = defaultSpells.get(element);
+		if (list == null) {
+			list = new ArrayList<>();
+			defaultSpells.put(element, list);
+		}
+		
+		list.add(spell);
+	}
 	
 	private static void putSpell(String name,
 			SpellTrigger trigger,
@@ -651,12 +678,12 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 		spell.addPart(new SpellPart(trigger));
 		spell.addPart(new SpellPart(shape, element, power, alteration));
 		
-		defaultSpells.add(spell);
+		putSpell(spell, element);
 	}
 	
 	private static void init() {
 		if (defaultSpells == null) {
-			defaultSpells = new ArrayList<>();
+			defaultSpells = new EnumMap<>(EMagicElement.class);
 			
 			Spell spell;
 			
@@ -762,7 +789,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 					1, EAlteration.INFLICT));
 			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE,
 					1, null));
-			defaultSpells.add(spell);
+			putSpell(spell, EMagicElement.ICE);
 //			putSpell("Magic Aegis",
 //					SelfTrigger.instance(),
 //					SingleShape.instance(),
@@ -891,5 +918,21 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier {
 //					1,
 //					EAlteration.CONJURE);
 		}
+	}
+
+	@Override
+	public boolean canEnchant(Entity entity, EMagicElement element, int power) {
+		return true;
+	}
+
+	@Override
+	public boolean attemptEnchant(Entity entity, EMagicElement element, int power) {
+		if (element == this.getElement()) {
+			// Get a buff
+			this.addPotionEffect(new EffectInstance(NostrumEffects.magicBoost, 20 * 30, Math.max(0, power - 1)));
+		} else {
+			this.setElement(element);
+		}
+		return true;
 	}
 }
