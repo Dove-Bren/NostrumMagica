@@ -22,7 +22,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class MagicCutterTrigger extends SpellTrigger {
@@ -30,13 +30,13 @@ public class MagicCutterTrigger extends SpellTrigger {
 	public class MagicCutterTriggerInstance extends SpellTrigger.SpellTriggerInstance implements ISpellSaucerTrigger {
 
 		private World world;
-		private Vec3d pos;
+		private Vector3d pos;
 		private float pitch;
 		private float yaw;
 		private boolean piercing;
 		private int trips;
 		
-		public MagicCutterTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean piercing, int trips) {
+		public MagicCutterTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean piercing, int trips) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -50,11 +50,11 @@ public class MagicCutterTrigger extends SpellTrigger {
 		public void init(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
-			final Vec3d dir;
+			final Vector3d dir;
 			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
 				dir = ent.getAttackTarget().getPositionVector().add(0.0, ent.getHeight() / 2.0, 0.0)
-						.subtract(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
+						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
 			} else {
 				dir = MagicCutterTrigger.getVectorForRotation(pitch, yaw);
 			}
@@ -122,7 +122,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartParam params) {
 		// We use param's flip to indicate whether we should be piercing or not
 		boolean piercing = false;
 		if (params != null)
@@ -132,17 +132,17 @@ public class MagicCutterTrigger extends SpellTrigger {
 			trips = Math.max(1, (int) params.level);
 		
 		// Add direction
-		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new MagicCutterTriggerInstance(state, world, pos, pitch, yaw, piercing, trips);
 	}
 
 	// Copied from vanilla entity class
-	public static final Vec3d getVectorForRotation(float pitch, float yaw) {
+	public static final Vector3d getVectorForRotation(float pitch, float yaw) {
         float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-pitch * 0.017453292F);
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
 
 	@Override

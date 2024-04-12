@@ -28,7 +28,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -45,7 +45,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -241,7 +241,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 
 		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
 			double amt = typeScale(this.type)* .1;
-			multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -349,7 +349,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		Vec3d dir = playerIn.getLookVec();
+		Vector3d dir = playerIn.getLookVec();
 		dir = dir.add(0, -dir.y, 0).normalize();
 		
 		ItemStack itemStackIn = playerIn.getHeldItem(hand);
@@ -375,7 +375,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 //					cloud.getMotion().y = dir.y;
 //					cloud.getMotion().z = dir.z;
 					
-					spawnIceCloud(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, this.type);
+					spawnIceCloud(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
 					
 					ItemStacks.damageItem(itemStackIn, playerIn, hand, 2);
 				}
@@ -388,7 +388,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				if (playerIn.isSneaking()) {
 					if (!worldIn.isRemote) {
-						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, this.type);
+						spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
 						ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 					}
 					playerIn.resetCooldown();
@@ -415,7 +415,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 							final float maxDist = 50;
 							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
+								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -440,17 +440,17 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		final World worldIn = context.getWorld();
 		final PlayerEntity playerIn = context.getPlayer();
 		final BlockPos pos = context.getPos();
-		Vec3d hitVec = context.getHitVec();
+		Vector3d hitVec = context.getHitVec();
 		ItemStack stack = context.getItem();
 		final Hand hand = context.getHand();
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-			Vec3d dir = hitVec.subtract(playerIn.getPositionVector());
+			Vector3d dir = hitVec.subtract(playerIn.getPositionVector());
 			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
 				if (playerIn.isSneaking()) {
 					if (!worldIn.isRemote) {
-						spawnWalkingVortex(worldIn, playerIn, new Vec3d(playerIn.posX + dir.x, playerIn.posY + .75, playerIn.posZ + dir.z), dir, this.type);
+						spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
 						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
 					playerIn.resetCooldown();
@@ -458,7 +458,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				}
 			} else if (element == EMagicElement.ICE) {
 				if (!worldIn.isRemote) { 
-					spawnIceCloud(worldIn, playerIn, new Vec3d(pos.getX() + hitVec.x, pos.getY() + 1, pos.getZ() + hitVec.z), dir, this.type);
+					spawnIceCloud(worldIn, playerIn, new Vector3d(pos.getX() + hitVec.x, pos.getY() + 1, pos.getZ() + hitVec.z), dir, this.type);
 					ItemStacks.damageItem(stack, playerIn, hand, 2);
 				}
 				playerIn.resetCooldown();
@@ -481,7 +481,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 							final float maxDist = 50;
 							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
+								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -501,7 +501,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		
 	}
 	
-	protected static void spawnIceCloud(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
+	protected static void spawnIceCloud(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
@@ -524,7 +524,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setMotion(direction);
 	}
 	
-	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vec3d at, Vec3d direction, Type weaponType) {
+	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
 		final int hurricaneCount = MagicArmor.GetSetCount(caster, EMagicElement.WIND, MagicArmor.Type.TRUE);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
@@ -542,7 +542,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				cloud.addTime(1, false);
 				
 				// Move in direction of player look
-				Vec3d lookDir = Vec3d.fromPitchYaw(0, entity.rotationYaw).scale(5f/(3f * 20f)); // 5 blocks over 10 seconds;
+				Vector3d lookDir = Vector3d.fromPitchYaw(0, entity.rotationYaw).scale(5f/(3f * 20f)); // 5 blocks over 10 seconds;
 				cloud.setWaddle(lookDir, 2);
 				entity.getLookVec();
 				
@@ -560,15 +560,15 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			final int period = 20;
 			final float prog = ((float) (entity.ticksExisted % period) / (float) period);
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
-			final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
-			final Vec3d diff = target.subtract(entity.getPositionVector());
+			final Vector3d target = new Vector3d(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
+			final Vector3d diff = target.subtract(entity.getPositionVector());
 			entity.setMotion(diff.x / 2,
 					diff.y / 2,
 					diff.z / 2
 					);
 			entity.velocityChanged = true;
-			//entity.posY = 2 + dy;
-			//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+			//entity.getPosY() = 2 + dy;
+			//entity.setPositionAndUpdate(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
 			
 			// Hurricane vortexes also deal damage to non-friendlies!
 			if (hurricaneCount >= 4 && entity.ticksExisted % 15 == 0) {
@@ -581,7 +581,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					
 					 NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(
 							 10,
-							 living.posX, entity.posY + entity.getHeight()/2f, entity.posZ, entity.getWidth() * 2,
+							 living.getPosX(), entity.getPosY() + entity.getHeight()/2f, entity.getPosZ(), entity.getWidth() * 2,
 							 10, 5,
 							 living.getEntityId())
 							 .color(EMagicElement.WIND.getColor()));
@@ -611,7 +611,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setMotion(direction);
 	}
 	
-	public static void spawnJumpVortex(World world, PlayerEntity caster, Vec3d at, Type weaponType) {
+	public static void spawnJumpVortex(World world, PlayerEntity caster, Vector3d at, Type weaponType) {
 		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
@@ -659,7 +659,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		}
 		
 		((ServerWorld)entity.world).addLightningBolt(
-				new NostrumTameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.posX, entity.posY, entity.posZ)
+				new NostrumTameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ())
 				);
 		attr.addMana(-30);
 		if (entity instanceof PlayerEntity) {
@@ -668,7 +668,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		return true;
 	}
 	
-	protected static boolean summonBoltAtTarget(LivingEntity caster, World world, Vec3d pos) {
+	protected static boolean summonBoltAtTarget(LivingEntity caster, World world, Vector3d pos) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		if (attr == null || attr.getMana() < 30) {
 			return false;
@@ -744,7 +744,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
         return false;
 	}
 	
-	public static void spawnWhirlwindParticle(World world, int count, Vec3d pos, EntityAreaEffect cloud, int color, float gravity) {
+	public static void spawnWhirlwindParticle(World world, int count, Vector3d pos, EntityAreaEffect cloud, int color, float gravity) {
 		NostrumParticles.GLOW_ORB.spawn(world, new NostrumParticles.SpawnParams(count, pos.x, pos.y, pos.z,
 				cloud.getRadius(),
 				cloud.getRemainingTicks() / 4, 20,

@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +36,7 @@ public class EntitySwitchTrigger extends MobEntity {
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1D);
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1D);
 	}
 	
 	

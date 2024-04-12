@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -190,7 +190,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	public void tick() {
 		super.tick();
 		
-		//System.out.println("(" + this.posX + ", " + this.posZ + ")");
+		//System.out.println("(" + this.getPosX() + ", " + this.getPosZ() + ")");
 		
 		long now = System.currentTimeMillis();
 		if (isFlightTransitioning()) {
@@ -226,7 +226,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-		this.getAttributes().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
+		this.getAttributes().registerAttribute(Attributes.FLYING_SPEED);
 	}
 
 }

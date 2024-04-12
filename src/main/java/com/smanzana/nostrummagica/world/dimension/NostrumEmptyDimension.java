@@ -27,7 +27,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.Teleporter;
@@ -40,7 +40,7 @@ import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
@@ -99,15 +99,15 @@ public class NostrumEmptyDimension {
 		
 		protected static final Map<DimensionType, DimensionListener> listeners = new HashMap<>();
 		
-		protected Vec3d skyColor;
-		protected Vec3d fogColor;
+		protected Vector3d skyColor;
+		protected Vector3d fogColor;
 		
 		public EmptyDimension(World worldIn, DimensionType typeIn) {
 			super(worldIn, typeIn);
 			
 			this.nether = false;
-			this.skyColor = new Vec3d(.2D, 0D, .2D);
-			fogColor = new Vec3d(.2, .2, .2);
+			this.skyColor = new Vector3d(.2D, 0D, .2D);
+			fogColor = new Vector3d(.2, .2, .2);
 			
 			if (!listeners.containsKey(typeIn)) {
 				listeners.put(typeIn, new DimensionListener(typeIn));
@@ -166,7 +166,7 @@ public class NostrumEmptyDimension {
 		
 		@OnlyIn(Dist.CLIENT)
 		@Override
-		public Vec3d getSkyColor(BlockPos cameraPos, float partialTicks) {
+		public Vector3d getSkyColor(BlockPos cameraPos, float partialTicks) {
 			return skyColor;
 		}
 		
@@ -196,8 +196,8 @@ public class NostrumEmptyDimension {
 		
 		@OnlyIn(Dist.CLIENT)
 		@Override
-		public Vec3d getFogColor(float p_76562_1_, float p_76562_2_) {
-			fogColor = new Vec3d(.1, 0, .1);
+		public Vector3d getFogColor(float p_76562_1_, float p_76562_2_) {
+			fogColor = new Vector3d(.1, 0, .1);
 			return fogColor;
 		}
 		
@@ -209,7 +209,7 @@ public class NostrumEmptyDimension {
 			for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers()) {
 				
 				// Make sure they aren't falling out of the world
-				if (player.posY < 1) {
+				if (player.getPosY() < 1) {
 					NostrumMagica.logger.info("Respawning player " + player + " because they seem to have fallen out of the world");
 					DimensionEntryTeleporter.respawnPlayer(player);
 					continue; // skip rate limitting
@@ -219,9 +219,9 @@ public class NostrumEmptyDimension {
 					continue;
 				}
 				
-				double distSqr = Math.pow(player.posX - player.lastTickPosX, 2)
-						+ Math.pow(player.posZ - player.lastTickPosZ, 2)
-						+ Math.pow(player.posY - player.lastTickPosY, 2);
+				double distSqr = Math.pow(player.getPosX() - player.lastTickPosX, 2)
+						+ Math.pow(player.getPosZ() - player.lastTickPosZ, 2)
+						+ Math.pow(player.getPosY() - player.lastTickPosY, 2);
 				if (distSqr > 25) {
 					// Player appears to have teleported
 					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
@@ -361,7 +361,7 @@ public class NostrumEmptyDimension {
 						);
 //				player.rotationYaw = Direction.NORTH.getHorizontalAngle();
 //				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-//				player.setMotion(Vec3d.ZERO);
+//				player.setMotion(Vector3d.ZERO);
 //				player.fallDistance = 0;
 				player.setSpawnPoint(spawn.up(2), true, NostrumDimensions.EmptyDimension);
 				
@@ -387,7 +387,7 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		@Nullable
-		public BlockPattern.PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
+		public BlockPattern.PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vector3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
 			// "GetExistingPortalLocation" that base entity uses to try and move to another dimension.
 			// Our dimension doesn't support non-players going through as we don't have a spot for them, so return NULL.
 			return null;
@@ -473,7 +473,7 @@ public class NostrumEmptyDimension {
 						);
 //				player.rotationYaw = Direction.NORTH.getHorizontalAngle();
 //				player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-//				player.setMotion(Vec3d.ZERO);
+//				player.setMotion(Vector3d.ZERO);
 //				player.fallDistance = 0;
 				
 				try {
@@ -498,7 +498,7 @@ public class NostrumEmptyDimension {
 		
 		@Override
 		@Nullable
-		public BlockPattern.PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vec3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
+		public BlockPattern.PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vector3d p_222272_2_, Direction p_222272_3_, double p_222272_4_, double p_222272_6_, boolean p_222272_8_) {
 			// We can put items 'back' and default to world spawn...
 			// But nah just ignore them
 			return null;

@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalTyp
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,7 +18,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 	protected final Entity entity;
 	
 	public ClientEffectEldrichBlast(Entity entity, int duration) {
-		super(Vec3d.ZERO, null, duration);
+		super(Vector3d.ZERO, null, duration);
 		this.entity = entity;
 	}
 	
@@ -36,21 +36,21 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 		final float ticks = ticksExisted + partialTicks;
 		final float period = 2 * 20;
 		final double angleRad = Math.PI * 2 * ((ticks % period) / period);
-		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25 + .1 * Math.sin(angleRad), Math.sin(angleRad) * .5);
+		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25 + .1 * Math.sin(angleRad), Math.sin(angleRad) * .5);
 		entity.world.addParticle(ParticleTypes.PORTAL,
-				entity.posX + offset.x,
-				entity.posY + entity.getHeight() + offset.y,
-				entity.posZ + offset.z,
+				entity.getPosX() + offset.x,
+				entity.getPosY() + entity.getHeight() + offset.y,
+				entity.getPosZ() + offset.z,
 				0, -.1, 0
 				);
 	}
 	
 	protected void spawnActiveEffect() {
 		//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-		//Vec3d velocity, Vec3d velocityJitter
+		//Vector3d velocity, Vector3d velocityJitter
 		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
-				30, entity.posX, entity.posY + (entity.getHeight() / 2), entity.posZ, entity.getHeight()/2, 30, 5,
-				Vec3d.ZERO, null
+				30, entity.getPosX(), entity.getPosY() + (entity.getHeight() / 2), entity.getPosZ(), entity.getHeight()/2, 30, 5,
+				Vector3d.ZERO, null
 				).color(ArcaneWolfElementalType.ELDRICH.getColor()));
 	}
 	

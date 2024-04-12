@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.Predefin
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -31,10 +31,10 @@ public class SpawnPredefinedEffectMessage {
 		}
 		
 		Entity ent = player.world.getEntityByID(message.entityID);
-		Vec3d offset = (ent != null ? Vec3d.ZERO : message.position);
+		Vector3d offset = (ent != null ? Vector3d.ZERO : message.position);
 		
 		if (offset == null) {
-			offset = Vec3d.ZERO;
+			offset = Vector3d.ZERO;
 		}
 		
 		ClientPredefinedEffect.Spawn(offset, message.type, message.duration, ent);
@@ -44,10 +44,10 @@ public class SpawnPredefinedEffectMessage {
 	protected final DimensionType dimension;
 	protected final int duration;
 	
-	protected final @Nullable Vec3d position;
+	protected final @Nullable Vector3d position;
 	protected final int entityID;
 	
-	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, DimensionType dimension, Vec3d position) {
+	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, DimensionType dimension, Vector3d position) {
 		this.type = type;
 		this.duration = duration;
 		this.dimension = dimension;
@@ -68,7 +68,7 @@ public class SpawnPredefinedEffectMessage {
 		final int dimension;
 		final int duration;
 		
-		//final @Nullable Vec3d position;
+		//final @Nullable Vector3d position;
 		//final int entityID;
 		
 		type = buf.readEnumValue(PredefinedEffect.class);
@@ -76,7 +76,7 @@ public class SpawnPredefinedEffectMessage {
 		dimension = buf.readVarInt();
 		
 		if (buf.readBoolean()) {
-			return new SpawnPredefinedEffectMessage(type, duration, DimensionType.getById(dimension), new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble()));
+			return new SpawnPredefinedEffectMessage(type, duration, DimensionType.getById(dimension), new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble()));
 		} else {
 			return new SpawnPredefinedEffectMessage(type, duration, DimensionType.getById(dimension), buf.readVarInt());
 		}

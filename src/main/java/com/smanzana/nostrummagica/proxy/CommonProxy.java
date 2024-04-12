@@ -115,7 +115,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -391,8 +391,8 @@ public class CommonProxy {
 	 * @param param optional extra float param for display
 	 */
 	public void spawnEffect(World world, SpellComponentWrapper comp,
-			LivingEntity caster, Vec3d casterPos,
-			LivingEntity target, Vec3d targetPos,
+			LivingEntity caster, Vector3d casterPos,
+			LivingEntity target, Vector3d targetPos,
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null) {
 			if (caster == null)
@@ -493,7 +493,7 @@ public class CommonProxy {
 		}
 	}
 	
-	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vec3d position) {
+	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vector3d position) {
 		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), position), world, position);
 	}
 	
@@ -501,7 +501,7 @@ public class CommonProxy {
 		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), entity.getEntityId()), world, entity.getPositionVector());
 	}
 	
-	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vec3d center) {
+	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {
 		final double MAX_RANGE = 50.0;
 		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimension().getType()));
 	}

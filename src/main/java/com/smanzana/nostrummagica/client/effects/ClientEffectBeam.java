@@ -10,7 +10,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * Effect made up of multiple copies of another effect
@@ -21,9 +21,9 @@ public class ClientEffectBeam extends ClientEffect {
 
 	private static class BeamForm implements ClientEffectForm {
 
-		private Vec3d end;
+		private Vector3d end;
 		
-		public BeamForm(Vec3d end) {
+		public BeamForm(Vector3d end) {
 			this.end = end;
 		}
 		
@@ -58,10 +58,10 @@ public class ClientEffectBeam extends ClientEffect {
 						NostrumMagica.MODID + ":effects/cyl", "normal"));
 				GlStateManager.pushMatrix();
 				
-				//GlStateManager.translatef(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
+				//GlStateManager.translatef(mc.thePlayer.getPosX(), mc.thePlayer.getPosY(), mc.thePlayer.getPosZ());
 				// Model is length 1 and points y+
 				double len = end.length();
-				Vec3d norm = end.normalize();
+				Vector3d norm = end.normalize();
 				double xzdist = Math.min(1.0, Math.max(-1.0, Math.sqrt(norm.x * norm.x + norm.z * norm.z)));
 				float angle = (float) (Math.asin(xzdist) / (2.0 * Math.PI));
 				float x = (float) (Math.asin(norm.x) / (2.0 * Math.PI));
@@ -96,11 +96,11 @@ public class ClientEffectBeam extends ClientEffect {
 		
 	}
 	
-	public ClientEffectBeam(Vec3d origin, Vec3d end, int ticks) {
+	public ClientEffectBeam(Vector3d origin, Vector3d end, int ticks) {
 		super(origin, new BeamForm(end.subtract(origin)), ticks);
 	}
 	
-	public ClientEffectBeam(Vec3d origin, Vec3d end, long ms) {
+	public ClientEffectBeam(Vector3d origin, Vector3d end, long ms) {
 		super(origin, new BeamForm(end.subtract(origin)), ms);
 	}
 	

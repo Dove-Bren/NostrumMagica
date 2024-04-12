@@ -12,7 +12,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class EntityChakramSpellSaucer extends EntitySpellSaucer {
@@ -20,8 +20,8 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	public static final String ID = "entity_internal_spellsaucer_chakram";
 	
 	// Chakram:
-	private Vec3d origin;
-	private Vec3d target;
+	private Vector3d origin;
+	private Vector3d target;
 	private boolean returning;
 	private int trips = 0;
 	
@@ -40,18 +40,18 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type,
 			MagicCutterTriggerInstance trigger, LivingEntity shooter,
 			World world,
-			double fromX, double fromY, double fromZ, Vec3d direction,
+			double fromX, double fromY, double fromZ, Vector3d direction,
 			float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
 		this(type, world, shooter, trigger, speedFactor);
 		
-		this.origin = new Vec3d(fromX, fromY, fromZ);
+		this.origin = new Vector3d(fromX, fromY, fromZ);
 		direction = direction.normalize();
 		
 		this.setLocationAndAngles(fromX, fromY, fromZ, this.rotationYaw, this.rotationPitch);
         this.setPosition(fromX, fromY, fromZ);
         
         // Set initial motion perpendicular to where we're going to add some cross
-        Vec3d tilt = direction.rotateYaw(90f * (this.rand.nextBoolean() ? 1 : -1)).scale(2);
+        Vector3d tilt = direction.rotateYaw(90f * (this.rand.nextBoolean() ? 1 : -1)).scale(2);
         this.setMotion(tilt.x, tilt.y, tilt.z);
         
         // Raytrace at hit point, or just go max distance.
@@ -81,7 +81,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 				trigger,
 				shooter,
 				shooter.world,
-				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
+				shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight(), shooter.getPosZ(),
 				shooter.getLookVec(),
 				speedFactor, maxDistance, piercing, maxTrips
 				);
@@ -95,7 +95,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			this._getInstantVelocityVec = new Vector();
 		}
 		
-		Vec3d to;
+		Vector3d to;
 		
 		if (this.returning) {
 			to = origin;
@@ -104,7 +104,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 		}
 		
 		final double moveScale = 0.15d * this.speed;
-		Vec3d diff = to.subtract(this.getPositionVector()).normalize().scale(moveScale);
+		Vector3d diff = to.subtract(this.getPositionVector()).normalize().scale(moveScale);
 		this._getInstantVelocityVec.set(diff);
 		
 		return this._getInstantVelocityVec;
@@ -130,7 +130,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			RayTraceResult raytraceresult = ProjectileHelper.func_221266_a(this, true, this.ticksInAir >= 25, this.shootingEntity, BlockMode.COLLIDER);
 			
 			// Also calc pitch and yaw
-			final Vec3d prevMotion = this.getMotion();
+			final Vector3d prevMotion = this.getMotion();
 			float f = MathHelper.sqrt(prevMotion.x * prevMotion.x + prevMotion.z * prevMotion.z);
             this.rotationPitch = (float)(MathHelper.atan2(prevMotion.y, (double)f) * (180D / Math.PI));
             this.rotationYaw = (float)(MathHelper.atan2(prevMotion.x, prevMotion.z) * (180D / Math.PI));
@@ -142,12 +142,12 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	            this.onImpact(raytraceresult);
 	        }
 	        
-	        this.posX += this.getMotion().x;
-	        this.posY += this.getMotion().y;
-	        this.posZ += this.getMotion().z;
-	        this.posX += accel.x;
-	        this.posY += accel.y;
-	        this.posZ += accel.z;
+	        this.getPosX() += this.getMotion().x;
+	        this.getPosY() += this.getMotion().y;
+	        this.getPosZ() += this.getMotion().z;
+	        this.getPosX() += accel.x;
+	        this.getPosY() += accel.y;
+	        this.getPosZ() += accel.z;
 	        
 	        // Apply air-friction, making motion's sort-of our initial motion
 	        this.setMotion(this.getMotion().scale(0.8));
@@ -158,7 +158,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 //					this.remove();
 //				}
 			
-			this.setPosition(this.posX, this.posY, this.posZ);
+			this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 			
 			// Check for motion boundaries
 			if (this.returning) {
@@ -168,7 +168,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 					} else {
 						returning = false;
 						// Capture motion to get boomerang-effect
-						Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
+						Vector3d motion = new Vector3d(accel.x, accel.y, accel.z).normalize().scale(1);
 						motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
 						this.setMotion(this.getMotion().add(motion));
 					}
@@ -178,7 +178,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 					this.returning = true;
 					
 					// Capture motion to get boomerang-effect
-					Vec3d motion = new Vec3d(accel.x, accel.y, accel.z).normalize().scale(1);
+					Vector3d motion = new Vector3d(accel.x, accel.y, accel.z).normalize().scale(1);
 					motion = motion.rotateYaw(30f * (this.rand.nextBoolean() ? 1 : -1));
 					this.setMotion(this.getMotion().add(motion));
 				}
@@ -204,8 +204,8 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	@Override
 	protected void shoot(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
 		super.shoot(xStart, yStart, zStart, xTo, yTo, zTo, velocity, inaccuracy);
-		this.origin = new Vec3d(xStart, yStart, zStart);
-		this.target = new Vec3d(xTo, yTo, zTo);
+		this.origin = new Vector3d(xStart, yStart, zStart);
+		this.target = new Vector3d(xTo, yTo, zTo);
 	}
 
 

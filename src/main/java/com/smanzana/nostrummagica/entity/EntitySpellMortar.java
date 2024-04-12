@@ -24,7 +24,7 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -35,7 +35,7 @@ public class EntitySpellMortar extends FireballEntity {
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellMortar.class, MagicElementDataSerializer.instance);
 	
 	private MortarTriggerInstance trigger;
-	private Vec3d origin;
+	private Vector3d origin;
 	
 	private double gravity;
 	
@@ -46,7 +46,7 @@ public class EntitySpellMortar extends FireballEntity {
 	}
 	
 	public EntitySpellMortar(EntityType<? extends EntitySpellMortar> type, MortarTriggerInstance trigger, LivingEntity shooter,
-			World world, Vec3d start, Vec3d velocity,
+			World world, Vector3d start, Vector3d velocity,
 			float speedFactor, double gravity) {
 		//super(world, start.x, start.y, start.z, 0, 0, 0);
 		this(type, world);
@@ -63,7 +63,7 @@ public class EntitySpellMortar extends FireballEntity {
 		
 		this.setElement(trigger.getElement());
 		
-//		System.out.println("Starting at [" + this.posX + ", " + this.posY + ", " + this.posZ + "] -> ("
+//		System.out.println("Starting at [" + this.getPosX() + ", " + this.getPosY() + ", " + this.getPosZ() + "] -> ("
 //					+ this.getMotion().x + ", " + this.getMotion().y + ", " + this.getMotion().z + ")");
 	}
 	
@@ -98,7 +98,7 @@ public class EntitySpellMortar extends FireballEntity {
 			// Gravity!
 			this.setMotion(this.getMotion().add(0, -gravity, 0));
 			
-//			System.out.println("[" + this.posX + ", " + this.posY + ", " + this.posZ + "] -> ("
+//			System.out.println("[" + this.getPosX() + ", " + this.getPosY() + ", " + this.getPosZ() + "] -> ("
 //					+ this.getMotion().x + ", " + this.getMotion().y + ", " + this.getMotion().z + ")"
 //					);
 		} else {
@@ -107,7 +107,7 @@ public class EntitySpellMortar extends FireballEntity {
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					2,
 					posX, posY + getHeight()/2f, posZ, 0, 40, 0,
-					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 				).color(color));
 		}
 	}

@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -20,7 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ClientEffectFormFlat implements ClientEffectForm {
 	
 	private final ResourceLocation texture;
-	private Vec3d offset;
+	private Vector3d offset;
 	
 	public ClientEffectFormFlat(ResourceLocation texture) {
 		this(texture, 0d, 0d, 0d);
@@ -29,7 +29,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 	public ClientEffectFormFlat(ResourceLocation texture, double x, double y, double z) {
 		this.texture = texture;
 		if (x != 0 || y != 0 || z != 0)
-			this.offset = new Vec3d(x, y, z);
+			this.offset = new Vector3d(x, y, z);
 		else
 			this.offset = null;
 	}

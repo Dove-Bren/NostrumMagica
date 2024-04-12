@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class WallTrigger extends TriggerAreaTrigger {
@@ -39,8 +39,8 @@ public class WallTrigger extends TriggerAreaTrigger {
 		private double minZ;
 		private double maxZ;
 		
-		public WallTriggerInstance(SpellState state, World world, Vec3d pos, boolean northsouth, float radius, boolean ignoreBlocks) {
-			super(state, world, new Vec3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, true, !ignoreBlocks);
+		public WallTriggerInstance(SpellState state, World world, Vector3d pos, boolean northsouth, float radius, boolean ignoreBlocks) {
+			super(state, world, new Vector3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, true, !ignoreBlocks);
 			this.radius = radius;
 			this.northsouth = northsouth;
 		}
@@ -83,9 +83,9 @@ public class WallTrigger extends TriggerAreaTrigger {
 		
 		@Override
 		protected boolean isInArea(LivingEntity entity) {
-			return entity.posX >= this.minX && entity.posX <= this.maxX
-					&& entity.posZ >= this.minZ && entity.posZ <= this.maxZ
-					&& (entity.posY + entity.getHeight()) >= Math.floor(this.pos.y) && entity.posY <= Math.floor(this.pos.y) + BLOCK_HEIGHT;
+			return entity.getPosX() >= this.minX && entity.getPosX() <= this.maxX
+					&& entity.getPosZ() >= this.minZ && entity.getPosZ() <= this.maxZ
+					&& (entity.getPosY() + entity.getHeight()) >= Math.floor(this.pos.y) && entity.getPosY() <= Math.floor(this.pos.y) + BLOCK_HEIGHT;
 		}
 
 		@Override
@@ -110,7 +110,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 						minZ + NostrumMagica.rand.nextFloat() * diffZ,
 						0, // pos + posjitter
 						40, 10, // lifetime + jitter
-						new Vec3d(0, .05, 0), null
+						new Vector3d(0, .05, 0), null
 						).color(getState().getNextElement().getColor()));
 			}
 			
@@ -127,7 +127,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 							z,
 							0, // pos + posjitter
 							40, 10, // lifetime + jitter
-							new Vec3d(0, .05, 0), null
+							new Vector3d(0, .05, 0), null
 							).color(getState().getNextElement().getColor()));
 				}
 			}
@@ -161,11 +161,11 @@ public class WallTrigger extends TriggerAreaTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		// Get N/S or E/W from target positions
-		final double dz = Math.abs(state.getCaster().posZ - pos.z);
-		final double dx = Math.abs(state.getCaster().posX - pos.x);
+		final double dz = Math.abs(state.getCaster().getPosZ() - pos.z);
+		final double dx = Math.abs(state.getCaster().getPosX() - pos.x);
 		final boolean northsouth = dz < dx;
 		
 		// Blindly guess if trigger put us in a wall but above us isn't that t he player

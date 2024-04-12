@@ -55,7 +55,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
@@ -86,7 +86,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
@@ -254,7 +254,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	public void notifyDataManagerChange(DataParameter<?> key) {
 		super.notifyDataManagerChange(key);
 		if (key == SYNCED_MAX_HEALTH) {
-			this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(
+			this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(
 					this.dataManager.get(SYNCED_MAX_HEALTH).floatValue()
 					);
 		}
@@ -398,7 +398,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					LivingEntity owner = selfDragon.getOwner();
 					if (owner != null) {
 						List<LivingEntity> nearby = owner.world.getEntitiesWithinAABB(LivingEntity.class,
-								new AxisAlignedBB(owner.posX - 8, owner.posY - 5, owner.posZ - 8, owner.posX + 8, owner.posY + 5, owner.posZ + 8),
+								new AxisAlignedBB(owner.getPosX() - 8, owner.getPosY() - 5, owner.getPosZ() - 8, owner.getPosX() + 8, owner.getPosY() + 5, owner.getPosZ() + 8),
 								new Predicate<LivingEntity>() {
 
 									@Override
@@ -530,7 +530,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					return true;
 				} else if (this.isEntitySitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
-						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
+						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
 						NostrumMagica.instance.proxy.openPetGUI(player, this);
 					}
 					return true;
@@ -878,7 +878,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				this.setTamed(true);
 				this.navigator.clearPath();
 				this.setAttackTarget(null);
-				this.setHealth((float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue());
+				this.setHealth((float) this.getAttribute(Attributes.MAX_HEALTH).getBaseValue());
 				this.setOwnerId(player.getUniqueID());
 				this.setSitting(true);
 				
@@ -915,7 +915,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -1006,9 +1006,9 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		this.dataManager.set(ATTRIBUTE_LEVEL, level);
 		this.dataManager.set(ATTRIBUTE_BOND, bond);
 		
-		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
+		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
 		this.dataManager.set(SYNCED_MAX_HEALTH, maxHealth);
-		//this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth); Synced thr ough data manager
+		//this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth); Synced thr ough data manager
 		this.setHealth(health);
 	}
 	
@@ -1283,7 +1283,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
 					if (!stack.isEmpty()) {
-						ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
+						ItemEntity item = new ItemEntity(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), stack);
 						this.world.addEntity(item);
 					}
 				}
@@ -1292,7 +1292,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				ItemStack stack = equipment.getStackInSlot(slot);
 				if (!stack.isEmpty()) {
-					ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
+					ItemEntity item = new ItemEntity(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), stack);
 					this.world.addEntity(item);
 				}
 			}
@@ -1372,13 +1372,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.31D);
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
-        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.31D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(10.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(10.0D);
+        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
+        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64D);
     }
 	
 	@Override
@@ -1416,14 +1416,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			// If strong flight gets added here, this should be adjusted so that strong flight can flap when standing still, etc.
 			// Checking whether motion is high is great for gliding but probably won't work well if the dragon can wade basically
 			if (this.isFlying() && !this.getWingFlapping()) {
-				final Vec3d curMotion = this.getMotion();
+				final Vector3d curMotion = this.getMotion();
 				final double motion = Math.abs(curMotion.x) + Math.abs(curMotion.z);
 				
 				final double glideStallMotion = .4;
 				boolean flap = false;
 				boolean flapFast = false;
 				
-				if (this.posY > this.prevPosY) {
+				if (this.getPosY() > this.prevPosY) {
 					flap = true;
 					flapFast = true;
 				}
@@ -1488,7 +1488,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //	}
 	
 	@Override
-	public void travel(Vec3d motion /*float strafe, float vertical, float forward*/) {
+	public void travel(Vector3d motion /*float strafe, float vertical, float forward*/) {
 		
 		if (this.onGround && this.getMotion().y <= 0) {
 			this.jumpCount = 0;
@@ -1526,17 +1526,17 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue());
-				super.travel(new Vec3d(strafe, motion.y, forward));
+				this.setAIMoveSpeed((float)this.getAttribute(Attributes.MOVEMENT_SPEED).getValue());
+				super.travel(new Vector3d(strafe, motion.y, forward));
 			}
 			else if (entitylivingbase instanceof PlayerEntity)
 			{
-				this.setMotion(Vec3d.ZERO);
+				this.setMotion(Vector3d.ZERO);
 			}
 
 			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.posX - this.prevPosX;
-			double d0 = this.posZ - this.prevPosZ;
+			double d1 = this.getPosX() - this.prevPosX;
+			double d0 = this.getPosZ() - this.prevPosZ;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F)
@@ -2122,7 +2122,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 						gambit = EntityDragonGambit.ALWAYS;
 					}
 					
-					list.add(new StringNBT(gambit.name()));
+					list.add(StringNBT.valueOf(gambit.name()));
 				}
 				
 				nbt.put(NBT_GAMBITS, list);

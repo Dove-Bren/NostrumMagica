@@ -76,12 +76,12 @@ public class ChainShape extends SpellShape {
 			
 			// Find any other eligible entities around them
 			List<Entity> entities = world.getEntitiesInAABBexcluding(null, 
-					new AxisAlignedBB(center.posX - radius,
-								center.posY - radius,
-								center.posZ - radius,
-								center.posX + radius,
-								center.posY + radius,
-								center.posZ + radius),
+					new AxisAlignedBB(center.getPosX() - radius,
+								center.getPosY() - radius,
+								center.getPosZ() - radius,
+								center.getPosX() + radius,
+								center.getPosY() + radius,
+								center.getPosZ() + radius),
 					(ent) -> {
 						return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
 					});

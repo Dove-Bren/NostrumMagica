@@ -15,19 +15,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
@@ -58,11 +57,11 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 		this.bUnbreakable = bUnbreakable;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public BlockRenderLayer getRenderLayer() {
+//		return BlockRenderLayer.TRANSLUCENT;
+//	}
 	
 	@Override
 	public Item getFilledBucket() {
@@ -75,7 +74,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(World worldIn, BlockPos pos, IFluidState state, Random rand) {
+	public void animateTick(World worldIn, BlockPos pos, FluidState state, Random rand) {
 		super.animateTick(worldIn, pos, state, rand);
 		
 		if (worldIn.isAirBlock(pos.up())) {
@@ -94,7 +93,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 				NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 						1,
 						pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, .5, 30, 10,
-						new Vec3d(rand.nextFloat() * hMag - (hMag/2), rand.nextFloat() * vMag, rand.nextFloat() * hMag - (hMag/2)), null
+						new Vector3d(rand.nextFloat() * hMag - (hMag/2), rand.nextFloat() * vMag, rand.nextFloat() * hMag - (hMag/2)), null
 						).color(color));
 			}
 		}
@@ -114,7 +113,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	@Override
 	protected void beforeReplacingBlock(IWorld worldIn, BlockPos pos, BlockState state) {
 		TileEntity tileentity = state.hasTileEntity() ? worldIn.getTileEntity(pos) : null;
-		Block.spawnDrops(state, worldIn.getWorld(), pos, tileentity);
+		Block.spawnDrops(state, worldIn, pos, tileentity);
 	}
 	
 	@Override
@@ -123,7 +122,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	public BlockState getBlockState(IFluidState state) {
+	public BlockState getBlockState(FluidState state) {
 		Block block = this.bUnbreakable ? NostrumBlocks.unbreakablePoisonWaterBlock : NostrumBlocks.poisonWaterBlock;
 		return block.getDefaultState().with(FlowingFluidBlock.LEVEL, Integer.valueOf(getLevelFromState(state)));
 	}
@@ -148,7 +147,7 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 	}
 	
 	@Override // no clue what this is
-	public boolean canDisplace(IFluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
+	public boolean canDisplace(FluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
 		return p_215665_5_ == Direction.DOWN && !p_215665_4_.isIn(FluidTags.WATER);
 	}
 
@@ -184,12 +183,12 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 		}
 
 		@Override
-		public int getLevel(IFluidState p_207192_1_) {
+		public int getLevel(FluidState p_207192_1_) {
 			return 8;
 		}
 
 		@Override
-		public boolean isSource(IFluidState state) {
+		public boolean isSource(FluidState state) {
 			return true;
 		}
 	}
@@ -201,18 +200,18 @@ public abstract class FluidPoisonWater extends ForgeFlowingFluid {
 		}
 		
 		@Override
-		protected void fillStateContainer(StateContainer.Builder<Fluid, IFluidState> builder) {
+		protected void fillStateContainer(StateContainer.Builder<Fluid, FluidState> builder) {
 			super.fillStateContainer(builder);
 			builder.add(FlowingFluid.LEVEL_1_8);
 		}
 
 		@Override
-		public int getLevel(IFluidState p_207192_1_) {
+		public int getLevel(FluidState p_207192_1_) {
 			return p_207192_1_.get(FlowingFluid.LEVEL_1_8);
 		}
 
 		@Override
-		public boolean isSource(IFluidState state) {
+		public boolean isSource(FluidState state) {
 			return false;
 		}
 	}

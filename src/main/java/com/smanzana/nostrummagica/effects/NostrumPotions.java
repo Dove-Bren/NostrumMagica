@@ -15,7 +15,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.common.crafting.IngredientNBT;
+import net.minecraftforge.common.crafting.NBTIngredient;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -83,7 +83,7 @@ public enum NostrumPotions {
 		return PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion);
 	}
 	
-	public static class PotionIngredient extends IngredientNBT {
+	public static class PotionIngredient extends NBTIngredient {
 
 		public PotionIngredient(Potion potion) {
 			super(MakePotion(potion));

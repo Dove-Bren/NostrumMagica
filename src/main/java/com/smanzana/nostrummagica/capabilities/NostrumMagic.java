@@ -32,10 +32,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -115,10 +117,10 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<String, IObjectiveState> questData;
 	private List<String> completedResearch;
 	private BlockPos markLocation;
-	private int markDimension;
+	private RegistryKey<World> markDimension;
 	private boolean enhancedTeleport;
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
-	private DimensionType sorceryPortalDim;
+	private RegistryKey<World> sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
 	private Map<TransmuteKnowledge, Boolean> transmuteKnowledge;
 	
@@ -141,7 +143,7 @@ public class NostrumMagic implements INostrumMagic {
 		bindingSpell = null;
 		bindingComponent = null;
 		familiars = new LinkedList<>();
-		sorceryPortalDim = DimensionType.OVERWORLD;
+		sorceryPortalDim = World.OVERWORLD;
 		sorceryPortalPos = null;
 		enhancedTeleport = false;
 		transmuteKnowledge = new HashMap<>();
@@ -503,7 +505,7 @@ public class NostrumMagic implements INostrumMagic {
 			if (this.entity != null && !this.entity.world.isRemote
 					&& this.entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) this.entity;
-				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()));
+				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.DUMMY_UUID);
 			}
 			
 			// Old and unneeded?
@@ -569,8 +571,7 @@ public class NostrumMagic implements INostrumMagic {
 		if (this.entity != null && !this.entity.world.isRemote
 				&& this.entity instanceof PlayerEntity) {
 			PlayerEntity player = (PlayerEntity) this.entity;
-			player.sendMessage(new StringTextComponent(
-					"Magic Unlocked"));
+			player.sendMessage(new StringTextComponent("Magic Unlocked"), Util.DUMMY_UUID);
 		}
 		
 	}
@@ -691,12 +692,12 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public int getMarkDimension() {
+	public RegistryKey<World> getMarkDimension() {
 		return markDimension;
 	}
 	
 	@Override
-	public void setMarkLocation(int dimension, BlockPos pos) {
+	public void setMarkLocation(RegistryKey<World> dimension, BlockPos pos) {
 		this.markDimension = dimension;
 		this.markLocation = pos;
 	}
@@ -834,7 +835,7 @@ public class NostrumMagic implements INostrumMagic {
 				tome = NostrumMagica.findTome(player, bindingTomeID);
 				if (tome.isEmpty()) {
 					player.sendMessage(new TranslationTextComponent(
-							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}));
+							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}), Util.DUMMY_UUID);
 					return;
 				}
 			}
@@ -842,7 +843,7 @@ public class NostrumMagic implements INostrumMagic {
 			if (!this.entity.world.isRemote) {
 				NostrumMagicaSounds.LEVELUP.play(player);
 				player.sendMessage(new TranslationTextComponent(
-						"info.tome.bind_finish", new Object[] {bindingSpell.getName()}));
+						"info.tome.bind_finish", new Object[] {bindingSpell.getName()}), Util.DUMMY_UUID);
 			}
 			
 			SpellTome.addSpell(tome, this.bindingSpell);
@@ -937,7 +938,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public DimensionType getSorceryPortalDimension() {
+	public RegistryKey<World> getSorceryPortalDimension() {
 		return this.sorceryPortalDim;
 	}
 	
@@ -952,7 +953,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public void setSorceryPortalLocation(DimensionType dimension, BlockPos pos) {
+	public void setSorceryPortalLocation(RegistryKey<World> dimension, BlockPos pos) {
 		this.sorceryPortalDim = dimension;
 		this.sorceryPortalPos = pos;
 	}

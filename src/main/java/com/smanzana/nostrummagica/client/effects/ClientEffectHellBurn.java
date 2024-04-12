@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -16,7 +16,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected final Entity entity;
 	
 	public ClientEffectHellBurn(Entity entity, int duration) {
-		super(Vec3d.ZERO, null, duration);
+		super(Vector3d.ZERO, null, duration);
 		this.entity = entity;
 	}
 	
@@ -32,11 +32,11 @@ public class ClientEffectHellBurn extends ClientEffect {
 	
 	protected void spawnFireEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
-		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
+		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.world.addParticle(ParticleTypes.FLAME,
-				entity.posX + offset.x,
-				entity.posY + entity.getHeight() + offset.y,
-				entity.posZ + offset.z,
+				entity.getPosX() + offset.x,
+				entity.getPosY() + entity.getHeight() + offset.y,
+				entity.getPosZ() + offset.z,
 				-offset.x * .1,
 				-offset.y * .1,
 				-offset.z * .1
@@ -45,22 +45,22 @@ public class ClientEffectHellBurn extends ClientEffect {
 	
 	protected void spawnPoisonEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
-		final Vec3d offset = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
+		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.world.addParticle(ParticleTypes.CRIT,
-				entity.posX + offset.x,
-				entity.posY + entity.getHeight() + offset.y,
-				entity.posZ + offset.z,
+				entity.getPosX() + offset.x,
+				entity.getPosY() + entity.getHeight() + offset.y,
+				entity.getPosZ() + offset.z,
 				0, 0, 0
 				);
 	}
 	
 	protected void spawnMagmaEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
-		final Vec3d dir = new Vec3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
+		final Vector3d dir = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.world.addParticle(ParticleTypes.LAVA,
-				entity.posX,
-				entity.posY + entity.getHeight() - .1,
-				entity.posZ,
+				entity.getPosX(),
+				entity.getPosY() + entity.getHeight() - .1,
+				entity.getPosZ(),
 				dir.x,
 				dir.y,
 				dir.z

@@ -31,7 +31,6 @@ import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentBag;
 import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.RuneBag;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.ThanoPendant;
@@ -52,15 +51,14 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.SpiderEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.FireballEntity;
-import net.minecraft.entity.projectile.ThrowableEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -71,7 +69,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -79,7 +77,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -95,7 +93,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -181,10 +178,10 @@ public class PlayerListener {
 		public World world;
 		
 		// Proximity based
-		public Vec3d position;
+		public Vector3d position;
 		public double proximity;
 		
-		public ProximityInfo(World world, Vec3d position, double proximity) {
+		public ProximityInfo(World world, Vector3d position, double proximity) {
 			this.world = world;
 			this.position = position;
 			this.proximity = proximity;
@@ -310,7 +307,7 @@ public class PlayerListener {
 	 * @param range negative just won't work. :)
 	 */
 	public void registerProximity(IGenericListener listener, 
-			World world, Vec3d pos, double range) {
+			World world, Vector3d pos, double range) {
 		proximityInfos.put(listener,
 				new ProximityInfo(world, pos, range));
 	}
@@ -409,7 +406,7 @@ public class PlayerListener {
 				if (entry.getValue().world != ent.world)
 					continue;
 				
-				double dist = Math.abs(ent.getPositionVector().subtract(entry.getValue().position).length());
+				double dist = Math.abs(ent.getPositionVec().subtract(entry.getValue().position).length());
 				if (dist <= entry.getValue().proximity) {
 					if (entry.getKey().onEvent(Event.PROXIMITY, ent, null))
 						it.remove();
@@ -581,12 +578,8 @@ public class PlayerListener {
 		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource && !((EntityDamageSource) event.getSource()).getIsThornsDamage()) {
 			Entity source = ((EntityDamageSource) event.getSource()).getTrueSource();
 			
-			if (source instanceof AbstractArrowEntity) {
-				source = ((AbstractArrowEntity) source).getShooter();
-			} else if (source instanceof FireballEntity) {
-				source = ((FireballEntity) source).shootingEntity;
-			} else if (source instanceof ThrowableEntity) {
-				source = ((ThrowableEntity) source).getThrower();
+			if (source instanceof ProjectileEntity) {
+				source = ((ProjectileEntity) source).func_234616_v_(); //getShooter();
 			}
 			
 			if (source instanceof LivingEntity) {
@@ -721,25 +714,6 @@ public class PlayerListener {
 	}
 	
 	@SubscribeEvent
-	public void onBlockDrops(HarvestDropsEvent event) {
-		
-		// This event isn't fired anymore. No sky ash?
-		if (event.isCanceled()) {
-			return;
-		}
-		
-		final List<ItemStack> drops = event.getDrops();
-		
-		if (event.getState().getMaterial() == Material.LEAVES
-				&& NostrumMagica.rand.nextFloat() <= 0.2f) {
-			drops.add(ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
-		}
-		if (event.getState().getMaterial() == Material.WEB) {
-			drops.add(ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1));
-		}
-	}
-	
-	@SubscribeEvent
 	public void onBlockBreak(BreakEvent event) {
 		if (event.isCanceled())
 			return;
@@ -817,9 +791,9 @@ public class PlayerListener {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
 					ItemEntity entity = new ItemEntity(event.getEntity().world,
-							event.getEntity().posX,
-							event.getEntity().posY,
-							event.getEntity().posZ,
+							event.getEntity().getPosX(),
+							event.getEntity().getPosY(),
+							event.getEntity().getPosZ(),
 							new ItemStack(NostrumItems.reagentGraveDust, 1));
 					event.getDrops().add(entity);
 				}
@@ -830,9 +804,9 @@ public class PlayerListener {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
 					ItemEntity entity = new ItemEntity(event.getEntity().world,
-							event.getEntity().posX,
-							event.getEntity().posY,
-							event.getEntity().posZ,
+							event.getEntity().getPosX(),
+							event.getEntity().getPosY(),
+							event.getEntity().getPosZ(),
 							new ItemStack(NostrumItems.reagentSpiderSilk, 1));
 					event.getDrops().add(entity);
 				}
@@ -904,7 +878,7 @@ public class PlayerListener {
 					if (!shouldIgnoreVacuum(player) && ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
@@ -920,7 +894,7 @@ public class PlayerListener {
 					if (!shouldIgnoreVacuum(player) && ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
@@ -947,7 +921,7 @@ public class PlayerListener {
 					if (!shouldIgnoreVacuum(player) && RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
@@ -963,7 +937,7 @@ public class PlayerListener {
 					if (!shouldIgnoreVacuum(player) && RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
 						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
-							NostrumMagicaSounds.UI_TICK.play(player.world, player.posX, player.posY, player.posZ);
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
@@ -978,15 +952,13 @@ public class PlayerListener {
 	}
 	
 	@SubscribeEvent
-	public void onConstruct(EntityConstructing event) {
-		Entity ent = event.getEntity();
-		if (ent instanceof LivingEntity) {
-			LivingEntity living = (LivingEntity) ent;
-			living.getAttributes().registerAttribute(AttributeMagicResist.instance());
-			living.getAttributes().registerAttribute(AttributeMagicPotency.instance());
-			living.getAttributes().registerAttribute(AttributeManaRegen.instance());
+	public void onAttributeConstruct(EntityAttributeModificationEvent event) {
+		for (EntityType<? extends LivingEntity> type : event.getTypes()) {
+			event.add(type, AttributeMagicResist.instance());
+			event.add(type, AttributeMagicPotency.instance());
+			event.add(type, AttributeManaRegen.instance());
 			for (EMagicElement elem : EMagicElement.values()) {
-				living.getAttributes().registerAttribute(AttributeMagicReduction.instance(elem));
+				event.add(type, AttributeMagicReduction.instance(elem));
 			}
 		}
 	}
@@ -1246,8 +1218,8 @@ public class PlayerListener {
 		}
 	}
 	
-	protected Map<Entity, Vec3d> lastPosCache = new HashMap<>();
-	protected Map<Entity, Vec3d> lastMoveCache = new HashMap<>();
+	protected Map<Entity, Vector3d> lastPosCache = new HashMap<>();
+	protected Map<Entity, Vector3d> lastMoveCache = new HashMap<>();
 	
 	protected void addEntity(Entity ent) {
 		if (!lastPosCache.containsKey(ent)) {
@@ -1263,26 +1235,26 @@ public class PlayerListener {
 	 * @param ent
 	 * @return
 	 */
-	public Vec3d getLastTickPos(Entity ent) {
+	public Vector3d getLastTickPos(Entity ent) {
 		addEntity(ent);
 		return lastPosCache.get(ent);
 	}
 	
-	public Vec3d getLastMove(Entity ent) {
+	public Vector3d getLastMove(Entity ent) {
 		addEntity(ent);
 		return lastMoveCache.get(ent);
 	}
 	
 	protected void updateTrackedEntities() {
 		// Look at entities being tracked. If dead or removed, remove from tracking. Else stash their current positions.
-		Iterator<Entry<Entity, Vec3d>> it = lastPosCache.entrySet().iterator();
+		Iterator<Entry<Entity, Vector3d>> it = lastPosCache.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<Entity, Vec3d> entry = it.next();
+			Entry<Entity, Vector3d> entry = it.next();
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				it.remove();
 			} else {
-				Vec3d last = entry.getValue();
-				Vec3d cur = entry.getKey().getPositionVector();
+				Vector3d last = entry.getValue();
+				Vector3d cur = entry.getKey().getPositionVector();
 				entry.setValue(cur);
 				if (last.squareDistanceTo(cur) > .025) {
 					// Update movement
@@ -1316,7 +1288,7 @@ public class PlayerListener {
 						(int)Math.ceil(entityBB.maxZ))) {
 					BlockState state = world.getBlockState(pos);
 					if (state.getMaterial() == Material.LAVA)
-							if (((FlowingFluidBlock) state.getBlock()).getFluidState(state).isEntityInside(world, pos, wolf, wolf.posY, FluidTags.LAVA, false)) {
+							if (((FlowingFluidBlock) state.getBlock()).getFluidState(state).isEntityInside(world, pos, wolf, wolf.getPosY(), FluidTags.LAVA, false)) {
 						// Standing on lava. Check if the block this matched is within the BB the event is asking about
 						//final float height = BlockLiquid.getBlockLiquidHeight(state, world, pos);
 						AxisAlignedBB blockBB = new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);

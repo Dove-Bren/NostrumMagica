@@ -62,7 +62,7 @@ import com.smanzana.nostrummagica.utils.Inventories;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.goal.BegGoal;
 import net.minecraft.entity.ai.goal.FollowOwnerGoal;
@@ -98,7 +98,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -470,12 +470,12 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.35D);
-		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
-		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
-		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(60.0);
+		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.35D);
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50.0D);
+		this.getAttribute(Attributes.ARMOR).setBaseValue(10.0D);
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(60.0);
 		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(20.0D);
-		this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6.0D);
 	}
 	
 	@Override
@@ -517,7 +517,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 					// Too far
 					if (EntityArcaneWolf.this.hasWolfCapability(WolfTypeCapability.WOLF_BLINK)
 							&& EntityArcaneWolf.this.rand.nextFloat() < .05) {
-						Vec3d currentPos = EntityArcaneWolf.this.getPositionVector();
+						Vector3d currentPos = EntityArcaneWolf.this.getPositionVector();
 						if (EntityArcaneWolf.this.teleportToEnemy(target)) {
 							EntityArcaneWolf.this.world.playSound(null, currentPos.x, currentPos.y, currentPos.z,
 									SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
@@ -691,7 +691,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void travel(Vec3d move) {
+	public void travel(Vector3d move) {
 		//super.travel(strafe, vertical, forward);
 		
 		if (this.onGround && this.getMotion().y <= 0) {
@@ -728,16 +728,16 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue());
-				super.travel(new Vec3d(strafe, move.y, forward));
+				this.setAIMoveSpeed((float)this.getAttribute(Attributes.MOVEMENT_SPEED).getValue());
+				super.travel(new Vector3d(strafe, move.y, forward));
 			}
 			else if (entitylivingbase instanceof PlayerEntity) {
-				this.setMotion(Vec3d.ZERO);
+				this.setMotion(Vector3d.ZERO);
 			}
 
 			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.posX - this.prevPosX;
-			double d0 = this.posZ - this.prevPosZ;
+			double d1 = this.getPosX() - this.prevPosX;
+			double d0 = this.getPosZ() - this.prevPosZ;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
@@ -830,7 +830,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				return true;
 			} else if (this.isSitting() && stack.isEmpty()) {
 				if (!this.world.isRemote) {
-					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.posX, (int) this.posY, (int) this.posZ);
+					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
 					NostrumMagica.instance.proxy.openPetGUI(player, this);
 				}
 				return true;
@@ -1060,7 +1060,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void setMaxHealth(float maxHealth) {
-		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxHealth);
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth);
 	}
 	
 	public int getRuneColor() {
@@ -1400,7 +1400,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				for (int i = 0; i < inventory.getSizeInventory(); i++) {
 					ItemStack stack = inventory.getStackInSlot(i);
 					if (!stack.isEmpty()) {
-						ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
+						ItemEntity item = new ItemEntity(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), stack);
 						this.world.addEntity(item);
 					}
 				}
@@ -1409,7 +1409,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 //			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 //				ItemStack stack = equipment.getStackInSlot(slot);
 //				if (!stack.isEmpty()) {
-//					ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, stack);
+//					ItemEntity item = new ItemEntity(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), stack);
 //					this.world.addEntity(item);
 //				}
 //			}
@@ -1690,7 +1690,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			// Earth upgrades inventory size!
 			ensureInventorySize(); // Auto resizes
 			// And adds armor
-			this.getAttribute(SharedMonsterAttributes.ARMOR).applyModifier(new AttributeModifier(
+			this.getAttribute(Attributes.ARMOR).applyModifier(new AttributeModifier(
 					UUID.fromString(UUID_EXTRA_ARMOR_MOD),
 					"ArcaneWolfEarthArmor",
 					5.0D,
@@ -1891,7 +1891,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	public static EntityArcaneWolf TransformWolf(WolfEntity wolf, PlayerEntity player) {
 		EntityArcaneWolf newWolf = new EntityArcaneWolf(NostrumEntityTypes.arcaneWolf, wolf.world);
-		newWolf.setPosition(wolf.posX, wolf.posY, wolf.posZ);
+		newWolf.setPosition(wolf.getPosX(), wolf.getPosY(), wolf.getPosZ());
 		newWolf.setTamedBy(player);
 		newWolf.setHealth(5f);
 		wolf.remove();

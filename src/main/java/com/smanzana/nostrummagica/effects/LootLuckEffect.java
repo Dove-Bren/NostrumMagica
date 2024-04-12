@@ -38,9 +38,9 @@ public class LootLuckEffect extends Effect {
 				
 				LivingEntity target = event.getEntityLiving();
 				((ServerWorld) target.world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
-						target.posX,
-						target.posY,	
-						target.posZ,
+						target.getPosX(),
+						target.getPosY(),	
+						target.getPosZ(),
 						10,
 						.2,
 						.25,

@@ -22,7 +22,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -80,22 +80,22 @@ public class AuraTrigger extends TriggerAreaTrigger {
 			for (int i = 0; i < radius + 1; i++) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
-						origin.posX,
-						origin.posY + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
-						origin.posZ,
+						origin.getPosX(),
+						origin.getPosY() + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
+						origin.getPosZ(),
 						.1,
 						30, 0, // lifetime + jitter
-						Vec3d.ZERO, (new Vec3d(.2, .2, .2)).scale(radius / 4)
+						Vector3d.ZERO, (new Vector3d(.2, .2, .2)).scale(radius / 4)
 						).color(getState().getNextElement().getColor())
 						);
 				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
 						2,
-						origin.posX,
-						origin.posY + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
-						origin.posZ,
+						origin.getPosX(),
+						origin.getPosY() + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
+						origin.getPosZ(),
 						radius,
 						20, 0, // lifetime + jitter
-						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
+						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
 						).color(getState().getNextElement().getColor()));
 			}
 		}
@@ -190,7 +190,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		return new AuraTriggerInstance(state, world, state.getSelf(),
 				Math.max(supportedFloats()[0], params.level),

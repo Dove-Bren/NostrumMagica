@@ -22,7 +22,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 
 public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableTileEntity {
@@ -120,7 +120,7 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 				100,
 				pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, .1,
 				60, 10,
-				new Vec3d(0, .1, 0), new Vec3d(.1, .1, .1)
+				new Vector3d(0, .1, 0), new Vector3d(.1, .1, .1)
 				).gravity(.05f).color(this.getElement().getColor()));
 	}
 	
@@ -198,7 +198,7 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 				(60 - this.trialTicks) / 10,
 				pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, 5,
 				40, 10,
-				new Vec3d(pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5)
+				new Vector3d(pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5)
 				).color(this.getElement().getColor()));
 	}
 	

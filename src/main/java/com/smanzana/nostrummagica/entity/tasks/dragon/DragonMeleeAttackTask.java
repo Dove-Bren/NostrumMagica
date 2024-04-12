@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 
 public class DragonMeleeAttackTask extends MeleeAttackGoal {
@@ -135,7 +135,7 @@ public class DragonMeleeAttackTask extends MeleeAttackGoal {
 			
 			// In either case, reset attackTick
 			if (attacked) {
-				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getValue()));
+				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getAttribute(Attributes.ATTACK_SPEED).getValue()));
 			}
 		}
 		

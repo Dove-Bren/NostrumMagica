@@ -24,9 +24,11 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -109,7 +111,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		ListNBT list = new ListNBT();
 		for (String crc : instance.serializeSpellHistory()) {
-			list.add(new StringNBT(crc));
+			list.add(StringNBT.valueOf(crc));
 		}
 		nbt.put(NBT_SPELLCRCS, list);
 		
@@ -190,14 +192,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		list = new ListNBT();
 		for (SpellShape shape : instance.getShapes()) {
 			String key = shape.getShapeKey();
-			list.add(new StringNBT(key));
+			list.add(StringNBT.valueOf(key));
 		}
 		nbt.put(NBT_SHAPES, list);
 		
 		list = new ListNBT();
 		for (SpellTrigger trigger : instance.getTriggers()) {
 			String key = trigger.getTriggerKey();
-			list.add(new StringNBT(key));
+			list.add(StringNBT.valueOf(key));
 		}
 		nbt.put(NBT_TRIGGERS, list);
 		
@@ -216,7 +218,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			posTag.putInt("x", markPos.getX());
 			posTag.putInt("y", markPos.getY());
 			posTag.putInt("z", markPos.getZ());
-			nbt.putInt(NBT_MARK_DIMENSION, instance.getMarkDimension());
+			nbt.putString(NBT_MARK_DIMENSION, instance.getMarkDimension().getLocation().toString());
 			nbt.put(NBT_MARK_POS, posTag);
 		}
 		if (instance.hasEnhancedTeleport()) {
@@ -227,7 +229,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		if (stringList != null && !stringList.isEmpty()) {
 			ListNBT tagList = new ListNBT();
 			for (String quest : stringList) {
-				tagList.add(new StringNBT(quest));
+				tagList.add(StringNBT.valueOf(quest));
 			}
 			nbt.put(NBT_QUESTS_CURRENT, tagList);
 		}
@@ -236,7 +238,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		if (stringList != null && !stringList.isEmpty()) {
 			ListNBT tagList = new ListNBT();
 			for (String quest : stringList) {
-				tagList.add(new StringNBT(quest));
+				tagList.add(StringNBT.valueOf(quest));
 			}
 			nbt.put(NBT_QUESTS_COMPLETED, tagList);
 		}
@@ -259,7 +261,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		if (stringList != null && !stringList.isEmpty()) {
 			ListNBT tagList = new ListNBT();
 			for (String research : stringList) {
-				tagList.add(new StringNBT(research));
+				tagList.add(StringNBT.valueOf(research));
 			}
 			nbt.put(NBT_RESEARCHES, tagList);
 		}
@@ -383,9 +385,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 					posTag.getInt("y"),
 					posTag.getInt("z")
 					);
-			int dimension = tag.getInt(NBT_MARK_DIMENSION);
+			String dimension = tag.getString(NBT_MARK_DIMENSION);
+			RegistryKey<World> dimKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ResourceLocation.tryCreate(dimension));
 			
-			instance.setMarkLocation(dimension, location);
+			instance.setMarkLocation(dimKey, location);
 		}
 		
 		if (tag.contains(NBT_ENHANCED_TELEPORT) && tag.getBoolean(NBT_ENHANCED_TELEPORT)) {
@@ -470,7 +473,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		if (tag.contains(NBT_SORCERYPORTAL_POS)) {
 			String dimName = tag.getString(NBT_SORCERYPORTAL_DIM);
-			DimensionType dim = DimensionType.byName(ResourceLocation.tryCreate(dimName));
+			RegistryKey<World> dim = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ResourceLocation.tryCreate(dimName));
 			instance.setSorceryPortalLocation(
 					dim,
 					NBTUtil.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions

@@ -23,7 +23,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -78,7 +78,7 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	protected void beforePetRespawn(LivingEntity pet, World world, Vec3d pos, ItemStack stack) {
+	protected void beforePetRespawn(LivingEntity pet, World world, Vector3d pos, ItemStack stack) {
 		// Dragons spawn at 50% health and 0% mana
 		if (pet instanceof EntityTameDragonRed) { // TODO new base class lol
 			EntityTameDragonRed dragon = ((EntityTameDragonRed) pet);
@@ -156,13 +156,13 @@ public class DragonSoulItem extends PetSoulItem {
 		if (player.world.isRemote) {
 			// On client, spawn particles
 			if (NostrumMagica.rand.nextBoolean()) {
-				Vec3d offset;
+				Vector3d offset;
 				final float rotation;
 				if (player == NostrumMagica.instance.proxy.getPlayer() && Minecraft.getInstance().gameSettings.thirdPersonView == 0) {
-					offset = new Vec3d(-.1, player.getEyeHeight() -.05, .2);
+					offset = new Vector3d(-.1, player.getEyeHeight() -.05, .2);
 					rotation = -player.rotationYaw % 360f;
 				} else {
-					offset = new Vec3d(-.375, player.getEyeHeight() -.05, .825);
+					offset = new Vector3d(-.375, player.getEyeHeight() -.05, .825);
 					if (player == NostrumMagica.instance.proxy.getPlayer()) {
 						rotation = -player.renderYawOffset % 360f;
 					} else {
@@ -201,8 +201,8 @@ public class DragonSoulItem extends PetSoulItem {
 			// Particles!
 			if (NostrumMagica.rand.nextBoolean()) {
 				NostrumParticles.GLOW_ORB.spawn(entityItem.world, new SpawnParams(
-						1, entityItem.posX, entityItem.posY + .5, entityItem.posZ, .25, 30, 10,
-						new Vec3d(0, .05, 0), new Vec3d(.025, 0, .025)
+						1, entityItem.getPosX(), entityItem.getPosY() + .5, entityItem.getPosZ(), .25, 30, 10,
+						new Vector3d(0, .05, 0), new Vector3d(.025, 0, .025)
 						).color(.3f, .6f, 0f, 0f));
 			}
 		}
@@ -274,7 +274,7 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	public boolean canSpawnEntity(World world, LivingEntity spawner, Vec3d pos, ItemStack stack) {
+	public boolean canSpawnEntity(World world, LivingEntity spawner, Vector3d pos, ItemStack stack) {
 		if (this.getMana(stack) < this.getMaxMana(stack)) {
 			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]));
 			return false;

@@ -249,7 +249,7 @@ public class GolemTask extends Goal {
 		} else if (range) {
 			
 			success = true;
-			double dist = golem.getDistanceSq(target.posX, target.getBoundingBox().minY, target.posZ);
+			double dist = golem.getDistanceSq(target.getPosX(), target.getBoundingBox().minY, target.getPosZ());
 
             if (dist <= RANGE_SQR - 25.0 && golem.canEntityBeSeen(target))
             {

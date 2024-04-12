@@ -11,7 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -69,7 +69,7 @@ public abstract class SpellShape {
 		
 		if (target != null && (world == null || pos == null)) {
 			world = target.world;
-			Vec3d vec = target.getPositionVector();
+			Vector3d vec = target.getPositionVector();
 			pos = new BlockPos(vec.x, vec.y, vec.z);
 		}
 		

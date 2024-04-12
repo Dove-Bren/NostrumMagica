@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.utils;
 
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public final class Curves {
 
-	private static Vec3d bezierInternal(float progress, Vec3d points[], int start, int end) {
+	private static Vector3d bezierInternal(float progress, Vector3d points[], int start, int end) {
 		// base case: 1 point, in which case we just return ourself
 		if (start == end) {
 			return points[start];
 		}
 		
 		// Blend between bezier of 1 fewer node lower and 1 more higher
-		Vec3d blendStart = bezierInternal(progress, points, start, end - 1);
-		Vec3d blendEnd = bezierInternal(progress, points, start + 1, end);
-		return new Vec3d(
+		Vector3d blendStart = bezierInternal(progress, points, start, end - 1);
+		Vector3d blendEnd = bezierInternal(progress, points, start + 1, end);
+		return new Vector3d(
 				blendStart.x * (1 - progress) + blendEnd.x * progress,
 				blendStart.y * (1 - progress) + blendEnd.y * progress,
 				blendStart.z * (1 - progress) + blendEnd.z * progress
@@ -30,7 +30,7 @@ public final class Curves {
 	 * @param points
 	 * @return
 	 */
-	public static Vec3d bezier(float progress, Vec3d ... points) {
+	public static Vector3d bezier(float progress, Vector3d ... points) {
 		if (points == null || points.length < 2) {
 			throw new RuntimeException("Invalid number of points for bezier curve");
 		}
@@ -86,17 +86,17 @@ public final class Curves {
 	 * @param gravity
 	 * @return
 	 */
-	public static Vec3d getMortarArcVelocity(Vec3d start, Vec3d end, double startHVelocity, double gravity) {
+	public static Vector3d getMortarArcVelocity(Vector3d start, Vector3d end, double startHVelocity, double gravity) {
 		// TODO have to adjust for tick time instead of continuous real time?
 		
 		if (gravity < 0) {
 			gravity = -gravity; // should be magnitude of pull down
 		}
 		
-		final Vec3d diff = end.subtract(start);
+		final Vector3d diff = end.subtract(start);
 		
 		// Distance of a projectile is hVel * timeAirborn. Solve for how long we want to be airborn.
-		final double hDist = Vec3d.ZERO.distanceTo(new Vec3d(diff.x, 0, diff.z));
+		final double hDist = Vector3d.ZERO.distanceTo(new Vector3d(diff.x, 0, diff.z));
 		final double desiredTime = hDist / startHVelocity;
 		
 		// y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
@@ -112,7 +112,7 @@ public final class Curves {
 		final double vVel = -((-diff.y / desiredTime) - (.5 * gravity * desiredTime));
 		
 		// Break hVel into x and z
-		return (new Vec3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
+		return (new Vector3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
 	}
 	
 	public static Vec2f solveQuadraticEquation(float a, float b, float c) {

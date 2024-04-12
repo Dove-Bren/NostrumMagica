@@ -204,7 +204,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IEnviromentBlockReader;
@@ -866,7 +866,7 @@ public class ClientProxy extends CommonProxy {
 					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
 					player.world
 						.addParticle(ParticleTypes.LARGE_SMOKE,
-								player.posX + offsetx, player.posY, player.posZ + offsetz,
+								player.getPosX() + offsetx, player.getPosY(), player.getPosZ() + offsetz,
 								0, -.5, 0);
 					
 				}
@@ -1387,9 +1387,9 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private static final ClientEffect doCorruptEffect(LivingEntity source,
-			Vec3d sourcePos,
+			Vector3d sourcePos,
 			LivingEntity target,
-			Vec3d targetPos,
+			Vector3d targetPos,
 			SpellComponentWrapper flavor,
 			boolean negative,
 			float param) {
@@ -1408,7 +1408,7 @@ public class ClientProxy extends CommonProxy {
 		effect
 		.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
 		.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
-		.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), .3f, 1f))
+		.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), .3f, 1f))
 		.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
 		.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
 		;
@@ -1421,7 +1421,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					// TODO get the shape params in here to modify scale
 					// TODO get whether it's a good thing or not
-					ClientEffect effect = new ClientEffectMajorSphere(target == null ? targetPos : new Vec3d(0, 0, 0),
+					ClientEffect effect = new ClientEffectMajorSphere(target == null ? targetPos : new Vector3d(0, 0, 0),
 							param + .5f,
 							negative,
 							1000L);
@@ -1458,7 +1458,7 @@ public class ClientProxy extends CommonProxy {
 		for (EMagicElement element : EMagicElement.values()) {
 			renderer.registerEffect(new SpellComponentWrapper(element),
 					(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-						ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vec3d(0, 0, 0),
+						ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vector3d(0, 0, 0),
 								new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 								500L, 5);
 						
@@ -1469,7 +1469,7 @@ public class ClientProxy extends CommonProxy {
 						.modify(new ClientEffectModifierColor(element.getColor(), element.getColor()))
 						.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
 						.modify(new ClientEffectModifierTranslate(0, 0, -1))
-						.modify(new ClientEffectModifierMove(new Vec3d(0, 1.5, 0), new Vec3d(0, .5, .7), .5f, 1f))
+						.modify(new ClientEffectModifierMove(new Vector3d(0, 1.5, 0), new Vector3d(0, .5, .7), .5f, 1f))
 						.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
 						;
 						return effect;
@@ -1646,7 +1646,7 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
 					.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), .3f, 1f))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), .3f, 1f))
 					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
 					;
@@ -1670,7 +1670,7 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
 					.modify(new ClientEffectModifierTranslate(0, 0f, -1.5f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 1.5, 0), 0f, .7f))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 1.5, 0), 0f, .7f))
 					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
 					;
@@ -1680,7 +1680,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.GROWTH),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.getPositionVector() : targetPos, 
-							new ClientEffectMirrored(new Vec3d(0,0,0),
+							new ClientEffectMirrored(new Vector3d(0,0,0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							2L * 1000L, 4), 2L * 1000L, 5, .2f);
 					
@@ -1747,7 +1747,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
-							3L * 500L, 6, new Vec3d(1, 0, 0));
+							3L * 500L, 6, new Vector3d(1, 0, 0));
 					
 					if (flavor != null && flavor.isElement()) {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
@@ -1784,9 +1784,9 @@ public class ClientProxy extends CommonProxy {
 										
 					effect
 					.modify(new ClientEffectModifierTranslate(0f, 1f, 0f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 1.5, 0), 0f, .3f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 0, 1.5)))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), 0f, 1f))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 1.5, 0), 0f, .3f))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1.5)))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), 0f, 1f))
 					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
 					;
@@ -1810,9 +1810,9 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, -.5f, 0f))
 					.modify(new ClientEffectModifierTranslate(0f, 1f, 0f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 1.5, 0), 0f, .3f))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, 0, 1.5)))
-					.modify(new ClientEffectModifierMove(new Vec3d(0, 0, 0), new Vec3d(0, -2, 0), 0f, 1f))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 1.5, 0), 0f, .3f))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1.5)))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), 0f, 1f))
 					.modify(new ClientEffectModifierRotate(1f, 0f, 0f))
 					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
@@ -1824,7 +1824,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
-							2L * 500L, 6, new Vec3d(.5, .5, 0));
+							2L * 500L, 6, new Vector3d(.5, .5, 0));
 					
 					if (flavor != null && flavor.isElement()) {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
@@ -1849,8 +1849,8 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void spawnEffect(World world, SpellComponentWrapper comp,
-			LivingEntity caster, Vec3d casterPos,
-			LivingEntity target, Vec3d targetPos,
+			LivingEntity caster, Vector3d casterPos,
+			LivingEntity target, Vector3d targetPos,
 			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
 		if (world == null && target != null) {
 			world = target.world;
@@ -1866,7 +1866,7 @@ public class ClientProxy extends CommonProxy {
 //			if (target != null)
 //				targetPos = target.getPositionVector();
 //			else
-				targetPos = new Vec3d(0, 0, 0);
+				targetPos = new Vector3d(0, 0, 0);
 		
 		this.effectRenderer.spawnEffect(comp, caster, casterPos, target, targetPos, flavor, isNegative, compParam);
 	}

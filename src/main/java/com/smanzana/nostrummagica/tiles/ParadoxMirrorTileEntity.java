@@ -29,7 +29,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTileEntity, IAetherInfusableTileEntity {
@@ -212,8 +212,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	protected void receiveAndSpawnItem(@Nonnull ItemStack stack, BlockPos fromPos) {
-		Vec3d spawnLoc = getSpawnLocation();
-		Vec3d spawnVelocity = getSpawnVelocity();
+		Vector3d spawnLoc = getSpawnLocation();
+		Vector3d spawnVelocity = getSpawnVelocity();
 		ItemEntity entity = new ItemEntity(getWorld(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
 		entity.setMotion(spawnVelocity);
 		entity.velocityChanged = true;
@@ -224,7 +224,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		playReceiveEffect(entity, fromPos);
 	}
 	
-	protected Vec3d getSpawnLocation() {
+	protected Vector3d getSpawnLocation() {
 		BlockPos pos = this.getPos();
 		double x = pos.getX() + .5;
 		double y = pos.getY() + .4;
@@ -251,11 +251,11 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		
 		}
 		
-		return new Vec3d(x, y, z);
+		return new Vector3d(x, y, z);
 	}
 	
-	protected Vec3d getSpawnVelocity() {
-		return new Vec3d(getFacing().getDirectionVec()).scale(.1);
+	protected Vector3d getSpawnVelocity() {
+		return new Vector3d(getFacing().getDirectionVec()).scale(.1);
 	}
 	
 	protected @Nullable ItemEntity findNearbyItem() {
@@ -300,7 +300,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 			return;
 		}
 		
-		Vec3d spawnPos = this.getSpawnLocation();
+		Vector3d spawnPos = this.getSpawnLocation();
 		
 		NostrumParticles.GLOW_ORB.spawn(getWorld(), new SpawnParams(
 				2, // spawn count
@@ -315,7 +315,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 //				spawnPos.x, spawnPos.y, spawnPos.z, // spawn position (center)
 //				.1, // spawn position jitter
 //				30, 20, // lifetime (base + jitter)
-//				getSpawnVelocity().scale(.7), new Vec3d(.05, .05, .05)
+//				getSpawnVelocity().scale(.7), new Vector3d(.05, .05, .05)
 //				).color(EMagicElement.ENDER.getColor())
 //				.gravity(-.025f));
 	}

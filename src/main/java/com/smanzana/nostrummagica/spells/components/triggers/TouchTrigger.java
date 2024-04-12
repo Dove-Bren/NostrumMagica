@@ -14,7 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -43,7 +43,7 @@ public class TouchTrigger extends InstantTrigger {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,
-				Vec3d pos, float pitch, float yaw) {
+				Vector3d pos, float pitch, float yaw) {
 		pos = pos.add(0, state.getSelf().getEyeHeight(), 0);
 		
 		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
@@ -59,7 +59,7 @@ public class TouchTrigger extends InstantTrigger {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), others, world, null);
 		} else if (trace.getType() == RayTraceResult.Type.BLOCK) {
-			Vec3d vec = trace.getHitVec();
+			Vector3d vec = trace.getHitVec();
 			return new TriggerData(null, others, world,
 					Lists.newArrayList(new BlockPos(Math.floor(vec.x), Math.floor(vec.y), Math.floor(vec.z))));
 		} else {

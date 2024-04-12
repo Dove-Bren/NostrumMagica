@@ -162,15 +162,15 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 			return;
 		}
 		
-//		final Vec3d casterPos = caster.getPositionVec().add(0, caster.getEyeHeight(), 0);
-//		final Vec3d targetPos = target.getPositionVec().add(0, target.getHeight()/2, 0); 
-//		Vec3d diff = targetPos.subtract(casterPos);
+//		final Vector3d casterPos = caster.getPositionVec().add(0, caster.getEyeHeight(), 0);
+//		final Vector3d targetPos = target.getPositionVec().add(0, target.getHeight()/2, 0); 
+//		Vector3d diff = targetPos.subtract(casterPos);
 //		
 //		// Could go discrete increments, but just divide and stretch
 //		final int intervals = 10;
 //		for (int i = 0; i < intervals; i++) {
-//			Vec3d offset = diff.scale((float) i/ (float) intervals);
-//			final Vec3d pos = casterPos.add(offset);
+//			Vector3d offset = diff.scale((float) i/ (float) intervals);
+//			final Vector3d pos = casterPos.add(offset);
 //			NostrumParticles.GLOW_ORB.spawn(caster.world, new SpawnParams(
 //					1,
 //					pos.x, pos.y, pos.z, 0, 30, 5,

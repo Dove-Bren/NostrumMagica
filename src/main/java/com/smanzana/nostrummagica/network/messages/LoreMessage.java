@@ -46,7 +46,7 @@ public class LoreMessage {
 			comp = comp.setStyle(style);
 			
 			player.sendMessage(comp);
-			NostrumMagicaSounds.LORE.play(player, player.world, player.posX, player.posY, player.posZ);
+			NostrumMagicaSounds.LORE.play(player, player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 		});
 	}
 	

@@ -15,7 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class DelayTrigger extends SpellTrigger {
@@ -77,7 +77,7 @@ public class DelayTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		return new DelayTriggerInstance(state, Math.max(20 * (int) supportedFloats()[0], (int) params.level));
 	}

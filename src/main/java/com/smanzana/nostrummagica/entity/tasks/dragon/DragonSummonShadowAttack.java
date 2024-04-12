@@ -91,11 +91,11 @@ public class DragonSummonShadowAttack<T extends EntityDragon> extends Goal {
 		Random rand = dragon.getRNG();
 		for (LivingEntity targ : this.pool) {
 			EntityShadowDragonRed ent = new EntityShadowDragonRed(NostrumEntityTypes.shadowDragonRed, targ.world, targ);
-			ent.setPosition(targ.posX + 5.0 * (rand.nextDouble() - .5D), targ.posY, targ.posZ + 5.0 * (rand.nextDouble() - .5D));
+			ent.setPosition(targ.getPosX() + 5.0 * (rand.nextDouble() - .5D), targ.getPosY(), targ.getPosZ() + 5.0 * (rand.nextDouble() - .5D));
 			targ.world.addEntity(ent);
 		}
 		
-		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.world, dragon.posX, dragon.posY, dragon.posZ);
+		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.world, dragon.getPosX(), dragon.getPosY(), dragon.getPosZ());
 		
 		attackTicks = this.delay;
 	}

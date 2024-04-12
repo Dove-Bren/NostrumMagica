@@ -19,7 +19,7 @@ public class AttributeMagicPotency extends RangedAttribute {
 	}
 	
 	private AttributeMagicPotency() {
-		super(null, unlocalized_name, 0, -100.0D, 100.0D);
+		super(unlocalized_name, 0, -100.0D, 100.0D);
 	}
 
 }

@@ -157,9 +157,9 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -834,7 +834,7 @@ public class NostrumMagica {
 						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
 				new RRequirementResearch("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
-					public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem) {
+					public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem) {
 						EntityKoid koid = new EntityKoid(NostrumEntityTypes.koid, world);
 						koid.setPosition(pos.x, pos.y, pos.z);
 						world.addEntity(koid);
@@ -2638,9 +2638,9 @@ public class NostrumMagica {
 			boolean onlyOwned) {
 		List<ITameDragon> list = new LinkedList<>();
 
-		AxisAlignedBB box = new AxisAlignedBB(entity.posX - blockRadius, entity.posY - blockRadius,
-				entity.posZ - blockRadius, entity.posX + blockRadius, entity.posY + blockRadius,
-				entity.posZ + blockRadius);
+		AxisAlignedBB box = new AxisAlignedBB(entity.getPosX() - blockRadius, entity.getPosY() - blockRadius,
+				entity.getPosZ() - blockRadius, entity.getPosX() + blockRadius, entity.getPosY() + blockRadius,
+				entity.getPosZ() + blockRadius);
 
 		List<EntityTameDragonRed> dragonList = entity.world.getEntitiesWithinAABB(EntityTameDragonRed.class, box,
 				(dragon) -> {

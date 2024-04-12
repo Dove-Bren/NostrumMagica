@@ -22,7 +22,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class RayTrace {
@@ -70,17 +70,17 @@ public class RayTrace {
 		}
 	}
 	
-	public static Vec3d directionFromAngles(float pitch, float yaw) {
+	public static Vector3d directionFromAngles(float pitch, float yaw) {
 		float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-pitch * 0.017453292F);
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
         
-        return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
 	}
 	
-	public static RayTraceResult miss(Vec3d fromPos, Vec3d toPos) {
-		Vec3d rayVec = toPos.subtract(fromPos);
+	public static RayTraceResult miss(Vector3d fromPos, Vector3d toPos) {
+		Vector3d rayVec = toPos.subtract(fromPos);
     	return BlockRayTraceResult.createMiss(fromPos, Direction.getFacingFromVector(rayVec.x, rayVec.y, rayVec.z), new BlockPos(fromPos));
 	}
 	
@@ -109,7 +109,7 @@ public class RayTrace {
 		return ((BlockRayTraceResult) result).getPos();
 	}
 	
-	public static RayTraceResult raytrace(World world, @Nonnull Entity tracingEntity, Vec3d fromPos, float pitch,
+	public static RayTraceResult raytrace(World world, @Nonnull Entity tracingEntity, Vector3d fromPos, float pitch,
 			float yaw, float maxDistance, Predicate<? super Entity> selector) {
 		if (world == null || fromPos == null)
 			return null;
@@ -117,7 +117,7 @@ public class RayTrace {
 		return raytrace(world, tracingEntity, fromPos, directionFromAngles(pitch, yaw), maxDistance, selector);
 	}
 	
-	public static RayTraceResult raytraceApprox(World world, @Nonnull Entity tracingEntity, Vec3d fromPos, float pitch,
+	public static RayTraceResult raytraceApprox(World world, @Nonnull Entity tracingEntity, Vector3d fromPos, float pitch,
 			float yaw, float maxDistance, Predicate<? super Entity> selector, double nearbyRadius) {
 		if (world == null || fromPos == null)
 			return null;
@@ -129,9 +129,9 @@ public class RayTrace {
 		return result;
 	}
 	
-	public static RayTraceResult raytrace(World world, @Nonnull Entity tracingEntity, Vec3d fromPos,
-			Vec3d direction, float maxDistance, Predicate<? super Entity> selector) {
-		Vec3d toPos;
+	public static RayTraceResult raytrace(World world, @Nonnull Entity tracingEntity, Vector3d fromPos,
+			Vector3d direction, float maxDistance, Predicate<? super Entity> selector) {
+		Vector3d toPos;
 		
 		if (world == null || fromPos == null || direction == null)
 			return null;
@@ -139,7 +139,7 @@ public class RayTrace {
 		double x = direction.x * maxDistance;
 		double y = direction.y * maxDistance;
 		double z = direction.z * maxDistance;
-		toPos = new Vec3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
+		toPos = new Vector3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
 		
 		
 		return raytrace(world, tracingEntity, fromPos, toPos, selector);
@@ -147,8 +147,8 @@ public class RayTrace {
 	
 
 	
-	public static RayTraceResult raytraceApprox(World world, @Nonnull Entity tracingEntity, Vec3d fromPos,
-			Vec3d direction, float maxDistance, Predicate<? super Entity> selector, double nearbyRadius) {
+	public static RayTraceResult raytraceApprox(World world, @Nonnull Entity tracingEntity, Vector3d fromPos,
+			Vector3d direction, float maxDistance, Predicate<? super Entity> selector, double nearbyRadius) {
 		if (world == null || fromPos == null)
 			return null;
 		
@@ -159,7 +159,7 @@ public class RayTrace {
 		return result;
 	}
 
-	public static RayTraceResult raytrace(World world, Entity tracingEntity, Vec3d fromPos, Vec3d toPos,
+	public static RayTraceResult raytrace(World world, Entity tracingEntity, Vector3d fromPos, Vector3d toPos,
 			Predicate<? super Entity> selector) {
 		
         if (world == null) {
@@ -189,7 +189,7 @@ public class RayTrace {
         // d2 is current closest distance
         double minDist = fromPos.distanceTo(toPos);
         Entity curEntity = null;
-        Vec3d curEntityVec = null;
+        Vector3d curEntityVec = null;
 
         for (int j = 0; j < list.size(); ++j)
         {
@@ -197,7 +197,7 @@ public class RayTrace {
             
             float f1 = entity1.getCollisionBorderSize();
             AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f1, (double)f1, (double)f1);
-            Optional<Vec3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
+            Optional<Vector3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
 
             if (axisalignedbb.contains(fromPos))
             {
@@ -231,7 +231,7 @@ public class RayTrace {
 	}
 	
 	
-	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity,  Vec3d fromPos, float pitch,
+	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity,  Vector3d fromPos, float pitch,
 			float yaw, float maxDistance, Predicate<? super Entity> selector) {
 		if (world == null || fromPos == null)
 			return null;
@@ -239,9 +239,9 @@ public class RayTrace {
 		return allInPath(world, tracingEntity, fromPos, directionFromAngles(pitch, yaw), maxDistance, selector);
 	}
 	
-	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity,  Vec3d fromPos,
-			Vec3d direction, float maxDistance, Predicate<? super Entity> selector) {
-		Vec3d toPos;
+	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity,  Vector3d fromPos,
+			Vector3d direction, float maxDistance, Predicate<? super Entity> selector) {
+		Vector3d toPos;
 		
 		if (world == null || fromPos == null || direction == null)
 			return new LinkedList<>();
@@ -249,7 +249,7 @@ public class RayTrace {
 		double x = direction.x * maxDistance;
 		double y = direction.y * maxDistance;
 		double z = direction.z * maxDistance;
-		toPos = new Vec3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
+		toPos = new Vector3d(fromPos.x + x, fromPos.y + y, fromPos.z + z);
 		
 		
 		return allInPath(world, tracingEntity, fromPos, toPos, selector);
@@ -263,7 +263,7 @@ public class RayTrace {
 	 * @param onlyLiving
 	 * @return
 	 */
-	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity, Vec3d fromPos, Vec3d toPos,
+	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity, Vector3d fromPos, Vector3d toPos,
 			Predicate<? super Entity> selector) {
 		
 		List<RayTraceResult> ret = new LinkedList<>();
@@ -300,7 +300,7 @@ public class RayTrace {
             
             float f1 = entity1.getCollisionBorderSize();
             AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f1, (double)f1, (double)f1);
-            Optional<Vec3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
+            Optional<Vector3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
 
             if (axisalignedbb.contains(fromPos))
             {
@@ -341,26 +341,26 @@ public class RayTrace {
 	
 	// Copy of ProjectileUtil method but with ability to collide with other misc entities
 	public static RayTraceResult forwardsRaycast(Entity projectile, RayTraceContext.BlockMode blockMode, boolean includeEntities, boolean ignoreCollideFlag, boolean shouldExclude, Entity maybeExcludedEntity){
-		double d0 = projectile.posX;
-		double d1 = projectile.posY;
-		double d2 = projectile.posZ;
+		double d0 = projectile.getPosX();
+		double d1 = projectile.getPosY();
+		double d2 = projectile.getPosZ();
 		double d3 = projectile.getMotion().x;
 		double d4 = projectile.getMotion().y;
 		double d5 = projectile.getMotion().z;
 		World world = projectile.world;
-		Vec3d vec3d = new Vec3d(d0, d1, d2);
-		Vec3d vec3d1 = new Vec3d(d0 + d3, d1 + d4, d2 + d5);
-		RayTraceResult raytraceresult = world.rayTraceBlocks(new RayTraceContext(vec3d, vec3d1, blockMode, RayTraceContext.FluidMode.NONE, projectile));
+		Vector3d Vector3d = new Vector3d(d0, d1, d2);
+		Vector3d Vector3d1 = new Vector3d(d0 + d3, d1 + d4, d2 + d5);
+		RayTraceResult raytraceresult = world.rayTraceBlocks(new RayTraceContext(Vector3d, Vector3d1, blockMode, RayTraceContext.FluidMode.NONE, projectile));
 
 		if (includeEntities)
 		{
 			if (raytraceresult.getType() != RayTraceResult.Type.MISS)
 			{
-				vec3d1 = raytraceresult.getHitVec();
+				Vector3d1 = raytraceresult.getHitVec();
 			}
 
 			Entity entity = null;
-			Vec3d entityHitVec = null;
+			Vector3d entityHitVec = null;
 			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(projectile, projectile.getBoundingBox().offset(d3, d4, d5).grow(1.0D));
 			double d6 = 0.0D;
 
@@ -371,11 +371,11 @@ public class RayTrace {
 				if ((ignoreCollideFlag || entity1.canBeCollidedWith()) && (shouldExclude || !entity1.isEntityEqual(maybeExcludedEntity)) && !entity1.noClip)
 				{
 					AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.30000001192092896D);
-					Optional<Vec3d> innerHit = axisalignedbb.rayTrace(vec3d, vec3d1);
+					Optional<Vector3d> innerHit = axisalignedbb.rayTrace(Vector3d, Vector3d1);
 
 					if (innerHit.isPresent())
 					{
-						double d7 = vec3d.squareDistanceTo(innerHit.get());
+						double d7 = Vector3d.squareDistanceTo(innerHit.get());
 
 						if (d7 < d6 || d6 == 0.0D)
 						{
@@ -406,7 +406,7 @@ public class RayTrace {
 		}
 		
 		// Get entities near the result
-		Vec3d hitPos = result.getHitVec();
+		Vector3d hitPos = result.getHitVec();
 		List<Entity> entities = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(
 				hitPos.x, hitPos.y, hitPos.z, hitPos.x, hitPos.y, hitPos.z
 				).grow(maxDist), selector);

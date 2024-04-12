@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.effects;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.ai.attributes.AttributeModifierManager;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,7 +33,7 @@ public class FastFallEffect extends Effect {
 //			return;
 //		}
 		
-		final Vec3d motion = entity.getMotion();
+		final Vector3d motion = entity.getMotion();
 		if (motion.y < 0 && motion.y > -MAX_VEL) {
 			final double y = Math.max(-MAX_VEL, motion.y * 1.4);
 			entity.setMotion(motion.x, y, motion.z);
@@ -43,12 +43,12 @@ public class FastFallEffect extends Effect {
 	}
 	
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AbstractAttributeMap attributeMap, int amplifier) {
+	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
 		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AbstractAttributeMap attributeMapIn, int amplifier) {
+	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	

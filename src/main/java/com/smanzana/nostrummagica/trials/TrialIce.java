@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
@@ -35,7 +35,7 @@ public class TrialIce extends WorldTrial {
 			if (e.getSource() != DamageSource.DROWN)
 				return;
 			
-			Vec3d pos = e.getEntityLiving().getPositionVector();
+			Vector3d pos = e.getEntityLiving().getPositionVector();
 			Biome biome = e.getEntityLiving().world.getBiome(
 					new BlockPos(pos.x, pos.y, pos.z));
 			

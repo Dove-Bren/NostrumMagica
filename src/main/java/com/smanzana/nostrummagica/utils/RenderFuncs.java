@@ -43,7 +43,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -71,7 +71,7 @@ public final class RenderFuncs {
 	
 	private static final MutableBlockPos cursor = new MutableBlockPos(); // If there are ever threads at play, this will not work
 	
-	public static final void RenderBlockOutline(PlayerEntity player, World world, Vec3d pos, BlockState blockState, float partialTicks) {
+	public static final void RenderBlockOutline(PlayerEntity player, World world, Vector3d pos, BlockState blockState, float partialTicks) {
 		GlStateManager.enableBlend();
 		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		GlStateManager.lineWidth(2.0F);
@@ -79,9 +79,9 @@ public final class RenderFuncs {
 		GlStateManager.depthMask(false);
 
 		if (blockState.getMaterial() != Material.AIR) {
-			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
-			double d1 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
-			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
+			double d0 = player.lastTickPosX + (player.getPosX() - player.lastTickPosX) * (double)partialTicks;
+			double d1 = player.lastTickPosY + (player.getPosY() - player.lastTickPosY) * (double)partialTicks;
+			double d2 = player.lastTickPosZ + (player.getPosZ() - player.lastTickPosZ) * (double)partialTicks;
 			
 			WorldRenderer.drawVoxelShapeParts(blockState.getShape(world, new BlockPos(pos), ISelectionContext.forEntity(player)), -d0, -d1, -d2, 0.0F, 0.0F, 0.0F, 0.4F);
 			
@@ -93,7 +93,7 @@ public final class RenderFuncs {
 	}
 	
 	public static final void RenderBlockOutline(PlayerEntity player, World world, BlockPos pos, BlockState blockState, float partialTicks) {
-		RenderBlockOutline(player, world, new Vec3d(pos), blockState, partialTicks);
+		RenderBlockOutline(player, world, new Vector3d(pos), blockState, partialTicks);
 	}
 	
 	public static void RenderModelWithColor(IBakedModel model, int color) {
@@ -330,9 +330,9 @@ public final class RenderFuncs {
 		disableLightmap();
 		Entity entity = mc.getRenderViewEntity();
 		World world = mc.world;
-//		int entPosX = MathHelper.floor_double(entity.posX);
-		int entPosY = MathHelper.floor(entity.posY);
-//		int entPosZ = MathHelper.floor_double(entity.posZ);
+//		int entPosX = MathHelper.floor_double(entity.getPosX());
+		int entPosY = MathHelper.floor(entity.getPosY());
+//		int entPosZ = MathHelper.floor_double(entity.getPosZ());
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder vertexbuffer = tessellator.getBuffer();
 		GlStateManager.disableCull();
@@ -343,9 +343,9 @@ public final class RenderFuncs {
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableTexture();
 		GlStateManager.enableTexture();
-		double entPosDX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
-		double entPosDY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
-		double entPosDZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
+		double entPosDX = entity.lastTickPosX + (entity.getPosX() - entity.lastTickPosX) * (double)partialTicks;
+		double entPosDY = entity.lastTickPosY + (entity.getPosY() - entity.lastTickPosY) * (double)partialTicks;
+		double entPosDZ = entity.lastTickPosZ + (entity.getPosZ() - entity.lastTickPosZ) * (double)partialTicks;
 		int entPosDYFloor = MathHelper.floor(entPosDY);
 		int radius = 5;
 
@@ -391,8 +391,8 @@ public final class RenderFuncs {
 				{
 					mc.getTextureManager().bindTexture(RAIN_TEXTURES);
 					double d5 = -((double)(getRendererUpdateCount() + 0 * 0 * 3121 + 0 * 45238971 + 0 * 0 * 418711 + 0 * 13761 & 31) + (double)partialTicks) / 32.0D * (3.0D + 0);
-					double d6 = (double)((float)at.getX() + 0.5F) - entity.posX;
-					double d7 = (double)((float)at.getZ() + 0.5F) - entity.posZ;
+					double d6 = (double)((float)at.getX() + 0.5F) - entity.getPosX();
+					double d7 = (double)((float)at.getZ() + 0.5F) - entity.getPosZ();
 					float f3 = MathHelper.sqrt(d6 * d6 + d7 * d7) / (float)radius;
 					float f4 = ((1.0F - f3 * f3) * 0.5F + 0.5F) * .5f;
 					cursor.setPos(at.getX(), lightSampleY, at.getZ());
@@ -409,8 +409,8 @@ public final class RenderFuncs {
 					double d8 = (double)(-((float)(getRendererUpdateCount() & 511) + partialTicks) / 512.0F);
 					double d9 = 0 + (double)f1 * 0.01D * (double)((float) .5D);
 					double d10 = 0 + (double)(f1 * (float) .5D) * 0.001D;
-					double d11 = (double)((float)at.getX() + 0.5F) - entity.posX;
-					double d12 = (double)((float)at.getZ() + 0.5F) - entity.posZ;
+					double d11 = (double)((float)at.getX() + 0.5F) - entity.getPosX();
+					double d12 = (double)((float)at.getZ() + 0.5F) - entity.getPosZ();
 					float f6 = MathHelper.sqrt(d11 * d11 + d12 * d12) / (float)radius;
 					float f5 = ((1.0F - f6 * f6) * 0.3F + 0.5F) * .5f;
 					cursor.setPos(at.getX(), lightSampleY, at.getZ());

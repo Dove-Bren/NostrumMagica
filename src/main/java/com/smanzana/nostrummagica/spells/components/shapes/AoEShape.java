@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class AoEShape extends SpellShape {
@@ -53,7 +53,7 @@ public class AoEShape extends SpellShape {
 							pos.getZ() + radius))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 			if (living != null && (!ignoreAllies || (target != null && !NostrumMagica.IsSameTeam(target, living))))
-				if (Math.abs(entity.getPositionVector().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
+				if (Math.abs(entity.getPositionVector().distanceTo(new Vector3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
 					ret.add(living);
 		}
 		

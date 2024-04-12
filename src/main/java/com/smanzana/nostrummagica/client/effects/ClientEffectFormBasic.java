@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ClientEffectFormBasic implements ClientEffectForm {
 	
 	private IBakedModel model;
-	private Vec3d offset;
+	private Vector3d offset;
 	
 	public ClientEffectFormBasic(String key) {
 		this(key, 0d, 0d, 0d);
@@ -25,7 +25,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 	
 	public ClientEffectFormBasic(String key, double x, double y, double z) {
 		if (x != 0 || y != 0 || z != 0)
-			this.offset = new Vec3d(x, y, z);
+			this.offset = new Vector3d(x, y, z);
 		else
 			this.offset = null;
 		

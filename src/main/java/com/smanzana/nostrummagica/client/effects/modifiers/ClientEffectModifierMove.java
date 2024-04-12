@@ -3,23 +3,23 @@ package com.smanzana.nostrummagica.client.effects.modifiers;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientEffectModifierMove implements ClientEffectModifier {
 
-	private Vec3d startPos;
-	private Vec3d endPos;
+	private Vector3d startPos;
+	private Vector3d endPos;
 	private float startTime;
 	private float endTime;
 	
-	public ClientEffectModifierMove(Vec3d start, Vec3d end) {
+	public ClientEffectModifierMove(Vector3d start, Vector3d end) {
 		this(start, end, 0f, 1f);
 	}
 	
-	public ClientEffectModifierMove(Vec3d start, Vec3d end, float startTime, float endTime) {
+	public ClientEffectModifierMove(Vector3d start, Vector3d end, float startTime, float endTime) {
 		this.startPos = start;
 		this.endPos = end;
 		this.startTime = startTime;

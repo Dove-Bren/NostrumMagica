@@ -25,7 +25,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -136,7 +136,7 @@ public class HealthTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		return new HealthTriggerInstance(state, state.getCaster(),
 				Math.max((int) supportedFloats()[0], (int) params.level), params.flip, 300);

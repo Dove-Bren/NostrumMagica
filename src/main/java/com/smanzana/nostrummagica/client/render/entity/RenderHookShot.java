@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 
@@ -40,7 +40,7 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 		return true;
 	}
 	
-	private void renderChain(BufferBuilder wr, Vec3d cordOffset, double segments, Vec3d perSeg) {
+	private void renderChain(BufferBuilder wr, Vector3d cordOffset, double segments, Vector3d perSeg) {
 		final int wholeSegments = (int) segments;
 		final double partialSegment = segments - wholeSegments;
 		double v;
@@ -94,13 +94,13 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 		// First, render chain
 		LivingEntity shooter = entity.getCaster();
 		if (shooter != null) {
-			Vec3d offset = ProjectileTrigger.getVectorForRotation(shooter.rotationPitch - 90f, shooter.rotationYawHead + 90f).scale(.1);
-			final Vec3d diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
-			final double totalLength = diff.distanceTo(new Vec3d(0,0,0));
+			Vector3d offset = ProjectileTrigger.getVectorForRotation(shooter.rotationPitch - 90f, shooter.rotationYawHead + 90f).scale(.1);
+			final Vector3d diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
+			final double totalLength = diff.distanceTo(new Vector3d(0,0,0));
 			final double segments = totalLength / texLen;
-			final Vec3d perSeg = diff.scale(1.0/segments);
-			final Vec3d cordOffset = perSeg.normalize().scale(chainWidth).rotateYaw(90f);
-			final Vec3d cordVOffset = perSeg.normalize().scale(chainWidth).rotatePitch(90f);
+			final Vector3d perSeg = diff.scale(1.0/segments);
+			final Vector3d cordOffset = perSeg.normalize().scale(chainWidth).rotateYaw(90f);
+			final Vector3d cordVOffset = perSeg.normalize().scale(chainWidth).rotatePitch(90f);
 			
 			// Want some sort of width
 			// TODO rotate depending on the direction chain is instead of always horizontal + updown

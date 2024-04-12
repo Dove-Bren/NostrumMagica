@@ -514,7 +514,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		
 		ListNBT list = new ListNBT();
 		for (int i = 0; i < gambits.length; i++) {
-			StringNBT tag = new StringNBT(gambits[i].name());
+			StringNBT tag = StringNBT.valueOf(gambits[i].name());
 			list.add(tag);
 		}
 		

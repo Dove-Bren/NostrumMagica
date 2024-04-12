@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class AtFeetTrigger extends InstantTrigger {
@@ -28,7 +28,7 @@ public class AtFeetTrigger extends InstantTrigger {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw) {
 		return new TriggerData(null, null, world, Lists.newArrayList(state.getSelf().getPosition().down()));
 	}
 	

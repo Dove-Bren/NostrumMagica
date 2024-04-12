@@ -4,12 +4,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.ai.attributes.AttributeModifierManager;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.util.DamageSource;
-import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -27,17 +27,17 @@ public class DisruptionEffect extends Effect {
 	}
 
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AbstractAttributeMap attributeMap, int amplifier) {
+	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
 		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AbstractAttributeMap attributeMapIn, int amplifier) {
+	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@SubscribeEvent
-	public static void onTeleport(EnderTeleportEvent event) {
+	public static void onTeleport(EntityTeleportEvent.EnderEntity event) {
 		final LivingEntity ent = event.getEntityLiving();
 		
 		if (ent.world.isRemote()) {
@@ -46,7 +46,7 @@ public class DisruptionEffect extends Effect {
 		
 		EffectInstance effect = ent.getActivePotionEffect(NostrumEffects.disruption);
 		if (effect != null && effect.getDuration() > 0) {
-			NostrumMagicaSounds.CAST_FAIL.play(ent.world, ent.posX, ent.posY, ent.posZ);
+			NostrumMagicaSounds.CAST_FAIL.play(ent.world, ent.getPosX(), ent.getPosY(), ent.getPosZ());
 			event.setCanceled(true);
 			
 			if (effect.getAmplifier() > 0) {

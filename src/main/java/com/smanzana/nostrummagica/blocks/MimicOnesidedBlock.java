@@ -22,7 +22,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -67,7 +67,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		builder.add(FACING);
 	}
 	
-	protected Vec3d getEntEffectiveMotion(Entity entityIn) {
+	protected Vector3d getEntEffectiveMotion(Entity entityIn) {
 		// XZ motion isn't stored on the server and is handled client-side
 		// Server also resets lastPos in an inconvenient way.
 		final double dx;
@@ -75,10 +75,10 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		if (entityIn instanceof PlayerEntity) {
 			dx = entityIn.world.isRemote()
 					? (entityIn.getMotion().x)
-					: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+					: (entityIn.getPosX() - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
 			dz = entityIn.world.isRemote()
 					? (entityIn.getMotion().z)
-					: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+					: (entityIn.getPosZ() - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 		} else {
 			dx = entityIn.getMotion().x;
 			dz = entityIn.getMotion().z;
@@ -86,21 +86,21 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		
 //				final double dx = worldIn.isRemote
 //						? (entityIn.getMotion().x)
-//						: (entityIn.posX - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+//						: (entityIn.getPosX() - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
 //				final double dz = worldIn.isRemote
 //						? (entityIn.getMotion().z)
-//						: (entityIn.posZ - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+//						: (entityIn.getPosZ() - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 		
-		return new Vec3d(dx, entityIn.getMotion().y, dz);
+		return new Vector3d(dx, entityIn.getMotion().y, dz);
 	}
 	
-	protected Vec3d getEntEffectivePos(Entity entityIn, @Nullable Vec3d motion) {
+	protected Vector3d getEntEffectivePos(Entity entityIn, @Nullable Vector3d motion) {
 		//final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
 		
 		// cant use getCenter cause it's client-side only
-		//Vec3d center = entityBox.getCenter();
-		//Vec3d center = new Vec3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
-		Vec3d center = entityIn.getPositionVector();
+		//Vector3d center = entityBox.getCenter();
+		//Vector3d center = new Vector3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
+		Vector3d center = entityIn.getPositionVector();
 		
 		if (motion == null) {
 			motion = getEntEffectiveMotion(entityIn);
@@ -120,7 +120,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		if (context != ISelectionContext.dummy()) {
 			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
 				// Hide if looking at from the right way
-				final Vec3d center = getEntEffectivePos(context.getEntity(), null);
+				final Vector3d center = getEntEffectivePos(context.getEntity(), null);
 				final Direction side = state.get(FACING);
 				final boolean blocks;
 				
@@ -163,8 +163,8 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 			solid = false;
 		} else if (context.getEntity() != null) {
 			final Entity entityIn = context.getEntity();
-			final Vec3d motion = this.getEntEffectiveMotion(entityIn);
-			final Vec3d center = this.getEntEffectivePos(entityIn, motion);
+			final Vector3d motion = this.getEntEffectiveMotion(entityIn);
+			final Vector3d center = this.getEntEffectivePos(entityIn, motion);
 			Direction side = state.get(FACING);
 			
 			switch (side) {

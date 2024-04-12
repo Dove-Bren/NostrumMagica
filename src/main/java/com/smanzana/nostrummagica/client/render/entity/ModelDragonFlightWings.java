@@ -112,8 +112,8 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 //
 //			if (entityIn.getMotion().y < 0.0D)
 //			{
-//				Vec3d vec3d = (new Vec3d(entityIn.getMotion().x, entityIn.getMotion().y, entityIn.getMotion().z)).normalize();
-//				f4 = 1.0F - (float)Math.pow(-vec3d.yCoord, 1.5D);
+//				Vector3d Vector3d = (new Vector3d(entityIn.getMotion().x, entityIn.getMotion().y, entityIn.getMotion().z)).normalize();
+//				f4 = 1.0F - (float)Math.pow(-Vector3d.yCoord, 1.5D);
 //			}
 //
 //			f = f4 * 0.34906584F + (1.0F - f4) * f;

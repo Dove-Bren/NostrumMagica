@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class OtherTrigger extends InstantTrigger {
@@ -30,7 +30,7 @@ public class OtherTrigger extends InstantTrigger {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw) {
 		
 		NostrumMagica.instance.proxy.spawnEffect(state.getOther().world,
 				new SpellComponentWrapper(instance()),

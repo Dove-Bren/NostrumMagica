@@ -29,7 +29,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -49,7 +49,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -89,8 +89,8 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
         }
 
         return multimap;
@@ -241,10 +241,10 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 //		//TODO testing code; remove!
 //		{
 //			{
-////				ClientEffect effect = new ClientEffectMirrored(Vec3d.ZERO,
+////				ClientEffect effect = new ClientEffectMirrored(Vector3d.ZERO,
 ////						new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-16f/24f), (-16f/24f), (-16f/24f)),
 ////						30, 5);
-//				ClientEffect effect = new ClientEffectMirrored(Vec3d.ZERO,
+//				ClientEffect effect = new ClientEffectMirrored(Vector3d.ZERO,
 //						new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-8f/24f), (8f/24f), (-12f/24f)),
 //						durationTicks, 5);
 //				
@@ -253,14 +253,14 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 //				effect
 //				.modify(new ClientEffectModifierColor(0xFF000000, 0xFF800000))
 //				//.modify(new ClientEffectModifierTranslate(0, 0, 0))
-//				.modify(new ClientEffectModifierMove(new Vec3d(2, 2, 0), new Vec3d(0, 0, 0), 0f, .1f))
+//				.modify(new ClientEffectModifierMove(new Vector3d(2, 2, 0), new Vector3d(0, 0, 0), 0f, .1f))
 //				.modify(new ClientEffectModifierGrow(2f, 0f, 2f, 1f, .05f))
 //				.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .75f))
 //				;
 ////				.modify(new ClientEffectModifierColor(element.getColor(), element.getColor()))
 ////				.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
 ////				.modify(new ClientEffectModifierTranslate(0, 0, -1))
-////				.modify(new ClientEffectModifierMove(new Vec3d(0, 1.5, 0), new Vec3d(0, .5, .7), .5f, 1f))
+////				.modify(new ClientEffectModifierMove(new Vector3d(0, 1.5, 0), new Vector3d(0, .5, .7), .5f, 1f))
 ////				.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
 ////				;
 //				//return effect;
@@ -287,8 +287,8 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 			// Effects:
 			{
 				NostrumParticles.GLOW_ORB.spawn(attacker.world, new SpawnParams(
-						30, target.posX, target.posY + target.getHeight(), target.posZ, .5, 60, 20,
-						new Vec3d(0, .05, 0), new Vec3d(.1, 0, .1)
+						30, target.getPosX(), target.getPosY() + target.getHeight(), target.getPosZ(), .5, 60, 20,
+						new Vector3d(0, .05, 0), new Vector3d(.1, 0, .1)
 						).color(.6f, .6f, 0f, 0f).dieOnTarget(true).gravity(.1f));
 			}
 			
@@ -315,7 +315,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 					attrSelf.addMana(manaDrawn);
 					
 					NostrumParticles.FILLED_ORB.spawn(attacker.world, new SpawnParams(
-							50, target.posX, target.posY + target.getHeight(), target.posZ, .5, 60, 0,
+							50, target.getPosX(), target.getPosY() + target.getHeight(), target.getPosZ(), .5, 60, 0,
 							attacker.getEntityId()
 							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
 				}

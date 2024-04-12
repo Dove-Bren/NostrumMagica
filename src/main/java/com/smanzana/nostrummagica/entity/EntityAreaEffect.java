@@ -30,7 +30,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -76,7 +76,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	protected boolean ignoreOwner;
 	
 	//private float prevHeight;
-	private Vec3d waddleDir;
+	private Vector3d waddleDir;
 	private double waddleMagnitude;
 	
 	protected final List<IAreaVFX> manualVFX;
@@ -150,7 +150,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		this.locationEffects.add(effect);
 	}
 	
-	public void setWaddle(Vec3d direction, double waddle) {
+	public void setWaddle(Vector3d direction, double waddle) {
 		this.waddleDir = direction;
 		this.waddleMagnitude = waddle;
 	}
@@ -301,13 +301,13 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		
 		// Motion
 		this.waddle();
-		this.posX += this.getMotion().x;
-        this.posY += this.getMotion().y;
-        this.posZ += this.getMotion().z;
+		this.getPosX() += this.getMotion().x;
+        this.getPosY() += this.getMotion().y;
+        this.getPosZ() += this.getMotion().z;
         
         boolean elevated = false;
         MutableBlockPos pos = new MutableBlockPos();
-        final double startY = this.posY;
+        final double startY = this.getPosY();
         
         // Move up out of solid blocks
         if (this.doesVerticalSteps()) {
@@ -322,7 +322,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	        		}
 	        	}
 	        	
-	        	this.posY += 1;
+	        	this.getPosY() += 1;
 	        	elevated = true;
         	}
         	
@@ -349,10 +349,10 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	        	}
 	        	
         		if (left >= 1) {
-	        		this.posY -= 1;
+	        		this.getPosY() -= 1;
 	        		left -= 1;
         		} else {
-        			this.posY -= left;
+        			this.getPosY() -= left;
         			left = 0;
         		}
         		elevated = true;
@@ -412,9 +412,9 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 					int i2 = l1 >> 16 & 255;
 					int j2 = l1 >> 8 & 255;
 					int j1 = l1 & 255;
-					this.world.addOptionalParticle(particle, this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (double)((float)i2 / 255.0F), (double)((float)j2 / 255.0F), (double)((float)j1 / 255.0F));
+					this.world.addOptionalParticle(particle, this.getPosX() + (double)f8, this.getPosY() + y, this.getPosZ() + (double)f9, (double)((float)i2 / 255.0F), (double)((float)j2 / 255.0F), (double)((float)j1 / 255.0F));
 				} else {
-					this.world.addOptionalParticle(particle, this.posX + (double)f8, this.posY + y, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D);
+					this.world.addOptionalParticle(particle, this.getPosX() + (double)f8, this.getPosY() + y, this.getPosZ() + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D);
 				}
 			}
 		}
@@ -437,7 +437,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 				float f9 = MathHelper.sin(f6) * f7;
 				double y = rand.nextDouble() * (this.getHeight() - .5) + .5;
 	
-				this.world.addParticle(particle, this.posX + (double)f8, this.posY + y + yOffset, this.posZ + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D);
+				this.world.addParticle(particle, this.getPosX() + (double)f8, this.getPosY() + y + yOffset, this.getPosZ() + (double)f9, (0.5D - this.rand.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.rand.nextDouble()) * 0.15D);
 			}
 		}
 	}
@@ -461,8 +461,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 				List<Entity> list = this.world.<Entity>getEntitiesWithinAABB(Entity.class, this.getBoundingBox(), (ent) -> { return ent != this;});
 				if (list != null && !list.isEmpty()) {
 					for (Entity ent : list) {
-						double dx = ent.posX - this.posX;
-						double dz = ent.posZ - this.posZ;
+						double dx = ent.getPosX() - this.getPosX();
+						double dz = ent.getPosZ() - this.getPosZ();
 						double d = dx * dx + dz * dz;
 						
 						if (d > this.getRadius() * this.getRadius()) {
@@ -481,8 +481,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 				// Blocks
 				AxisAlignedBB box = this.getBoundingBox();
 				for (BlockPos pos : BlockPos.getAllInBoxMutable(new BlockPos(box.minX, box.minY - 1, box.minZ), new BlockPos(box.maxX, box.maxY, box.maxZ))) {
-					double dx = (pos.getX() + .5) - this.posX;
-					double dz = (pos.getZ() + .5) - this.posZ;
+					double dx = (pos.getX() + .5) - this.getPosX();
+					double dz = (pos.getZ() + .5) - this.getPosZ();
 					double d = dx * dx + dz * dz;
 					
 					if (d > this.getRadius() * this.getRadius()) {

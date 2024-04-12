@@ -170,7 +170,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 								this.type);
 						worldIn.addEntity(hook);
 						SetHook(itemStackIn, hook);
-						NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.posX, playerIn.posY, playerIn.posZ);
+						NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ());
 					}
 				}
 			}

@@ -88,9 +88,9 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	}
 	
 	public static void RenderQuad(BufferBuilder buffer, BatchRenderParticle particle, RenderParams params, float partialTicks, float scale) {
-		final float offsetX = (float)(particle.prevPosX + (particle.posX - particle.prevPosX) * partialTicks - Particle.interpPosX);
-		final float offsetY = (float)(particle.prevPosY + (particle.posY - particle.prevPosY) * partialTicks - Particle.interpPosY);
-		final float offsetZ = (float)(particle.prevPosZ + (particle.posZ - particle.prevPosZ) * partialTicks - Particle.interpPosZ);
+		final float offsetX = (float)(particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks - Particle.interpPosX);
+		final float offsetY = (float)(particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks - Particle.interpPosY);
+		final float offsetZ = (float)(particle.prevPosZ + (particle.getPosZ() - particle.prevPosZ) * partialTicks - Particle.interpPosZ);
 		final float rX = params.rotX;
 		final float rXZ = params.rotXZ;
 		final float rZ = params.rotZ;

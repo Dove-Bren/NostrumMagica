@@ -109,8 +109,8 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 		}
 		
 		final World theWorld = targetEntity.world;
-		int i = MathHelper.floor(targetEntity.posX) - 2;
-		int j = MathHelper.floor(targetEntity.posZ) - 2;
+		int i = MathHelper.floor(targetEntity.getPosX()) - 2;
+		int j = MathHelper.floor(targetEntity.getPosZ()) - 2;
 		int k = MathHelper.floor(targetEntity.getBoundingBox().minY);
 		
 		MutableBlockPos pos1 = new MutableBlockPos();

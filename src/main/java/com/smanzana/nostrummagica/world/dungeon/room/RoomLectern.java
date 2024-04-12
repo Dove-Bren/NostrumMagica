@@ -371,7 +371,7 @@ public class RoomLectern extends StaticRoom {
 				if (null == list)
 					list = new ListNBT();
 				
-				list.add(new StringNBT(spell.getDescription()));
+				list.add(StringNBT.valueOf(spell.getDescription()));
 				nbt.put("Lore", list);
 				scroll.setTag(nbt);
 				

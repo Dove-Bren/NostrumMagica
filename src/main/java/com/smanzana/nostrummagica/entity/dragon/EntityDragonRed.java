@@ -42,7 +42,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
@@ -61,7 +61,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.BossInfo;
 import net.minecraft.world.ServerBossInfo;
 import net.minecraft.world.World;
@@ -70,20 +70,20 @@ import net.minecraftforge.common.util.Constants.NBT;
 public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEntity {
 
 	public static enum DragonBodyPartType {
-		BODY("body", 2.5f, 3f, Vec3d.ZERO),
-		REAR("rear", 2.5f, 3, new Vec3d(0, 0, -2.5f)),
-		HEAD("head", .5f, 2f, new Vec3d(0, 3.0, 1.5f)),
-		//TAIL("tail", .5f, .5f, new Vec3d(0, 0, 3.0)),
-		//WING_LEFT("wing_left", 1f, 1f, new Vec3d(-2, 0, 1.0)),
-		//WING_RIGHT("wing_right", 2f, .5f, new Vec3d(2, 0, 1.0)),
+		BODY("body", 2.5f, 3f, Vector3d.ZERO),
+		REAR("rear", 2.5f, 3, new Vector3d(0, 0, -2.5f)),
+		HEAD("head", .5f, 2f, new Vector3d(0, 3.0, 1.5f)),
+		//TAIL("tail", .5f, .5f, new Vector3d(0, 0, 3.0)),
+		//WING_LEFT("wing_left", 1f, 1f, new Vector3d(-2, 0, 1.0)),
+		//WING_RIGHT("wing_right", 2f, .5f, new Vector3d(2, 0, 1.0)),
 		;
 		
 		private final String name;
 		private final float width;
 		private final float height;
-		private final Vec3d offset;
+		private final Vector3d offset;
 		
-		private DragonBodyPartType(String name, float width, float height, Vec3d offset) {
+		private DragonBodyPartType(String name, float width, float height, Vector3d offset) {
 			this.name = name;
 			this.width = width;
 			this.height = height;
@@ -103,7 +103,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 			return height;
 		}
 		
-		public Vec3d getPartOffset() {
+		public Vector3d getPartOffset() {
 			return offset;
 		}
 	}
@@ -413,14 +413,14 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(3D);
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
-        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(Attributes.FLYING_SPEED).setBaseValue(3D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(15.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(15.0D);
+        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
+        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64D);
     }
 	
 	@Override
@@ -434,7 +434,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 			DragonBodyPart part = new DragonBodyPart(partType, this);
 			bodyParts.put(partType, part);
 			
-			part.setPosition(this.posX, this.posY, this.posZ);
+			part.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 			this.world.addEntity(part);
 		}
 	}
@@ -486,11 +486,11 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 				continue; // Client, and hasn't attached yet?
 			}
 			
-			Vec3d offset = type.getPartOffset();
+			Vector3d offset = type.getPartOffset();
 			part.setLocationAndAngles(
-					this.posX + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
-					this.posY + offset.y,
-					this.posZ + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
+					this.getPosX() + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
+					this.getPosY() + offset.y,
+					this.getPosZ() + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
 					this.rotationYaw, this.rotationPitch);
 			part.tick();
 		}
@@ -519,7 +519,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		
 		if (world.isRemote) {
 			if (this.isFlying() && !this.getWingFlapping()) {
-				if ((this.posY > this.prevPosY) || (this.getMotion().x + this.getMotion().z < .2)) {
+				if ((this.getPosY() > this.prevPosY) || (this.getMotion().x + this.getMotion().z < .2)) {
 					this.flapWing(this.getMotion().x + this.getMotion().z < .2 ? .5f : 1f);
 				}
 			}
@@ -532,7 +532,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 //					posX, posY + this.getHeight() / 2, posZ,
 //					5,
 //					30, 5,
-//					new Vec3d(0, .25, 0), Vec3d.ZERO)
+//					new Vector3d(0, .25, 0), Vector3d.ZERO)
 //					.color(0xFFFF0022));
 			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
 					posX, posY + this.getHeight() / 2, posZ,

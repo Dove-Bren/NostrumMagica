@@ -22,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -223,13 +223,13 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 			return this;
 		}
 		
-		public Vector set(Vec3d vec) {
+		public Vector set(Vector3d vec) {
 			this.set(vec.x, vec.y, vec.z);
 			
 			return this;
 		}
 		
-		public Vector subtract(Vec3d vec) {
+		public Vector subtract(Vector3d vec) {
 			this.x -= vec.x;
 			this.y -= vec.y;
 			this.z -= vec.z;

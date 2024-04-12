@@ -20,7 +20,7 @@ import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
@@ -35,7 +35,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 	private float minDist;
 	private float oldWaterCost;
 	
-	private @Nullable Vec3d lastPosition;
+	private @Nullable Vector3d lastPosition;
 	private int timeToRecalcPosition; // measured in existTicks of pet
 	
 	protected Predicate<? super T> filter;
@@ -115,9 +115,9 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 	 * @param mode
 	 * @return
 	 */
-	protected Vec3d getIdealTargetPosition(T pet, LivingEntity owner, PetPlacementMode mode) {
+	protected Vector3d getIdealTargetPosition(T pet, LivingEntity owner, PetPlacementMode mode) {
 		final int index = getPetPositionIndex(pet, owner);
-		final Vec3d target;
+		final Vector3d target;
 		
 		switch (mode) {
 		case HEEL_DEFENSIVE:
@@ -144,11 +144,11 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			final float adjX = Math.signum(offsetX) * spacing * shell;
 			
 			// Get owner rotation to apply to
-			final Vec3d ownerMoveVec = NostrumMagica.playerListener.getLastMove(owner);
+			final Vector3d ownerMoveVec = NostrumMagica.playerListener.getLastMove(owner);
 			final float yawOwnerRad = (float) Math.atan2(ownerMoveVec.x, ownerMoveVec.z);
 			
 			// Get offset first as if owner was facing 
-			Vec3d offset = new Vec3d(offsetX + adjX, 0, offsetZ);
+			Vector3d offset = new Vector3d(offsetX + adjX, 0, offsetZ);
 			offset = offset.rotateYaw(yawOwnerRad + .0f * (float) Math.PI);
 			target = owner.getPositionVector().add(offset);
 			
@@ -179,11 +179,11 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			final float magnitude = 1.5f + (1.5f * row);
 			
 			// Get owner rotation to apply to
-			final Vec3d ownerMoveVec = NostrumMagica.playerListener.getLastMove(owner);
+			final Vector3d ownerMoveVec = NostrumMagica.playerListener.getLastMove(owner);
 			final float yawOwnerRad = (float) Math.atan2(ownerMoveVec.x, ownerMoveVec.z);
 			
 			// Get offset first as if owner was facing 
-			Vec3d offset = new Vec3d(magnitude * Math.cos(angleRad), 0, magnitude * Math.sin(angleRad));
+			Vector3d offset = new Vector3d(magnitude * Math.cos(angleRad), 0, magnitude * Math.sin(angleRad));
 			offset = offset.rotateYaw(yawOwnerRad + .75f * (float) Math.PI);
 			target = owner.getPositionVector().add(offset);
 			
@@ -199,7 +199,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 		return target;
 	}
 	
-	protected Vec3d getTargetPosition(T pet, LivingEntity owner, PetPlacementMode mode) {
+	protected Vector3d getTargetPosition(T pet, LivingEntity owner, PetPlacementMode mode) {
 		if (timeToRecalcPosition == 0 || timeToRecalcPosition < pet.ticksExisted) {
 			timeToRecalcPosition = pet.ticksExisted + 20;
 			lastPosition = getIdealTargetPosition(pet, owner, mode);
@@ -243,7 +243,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 		}
 		
 		final boolean sitting = this.isPetSitting(thePet);
-		final Vec3d targetPos = getTargetPosition(thePet, entitylivingbase, mode);
+		final Vector3d targetPos = getTargetPosition(thePet, entitylivingbase, mode);
 
 		if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
 			return false;
@@ -277,7 +277,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			return false;
 		}
 		
-		final Vec3d targetPos = getTargetPosition(thePet, theOwner, mode);
+		final Vector3d targetPos = getTargetPosition(thePet, theOwner, mode);
 		return !this.petPathfinder.noPath() && this.thePet.getDistanceSq(targetPos.x, targetPos.y, targetPos.z) > (double)(this.maxDist * this.maxDist);
 	}
 
@@ -307,7 +307,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 		//this.thePet.getLookHelper().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
 
 		if (!isPetSitting(thePet)) {
-//			final Vec3d ownerMoveVec = NostrumMagica.playerListener.getLastMove(theOwner);
+//			final Vector3d ownerMoveVec = NostrumMagica.playerListener.getLastMove(theOwner);
 //			final float yawOwner = (float) -Math.atan2(ownerMoveVec.x, ownerMoveVec.z) * 180f / (float)Math.PI;
 //			this.thePet.getLookHelper().setLookPosition(x, y, z, deltaYaw, deltaPitch);
 			
@@ -315,7 +315,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			if (--this.timeToRecalcPath <= 0) {
 				this.timeToRecalcPath = 10;
 				final PetPlacementMode mode = NostrumMagica.instance.getPetCommandManager().getPlacementMode(this.theOwner);
-				final Vec3d targetPos = this.getTargetPosition(thePet, theOwner, mode);
+				final Vector3d targetPos = this.getTargetPosition(thePet, theOwner, mode);
 
 				//thePet.setLocationAndAngles(targetPos.x, targetPos.y, targetPos.z, this.thePet.rotationYaw, this.thePet.rotationPitch);
 				if (!this.petPathfinder.tryMoveToXYZ(targetPos.x, targetPos.y, targetPos.z, this.followSpeed)) {

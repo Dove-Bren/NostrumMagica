@@ -21,7 +21,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
@@ -76,7 +76,7 @@ public class MysticAnchor extends Block {
 			NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 					1,
 					pos.getX() + .5, pos.getY() + .75, pos.getZ() + .5, .5, 40, 0,
-					new Vec3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}
@@ -102,7 +102,7 @@ public class MysticAnchor extends Block {
 	
 	protected void teleportEntity(World world, BlockPos pos, Entity entity) {
 		if (entity.dimension == world.getDimension().getType()) {
-			final Vec3d vecToEnt = entity.getPositionVec().subtract(new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)).normalize();
+			final Vector3d vecToEnt = entity.getPositionVec().subtract(new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)).normalize();
 			final Direction dirToEnt = Direction.getFacingFromVector(vecToEnt.getX(), vecToEnt.getY(), vecToEnt.getZ());
 			BlockPos toPos = findTeleportSpot(world, pos, dirToEnt);
 			

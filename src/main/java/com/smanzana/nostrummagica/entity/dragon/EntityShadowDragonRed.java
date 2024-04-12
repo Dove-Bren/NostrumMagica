@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.player.PlayerEntity;
@@ -107,13 +107,13 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(8.0D);
-        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(5.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(8.0D);
+        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
+        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64D);
     }
 	
 	@Override
@@ -128,12 +128,12 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		
 		if (this.target != null) {
 			if (!this.target.isAlive()) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
 			}
 		} else {
 			// If target is null but we're a target-type, DIE
 			if (this.dataManager.get(HASTARGET)) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getValue());
+				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
 			}
 		}
 	}

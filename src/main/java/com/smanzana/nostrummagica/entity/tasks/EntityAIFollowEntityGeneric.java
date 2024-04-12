@@ -116,8 +116,8 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 				if (!this.petPathfinder.tryMoveToEntityLiving(this.theTarget, this.followSpeed) && this.canTeleport) {
 					if (!this.entity.getLeashed()) {
 						if (this.entity.getDistanceSq(this.theTarget) >= 144.0D) {
-							int i = MathHelper.floor(this.theTarget.posX) - 2;
-							int j = MathHelper.floor(this.theTarget.posZ) - 2;
+							int i = MathHelper.floor(this.theTarget.getPosX()) - 2;
+							int j = MathHelper.floor(this.theTarget.getPosZ()) - 2;
 							int k = MathHelper.floor(this.theTarget.getBoundingBox().minY);
 							
 							MutableBlockPos pos1 = new MutableBlockPos();

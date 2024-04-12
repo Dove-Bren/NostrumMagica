@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,7 +30,7 @@ public class ClientEffect {
 		}
 	}
 
-	final protected Vec3d origin;
+	final protected Vector3d origin;
 	final private ClientEffectForm form;
 
 	protected long startTime;
@@ -41,7 +41,7 @@ public class ClientEffect {
 	
 	protected List<ClientEffectModifier> modifiers;
 	
-	private ClientEffect(Vec3d origin, ClientEffectForm form) {
+	private ClientEffect(Vector3d origin, ClientEffectForm form) {
 		existedMS = 0;
 		existedTicks = 0;
 		startTime = 0;
@@ -50,12 +50,12 @@ public class ClientEffect {
 		modifiers = new LinkedList<>();
 	}
 	
-	public ClientEffect(Vec3d origin, ClientEffectForm form, int durationTicks) {
+	public ClientEffect(Vector3d origin, ClientEffectForm form, int durationTicks) {
 		this(origin, form);
 		this.durationTicks = durationTicks;
 	}
 	
-	public ClientEffect(Vec3d origin, ClientEffectForm form, long durationMS) {
+	public ClientEffect(Vector3d origin, ClientEffectForm form, long durationMS) {
 		this(origin, form);
 		this.durationMS = durationMS;
 	}

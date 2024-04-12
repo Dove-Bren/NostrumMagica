@@ -19,7 +19,7 @@ public class AttributeManaRegen extends RangedAttribute {
 	}
 	
 	private AttributeManaRegen() {
-		super(null, unlocalized_name, 0, -100.0D, 500.0D);
+		super(unlocalized_name, 0, -100.0D, 500.0D);
 	}
 
 }

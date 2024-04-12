@@ -217,7 +217,7 @@ public class NostrumQuest {
 		// TODO if there's some sort of listener, it should be cleaned up here
 		
 		if (!player.world.isRemote)
-			NostrumMagicaSounds.SUCCESS_QUEST.play(player.world, player.posX, player.posY, player.posZ);
+			NostrumMagicaSounds.SUCCESS_QUEST.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 		else
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 	}

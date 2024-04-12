@@ -68,7 +68,7 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -79,7 +79,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -413,7 +413,7 @@ public class OverlayRenderer extends AbstractGui {
 			}
 			
 			final int h = (int) player.getEyeHeight();
-			BlockState inBlock = player.world.getBlockState(new BlockPos(player.posX, player.posY + h, player.posZ));
+			BlockState inBlock = player.world.getBlockState(new BlockPos(player.getPosX(), player.getPosY() + h, player.getPosZ()));
 			if (inBlock.getBlock() instanceof DungeonAir) {
 				// Render dungeon air overlay
 				{
@@ -687,7 +687,7 @@ public class OverlayRenderer extends AbstractGui {
 	private void renderArmorOverlay(ClientPlayerEntity player, MainWindow window) {
 		// Clone calc of left y offset, since it's not passed through
 		int left_height = 39;
-		IAttributeInstance attrMaxHealth = player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+		IAttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
         float healthMax = (float)attrMaxHealth.getValue();
         float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 		int healthRows = MathHelper.ceil((healthMax + absorb) / 2.0F / 10.0F);
@@ -1410,11 +1410,11 @@ public class OverlayRenderer extends AbstractGui {
 			if (data != null && data.getCount() != 0) {
 				final ClientEffect effect = new ClientEffectAnimated(entity.getPositionVector(), 1000L,
 						new ClientEffect[] {
-							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
+							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
+							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
+							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
+							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
+							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
 						},
 						new float[] {
 							.1f,
@@ -1533,7 +1533,7 @@ public class OverlayRenderer extends AbstractGui {
 //		if (!event.isCanceled() && event.getOverlayType() == OverlayType.WATER) {
 //			final PlayerEntity player = event.getPlayer();
 //			// the event has the wrong BlockPos (entity center instead of eyes)
-//			final BlockPos blockpos = new BlockPos(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+//			final BlockPos blockpos = new BlockPos(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
 //			final BlockState state = player.world.getBlockState(blockpos);
 //			final Block block = state.getBlock();
 //			final IFluidState fluidState = state.getFluidState();
@@ -1543,7 +1543,7 @@ public class OverlayRenderer extends AbstractGui {
 //				
 //				
 //				BlockFluidBase fblock = (BlockFluidBase) block;
-//				Vec3d fogColor = fblock.getFogColor(player.world, blockpos, state, player,
+//				Vector3d fogColor = fblock.getFogColor(player.world, blockpos, state, player,
 //						player.world.getFogColor(event.getRenderPartialTicks()),
 //						event.getRenderPartialTicks());
 //				float fogColorRed = (float) fogColor.x;

@@ -27,7 +27,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -47,12 +47,12 @@ public class MortarTrigger extends SpellTrigger {
 		protected static final double HVel = .5; 
 
 		private World world;
-		private Vec3d pos;
+		private Vector3d pos;
 		private float pitch;
 		private float yaw;
 		private boolean noArc;
 		
-		public MortarTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean noArc) {
+		public MortarTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean noArc) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -66,7 +66,7 @@ public class MortarTrigger extends SpellTrigger {
 			
 			// Do a little more work of getting a good vector for things
 			// that aren't players
-			final Vec3d dir;
+			final Vector3d dir;
 			final LivingEntity target;
 			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
@@ -86,7 +86,7 @@ public class MortarTrigger extends SpellTrigger {
 				public void run() {
 					
 					// If we have entity target, set that as dest. Otherwise, raytrace
-					final Vec3d dest;
+					final Vector3d dest;
 					if (target != null) {
 						dest = target.getPositionVector();
 					} else {
@@ -108,8 +108,8 @@ public class MortarTrigger extends SpellTrigger {
 					}
 					
 					// Figure out angle to hit destination from source. Ignore blocks and stuff
-					final Vec3d startVelocity;
-					final Vec3d startPos;
+					final Vector3d startVelocity;
+					final Vector3d startPos;
 					if (self.noArc) {
 						// Drop from above
 						// Try not to start in the ceiling
@@ -126,8 +126,8 @@ public class MortarTrigger extends SpellTrigger {
 							}
 						}
 						
-						startPos = new Vec3d(dest.x, cursor.getY(), dest.z);
-						startVelocity = new Vec3d(0, -.25, 0);
+						startPos = new Vector3d(dest.x, cursor.getY(), dest.z);
+						startVelocity = new Vector3d(0, -.25, 0);
 					} else {
 						startPos = pos;
 						startVelocity = Curves.getMortarArcVelocity(pos, dest, HVel, OverworldGravity);
@@ -219,7 +219,7 @@ public class MortarTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartParam params) {
 		boolean noArc = false;
 		
 		// We use param's flip to indicate whether to drop from the sky or not
@@ -227,7 +227,7 @@ public class MortarTrigger extends SpellTrigger {
 			noArc = params.flip;
 		
 		// Add direction
-		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new MortarTriggerInstance(state, world, pos, pitch, yaw, noArc);
 	}
 

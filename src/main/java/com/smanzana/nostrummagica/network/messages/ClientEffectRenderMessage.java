@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.utils.Entities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -50,17 +50,17 @@ public class ClientEffectRenderMessage {
 	}
 
 	private final UUID caster;
-	private final Vec3d casterPos;
+	private final Vector3d casterPos;
 	private final UUID target;
-	private final Vec3d targetPos;
+	private final Vector3d targetPos;
 	private final SpellComponentWrapper component;
 	private final SpellComponentWrapper flavor;
 	private final boolean negative;
 	private final float param;
 	
 	public ClientEffectRenderMessage(
-			LivingEntity caster, Vec3d casterPos,
-			LivingEntity target, Vec3d targetPos,
+			LivingEntity caster, Vector3d casterPos,
+			LivingEntity target, Vector3d targetPos,
 			SpellComponentWrapper component,
 			SpellComponentWrapper flavor,
 			boolean negative,
@@ -71,8 +71,8 @@ public class ClientEffectRenderMessage {
 	}
 	
 	public ClientEffectRenderMessage(
-			UUID caster, Vec3d casterPos,
-			UUID target, Vec3d targetPos,
+			UUID caster, Vector3d casterPos,
+			UUID target, Vector3d targetPos,
 			SpellComponentWrapper component,
 			SpellComponentWrapper flavor,
 			boolean negative,
@@ -89,9 +89,9 @@ public class ClientEffectRenderMessage {
 
 	public static ClientEffectRenderMessage decode(PacketBuffer buf) {
 		final UUID caster;
-		final Vec3d casterPos;
+		final Vector3d casterPos;
 		final UUID target;
-		final Vec3d targetPos;
+		final Vector3d targetPos;
 		final SpellComponentWrapper component;
 		final SpellComponentWrapper flavor;
 		final boolean negative;
@@ -104,7 +104,7 @@ public class ClientEffectRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			casterPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+			casterPos = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		} else {
 			casterPos = null;
 		}
@@ -116,7 +116,7 @@ public class ClientEffectRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			targetPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+			targetPos = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		} else {
 			targetPos = null;
 		}

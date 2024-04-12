@@ -96,7 +96,7 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (!worldIn.isRemote && attr != null && attr.isUnlocked()) {
 			if (this.func.award(playerIn, attr, stack)) {
-				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.posX, playerIn.posY, playerIn.posZ);
+				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ());
 				stack.shrink(1);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
 			}

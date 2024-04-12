@@ -200,7 +200,7 @@ public class DungeonRoomRegistry {
 		
 		ListNBT list = new ListNBT();
 		for (String tag : tags) {
-			list.add(new StringNBT(tag));
+			list.add(StringNBT.valueOf(tag));
 		}
 		nbt.put(NBT_TAGS, list);
 		

@@ -27,7 +27,7 @@ public class AttributeMagicReduction extends RangedAttribute {
 	private final EMagicElement element;
 	
 	private AttributeMagicReduction(EMagicElement elem) {
-		super(null, GetUnlocName(elem), 0, -20.0D, 20.0D);
+		super(GetUnlocName(elem), 0, -20.0D, 20.0D);
 		this.element = elem;
 	}
 	

@@ -37,7 +37,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 	protected final Predicate<? super T> continuePred;
 	
 	private double offsetYaw;
-	private final MutableVec3d cursor;
+	private final MutableVector3d cursor;
 
 	public EntityAIOrbitEntityGeneric(T orbiter, LivingEntity target, double orbitDistance, double orbitPeriod) {
 		this(orbiter, target, orbitDistance, orbitPeriod, 1.0, DEFAULT_WOBBLE, DEFAULT_BUMPS, null, null);
@@ -57,7 +57,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 		this.startPred = startFilter;
 		this.continuePred = continueFilter;
 		
-		cursor = new MutableVec3d(0, 0, 0);
+		cursor = new MutableVector3d(0, 0, 0);
 		
 		this.setMutexFlags(EnumSet.of(Goal.Flag.JUMP));
 	}
@@ -123,7 +123,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 		;
 	}
 
-	protected static MutableVec3d getPoint(MutableVec3d posOut, double radius, double periodTicks, double elapsedTicks, double periodOffset,
+	protected static MutableVector3d getPoint(MutableVector3d posOut, double radius, double periodTicks, double elapsedTicks, double periodOffset,
 			int ringBumps, double ringWobblePeriod) {
 		// x/z come from one regular circle with radius [radius] an period [periodTicks].
 		// On top of that, y offset comes from the ring wobble params.
@@ -137,7 +137,7 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 		final double y = Math.sin(wobbleRadians) * .5;
 		
 		if (posOut == null) {
-			posOut = new MutableVec3d(x, y, z);
+			posOut = new MutableVector3d(x, y, z);
 		} else {
 			posOut.xCoord = x;
 			posOut.yCoord = y;
@@ -152,20 +152,20 @@ public class EntityAIOrbitEntityGeneric<T extends MobEntity> extends Goal {
 	 */
 	public void tick() {
 		getPoint(cursor, orbitDistance, orbitPeriod, ent.ticksExisted, offsetYaw, ringWobbleBumps, ringWobbleSpeed);
-		if (ent.getDistanceSq(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ)
+		if (ent.getDistanceSq(cursor.xCoord + orbitTarget.getPosX(), cursor.yCoord + orbitTarget.getPosY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getPosZ())
 				> 512) {
-			ent.setPosition(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ);
+			ent.setPosition(cursor.xCoord + orbitTarget.getPosX(), cursor.yCoord + orbitTarget.getPosY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getPosZ());
 		} else {
-			ent.getMoveHelper().setMoveTo(cursor.xCoord + orbitTarget.posX, cursor.yCoord + orbitTarget.posY + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.posZ, 2);
+			ent.getMoveHelper().setMoveTo(cursor.xCoord + orbitTarget.getPosX(), cursor.yCoord + orbitTarget.getPosY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getPosZ(), 2);
 		}
 	}
 	
-	private static final class MutableVec3d {
+	private static final class MutableVector3d {
 		public double xCoord;
 		public double yCoord;
 		public double zCoord;
 		
-		public MutableVec3d(double x, double y, double z) {
+		public MutableVector3d(double x, double y, double z) {
 			this.xCoord = x;
 			this.yCoord = y;
 			this.zCoord = z;

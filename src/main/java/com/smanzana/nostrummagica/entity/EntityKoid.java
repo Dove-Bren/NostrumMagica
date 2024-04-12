@@ -19,7 +19,7 @@ import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Pose;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtGoal;
 import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
@@ -76,10 +76,10 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
     protected void registerAttributes()
     {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(2.0D);
     }
 
     protected void playStepSound(BlockPos pos, BlockState blockIn)
@@ -112,7 +112,7 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
 
     public boolean attackEntityAsMob(Entity entityIn)
     {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
+        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
         if (flag)
         {

@@ -115,7 +115,7 @@ public class ArcaneWolfAIBarrierTask extends Goal {
 			if (applyTo(wolf, target)) {
 				applied = true;
 				NostrumParticles.FILLED_ORB.spawn(wolf.world, new SpawnParams(
-						1, wolf.posX, wolf.posY + wolf.getHeight()/2, wolf.posZ, 0, 40, 0, target.getEntityId()
+						1, wolf.getPosX(), wolf.getPosY() + wolf.getHeight()/2, wolf.getPosZ(), 0, 40, 0, target.getEntityId()
 						).color(ArcaneWolfElementalType.BARRIER.getColor()));
 			}
 		}

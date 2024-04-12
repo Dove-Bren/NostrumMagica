@@ -11,7 +11,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.DimensionArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
 
 public class CommandSetDimension {
 	
@@ -20,12 +20,12 @@ public class CommandSetDimension {
 				Commands.literal("tpdm")
 					.requires(s -> s.hasPermissionLevel(2))
 					.then(Commands.argument("dimension", DimensionArgument.getDimension())
-							.executes(ctx -> execute(ctx, DimensionArgument.func_212592_a(ctx, "dimension")))
+							.executes(ctx -> execute(ctx, DimensionArgument.getDimensionArgument(ctx, "dimension")))
 							)
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, DimensionType dimension) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSource> context, ServerWorld world) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -35,10 +35,10 @@ public class CommandSetDimension {
 		}
 		
 		if (player.isCreative()) {
-			if (dimension != null) {
+			if (world != null) {
 				System.out.println("Teleport Command!");
 				//player.setPortal(player.getPosition());
-				player.changeDimension(dimension);
+				player.changeDimension(world);
 			} else {
 				context.getSource().sendFeedback(new StringTextComponent("That dimension doesn't seem to exist!"), true);
 			}

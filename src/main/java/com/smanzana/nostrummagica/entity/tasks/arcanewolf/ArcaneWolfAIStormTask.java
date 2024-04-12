@@ -80,9 +80,9 @@ public class ArcaneWolfAIStormTask extends Goal {
 		for (int i = 0; i < 2; i++) {
 			((ServerWorld) target.world).addLightningBolt(
 					(new NostrumTameLightning(NostrumEntityTypes.tameLightning, target.world,
-							target.posX + (wolf.getRNG().nextFloat()-.5f),
-							target.posY,
-							target.posZ + (wolf.getRNG().nextFloat()-.5f))
+							target.getPosX() + (wolf.getRNG().nextFloat()-.5f),
+							target.getPosY(),
+							target.getPosZ() + (wolf.getRNG().nextFloat()-.5f))
 					).setEntityToIgnore(wolf));
 		}
 	}

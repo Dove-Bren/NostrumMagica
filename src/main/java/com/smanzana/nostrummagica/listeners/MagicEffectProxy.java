@@ -11,18 +11,15 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -192,36 +189,38 @@ public class MagicEffectProxy {
 	}
 	
 	public void setTargetted(LivingEntity entity) {
-		final int start = entity.ticksExisted;
-		final DimensionType dimension = entity.dimension;
-		apply(SpecialEffect.TARGETED, new EffectData().count(start).amt(dimension.getId()), entity);
-		NostrumMagica.playerListener.registerTimer((type, ent, junk) -> {
-			boolean remove = false;
-			
-			// Find what the current data is
-			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.TARGETED);
-			if (data != null && (int) data.getAmt() == dimension.getId() && data.getCount() == start && !entity.world.isRemote()) {
-				// Most recent is still us. Check if we should cancel
-				if (entity.world != null && entity.isAlive()) {
-					if (Entities.GetEntities((ServerWorld) entity.world, (e) -> {
-						return e != null
-								&& e instanceof MobEntity
-								&& ((MobEntity) e).getAttackTarget() != null
-								&& ((MobEntity) e).getAttackTarget().equals(entity)
-								&& entity.getDistanceSq(e) < 400;
-					}).isEmpty()) {
-						NostrumMagica.magicEffectProxy.remove(SpecialEffect.TARGETED, entity);
-						remove = true;
-					} else {
-						// Check again
-					}
-				}
-			} else {
-				remove = true;
-			}
-			
-			return remove;
-		}, 20 * 5, 1);
+//		final int start = entity.ticksExisted;
+//		final RegistryKey<World> dimension = entity.getEntityWorld().getDimensionKey();
+//		apply(SpecialEffect.TARGETED, new EffectData().count(start).amt(/*dimension.getId()*/ 0), entity);
+//		NostrumMagica.playerListener.registerTimer((type, ent, junk) -> {
+//			boolean remove = false;
+//			
+//			// Find what the current data is
+//			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.TARGETED);
+//			if (data != null && (int) data.getAmt() == dimension.getId() && data.getCount() == start && !entity.world.isRemote()) {
+//				// Most recent is still us. Check if we should cancel
+//				if (entity.world != null && entity.isAlive()) {
+//					if (Entities.GetEntities((ServerWorld) entity.world, (e) -> {
+//						return e != null
+//								&& e instanceof MobEntity
+//								&& ((MobEntity) e).getAttackTarget() != null
+//								&& ((MobEntity) e).getAttackTarget().equals(entity)
+//								&& entity.getDistanceSq(e) < 400;
+//					}).isEmpty()) {
+//						NostrumMagica.magicEffectProxy.remove(SpecialEffect.TARGETED, entity);
+//						remove = true;
+//					} else {
+//						// Check again
+//					}
+//				}
+//			} else {
+//				remove = true;
+//			}
+//			
+//			return remove;
+//		}, 20 * 5, 1);
+		int unused;
+		// The above doesn't work anymore as dimensions don't have int IDs
 	}
 	
 	public void remove(SpecialEffect effect, LivingEntity entity) {

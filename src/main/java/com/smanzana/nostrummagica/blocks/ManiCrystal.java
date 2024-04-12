@@ -17,7 +17,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -196,28 +196,28 @@ public class ManiCrystal extends Block {
 	 * Get a useful offset for this crystal for things like effects to go to to go 'to' the crystal
 	 * @return
 	 */
-	public Vec3d getCrystalTipOffset(BlockState state) {
+	public Vector3d getCrystalTipOffset(BlockState state) {
 		Direction facing = state.get(FACING);
-		Vec3d offset = Vec3d.ZERO;
+		Vector3d offset = Vector3d.ZERO;
 		if (facing != null) {
 			switch (facing) {
 			case DOWN:
-				offset = new Vec3d(.5, .55, .5);
+				offset = new Vector3d(.5, .55, .5);
 				break;
 			case UP:
-				offset = new Vec3d(.5, .8, .5);
+				offset = new Vector3d(.5, .8, .5);
 				break;
 			case EAST:
-				offset = new Vec3d(.16, .5, .5);
+				offset = new Vector3d(.16, .5, .5);
 				break;
 			case WEST:
-				offset = new Vec3d(1-.16, .5, .5);
+				offset = new Vector3d(1-.16, .5, .5);
 				break;
 			case NORTH:
-				offset = new Vec3d(.5, .5, 1-.16);
+				offset = new Vector3d(.5, .5, 1-.16);
 				break;
 			case SOUTH:
-				offset = new Vec3d(.5, .5, .16);
+				offset = new Vector3d(.5, .5, .16);
 				break;
 			}
 		}

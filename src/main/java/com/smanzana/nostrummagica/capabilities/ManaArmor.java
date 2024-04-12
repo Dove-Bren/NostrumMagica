@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * Default implementation of the IManaArmor interface
@@ -116,8 +116,8 @@ public class ManaArmor implements IManaArmor {
 	
 	protected void spawnEffects(Entity hurtEntity, DamageSource source, float originalAmount, float finalAmount) {
 		NostrumParticles.WARD.spawn(hurtEntity.world, new NostrumParticles.SpawnParams(
-				4, hurtEntity.posX, hurtEntity.posY + (hurtEntity.getHeight()/2), hurtEntity.posZ, .75, 30, 0,
-				Vec3d.ZERO, new Vec3d(.0, -.01, .0)
+				4, hurtEntity.getPosX(), hurtEntity.getPosY() + (hurtEntity.getHeight()/2), hurtEntity.getPosZ(), .75, 30, 0,
+				Vector3d.ZERO, new Vector3d(.0, -.01, .0)
 				//hurtEntity.getEntityId()
 				)
 					.color(0x602244FF)
@@ -137,8 +137,8 @@ public class ManaArmor implements IManaArmor {
 	protected void spawnBreakEffects(Entity hurtEntity) {
 		NostrumMagicaSounds.SHIELD_BREAK.play(hurtEntity);
 		NostrumParticles.WARD.spawn(hurtEntity.world, new NostrumParticles.SpawnParams(
-				20, hurtEntity.posX, hurtEntity.posY + (hurtEntity.getHeight()/2), hurtEntity.posZ, .75, 30, 0,
-				new Vec3d(.0, -.01, .0), new Vec3d(.01, 0, .01) 
+				20, hurtEntity.getPosX(), hurtEntity.getPosY() + (hurtEntity.getHeight()/2), hurtEntity.getPosZ(), .75, 30, 0,
+				new Vector3d(.0, -.01, .0), new Vector3d(.01, 0, .01) 
 				//hurtEntity.getEntityId()
 				)
 					.gravity(true)

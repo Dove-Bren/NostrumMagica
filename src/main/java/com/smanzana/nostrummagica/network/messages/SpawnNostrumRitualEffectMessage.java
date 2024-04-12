@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -34,7 +34,7 @@ public class SpawnNostrumRitualEffectMessage {
 		
 //			Minecraft.getInstance().runAsync(() -> {
 //				ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
-//						new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
+//						new Vector3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
 //						element, centerF, extrasF, types, outputF
 //						));
 //			});

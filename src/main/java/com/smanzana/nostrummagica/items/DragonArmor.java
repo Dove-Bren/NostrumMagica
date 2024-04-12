@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -304,8 +304,8 @@ public class DragonArmor extends Item {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
 
 		if (equipmentSlot == this.slot) {
-			multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor modifier", (double)this.getArmorValue(), AttributeModifier.Operation.ADDITION));
-			multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor toughness", this.getArmorToughness(), AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor modifier", (double)this.getArmorValue(), AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Armor toughness", this.getArmorToughness(), AttributeModifier.Operation.ADDITION));
 			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.ordinal()], "Magic Resist", (double)this.getMagicResistance(), AttributeModifier.Operation.ADDITION));
 		}
 
@@ -356,13 +356,13 @@ public class DragonArmor extends Item {
 
 					if (attributemodifier.getID() == Item.ATTACK_DAMAGE_MODIFIER)
 					{
-						d0 = d0 + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
+						d0 = d0 + player.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();
 						d0 = d0 + (double)EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
 						flag = true;
 					}
 					else if (attributemodifier.getID() == Item.ATTACK_SPEED_MODIFIER)
 					{
-						d0 += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+						d0 += player.getAttribute(Attributes.ATTACK_SPEED).getBaseValue();
 						flag = true;
 					}
 

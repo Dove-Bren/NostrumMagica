@@ -150,7 +150,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //        public void tick() {
 ////        	if (this.action == MovementController.Action.STRAFE)
 ////    		{
-////    			float f = (float)this.entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+////    			float f = (float)this.entity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 ////    			float f1 = (float)this.speed * f;
 ////    			float f2 = this.moveForward;
 ////    			float f3 = this.moveStrafe;
@@ -174,7 +174,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 ////    			{
 ////    				NodeProcessor nodeprocessor = PathNavigator.getNodeProcessor();
 ////
-////    				if (nodeprocessor != null && nodeprocessor.getPathNodeType(this.entity.world, MathHelper.floor(this.entity.posX + (double)f7), MathHelper.floor(this.entity.posY), MathHelper.floor(this.entity.posZ + (double)f8)) != PathNodeType.OPEN)
+////    				if (nodeprocessor != null && nodeprocessor.getPathNodeType(this.entity.world, MathHelper.floor(this.entity.getPosX() + (double)f7), MathHelper.floor(this.entity.getPosY()), MathHelper.floor(this.entity.getPosZ() + (double)f8)) != PathNodeType.OPEN)
 ////    				{
 ////    					this.moveForward = 1.0F;
 ////    					this.moveStrafe = 0.0F;
@@ -190,9 +190,9 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 ////        	else 
 //        	if (this.action == MovementController.Action.MOVE_TO)
 //            {
-//                double d0 = this.posX - this.parentEntity.posX;
-//                double d1 = this.posY - this.parentEntity.posY;
-//                double d2 = this.posZ - this.parentEntity.posZ;
+//                double d0 = this.getPosX() - this.parentEntity.getPosX();
+//                double d1 = this.getPosY() - this.parentEntity.getPosY();
+//                double d2 = this.getPosZ() - this.parentEntity.getPosZ();
 //                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 //
 //                d3 = (double)MathHelper.sqrt(d3);
@@ -210,7 +210,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //                	lastDist = 0.0D;
 //                	this.action = MovementController.Action.WAIT;
 //                } else {
-//                	float speed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+//                	float speed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 //                	speed *= 3f;
 //                	this.parentEntity.setMotion(
 //                			(d0 / d3) * speed,
@@ -440,29 +440,29 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //	    }
 //
 //	    @Override
-//	    protected Vec3d getEntityPosition() {
-//	        return new Vec3d(this.entity.posX, this.entity.posY + (double)this.entity.getHeight() * 0.5D, this.entity.posZ);
+//	    protected Vector3d getEntityPosition() {
+//	        return new Vector3d(this.entity.getPosX(), this.entity.getPosY() + (double)this.entity.getHeight() * 0.5D, this.entity.getPosZ());
 //	    }
 //
 //	    @Override
 //	    protected void pathFollow() {
-//	        Vec3d vec3d = this.getEntityPosition();
+//	        Vector3d Vector3d = this.getEntityPosition();
 //	        float f = this.entity.getWidth() * this.entity.getWidth();
 //	
-//	        if (vec3d.squareDistanceTo(this.currentPath.getVectorFromIndex(this.entity, this.currentPath.getCurrentPathIndex())) < (double)f) {
+//	        if (Vector3d.squareDistanceTo(this.currentPath.getVectorFromIndex(this.entity, this.currentPath.getCurrentPathIndex())) < (double)f) {
 //	            this.currentPath.incrementPathIndex();
 //	        }
 //	
 //	        for (int j = Math.min(this.currentPath.getCurrentPathIndex() + 6, this.currentPath.getCurrentPathLength() - 1); j > this.currentPath.getCurrentPathIndex(); --j) {
-//	            Vec3d vec3d1 = this.currentPath.getVectorFromIndex(this.entity, j);
+//	            Vector3d Vector3d1 = this.currentPath.getVectorFromIndex(this.entity, j);
 //	
-//	            if (vec3d1.squareDistanceTo(vec3d) <= 36.0D && this.isDirectPathBetweenPoints(vec3d, vec3d1, 0, 0, 0)) {
+//	            if (Vector3d1.squareDistanceTo(Vector3d) <= 36.0D && this.isDirectPathBetweenPoints(Vector3d, Vector3d1, 0, 0, 0)) {
 //	                this.currentPath.setCurrentPathIndex(j);
 //	                break;
 //	            }
 //	        }
 //	
-//	        this.checkForStuck(vec3d);
+//	        this.checkForStuck(Vector3d);
 //	    }
 //	
 //	    /**
@@ -477,8 +477,8 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //	     * Checks if the specified entity can safely walk to the specified location.
 //	     */
 //	    @Override
-//	    protected boolean isDirectPathBetweenPoints(Vec3d posVec31, Vec3d posVec32, int sizeX, int sizeY, int sizeZ) {
-//	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vec3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
+//	    protected boolean isDirectPathBetweenPoints(Vector3d posVec31, Vector3d posVec32, int sizeX, int sizeY, int sizeZ) {
+//	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vector3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
 //	        return raytraceresult == null || raytraceresult.getType() == RayTraceResult.Type.MISS;
 //	    }
 //

@@ -17,7 +17,7 @@ import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -185,11 +185,11 @@ public class EntityPlantBossBramble extends Entity {
 		if (!world.isRemote) {
 			// Move if given a direction
 			if (this.getFacing() != null) {
-				if (startPos.distanceSq(this.posX, this.posY, this.posZ, true) > this.distance * this.distance) {
+				if (startPos.distanceSq(this.getPosX(), this.getPosY(), this.getPosZ(), true) > this.distance * this.distance) {
 					this.remove();
 				}
 				
-				Vec3d motion = new Vec3d(this.getFacing().getDirectionVec())
+				Vector3d motion = new Vector3d(this.getFacing().getDirectionVec())
 						.scale(.2)
 						;
 				this.setPositionAndUpdate(posX + motion.x, posY + motion.y, posZ + motion.z);
@@ -213,12 +213,12 @@ public class EntityPlantBossBramble extends Entity {
 		final float h = this.getBrambleHeight();
 		final float d = turned ? this.getBrambleWidth() : this.getBrambleDepth();
 		this.entityBBOverride = new AxisAlignedBB(
-				this.posX - (w/2f),
-				this.posY,
-				this.posZ - (d/2f),
-				this.posX + (w/2f),
-				this.posY + h,
-				this.posZ + (d/2f)
+				this.getPosX() - (w/2f),
+				this.getPosY(),
+				this.getPosZ() - (d/2f),
+				this.getPosX() + (w/2f),
+				this.getPosY() + h,
+				this.getPosZ() + (d/2f)
 				);
 	}
 	

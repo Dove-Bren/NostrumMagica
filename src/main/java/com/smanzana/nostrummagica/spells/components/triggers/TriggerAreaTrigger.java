@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -32,7 +32,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		private static final int GROUND_TICK_CYCLES = (20 * 4) / TICK_RATE;
 
 		protected final World world;
-		protected final Vec3d pos;
+		protected final Vector3d pos;
 		protected final int tickRate;
 		protected final int duration;
 		private final boolean continuous;
@@ -44,7 +44,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		private boolean dead;
 		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
-		public TriggerAreaTriggerInstance(SpellState state, World world, Vec3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround) {
+		public TriggerAreaTriggerInstance(SpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround) {
 			super(state);
 			this.world = world;
 			this.pos = pos;

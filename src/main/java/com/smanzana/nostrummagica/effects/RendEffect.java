@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DisplayEffectsScreen;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
@@ -17,18 +19,18 @@ public class RendEffect extends Effect {
 	
 	public RendEffect() {
 		super(EffectType.HARMFUL, 0xFFC7B5BE);
-		this.addAttributesModifier(SharedMonsterAttributes.ARMOR, MOD_UUID, -2D, AttributeModifier.Operation.ADDITION);
+		this.addAttributesModifier(Attributes.ARMOR, MOD_UUID, -2D, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack stack, int x, int y, float z) {
 		;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack stack, int x, int y, float z, float alpha) {
 		;
 	}
 }

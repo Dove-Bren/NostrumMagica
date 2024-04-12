@@ -31,7 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -49,7 +49,7 @@ public class EntityHookShot extends Entity {
 	
 	// Sound and other mechanical cache stuff
 	private int tickHooked;
-	private Vec3d posLastPlayed;
+	private Vector3d posLastPlayed;
 	
 	private static final String NBT_CASTER_ID = "caster_uuid";
 	private static final String NBT_ATTACHED_ID = "attached_uuid";
@@ -72,11 +72,11 @@ public class EntityHookShot extends Entity {
 		this.setInvulnerable(true);
 	}
 	
-	public EntityHookShot(EntityType<? extends EntityHookShot> entType, World worldIn, LivingEntity caster, double maxLength, Vec3d direction, HookshotType type) {
+	public EntityHookShot(EntityType<? extends EntityHookShot> entType, World worldIn, LivingEntity caster, double maxLength, Vector3d direction, HookshotType type) {
 		this(entType, worldIn);
 		setCaster(caster);
 		setMaxLength(maxLength);
-		this.setPosition(caster.posX, caster.posY + (caster.getEyeHeight()), caster.posZ);
+		this.setPosition(caster.getPosX(), caster.getPosY() + (caster.getEyeHeight()), caster.getPosZ());
 		this.velocityX = direction.x;
 		this.velocityY = direction.y;
 		this.velocityZ = direction.z;
@@ -206,9 +206,9 @@ public class EntityHookShot extends Entity {
 				this.onImpact(raytraceresult);
 			}
 
-			this.posX += this.getMotion().x;
-			this.posY += this.getMotion().y;
-			this.posZ += this.getMotion().z;
+			this.getPosX() += this.getMotion().x;
+			this.getPosY() += this.getMotion().y;
+			this.getPosZ() += this.getMotion().z;
 			ProjectileHelper.rotateTowardsMovement(this, 0.2F);
 			float f = getMovementFactor();
 
@@ -216,7 +216,7 @@ public class EntityHookShot extends Entity {
 			{
 				for (int i = 0; i < 4; ++i)
 				{
-					this.world.addParticle(ParticleTypes.BUBBLE, this.posX - this.getMotion().x * 0.25D, this.posY - this.getMotion().y * 0.25D, this.posZ - this.getMotion().z * 0.25D, this.getMotion().x, this.getMotion().y, this.getMotion().z);
+					this.world.addParticle(ParticleTypes.BUBBLE, this.getPosX() - this.getMotion().x * 0.25D, this.getPosY() - this.getMotion().y * 0.25D, this.getPosZ() - this.getMotion().z * 0.25D, this.getMotion().x, this.getMotion().y, this.getMotion().z);
 				}
 
 				f = 0.8F;
@@ -227,8 +227,8 @@ public class EntityHookShot extends Entity {
 					this.velocityY * f,
 					this.velocityZ * f
 					);
-			//this.world.addParticle(this.getParticleType(), this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D);
-			this.setPosition(this.posX, this.posY, this.posZ);
+			//this.world.addParticle(this.getParticleType(), this.getPosX(), this.getPosY() + 0.5D, this.getPosZ(), 0.0D, 0.0D, 0.0D);
+			this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 		}
 		else
 		{
@@ -280,11 +280,11 @@ public class EntityHookShot extends Entity {
 			caster.velocityChanged = true;
 			attachedEntity.velocityChanged = true;
 			
-			Vec3d diff = caster.getPositionVector().add(0, caster.getEyeHeight(), 0).subtract(this.getPositionVector());
-			Vec3d velocity = diff.normalize().scale(0.75);
-			this.posX += velocity.x;
-			this.posY += velocity.y;
-			this.posZ += velocity.z;
+			Vector3d diff = caster.getPositionVector().add(0, caster.getEyeHeight(), 0).subtract(this.getPositionVector());
+			Vector3d velocity = diff.normalize().scale(0.75);
+			this.getPosX() += velocity.x;
+			this.getPosY() += velocity.y;
+			this.getPosZ() += velocity.z;
 			
 			if (attachedEntity instanceof ItemEntity) {
 				attachedEntity.setMotion(velocity.x, velocity.y, velocity.z);
@@ -292,7 +292,7 @@ public class EntityHookShot extends Entity {
 			}
 			this.setPositionAndUpdate(posX, posY, posZ);
 			
-			attachedEntity.setPositionAndUpdate(this.posX, this.posY - (attachedEntity.getHeight() / 2), this.posZ);
+			attachedEntity.setPositionAndUpdate(this.getPosX(), this.getPosY() - (attachedEntity.getHeight() / 2), this.getPosZ());
 		} else {
 			// Bring the shooter to the hooked entity
 			
@@ -301,7 +301,7 @@ public class EntityHookShot extends Entity {
 					this.remove();
 					return;
 				}
-				this.setPositionAndUpdate(attachedEntity.posX, attachedEntity.posY + (attachedEntity.getHeight() / 2), attachedEntity.posZ);
+				this.setPositionAndUpdate(attachedEntity.getPosX(), attachedEntity.getPosY() + (attachedEntity.getHeight() / 2), attachedEntity.getPosZ());
 			}
 			
 			if (caster != null) {
@@ -310,8 +310,8 @@ public class EntityHookShot extends Entity {
 					return;
 				}
 				
-				Vec3d diff = this.getPositionVector().subtract(caster.getPositionVector());
-				Vec3d velocity = diff.normalize().scale(0.75);
+				Vector3d diff = this.getPositionVector().subtract(caster.getPositionVector());
+				Vector3d velocity = diff.normalize().scale(0.75);
 				caster.setMotion(velocity.x, velocity.y, velocity.z);
 				caster.fallDistance = 0;
 				//caster.onGround = true;
@@ -322,7 +322,7 @@ public class EntityHookShot extends Entity {
 			if (caster != null) {
 				if (posLastPlayed == null || (posLastPlayed.subtract(caster.getPositionVector()).lengthSquared() > 3)) {
 					NostrumMagicaSounds.HOOKSHOT_TICK.play(world, 
-							caster.posX + caster.getMotion().x, caster.posY + caster.getMotion().y, caster.posZ + caster.getMotion().z);
+							caster.getPosX() + caster.getMotion().x, caster.getPosY() + caster.getMotion().y, caster.getPosZ() + caster.getMotion().z);
 					posLastPlayed = caster.getPositionVector();
 				}
 			}
@@ -395,7 +395,7 @@ public class EntityHookShot extends Entity {
 			// Have to do this before officially being 'hooked'
 			if (!this.isFetch() && caster != null) {
 				// Pulling player towards them. Go ahead and move the player up since they're in elytra mode now
-				caster.setPositionAndUpdate(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
+				caster.setPositionAndUpdate(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
 			}
 			
 			setHookedEntity(((EntityRayTraceResult) result).getEntity());
@@ -417,7 +417,7 @@ public class EntityHookShot extends Entity {
 			// Have to do this before officially being 'hooked'
 			if (caster != null) {
 				// Pulling player towards them. Go ahead and move the player up since they're in elytra mode now
-				caster.setPositionAndUpdate(caster.posX, caster.posY + caster.getEyeHeight(), caster.posZ);
+				caster.setPositionAndUpdate(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
 			}
 			setHookedInPlace();
 		} else {

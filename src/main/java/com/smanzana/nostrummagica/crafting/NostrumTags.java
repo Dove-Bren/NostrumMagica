@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 
 public class NostrumTags {
@@ -108,102 +108,112 @@ public class NostrumTags {
 		
 		private static final String TAG_TRANSMUTABLE_ITEM = "transmutable/item";
 		
-		public static final Tag<Item> RuneAny = tag(TAG_RUNE);
+		public static final ITag.INamedTag<Item> RuneAny = tag(TAG_RUNE);
 		
-		public static final Tag<Item> Reagent = tag(TAG_REAGENT);
-		public static final Tag<Item> ReagentMandrakeRoot = tag(TAG_REAGENT_MANDRAKEROOT);
-		public static final Tag<Item> ReagentGinseng = tag(TAG_REAGENT_GINSENG);
-		public static final Tag<Item> ReagentSpiderSilk = tag(TAG_REAGENT_SPIDERSILK);
-		public static final Tag<Item> ReagentBlackPearl = tag(TAG_REAGENT_BLACKPEARL);
-		public static final Tag<Item> ReagentSkyAsh = tag(TAG_REAGENT_SKYASH);
-		public static final Tag<Item> ReagentGraveDust = tag(TAG_REAGENT_GRAVEDUST);
-		public static final Tag<Item> ReagentManiDust = tag(TAG_REAGENT_MANIDUST);
-		public static final Tag<Item> ReagentCrystabloom = tag(TAG_REAGENT_CRYSTABLOOM);
+		public static final ITag.INamedTag<Item> Reagent = tag(TAG_REAGENT);
+		public static final ITag.INamedTag<Item> ReagentMandrakeRoot = tag(TAG_REAGENT_MANDRAKEROOT);
+		public static final ITag.INamedTag<Item> ReagentGinseng = tag(TAG_REAGENT_GINSENG);
+		public static final ITag.INamedTag<Item> ReagentSpiderSilk = tag(TAG_REAGENT_SPIDERSILK);
+		public static final ITag.INamedTag<Item> ReagentBlackPearl = tag(TAG_REAGENT_BLACKPEARL);
+		public static final ITag.INamedTag<Item> ReagentSkyAsh = tag(TAG_REAGENT_SKYASH);
+		public static final ITag.INamedTag<Item> ReagentGraveDust = tag(TAG_REAGENT_GRAVEDUST);
+		public static final ITag.INamedTag<Item> ReagentManiDust = tag(TAG_REAGENT_MANIDUST);
+		public static final ITag.INamedTag<Item> ReagentCrystabloom = tag(TAG_REAGENT_CRYSTABLOOM);
 		
-		public static final Tag<Item> InfusedGem = tag(TAG_INFGEM);
-		public static final Tag<Item> InfusedGemVoid = tag(TAG_INFGEM_VOID);
-		public static final Tag<Item> InfusedGemFire = tag(TAG_INFGEM_FIRE);
-		public static final Tag<Item> InfusedGemIce = tag(TAG_INFGEM_ICE);
-		public static final Tag<Item> InfusedGemWind = tag(TAG_INFGEM_WIND);
-		public static final Tag<Item> InfusedGemEarth = tag(TAG_INFGEM_EARTH);
-		public static final Tag<Item> InfusedGemLightning = tag(TAG_INFGEM_LIGHTNING);
-		public static final Tag<Item> InfusedGemEnder = tag(TAG_INFGEM_ENDER);
+		public static final ITag.INamedTag<Item> InfusedGem = tag(TAG_INFGEM);
+		public static final ITag.INamedTag<Item> InfusedGemVoid = tag(TAG_INFGEM_VOID);
+		public static final ITag.INamedTag<Item> InfusedGemFire = tag(TAG_INFGEM_FIRE);
+		public static final ITag.INamedTag<Item> InfusedGemIce = tag(TAG_INFGEM_ICE);
+		public static final ITag.INamedTag<Item> InfusedGemWind = tag(TAG_INFGEM_WIND);
+		public static final ITag.INamedTag<Item> InfusedGemEarth = tag(TAG_INFGEM_EARTH);
+		public static final ITag.INamedTag<Item> InfusedGemLightning = tag(TAG_INFGEM_LIGHTNING);
+		public static final ITag.INamedTag<Item> InfusedGemEnder = tag(TAG_INFGEM_ENDER);
 
-		public static final Tag<Item> CrystalSmall = tag(TAG_CRYSTALSMALL);
-		public static final Tag<Item> CrystalMedium = tag(TAG_CRYSTALMEDIUM);
-		public static final Tag<Item> CrystalLarge = tag(TAG_CRYSTALLARGE);
+		public static final ITag.INamedTag<Item> CrystalSmall = tag(TAG_CRYSTALSMALL);
+		public static final ITag.INamedTag<Item> CrystalMedium = tag(TAG_CRYSTALMEDIUM);
+		public static final ITag.INamedTag<Item> CrystalLarge = tag(TAG_CRYSTALLARGE);
 		
-		public static final Tag<Item> MagicToken = tag(TAG_TOKEN);
-		public static final Tag<Item> PendantLeft = tag(TAG_PENDANTLEFT);
-		public static final Tag<Item> PendantRight = tag(TAG_PENDANTRIGHT);
-		public static final Tag<Item> SlabFierce = tag(TAG_SLABFIERCE);
-		public static final Tag<Item> SlabKind = tag(TAG_SLABKIND);
-		public static final Tag<Item> SlabBalanced = tag(TAG_SLABBALANCED);
-		public static final Tag<Item> SpriteCore = tag(TAG_SPRITECORE);
-		public static final Tag<Item> EnderBristle = tag(TAG_ENDERBRISTLE);
-		public static final Tag<Item> WispPebble = tag(TAG_WISPPEBBLE);
-		public static final Tag<Item> DragonWing = tag(TAG_DRAGON_WING);
+		public static final ITag.INamedTag<Item> MagicToken = tag(TAG_TOKEN);
+		public static final ITag.INamedTag<Item> PendantLeft = tag(TAG_PENDANTLEFT);
+		public static final ITag.INamedTag<Item> PendantRight = tag(TAG_PENDANTRIGHT);
+		public static final ITag.INamedTag<Item> SlabFierce = tag(TAG_SLABFIERCE);
+		public static final ITag.INamedTag<Item> SlabKind = tag(TAG_SLABKIND);
+		public static final ITag.INamedTag<Item> SlabBalanced = tag(TAG_SLABBALANCED);
+		public static final ITag.INamedTag<Item> SpriteCore = tag(TAG_SPRITECORE);
+		public static final ITag.INamedTag<Item> EnderBristle = tag(TAG_ENDERBRISTLE);
+		public static final ITag.INamedTag<Item> WispPebble = tag(TAG_WISPPEBBLE);
+		public static final ITag.INamedTag<Item> DragonWing = tag(TAG_DRAGON_WING);
 		
-		public static final Tag<Item> Spellpage = tag(TAG_SPELLPAGE);
+		public static final ITag.INamedTag<Item> Spellpage = tag(TAG_SPELLPAGE);
 		
-		public static final Tag<Item> Essence = tag(TAG_ESSENCE);
-		public static final Tag<Item> EssenceVoid = tag(TAG_ESSENCE_VOID);
-		public static final Tag<Item> EssenceFire = tag(TAG_ESSENCE_FIRE);
-		public static final Tag<Item> EssenceIce = tag(TAG_ESSENCE_ICE);
-		public static final Tag<Item> EssenceWind = tag(TAG_ESSENCE_WIND);
-		public static final Tag<Item> EssenceEarth = tag(TAG_ESSENCE_EARTH);
-		public static final Tag<Item> EssenceLightning = tag(TAG_ESSENCE_LIGHTNING);
-		public static final Tag<Item> EssenceEnder = tag(TAG_ESSENCE_ENDER);
+		public static final ITag.INamedTag<Item> Essence = tag(TAG_ESSENCE);
+		public static final ITag.INamedTag<Item> EssenceVoid = tag(TAG_ESSENCE_VOID);
+		public static final ITag.INamedTag<Item> EssenceFire = tag(TAG_ESSENCE_FIRE);
+		public static final ITag.INamedTag<Item> EssenceIce = tag(TAG_ESSENCE_ICE);
+		public static final ITag.INamedTag<Item> EssenceWind = tag(TAG_ESSENCE_WIND);
+		public static final ITag.INamedTag<Item> EssenceEarth = tag(TAG_ESSENCE_EARTH);
+		public static final ITag.INamedTag<Item> EssenceLightning = tag(TAG_ESSENCE_LIGHTNING);
+		public static final ITag.INamedTag<Item> EssenceEnder = tag(TAG_ESSENCE_ENDER);
 		
-		public static final Tag<Item> SkillItem = tag(TAG_SKILLITEM);
-		public static final Tag<Item> SkillItemMirror = tag(TAG_SKILLITEM_MIRROR);
-		public static final Tag<Item> SkillItemOoze = tag(TAG_SKILLITEM_OOZE);
-		public static final Tag<Item> SkillItemPendant = tag(TAG_SKILLITEM_PENDANT);
-		public static final Tag<Item> SkillItemFlute = tag(TAG_SKILLITEM_FLUTE);
-		public static final Tag<Item> SkillItemEnderPin = tag(TAG_SKILLITEM_ENDERPIN);
-		public static final Tag<Item> SkillItemSmallResearch = tag(TAG_SKILLITEM_RESEARCHSMALL);
-		public static final Tag<Item> SkillItemLargeResearch = tag(TAG_SKILLITEM_RESEARCHLARGE);
+		public static final ITag.INamedTag<Item> SkillItem = tag(TAG_SKILLITEM);
+		public static final ITag.INamedTag<Item> SkillItemMirror = tag(TAG_SKILLITEM_MIRROR);
+		public static final ITag.INamedTag<Item> SkillItemOoze = tag(TAG_SKILLITEM_OOZE);
+		public static final ITag.INamedTag<Item> SkillItemPendant = tag(TAG_SKILLITEM_PENDANT);
+		public static final ITag.INamedTag<Item> SkillItemFlute = tag(TAG_SKILLITEM_FLUTE);
+		public static final ITag.INamedTag<Item> SkillItemEnderPin = tag(TAG_SKILLITEM_ENDERPIN);
+		public static final ITag.INamedTag<Item> SkillItemSmallResearch = tag(TAG_SKILLITEM_RESEARCHSMALL);
+		public static final ITag.INamedTag<Item> SkillItemLargeResearch = tag(TAG_SKILLITEM_RESEARCHLARGE);
 		
-		public static final Tag<Item> Rose = tag(TAG_ROSE);
-		public static final Tag<Item> RoseBlood = tag(TAG_ROSE_BLOOD);
-		public static final Tag<Item> RoseEldrich = tag(TAG_ROSE_ELDRICH);
-		public static final Tag<Item> RosePale = tag(TAG_ROSE_PALE);
+		public static final ITag.INamedTag<Item> Rose = tag(TAG_ROSE);
+		public static final ITag.INamedTag<Item> RoseBlood = tag(TAG_ROSE_BLOOD);
+		public static final ITag.INamedTag<Item> RoseEldrich = tag(TAG_ROSE_ELDRICH);
+		public static final ITag.INamedTag<Item> RosePale = tag(TAG_ROSE_PALE);
 		
-		public static final Tag<Item> Hookshot = tag(TAG_HOOKSHOT);
-		public static final Tag<Item> HookshotWeak = tag(TAG_HOOKSHOT_WEAK);
-		public static final Tag<Item> HookshotMedium = tag(TAG_HOOKSHOT_MEDIUM);
-		public static final Tag<Item> HookshotStrong = tag(TAG_HOOKSHOT_STRONG);
-		public static final Tag<Item> HookshotClaw = tag(TAG_HOOKSHOT_CLAW);
+		public static final ITag.INamedTag<Item> Hookshot = tag(TAG_HOOKSHOT);
+		public static final ITag.INamedTag<Item> HookshotWeak = tag(TAG_HOOKSHOT_WEAK);
+		public static final ITag.INamedTag<Item> HookshotMedium = tag(TAG_HOOKSHOT_MEDIUM);
+		public static final ITag.INamedTag<Item> HookshotStrong = tag(TAG_HOOKSHOT_STRONG);
+		public static final ITag.INamedTag<Item> HookshotClaw = tag(TAG_HOOKSHOT_CLAW);
 		
-		public static final Tag<Item> Seed = tag(TAG_REAGENTSEED);
-		public static final Tag<Item> SeedMandrake = tag(TAG_REAGENTSEED_MANDRAKE);
-		public static final Tag<Item> SeedGinseng = tag(TAG_REAGENTSEED_GINSENG);
-		public static final Tag<Item> SeedEssence = tag(TAG_REAGENTSEED_ESSENCE);
+		public static final ITag.INamedTag<Item> Seed = tag(TAG_REAGENTSEED);
+		public static final ITag.INamedTag<Item> SeedMandrake = tag(TAG_REAGENTSEED_MANDRAKE);
+		public static final ITag.INamedTag<Item> SeedGinseng = tag(TAG_REAGENTSEED_GINSENG);
+		public static final ITag.INamedTag<Item> SeedEssence = tag(TAG_REAGENTSEED_ESSENCE);
 		
-		public static final Tag<Item> TomePlate = tag(TAG_TOMEPLATE);
-		public static final Tag<Item> TomePlateNovice = tag(TAG_TOMEPLATE_NOVICE);
-		public static final Tag<Item> TomePlateAdvanced = tag(TAG_TOMEPLATE_ADVANCED);
-		public static final Tag<Item> TomePlateCombat = tag(TAG_TOMEPLATE_COMBAT);
-		public static final Tag<Item> TomePlateDeath = tag(TAG_TOMEPLATE_DEATH);
-		public static final Tag<Item> TomePlateSpooky = tag(TAG_TOMEPLATE_SPOOKY);
-		public static final Tag<Item> TomePlateMuted = tag(TAG_TOMEPLATE_MUTED);
-		public static final Tag<Item> TomePlateLiving = tag(TAG_TOMEPLATE_LIVING);
+		public static final ITag.INamedTag<Item> TomePlate = tag(TAG_TOMEPLATE);
+		public static final ITag.INamedTag<Item> TomePlateNovice = tag(TAG_TOMEPLATE_NOVICE);
+		public static final ITag.INamedTag<Item> TomePlateAdvanced = tag(TAG_TOMEPLATE_ADVANCED);
+		public static final ITag.INamedTag<Item> TomePlateCombat = tag(TAG_TOMEPLATE_COMBAT);
+		public static final ITag.INamedTag<Item> TomePlateDeath = tag(TAG_TOMEPLATE_DEATH);
+		public static final ITag.INamedTag<Item> TomePlateSpooky = tag(TAG_TOMEPLATE_SPOOKY);
+		public static final ITag.INamedTag<Item> TomePlateMuted = tag(TAG_TOMEPLATE_MUTED);
+		public static final ITag.INamedTag<Item> TomePlateLiving = tag(TAG_TOMEPLATE_LIVING);
 		
-		public static final Tag<Item> SpellTome = tag(TAG_SPELLTOME);
-		public static final Tag<Item> SpellTomeNovice = tag(TAG_SPELLTOME_NOVICE);
-		public static final Tag<Item> SpellTomeAdvanced = tag(TAG_SPELLTOME_ADVANCED);
-		public static final Tag<Item> SpellTomeCombat = tag(TAG_SPELLTOME_COMBAT);
-		public static final Tag<Item> SpellTomeDeath = tag(TAG_SPELLTOME_DEATH);
-		public static final Tag<Item> SpellTomeSpooky = tag(TAG_SPELLTOME_SPOOKY);
-		public static final Tag<Item> SpellTomeMuted = tag(TAG_SPELLTOME_MUTED);
-		public static final Tag<Item> SpellTomeLiving = tag(TAG_SPELLTOME_LIVING);
+		public static final ITag.INamedTag<Item> SpellTome = tag(TAG_SPELLTOME);
+		public static final ITag.INamedTag<Item> SpellTomeNovice = tag(TAG_SPELLTOME_NOVICE);
+		public static final ITag.INamedTag<Item> SpellTomeAdvanced = tag(TAG_SPELLTOME_ADVANCED);
+		public static final ITag.INamedTag<Item> SpellTomeCombat = tag(TAG_SPELLTOME_COMBAT);
+		public static final ITag.INamedTag<Item> SpellTomeDeath = tag(TAG_SPELLTOME_DEATH);
+		public static final ITag.INamedTag<Item> SpellTomeSpooky = tag(TAG_SPELLTOME_SPOOKY);
+		public static final ITag.INamedTag<Item> SpellTomeMuted = tag(TAG_SPELLTOME_MUTED);
+		public static final ITag.INamedTag<Item> SpellTomeLiving = tag(TAG_SPELLTOME_LIVING);
 		
-		public static final Tag<Item> SilverIngot = new ItemTags.Wrapper(new ResourceLocation("forge", TAG_SILVER_INGOT));
+		public static final ITag.INamedTag<Item> SilverIngot = forgeTag(TAG_SILVER_INGOT);
 		
-		public static final Tag<Item> TransmutableItem = tag(TAG_TRANSMUTABLE_ITEM);
+		public static final ITag.INamedTag<Item> TransmutableItem = tag(TAG_TRANSMUTABLE_ITEM);
 		
-		private static Tag<Item> tag(String path) {
-			return new ItemTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));
+		private static ITag.INamedTag<Item> tag(String path) {
+			return ItemTags.makeWrapperTag(new ResourceLocation(NostrumMagica.MODID, path).toString());
+		}
+		
+		private static ITag.INamedTag<Item> forgeTag(String name) {
+			final ResourceLocation loc = new ResourceLocation("forge", name);
+			ITag<Item> found = ItemTags.getCollection().get(loc);
+			if (found != null && found instanceof ITag.INamedTag) {
+				return (ITag.INamedTag<Item>) found;
+			}
+			
+			return ItemTags.makeWrapperTag(loc.toString());
 		}
 	}
 	
@@ -211,10 +221,10 @@ public class NostrumTags {
 		
 		private static final String TAG_TRANSMUTABLE_BLOCK = "transmutable/block";
 		
-		public static final Tag<Block> TransmutableBlock = tag(TAG_TRANSMUTABLE_BLOCK);
+		public static final ITag.INamedTag<Block> TransmutableBlock = tag(TAG_TRANSMUTABLE_BLOCK);
 		
-		private static Tag<Block> tag(String path) {
-			return new BlockTags.Wrapper(new ResourceLocation(NostrumMagica.MODID, path));
+		private static ITag.INamedTag<Block> tag(String path) {
+			return BlockTags.makeWrapperTag(new ResourceLocation(NostrumMagica.MODID, path).toString());
 		}
 	}
 }

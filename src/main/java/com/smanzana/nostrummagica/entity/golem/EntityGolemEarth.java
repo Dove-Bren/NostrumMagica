@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
@@ -90,12 +90,12 @@ public class EntityGolemEarth extends EntityGolem {
 
 	@Override
 	public void initGolemAttributes() {
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.20D);
 
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(24.0D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(24.0D);
 
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(4.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(12.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(4.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(12.0D);
 	}
 
 	@Override

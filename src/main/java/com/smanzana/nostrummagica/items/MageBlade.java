@@ -31,7 +31,7 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -190,8 +190,8 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IE
 	protected void doEffect(LivingEntity entity, EMagicElement element) {
 		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
 				3,
-				entity.posX, entity.posY + entity.getHeight(), entity.posZ, 1, 30, 5,
-				new Vec3d(0, -0.05, 0), null
+				entity.getPosX(), entity.getPosY() + entity.getHeight(), entity.getPosZ(), 1, 30, 5,
+				new Vector3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 		NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
 	}

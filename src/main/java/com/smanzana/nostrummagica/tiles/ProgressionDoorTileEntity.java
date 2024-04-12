@@ -145,7 +145,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		if (!this.requiredComponents.isEmpty()) {
 			ListNBT list = new ListNBT();
 			for (SpellComponentWrapper comp : this.requiredComponents) {
-				list.add(new StringNBT(comp.getKeyString()));
+				list.add(StringNBT.valueOf(comp.getKeyString()));
 			}
 			nbt.put(NBT_COMPS, list);
 		}

@@ -7,12 +7,12 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 
 public class SoulDrainEffect extends Effect {
@@ -22,7 +22,7 @@ public class SoulDrainEffect extends Effect {
 	public SoulDrainEffect() {
 		super(EffectType.HARMFUL, 0xFFE5799B);
 		
-		this.addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
+		this.addAttributesModifier(Attributes.MOVEMENT_SPEED,
 				"13dfa3dc-1105-40a9-92e4-bbc506eb90ed", -0.1D, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
@@ -36,7 +36,7 @@ public class SoulDrainEffect extends Effect {
 	
 	protected void playHealthEffect(LivingEntity source, float amt, LivingEntity dest) {
 		NostrumParticles.FILLED_ORB.spawn(source.world, new SpawnParams(
-				5, source.posX, source.posY + .75, source.posZ, 0,
+				5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
 				40, 0,
 				dest.getEntityId()
 				).color(0xFFE2346B).dieOnTarget(true));
@@ -44,9 +44,9 @@ public class SoulDrainEffect extends Effect {
 	
 	protected void playDamageEffect(LivingEntity source, float amt) {
 		NostrumParticles.GLOW_ORB.spawn(source.world, new SpawnParams(
-				5, source.posX, source.posY + .75, source.posZ, 0,
+				5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
 				40, 0,
-				new Vec3d(0, .1, 0), new Vec3d(.1, 0, .1)
+				new Vector3d(0, .1, 0), new Vector3d(.1, 0, .1)
 				).color(0xFFE2346B).gravity(true));
 	}
 	

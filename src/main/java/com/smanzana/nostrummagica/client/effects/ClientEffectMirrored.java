@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.effects;
 
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -15,27 +15,27 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ClientEffectMirrored extends ClientEffect {
 
 	private int count;
-	private Vec3d eulers;
+	private Vector3d eulers;
 	
 	// Nice cached math
 	private float dAngle;
 	
-	public ClientEffectMirrored(Vec3d origin, ClientEffectForm form, int ticks, int count) {
-		this(origin, form, ticks, count, new Vec3d(0.0, 1.0, 0.0));
+	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, int ticks, int count) {
+		this(origin, form, ticks, count, new Vector3d(0.0, 1.0, 0.0));
 	}
 	
-	public ClientEffectMirrored(Vec3d origin, ClientEffectForm form, int ticks, int count, Vec3d angles) {
+	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, int ticks, int count, Vector3d angles) {
 		super(origin, form, ticks);
 		this.count = count;
 		this.dAngle = (float) (360f) / (float) count;
 		this.eulers = angles;
 	}
 	
-	public ClientEffectMirrored(Vec3d origin, ClientEffectForm form, long ms, int count) {
-		this(origin, form, ms, count, new Vec3d(0, 1, 0));
+	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, long ms, int count) {
+		this(origin, form, ms, count, new Vector3d(0, 1, 0));
 	}
 	
-	public ClientEffectMirrored(Vec3d origin, ClientEffectForm form, long ms, int count, Vec3d angles) {
+	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, long ms, int count, Vector3d angles) {
 		super(origin, form, ms);
 		this.count = count;
 		this.dAngle = (float) (360f) / (float) count;

@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBossLeafLimb> {
 
@@ -59,7 +59,7 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 		GlStateManager.pushMatrix();
 		
 		// Offset to body center
-		Vec3d cameraOffsetToParent = plant.getPositionVec().subtract(
+		Vector3d cameraOffsetToParent = plant.getPositionVec().subtract(
 				TileEntityRendererDispatcher.staticPlayerX,
 				TileEntityRendererDispatcher.staticPlayerY,
 				TileEntityRendererDispatcher.staticPlayerZ

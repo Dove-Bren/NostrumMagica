@@ -132,7 +132,7 @@ public class EntityAIAttackRanged<T extends MobEntity> extends Goal
 		LivingEntity entitylivingbase = this.entity.getAttackTarget();
 
 		if (entitylivingbase != null) {
-			double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
+			double d0 = this.entity.getDistanceSq(entitylivingbase.getPosX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getPosZ());
 			boolean flag = this.entity.getEntitySenses().canSee(entitylivingbase);
 			boolean flag1 = this.seeTime > 0;
 

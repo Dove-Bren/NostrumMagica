@@ -15,7 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class ModelAetherCloak<T extends LivingEntity> extends EntityModel<T> {
 
@@ -48,10 +48,10 @@ public class ModelAetherCloak<T extends LivingEntity> extends EntityModel<T> {
 		final @Nullable ResourceLocation[] textures = provider.getCapeTextures(living, stack);
 		
 		// Get how 'forward' we're moving for cape rotation
-		Vec3d look = entityIn.getLook(ageInTicks % 1f);
+		Vector3d look = entityIn.getLook(ageInTicks % 1f);
 		double motionForward = look
 				.subtract(0, look.y, 0)
-				.dotProduct(new Vec3d(entityIn.getMotion().x, 0, entityIn.getMotion().z));
+				.dotProduct(new Vector3d(entityIn.getMotion().x, 0, entityIn.getMotion().z));
 		float rot = -10f;
 		final float moveMaxRot = (!isFlying && motionForward > 0 ? -20f : 10f);
 		//final double yVelOverride = .25;

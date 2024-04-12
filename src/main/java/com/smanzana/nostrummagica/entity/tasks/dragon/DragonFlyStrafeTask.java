@@ -48,7 +48,7 @@ public class DragonFlyStrafeTask<T extends EntityDragon> extends Goal {
 
         if (entitylivingbase != null)
         {
-            double d0 = this.dragon.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
+            double d0 = this.dragon.getDistanceSq(entitylivingbase.getPosX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getPosZ());
             boolean flag = this.dragon.getEntitySenses().canSee(entitylivingbase);
             boolean flag1 = this.seeTime > 0;
 

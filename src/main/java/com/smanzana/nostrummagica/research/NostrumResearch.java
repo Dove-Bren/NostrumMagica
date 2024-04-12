@@ -227,8 +227,8 @@ public class NostrumResearch {
 			}
 		}
 		if (!player.world.isRemote) {
-			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.world, player.posX, player.posY, player.posZ);
-			NostrumMagicaSounds.UI_RESEARCH.play(player.world, player.posX, player.posY, player.posZ);
+			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+			NostrumMagicaSounds.UI_RESEARCH.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
 		} else {
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 		}

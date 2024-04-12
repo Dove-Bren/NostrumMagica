@@ -39,7 +39,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.Pose;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
@@ -65,7 +65,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -173,7 +173,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				if (tempted.getDistanceSq(player) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
-					tempted.getMoveHelper().setMoveTo(player.posX, player.posY, player.posZ, 1D);
+					tempted.getMoveHelper().setMoveTo(player.getPosX(), player.getPosY(), player.getPosZ(), 1D);
 				}
 			}
 		});
@@ -218,12 +218,12 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	protected void registerAttributes()
 	{
 		super.registerAttributes();
-		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D);
-		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(4.0D);
-		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.0D);
-		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
+		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.2D);
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4.0D);
+		this.getAttribute(Attributes.ARMOR).setBaseValue(0.0D);
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(30.0);
 		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
-		this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
+		this.getAttributes().registerAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(1.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState blockIn)
@@ -256,7 +256,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
@@ -292,7 +292,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 							1,
 							posX, posY + getHeight()/2, posZ,
 							0.05, 40, 10,
-							new Vec3d(0, -.1, 0),
+							new Vector3d(0, -.1, 0),
 							null
 							).color(.3f, .7f - darken, 1f - darken, .9f - darken));
 				}
@@ -486,7 +486,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -503,19 +503,19 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		@Override
 		public void tick() {
 			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.posX - this.parentEntity.posX;
-				double d1 = this.posY - this.parentEntity.posY;
-				double d2 = this.posZ - this.parentEntity.posZ;
+				double d0 = this.getPosX() - this.parentEntity.getPosX();
+				double d1 = this.getPosY() - this.parentEntity.getPosY();
+				double d2 = this.getPosZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
 				d3 = (double)MathHelper.sqrt(d3);
 				
 				if (Math.abs(d3) < .1) {
-					this.parentEntity.setMotion(Vec3d.ZERO);
+					this.parentEntity.setMotion(Vector3d.ZERO);
 					this.action = MovementController.Action.WAIT;
 					return;
 				} else if (courseChangeCooldown-- <= 0) {
-					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 					final double moveSpeed = (basespeed * this.speed * .3f);
 					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 					//speed *= 3f;
@@ -534,7 +534,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	// Copied from EntityFlying class
 		@Override
-		public void travel(Vec3d how) {
+		public void travel(Vector3d how) {
 			if (this.isInWater()) {
 				this.moveRelative(0.02F, how);
 				this.move(MoverType.SELF, this.getMotion());
@@ -547,8 +547,8 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				float f = 0.91F;
 
 				if (this.onGround) {
-					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
 					BlockState underState = this.world.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 				}
@@ -558,8 +558,8 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				f = 0.91F;
 
 				if (this.onGround) {
-					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
 					BlockState underState = this.world.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 				}
@@ -569,8 +569,8 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			}
 
 			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.posX - this.prevPosX;
-			double d0 = this.posZ - this.prevPosZ;
+			double d1 = this.getPosX() - this.prevPosX;
+			double d0 = this.getPosZ() - this.prevPosZ;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
@@ -617,9 +617,9 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			} else if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.posX;
-				double d1 = MovementController.getY() - this.parentEntity.posY;
-				double d2 = MovementController.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.getPosX();
+				double d1 = MovementController.getY() - this.parentEntity.getPosY();
+				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -641,15 +641,15 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			int attempts = 10;
 			while (attempts-- > 0) { 
 				final double radius = 8.0F;
-				final double d1 = this.parentEntity.posY + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
+				final double d1 = this.parentEntity.getPosY() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// check acceptable y first
 				if (d1 <= 0 || d1 > parentEntity.world.getHeight()) {
 					continue;
 				}
 				
-				final double d0 = this.parentEntity.posX + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
-				final double d2 = this.parentEntity.posZ + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
+				final double d0 = this.parentEntity.getPosX() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
+				final double d2 = this.parentEntity.getPosZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// Check specific spot
 				MutableBlockPos cursor = new MutableBlockPos();
@@ -767,7 +767,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 						parentEntity.setPosition(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
 					}
 					
-					parentEntity.setMotion(Vec3d.ZERO);
+					parentEntity.setMotion(Vector3d.ZERO);
 					parentEntity.startRoosting();
 				} else if (!parentEntity.getMoveHelper().isUpdating()) {
 					this.parentEntity.getMoveHelper().setMoveTo(
@@ -859,9 +859,9 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.posX;
-				double d1 = MovementController.getY() - this.parentEntity.posY;
-				double d2 = MovementController.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.getPosX();
+				double d1 = MovementController.getY() - this.parentEntity.getPosY();
+				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}

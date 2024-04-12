@@ -66,7 +66,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 				trigger,
 				shooter,
 				shooter.world,
-				shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
+				shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight(), shooter.getPosZ(),
 				speedFactor, durationTicks, onBlocks
 				);
 	}
@@ -202,9 +202,9 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			// Also check for blocks, if we contact blocks
 			if (this.onBlocks) {
 				if (_lastBlockVector == null ||
-						((int)_lastBlockVector.x == (int) this.posX
-						&& (int) _lastBlockVector.y == (int) this.posY
-						&& (int) _lastBlockVector.z == (int) this.posZ)) {
+						((int)_lastBlockVector.x == (int) this.getPosX()
+						&& (int) _lastBlockVector.y == (int) this.getPosY()
+						&& (int) _lastBlockVector.z == (int) this.getPosZ())) {
 					
 					// Only trigger on non-air
 					BlockPos blockPos = new BlockPos(posX, posY, posZ); // not using getPosition() since it adds .5 y 
@@ -237,12 +237,12 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 //	            this.onImpact(raytraceresult);
 //	        }
 	        
-//	        this.posX += this.getMotion().x;
-//	        this.posY += this.getMotion().y;
-//	        this.posZ += this.getMotion().z;
-//	        this.posX += accel.x;
-//	        this.posY += accel.y;
-//	        this.posZ += accel.z;
+//	        this.getPosX() += this.getMotion().x;
+//	        this.getPosY() += this.getMotion().y;
+//	        this.getPosZ() += this.getMotion().z;
+//	        this.getPosX() += accel.x;
+//	        this.getPosY() += accel.y;
+//	        this.getPosZ() += accel.z;
 //	        
 //	        // Apply air-friction, making motion's sort-of our initial motion
 //	        this.getMotion().x *= 0.8;
@@ -255,7 +255,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 ////					this.remove();
 ////				}
 //			
-//			this.setPosition(this.posX, this.posY, this.posZ);
+//			this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 		}
 	}
 	

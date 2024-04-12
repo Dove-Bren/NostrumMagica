@@ -14,7 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 // Copy of vanilla with no fire
@@ -50,8 +50,8 @@ public class NostrumTameLightning extends LightningBoltEntity {
 		
 		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
 				3,
-				entity.posX, entity.posY + entity.getHeight(), entity.posZ, 1, 30, 5,
-				new Vec3d(0, -0.05, 0), null
+				entity.getPosX(), entity.getPosY() + entity.getHeight(), entity.getPosZ(), 1, 30, 5,
+				new Vector3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & EMagicElement.LIGHTNING.getColor())));
 	}
 	
@@ -62,7 +62,7 @@ public class NostrumTameLightning extends LightningBoltEntity {
 		--this.lightningState;
 
 		if (this.lightningState >= 0) {
-			List<Entity> list = this.world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(this.posX - 3.0D, this.posY - 3.0D, this.posZ - 3.0D, this.posX + 3.0D, this.posY + 6.0D + 3.0D, this.posZ + 3.0D),
+			List<Entity> list = this.world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(this.getPosX() - 3.0D, this.getPosY() - 3.0D, this.getPosZ() - 3.0D, this.getPosX() + 3.0D, this.getPosY() + 6.0D + 3.0D, this.getPosZ() + 3.0D),
 					Entity::isAlive);
 
 			for (int i = 0; i < list.size(); ++i) {

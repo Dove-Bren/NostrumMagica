@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -19,11 +19,11 @@ public abstract class InstantTrigger extends SpellTrigger {
 	public class InstantTriggerInstance extends SpellTrigger.SpellTriggerInstance {
 
 		private World world;
-		private Vec3d pos;
+		private Vector3d pos;
 		private float pitch;
 		private float yaw;
 		
-		public InstantTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+		public InstantTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -44,7 +44,7 @@ public abstract class InstantTrigger extends SpellTrigger {
 	}
 	
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartParam params) {
 		return new InstantTriggerInstance(state, world, pos, pitch, yaw);
 	}
 	
@@ -56,6 +56,6 @@ public abstract class InstantTrigger extends SpellTrigger {
 	 * @param yaw
 	 * @return
 	 */
-	protected abstract TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw);
+	protected abstract TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw);
 	
 }

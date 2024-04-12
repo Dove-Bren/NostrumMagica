@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
@@ -102,7 +102,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	}
 	
 	private void biteDamageInternal(LivingEntity target) {
-		float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
+		float f = (float)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue();
 		
 		// Dragons do 20 damage while on the ground, and 16 when flying
 		if (!this.isFlying()) {
@@ -149,7 +149,7 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 	public void tick() {
 		super.tick();
 		
-		//System.out.println("(" + this.posX + ", " + this.posZ + ")");
+		//System.out.println("(" + this.getPosX() + ", " + this.getPosZ() + ")");
 		
 		long now = System.currentTimeMillis();
 		

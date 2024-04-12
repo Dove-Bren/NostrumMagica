@@ -105,18 +105,18 @@ public class EntityAIFlierDiveTask<T extends MobEntity> extends Goal
 		if (target != null) {
 			
 			// If close enough, attack!
-			if (entity.getDistanceSq(target.posX, target.posY + (target.getHeight() / 2), target.posZ) < Math.max(entity.getWidth() * entity.getWidth(), 1.5)) {
+			if (entity.getDistanceSq(target.getPosX(), target.getPosY() + (target.getHeight() / 2), target.getPosZ()) < Math.max(entity.getWidth() * entity.getWidth(), 1.5)) {
 				this.attackTarget(entity, target);
 				this.lastAttackTicks = entity.world.getGameTime();
 				entity.getMoveHelper().strafe(1f, 0f);
 			} else {
 			
 				// Attempt to move towards the target
-				entity.getMoveHelper().setMoveTo(target.posX, target.posY + (target.getHeight() / 2), target.posZ, moveSpeedAmp);
+				entity.getMoveHelper().setMoveTo(target.getPosX(), target.getPosY() + (target.getHeight() / 2), target.getPosZ(), moveSpeedAmp);
 				
-				if (Math.abs(entity.prevPosX - entity.posX)
-						+ Math.abs(entity.prevPosY - entity.posY)
-						+ Math.abs(entity.prevPosZ - entity.posZ) < .01) {
+				if (Math.abs(entity.prevPosX - entity.getPosX())
+						+ Math.abs(entity.prevPosY - entity.getPosY())
+						+ Math.abs(entity.prevPosZ - entity.getPosZ()) < .01) {
 					// Stuck?
 					stallTicks++;
 				} else {

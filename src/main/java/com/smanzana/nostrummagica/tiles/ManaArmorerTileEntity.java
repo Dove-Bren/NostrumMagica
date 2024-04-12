@@ -31,7 +31,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEntity {
 	
@@ -235,20 +235,20 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	protected void doManaEffectDirect(LivingEntity entity) {
 		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
 				1,
-				entity.posX, entity.posY + entity.getEyeHeight() / 2f, entity.posZ, .25,
+				entity.getPosX(), entity.getPosY() + entity.getEyeHeight() / 2f, entity.getPosZ(), .25,
 				40, 0,
-				new Vec3d(pos.getX() + .5, pos.getY() + .75, pos.getZ() + .5)
+				new Vector3d(pos.getX() + .5, pos.getY() + .75, pos.getZ() + .5)
 				).color(0xFF5511FF));
 	}
 	
 	protected void doManaEffectCrystal(LivingEntity entity, BlockPos crystal) {
 		BlockState state = entity.world.getBlockState(crystal);
-		Vec3d offset = NostrumBlocks.maniCrystalBlock.getCrystalTipOffset(state);
-		Vec3d crystalPos = new Vec3d(crystal.getX() + offset.x, crystal.getY() + offset.y, crystal.getZ() + offset.z);
+		Vector3d offset = NostrumBlocks.maniCrystalBlock.getCrystalTipOffset(state);
+		Vector3d crystalPos = new Vector3d(crystal.getX() + offset.x, crystal.getY() + offset.y, crystal.getZ() + offset.z);
 		
 		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
 				1,
-				entity.posX, entity.posY + entity.getEyeHeight() / 2f, entity.posZ, .25,
+				entity.getPosX(), entity.getPosY() + entity.getEyeHeight() / 2f, entity.getPosZ(), .25,
 				40, 0,
 				crystalPos
 				).color(0x805511FF));
@@ -257,7 +257,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				1,
 				crystalPos.x, crystalPos.y, crystalPos.z, 0,
 				40, 0,
-				new Vec3d(pos.getX() + .5, pos.getY() + .75, pos.getZ() + .5)
+				new Vector3d(pos.getX() + .5, pos.getY() + .75, pos.getZ() + .5)
 				).color(0xFF5511FF));
 	}
 	
@@ -274,9 +274,9 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		
 		NostrumParticles.WARD.spawn(entity.world, new SpawnParams(
 				100,
-				entity.posX, entity.posY + entity.getEyeHeight() / 2f, entity.posZ, 1,
+				entity.getPosX(), entity.getPosY() + entity.getEyeHeight() / 2f, entity.getPosZ(), 1,
 				40, 20,
-				Vec3d.ZERO, new Vec3d(0, .01, 0)
+				Vector3d.ZERO, new Vector3d(0, .01, 0)
 				).color(0xFF5511FF));
 	}
 	

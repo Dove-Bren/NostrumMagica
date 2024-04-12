@@ -251,7 +251,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 ////			if (worldtime > start + WAKE_TIME) {
 ////				setNestedScrollMeta(stack, (byte) 2);
 ////				if (!worldIn.isRemote) {
-////					NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.posX, entityIn.posY, entityIn.posZ);
+////					NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ());
 ////				}
 ////			}
 ////		}

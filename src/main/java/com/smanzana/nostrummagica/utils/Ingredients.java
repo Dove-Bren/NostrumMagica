@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.IngredientNBT;
+import net.minecraftforge.common.crafting.NBTIngredient;
 
 public class Ingredients {
 
-	protected static class NBTIngredientWrapper extends IngredientNBT {
+	protected static class NBTIngredientWrapper extends NBTIngredient {
 		public NBTIngredientWrapper(ItemStack stack) {
 			super(stack);
 		}

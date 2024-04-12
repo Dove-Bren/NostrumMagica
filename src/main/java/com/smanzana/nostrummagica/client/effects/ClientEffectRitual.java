@@ -24,7 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -43,7 +43,7 @@ public class ClientEffectRitual extends ClientEffect {
 	protected ReagentType[] reagents = null; // Either [1] or [4]
 	protected ItemStack output = ItemStack.EMPTY; // either .empty() or actual output
 	
-	protected ClientEffectRitual(int duration, Vec3d origin,
+	protected ClientEffectRitual(int duration, Vector3d origin,
 			EMagicElement element, ItemStack center, NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
 		super(origin, null, duration);
 		this.center = center;
@@ -82,15 +82,15 @@ public class ClientEffectRitual extends ClientEffect {
 		return itemCache.get(type);
 	}
 	
-	public ClientEffectRitual(Vec3d origin, EMagicElement element, ItemStack center, NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
+	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack center, NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
 		this(DURATION_TIER3, origin, element, center, extras, reagents, output);
 	}
 	
-	public ClientEffectRitual(Vec3d origin, EMagicElement element, ItemStack center, ReagentType[] reagents, ItemStack output) {
+	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack center, ReagentType[] reagents, ItemStack output) {
 		this(DURATION_TIER2, origin, element, center, null, reagents, output);
 	}
 	
-	public ClientEffectRitual(Vec3d origin, EMagicElement element, ReagentType reagent, ItemStack output) {
+	public ClientEffectRitual(Vector3d origin, EMagicElement element, ReagentType reagent, ItemStack output) {
 		this(DURATION_TIER1, origin, element, ItemStack.EMPTY, null, new ReagentType[] {reagent}, output);
 	}
 	
@@ -103,7 +103,7 @@ public class ClientEffectRitual extends ClientEffect {
 	 * @param output
 	 * @return
 	 */
-	public static ClientEffectRitual Create(Vec3d origin, EMagicElement element, ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
+	public static ClientEffectRitual Create(Vector3d origin, EMagicElement element, ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
 		if (center.isEmpty()) {
 			return new ClientEffectRitual(origin, element, reagents[0], output);
 		} else if (extras == null) {
@@ -113,7 +113,7 @@ public class ClientEffectRitual extends ClientEffect {
 		}
 	}
 	
-	protected void drawFloatingItem(Minecraft mc, float adjProgress, float partialTicks, Vec3d pos, @Nonnull ItemStack stack) {
+	protected void drawFloatingItem(Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nonnull ItemStack stack) {
 		if (stack.isEmpty()) {
 			return;
 		}
@@ -144,15 +144,15 @@ public class ClientEffectRitual extends ClientEffect {
 				&& NostrumMagica.rand.nextBoolean()) {
 			NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
 					1, origin.x + pos.x, origin.y + pos.y - .15, origin.z + pos.z, .1, 15, 5,
-					new Vec3d(0, -.01, 0), null
+					new Vector3d(0, -.01, 0), null
 					)).color(.4f, .3f, .2f, .4f));
 			
 			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-			//Vec3d velocity, boolean unused
+			//Vector3d velocity, boolean unused
 		}
 	}
 	
-	protected void drawCandleTrail(Minecraft mc, float adjProgress, float partialTicks, Vec3d pos, @Nullable ReagentType type) {
+	protected void drawCandleTrail(Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nullable ReagentType type) {
 		
 		if (type != null) {
 			final float scale = .75f;
@@ -183,18 +183,18 @@ public class ClientEffectRitual extends ClientEffect {
 		{
 			NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
 					1, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 45, 15,
-					new Vec3d(0, -.02, 0), null
+					new Vector3d(0, -.02, 0), null
 					)).color(.4f, .3f, .2f, .4f));
 			
 			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-			//Vec3d velocity, boolean unused
+			//Vector3d velocity, boolean unused
 		}
 	}
 	
-	protected void drawRevealCloud(Minecraft mc, float adjProgress, float partialTicks, Vec3d pos) {
+	protected void drawRevealCloud(Minecraft mc, float adjProgress, float partialTicks, Vector3d pos) {
 		NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
 				10, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 40, 20,
-				Vec3d.ZERO, new Vec3d(.1, .1, .1)
+				Vector3d.ZERO, new Vector3d(.1, .1, .1)
 				)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 	}
 	
@@ -207,7 +207,7 @@ public class ClientEffectRitual extends ClientEffect {
 			//Center item
 			{
 				final double yDiff = (adjProgress * .5);
-				drawFloatingItem(mc, adjProgress, partialTicks, new Vec3d(0, yDiff + .35, 0), center);
+				drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(0, yDiff + .35, 0), center);
 			}
 			
 			// Extras
@@ -240,7 +240,7 @@ public class ClientEffectRitual extends ClientEffect {
 					final double x = Math.cos(angle) * dist;
 					final double z = Math.sin(angle) * dist;
 					
-					drawFloatingItem(mc, adjProgress, partialTicks, new Vec3d(
+					drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(
 							x,
 							y,
 							z
@@ -276,8 +276,8 @@ public class ClientEffectRitual extends ClientEffect {
 					final double x = Math.cos(angle) * dist;
 					final double z = Math.sin(angle) * dist;
 					
-					drawCandleTrail(mc, adjProgress, partialTicks, new Vec3d(x, y, z), type);
-//					drawFloatingItem(mc, adjProgress, partialTicks, new Vec3d(
+					drawCandleTrail(mc, adjProgress, partialTicks, new Vector3d(x, y, z), type);
+//					drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(
 //							x,
 //							y,
 //							z
@@ -290,11 +290,11 @@ public class ClientEffectRitual extends ClientEffect {
 			{
 				// Float up (early) or start speeding in
 				final double range = 4;
-				final Vec3d pos = Vec3d.ZERO;
+				final Vector3d pos = Vector3d.ZERO;
 				if (adjProgress < .85f) {
 					NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
-							new Vec3d(0, .01, 0), new Vec3d(.1, .1, .1)
+							new Vector3d(0, .01, 0), new Vector3d(.1, .1, .1)
 							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 				} else {
 					final double yDiff = .35 + .5;
@@ -321,7 +321,7 @@ public class ClientEffectRitual extends ClientEffect {
 			//final ReagentType type = reagents[0];
 			
 			for (int i = 0; i < 4; i++) {
-				Vec3d pos = new Vec3d(
+				Vector3d pos = new Vector3d(
 						hDist * Math.cos(rotYawRad + (i * RadDiff)),
 						hDist * 2,
 						hDist * Math.sin(rotYawRad + (i * RadDiff))
@@ -338,17 +338,17 @@ public class ClientEffectRitual extends ClientEffect {
 			// If item output, draw that and lower it to the platform
 			if (this.output != null && !this.output.isEmpty()) {
 				final double yDiff = ((1.0-adjProgress) * .65);
-				drawFloatingItem(mc, adjProgress/4f, partialTicks, new Vec3d(0, yDiff + .2, 0), output);
+				drawFloatingItem(mc, adjProgress/4f, partialTicks, new Vector3d(0, yDiff + .2, 0), output);
 			}
 			// Else cause an explosion of particles that just move outward
 			else {
-				drawRevealCloud(mc, adjProgress, partialTicks, new Vec3d(0, 1.15, 0));
+				drawRevealCloud(mc, adjProgress, partialTicks, new Vector3d(0, 1.15, 0));
 			}
 			
 			// Ambient particles
 			{
 				final double range = 4;
-				final Vec3d pos = Vec3d.ZERO;
+				final Vector3d pos = Vector3d.ZERO;
 				NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
 						4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
 						origin.add(0, .35, 0)
@@ -370,7 +370,7 @@ public class ClientEffectRitual extends ClientEffect {
 			//final ReagentType type = reagents[0];
 			
 			for (int i = 0; i < 4; i++) {
-				Vec3d pos = new Vec3d(
+				Vector3d pos = new Vector3d(
 						hDist * Math.cos(rotYawRad + (i * RadDiff)),
 						hDist * 2,
 						hDist * Math.sin(rotYawRad + (i * RadDiff))
@@ -378,7 +378,7 @@ public class ClientEffectRitual extends ClientEffect {
 				drawCandleTrail(mc, adjProgress, partialTicks, pos, null);
 			}
 			if (adjProgress > .5f) {
-				drawRevealCloud(mc, adjProgress, partialTicks, Vec3d.ZERO);
+				drawRevealCloud(mc, adjProgress, partialTicks, Vector3d.ZERO);
 			}
 		}
 	}

@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * Effect made by displaying different effects based on the time
@@ -43,21 +43,21 @@ public class ClientEffectAnimated extends ClientEffect {
 
 	private final AnimationFrame[] frames;
 	
-	public ClientEffectAnimated(Vec3d origin, int ticks, AnimationFrame ... frames) {
+	public ClientEffectAnimated(Vector3d origin, int ticks, AnimationFrame ... frames) {
 		super(origin, null, ticks);
 		this.frames = frames;
 	}
 	
-	public ClientEffectAnimated(Vec3d origin, int ticks, ClientEffect[] effects, float[] timings) {
+	public ClientEffectAnimated(Vector3d origin, int ticks, ClientEffect[] effects, float[] timings) {
 		this(origin, ticks, AnimationFrame.MakeFrames(effects, timings));
 	}
 	
-	public ClientEffectAnimated(Vec3d origin, long ms, AnimationFrame[] frames) {
+	public ClientEffectAnimated(Vector3d origin, long ms, AnimationFrame[] frames) {
 		super(origin, null, ms);
 		this.frames = frames;
 	}
 	
-	public ClientEffectAnimated(Vec3d origin, long ms, ClientEffect[] effects, float[] timings) {
+	public ClientEffectAnimated(Vector3d origin, long ms, ClientEffect[] effects, float[] timings) {
 		this(origin, ms, AnimationFrame.MakeFrames(effects, timings));
 	}
 	

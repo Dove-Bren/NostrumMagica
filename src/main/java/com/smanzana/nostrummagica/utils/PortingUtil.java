@@ -361,7 +361,7 @@ public class PortingUtil {
 				final @Nullable String fixupString = fixupSpellComponentWrapperKey(keyString);
 				
 				if (fixupString != null) {
-					list.set(i, new StringNBT(fixupString));
+					list.set(i, StringNBT.valueOf(fixupString));
 				}
 			}
 		}

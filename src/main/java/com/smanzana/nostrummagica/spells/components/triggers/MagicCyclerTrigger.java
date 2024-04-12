@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class MagicCyclerTrigger extends SpellTrigger {
@@ -28,11 +28,11 @@ public class MagicCyclerTrigger extends SpellTrigger {
 	public class MagicCyclerTriggerInstance extends SpellTrigger.SpellTriggerInstance implements ISpellSaucerTrigger {
 
 		private World world;
-		private Vec3d pos;
+		private Vector3d pos;
 		private boolean onBlocks;
 		private float duration;
 		
-		public MagicCyclerTriggerInstance(SpellState state, World world, Vec3d pos, boolean onBlocks, float duration) {
+		public MagicCyclerTriggerInstance(SpellState state, World world, Vector3d pos, boolean onBlocks, float duration) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -98,7 +98,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartParam params) {
 		// We use param's flip to indicate whether we should interact with blocks
 		boolean onBlocks = false;
 		if (params != null)
@@ -111,7 +111,7 @@ public class MagicCyclerTrigger extends SpellTrigger {
 			
 		
 		// Add direction
-		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new MagicCyclerTriggerInstance(state, world, pos, onBlocks, duration);
 	}
 

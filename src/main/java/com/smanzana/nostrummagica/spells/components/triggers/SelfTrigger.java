@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class SelfTrigger extends InstantTrigger {
@@ -28,7 +28,7 @@ public class SelfTrigger extends InstantTrigger {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw) {
 		return new TriggerData(Lists.newArrayList(state.getSelf()), null, world, null);
 	}
 	

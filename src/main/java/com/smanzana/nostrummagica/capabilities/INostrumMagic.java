@@ -21,8 +21,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 
 public interface INostrumMagic {
 	
@@ -72,7 +73,7 @@ public interface INostrumMagic {
 		}
 		
 		public INBT toNBT() {
-			return new StringNBT(this.name());
+			return StringNBT.valueOf(this.name());
 		}
 		
 		public static ElementalMastery fromNBT(INBT nbt) {
@@ -191,9 +192,9 @@ public interface INostrumMagic {
 	public boolean hasTrial(EMagicElement element);
 	
 	// Mark/recall
-	public void setMarkLocation(int dimension, BlockPos location);
+	public void setMarkLocation(RegistryKey<World> dimension, BlockPos location);
 	public BlockPos getMarkLocation();
-	public int getMarkDimension();
+	public RegistryKey<World> getMarkDimension();
 	public void unlockEnhancedTeleport();
 	public boolean hasEnhancedTeleport();
 	
@@ -257,10 +258,10 @@ public interface INostrumMagic {
 	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge();
 	
 	// Sorcery Portal
-	public DimensionType getSorceryPortalDimension();
+	public RegistryKey<World> getSorceryPortalDimension();
 	public BlockPos getSorceryPortalPos();
 	public void clearSorceryPortal();
-	public void setSorceryPortalLocation(DimensionType dimension, BlockPos pos);
+	public void setSorceryPortalLocation(RegistryKey<World> dimension, BlockPos pos);
 	
 	// Refresh attributes and rescan for them
 	public void refresh(ServerPlayerEntity player);

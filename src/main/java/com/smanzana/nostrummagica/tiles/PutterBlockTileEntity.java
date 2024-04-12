@@ -80,9 +80,9 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		// Validate entityItem
 		if (itemEntCache != null) {
 			if (!itemEntCache.isAlive()
-					|| (int) itemEntCache.posX != pos.getX()
-					|| (int) itemEntCache.posY != pos.getY()
-					|| (int) itemEntCache.posZ != pos.getZ()) {
+					|| (int) itemEntCache.getPosX() != pos.getX()
+					|| (int) itemEntCache.getPosY() != pos.getY()
+					|| (int) itemEntCache.getPosZ() != pos.getZ()) {
 				itemEntCache = null;
 			}
 		}
@@ -178,7 +178,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	private ItemEntity refreshEntityItem(ItemEntity oldItem) {
-		ItemEntity newItem = new ItemEntity(oldItem.world, oldItem.posX, oldItem.posY, oldItem.posZ, oldItem.getItem().copy());
+		ItemEntity newItem = new ItemEntity(oldItem.world, oldItem.getPosX(), oldItem.getPosY(), oldItem.getPosZ(), oldItem.getItem().copy());
 		newItem.setMotion(oldItem.getMotion());
 		newItem.lifespan = oldItem.lifespan;
 		oldItem.world.addEntity(newItem);

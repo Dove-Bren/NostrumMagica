@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * Effect made up of multiple copies of another effect
@@ -80,11 +80,11 @@ public class ClientEffectMajorSphere extends ClientEffect {
 	}
 	
 	// Scale in 'blocks' radius
-	public ClientEffectMajorSphere(Vec3d origin, float scale, boolean cloudy, int ticks) {
+	public ClientEffectMajorSphere(Vector3d origin, float scale, boolean cloudy, int ticks) {
 		super(origin, new MajorSphereForm(scale, cloudy), ticks);
 	}
 	
-	public ClientEffectMajorSphere(Vec3d origin, float scale, boolean cloudy, long ms) {
+	public ClientEffectMajorSphere(Vector3d origin, float scale, boolean cloudy, long ms) {
 		super(origin, new MajorSphereForm(scale, cloudy), ms);
 	}
 	

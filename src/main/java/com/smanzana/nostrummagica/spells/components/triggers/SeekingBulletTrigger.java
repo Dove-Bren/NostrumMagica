@@ -24,7 +24,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -41,7 +41,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	public class SeekingBulletTriggerInstance extends SpellTrigger.SpellTriggerInstance {
 
 		private World world;
-		private Vec3d pos;
+		private Vector3d pos;
 		
 		// Just initial parameters for setup
 		private float pitch;
@@ -50,7 +50,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		
 		private LivingEntity target;
 		
-		public SeekingBulletTriggerInstance(SpellState state, World world, Vec3d pos, float pitch, float yaw, boolean ignoreAllies) {
+		public SeekingBulletTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean ignoreAllies) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -63,7 +63,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		public void init(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
-			final Vec3d dir;
+			final Vector3d dir;
 			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
 				target = ent.getAttackTarget(); // We already know target
@@ -113,14 +113,14 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					
 					// Get axis from where target is
 					Direction.Axis axis = Direction.Axis.Y;
-					Vec3d forwardDir = dir;
+					Vector3d forwardDir = dir;
 					if (target != null) {
-						Vec3d vec = target.getPositionVector().subtract(caster.getPositionVector());
+						Vector3d vec = target.getPositionVector().subtract(caster.getPositionVector());
 						forwardDir = vec.normalize();
 						axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 					}
 					
-					Vec3d startMotion;
+					Vector3d startMotion;
 					
 					// For players, start with motion ortho to forward
 					if (getState().getSelf() instanceof PlayerEntity) {
@@ -130,7 +130,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					}
 					// For non-players, fire mostly up
 					else {
-						startMotion = (new Vec3d(0, 1, 0)).normalize()
+						startMotion = (new Vector3d(0, 1, 0)).normalize()
 								.rotateYaw(360f * NostrumMagica.rand.nextFloat());
 					}
 					
@@ -201,19 +201,19 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw, SpellPartParam params) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartParam params) {
 		// Add direction
-		pos = new Vec3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new SeekingBulletTriggerInstance(state, world, pos, pitch, yaw, params.flip);
 	}
 
 	// Copied from vanilla entity class
-	public static final Vec3d getVectorForRotation(float pitch, float yaw) {
+	public static final Vector3d getVectorForRotation(float pitch, float yaw) {
         float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-pitch * 0.017453292F);
         float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
 
 	@Override

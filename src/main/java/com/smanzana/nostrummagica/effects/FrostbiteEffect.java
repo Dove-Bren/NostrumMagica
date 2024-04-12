@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
@@ -17,8 +18,8 @@ import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.IParticleData;
@@ -41,7 +42,7 @@ public class FrostbiteEffect extends Effect {
 	public FrostbiteEffect() {
 		super(EffectType.HARMFUL, 0xFF93E0FF);
 		
-		this.addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
+		this.addAttributesModifier(Attributes.MOVEMENT_SPEED,
 				"60A6EF27-8A11-2213-A734-30A4B0CC4E90", -0.1D, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
@@ -76,7 +77,7 @@ public class FrostbiteEffect extends Effect {
 					NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 				}
 				
-				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, entity.world, entity.posX, entity.posY, entity.posZ);
+				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ());
 				cloud.setOwner(entity);
 				cloud.setIgnoreOwner(true);
 				cloud.setRadius(10f);
@@ -125,13 +126,13 @@ public class FrostbiteEffect extends Effect {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, int x, int y, float z) {
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack stack, int x, int y, float z) {
 		PotionIcon.FROSTBITE.draw(gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, int x, int y, float z, float alpha) {
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack stack, int x, int y, float z, float alpha) {
 		PotionIcon.FROSTBITE.draw(Minecraft.getInstance(), x + 3, y + 3);
 	}
 }

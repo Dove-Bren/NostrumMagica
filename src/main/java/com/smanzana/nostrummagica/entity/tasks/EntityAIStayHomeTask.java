@@ -9,7 +9,7 @@ import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 
@@ -56,14 +56,14 @@ public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 		BlockPos home = creature.getHomePosition();
 		if (home != null) {
 			// Try and find a place to move
-			Vec3d targ = null;
+			Vector3d targ = null;
 			int attempts = 20;
 			do {
 				double dist = this.rand.nextDouble() * Math.sqrt(this.maxDistSq);
 				float angle = (float) (this.rand.nextDouble() * (2 * Math.PI));
 				float tilt = (float) (this.rand.nextDouble() * (2 * Math.PI)) * .5f;
 				
-				targ = new Vec3d(
+				targ = new Vector3d(
 						home.getX() + (Math.cos(angle) * dist),
 						home.getY() + (Math.cos(tilt) * dist),
 						home.getZ() + (Math.sin(angle) * dist));
@@ -73,7 +73,7 @@ public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 			} while (targ == null && attempts > 0);
 			
 			if (targ == null) {
-				targ = new Vec3d(home.getX() + .5, home.getY() + 1, home.getZ() + .5);
+				targ = new Vector3d(home.getX() + .5, home.getY() + 1, home.getZ() + .5);
 			}
 			
 			//this.creature.getNavigator().tryMoveToXYZ(targ.xCoord, targ.yCoord, targ.zCoord, this.speed);
@@ -86,6 +86,6 @@ public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 	 */
 	public boolean shouldContinueExecuting() {
 		MovementController mover = creature.getMoveHelper();
-		return mover.isUpdating() && ((mover.getX() - creature.posX) + (mover.getY() - creature.posY) + (mover.getZ() - creature.posZ) > 2);
+		return mover.isUpdating() && ((mover.getX() - creature.getPosX()) + (mover.getY() - creature.getPosY()) + (mover.getZ() - creature.getPosZ()) > 2);
 	}
 }

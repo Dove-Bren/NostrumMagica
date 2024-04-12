@@ -29,7 +29,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
@@ -231,7 +231,7 @@ public class Spell {
 								comp = new SpellComponentWrapper(next.getAlteration());
 							
 							NostrumMagica.instance.proxy.spawnEffect(world, comp,
-									caster, null, null, new Vec3d(affectPos.getX() + .5, affectPos.getY(), affectPos.getZ() + .5),
+									caster, null, null, new Vector3d(affectPos.getX() + .5, affectPos.getY(), affectPos.getZ() + .5),
 									new SpellComponentWrapper(next.getElement()), harmful, 0);
 						}
 						
@@ -239,7 +239,7 @@ public class Spell {
 						final @Nullable LivingEntity centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
 						final @Nullable BlockPos centerBP = (locations == null || locations.isEmpty() ? null : locations.get(0));
 						if (centerEnt != null || centerBP != null) {
-							final Vec3d centerPos = (centerEnt == null ? new Vec3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().add(0, centerEnt.getHeight() / 2, 0));
+							final Vector3d centerPos = (centerEnt == null ? new Vector3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().add(0, centerEnt.getHeight() / 2, 0));
 							final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
 									param.level == 0f ? shape.supportedFloats()[0] : param.level));
 							NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(shape),
@@ -316,11 +316,11 @@ public class Spell {
 		
 		private void spawnTrigger(SpellTrigger trigger, LivingEntity targ, World world, BlockPos targpos, SpellPartParam param) {
 			// instantiate trigger in world
-			Vec3d pos;
+			Vector3d pos;
 			if (world == null)
 				world = targ.world;
 			if (targ == null)
-				pos = new Vec3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
+				pos = new Vector3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
 			else
 				pos = targ.getPositionVector();
 			

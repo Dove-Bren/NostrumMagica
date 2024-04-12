@@ -11,7 +11,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 
 public class ModConfig {
 	
@@ -322,8 +322,8 @@ public class ModConfig {
 	}
 	
 	@SubscribeEvent
-	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		if(eventArgs.getModID().equals(NostrumMagica.MODID)) {
+	public void onConfigChanged(ModConfigEvent eventArgs) {
+		if(eventArgs.getConfig().getModId().equals(NostrumMagica.MODID)) {
 
 			//tell each watcher the c onfig has been updated
 			if (watchers != null)

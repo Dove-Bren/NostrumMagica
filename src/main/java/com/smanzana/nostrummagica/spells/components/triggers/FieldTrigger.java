@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class FieldTrigger extends TriggerAreaTrigger {
@@ -27,10 +27,10 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 10) / TICK_RATE; // 20 seconds
 
-		private Vec3d origin;
+		private Vector3d origin;
 		private float radius;
 		
-		public FieldTriggerInstance(SpellState state, World world, Vec3d pos, float radius, boolean continuous) {
+		public FieldTriggerInstance(SpellState state, World world, Vector3d pos, float radius, boolean continuous) {
 			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, true);
 			this.radius = radius;
 			this.origin = pos;
@@ -43,7 +43,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		
 		@Override
 		protected boolean isInArea(LivingEntity entity) {
-			return origin.distanceTo(new Vec3d(entity.posX, origin.y, entity.posZ)) <= radius; // compare against our y for horizontal distance.
+			return origin.distanceTo(new Vector3d(entity.getPosX(), origin.y, entity.getPosZ())) <= radius; // compare against our y for horizontal distance.
 			// .75 wiggle room in listener means you can't be way below.
 		}
 
@@ -64,7 +64,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 //						origin.z,
 //						radius,
 //						20, 0, // lifetime + jitter
-//						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
+//						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
 //						).color(getState().getNextElement().getColor()));
 //				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
 //						2,
@@ -73,7 +73,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 //						origin.z,
 //						radius,
 //						20, 0, // lifetime + jitter
-//						new Vec3d(0, -.025, 0), new Vec3d(0, .05, 0)
+//						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
 //						).color(getState().getNextElement().getColor()));
 				
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
@@ -109,14 +109,14 @@ public class FieldTrigger extends TriggerAreaTrigger {
 //			//for (int i = 0; i < slices; i++) {
 //			{
 //				final double rot = i * radPerSlice;
-//				Vec3d borderPos = origin.add(Math.cos(rot) * radius, 0, Math.sin(rot) * radius);
+//				Vector3d borderPos = origin.add(Math.cos(rot) * radius, 0, Math.sin(rot) * radius);
 //				
 //				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 //						1,
 //						borderPos.x, borderPos.y + .25, borderPos.z,
 //						0,
 //						20, 0, // lifetime + jitter
-//						new Vec3d(0, .05, 0), Vec3d.ZERO
+//						new Vector3d(0, .05, 0), Vector3d.ZERO
 //						).color(getState().getNextElement().getColor()));
 //			}
 		}
@@ -150,7 +150,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		
 		// Blindly guess if trigger put us in a wall but above us isn't that t he player

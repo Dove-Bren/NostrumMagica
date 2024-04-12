@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,9 +32,9 @@ public class ClientEffectRenderer {
 	public static interface ClientEffectFactory {
 		
 		public ClientEffect build(LivingEntity caster,
-			Vec3d sourcePosition,
+			Vector3d sourcePosition,
 			LivingEntity target,
-			Vec3d destPosition,
+			Vector3d destPosition,
 			SpellComponentWrapper flavor,
 			boolean isNegative,
 			float compParam);
@@ -79,8 +79,8 @@ public class ClientEffectRenderer {
 		GlStateManager.pushMatrix();
 		Minecraft mc = Minecraft.getInstance();
 		
-		Vec3d playerOffset = mc.player.getEyePosition(event.getPartialTicks());
-		//Vec3d playerOffset = mc.thePlayer.getPositionVector();
+		Vector3d playerOffset = mc.player.getEyePosition(event.getPartialTicks());
+		//Vector3d playerOffset = mc.thePlayer.getPositionVector();
 		GlStateManager.translated(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		
 		synchronized(activeEffects) {
@@ -105,9 +105,9 @@ public class ClientEffectRenderer {
 	
 	public void spawnEffect(SpellComponentWrapper component,
 			LivingEntity caster,
-			Vec3d sourcePosition,
+			Vector3d sourcePosition,
 			LivingEntity target,
-			Vec3d destPosition,
+			Vector3d destPosition,
 			SpellComponentWrapper flavor,
 			boolean isNegative,
 			float compParam) {

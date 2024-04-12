@@ -14,7 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class ArcaneWolfAIMysticTask extends Goal {
 
@@ -80,8 +80,8 @@ public class ArcaneWolfAIMysticTask extends Goal {
 				for (int i = 0; i < 10; i++) {
 					final double angleRad = 2 * Math.PI * ((double) i / 10.0);
 					NostrumParticles.FILLED_ORB.spawn(wolf.world, new SpawnParams(
-							1, target.posX, target.posY + target.getEyeHeight(), target.posZ, 0, 30, 0,
-							new Vec3d(Math.cos(angleRad) * .1, .05, Math.sin(angleRad) * .1), null
+							1, target.getPosX(), target.getPosY() + target.getEyeHeight(), target.getPosZ(), 0, 30, 0,
+							new Vector3d(Math.cos(angleRad) * .1, .05, Math.sin(angleRad) * .1), null
 							).color(ArcaneWolfElementalType.MYSTIC.getColor()));
 				}
 			}

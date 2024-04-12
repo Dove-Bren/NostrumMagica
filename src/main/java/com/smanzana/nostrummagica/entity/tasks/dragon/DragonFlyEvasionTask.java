@@ -78,8 +78,8 @@ public class DragonFlyEvasionTask extends Goal {
 		Random random = this.dragon.getRNG();
 		double angle = random.nextDouble() * 2D * Math.PI;
 		double range = 24.0 + (8.0 * random.nextDouble());
-        double x = this.dragon.posX + (range * Math.cos(angle));
-        double z = this.dragon.posZ + (range * Math.sin(angle));
+        double x = this.dragon.getPosX() + (range * Math.cos(angle));
+        double z = this.dragon.getPosZ() + (range * Math.sin(angle));
         
         // Find y
         double y;

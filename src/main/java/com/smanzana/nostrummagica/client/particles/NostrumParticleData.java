@@ -12,7 +12,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -23,7 +23,7 @@ public class NostrumParticleData implements IParticleData {
 		@Override
 		public NostrumParticleData deserialize(ParticleType<NostrumParticleData> particleTypeIn, StringReader reader)
 				throws CommandSyntaxException {
-			return new NostrumParticleData(particleTypeIn, new SpawnParams(1, 0, 0, 0, .5, 20, 0, new Vec3d(0, 1, 0), Vec3d.ZERO));
+			return new NostrumParticleData(particleTypeIn, new SpawnParams(1, 0, 0, 0, .5, 20, 0, new Vector3d(0, 1, 0), Vector3d.ZERO));
 		}
 
 		@Override

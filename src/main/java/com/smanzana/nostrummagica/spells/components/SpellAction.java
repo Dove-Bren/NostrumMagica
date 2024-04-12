@@ -79,7 +79,7 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.NetherBiome;
 import net.minecraft.world.server.ServerWorld;
@@ -484,12 +484,12 @@ public class SpellAction {
 			// Apply efficiency bonus
 			float dist = this.dist * efficiency;
 			
-			Vec3d dest;
-			Vec3d direction = entity.getLookVec().normalize();
-			Vec3d source = entity.getPositionVector();
+			Vector3d dest;
+			Vector3d direction = entity.getLookVec().normalize();
+			Vector3d source = entity.getPositionVector();
 			source = source.add(0, entity.getEyeHeight(), 0);
 			BlockPos bpos;
-			Vec3d translation = new Vec3d(direction.x * dist,
+			Vector3d translation = new Vector3d(direction.x * dist,
 					direction.y * dist,
 					direction.z * dist);
 			
@@ -504,9 +504,9 @@ public class SpellAction {
 					// Whoo! Looks like we can teleport there!
 			} else {
 				int i = 4; // Attempt raytrace from (20% * i * pathlength)
-				Vec3d endpoint = dest;
+				Vector3d endpoint = dest;
 				dest = null;
-				Vec3d from;
+				Vector3d from;
 				double curDist;
 				while (i >= 0) {
 					if (i == 0) {
@@ -514,7 +514,7 @@ public class SpellAction {
 						from = source;
 					} else {
 						curDist = (.2 * i);
-						from = new Vec3d(translation.x * curDist,
+						from = new Vector3d(translation.x * curDist,
 								translation.y * curDist,
 								translation.z * curDist);
 						from = source.add(from);
@@ -594,7 +594,7 @@ public class SpellAction {
 
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
-			Vec3d center = new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			Vector3d center = new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 			NostrumMagicaSounds.DAMAGE_WIND.play(world, center.x, center.y, center.z);
 			
 			boolean any = false;
@@ -607,9 +607,9 @@ public class SpellAction {
 					// If push, straight magnitude
 					// If pull, cap magnitude so that it doesn't fly past player
 					
-					Vec3d force;
-					Vec3d direction = e.getPositionVector().add(0, e.getEyeHeight(), 0).subtract(center).normalize();
-					force = new Vec3d(
+					Vector3d force;
+					Vector3d direction = e.getPositionVector().add(0, e.getEyeHeight(), 0).subtract(center).normalize();
+					force = new Vector3d(
 							direction.x * magnitude,
 							direction.y * magnitude,
 							direction.z * magnitude
@@ -620,14 +620,14 @@ public class SpellAction {
 						double mod = force.length();
 						if (mod > dist * .2) {
 							mod = (dist * .4) / mod;
-							force = new Vec3d(
+							force = new Vector3d(
 									force.x * mod,
 									force.y * mod,
 									force.z * mod
 									);
 						}
 
-						force = new Vec3d(
+						force = new Vector3d(
 								force.x * -1.0,
 								force.y * -1.0,
 								force.z * -1.0);
@@ -1062,23 +1062,23 @@ public class SpellAction {
 				return false;
 			}
 			
-			Vec3d pos = caster.getPositionVector();
+			Vector3d pos = caster.getPositionVector();
 			float pitch = caster.rotationPitch;
 			float yaw = caster.rotationYawHead;
 			
 			if (caster instanceof PlayerEntity) {
-				caster.setPositionAndRotation(caster.posX, caster.posY, caster.posZ, entity.rotationYawHead, entity.rotationPitch);
+				caster.setPositionAndRotation(caster.getPosX(), caster.getPosY(), caster.getPosZ(), entity.rotationYawHead, entity.rotationPitch);
 				caster.setPositionAndUpdate(
-						entity.posX, entity.posY, entity.posZ);
+						entity.getPosX(), entity.getPosY(), entity.getPosZ());
 			} else {
 				caster.setPositionAndRotation(
-						entity.posX, entity.posY, entity.posZ,
+						entity.getPosX(), entity.getPosY(), entity.getPosZ(),
 						entity.rotationPitch, entity.rotationYawHead
 						);
 			}
 			
 			if (entity instanceof PlayerEntity) {
-				entity.setPositionAndRotation(entity.posX, entity.posY, entity.posZ, yaw, pitch);
+				entity.setPositionAndRotation(entity.getPosX(), entity.getPosY(), entity.getPosZ(), yaw, pitch);
 				entity.setPositionAndUpdate(pos.x, pos.y, pos.z);
 			} else {
 				entity.setPositionAndRotation(pos.x, pos.y, pos.z, yaw, pitch);
@@ -1147,10 +1147,10 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 
-			Vec3d force = entity.getLookVec().add(0, 0.15, 0).normalize();
+			Vector3d force = entity.getLookVec().add(0, 0.15, 0).normalize();
 			float scale = 1f * (.5f * (level + 1)) * (float) (Math.max(0.0, Math.min(2.0, 1.0 - Math.log(efficiency))));
 			
-			force = new Vec3d(force.x * scale, force.y * scale, force.z * scale);
+			force = new Vector3d(force.x * scale, force.y * scale, force.z * scale);
 			
 			entity.setMotion(entity.getMotion().add(force.x, force.y, force.z));
 			entity.velocityChanged = true;
@@ -1230,9 +1230,9 @@ public class SpellAction {
 			for (int i = 0; i < 20; i++) {
 			
 				// Find a random place to teleport
-		        double x = entity.posX + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
-		        double y = entity.posY + (double)(NostrumMagica.rand.nextInt((int) radius) - (int) radius / 2.0);
-		        double z = entity.posZ + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
+		        double x = entity.getPosX() + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
+		        double y = entity.getPosY() + (double)(NostrumMagica.rand.nextInt((int) radius) - (int) radius / 2.0);
+		        double z = entity.getPosZ() + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
 	
 			    // Try to teleport
 		        if (entity.attemptTeleport(x, y, z, false))

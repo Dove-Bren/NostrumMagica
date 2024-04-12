@@ -61,7 +61,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.player.PlayerEntity;
@@ -86,7 +86,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -529,9 +529,9 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 
         if (equipmentSlot == this.slot)
         {
-            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
-            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
-            multimap.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            multimap.put(Attributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.MOVEMENT_SPEED.getName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
             multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
             multimap.put(AttributeMagicReduction.instance(this.element).getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
         }
@@ -1261,9 +1261,9 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			dx = dz = dy = mult = 0;
 			rangeMod = 0;
 			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-			//Vec3d velocity, boolean unused
+			//Vector3d velocity, boolean unused
 			NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
-					1, player.posX, player.posY + 1, player.posZ, 1, 20 * 1, 0, new Vec3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null
+					1, player.getPosX(), player.getPosY() + 1, player.getPosZ(), 1, 20 * 1, 0, new Vector3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null
 					).color(.8f, 1f, 1f, 0f));
 			break;
 		case PHYSICAL:
@@ -1283,9 +1283,9 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		for (int i = 0; i < mult; i++) {
 			final float rd = NostrumMagica.rand.nextFloat();
 			final float radius = .5f + (NostrumMagica.rand.nextFloat() * (.5f * rangeMod));
-			final double px = (player.posX + radius * Math.cos(rd * Math.PI * 2));
-			final double py = (player.posY + (NostrumMagica.rand.nextFloat() * 2));
-			final double pz = (player.posZ + radius * Math.sin(rd * Math.PI * 2));
+			final double px = (player.getPosX() + radius * Math.cos(rd * Math.PI * 2));
+			final double py = (player.getPosY() + (NostrumMagica.rand.nextFloat() * 2));
+			final double pz = (player.getPosZ() + radius * Math.sin(rd * Math.PI * 2));
 			world.addParticle(effect, px, py, pz, dx, dy, dz);
 		}
 	}
@@ -1314,7 +1314,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					
 					// Refresh nearby tornados
 					if (player.onGround)
-					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.posX, player.posY, player.posZ).grow(5), (effect) -> {
+					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.getPosX(), player.getPosY(), player.getPosZ()).grow(5), (effect) -> {
 						// lol
 						return effect != null
 								&& (effect.getCustomParticle() == ParticleTypes.SWEEP_ATTACK || effect.getParticleData() == ParticleTypes.SWEEP_ATTACK);
@@ -2221,21 +2221,21 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				&& stack.getTag().getBoolean(NBT_WING_UPGRADE);
 	}
 	
-	private static final boolean DoEnderDash(LivingEntity entity, Vec3d dir) {
+	private static final boolean DoEnderDash(LivingEntity entity, Vector3d dir) {
 		final float dashDist = 4.0f;
-		final Vec3d idealVec = entity.getPositionVector().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
+		final Vector3d idealVec = entity.getPositionVector().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
 		
 		// Do three traces from y=0, y=1, and y=2. Take best one
-		Vec3d bestResult = null;
+		Vector3d bestResult = null;
 		double bestDist = -1;
-		final Vec3d startPos = entity.getPositionVector();
+		final Vector3d startPos = entity.getPositionVector();
 		for (int y = -1; y <= 4; y++) {
-			final Vec3d end = idealVec.add(0, y, 0);
+			final Vector3d end = idealVec.add(0, y, 0);
 			RayTraceResult mop = RayTrace.raytrace(entity.world, entity, startPos.add(0, y, 0), end, (ent) -> {
 				return false;
 			});
 			
-			final Vec3d spot;
+			final Vector3d spot;
 			if (mop != null && mop.getType() == RayTraceResult.Type.BLOCK) {
 				spot = mop.getHitVec();
 			} else {
@@ -2389,9 +2389,9 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 						AspectedEnderWeapon.AttemptCasterTeleport(ent, held);
 					}
 				} else {
-					final Vec3d realLook = ent.getLookVec();
-					final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
-					Vec3d dir = fakeLook.scale(-1);
+					final Vector3d realLook = ent.getLookVec();
+					final Vector3d fakeLook = new Vector3d(realLook.x, 0, realLook.z);
+					Vector3d dir = fakeLook.scale(-1);
 					if (DoEnderDash(ent, dir)) {
 						MagicArmor.consumeEnderDash(ent);
 					} else {
@@ -2404,9 +2404,9 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			break;
 		case ENDER_DASH_SIDE:
 			if (!ent.world.isRemote && armor.hasEnderDash(ent)) {
-				final Vec3d realLook = ent.getLookVec();
-				final Vec3d fakeLook = new Vec3d(realLook.x, 0, realLook.z);
-				final Vec3d dir = fakeLook.rotateYaw((float) ((Math.PI / 2) * (data ? -1 : 1)));
+				final Vector3d realLook = ent.getLookVec();
+				final Vector3d fakeLook = new Vector3d(realLook.x, 0, realLook.z);
+				final Vector3d dir = fakeLook.rotateYaw((float) ((Math.PI / 2) * (data ? -1 : 1)));
 				if (DoEnderDash(ent, dir)) {
 					consumeEnderDash(ent);
 				}
@@ -2415,7 +2415,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		case WIND_TORNADO:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				consumeWindTornado(ent);
-				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, ent.world, ent.posX, ent.posY, ent.posZ);
+				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, ent.world, ent.getPosX(), ent.getPosY(), ent.getPosZ());
 				cloud.setOwner(ent);
 				
 				cloud.setHeight(5f);
@@ -2456,14 +2456,14 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 //					final int period = 20;
 //					final float prog = ((float) (entity.ticksExisted % period) / (float) period);
 //					final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
-//					final Vec3d target = new Vec3d(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
-//					final Vec3d diff = target.subtract(entity.getPositionVector());
+//					final Vector3d target = new Vector3d(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
+//					final Vector3d diff = target.subtract(entity.getPositionVector());
 //					entity.getMotion().x = 0;//diff.x/ 2;
 //					entity.getMotion().y = diff.y/ 2;
 //					entity.getMotion().z = 0;//diff.z/ 2;
 //					entity.velocityChanged = true;
-//					//entity.posY = 2 + dy;
-//					//entity.setPositionAndUpdate(cloud.posX, cloud.posY + 2 + dy, cloud.posZ);
+//					//entity.getPosY() = 2 + dy;
+//					//entity.setPositionAndUpdate(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
 					
 					// Downward suppresive effect
 					entity.setMotion(entity.getMotion()
@@ -2486,7 +2486,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 							
 //							NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(
 //									 10,
-//									 living.posX, entity.posY + entity.height/2f, entity.posZ, entity.width * 2,
+//									 living.getPosX(), entity.getPosY() + entity.height/2f, entity.getPosZ(), entity.width * 2,
 //									 10, 5,
 //									 living.getEntityId())
 //									 .color(EMagicElement.WIND.getColor()));
@@ -2536,7 +2536,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				final float maxDist = 20;
 				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
 				if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-					final Vec3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
+					final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
 					AspectedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, AspectedWeapon.Type.MASTER);
 				}
 			}
@@ -2555,7 +2555,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		MagicArmor armor = getChestPiece(ent);
 		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
-			Vec3d motion = ent.getMotion();
+			Vector3d motion = ent.getMotion();
 			ent.setMotion(motion.x, motion.y + armor.jumpBoost, motion.z);
 		}
 	}

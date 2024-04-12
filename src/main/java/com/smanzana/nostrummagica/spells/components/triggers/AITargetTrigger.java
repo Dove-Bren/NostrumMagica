@@ -8,7 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -34,7 +34,7 @@ public class AITargetTrigger extends InstantTrigger {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vec3d pos, float pitch, float yaw) {
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw) {
 		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
 		if (state.getCaster() instanceof MobEntity) {
 			target = ((MobEntity) state.getCaster()).getAttackTarget();

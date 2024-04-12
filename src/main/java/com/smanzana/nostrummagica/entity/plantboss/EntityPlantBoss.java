@@ -51,7 +51,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.Pose;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.IFluidState;
@@ -66,7 +66,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.BossInfo;
 import net.minecraft.world.ServerBossInfo;
 import net.minecraft.world.World;
@@ -352,15 +352,15 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	@Override
 	protected void registerAttributes() {
 		super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.00D);
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
-        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(18.0D);
-        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(8D);
-        this.getAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.00D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(800.0D);
+        this.getAttributes().registerAttribute(Attributes.ATTACK_DAMAGE);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(10.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(18.0D);
+        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
+        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(8D);
+        this.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
     }
 	
 	@Override
@@ -406,7 +406,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		// Add children to world
 		for (MultiPartEntityPart<EntityPlantBoss> part : this.parts) {
 			// Need to make sure to set a near-ish position for the entities or they may not be added tto the world
-			part.setPosition(this.posX, this.posY, this.posZ);
+			part.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 			this.world.addEntity(part);
 		}
 	}
@@ -429,9 +429,9 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 								;
 			final double radius = this.getBody().getWidth() * (limb.getLeafIndex() % 2 == 0 ? 1.25 : 1.5);
 			
-			final double x = this.posX
+			final double x = this.getPosX()
 					+ Math.cos(limbRot) * radius;
-			final double z = this.posZ + Math.sin(limbRot) * radius;
+			final double z = this.getPosZ() + Math.sin(limbRot) * radius;
 			
 			final float pitch = calcTargetLeafPitch(limb);
 			limb.setLocationAndAngles(x, posY, z, yawProg * 360f, pitch);
@@ -462,44 +462,44 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	protected void spawnTreeParticles() {
 		//		NostrumParticles.GLOW_ORB.spawn(this.world, new NostrumParticles.SpawnParams(
 		//		1,
-		//		this.posX, this.posY + this.getHeight() + 4, this.posZ, 3,
+		//		this.getPosX(), this.getPosY() + this.getHeight() + 4, this.getPosZ(), 3,
 		//		30, 10,
 		//		this.getPositionVector().add(0, this.getHeight() + 1.7, 0)
 		//		).color(this.getTreeElement().getColor()));
 		
 		//NostrumParticles.GLOW_ORB.spawn(this.world, new NostrumParticles.SpawnParams(
 		//		1,
-		//		this.posX, this.posY + this.getHeight() + 1.70, this.posZ, .25,
+		//		this.getPosX(), this.getPosY() + this.getHeight() + 1.70, this.getPosZ(), .25,
 		//		40, 20,
-		//		new Vec3d(0, .2, 0), new Vec3d(.2, .1, .2)
+		//		new Vector3d(0, .2, 0), new Vector3d(.2, .1, .2)
 		//		).gravity(true).color(this.getTreeElement().getColor()));
 		
 		NostrumParticles.LIGHTNING_STATIC.spawn(this.world, new NostrumParticles.SpawnParams(
 				1,
-				this.posX, this.posY + this.getHeight() + 1, this.posZ, 1,
+				this.getPosX(), this.getPosY() + this.getHeight() + 1, this.getPosZ(), 1,
 				40, 20,
-				new Vec3d(0, .05, 0), Vec3d.ZERO
+				new Vector3d(0, .05, 0), Vector3d.ZERO
 				).color(this.getTreeElement().getColor()));
 	}
 	
 	protected void spawnWardParticles(int count) {
 		NostrumParticles.WARD.spawn(this.world, new NostrumParticles.SpawnParams(
 				count * 10,
-				this.posX, this.posY + (this.getHeight() / 2), this.posZ, this.getWidth() * 1.5,
+				this.getPosX(), this.getPosY() + (this.getHeight() / 2), this.getPosZ(), this.getWidth() * 1.5,
 				40, 10,
-				new Vec3d(0, 0, 0), Vec3d.ZERO
+				new Vector3d(0, 0, 0), Vector3d.ZERO
 				));
 	}
 	
-	protected void spawnWardParticles(@Nonnull Vec3d at, int count) {
+	protected void spawnWardParticles(@Nonnull Vector3d at, int count) {
 		// Calculate vector away from ent to where it got attacked
-		Vec3d bounceDir = at.subtract(this.getPositionVec()).normalize();
+		Vector3d bounceDir = at.subtract(this.getPositionVec()).normalize();
 		
 		NostrumParticles.WARD.spawn(this.world, new NostrumParticles.SpawnParams(
 				count * 5,
 				at.x, at.y, at.z, .25,
 				10, 5,
-				bounceDir.scale(.01), new Vec3d(.0025, .0025, .0025)
+				bounceDir.scale(.01), new Vector3d(.0025, .0025, .0025)
 				));
 	}
 	
@@ -880,28 +880,28 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		MutableBlockPos cursor = new MutableBlockPos();
 		int remaining;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
+		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(Direction.NORTH);
 		}
 		final int minZ = cursor.getZ() + 1;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
+		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(Direction.SOUTH);
 		}
 		final int maxZ = cursor.getZ() - 1;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
+		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(Direction.EAST);
 		}
 		final int maxX = cursor.getX() - 1;
 		
-		cursor.setPos(this.posX, this.posY, this.posZ).move(Direction.DOWN);
+		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
 		remaining = 20;
 		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
 			cursor.move(Direction.WEST);
@@ -1044,7 +1044,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	protected void pushEntity(Entity e) {
-		Vec3d awayDir = e.getPositionVec().subtract(this.getPositionVec());
+		Vector3d awayDir = e.getPositionVec().subtract(this.getPositionVec());
 		double dist = awayDir.lengthSquared();
 		double force = Math.min(.1, Math.max(.5, .1 * (16.0 / dist)));
 		
@@ -1078,22 +1078,22 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		switch (side) {
 		default:
 		case NORTH:
-			start = new BlockPos((int) this.posX, this.posY, arenaMax.getZ() + 1);
+			start = new BlockPos((int) this.getPosX(), this.getPosY(), arenaMax.getZ() + 1);
 			width = dx;
 			dist = dz + 2;
 			break;
 		case SOUTH:
-			start = new BlockPos((int) this.posX, this.posY, arenaMin.getZ() - 1);
+			start = new BlockPos((int) this.getPosX(), this.getPosY(), arenaMin.getZ() - 1);
 			width = dx;
 			dist = dz + 2;
 			break;
 		case EAST:
-			start = new BlockPos(arenaMin.getX() - 1, this.posY, (int) this.posZ);
+			start = new BlockPos(arenaMin.getX() - 1, this.getPosY(), (int) this.getPosZ());
 			width = dz;
 			dist = dx + 2;
 			break;
 		case WEST:
-			start = new BlockPos(arenaMax.getX() + 1, this.posY, (int) this.posZ);
+			start = new BlockPos(arenaMax.getX() + 1, this.getPosY(), (int) this.getPosZ());
 			width = dz;
 			dist = dx + 2;
 			break;
@@ -1433,9 +1433,9 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 				if (pillar != null) {
 					// Face platform
 					{
-						double d0 = (pillar.getX() + .5) - parent.posX;
-						double d2 = (pillar.getZ() + .5) - parent.posZ;
-						double d1 = (pillar.getY() + 1) - (parent.posY + parent.getEyeHeight());
+						double d0 = (pillar.getX() + .5) - parent.getPosX();
+						double d2 = (pillar.getZ() + .5) - parent.getPosZ();
+						double d1 = (pillar.getY() + 1) - (parent.getPosY() + parent.getEyeHeight());
 						
 						double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
 						float f = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
@@ -1544,7 +1544,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			
 			final float yaw = getYaw(this.startingYaw, this.elapsedTicks, this.periodTicks);
 			parent.setRotationYawHead(yaw);
-			parent.setPositionAndRotation(parent.posX, parent.posY, parent.posZ, yaw, 0);
+			parent.setPositionAndRotation(parent.getPosX(), parent.getPosY(), parent.getPosZ(), yaw, 0);
 			//parent.setRotation(yaw, 0f);
 			
 			if (this.elapsedTicks % 5 == 0) {

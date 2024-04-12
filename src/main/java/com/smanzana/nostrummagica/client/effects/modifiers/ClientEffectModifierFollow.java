@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRender
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -24,7 +24,7 @@ public class ClientEffectModifierFollow implements ClientEffectModifier {
 
 	@Override
 	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
-		Vec3d pos = entity.getEyePosition(partialTicks).subtract(0, entity.getEyeHeight(), 0);
+		Vector3d pos = entity.getEyePosition(partialTicks).subtract(0, entity.getEyeHeight(), 0);
 		GlStateManager.translated(pos.x, pos.y, pos.z);
 	}
 }

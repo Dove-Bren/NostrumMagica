@@ -26,7 +26,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class KoidTask extends Goal {
 	
@@ -459,7 +459,7 @@ public class KoidTask extends Goal {
         	if (updateCooldown > 0 && !koid.getNavigator().noPath())
     			return true;
         	
-        	//if (Math.abs(koid.posY - target.posY) > 1) {
+        	//if (Math.abs(koid.getPosY() - target.getPosY()) > 1) {
         	//	if (koid.getNavigator().)
         	//}
 			
@@ -471,7 +471,7 @@ public class KoidTask extends Goal {
 		} else if (hasRange) {
 			
 			success = true;
-			double dist = koid.getDistanceSq(target.posX, target.getBoundingBox().minY, target.posZ);
+			double dist = koid.getDistanceSq(target.getPosX(), target.getBoundingBox().minY, target.getPosZ());
 
             if (dist <= RANGE_SQR - 64.0 && koid.canEntityBeSeen(target))
             {
@@ -519,8 +519,8 @@ public class KoidTask extends Goal {
                 }
                 
                 if (koid.onGround) {
-                	Vec3d forward = getForward(koid);
-                	Vec3d right = getForward(koid).rotatePitch(90.0f);
+                	Vector3d forward = getForward(koid);
+                	Vector3d right = getForward(koid).rotatePitch(90.0f);
                 	double mag = strafeBack ? -.1 : 0;
                 	double x, y, z;
                 	x = forward.x * mag;
@@ -627,21 +627,21 @@ public class KoidTask extends Goal {
 		return vec2f;
 	}
 
-	private static Vec3d getForward(LivingEntity entity) {
+	private static Vector3d getForward(LivingEntity entity) {
 		return fromPitchYawVector(getPitchYaw(entity));
 	}
 	
-	public static Vec3d fromPitchYawVector(Vec2f vector) {
+	public static Vector3d fromPitchYawVector(Vec2f vector) {
 		return fromPitchYaw(vector.pitch, vector.yaw);
 	}
 	
-	public static Vec3d fromPitchYaw(float p_189986_0_, float p_189986_1_)
+	public static Vector3d fromPitchYaw(float p_189986_0_, float p_189986_1_)
     {
         float f = MathHelper.cos(-p_189986_1_ * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-p_189986_1_ * 0.017453292F - (float)Math.PI);
         float f2 = -MathHelper.cos(-p_189986_0_ * 0.017453292F);
         float f3 = MathHelper.sin(-p_189986_0_ * 0.017453292F);
-        return new Vec3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
 	
 }

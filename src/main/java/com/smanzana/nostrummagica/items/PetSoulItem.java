@@ -14,7 +14,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -86,11 +86,11 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	 * @param stack
 	 * @return
 	 */
-	public abstract boolean canSpawnEntity(World world, @Nullable LivingEntity spawner, Vec3d pos, ItemStack stack);
+	public abstract boolean canSpawnEntity(World world, @Nullable LivingEntity spawner, Vector3d pos, ItemStack stack);
 	
 	protected abstract void setWorldID(LivingEntity pet, UUID worldID);
 	
-	protected abstract void beforePetRespawn(LivingEntity pet, World world, Vec3d pos, ItemStack stack);
+	protected abstract void beforePetRespawn(LivingEntity pet, World world, Vector3d pos, ItemStack stack);
 	
 	@Override
 	public int getEntityLifespan(ItemStack itemStack, World world) {
@@ -98,7 +98,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		return 18000;
 	}
 	
-	public static @Nullable LivingEntity SpawnPet(ItemStack stack, World world, Vec3d pos) {
+	public static @Nullable LivingEntity SpawnPet(ItemStack stack, World world, Vector3d pos) {
 		if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof PetSoulItem)) {
 			return null;
 		}

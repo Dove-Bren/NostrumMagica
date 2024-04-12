@@ -44,7 +44,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -156,7 +156,7 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 		return 270000;
 	}
 	
-	protected void doCastEffect(LivingEntity target, Vec3d startPos, Vec3d endPos) {
+	protected void doCastEffect(LivingEntity target, Vector3d startPos, Vector3d endPos) {
 		if (target.world.isRemote) {
 			return;
 		}
@@ -168,13 +168,13 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 			target.world.addParticle(ParticleTypes.PORTAL, endPos.getX(), endPos.getY() + NostrumMagica.rand.nextDouble() * 2.0D, endPos.getZ(), NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian());
 		}
 		
-		Vec3d diff = endPos.subtract(startPos);
+		Vector3d diff = endPos.subtract(startPos);
 		
 		// Could go discrete increments, but just divide and stretch
 		final int intervals = 10;
 		for (int i = 0; i < intervals; i++) {
-			Vec3d offset = diff.scale((float) i/ (float) intervals);
-			final Vec3d pos = startPos.add(offset);
+			Vector3d offset = diff.scale((float) i/ (float) intervals);
+			final Vector3d pos = startPos.add(offset);
 			NostrumParticles.GLOW_ORB.spawn(target.world, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
@@ -183,7 +183,7 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 		}
 	}
 	
-	protected Vec3d getCastPosition(LivingEntity caster) {
+	protected Vector3d getCastPosition(LivingEntity caster) {
 		RayTraceResult result = RayTrace.raytrace(caster.world, caster, caster.getPositionVector().add(0, caster.getEyeHeight(), 0),
 				caster.rotationPitch, caster.rotationYaw, MAX_BALL_DIST, (ent) -> {
 					return false; // Don't want entities
@@ -199,7 +199,7 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 			if (!caster.world.isAirBlock(pos)) {
 				pos = pos.offset(blockRes.getFace());
 			}
-			return new Vec3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			return new Vector3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 		}
 	}
 	
@@ -239,16 +239,16 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 			
 			NostrumParticles.GLOW_ORB.spawn(ball.world, new SpawnParams(
 					50,
-					ball.posX, ball.posY + ball.getHeight() / 2, ball.posZ, .25, 50, 20,
-					new Vec3d(0, .1, 0), new Vec3d(.25, .05, .25)
+					ball.getPosX(), ball.getPosY() + ball.getHeight() / 2, ball.getPosZ(), .25, 50, 20,
+					new Vector3d(0, .1, 0), new Vector3d(.25, .05, .25)
 					).color(EMagicElement.ENDER.getColor()).gravity(true));
 		}
 		
 		ball.remove();
 	}
 	
-	protected void teleportEntity(LivingEntity entity, Vec3d pos) {
-		final Vec3d startPos = entity.getPositionVec();
+	protected void teleportEntity(LivingEntity entity, Vector3d pos) {
+		final Vector3d startPos = entity.getPositionVec();
 		entity.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
 		doCastEffect(entity, startPos, pos);
 	}
@@ -289,7 +289,7 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 		}
 		
 		// Create a new ball where caster is looking
-		Vec3d pos = this.getCastPosition(caster);
+		Vector3d pos = this.getCastPosition(caster);
 		ball = new EntityEnderRodBall(NostrumEntityTypes.enderRodBall, worldIn, caster);
 		ball.setPosition(pos.x, pos.y, pos.z);
 		worldIn.addEntity(ball);

@@ -52,7 +52,7 @@ import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.Pose;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
@@ -77,12 +77,12 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -151,10 +151,10 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	
 	protected void registerAttributes() {
 		super.registerAttributes();
-		this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D);
-		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
-		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(4.0D);
-		this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(30.0);
+		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.2D);
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
+		this.getAttribute(Attributes.ARMOR).setBaseValue(4.0D);
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(30.0);
 		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
 	}
 
@@ -188,7 +188,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue()));
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
@@ -240,7 +240,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		if (world.isRemote) {
 //			EMagicElement element = this.getElement();
 //			int color = element.getColor();
-//			Vec3d offset = this.getVectorForRotation(0f, this.rotationYawHead).rotateYaw(rand.nextBoolean() ? 90f : -90f).scale(.5);
+//			Vector3d offset = this.getVectorForRotation(0f, this.rotationYawHead).rotateYaw(rand.nextBoolean() ? 90f : -90f).scale(.5);
 //			final double yOffset =  Math.sin(2 * Math.PI * ((double) ticksExisted % 20.0) / 20.0) * (height/2);
 //			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 //					1,
@@ -254,7 +254,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			
 			EMagicElement element = this.getElement();
 			int color = element.getColor();
-			Vec3d offset = this.getVectorForRotation(0f, this.rotationYawHead).rotateYaw(rand.nextBoolean() ? 90f : -90f).scale(.5)
+			Vector3d offset = this.getVectorForRotation(0f, this.rotationYawHead).rotateYaw(rand.nextBoolean() ? 90f : -90f).scale(.5)
 					.scale(rand.nextFloat() * 3 + 1f);
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					1,
@@ -263,7 +263,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 					posZ + offset.z,
 					0, 40, 0,
 					//offset.scale(rand.nextFloat() * .2f),
-					new Vec3d(0, -.05, 0),
+					new Vector3d(0, -.05, 0),
 					null
 					).color(color));
 		}
@@ -452,7 +452,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			double d0 = this.rand.nextGaussian() * 0.02D;
 			double d1 = this.rand.nextGaussian() * 0.02D;
 			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.posY + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.posZ + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -482,9 +482,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		@Override
 		public void tick() {
 			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.posX - this.parentEntity.posX;
-				double d1 = this.posY - this.parentEntity.posY;
-				double d2 = this.posZ - this.parentEntity.posZ;
+				double d0 = this.getPosX() - this.parentEntity.getPosX();
+				double d1 = this.getPosY() - this.parentEntity.getPosY();
+				double d2 = this.getPosZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
 				d3 = (double)MathHelper.sqrt(d3);
@@ -498,8 +498,8 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 //				} else if (courseChangeCooldown-- <= 0) {
 //					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
 //					
-//					if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-//						float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+//					if (this.isNotColliding(this.getPosX(), this.getPosY(), this.getPosZ(), d3)) {
+//						float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 //						//speed *= 3f;
 //						this.parentEntity.getMotion().x = (d0 / d3) * basespeed * speed;
 //						this.parentEntity.getMotion().y = (d1 / d3) * basespeed  * speed;
@@ -513,11 +513,11 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 //				}
 				
 				if (Math.abs(d3) < .5) {
-					this.parentEntity.setMotion(Vec3d.ZERO);
+					this.parentEntity.setMotion(Vector3d.ZERO);
 					this.action = MovementController.Action.WAIT;
 					return;
-				} else if (this.isNotColliding(this.posX, this.posY, this.posZ, d3)) {
-					float basespeed = (float) this.parentEntity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getValue();
+				} else if (this.isNotColliding(this.getPosX(), this.getPosY(), this.getPosZ(), d3)) {
+					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 					//speed *= 3f;
 					this.parentEntity.setMotion(
 							(d0 / d3) * basespeed * speed,
@@ -538,9 +538,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		 * Checks if entity bounding box is not colliding with terrain
 		 */
 		private boolean isNotColliding(double x, double y, double z, double p_179926_7_) {
-			double d0 = (x - this.parentEntity.posX) / p_179926_7_;
-			double d1 = (y - this.parentEntity.posY) / p_179926_7_;
-			double d2 = (z - this.parentEntity.posZ) / p_179926_7_;
+			double d0 = (x - this.parentEntity.getPosX()) / p_179926_7_;
+			double d1 = (y - this.parentEntity.getPosY()) / p_179926_7_;
+			double d2 = (z - this.parentEntity.getPosZ()) / p_179926_7_;
 			AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
 
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
@@ -557,7 +557,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	
 	// Copied from EntityFlying class
 		@Override
-		public void travel(Vec3d how) {
+		public void travel(Vector3d how) {
 			if (this.isInWater()) {
 				this.moveRelative(0.02F, how);
 				this.move(MoverType.SELF, this.getMotion());
@@ -570,8 +570,8 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 				float f = 0.91F;
 
 				if (this.onGround) {
-					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
 					BlockState underState = this.world.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 				}
@@ -581,8 +581,8 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 				f = 0.91F;
 
 				if (this.onGround) {
-					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
 					BlockState underState = this.world.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
 				}
@@ -592,8 +592,8 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			}
 
 			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.posX - this.prevPosX;
-			double d0 = this.posZ - this.prevPosZ;
+			double d1 = this.getPosX() - this.prevPosX;
+			double d0 = this.getPosZ() - this.prevPosZ;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
@@ -648,9 +648,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			if (!MovementController.isUpdating()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.posX;
-				double d1 = MovementController.getY() - this.parentEntity.posY;
-				double d2 = MovementController.getZ() - this.parentEntity.posZ;
+				double d0 = MovementController.getX() - this.parentEntity.getPosX();
+				double d1 = MovementController.getY() - this.parentEntity.getPosY();
+				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -669,7 +669,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		 */
 		public void startExecuting() {
 			Random random = this.parentEntity.getRNG();
-			final Vec3d center = (parentEntity.getAttackTarget() == null ? parentEntity.getPositionVector() : parentEntity.getAttackTarget().getPositionVector());
+			final Vector3d center = (parentEntity.getAttackTarget() == null ? parentEntity.getPositionVector() : parentEntity.getAttackTarget().getPositionVector());
 			final float range = (parentEntity.getAttackTarget() == null ? 16f : 8f);
 			double d0 = center.x + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
 			double d1 = center.y + (double)((random.nextFloat() * 2.0F - 1.0F) * range);

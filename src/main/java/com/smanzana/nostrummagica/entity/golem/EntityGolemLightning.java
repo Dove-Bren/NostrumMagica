@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.World;
 
@@ -104,12 +104,12 @@ public class EntityGolemLightning extends EntityGolem {
 
 	@Override
 	public void initGolemAttributes() {
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.25D);
 
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(14.0D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(14.0D);
 
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(2.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(6.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(6.0D);
 	}
 
 	@Override
@@ -120,15 +120,15 @@ public class EntityGolemLightning extends EntityGolem {
 	@Override
 	public void tick() {
 		if (world.isRainingAt(this.getPosition())) {
-			if (!this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+			if (!this.getAttribute(Attributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
-				this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+				this.getAttribute(Attributes.MOVEMENT_SPEED)
 					.applyModifier(MOVEMENT_STORM_MODIFIER);
 			}
 		} else {
-			if (this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+			if (this.getAttribute(Attributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
-				this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED)
+				this.getAttribute(Attributes.MOVEMENT_SPEED)
 					.removeModifier(MOVEMENT_STORM_MODIFIER);
 			}
 		}

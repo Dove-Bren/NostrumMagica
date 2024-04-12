@@ -30,7 +30,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -106,7 +106,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		
 		// shulker shells move them to center of block. We want shooter pos + eye height
 		if (shooter != null) {
-			this.setLocationAndAngles(shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ, this.rotationYaw, this.rotationPitch);
+			this.setLocationAndAngles(shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight(), shooter.getPosZ(), this.rotationYaw, this.rotationPitch);
 		}
 		
 		this.setElement(self.getElement());
@@ -175,7 +175,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		else
 		{
 			targetHeight = (double)this.target.getHeight() * 0.5D;
-			targetPos = new BlockPos(this.target.posX, this.target.posY, this.target.posZ);
+			targetPos = new BlockPos(this.target.getPosX(), this.target.getPosY(), this.target.getPosZ());
 		}
 
 		double targetX = (double)targetPos.getX() + 0.5D;
@@ -185,7 +185,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
-		if (blockyPath && targetPos.distanceSq(this.posX, this.posY, this.posZ, true) >= 4.0D) {
+		if (blockyPath && targetPos.distanceSq(this.getPosX(), this.getPosY(), this.getPosZ(), true) >= 4.0D) {
 			BlockPos blockpos1 = new BlockPos(this);
 			List<Direction> list = Lists.<Direction>newArrayList();
 
@@ -239,15 +239,15 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				enumfacing = (Direction)list.get(this.rand.nextInt(list.size()));
 			}
 
-			targetX = this.posX + (double)enumfacing.getXOffset();
-			targetY = this.posY + (double)enumfacing.getYOffset();
-			targetZ = this.posZ + (double)enumfacing.getZOffset();
+			targetX = this.getPosX() + (double)enumfacing.getXOffset();
+			targetY = this.getPosY() + (double)enumfacing.getYOffset();
+			targetZ = this.getPosZ() + (double)enumfacing.getZOffset();
 		}
 
 		this.setDirection(enumfacing);
-		double deltaX = targetX - this.posX;
-		double deltaY = targetY - this.posY;
-		double deltaZ = targetZ - this.posZ;
+		double deltaX = targetX - this.getPosX();
+		double deltaY = targetY - this.getPosY();
+		double deltaZ = targetZ - this.getPosZ();
 		double dist = (double)MathHelper.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
 		if (dist == 0.0D)
@@ -289,7 +289,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
 					final double adj = (this.blockyPath ? .2 : (dist < 2 ? .3 : .05));
-					final Vec3d oldMot = this.getMotion();
+					final Vector3d oldMot = this.getMotion();
 					this.setMotion(oldMot.add(
 							(this.targetDeltaX - oldMot.x) * adj,
 							(this.targetDeltaY - oldMot.y) * adj,
@@ -308,11 +308,11 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				}
 			}
 
-			this.setPosition(this.posX + this.getMotion().x, this.posY + this.getMotion().y, this.posZ + this.getMotion().z);
+			this.setPosition(this.getPosX() + this.getMotion().x, this.getPosY() + this.getMotion().y, this.getPosZ() + this.getMotion().z);
 			ProjectileHelper.rotateTowardsMovement(this, 0.5F);
 
 			if (this.world.isRemote) {
-				this.world.addParticle(particle, this.posX - this.getMotion().x, this.posY - this.getMotion().y + 0.15D, this.posZ - this.getMotion().z, 0.0D, 0.0D, 0.0D);
+				this.world.addParticle(particle, this.getPosX() - this.getMotion().x, this.getPosY() - this.getMotion().y + 0.15D, this.getPosZ() - this.getMotion().z, 0.0D, 0.0D, 0.0D);
 			} else if (this.target != null && this.target.isAlive()) {
 				if (this.steps > 0) {
 					--this.steps;

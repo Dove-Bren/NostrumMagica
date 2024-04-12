@@ -32,9 +32,9 @@ public class DragonFlyRandomTask extends Goal {
         }
         else
         {
-            double d0 = MovementController.getX() - this.parentEntity.posX;
-            double d1 = MovementController.getY() - this.parentEntity.posY;
-            double d2 = MovementController.getZ() - this.parentEntity.posZ;
+            double d0 = MovementController.getX() - this.parentEntity.getPosX();
+            double d1 = MovementController.getY() - this.parentEntity.getPosY();
+            double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
             double d3 = d0 * d0 + d1 * d1 + d2 * d2;
             if (d3 >= 1.0D && d3 <= 3600.0D) {
             	return false;
@@ -58,8 +58,8 @@ public class DragonFlyRandomTask extends Goal {
     public void startExecuting()
     {
         Random random = this.parentEntity.getRNG();
-        double x = this.parentEntity.posX + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
-        double z = this.parentEntity.posZ + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
+        double x = this.parentEntity.getPosX() + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
+        double z = this.parentEntity.getPosZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
         
         // Find y
         double y;

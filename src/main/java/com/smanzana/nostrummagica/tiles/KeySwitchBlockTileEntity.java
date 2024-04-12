@@ -15,7 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
 
@@ -107,7 +107,7 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 				30, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5, 0,
 				50, 10,
-				Vec3d.ZERO, new Vec3d(.075, .05, .075)
+				Vector3d.ZERO, new Vector3d(.075, .05, .075)
 				).gravity(-.1f).color(this.getColor().getColorValue() | 0xAA000000));
 	}
 	

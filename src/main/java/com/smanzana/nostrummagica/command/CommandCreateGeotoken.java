@@ -25,7 +25,7 @@ public class CommandCreateGeotoken  {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
 		ItemStack stack = new ItemStack(NostrumItems.positionToken);
-		PositionToken.setPosition(stack, player.dimension, player.getPosition());
+		PositionToken.setPosition(stack, player.getEntityWorld().getDimensionKey(), player.getPosition());
 		player.inventory.addItemStackToInventory(stack);
 		
 		return 0;

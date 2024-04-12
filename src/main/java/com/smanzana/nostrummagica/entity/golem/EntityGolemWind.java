@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
 
@@ -84,12 +84,12 @@ public class EntityGolemWind extends EntityGolem {
 
 	@Override
 	public void initGolemAttributes() {
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.33D);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
 
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(16.0D);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(16.0D);
 
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(8.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(6.0D);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(8.0D);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(6.0D);
 	}
 
 	@Override

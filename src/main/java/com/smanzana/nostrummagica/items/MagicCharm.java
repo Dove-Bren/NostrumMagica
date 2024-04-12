@@ -31,7 +31,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -160,7 +160,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		for (int x = -4; x <= 4; x++)
 		for (int y = 0; y < 5; y++)
 		for (int z = -4; z <= 4; z++) {
-			BlockPos pos = new BlockPos(player.posX + x, player.posY + y, player.posZ + z);
+			BlockPos pos = new BlockPos(player.getPosX() + x, player.getPosY() + y, player.getPosZ() + z);
 			
 			if (world.isAirBlock(pos))
 				continue;
@@ -185,7 +185,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			world.removeBlock(pos, false);
 		}
 		
-		NostrumMagicaSounds.DAMAGE_EARTH.play(world, player.posX, player.posY, player.posZ);
+		NostrumMagicaSounds.DAMAGE_EARTH.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 		return true;
 	}
 	
@@ -204,7 +204,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			if (Math.abs(x) <= 1 && Math.abs(z) <= 1)
 				break;
 			
-			BlockPos pos = new BlockPos(player.posX + x, player.posY + y, player.posZ + z);
+			BlockPos pos = new BlockPos(player.getPosX() + x, player.getPosY() + y, player.getPosZ() + z);
 			
 			if (y == -3) {
 				// Bottom block has to be non-air or we can't place fire
@@ -227,7 +227,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			
 		}
 		
-		NostrumMagicaSounds.DAMAGE_FIRE.play(world, player.posX, player.posY, player.posZ);
+		NostrumMagicaSounds.DAMAGE_FIRE.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 		return true;
 	}
 	
@@ -235,28 +235,28 @@ public class MagicCharm extends Item implements ILoreTagged {
 		player.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, 20 * 60 * 2, 0));
 		player.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 60 * 2, 0));
 		
-		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.posX, player.posY, player.posZ);
+		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 		return true;
 	}
 	
 	private boolean doWind(PlayerEntity player, ServerWorld world) {
 		AxisAlignedBB bb = new AxisAlignedBB(
-				player.posX - 3,
-				player.posY - 1,
-				player.posZ - 3,
-				player.posX + 3,
-				player.posY + 2,
-				player.posZ + 3);
+				player.getPosX() - 3,
+				player.getPosY() - 1,
+				player.getPosZ() - 3,
+				player.getPosX() + 3,
+				player.getPosY() + 2,
+				player.getPosZ() + 3);
 		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(player, bb);
 		if (entities != null && !entities.isEmpty())
 			for (Entity e : entities) {
-				Vec3d vec = e.getPositionVector().subtract(player.getPositionVector().add(0, -1, 0));
+				Vector3d vec = e.getPositionVector().subtract(player.getPositionVector().add(0, -1, 0));
 				vec = vec.normalize();
 				vec = vec.scale(2);
 				e.setVelocity(vec.x, vec.y, vec.z);
 			}
 		
-		NostrumMagicaSounds.DAMAGE_WIND.play(world, player.posX, player.posY, player.posZ);
+		NostrumMagicaSounds.DAMAGE_WIND.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 		return true;
 	}
 	
@@ -271,7 +271,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			}
 			
 			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false)) {
-				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.posX, player.posY, player.posZ);
+				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 				return true;
 			}
 			
@@ -294,9 +294,9 @@ public class MagicCharm extends Item implements ILoreTagged {
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
 			// Allow this type of teleportation by updating last coords...
-			player.lastTickPosX = player.posX;
-			player.lastTickPosY = player.posY;
-			player.lastTickPosZ = player.posZ;
+			player.lastTickPosX = player.getPosX();
+			player.lastTickPosY = player.getPosY();
+			player.lastTickPosZ = player.getPosZ();
 			player.fallDistance = 0;
 			return true;
 		}
@@ -311,7 +311,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 				1
 				));
 		
-		NostrumMagicaSounds.DAMAGE_PHYSICAL.play(world, player.posX, player.posY, player.posZ);
+		NostrumMagicaSounds.DAMAGE_PHYSICAL.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 		
 		return true;
 	}
@@ -319,23 +319,23 @@ public class MagicCharm extends Item implements ILoreTagged {
 	private boolean doLightning(PlayerEntity player, ServerWorld world) {
 		if (world.isRaining()) {
 			AxisAlignedBB bb = new AxisAlignedBB(
-					player.posX - 5,
-					player.posY - 2,
-					player.posZ - 5,
-					player.posX + 5,
-					player.posY + 10,
-					player.posZ + 5);
+					player.getPosX() - 5,
+					player.getPosY() - 2,
+					player.getPosZ() - 5,
+					player.getPosX() + 5,
+					player.getPosY() + 10,
+					player.getPosZ() + 5);
 			List<Entity> entities = world.getEntitiesWithinAABB(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
-					world.addLightningBolt(new LightningBoltEntity(world, e.posX, e.posY, e.posZ, false)); // TODO nostrum lightning?
+					world.addLightningBolt(new LightningBoltEntity(world, e.getPosX(), e.getPosY(), e.getPosZ(), false)); // TODO nostrum lightning?
 				}
 		} else {
 			world.getWorldInfo().setRaining(true);
 			world.getWorldInfo().setThundering(true);
 		}
 		
-		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.posX, player.posY, player.posZ);
+		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 		return true;
 	}
 	

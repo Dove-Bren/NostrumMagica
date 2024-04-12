@@ -18,7 +18,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -47,7 +47,7 @@ public class BeamTrigger extends InstantTrigger {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world,
-				Vec3d pos, float pitch, float yaw) {
+				Vector3d pos, float pitch, float yaw) {
 		
 		// Cast from eyes
 		pos = pos.add(0, state.getCaster().getEyeHeight(), 0);
@@ -57,7 +57,7 @@ public class BeamTrigger extends InstantTrigger {
 		List<LivingEntity> targs = null;
 		List<BlockPos> blocks = null;
 		
-		Vec3d end = null;
+		Vector3d end = null;
 		
 		if (traces != null && !traces.isEmpty()) {
 		

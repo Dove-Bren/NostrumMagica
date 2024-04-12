@@ -17,7 +17,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public class ProximityTrigger extends SpellTrigger {
@@ -25,13 +25,13 @@ public class ProximityTrigger extends SpellTrigger {
 	public class ProximityTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
 
 		private World world;
-		private Vec3d pos;
+		private Vector3d pos;
 		private boolean set;
 		private float range;
 		private boolean dead;
 		
 		public ProximityTriggerInstance(SpellState state, World world,
-				Vec3d pos, float range) {
+				Vector3d pos, float range) {
 			super(state);
 			this.world = world;
 			this.set = false;
@@ -107,7 +107,7 @@ public class ProximityTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vec3d pos, float pitch, float yaw,
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellPartParam params) {
 		return new ProximityTriggerInstance(state, world, pos,
 				Math.max(supportedFloats()[0], params.level));

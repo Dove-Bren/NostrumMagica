@@ -39,8 +39,8 @@ public class DragonLandTask extends Goal {
 		if (!MovementController.isUpdating()) {
 			return false;
 		} else {
-			double dx = MovementController.getX() - this.dragon.posX;
-			double dz = MovementController.getZ() - this.dragon.posZ;
+			double dx = MovementController.getX() - this.dragon.getPosX();
+			double dz = MovementController.getZ() - this.dragon.getPosZ();
 			double dxz = dx * dx + dz * dz;
 			
 			// Keep running unless our XZ distance gets too big

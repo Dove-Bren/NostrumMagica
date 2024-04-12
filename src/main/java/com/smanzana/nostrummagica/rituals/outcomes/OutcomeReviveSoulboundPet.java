@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -19,7 +19,7 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	public OutcomeReviveSoulboundPet() {
 		super(new IEntityFactory() {
 			@Override
-			public void spawn(World world, Vec3d pos, PlayerEntity invoker, ItemStack centerItem) {
+			public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem) {
 				PetSoulItem.SpawnPet(centerItem, world, pos.add(0, 1, 0));
 //				EntityKoid koid = new EntityKoid(world);
 //				koid.setPosition(pos.x, pos.y, pos.z);
@@ -63,7 +63,7 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 			return false;
 		}
 		
-		if (!item.canSpawnEntity(world, player, new Vec3d(center), ingredients.center)) {
+		if (!item.canSpawnEntity(world, player, new Vector3d(center), ingredients.center)) {
 			return false;
 		}
 		

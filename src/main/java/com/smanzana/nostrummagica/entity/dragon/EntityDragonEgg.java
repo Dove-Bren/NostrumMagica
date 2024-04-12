@@ -15,7 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -69,8 +69,8 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 	protected void registerAttributes() {
 		super.registerAttributes();
 		
-		this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(2D);
-		this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0D);
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(2D);
+		this.getAttribute(Attributes.ARMOR).setBaseValue(0D);
 	}
 	
 	

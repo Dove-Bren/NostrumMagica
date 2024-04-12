@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * Effect made by displaying multiple other effects with slight time offsets
@@ -17,14 +17,14 @@ public class ClientEffectEchoed extends ClientEffect {
 	private float span;
 	private ClientEffect effect;
 	
-	public ClientEffectEchoed(Vec3d origin, ClientEffect effect, int ticks, int count, float span) {
+	public ClientEffectEchoed(Vector3d origin, ClientEffect effect, int ticks, int count, float span) {
 		super(origin, null, ticks);
 		this.count = count;
 		this.span = span;
 		this.effect = effect;
 	}
 	
-	public ClientEffectEchoed(Vec3d origin, ClientEffect effect, long ms, int count, float span) {
+	public ClientEffectEchoed(Vector3d origin, ClientEffect effect, long ms, int count, float span) {
 		super(origin, null, ms);
 		this.count = count;
 		this.span = span;

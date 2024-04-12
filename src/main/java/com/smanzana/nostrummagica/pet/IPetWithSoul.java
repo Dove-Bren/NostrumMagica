@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 public interface IPetWithSoul {
@@ -32,7 +32,7 @@ public interface IPetWithSoul {
 	 * @param snapshot
 	 * @return
 	 */
-	public static @Nullable Entity CreatePetFromSnapshot(World world, Vec3d pos, CompoundNBT snapshot) {
+	public static @Nullable Entity CreatePetFromSnapshot(World world, Vector3d pos, CompoundNBT snapshot) {
 		// return AnvilChunkLoader.readWorldEntityPos(snapshot, world, pos.x, pos.y, pos.z, worldSpawn);
 		
 		// Could use "EntityType.func_220335_a" which is more like readWorldEntityPos in that it handles passengers,

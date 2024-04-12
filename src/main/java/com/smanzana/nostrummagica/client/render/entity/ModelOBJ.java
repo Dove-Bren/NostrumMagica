@@ -56,7 +56,7 @@ public abstract class ModelOBJ<T extends Entity> extends EntityModel<T> {
 
 		@Override
 		protected boolean preRender(BufferBuilder buffer, float scale) {
-			return ModelOBJ.this.preRender(ent, this.modelIdx, buffer, ent.posX, ent.posY, ent.posZ, ent.rotationYaw, 0, scale);
+			return ModelOBJ.this.preRender(ent, this.modelIdx, buffer, ent.getPosX(), ent.getPosY(), ent.getPosZ(), ent.rotationYaw, 0, scale);
 		}
 		
 //		@Override

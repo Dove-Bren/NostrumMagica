@@ -27,7 +27,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -132,12 +132,12 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 		NostrumParticles.WARD.spawn(world, new SpawnParams(
 				50, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .75,
 				40, 10,
-				new Vec3d(0, .1, 0), new Vec3d(flySpeed, flySpeed / 2, flySpeed)
+				new Vector3d(0, .1, 0), new Vector3d(flySpeed, flySpeed / 2, flySpeed)
 				).gravity(.075f));
 		NostrumMagicaSounds.LORE.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		
 		//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-		//Vec3d velocity, Vec3d velocityJitter
+		//Vector3d velocity, Vector3d velocityJitter
 	}
 	
 	protected void fillChestEntity(TileEntity entity) {
