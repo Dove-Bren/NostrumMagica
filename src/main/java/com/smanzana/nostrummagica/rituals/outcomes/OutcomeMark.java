@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +28,7 @@ public class OutcomeMark implements IRitualOutcome {
 		if (attr == null)
 			return;
 		
-		attr.setMarkLocation(player.dimension.getId(), player.getPosition());
+		attr.setMarkLocation(DimensionUtils.GetDimension(player), player.getPosition());
 	}
 	
 	@Override

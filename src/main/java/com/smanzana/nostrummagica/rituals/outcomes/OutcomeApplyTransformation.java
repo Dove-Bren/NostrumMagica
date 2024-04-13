@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -65,7 +66,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		if (findEntity(world, player, center) == null) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.transformation.noentity"));
+				player.sendMessage(new TranslationTextComponent("info.transformation.noentity"), Util.DUMMY_UUID);
 			}
 			return false;
 		}

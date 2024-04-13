@@ -13,9 +13,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.PaneBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -66,7 +65,7 @@ public class WorldUtil {
 		// we have some blocks in beginChunkX (and Z).
 		// We may have some blocks in endChunkX+1 (and Z)
 		// beginChunkX may start with a portion of blocks known as beginChunkOffsetX
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int chunkX = beginChunkX; chunkX <= endChunkX; chunkX++)
 		for (int chunkZ = beginChunkZ; chunkZ <= endChunkZ; chunkZ++) {
 			final int baseX = (chunkX << 4);
@@ -110,7 +109,7 @@ public class WorldUtil {
 	 * Good old-fashioned manhattan distance
 	 * @return
 	 */
-	public static final int getBlockDistance(Vec3i pos1, Vec3i pos2) {
+	public static final int getBlockDistance(Vector3i pos1, Vector3i pos2) {
 		return Math.abs(pos1.getX() - pos2.getX())
 				+ Math.abs(pos1.getY() - pos2.getY())
 				+ Math.abs(pos1.getZ() - pos2.getZ());

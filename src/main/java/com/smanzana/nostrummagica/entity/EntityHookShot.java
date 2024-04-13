@@ -280,7 +280,7 @@ public class EntityHookShot extends Entity {
 			caster.velocityChanged = true;
 			attachedEntity.velocityChanged = true;
 			
-			Vector3d diff = caster.getPositionVector().add(0, caster.getEyeHeight(), 0).subtract(this.getPositionVector());
+			Vector3d diff = caster.getPositionVec().add(0, caster.getEyeHeight(), 0).subtract(this.getPositionVec());
 			Vector3d velocity = diff.normalize().scale(0.75);
 			this.getPosX() += velocity.x;
 			this.getPosY() += velocity.y;
@@ -310,7 +310,7 @@ public class EntityHookShot extends Entity {
 					return;
 				}
 				
-				Vector3d diff = this.getPositionVector().subtract(caster.getPositionVector());
+				Vector3d diff = this.getPositionVec().subtract(caster.getPositionVec());
 				Vector3d velocity = diff.normalize().scale(0.75);
 				caster.setMotion(velocity.x, velocity.y, velocity.z);
 				caster.fallDistance = 0;
@@ -320,10 +320,10 @@ public class EntityHookShot extends Entity {
 			
 			// Check about playing sounds
 			if (caster != null) {
-				if (posLastPlayed == null || (posLastPlayed.subtract(caster.getPositionVector()).lengthSquared() > 3)) {
+				if (posLastPlayed == null || (posLastPlayed.subtract(caster.getPositionVec()).lengthSquared() > 3)) {
 					NostrumMagicaSounds.HOOKSHOT_TICK.play(world, 
 							caster.getPosX() + caster.getMotion().x, caster.getPosY() + caster.getMotion().y, caster.getPosZ() + caster.getMotion().z);
-					posLastPlayed = caster.getPositionVector();
+					posLastPlayed = caster.getPositionVec();
 				}
 			}
 		}

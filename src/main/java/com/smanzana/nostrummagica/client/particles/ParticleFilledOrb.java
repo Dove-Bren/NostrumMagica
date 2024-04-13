@@ -140,7 +140,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 				final float period = 20f;
 				Vector3d offset = targetPos == null ? new Vector3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period));
 				Vector3d curVelocity = new Vector3d(motionX, motionY, motionZ);
-				Vector3d posDelta = targetEntity.getPositionVector()
+				Vector3d posDelta = targetEntity.getPositionVec()
 						.add(offset.x, offset.y + targetEntity.getHeight()/2, offset.z)
 						.subtract(posX, posY, posZ);
 				Vector3d idealVelocity = posDelta.normalize().scale(.3);

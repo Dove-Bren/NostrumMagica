@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.utils;
 
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 
 public final class Curves {
@@ -48,7 +48,7 @@ public final class Curves {
 	 * @param flip
 	 * @return
 	 */
-	public static Vec2f alignedArc2D(float progress, double radius, boolean flip) {
+	public static Vector2f alignedArc2D(float progress, double radius, boolean flip) {
 		double relX = Math.cos(progress * 2 * Math.PI);
 		double relY = Math.sin(progress * 2 * Math.PI);
 		
@@ -57,7 +57,7 @@ public final class Curves {
 			relX = relY;
 			relY = r;
 		}
-		return new Vec2f((float) (relX * radius), (float) (relY * radius));
+		return new Vector2f((float) (relX * radius), (float) (relY * radius));
 	}
 	
 	/**
@@ -69,11 +69,11 @@ public final class Curves {
 	 * @param flip
 	 * @return
 	 */
-	public static Vec2f alignedArc2D(float progress, Vec2f start, double radius, boolean flip) {
+	public static Vector2f alignedArc2D(float progress, Vector2f start, double radius, boolean flip) {
 		// Find center that is 'radius' units less in X
 		double radiusX = flip ? -radius : radius;
-		Vec2f center = new Vec2f((float) (start.x - radiusX), start.y);
-		return new Vec2f(
+		Vector2f center = new Vector2f((float) (start.x - radiusX), start.y);
+		return new Vector2f(
 				center.x + (float) (Math.cos(progress * .5 * Math.PI) * radiusX),
 				center.y + (float) (Math.sin(progress * .5 * Math.PI) * radius));
 	}
@@ -115,13 +115,13 @@ public final class Curves {
 		return (new Vector3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
 	}
 	
-	public static Vec2f solveQuadraticEquation(float a, float b, float c) {
+	public static Vector2f solveQuadraticEquation(float a, float b, float c) {
 		// (-b +- sqrt(b^2 - 4ac))  /  2a
 		final double sqrt = Math.sqrt(Math.pow(b, 2) - (4 * a * c));
 		
 		final double pos = (-b + sqrt) / (2 *a);
 		final double neg = (-b - sqrt) / (2 *a);
-		return new Vec2f((float) pos, (float) neg);
+		return new Vector2f((float) pos, (float) neg);
 	}
 	
 }

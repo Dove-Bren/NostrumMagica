@@ -21,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -48,7 +49,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		
 		BlockPos pos = PositionCrystal.getBlockPosition(centerItem);
 		if (pos == null) {
-			player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
 			return;
 		}
 		
@@ -57,7 +58,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				TileEntity te = world.getTileEntity(pos);
 				if (te == null || !(te instanceof NostrumObeliskEntity)) {
 					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"));
+					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"), Util.DUMMY_UUID);
 					return;
 				}
 				

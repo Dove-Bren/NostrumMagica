@@ -94,11 +94,11 @@ public enum NostrumMagicaSounds {
 	}
 	
 	public void play(Entity at) {
-		play(null, at.world, at.getPositionVector());
+		play(null, at.world, at.getPositionVec());
 	}
 	
 	public void play(PlayerEntity at) {
-		play(at, at.world, at.getPositionVector());
+		play(at, at.world, at.getPositionVec());
 	}
 	
 	public void play(PlayerEntity player, World world, Vector3d at) {

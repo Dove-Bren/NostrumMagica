@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -28,7 +29,7 @@ public class SpellDebugMessage {
 		}
 		
 		Minecraft.getInstance().runAsync(() -> {
-			NostrumMagica.instance.proxy.getPlayer().sendMessage(message.comp);
+			NostrumMagica.instance.proxy.getPlayer().sendMessage(message.comp, Util.DUMMY_UUID);
 		});
 	}
 

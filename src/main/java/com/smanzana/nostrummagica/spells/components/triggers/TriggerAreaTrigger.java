@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -85,7 +84,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 				
 				if (affectsGround && aliveCycles % GROUND_TICK_CYCLES == 0) {
 					// check all blocks in -radius,-radius,-radius <-> radius,radius,radius
-					MutableBlockPos cursor = new MutableBlockPos();
+					BlockPos.Mutable cursor = new BlockPos.Mutable();
 					List<BlockPos> list = Lists.newArrayList();
 					for (int i = -(int)radiusHint; i <= radiusHint; i++)
 					for (int j = -(int)radiusHint; j <= radiusHint; j++)

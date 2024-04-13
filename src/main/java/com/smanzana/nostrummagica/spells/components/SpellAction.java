@@ -54,7 +54,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.entity.monster.EndermiteEntity;
@@ -74,14 +74,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.NetherBiome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.ToolType;
@@ -486,7 +484,7 @@ public class SpellAction {
 			
 			Vector3d dest;
 			Vector3d direction = entity.getLookVec().normalize();
-			Vector3d source = entity.getPositionVector();
+			Vector3d source = entity.getPositionVec();
 			source = source.add(0, entity.getEyeHeight(), 0);
 			BlockPos bpos;
 			Vector3d translation = new Vector3d(direction.x * dist,
@@ -601,14 +599,14 @@ public class SpellAction {
 			for (Entity e : world.getEntitiesWithinAABBExcludingEntity(null, 
 					new AxisAlignedBB(center.x - range, center.y - range, center.z - range, center.x + range, center.y + range, center.z + range)
 					)) {
-				double dist = e.getPositionVector().distanceTo(center); 
+				double dist = e.getPositionVec().distanceTo(center); 
 				if (dist <= range) {
 					
 					// If push, straight magnitude
 					// If pull, cap magnitude so that it doesn't fly past player
 					
 					Vector3d force;
-					Vector3d direction = e.getPositionVector().add(0, e.getEyeHeight(), 0).subtract(center).normalize();
+					Vector3d direction = e.getPositionVec().add(0, e.getEyeHeight(), 0).subtract(center).normalize();
 					force = new Vector3d(
 							direction.x * magnitude,
 							direction.y * magnitude,
@@ -841,7 +839,7 @@ public class SpellAction {
 				}
 			}
 			
-			MutableBlockPos cursor = new MutableBlockPos(block);
+			BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(block);
 			Random rand = (caster == null ? new Random() : caster.getRNG());
 			for (int i = 0; i < count; i++) {
 				
@@ -861,7 +859,7 @@ public class SpellAction {
 					}
 				}
 				
-				((ServerWorld) world).addLightningBolt(
+				((ServerWorld) world).addEntity(
 					(new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5))
 					.setEntityToIgnore(caster)
 					);
@@ -944,9 +942,9 @@ public class SpellAction {
 				int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
 				caster.addPotionEffect(new EffectInstance(NostrumEffects.familiar, time, 0) {
 					@Override
-					public boolean tick(LivingEntity entityIn) {
+					public boolean tick(LivingEntity entityIn, Runnable onComplete) {
 						// heh snekky
-						boolean ret = super.tick(entityIn);
+						boolean ret = super.tick(entityIn, onComplete);
 						if (ret) {
 							// we're not being removed. Check familiars
 							if (entityIn.world.isRemote) {
@@ -1062,7 +1060,7 @@ public class SpellAction {
 				return false;
 			}
 			
-			Vector3d pos = caster.getPositionVector();
+			Vector3d pos = caster.getPositionVec();
 			float pitch = caster.rotationPitch;
 			float yaw = caster.rotationYawHead;
 			
@@ -1606,109 +1604,109 @@ public class SpellAction {
 		}
 	}
 	
-	private static class GeoBlock implements SpellEffect {
-		
-		private int level;
-		
-		public GeoBlock(int level) {
-			this.level = level;
-		}
-
-		@Override
-		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
-			return apply(caster, entity.world, entity.getPosition().add(0, -1, 0), efficiency);
-		}
-
-		@Override
-		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
-			
-			Block result;
-			float temp = world.getBiome(block).getTemperature(block);
-			// < 0 exists for icy places
-			// .1 to .2 has somethign to do with snow
-			// desert is 2.0
-			// Plains are just below 1
-			if (world.getBiome(block) instanceof NetherBiome) {
-				if (level == 1)
-					result = Blocks.NETHERRACK;
-				else if (level == 2)
-					result = Blocks.LAVA;
-				else
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.NETHER_QUARTZ_ORE;
-					else
-						result = Blocks.GLOWSTONE;
-			} else if (temp < 0f) {
-				if (level == 1)
-					result = Blocks.SNOW;
-				else if (level == 2)
-					result = Blocks.ICE;
-				else {
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.LAPIS_ORE;
-					else
-						result = Blocks.PACKED_ICE;
-				}
-			} else if (temp < 0.5f) {
-				if (level == 1)
-					result = Blocks.GRAVEL;
-				else if (level == 2)
-					result = Blocks.CLAY;
-				else
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.GOLD_ORE;
-					else
-						result = Blocks.PRISMARINE;
-			} else if (temp < 1.5f) {
-				if (level == 1)
-					result = Blocks.STONE;
-				else if (level == 2)
-					result = Blocks.MOSSY_COBBLESTONE;
-				else
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.IRON_ORE;
-					else
-						result = Blocks.COAL_ORE;
-			} else if (temp < 2.5f) {
-				if (level == 1)
-					result = Blocks.DIRT;
-				else if (level == 2)
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.REDSTONE_ORE;
-					else
-						result = Blocks.OBSIDIAN;
-				else
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.IRON_ORE;
-					else
-						result = Blocks.COAL_ORE;
-			} else {
-				if (level == 1)
-					result = Blocks.NETHERRACK;
-				else if (level == 2)
-					result = Blocks.LAVA;
-				else
-					if (NostrumMagica.rand.nextFloat() < 0.3f)
-						result = Blocks.NETHER_QUARTZ_ORE;
-					else
-						result = Blocks.GLOWSTONE;
-			}
-			
-			world.setBlockState(block, result.getDefaultState());
-			NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
-			return true;
-		}
-		
-		@Override
-		public boolean affectsBlocks() {
-			return true;
-		}
-		
-		@Override
-		public boolean affectsEntities() {
-			return false;
-		}
-	}
+//	private static class GeoBlock implements SpellEffect {
+//		
+//		private int level;
+//		
+//		public GeoBlock(int level) {
+//			this.level = level;
+//		}
+//
+//		@Override
+//		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
+//			return apply(caster, entity.world, entity.getPosition().add(0, -1, 0), efficiency);
+//		}
+//
+//		@Override
+//		public boolean apply(LivingEntity caster, World world, BlockPos block, float efficiency) {
+//			
+//			Block result;
+//			float temp = world.getBiome(block).getTemperature(block);
+//			// < 0 exists for icy places
+//			// .1 to .2 has somethign to do with snow
+//			// desert is 2.0
+//			// Plains are just below 1
+//			if (world.getBiome(block) instanceof NetherBiome) {
+//				if (level == 1)
+//					result = Blocks.NETHERRACK;
+//				else if (level == 2)
+//					result = Blocks.LAVA;
+//				else
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.NETHER_QUARTZ_ORE;
+//					else
+//						result = Blocks.GLOWSTONE;
+//			} else if (temp < 0f) {
+//				if (level == 1)
+//					result = Blocks.SNOW;
+//				else if (level == 2)
+//					result = Blocks.ICE;
+//				else {
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.LAPIS_ORE;
+//					else
+//						result = Blocks.PACKED_ICE;
+//				}
+//			} else if (temp < 0.5f) {
+//				if (level == 1)
+//					result = Blocks.GRAVEL;
+//				else if (level == 2)
+//					result = Blocks.CLAY;
+//				else
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.GOLD_ORE;
+//					else
+//						result = Blocks.PRISMARINE;
+//			} else if (temp < 1.5f) {
+//				if (level == 1)
+//					result = Blocks.STONE;
+//				else if (level == 2)
+//					result = Blocks.MOSSY_COBBLESTONE;
+//				else
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.IRON_ORE;
+//					else
+//						result = Blocks.COAL_ORE;
+//			} else if (temp < 2.5f) {
+//				if (level == 1)
+//					result = Blocks.DIRT;
+//				else if (level == 2)
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.REDSTONE_ORE;
+//					else
+//						result = Blocks.OBSIDIAN;
+//				else
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.IRON_ORE;
+//					else
+//						result = Blocks.COAL_ORE;
+//			} else {
+//				if (level == 1)
+//					result = Blocks.NETHERRACK;
+//				else if (level == 2)
+//					result = Blocks.LAVA;
+//				else
+//					if (NostrumMagica.rand.nextFloat() < 0.3f)
+//						result = Blocks.NETHER_QUARTZ_ORE;
+//					else
+//						result = Blocks.GLOWSTONE;
+//			}
+//			
+//			world.setBlockState(block, result.getDefaultState());
+//			NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
+//			return true;
+//		}
+//		
+//		@Override
+//		public boolean affectsBlocks() {
+//			return true;
+//		}
+//		
+//		@Override
+//		public boolean affectsEntities() {
+//			return false;
+//		}
+//	}
 	
 	private static class BreakEffect implements SpellEffect {
 
@@ -2155,7 +2153,7 @@ public class SpellAction {
 				base *= Math.pow(.75, resEffect.getAmplifier() + 1);
 			}
 			
-			IAttributeInstance attr = target.getAttribute(AttributeMagicResist.instance());
+			ModifiableAttributeInstance attr = target.getAttribute(AttributeMagicResist.instance());
 			if (attr != null && attr.getValue() != 0.0D) {
 				base *= Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)));
 			}
@@ -2190,7 +2188,7 @@ public class SpellAction {
 		}
 		
 		// Apply armor reductions
-		IAttributeInstance attr = target.getAttribute(AttributeMagicReduction.instance(element));
+		ModifiableAttributeInstance attr = target.getAttribute(AttributeMagicReduction.instance(element));
 		if (attr != null && attr.getValue() != 0.0D) {
 			base -= attr.getValue();
 		}
@@ -2321,10 +2319,10 @@ public class SpellAction {
 		return this;
 	}
 	
-	public SpellAction geoblock(int level) {
-		effects.add(new GeoBlock(level));
-		return this;
-	}
+//	public SpellAction geoblock(int level) {
+//		effects.add(new GeoBlock(level));
+//		return this;
+//	}
 	
 	public SpellAction cursedIce(int level) {
 		effects.add(new CursedIce(level));

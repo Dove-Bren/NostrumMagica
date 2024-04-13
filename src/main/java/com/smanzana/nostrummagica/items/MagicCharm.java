@@ -250,7 +250,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(player, bb);
 		if (entities != null && !entities.isEmpty())
 			for (Entity e : entities) {
-				Vector3d vec = e.getPositionVector().subtract(player.getPositionVector().add(0, -1, 0));
+				Vector3d vec = e.getPositionVec().subtract(player.getPositionVec().add(0, -1, 0));
 				vec = vec.normalize();
 				vec = vec.scale(2);
 				e.setVelocity(vec.x, vec.y, vec.z);

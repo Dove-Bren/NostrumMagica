@@ -176,7 +176,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 		// Do forward attack
 		//vfx
 		{
-			NostrumMagicaSounds.HEAVY_STRIKE.play(null, entityLiving.world, entityLiving.getPositionVector().add(0f, entityLiving.getEyeHeight(), 0).add(entityLiving.getLook(.5f)));
+			NostrumMagicaSounds.HEAVY_STRIKE.play(null, entityLiving.world, entityLiving.getPositionVec().add(0f, entityLiving.getEyeHeight(), 0).add(entityLiving.getLook(.5f)));
 		}
 		// actual effects
 		{

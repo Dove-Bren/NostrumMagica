@@ -76,7 +76,7 @@ public class CommandDebugEffect {
 //			throw new CommandException("You must be holding a Pet Soul Item in one of your hands.");
 //		}
 //		
-//		if (null == PetSoulItem.SpawnPet(soulStack, player.world, player.getPositionVector())) {
+//		if (null == PetSoulItem.SpawnPet(soulStack, player.world, player.getPositionVec())) {
 //			throw new CommandException("Failed to spawn entity");
 //		}
 		

@@ -150,7 +150,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			// Get offset first as if owner was facing 
 			Vector3d offset = new Vector3d(offsetX + adjX, 0, offsetZ);
 			offset = offset.rotateYaw(yawOwnerRad + .0f * (float) Math.PI);
-			target = owner.getPositionVector().add(offset);
+			target = owner.getPositionVec().add(offset);
 			
 			break;
 		}
@@ -185,14 +185,14 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			// Get offset first as if owner was facing 
 			Vector3d offset = new Vector3d(magnitude * Math.cos(angleRad), 0, magnitude * Math.sin(angleRad));
 			offset = offset.rotateYaw(yawOwnerRad + .75f * (float) Math.PI);
-			target = owner.getPositionVector().add(offset);
+			target = owner.getPositionVec().add(offset);
 			
 			break;
 		}
 		case FREE:
 		default:
 			// Free shouldn't ever get here, but return owner position just in case
-			target = owner.getPositionVector();
+			target = owner.getPositionVec();
 			break;
 		}
 		

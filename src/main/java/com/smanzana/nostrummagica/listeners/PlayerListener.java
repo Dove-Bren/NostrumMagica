@@ -45,9 +45,6 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.tiles.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.utils.Projectiles;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -64,13 +61,10 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -93,7 +87,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
@@ -1223,7 +1216,7 @@ public class PlayerListener {
 	
 	protected void addEntity(Entity ent) {
 		if (!lastPosCache.containsKey(ent)) {
-			lastPosCache.put(ent, ent.getPositionVector());
+			lastPosCache.put(ent, ent.getPositionVec());
 			lastMoveCache.put(ent, ent.getLook(.5f));
 		}
 	}
@@ -1254,7 +1247,7 @@ public class PlayerListener {
 				it.remove();
 			} else {
 				Vector3d last = entry.getValue();
-				Vector3d cur = entry.getKey().getPositionVector();
+				Vector3d cur = entry.getKey().getPositionVec();
 				entry.setValue(cur);
 				if (last.squareDistanceTo(cur) > .025) {
 					// Update movement
@@ -1264,41 +1257,42 @@ public class PlayerListener {
 		}
 	}
 	
-	@SubscribeEvent
-	public void getCollisions(@Nonnull GetCollisionBoxesEvent event) {
-		// Note: This even isn't fired on 1.14 :(
-		// Going to make the capability say 'Lava Swim' to players.
-		
-		if (event.isCanceled()) {
-			return;
-		}
-		
-		// Arcane Wolves have the ability to walk on water
-		if (event.getEntity() != null && event.getEntity() instanceof EntityArcaneWolf) {
-			EntityArcaneWolf wolf = (EntityArcaneWolf) event.getEntity();
-			if (wolf.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
-				AxisAlignedBB entityBB = wolf.getBoundingBox();
-				IWorld world = event.getWorld();
-				for (BlockPos pos : BlockPos.getAllInBoxMutable(
-						(int)Math.floor(entityBB.minX),
-						(int)Math.floor(entityBB.minY - 1),
-						(int)Math.floor(entityBB.minZ),
-						(int)Math.ceil(entityBB.maxX),
-						(int)Math.floor(entityBB.maxY),
-						(int)Math.ceil(entityBB.maxZ))) {
-					BlockState state = world.getBlockState(pos);
-					if (state.getMaterial() == Material.LAVA)
-							if (((FlowingFluidBlock) state.getBlock()).getFluidState(state).isEntityInside(world, pos, wolf, wolf.getPosY(), FluidTags.LAVA, false)) {
-						// Standing on lava. Check if the block this matched is within the BB the event is asking about
-						//final float height = BlockLiquid.getBlockLiquidHeight(state, world, pos);
-						AxisAlignedBB blockBB = new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
-						if (event.getAabb().intersects(blockBB)) {
-							event.getCollisionBoxesList().add(blockBB);
-						}
-					}
-				}
-			}
-		}
-	}
+	private int unused; // redo this?
+//	@SubscribeEvent
+//	public void getCollisions(@Nonnull GetCollisionBoxesEvent event) {
+//		// Note: This even isn't fired on 1.14 :(
+//		// Going to make the capability say 'Lava Swim' to players.
+//		
+//		if (event.isCanceled()) {
+//			return;
+//		}
+//		
+//		// Arcane Wolves have the ability to walk on water
+//		if (event.getEntity() != null && event.getEntity() instanceof EntityArcaneWolf) {
+//			EntityArcaneWolf wolf = (EntityArcaneWolf) event.getEntity();
+//			if (wolf.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+//				AxisAlignedBB entityBB = wolf.getBoundingBox();
+//				IWorld world = event.getWorld();
+//				for (BlockPos pos : BlockPos.getAllInBoxMutable(
+//						(int)Math.floor(entityBB.minX),
+//						(int)Math.floor(entityBB.minY - 1),
+//						(int)Math.floor(entityBB.minZ),
+//						(int)Math.ceil(entityBB.maxX),
+//						(int)Math.floor(entityBB.maxY),
+//						(int)Math.ceil(entityBB.maxZ))) {
+//					BlockState state = world.getBlockState(pos);
+//					if (state.getMaterial() == Material.LAVA)
+//							if (((FlowingFluidBlock) state.getBlock()).getFluidState(state).isEntityInside(world, pos, wolf, wolf.getPosY(), FluidTags.LAVA, false)) {
+//						// Standing on lava. Check if the block this matched is within the BB the event is asking about
+//						//final float height = BlockLiquid.getBlockLiquidHeight(state, world, pos);
+//						AxisAlignedBB blockBB = new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+//						if (event.getAabb().intersects(blockBB)) {
+//							event.getCollisionBoxesList().add(blockBB);
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 }

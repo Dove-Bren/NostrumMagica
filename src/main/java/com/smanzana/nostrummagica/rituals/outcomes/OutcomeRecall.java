@@ -7,11 +7,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -31,13 +33,13 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (!world.isRemote)
-				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.DUMMY_UUID);
 			return false;
 		}
 		
-		if (player.dimension.getId() != attr.getMarkDimension()) {
+		if (!DimensionUtils.InDimension(player, attr.getMarkDimension())) {
 			if (!world.isRemote)
-				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.DUMMY_UUID);
 			return false;
 		}
 		
@@ -54,11 +56,11 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (world.isRemote)
-				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.DUMMY_UUID);
 			return;
 		}
 		
-		if (player.dimension.getId() == attr.getMarkDimension()) {
+		if (DimensionUtils.InDimension(player, attr.getMarkDimension())) {
 			if (!world.isRemote) {
 				
 				NostrumMagica.attemptTeleport(world, pos, player, true, NostrumMagica.rand.nextInt(4) == 0);
@@ -85,7 +87,7 @@ public class OutcomeRecall implements IRitualOutcome {
 //				}
 			}
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.DUMMY_UUID);
 		}
 	}
 	

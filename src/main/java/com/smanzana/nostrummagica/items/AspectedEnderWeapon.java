@@ -184,13 +184,13 @@ public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpel
 	}
 	
 	protected Vector3d getCastPosition(LivingEntity caster) {
-		RayTraceResult result = RayTrace.raytrace(caster.world, caster, caster.getPositionVector().add(0, caster.getEyeHeight(), 0),
+		RayTraceResult result = RayTrace.raytrace(caster.world, caster, caster.getPositionVec().add(0, caster.getEyeHeight(), 0),
 				caster.rotationPitch, caster.rotationYaw, MAX_BALL_DIST, (ent) -> {
 					return false; // Don't want entities
 				});
 		
 		if (result.getType() == RayTraceResult.Type.MISS) {
-			return caster.getPositionVector().add(0, caster.getEyeHeight(), 0).add(
+			return caster.getPositionVec().add(0, caster.getEyeHeight(), 0).add(
 					caster.getLookVec().scale(MAX_BALL_DIST)
 					);
 		} else {

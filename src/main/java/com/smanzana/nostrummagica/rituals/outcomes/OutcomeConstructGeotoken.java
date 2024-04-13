@@ -13,6 +13,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -32,7 +33,7 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 		if (PositionCrystal.getBlockPosition(ingredients.center) == null
 				&& PositionToken.getBlockPosition(ingredients.center) == null) {
 			if (!world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.create_geotoken.nopos", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.create_geotoken.nopos", new Object[0]), Util.DUMMY_UUID);
 			}
 			return false;
 		}

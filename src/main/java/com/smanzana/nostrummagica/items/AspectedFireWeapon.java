@@ -170,7 +170,7 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 	
 	protected @Nullable LivingEntity getCastTarget(LivingEntity caster) {
 		// We have a target?
-		RayTraceResult result = RayTrace.raytraceApprox(caster.world, caster, caster.getPositionVector().add(0, caster.getEyeHeight(), 0),
+		RayTraceResult result = RayTrace.raytraceApprox(caster.world, caster, caster.getPositionVec().add(0, caster.getEyeHeight(), 0),
 				caster.rotationPitch, caster.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
 					return ent != null
 							&& ent != caster

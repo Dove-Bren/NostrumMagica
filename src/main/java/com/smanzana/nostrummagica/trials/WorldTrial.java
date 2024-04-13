@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class WorldTrial {
@@ -46,7 +47,7 @@ public abstract class WorldTrial {
 		if (mastery == ElementalMastery.NOVICE) {
 			if (!player.world.isRemote) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
-				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}));
+				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.DUMMY_UUID);
 			}
 		} else {
 			complete(player);

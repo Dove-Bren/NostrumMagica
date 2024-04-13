@@ -115,7 +115,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 					Direction.Axis axis = Direction.Axis.Y;
 					Vector3d forwardDir = dir;
 					if (target != null) {
-						Vector3d vec = target.getPositionVector().subtract(caster.getPositionVector());
+						Vector3d vec = target.getPositionVec().subtract(caster.getPositionVec());
 						forwardDir = vec.normalize();
 						axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 					}

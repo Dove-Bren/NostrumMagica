@@ -517,7 +517,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 					// Too far
 					if (EntityArcaneWolf.this.hasWolfCapability(WolfTypeCapability.WOLF_BLINK)
 							&& EntityArcaneWolf.this.rand.nextFloat() < .05) {
-						Vector3d currentPos = EntityArcaneWolf.this.getPositionVector();
+						Vector3d currentPos = EntityArcaneWolf.this.getPositionVec();
 						if (EntityArcaneWolf.this.teleportToEnemy(target)) {
 							EntityArcaneWolf.this.world.playSound(null, currentPos.x, currentPos.y, currentPos.z,
 									SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);

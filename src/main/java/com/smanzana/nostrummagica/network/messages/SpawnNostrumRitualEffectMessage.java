@@ -8,13 +8,16 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.utils.NetUtils;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -28,7 +31,7 @@ public class SpawnNostrumRitualEffectMessage {
 	public static void handle(SpawnNostrumRitualEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (player.dimension != message.dimension) {
+		if (!DimensionUtils.InDimension(player, message.dimension)) {
 			return;
 		}
 		
@@ -41,7 +44,7 @@ public class SpawnNostrumRitualEffectMessage {
 		ClientPredefinedEffect.SpawnRitualEffect(message.pos, message.element, message.center, message.extras, message.reagents, message.output);
 	}
 
-	private final DimensionType dimension;
+	private final RegistryKey<World> dimension;
 	private final BlockPos pos;
 	private final EMagicElement element;
 	private final ReagentType[] reagents;
@@ -49,7 +52,7 @@ public class SpawnNostrumRitualEffectMessage {
 	private final @Nullable NonNullList<ItemStack> extras;
 	private final ItemStack output;
 	
-	public SpawnNostrumRitualEffectMessage(DimensionType dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
+	public SpawnNostrumRitualEffectMessage(RegistryKey<World> dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
 			ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output) {
 		this.dimension = dimension;
 		this.pos = pos;
@@ -61,7 +64,7 @@ public class SpawnNostrumRitualEffectMessage {
 	}
 
 	public static SpawnNostrumRitualEffectMessage decode(PacketBuffer buf) {
-		final int dimID;
+		final RegistryKey<World> dimID;
 		final BlockPos pos;
 		final EMagicElement element;
 		final ReagentType[] reagents;
@@ -69,7 +72,7 @@ public class SpawnNostrumRitualEffectMessage {
 		final @Nullable NonNullList<ItemStack> extras;
 		final ItemStack output;
 		
-		dimID = buf.readVarInt();
+		dimID = NetUtils.unpackDimension(buf);
 		pos = buf.readBlockPos();
 		element = buf.readEnumValue(EMagicElement.class);
 		
@@ -101,11 +104,11 @@ public class SpawnNostrumRitualEffectMessage {
 			output = ItemStack.EMPTY;
 		}
 		
-		return new SpawnNostrumRitualEffectMessage(DimensionType.getById(dimID), pos, element, reagents, center, extras, output);
+		return new SpawnNostrumRitualEffectMessage(dimID, pos, element, reagents, center, extras, output);
 	}
 
 	public static void encode(SpawnNostrumRitualEffectMessage msg, PacketBuffer buf) {
-		buf.writeVarInt(msg.dimension.getId());
+		NetUtils.packDimension(buf, msg.dimension);
 		buf.writeBlockPos(msg.pos);
 		buf.writeEnumValue(msg.element);
 		

@@ -13,6 +13,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -41,7 +42,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 		
 		if (!SpellTome.hasRoom(tome)) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.full"));
+				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.DUMMY_UUID);
 			}
 			return false;
 		}

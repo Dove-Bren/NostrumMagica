@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -30,7 +31,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		if (!NostrumObelisk.canSpawnObelisk(world, center.add(0, -1, 0))) {
 			if (!world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]));
+				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
 			}
 			return false;
 		}
@@ -41,7 +42,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// All logic contained in obelisk class
 		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
-			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
 		} else if (!world.isRemote) {
 			// clear altar on server
 			TileEntity te = world.getTileEntity(center.add(0, 0, 0));

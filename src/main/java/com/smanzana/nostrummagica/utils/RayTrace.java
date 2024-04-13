@@ -417,7 +417,7 @@ public class RayTrace {
 				continue;
 			}
 			
-			double distSq = hitPos.squareDistanceTo(ent.getPositionVector());
+			double distSq = hitPos.squareDistanceTo(ent.getPositionVec());
 			if (minEnt == null || distSq < minDist) {
 				minEnt = ent;
 				minDist = distSq;

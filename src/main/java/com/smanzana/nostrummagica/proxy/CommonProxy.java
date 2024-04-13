@@ -130,9 +130,9 @@ import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
@@ -177,8 +177,8 @@ public class CommonProxy {
 	}
 	
 	@SubscribeEvent
-	public void startup(FMLServerStartingEvent event) {
-		final CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
+	public void registerCommands(RegisterCommandsEvent event) {
+		final CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
 		
 		CommandTestConfig.register(dispatcher);
 		CommandTestConfig.register(dispatcher);
@@ -498,7 +498,7 @@ public class CommonProxy {
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Entity entity) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), entity.getEntityId()), world, entity.getPositionVector());
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), entity.getEntityId()), world, entity.getPositionVec());
 	}
 	
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {

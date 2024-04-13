@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.client.resources.I18n;
@@ -107,7 +108,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 			
 			if (type == Event.TIME) {
 				
-				if (!origin.isAlive() || origin.world.getDimension().getType() != world.getDimension().getType()) {
+				if (!origin.isAlive() || !DimensionUtils.InDimension(origin, world)) {
 					this.dead = true;
 					return true;
 				}

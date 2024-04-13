@@ -284,7 +284,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 						this.setMotion(this.getMotion().add(0, -0.04, 0));
 					}
 				} else {
-					dist = target.getPositionVector().add(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVector());
+					dist = target.getPositionVec().add(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVec());
 					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);

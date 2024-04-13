@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
@@ -44,7 +45,7 @@ public abstract class CombatTrial {
 	public void trialTick() {
 		if (!playerIsNear()) {
 			if (this.focusedPlayer != null) {
-				focusedPlayer.sendMessage(new TranslationTextComponent("info.trial.fail"));
+				focusedPlayer.sendMessage(new TranslationTextComponent("info.trial.fail"), Util.DUMMY_UUID);
 			}
 			endTrial();
 		}

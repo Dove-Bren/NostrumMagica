@@ -15,7 +15,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -113,7 +112,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	protected static final List<BlockPos> findCacheableSpawnSuggestions(World world, BlockPos center, Predicate<BlockState> filter) {
 		List<BlockPos> list = new ArrayList<>();
 		
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int x = -10; x <= 10; x++)
 		for (int z = -10; z <= 10; z++)
 		for (int y = -2; y <= 2; y++) {

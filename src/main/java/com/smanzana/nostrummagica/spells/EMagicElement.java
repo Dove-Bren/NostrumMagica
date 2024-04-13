@@ -4,8 +4,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -37,22 +36,22 @@ public enum EMagicElement {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public ChatFormatting getChatColor() {
+	public TextFormatting getChatColor() {
 		switch(this) {
 		case EARTH:
-			return ChatFormatting.GOLD;
+			return TextFormatting.GOLD;
 		case ENDER:
-			return ChatFormatting.DARK_PURPLE;
+			return TextFormatting.DARK_PURPLE;
 		case FIRE:
-			return ChatFormatting.DARK_RED;
+			return TextFormatting.DARK_RED;
 		case ICE:
-			return ChatFormatting.AQUA;
+			return TextFormatting.AQUA;
 		case LIGHTNING:
-			return ChatFormatting.YELLOW;
+			return TextFormatting.YELLOW;
 		case PHYSICAL:
-			return ChatFormatting.DARK_GRAY;
+			return TextFormatting.DARK_GRAY;
 		case WIND:
-			return ChatFormatting.DARK_GREEN;
+			return TextFormatting.DARK_GREEN;
 		}
 		return null;
 	}

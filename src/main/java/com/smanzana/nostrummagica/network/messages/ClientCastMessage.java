@@ -24,6 +24,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -188,7 +189,7 @@ public class ClientCastMessage {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(sp, row.getKey());
 					if (count < row.getValue()) {
-						sp.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
+						sp.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.DUMMY_UUID);
 						NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
 								ctx.get().getSender());
 						return;
@@ -214,8 +215,8 @@ public class ClientCastMessage {
 					for (ITameDragon dragon : dragons) {
 						LivingEntity ent = (LivingEntity) dragon;
 						NostrumMagica.instance.proxy.spawnEffect(sp.world, new SpellComponentWrapper(BeamTrigger.instance()),
-								null, sp.getPositionVector().add(0, sp.getEyeHeight(), 0),
-								null, ent.getPositionVector().add(0, ent.getEyeHeight(), 0),
+								null, sp.getPositionVec().add(0, sp.getEyeHeight(), 0),
+								null, ent.getPositionVec().add(0, ent.getEyeHeight(), 0),
 								new SpellComponentWrapper(EMagicElement.ICE), false, 0);
 						
 						int dAvail = dragon.getMana();

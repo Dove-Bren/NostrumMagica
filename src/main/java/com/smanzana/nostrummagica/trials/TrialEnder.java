@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialEnder extends WorldTrial {
@@ -18,11 +18,11 @@ public class TrialEnder extends WorldTrial {
 	}
 
 	@SubscribeEvent
-	public void onTeleport(EnderTeleportEvent e) {
+	public void onTeleport(EntityTeleportEvent.EnderEntity e) {
 		
 		if (e.getEntityLiving() instanceof PlayerEntity) {
 
-			Vector3d pos = e.getEntityLiving().getPositionVector();
+			Vector3d pos = e.getEntityLiving().getPositionVec();
 			if (pos.squareDistanceTo(e.getTargetX(), e.getTargetY(), e.getTargetZ())
 					< 10000)
 				return; // 100x100

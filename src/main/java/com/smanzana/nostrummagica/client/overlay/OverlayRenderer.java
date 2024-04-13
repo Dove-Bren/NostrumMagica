@@ -1408,7 +1408,7 @@ public class OverlayRenderer extends AbstractGui {
 		if (entity.ticksExisted % 4 == 0) {
 			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.ROOTED);
 			if (data != null && data.getCount() != 0) {
-				final ClientEffect effect = new ClientEffectAnimated(entity.getPositionVector(), 1000L,
+				final ClientEffect effect = new ClientEffectAnimated(entity.getPositionVec(), 1000L,
 						new ClientEffect[] {
 							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
 							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),

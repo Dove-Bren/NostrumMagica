@@ -100,7 +100,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		// cant use getCenter cause it's client-side only
 		//Vector3d center = entityBox.getCenter();
 		//Vector3d center = new Vector3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
-		Vector3d center = entityIn.getPositionVector();
+		Vector3d center = entityIn.getPositionVec();
 		
 		if (motion == null) {
 			motion = getEntEffectiveMotion(entityIn);

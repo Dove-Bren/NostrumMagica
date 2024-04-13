@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.antlr.v4.runtime.atn.BasicState;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.ImmutableMap;
@@ -216,7 +217,6 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.BasicState;
 import net.minecraftforge.client.model.ForgeBlockStateV1.Transforms;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -225,6 +225,7 @@ import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -232,7 +233,6 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 @SuppressWarnings("deprecation")
 public class ClientProxy extends CommonProxy {
@@ -304,11 +304,11 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void startup(FMLServerStartingEvent event) {
-		super.startup(event);
+	public void registerCommands(RegisterCommandsEvent event) {
+		super.registerCommands(event);
 		
 		// Client-only commands
-		final CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
+		final CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
 		CommandInfoScreenGoto.register(dispatcher);
 		CommandDebugEffect.register(dispatcher);
 	}
@@ -1393,7 +1393,7 @@ public class ClientProxy extends CommonProxy {
 			SpellComponentWrapper flavor,
 			boolean negative,
 			float param) {
-		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 				new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 				3L * 500L, 6);
 		
@@ -1479,8 +1479,8 @@ public class ClientProxy extends CommonProxy {
 		// triggers (that have them)
 		renderer.registerEffect(new SpellComponentWrapper(BeamTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.getPositionVector() : sourcePos,
-							targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.getPositionVec() : sourcePos,
+							targetPos == null ? target.getPositionVec() : targetPos,
 							500L);
 					
 					//if (target != null)
@@ -1499,7 +1499,7 @@ public class ClientProxy extends CommonProxy {
 		
 //		renderer.registerEffect(new SpellComponentWrapper(SelfTrigger.instance()),
 //				(source, sourcePos, target, targetPos, flavor) -> {
-//					ClientEffect effect = new ClientEffect(source == null ? sourcePos : source.getPositionVector(),
+//					ClientEffect effect = new ClientEffect(source == null ? sourcePos : source.getPositionVec(),
 //							new ClientEffectFormBasic(ClientEffectIcon.TING2, 0, 0, 0),
 //							10);
 //					
@@ -1520,7 +1520,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							500L, 6);
 					
@@ -1543,7 +1543,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(HealthTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -1562,7 +1562,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(ManaTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -1581,7 +1581,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(FoodTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -1600,7 +1600,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(new SpellComponentWrapper(ProximityTrigger.instance()),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 1000L, 5);
 					
@@ -1631,7 +1631,7 @@ public class ClientProxy extends CommonProxy {
 		// Alterations
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.INFLICT),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 							3L * 500L, 6);
 					
@@ -1655,7 +1655,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RESIST),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.ARROWU, 0, 0, 0),
 							3L * 500L, 6);
 					
@@ -1679,7 +1679,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.GROWTH),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.getPositionVector() : targetPos, 
+					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.getPositionVec() : targetPos, 
 							new ClientEffectMirrored(new Vector3d(0,0,0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							2L * 1000L, 4), 2L * 1000L, 5, .2f);
@@ -1708,12 +1708,12 @@ public class ClientProxy extends CommonProxy {
 					if (flavor != null && flavor.isElement() && 
 							(flavor.getElement() == EMagicElement.EARTH || flavor.getElement() == EMagicElement.ICE)) {
 						// Special ones for shields!
-						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 								new ClientEffectFormBasic(ClientEffectIcon.SHIELD, 0, 0, 0),
 								3L * 500L, 5);
 						isShield = true;
 					} else {
-						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 								new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 								3L * 500L, 10);
 					}
@@ -1745,7 +1745,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.ENCHANT),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).add(0, 1, 0),
+					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							3L * 500L, 6, new Vector3d(1, 0, 0));
 					
@@ -1770,7 +1770,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					// TODO physical breaks stuff. Lots of particles. Should we return null here?
 					
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							1L * 500L, 6);
 					
@@ -1795,7 +1795,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.SUMMON),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVector() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							1L * 500L, 6);
 					
@@ -1822,7 +1822,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RUIN),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVector() : targetPos).add(0, 1, 0),
+					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 500L, 6, new Vector3d(.5, .5, 0));
 					
@@ -1864,7 +1864,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		if (targetPos == null)
 //			if (target != null)
-//				targetPos = target.getPositionVector();
+//				targetPos = target.getPositionVec();
 //			else
 				targetPos = new Vector3d(0, 0, 0);
 		

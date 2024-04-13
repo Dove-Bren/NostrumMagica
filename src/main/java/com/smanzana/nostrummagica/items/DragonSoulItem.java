@@ -172,7 +172,7 @@ public class DragonSoulItem extends PetSoulItem {
 				
 				final float rotRad = (float) ((rotation / 360f) * 2 * Math.PI);
 				offset = offset.rotateYaw(rotRad);
-				offset = offset.add(player.getPositionVector());
+				offset = offset.add(player.getPositionVec());
 				// Need to adjust while watching to go to hand
 				NostrumParticles.FILLED_ORB.spawn(player.world, new SpawnParams(
 						1, offset.x, offset.y, offset.z, 1.0, 20, 0,

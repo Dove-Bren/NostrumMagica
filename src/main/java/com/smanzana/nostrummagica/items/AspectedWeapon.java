@@ -413,9 +413,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isRemote) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
+								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -444,7 +444,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		ItemStack stack = context.getItem();
 		final Hand hand = context.getHand();
 		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-			Vector3d dir = hitVec.subtract(playerIn.getPositionVector());
+			Vector3d dir = hitVec.subtract(playerIn.getPositionVec());
 			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
@@ -479,9 +479,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isRemote) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVector() : mop.getHitVec());
+								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -561,7 +561,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			final float prog = ((float) (entity.ticksExisted % period) / (float) period);
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 			final Vector3d target = new Vector3d(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
-			final Vector3d diff = target.subtract(entity.getPositionVector());
+			final Vector3d diff = target.subtract(entity.getPositionVec());
 			entity.setMotion(diff.x / 2,
 					diff.y / 2,
 					diff.z / 2
@@ -599,7 +599,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
-				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, -.05f);
+				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVec(), cloudIn, 0xA0C0EEC0, -.05f);
 			//}
 		});
 		if (hurricaneCount >= 4) {
@@ -639,7 +639,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setIgnoreRadius(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
-				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA090EE90, -.1f);
+				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVec(), cloudIn, 0xA090EE90, -.1f);
 			//}
 		});
 		world.addEntity(cloud);

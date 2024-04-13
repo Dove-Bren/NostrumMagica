@@ -69,7 +69,7 @@ public abstract class SpellShape {
 		
 		if (target != null && (world == null || pos == null)) {
 			world = target.world;
-			Vector3d vec = target.getPositionVector();
+			Vector3d vec = target.getPositionVec();
 			pos = new BlockPos(vec.x, vec.y, vec.z);
 		}
 		

@@ -195,7 +195,7 @@ public class GolemTask extends Goal {
 		}
 
 		if (target != null && target.isAlive()) {
-			double distTarget = target.getPositionVector().distanceTo(golem.getPositionVector());
+			double distTarget = target.getPositionVec().distanceTo(golem.getPositionVec());
 			
 			double meleeRange = (double)(golem.getWidth() * 2.0F * golem.getWidth() * 2.0F);
 			if (distTarget < meleeRange) {

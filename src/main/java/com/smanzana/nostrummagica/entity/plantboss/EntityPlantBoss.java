@@ -464,7 +464,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		//		1,
 		//		this.getPosX(), this.getPosY() + this.getHeight() + 4, this.getPosZ(), 3,
 		//		30, 10,
-		//		this.getPositionVector().add(0, this.getHeight() + 1.7, 0)
+		//		this.getPositionVec().add(0, this.getHeight() + 1.7, 0)
 		//		).color(this.getTreeElement().getColor()));
 		
 		//NostrumParticles.GLOW_ORB.spawn(this.world, new NostrumParticles.SpawnParams(

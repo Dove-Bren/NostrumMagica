@@ -165,7 +165,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		
 		if (targetEntity != null && targetEntity.isAlive()) {
 			Vector3d curVelocity = new Vector3d(this.motionX, this.motionY, this.motionZ);
-			Vector3d posDelta = targetEntity.getPositionVector().add(0, targetEntity.getHeight()/2, 0).subtract(posX, posY, posZ);
+			Vector3d posDelta = targetEntity.getPositionVec().add(0, targetEntity.getHeight()/2, 0).subtract(posX, posY, posZ);
 			Vector3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		} else if (targetPos != null) {

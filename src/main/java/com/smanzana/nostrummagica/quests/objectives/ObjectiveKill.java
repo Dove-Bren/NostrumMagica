@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.quests.objectives;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
@@ -12,8 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -87,22 +85,18 @@ public class ObjectiveKill implements IObjective {
 			PlayerEntity player = null;
 			if (source instanceof PlayerEntity) {
 				player = (PlayerEntity) source;
-			} else if (source instanceof AbstractArrowEntity) {
-				AbstractArrowEntity arrow = (AbstractArrowEntity) source;
-				if (arrow.getShooter() instanceof PlayerEntity) {
-					player = (PlayerEntity) arrow.getShooter();
-				}
-			} else if (source instanceof EntitySpellProjectile) {
-				EntitySpellProjectile proj = (EntitySpellProjectile) source;
-				if (proj.shootingEntity instanceof PlayerEntity) {
-					player = (PlayerEntity) proj.shootingEntity;
-				}
-			} else if (source instanceof FireballEntity) {
-				FireballEntity proj = (FireballEntity) source;
-				if (proj.shootingEntity instanceof PlayerEntity) {
-					player = (PlayerEntity) proj.shootingEntity;
+			} else if (source instanceof ProjectileEntity) {
+				ProjectileEntity proj = (ProjectileEntity) source;
+				if (proj.func_234616_v_() instanceof PlayerEntity) {
+					player = (PlayerEntity) proj.func_234616_v_();
 				}
 			}
+//			else if (source instanceof EntitySpellProjectile) {
+//				EntitySpellProjectile proj = (EntitySpellProjectile) source;
+//				if (proj.shootingEntity instanceof PlayerEntity) {
+//					player = (PlayerEntity) proj.shootingEntity;
+//				}
+//			}
 			
 			if (player == null)
 				return;

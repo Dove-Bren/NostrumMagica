@@ -427,7 +427,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 			// Earlier right-click stuff here
 			if (!worldIn.isRemote) {
 				// We have a target?
-				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0),
+				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0),
 						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
 								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getOwner() != null) {

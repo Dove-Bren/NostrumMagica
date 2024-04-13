@@ -46,12 +46,12 @@ import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
+import com.smanzana.nostrummagica.items.AspectedWeapon;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.items.MagicArmor;
-import com.smanzana.nostrummagica.items.AspectedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.NostrumItems;
@@ -159,7 +159,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -177,7 +176,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(NostrumMagica.MODID)
 public class NostrumMagica {
@@ -212,11 +211,11 @@ public class NostrumMagica {
 	public NostrumMagica() {
 		instance = this;
 		
-		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-		curios = DistExecutor.runForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
-		aetheria = DistExecutor.runForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
-		//enderIO = DistExecutor.runForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
-		musica = DistExecutor.runForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
+		proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+		curios = DistExecutor.safeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
+		aetheria = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
+		//enderIO = DistExecutor.safeRunForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
+		musica = DistExecutor.safeRunForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
 		
 		playerListener = new PlayerListener();
 		magicEffectProxy = new MagicEffectProxy();
@@ -239,7 +238,7 @@ public class NostrumMagica {
 		};
 		//NostrumItems.spellTomePage.setCreativeTab(NostrumMagica.enhancementTab); // TODO still need this?
 
-		if (ModList.get().isLoaded(CuriosAPI.MODID)) {
+		if (ModList.get().isLoaded(CuriosApi.MODID)) {
 			curios.enable();
 		}
 		if (ModList.get().isLoaded("nostrumaetheria")) {
@@ -2781,7 +2780,7 @@ public class NostrumMagica {
 			throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
 		}
 
-		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getServer().getWorld(DimensionType.OVERWORLD)
+		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getServer().getWorld(World.OVERWORLD)
 				.getSavedData()
 				.getOrCreate(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
 
@@ -2796,7 +2795,7 @@ public class NostrumMagica {
 	}
 
 	private void initSpellRegistry(World world) {
-		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(SpellRegistry::new,
+		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(SpellRegistry::new,
 				SpellRegistry.DATA_NAME);
 
 		// TODO I think this is automatic now?
@@ -2807,7 +2806,7 @@ public class NostrumMagica {
 	}
 
 	private void initPetSoulRegistry(World world) {
-		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(PetSoulRegistry::new,
+		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PetSoulRegistry::new,
 				PetSoulRegistry.DATA_NAME);
 
 		// TODO I think this is automatic now?
@@ -2818,7 +2817,7 @@ public class NostrumMagica {
 	}
 
 	private void initPetCommandManager(World world) {
-		petCommandManager = (PetCommandManager) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(PetCommandManager::new,
+		petCommandManager = (PetCommandManager) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PetCommandManager::new,
 				PetCommandManager.DATA_NAME);
 
 		// TODO I think this is automatic now?
@@ -2829,7 +2828,7 @@ public class NostrumMagica {
 	}
 	
 	private void initWorldKeys(World world) {
-		worldKeys = (NostrumKeyRegistry) ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD).getSavedData().getOrCreate(NostrumKeyRegistry::new,
+		worldKeys = (NostrumKeyRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(NostrumKeyRegistry::new,
 				NostrumKeyRegistry.DATA_NAME);
 	}
 

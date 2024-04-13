@@ -45,7 +45,7 @@ public class EntityAIStayHomeTask<T extends CreatureEntity> extends Goal {
 			return false;
 		}
 		
-		return creature.getPositionVector().squareDistanceTo(home.getX(), home.getY(), home.getZ()) > this.maxDistSq;
+		return creature.getPositionVec().squareDistanceTo(home.getX(), home.getY(), home.getZ()) > this.maxDistSq;
 	}
 	
 	/**

@@ -26,6 +26,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -89,7 +90,7 @@ public class ManaTrigger extends SpellTrigger {
 					expired = true;
 					if (this.entity instanceof PlayerEntity) {
 						PlayerEntity player = (PlayerEntity) this.entity;
-						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.mana"));
+						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.mana"), Util.DUMMY_UUID);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
 					}
 				}

@@ -37,8 +37,9 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -127,7 +128,7 @@ public class NetworkHandler {
 		NetworkHandler.syncChannel.send(PacketDistributor.ALL.noArg(), msg);
 	}
 
-	public static <T> void sendToDimension(T msg, DimensionType dimension) {
+	public static <T> void sendToDimension(T msg, RegistryKey<World> dimension) {
 		NetworkHandler.syncChannel.send(PacketDistributor.DIMENSION.with(() -> dimension), msg);
 	}
 	

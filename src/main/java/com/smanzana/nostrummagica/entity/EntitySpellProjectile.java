@@ -107,7 +107,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 				return;
 			}
 			// Can't avoid a SQR; tracking motion would require SQR, too to get path length
-			if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
+			if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
 				trigger.onFizzle(this.getPosition());
 				this.remove();
 			}
@@ -181,5 +181,9 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 	public IPacket<?> createSpawnPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
+	}
+	
+	public @Nullable Entity getShooter() {
+		return super.func_234616_v_();
 	}
 }

@@ -15,6 +15,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -79,7 +80,7 @@ public class ObeliskTeleportationRequestMessage {
 		
 		// Validate obelisks
 		if (NostrumObelisk.isValidTarget(world, from, to)) {
-			player.sendMessage(new TranslationTextComponent("info.obelisk.dne"));
+			player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.DUMMY_UUID);
 			return false;
 		}
 		
@@ -88,14 +89,14 @@ public class ObeliskTeleportationRequestMessage {
 			TileEntity te = world.getTileEntity(from);
 			if (te == null || !(te instanceof NostrumObeliskEntity)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.sendMessage(new TranslationTextComponent("info.obelisk.dne"));
+				player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.DUMMY_UUID);
 				return false;
 			}
 			
 			NostrumObeliskEntity obelisk = (NostrumObeliskEntity) te;
 			if (!obelisk.deductForTeleport(to)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-				player.sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"));
+				player.sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"), Util.DUMMY_UUID);
 				return false;
 			}
 		}
@@ -113,7 +114,7 @@ public class ObeliskTeleportationRequestMessage {
 				
 			doEffects(world, to);
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"));
+			player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"), Util.DUMMY_UUID);
 		}
 		
 		return true;

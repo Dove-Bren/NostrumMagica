@@ -7,12 +7,16 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.utils.NetUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -27,7 +31,7 @@ public class CandleIgniteMessage {
 		Minecraft.getInstance().runAsync(() -> {
 			
 			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-			if (player.dimension.getId() != message.dimensionID) {
+			if (!DimensionUtils.InDimension(player, message.dimension)) {
 				return;
 			}
 			
@@ -40,22 +44,22 @@ public class CandleIgniteMessage {
 		});
 	}
 	
-	private final int dimensionID;
+	private final RegistryKey<World> dimension;
 	private final BlockPos pos;
 	private final @Nullable ReagentType type;
 	
-	public CandleIgniteMessage(int dimension, BlockPos pos, @Nullable ReagentType type) {
-		this.dimensionID = dimension;
+	public CandleIgniteMessage(RegistryKey<World> dimension, BlockPos pos, @Nullable ReagentType type) {
+		this.dimension = dimension;
 		this.pos = pos;
 		this.type = type;
 	}
 
 	public static CandleIgniteMessage decode(PacketBuffer buf) {
-		return new CandleIgniteMessage(buf.readInt(), buf.readBlockPos(), buf.readBoolean() ? buf.readEnumValue(ReagentType.class) : null);
+		return new CandleIgniteMessage(NetUtils.unpackDimension(buf), buf.readBlockPos(), buf.readBoolean() ? buf.readEnumValue(ReagentType.class) : null);
 	}
 
 	public static void encode(CandleIgniteMessage msg, PacketBuffer buf) {
-		buf.writeInt(msg.dimensionID);
+		NetUtils.packDimension(buf, msg.dimension);
 		buf.writeBlockPos(msg.pos);
 		buf.writeBoolean(msg.type != null);
 		if (msg.type != null) buf.writeEnumValue(msg.type);

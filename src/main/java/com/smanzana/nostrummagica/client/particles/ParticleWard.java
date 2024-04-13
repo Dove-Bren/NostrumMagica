@@ -167,7 +167,7 @@ public class ParticleWard extends BatchRenderParticle {
 					throw new RuntimeException("Unsupported particle behavior");
 				}
 				Vector3d curVelocity = new Vector3d(this.motionX, this.motionY, this.motionZ);
-				Vector3d posDelta = targetEntity.getPositionVector()
+				Vector3d posDelta = targetEntity.getPositionVec()
 						.add(offset.x, offset.y, offset.z)
 						.subtract(posX, posY, posZ);
 				Vector3d idealVelocity = posDelta.normalize().scale(.3);

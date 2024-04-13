@@ -57,7 +57,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
         // Raytrace at hit point, or just go max distance.
         // If piercing, only cap to raytrace if we hit an entity
         
-        RayTraceResult trace = RayTrace.raytrace(world, this, this.getPositionVector(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
+        RayTraceResult trace = RayTrace.raytrace(world, this, this.getPositionVec(), direction, (float) maxDistance, new RayTrace.OtherLiving(shootingEntity));
         if (trace != null && trace.getType() != RayTraceResult.Type.MISS) {
         	if (trace.getType() == RayTraceResult.Type.ENTITY) {
         		Entity entityHit = ((EntityRayTraceResult) trace).getEntity();
@@ -104,7 +104,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 		}
 		
 		final double moveScale = 0.15d * this.speed;
-		Vector3d diff = to.subtract(this.getPositionVector()).normalize().scale(moveScale);
+		Vector3d diff = to.subtract(this.getPositionVec()).normalize().scale(moveScale);
 		this._getInstantVelocityVec.set(diff);
 		
 		return this._getInstantVelocityVec;
@@ -153,7 +153,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	        this.setMotion(this.getMotion().scale(0.8));
 			
 //				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
-//				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
+//				if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
 //					trigger.onFizzle(this.getPosition());
 //					this.remove();
 //				}
@@ -162,7 +162,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 			
 			// Check for motion boundaries
 			if (this.returning) {
-				if (Math.abs(this.getPositionVector().distanceTo(this.origin)) <= 0.5) {
+				if (Math.abs(this.getPositionVec().distanceTo(this.origin)) <= 0.5) {
 					if (++trips >= maxTrips) {
 						this.remove();
 					} else {
@@ -174,7 +174,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 					}
 				}
 			} else {
-				if (Math.abs(this.getPositionVector().distanceTo(this.target)) <= 0.5) {
+				if (Math.abs(this.getPositionVec().distanceTo(this.target)) <= 0.5) {
 					this.returning = true;
 					
 					// Capture motion to get boomerang-effect

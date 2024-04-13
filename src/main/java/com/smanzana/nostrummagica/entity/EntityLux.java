@@ -761,7 +761,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				}
 				
 				// If already roosting, snap to right position and hold there with no jitter
-				final double dist = parentEntity.getPositionVector().squareDistanceTo(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
+				final double dist = parentEntity.getPositionVec().squareDistanceTo(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
 				if (dist < .015) {
 					if (dist > 0.0) {
 						parentEntity.setPosition(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
@@ -904,7 +904,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
 				}
 				
-				if (parentEntity.getPositionVector().squareDistanceTo(
+				if (parentEntity.getPositionVec().squareDistanceTo(
 						targetPos.getX() + .5,
 						targetPos.getY() + .5,
 						targetPos.getZ() + .5) < .05) {

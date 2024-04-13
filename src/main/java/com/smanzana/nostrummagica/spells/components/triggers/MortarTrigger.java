@@ -25,7 +25,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -88,7 +87,7 @@ public class MortarTrigger extends SpellTrigger {
 					// If we have entity target, set that as dest. Otherwise, raytrace
 					final Vector3d dest;
 					if (target != null) {
-						dest = target.getPositionVector();
+						dest = target.getPositionVec();
 					} else {
 						RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
 							if (getState().getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
@@ -99,7 +98,7 @@ public class MortarTrigger extends SpellTrigger {
 						}, .5);
 						
 						if (mop.getType() == RayTraceResult.Type.ENTITY) {
-							dest = RayTrace.entFromRaytrace(mop).getPositionVector();
+							dest = RayTrace.entFromRaytrace(mop).getPositionVec();
 						} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
 							dest = mop.getHitVec();
 						} else {
@@ -113,7 +112,7 @@ public class MortarTrigger extends SpellTrigger {
 					if (self.noArc) {
 						// Drop from above
 						// Try not to start in the ceiling
-						MutableBlockPos cursor = new MutableBlockPos();
+						BlockPos.Mutable cursor = new BlockPos.Mutable();
 						cursor.setPos(dest.x, dest.y + 3, dest.z); // start 3 above; best we can do
 						
 						for (int i = 0; i < 7; i++) {

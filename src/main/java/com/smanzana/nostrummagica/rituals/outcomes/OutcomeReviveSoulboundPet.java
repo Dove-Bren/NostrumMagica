@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -53,17 +54,17 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
 		// Must have PetSoulItem in center, and must have valid soul.
 		if (ingredients.center.isEmpty() || !(ingredients.center.getItem() instanceof PetSoulItem)) {
-			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.DUMMY_UUID);
 			return false;
 		}
 		
 		PetSoulItem item = (PetSoulItem) ingredients.center.getItem();
 		if (item.getPetSoulID(ingredients.center) == null) {
-			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]));
+			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.DUMMY_UUID);
 			return false;
 		}
 		
-		if (!item.canSpawnEntity(world, player, new Vector3d(center), ingredients.center)) {
+		if (!item.canSpawnEntity(world, player, Vector3d.copyCentered(center), ingredients.center)) {
 			return false;
 		}
 		

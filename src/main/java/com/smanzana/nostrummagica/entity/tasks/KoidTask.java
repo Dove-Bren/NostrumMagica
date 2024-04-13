@@ -411,7 +411,7 @@ public class KoidTask extends Goal {
 		}
 
 		if (target != null && target.isAlive()) {
-			double distTarget = target.getPositionVector().distanceTo(koid.getPositionVector());
+			double distTarget = target.getPositionVec().distanceTo(koid.getPositionVec());
 			
 			double meleeRange = (double)(koid.getWidth() * 2.0F * koid.getWidth() * 2.0F + koid.getWidth());
 			if (distTarget < meleeRange) {

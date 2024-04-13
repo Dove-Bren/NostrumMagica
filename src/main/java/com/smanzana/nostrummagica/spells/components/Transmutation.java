@@ -20,7 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.world.World;
-import net.minecraft.world.DimensionType;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class Transmutation {
@@ -140,10 +139,10 @@ public class Transmutation {
 		if (NostrumMagica.instance.proxy.getPlayer() != null) {
 			World world = NostrumMagica.instance.proxy.getPlayer().world;
 			//return world.getServer().getWorld(DimensionType.OVERWORLD).getSeed();
-			return world.getSeed(); // Not sure if seed is always the same? might change CLIENT list per dimension? lol
+			return world.getServer().getWorld(World.OVERWORLD).getSeed(); // Not sure if seed is always the same? might change CLIENT list per dimension? lol
 		} else {
 			try {
-				long seed = ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD).getSeed();
+				long seed = ServerLifecycleHooks.getCurrentServer().getWorld(World.OVERWORLD).getSeed();
 				return seed;
 			} catch (Exception e) {
 				e.printStackTrace();

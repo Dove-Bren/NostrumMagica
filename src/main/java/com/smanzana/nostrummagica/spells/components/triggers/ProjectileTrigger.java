@@ -58,7 +58,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			final Vector3d dir;
 			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				dir = ent.getAttackTarget().getPositionVector().add(0.0, ent.getHeight() / 2.0, 0.0)
+				dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
 						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
 			} else {
 				dir = ProjectileTrigger.getVectorForRotation(pitch, yaw);

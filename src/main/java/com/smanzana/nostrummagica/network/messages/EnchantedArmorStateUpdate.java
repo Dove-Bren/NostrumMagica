@@ -28,7 +28,7 @@ public class EnchantedArmorStateUpdate {
 			if (ctx.get().getDirection().getReceptionSide().isServer()) {
 				// Bounce this update to everyone else
 				EnchantedArmorStateUpdate bouncedMessage = new EnchantedArmorStateUpdate(message.state, message.data, ent.getEntityId());
-				NetworkHandler.sendToDimension(bouncedMessage, ent.dimension);
+				NetworkHandler.sendToDimension(bouncedMessage, ent.getEntityWorld().getDimensionKey());
 			}
 		}
 	}

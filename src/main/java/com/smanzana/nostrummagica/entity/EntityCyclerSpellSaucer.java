@@ -135,7 +135,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 		
 		if (this.shootingEntity != null) {
 			// Calc where around the entity we want to be
-			_getInstantVelocityVec.set(this.shootingEntity.getPositionVector());
+			_getInstantVelocityVec.set(this.shootingEntity.getPositionVec());
 			// Center vertically on the entity
 			_getInstantVelocityVec.y += (this.shootingEntity.getEyeHeight() / 2f);
 			final int ticksAround = 40;
@@ -210,7 +210,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 					BlockPos blockPos = new BlockPos(posX, posY, posZ); // not using getPosition() since it adds .5 y 
 					if (this.canImpact(blockPos)) {
 						RayTraceResult bundledResult = new BlockRayTraceResult(
-								this.getPositionVector(), Direction.UP, blockPos, false);
+								this.getPositionVec(), Direction.UP, blockPos, false);
 						
 						if (_lastBlockVector == null) {
 							_lastBlockVector = new Vector();
@@ -250,7 +250,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 //	        this.getMotion().z *= 0.8;
 //			
 ////				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
-////				if (this.getPositionVector().squareDistanceTo(origin) > maxDistance) {
+////				if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
 ////					trigger.onFizzle(this.getPosition());
 ////					this.remove();
 ////				}

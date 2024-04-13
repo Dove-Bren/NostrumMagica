@@ -2223,12 +2223,12 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 	
 	private static final boolean DoEnderDash(LivingEntity entity, Vector3d dir) {
 		final float dashDist = 4.0f;
-		final Vector3d idealVec = entity.getPositionVector().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
+		final Vector3d idealVec = entity.getPositionVec().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
 		
 		// Do three traces from y=0, y=1, and y=2. Take best one
 		Vector3d bestResult = null;
 		double bestDist = -1;
-		final Vector3d startPos = entity.getPositionVector();
+		final Vector3d startPos = entity.getPositionVec();
 		for (int y = -1; y <= 4; y++) {
 			final Vector3d end = idealVec.add(0, y, 0);
 			RayTraceResult mop = RayTrace.raytrace(entity.world, entity, startPos.add(0, y, 0), end, (ent) -> {
@@ -2457,7 +2457,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 //					final float prog = ((float) (entity.ticksExisted % period) / (float) period);
 //					final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
 //					final Vector3d target = new Vector3d(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
-//					final Vector3d diff = target.subtract(entity.getPositionVector());
+//					final Vector3d diff = target.subtract(entity.getPositionVec());
 //					entity.getMotion().x = 0;//diff.x/ 2;
 //					entity.getMotion().y = diff.y/ 2;
 //					entity.getMotion().z = 0;//diff.z/ 2;
@@ -2503,7 +2503,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				cloud.setIgnoreRadius(true);
 				cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 					final int count = 40;
-					AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVector(), cloudIn, 0xA0C0EEC0, .65f);
+					AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVec(), cloudIn, 0xA0C0EEC0, .65f);
 				});
 				cloud.setCustomParticle(ParticleTypes.SWEEP_ATTACK);
 				//cloud.setCustomParticleParam1(10);
@@ -2534,7 +2534,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				PlayerEntity playerIn = (PlayerEntity) ent;
 				MagicArmor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
-				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn, playerIn.getPositionVector().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
+				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (e) -> { return e != playerIn;});
 				if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
 					final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
 					AspectedWeapon.spawnJumpVortex(playerIn.world, playerIn, at, AspectedWeapon.Type.MASTER);

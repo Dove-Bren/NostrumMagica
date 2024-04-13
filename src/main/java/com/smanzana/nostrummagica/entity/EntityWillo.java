@@ -669,7 +669,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		 */
 		public void startExecuting() {
 			Random random = this.parentEntity.getRNG();
-			final Vector3d center = (parentEntity.getAttackTarget() == null ? parentEntity.getPositionVector() : parentEntity.getAttackTarget().getPositionVector());
+			final Vector3d center = (parentEntity.getAttackTarget() == null ? parentEntity.getPositionVec() : parentEntity.getAttackTarget().getPositionVec());
 			final float range = (parentEntity.getAttackTarget() == null ? 16f : 8f);
 			double d0 = center.x + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
 			double d1 = center.y + (double)((random.nextFloat() * 2.0F - 1.0F) * range);

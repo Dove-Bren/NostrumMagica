@@ -30,9 +30,9 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.HoverEvent.Action;
@@ -94,23 +94,23 @@ public class Spell {
 			} else {
 			
 				if (ModConfig.config.spellDebug() && this.caster instanceof PlayerEntity) {
-					ITextComponent comp = new StringTextComponent(""),
+					TextComponent comp = new StringTextComponent(""),
 							sib;
 					
 					sib = new StringTextComponent(name +  "> ");
-					sib.setStyle((new Style()).setBold(true).setColor(TextFormatting.GOLD));
-					comp.appendSibling(sib);
+					sib.setStyle(Style.EMPTY.setBold(true).applyFormatting(TextFormatting.GOLD));
+					comp.append(sib);
 					sib = new StringTextComponent("");
 					
 					// Get current trigger
 					if (index == -1) {
-						sib.appendText(" <<Start Cast>> ");
+						sib.appendString(" <<Start Cast>> ");
 					}
 					else {
 						SpellPart part = parts.get(index);
-						sib.appendText("[" + part.getTrigger().getDisplayName() + "] " );
+						sib.appendString("[" + part.getTrigger().getDisplayName() + "] " );
 						if (part.param.flip || Math.abs(part.param.level) > .001) {
-							Style style = new Style();
+							Style style = Style.EMPTY;
 							String buf = "";
 							if (part.param.flip) {
 								buf = "Inverted ";
@@ -129,18 +129,18 @@ public class Spell {
 						for (LivingEntity ent : targets) {
 							buf += ent.getName() + " ";
 						}
-						sib.appendText("on ");
-						sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
-						comp.appendSibling(sib);
+						sib.appendString("on ");
+						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.AQUA).setBold(false));
+						comp.append(sib);
 						sib = new StringTextComponent(targets.size() + " entities");
-						sib.setStyle((new Style()).setColor(TextFormatting.RED)
+						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.RED)
 								.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
 										new StringTextComponent(buf))));
-						comp.appendSibling(sib);
+						comp.append(sib);
 	
 						sib = new StringTextComponent(" (others)");
-						Style style = new Style();
-						style.setColor(TextFormatting.DARK_PURPLE);
+						Style style = Style.EMPTY;
+						style.applyFormatting(TextFormatting.DARK_PURPLE);
 						buf = "";
 						if (others.size() > 0) {
 							for (LivingEntity ent : others)
@@ -151,24 +151,24 @@ public class Spell {
 						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new StringTextComponent(buf)));
 						sib.setStyle(style);
 						
-						comp.appendSibling(sib);
+						comp.append(sib);
 					} else if (locations != null && !locations.isEmpty()) {
-						sib.appendText("on ");
-						sib.setStyle((new Style()).setColor(TextFormatting.AQUA).setBold(false));
-						comp.appendSibling(sib);
+						sib.appendString("on ");
+						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.AQUA).setBold(false));
+						comp.append(sib);
 						sib = new StringTextComponent(locations.size() + " location(s)");
 						String buf = "";
 						for (BlockPos pos : locations) {
 							buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
 						}
 						
-						sib.setStyle(new Style().setColor(TextFormatting.DARK_GREEN).setHoverEvent(
+						sib.setStyle(Style.EMPTY.applyFormatting(TextFormatting.DARK_GREEN).setHoverEvent(
 								new HoverEvent(Action.SHOW_TEXT, new StringTextComponent(buf))));
-						comp.appendSibling(sib);
+						comp.append(sib);
 					} else {
-						sib.appendText("no targets");
-						sib.setStyle((new Style()).setColor(TextFormatting.AQUA));
-						comp.appendSibling(sib);
+						sib.appendString("no targets");
+						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.AQUA));
+						comp.append(sib);
 					}
 					
 					//caster.addChatMessage(comp);
@@ -239,7 +239,7 @@ public class Spell {
 						final @Nullable LivingEntity centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
 						final @Nullable BlockPos centerBP = (locations == null || locations.isEmpty() ? null : locations.get(0));
 						if (centerEnt != null || centerBP != null) {
-							final Vector3d centerPos = (centerEnt == null ? new Vector3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVector().add(0, centerEnt.getHeight() / 2, 0));
+							final Vector3d centerPos = (centerEnt == null ? new Vector3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVec().add(0, centerEnt.getHeight() / 2, 0));
 							final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
 									param.level == 0f ? shape.supportedFloats()[0] : param.level));
 							NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(shape),
@@ -322,7 +322,7 @@ public class Spell {
 			if (targ == null)
 				pos = new Vector3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
 			else
-				pos = targ.getPositionVector();
+				pos = targ.getPositionVec();
 			
 			this.triggerInstance = trigger.instance(this, world, pos,
 					(targ == null ? -90.0f : targ.rotationPitch),
