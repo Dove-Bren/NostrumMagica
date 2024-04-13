@@ -119,13 +119,6 @@ public class NostrumObeliskEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
-		//this.compWrapper.setAutoFill(!world.isRemote && this.isMaster());
-		//aetherHandler.setAutoFill(!world.isRemote);
-	}
-	
-	@Override
 	public CompoundNBT write(CompoundNBT nbt) {
 		nbt = super.write(nbt);
 		
@@ -155,8 +148,8 @@ public class NostrumObeliskEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_MASTER, NBT.TAG_BYTE))
 			return;
@@ -344,7 +337,7 @@ public class NostrumObeliskEntity extends TileEntity implements ITickableTileEnt
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.

@@ -9,7 +9,6 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.IChunk;
@@ -143,7 +142,7 @@ public class RoomExtendedEntranceStaircase implements IDungeonRoom {
 		
 		// Add staircase down to actual start
 		final int stairHeight = 4;
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		cursor.setPos(start.getPos());
 		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
 			cursor.setY(i);

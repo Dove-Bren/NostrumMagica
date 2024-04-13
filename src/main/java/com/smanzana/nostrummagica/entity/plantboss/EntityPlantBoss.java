@@ -64,7 +64,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Plane;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.BossInfo;
@@ -877,7 +876,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	protected void discoverArena() {
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		int remaining;
 		
 		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
@@ -944,7 +943,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	protected BlockPos[] scanForPillars() {
 		List<BlockPos> pillars = new ArrayList<>();
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		
 		for (int x = arenaMin.getX(); x <= arenaMax.getX(); x++)
 		for (int z = arenaMin.getZ(); z <= arenaMax.getZ(); z++) {
@@ -965,7 +964,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	protected boolean isPillarCenter(World world, BlockPos pos) {
 		// Lazy; just check if center of a 3x1x3 of pillar blocks
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		int[] xs = new int[] {-1, 0, 1};
 		int[] zs = new int[] {-1, 0, 1};
 		for (int x : xs)

@@ -54,7 +54,6 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
@@ -708,7 +707,7 @@ public class RoomBlueprint {
 			pos2 = high;
 		}
 		
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		this.dimensions = new BlockPos(
 				1 + (pos2.getX() - pos1.getX()),
 				1 + (pos2.getY() - pos1.getY()),
@@ -933,7 +932,7 @@ public class RoomBlueprint {
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
 		final int length = dimensions.getZ();
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		Direction modDir = Direction.NORTH; // 0
 		
 		// Apply rotation changes
@@ -960,7 +959,7 @@ public class RoomBlueprint {
 		// To get actual least-x leastz coordinates, we need to add offset rotated to proper orientation
 		BlockPos origin;
 		{
-			MutableBlockPos rotOffset = new MutableBlockPos(applyRotation(offset, modDir));
+			BlockPos.Mutable rotOffset = new BlockPos.Mutable(applyRotation(offset, modDir));
 			//BlockPos rotOffset = applyRotation(offset, modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir);
 			
 			// To get proper offset, need to move so that our old origin (0,0) is at the real one, which is encoded in our adjusted dimensions

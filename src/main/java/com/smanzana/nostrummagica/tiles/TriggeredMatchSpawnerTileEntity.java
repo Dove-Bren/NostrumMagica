@@ -37,8 +37,8 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
 	}

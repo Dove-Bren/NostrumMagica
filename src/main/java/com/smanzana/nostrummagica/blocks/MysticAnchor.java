@@ -19,7 +19,6 @@ import net.minecraft.pathfinding.PathType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -82,7 +81,7 @@ public class MysticAnchor extends Block {
 	}
 	
 	protected BlockPos findTeleportSpot(World world, BlockPos myPos, Direction preferredDirection) {
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int y = -1; y <= 1; y++) {
 			int preferredX = preferredDirection.getXOffset();
 			int preferredZ = preferredDirection.getZOffset();

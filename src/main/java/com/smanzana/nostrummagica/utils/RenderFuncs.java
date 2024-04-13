@@ -41,7 +41,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -69,7 +68,7 @@ public final class RenderFuncs {
 		return RenderRandom(new Random());
 	}
 	
-	private static final MutableBlockPos cursor = new MutableBlockPos(); // If there are ever threads at play, this will not work
+	private static final BlockPos.Mutable cursor = new BlockPos.Mutable(); // If there are ever threads at play, this will not work
 	
 	public static final void RenderBlockOutline(PlayerEntity player, World world, Vector3d pos, BlockState blockState, float partialTicks) {
 		GlStateManager.enableBlend();

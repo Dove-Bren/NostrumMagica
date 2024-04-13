@@ -68,7 +68,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
@@ -223,7 +222,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		
 		if (!world.isRemote && this.getHome() == null && this.isAlive() && this.getHealth() > 0) {
 			if (perilLoc == null || !perilLoc.equals(getPosition())) {
-				MutableBlockPos cursor = new MutableBlockPos();
+				BlockPos.Mutable cursor = new BlockPos.Mutable();
 				cursor.setPos(getPosition());
 				while (world.isAirBlock(cursor)) {
 					cursor.move(Direction.DOWN);

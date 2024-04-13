@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellRune;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -169,8 +170,8 @@ public class RuneShaperEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;

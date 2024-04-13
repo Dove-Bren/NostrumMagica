@@ -28,7 +28,6 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -306,7 +305,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
         this.getPosZ() += this.getMotion().z;
         
         boolean elevated = false;
-        MutableBlockPos pos = new MutableBlockPos();
+        BlockPos.Mutable pos = new BlockPos.Mutable();
         final double startY = this.getPosY();
         
         // Move up out of solid blocks

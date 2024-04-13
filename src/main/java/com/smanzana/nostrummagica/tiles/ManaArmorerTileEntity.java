@@ -30,7 +30,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 
 public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEntity {
@@ -189,7 +188,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	
 	private void scanCrystalLayer(Set<BlockPos> positions, int radius) {
 		// Lazy way; just make sure one coord is == radius
-		MutableBlockPos pos = new MutableBlockPos();
+		BlockPos.Mutable pos = new BlockPos.Mutable();
 		for (int x = -radius; x <= radius; x++)
 		for (int y = -radius; y <= radius; y++)
 		for (int z = -radius; z <= radius; z++) {
@@ -408,8 +407,8 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -439,7 +438,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	private void dirty() {

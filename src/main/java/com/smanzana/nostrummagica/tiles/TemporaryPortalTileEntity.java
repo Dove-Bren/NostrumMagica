@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.tiles;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -74,8 +75,8 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState state, CompoundNBT compound) {
+		super.read(state, compound);
 		
 		endticks = compound.getLong("EXPIRE");
 	}

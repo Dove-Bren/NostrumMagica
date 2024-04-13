@@ -152,8 +152,8 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt.hasUniqueId(NBT_ENTITY_ID)) {
 			this.unlinkedEntID = nbt.getUniqueId(NBT_ENTITY_ID);

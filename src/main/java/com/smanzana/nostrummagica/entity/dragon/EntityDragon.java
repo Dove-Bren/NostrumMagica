@@ -268,7 +268,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //	    }
 //
 //	    private PathNodeType isFree(int p_186327_1_, int p_186327_2_, int p_186327_3_) {
-//	        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+//	        BlockPos.BlockPos.Mutable blockpos$BlockPos.Mutable = new BlockPos.BlockPos.Mutable();
 //
 //	        for (int i = p_186327_1_; i < p_186327_1_ + this.entitySizeX; ++i)
 //	        {
@@ -276,7 +276,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 //	            {
 //	                for (int k = p_186327_3_; k < p_186327_3_ + this.entitySizeZ; ++k)
 //	                {
-//	                    BlockState iblockstate = this.blockaccess.getBlockState(blockpos$mutableblockpos.setPos(i, j, k));
+//	                    BlockState iblockstate = this.blockaccess.getBlockState(blockpos$BlockPos.Mutable.setPos(i, j, k));
 //
 //	                    if (iblockstate.getMaterial() != Material.AIR)
 //	                    {

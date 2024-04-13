@@ -90,7 +90,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	public CompoundNBT write(CompoundNBT compound) {
@@ -103,8 +103,8 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		return compound;
 	}
 	
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState state, CompoundNBT compound) {
+		super.read(state, compound);
 		
 		teleOffset = null;
 		if (compound.contains(NBT_OFFSET, NBT.TAG_LONG)) {

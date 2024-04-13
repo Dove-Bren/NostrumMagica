@@ -14,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -113,9 +112,9 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 		int j = MathHelper.floor(targetEntity.getPosZ()) - 2;
 		int k = MathHelper.floor(targetEntity.getBoundingBox().minY);
 		
-		MutableBlockPos pos1 = new MutableBlockPos();
-		MutableBlockPos pos2 = new MutableBlockPos();
-		MutableBlockPos pos3 = new MutableBlockPos();
+		BlockPos.Mutable pos1 = new BlockPos.Mutable();
+		BlockPos.Mutable pos2 = new BlockPos.Mutable();
+		BlockPos.Mutable pos3 = new BlockPos.Mutable();
 
 		for (int l = 0; l <= 4; ++l) {
 			for (int i1 = 0; i1 <= 4; ++i1) {

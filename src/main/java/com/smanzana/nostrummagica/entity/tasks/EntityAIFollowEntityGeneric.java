@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -120,7 +119,7 @@ public class EntityAIFollowEntityGeneric<T extends MobEntity> extends Goal {
 							int j = MathHelper.floor(this.theTarget.getPosZ()) - 2;
 							int k = MathHelper.floor(this.theTarget.getBoundingBox().minY);
 							
-							MutableBlockPos pos1 = new MutableBlockPos();
+							BlockPos.Mutable pos1 = new BlockPos.Mutable();
 
 							for (int l = 0; l <= 4; ++l) {
 								for (int i1 = 0; i1 <= 4; ++i1) {

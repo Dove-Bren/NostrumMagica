@@ -43,7 +43,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -695,7 +694,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			}
 		}
 		
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		Random rand = (caster == null ? new Random() : caster.getRNG());
 		for (int i = 0; i < count; i++) {
 			

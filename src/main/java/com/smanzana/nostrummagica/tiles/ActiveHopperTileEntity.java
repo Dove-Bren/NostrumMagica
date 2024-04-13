@@ -60,8 +60,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		slot = (nbt.contains(NBT_SLOT) ? ItemStack.read(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
 		customName = (nbt.contains(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);
@@ -272,7 +272,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				if (te instanceof ChestTileEntity) {
 					BlockState state = world.getBlockState(pos.offset(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
-						inv = ChestBlock.getInventory(state, world, pos.offset(direction), true);
+						inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, world, pos.offset(direction), true);
 					}
 				}
 				
@@ -367,7 +367,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				if (te instanceof ChestTileEntity) {
 					BlockState state = world.getBlockState(pos.offset(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
-						inv = ChestBlock.getInventory(state, world, pos.offset(direction), true);
+						inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, world, pos.offset(direction), true);
 					}
 				}
 				return pullFrom(inv, direction);

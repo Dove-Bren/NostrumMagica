@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -190,8 +191,8 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;

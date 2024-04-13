@@ -60,7 +60,7 @@ public class TriggerRepeaterEntity extends TileEntity implements IOrientedTileEn
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	public CompoundNBT write(CompoundNBT compound) {
@@ -75,8 +75,8 @@ public class TriggerRepeaterEntity extends TileEntity implements IOrientedTileEn
 		return compound;
 	}
 	
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState state, CompoundNBT compound) {
+		super.read(state, compound);
 		
 		ListNBT list = compound.getList(NBT_OFFSET_LIST, NBT.TAG_COMPOUND);
 		offsets.clear();

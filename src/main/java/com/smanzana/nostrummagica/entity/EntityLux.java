@@ -63,7 +63,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
@@ -652,7 +651,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				final double d2 = this.parentEntity.getPosZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// Check specific spot
-				MutableBlockPos cursor = new MutableBlockPos();
+				BlockPos.Mutable cursor = new BlockPos.Mutable();
 				cursor.setPos(d0, d1, d2);
 				
 				if (!parentEntity.world.isAirBlock(cursor)) {
@@ -1031,7 +1030,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		// Do longer search nearby
 		List<BlockPos> leaves = new ArrayList<>();
 		BlockPos center = (homePos == null ? getPosition() : homePos);
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		final int radius = 10;
 		for (int x = -radius; x <= radius; x++)
 		for (int z = -radius; z <= radius; z++)
@@ -1077,7 +1076,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		List<BlockPos> flowers = new ArrayList<>();
 		final BlockPos homePos = this.getHome();
 		final BlockPos center = (homePos == null ? getPosition() : homePos);
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		final int radius = 10;
 		for (int x = -radius; x <= radius; x++)
 		for (int z = -radius; z <= radius; z++)
@@ -1153,7 +1152,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	protected void onPollinationComplete(ItemStack stack) {
 		// If over bare grass, plant flower. Otherwise, drop
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		cursor.setPos(this.getPosition());
 		while (cursor.getY() > 0) {
 			BlockState state = world.getBlockState(cursor);

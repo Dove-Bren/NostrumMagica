@@ -19,7 +19,6 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -122,8 +121,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private static final String NBT_COMPS = "required_componenets";
 	
 	@Override
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState state, CompoundNBT compound) {
+		super.read(state, compound);
 		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
 		this.requiredComponents.clear();
@@ -166,7 +165,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	protected void dirty() {
@@ -197,7 +196,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			// Master is at TE's pos... but is it the bottom block? And is it in center?
 			
 			// Find bottom
-			MutableBlockPos cursor = new MutableBlockPos(this.getPos());
+			BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(this.getPos());
 			cursor.move(Direction.DOWN, 1);
 			
 			while (cursor.getY() >= 0) {

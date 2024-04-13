@@ -18,7 +18,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -123,7 +122,7 @@ public class NostrumMagicaFlower extends BushBlock {
 			
 			if (ground != null && ground.getBlock() instanceof MagicDirt) {
 				// Spread!
-				MutableBlockPos cursor = new MutableBlockPos();
+				BlockPos.Mutable cursor = new BlockPos.Mutable();
 				boolean affected = false;
 				
 				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ());

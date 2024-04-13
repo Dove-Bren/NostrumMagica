@@ -92,8 +92,8 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		int ord = nbt.getInt(NBT_HIT_TYPE);
 		for (SwitchBlockTileEntity.SwitchHitType type : SwitchHitType.values()) {
@@ -134,7 +134,7 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	protected void dirty() {

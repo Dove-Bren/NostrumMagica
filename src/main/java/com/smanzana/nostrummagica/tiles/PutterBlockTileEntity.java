@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.PutterBlock;
 import com.smanzana.nostrummagica.utils.Inventories;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
@@ -56,8 +57,8 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;

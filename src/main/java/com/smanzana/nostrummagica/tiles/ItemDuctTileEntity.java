@@ -171,8 +171,8 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		itemQueue.clear();
 		ListNBT list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
@@ -364,7 +364,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				if (te instanceof ChestTileEntity) {
 					BlockState state = world.getBlockState(pos.offset(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
-						inv = ChestBlock.getInventory(state, world, pos.offset(direction), true);
+						inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, world, pos.offset(direction), true);
 					}
 				}
 				

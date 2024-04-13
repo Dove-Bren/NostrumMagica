@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,6 +27,7 @@ import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -66,8 +68,8 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -94,7 +96,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 
 	@Override
@@ -118,7 +120,7 @@ public class LockedChestEntity extends TileEntity implements ITickableTileEntity
 				) {
 			unlock();
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.locked_chest.nokey"));
+			player.sendMessage(new TranslationTextComponent("info.locked_chest.nokey"), Util.DUMMY_UUID);
 			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 		}
 	}

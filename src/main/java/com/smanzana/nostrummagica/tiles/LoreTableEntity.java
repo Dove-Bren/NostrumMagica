@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -111,8 +112,8 @@ public class LoreTableEntity extends TileEntity implements ITickableTileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;

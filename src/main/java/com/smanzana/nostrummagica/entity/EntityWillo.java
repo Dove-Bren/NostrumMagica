@@ -75,7 +75,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
@@ -677,7 +676,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			
 			// Adjust to above ground
 			double height = random.nextInt(4) + 2;
-			MutableBlockPos cursor = new MutableBlockPos();
+			BlockPos.Mutable cursor = new BlockPos.Mutable();
 			cursor.setPos(d0, d1, d2);
 			
 			while (cursor.getY() > 0 && parentEntity.world.isAirBlock(cursor)) {

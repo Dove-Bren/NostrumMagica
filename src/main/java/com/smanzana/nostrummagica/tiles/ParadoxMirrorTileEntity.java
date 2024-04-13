@@ -87,8 +87,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -116,7 +116,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	private void dirty() {
@@ -255,7 +255,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	protected Vector3d getSpawnVelocity() {
-		return new Vector3d(getFacing().getDirectionVec()).scale(.1);
+		return Vector3d.copy(getFacing().getDirectionVec()).scale(.1);
 	}
 	
 	protected @Nullable ItemEntity findNearbyItem() {

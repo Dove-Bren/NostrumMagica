@@ -57,7 +57,7 @@ public class MimicBlockTileEntity extends TileEntity {
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		this.handleUpdateTag(pkt.getNbtCompound());
+		this.handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	protected @Nonnull BlockState refreshState() {
@@ -65,8 +65,8 @@ public class MimicBlockTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public void handleUpdateTag(CompoundNBT tag) {
-		super.handleUpdateTag(tag);
+	public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+		super.handleUpdateTag(state, tag);
 		
 		final BlockState newState;
 		

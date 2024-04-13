@@ -52,7 +52,7 @@ public class DragonLandTask extends Goal {
 	public void startExecuting() {
 		
 		// Don't trust heightmap; just loop. Not that bad.
-		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(dragon.getPosition());
+		BlockPos.BlockPos.Mutable pos = new BlockPos.BlockPos.Mutable(dragon.getPosition());
 		while(pos.getY() > 0) {
 			if (dragon.world.isAirBlock(pos)) {
 				pos.setY(pos.getY() - 1);

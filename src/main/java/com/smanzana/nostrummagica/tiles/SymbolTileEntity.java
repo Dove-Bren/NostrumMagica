@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -131,8 +132,8 @@ public class SymbolTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING)
 				|| !nbt.contains(NBT_KEY, NBT.TAG_STRING))
@@ -195,7 +196,7 @@ public class SymbolTileEntity extends TileEntity {
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	protected void dirty() {

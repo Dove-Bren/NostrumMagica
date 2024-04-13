@@ -6,6 +6,7 @@ import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -66,8 +67,8 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -93,7 +94,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 	private void dirty() {

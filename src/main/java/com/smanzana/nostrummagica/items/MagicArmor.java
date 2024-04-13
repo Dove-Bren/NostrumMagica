@@ -84,7 +84,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
@@ -2269,7 +2268,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 	public static synchronized final @Nullable BlockPos DoEarthGrow(World world, BlockPos center) {
 		Collections.shuffle(EARTH_SCAN_POS);
 		
-		MutableBlockPos cursor = new MutableBlockPos();
+		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (BlockPos offset : EARTH_SCAN_POS) {
 			cursor.setPos(center.getX() + offset.getX(), center.getY() + offset.getY(), center.getZ() + offset.getZ());
 			BlockState state = world.getBlockState(cursor);

@@ -82,8 +82,8 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	}
 	
 	@Override
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState state, CompoundNBT compound) {
+		super.read(state, compound);
 		
 		if (compound.contains(NBT_TARGET, NBT.TAG_LONG)) {
 			// Legacy!
@@ -119,7 +119,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
 	
 }

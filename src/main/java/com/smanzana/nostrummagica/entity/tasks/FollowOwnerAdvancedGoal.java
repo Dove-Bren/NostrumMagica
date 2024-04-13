@@ -19,7 +19,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -204,7 +203,7 @@ public class FollowOwnerAdvancedGoal<T extends MobEntity> extends Goal {
 			timeToRecalcPosition = pet.ticksExisted + 20;
 			lastPosition = getIdealTargetPosition(pet, owner, mode);
 			
-			MutableBlockPos cursor = new MutableBlockPos();
+			BlockPos.Mutable cursor = new BlockPos.Mutable();
 			cursor.setPos(lastPosition.x, lastPosition.y, lastPosition.z);
 			if (!isEmptyBlock(cursor) || isEmptyBlock(cursor.down())) {
 				if (isEmptyBlock(cursor.down()) && !isEmptyBlock(cursor.down().down())) {

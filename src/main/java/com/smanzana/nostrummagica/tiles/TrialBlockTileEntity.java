@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.trials.CombatTrial;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -73,8 +74,8 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
-		super.read(nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 		
 		;
 	}
@@ -184,7 +185,7 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 	}
 	
 	protected void spawnStartupWarning() {
-		((ServerWorld) world).addLightningBolt(
+		((ServerWorld) world).addEntity(
 				(new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5))
 				);
 	}

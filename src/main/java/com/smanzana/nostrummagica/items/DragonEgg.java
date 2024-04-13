@@ -16,7 +16,6 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Rarity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -45,7 +44,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		if (pos == null)
 			return ActionResultType.PASS;
 		
-		MutableBlockPos checkPos = new MutableBlockPos(pos);
+		BlockPos.Mutable checkPos = new BlockPos.Mutable(pos);
 		checkPos.setY(checkPos.getY() + 1);
 		if (!worldIn.isAirBlock(checkPos)) {
 			return ActionResultType.PASS;
