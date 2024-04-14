@@ -235,7 +235,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot) {
 		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot);
 
 		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
@@ -731,7 +731,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction(playerIn);
 			fly.push(5.0f, typeScale(this.type));

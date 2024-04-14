@@ -22,10 +22,10 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.SwordItem;
@@ -34,7 +34,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
@@ -50,27 +49,10 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 	
 	public AspectedFireWeapon() {
 		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().maxDamage(1240));
-		
-		this.addPropertyOverride(new ResourceLocation("charge"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				if (entityIn == null) {
-					return 0.0F;
-				} else {
-					return !(entityIn.getActiveItemStack().getItem() instanceof AspectedFireWeapon) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getItemInUseCount()) / USE_DURATION;
-				}
-			}
-		});
-		this.addPropertyOverride(new ResourceLocation("charging"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
-			}
-		});
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		return super.getAttributeModifiers(equipmentSlot);
     }
 	
@@ -191,7 +173,7 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 		if (hasBonus) {
 			caster.addPotionEffect(new EffectInstance(NostrumEffects.soulVampire, 20 * 5, 0));
 			target.setFire(1);
-			target.setFireTimer(105);
+			target.forceFireTicks(105);
 		}
 		
 		doCastEffect(caster, target);
@@ -222,19 +204,33 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (!playerIn.world.isRemote()) {
 			if (castOn(playerIn, target)) {
 				ItemStacks.damageItem(stack, playerIn, playerIn.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 			}
 		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 
 	@Override
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		return true;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelCharge(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		if (entityIn == null) {
+			return 0.0F;
+		} else {
+			return !(entityIn.getActiveItemStack().getItem() instanceof AspectedFireWeapon) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getItemInUseCount()) / USE_DURATION;
+		}
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelCharging(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 	}
 
 }

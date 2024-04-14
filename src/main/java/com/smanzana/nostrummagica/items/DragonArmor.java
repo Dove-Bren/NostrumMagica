@@ -300,7 +300,7 @@ public class DragonArmor extends Item {
 		return defaultMagicResist;
 	}
 	
-	public Multimap<String, AttributeModifier> getAttributeModifiers(DragonEquipmentSlot equipmentSlot, ItemStack stack) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(DragonEquipmentSlot equipmentSlot, ItemStack stack) {
 		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
 
 		if (equipmentSlot == this.slot) {
@@ -313,7 +313,7 @@ public class DragonArmor extends Item {
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot, ItemStack stack) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot, ItemStack stack) {
 		final @Nullable DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(equipmentSlot);
 		if (dragonSlot != null) {
 			return getAttributeModifiers(dragonSlot, stack);

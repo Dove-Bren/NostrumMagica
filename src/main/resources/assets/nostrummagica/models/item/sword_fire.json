@@ -31,14 +31,14 @@
     "overrides": [
         {
             "predicate": {
-                "charging": 1
+                "nostrummagica:charging": 1
             },
             "model": "nostrummagica:item/sword_fire_charging"
         },
         {
             "predicate": {
-                "charging": 1,
-				"charge": 1
+                "nostrummagica:charging": 1,
+				"nostrummagica:charge": 1
             },
             "model": "nostrummagica:item/sword_fire_charged"
         }

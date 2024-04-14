@@ -93,7 +93,7 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (!playerIn.isCreative()) {
 			return false;
 		}

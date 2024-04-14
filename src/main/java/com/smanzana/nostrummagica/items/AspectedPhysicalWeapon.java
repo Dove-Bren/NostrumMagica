@@ -20,10 +20,10 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.SwordItem;
@@ -33,7 +33,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -52,13 +51,6 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	
 	public AspectedPhysicalWeapon() {
 		super(ItemTier.DIAMOND, 6, -3.0F, NostrumItems.PropEquipment().maxDamage(1240).addToolType(ToolType.AXE, 3));
-		
-		this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
-			}
-		});
 	}
 	
 	@Override
@@ -68,7 +60,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		return super.getAttributeModifiers(equipmentSlot);
     }
 	
@@ -210,6 +202,11 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 				// I want to disable the shield but that would make it not block
 			}
 		}
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelBlocking(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
 	}
 
 }

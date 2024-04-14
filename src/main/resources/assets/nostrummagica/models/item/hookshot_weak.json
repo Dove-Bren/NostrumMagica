@@ -6,7 +6,7 @@
     "overrides": [
         {
             "predicate": {
-                "extended": 1
+                "nostrummagica:extended": 1
             },
             "model": "nostrummagica:item/hookshot_weak_extended"
         }

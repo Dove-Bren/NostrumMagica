@@ -29,7 +29,7 @@
     "overrides": [
         {
             "predicate": {
-                "blocking": 1
+                "nostrummagica:blocking": 1
             },
             "model": "nostrummagica:item/sword_physical_blocking"
         }

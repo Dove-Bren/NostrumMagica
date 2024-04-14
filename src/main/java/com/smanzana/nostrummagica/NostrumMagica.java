@@ -154,6 +154,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -3072,5 +3073,9 @@ public class NostrumMagica {
 		}
 
 		return success;
+	}
+	
+	public static final @Nonnull ResourceLocation Loc(String path) {
+		return new ResourceLocation(NostrumMagica.MODID, path);
 	}
 }

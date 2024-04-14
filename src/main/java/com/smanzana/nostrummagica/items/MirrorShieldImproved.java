@@ -12,16 +12,15 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -36,22 +35,14 @@ public class MirrorShieldImproved extends MirrorShield {
 	
 	public MirrorShieldImproved() {
 		super(NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(1250));
-		
-		this.addPropertyOverride(new ResourceLocation("charged"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			@Override
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				return getBlockCharged(stack) ? 1.0F : 0.0F;
-			}
-		});
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicResist.instance(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -146,6 +137,11 @@ public class MirrorShieldImproved extends MirrorShield {
 		
 		nbt.putBoolean(NBT_CHARGED, charged);
 		stack.setTag(nbt);
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelCharged(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		return getBlockCharged(stack) ? 1.0F : 0.0F;
 	}
 
 }

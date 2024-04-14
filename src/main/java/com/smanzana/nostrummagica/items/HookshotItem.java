@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
@@ -25,7 +26,6 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
@@ -33,7 +33,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -75,17 +75,6 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	public HookshotItem(HookshotType type) {
 		super(NostrumItems.PropUnstackable().rarity(type.rarity));
 		this.type = type;
-		
-		this.addPropertyOverride(new ResourceLocation("extended"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			@Override
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				return entityIn != null
-						&& (IsExtended(stack)
-						&& (entityIn.getHeldItem(Hand.MAIN_HAND) == stack || entityIn.getHeldItem(Hand.OFF_HAND) == stack))
-						? 1.0F : 0.0F;
-			}
-		});
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {
@@ -162,8 +151,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 				}
 			} else {
 				if (!worldIn.isRemote) {
-					if (playerIn.dimension == NostrumDimensions.EmptyDimension) {
-						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"));
+					if (DimensionUtils.InDimension(playerIn, NostrumDimensions.EmptyDimension)) {
+						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"), Util.DUMMY_UUID);
 					} else {
 						EntityHookShot hook = new EntityHookShot(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
 								ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
@@ -440,6 +429,14 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 		} else {
 			NostrumElytraWrapper.RemoveElytraModifier(entity, OFFHAND_ELYTRA_MODIFIER);
 		}
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelExtended(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		return entityIn != null
+				&& (IsExtended(stack)
+				&& (entityIn.getHeldItem(Hand.MAIN_HAND) == stack || entityIn.getHeldItem(Hand.OFF_HAND) == stack))
+				? 1.0F : 0.0F;
 	}
 	
 }

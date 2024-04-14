@@ -17,17 +17,16 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -43,29 +42,20 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 	
 	public ThanosStaff() {
 		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
-		
-		this.addPropertyOverride(new ResourceLocation("activated"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			@Override
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				return entityIn != null && hasFreeCast(stack)
-						? 1.0F : 0.0F;
-			}
-		});
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+        Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            multimap.put(Attributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
         }
         
         if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(THANOSTAFF_POTENCY_UUID, "Potency modifier", 15, AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicPotency.instance(), new AttributeModifier(THANOSTAFF_POTENCY_UUID, "Potency modifier", 15, AttributeModifier.Operation.ADDITION));
 		}
 
         return multimap;
@@ -180,5 +170,11 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 		setXP(staff, (byte) inStaff);
 		
 		return remaining;
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelActivated(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		return entityIn != null && hasFreeCast(stack)
+				? 1.0F : 0.0F;
 	}
 }

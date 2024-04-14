@@ -42,7 +42,7 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
 		return getItem().getEquippedAttributeModifiers(stack);
 	}
 

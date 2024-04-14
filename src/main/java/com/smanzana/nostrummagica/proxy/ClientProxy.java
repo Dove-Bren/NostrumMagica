@@ -127,12 +127,21 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
+import com.smanzana.nostrummagica.items.AspectedEnderWeapon;
+import com.smanzana.nostrummagica.items.AspectedFireWeapon;
+import com.smanzana.nostrummagica.items.AspectedPhysicalWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
+import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.items.MageBlade;
 import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.items.MirrorShield;
+import com.smanzana.nostrummagica.items.MirrorShieldImproved;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SoulDagger;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -201,6 +210,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
@@ -341,6 +351,8 @@ public class ClientProxy extends CommonProxy {
 		
 		registerBlockRenderLayer();
 		int unused; // Entity render supposed to be here too?
+		
+		event.enqueueWork(ClientProxy::registerItemModelProperties);
 	}
 	
 	// To get around bounds matching. D:
@@ -656,6 +668,25 @@ public class ClientProxy extends CommonProxy {
 		//RenderTypeLookup.setRenderLayer(NostrumBlocks.keySwitch, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.teleportRune, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.triggerRepeater, RenderType.getTranslucent());
+	}
+	
+	private static void registerItemModelProperties() {
+		ItemModelsProperties.registerProperty(NostrumItems.enderRod, NostrumMagica.Loc("charge"), AspectedEnderWeapon::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.enderRod, NostrumMagica.Loc("charging"), AspectedEnderWeapon::ModelCharging);
+		ItemModelsProperties.registerProperty(NostrumItems.flameRod, NostrumMagica.Loc("charge"), AspectedFireWeapon::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.flameRod, NostrumMagica.Loc("charging"), AspectedFireWeapon::ModelCharging);
+		ItemModelsProperties.registerProperty(NostrumItems.deepMetalAxe, NostrumMagica.Loc("blocking"), AspectedPhysicalWeapon::ModelBlocking);
+		ItemModelsProperties.registerProperty(NostrumItems.hookshotWeak, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemModelsProperties.registerProperty(NostrumItems.hookshotMedium, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemModelsProperties.registerProperty(NostrumItems.hookshotStrong, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemModelsProperties.registerProperty(NostrumItems.hookshotClaw, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemModelsProperties.registerProperty(NostrumItems.mageBlade, NostrumMagica.Loc("element"), MageBlade::ModelElement);
+		ItemModelsProperties.registerProperty(NostrumItems.mirrorShield, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
+		ItemModelsProperties.registerProperty(NostrumItems.mirrorShieldImproved, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
+		ItemModelsProperties.registerProperty(NostrumItems.mirrorShieldImproved, NostrumMagica.Loc("charged"), MirrorShieldImproved::ModelCharged);
+		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, NostrumMagica.Loc("charge"), SoulDagger::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, NostrumMagica.Loc("charging"), SoulDagger::ModelCharging);
+		ItemModelsProperties.registerProperty(NostrumItems.thanosStaff, NostrumMagica.Loc("activated"), ThanosStaff::ModelActivated);
 	}
 	
 	@SubscribeEvent
@@ -1260,39 +1291,39 @@ public class ClientProxy extends CommonProxy {
 			if (!icon.getModelKey().endsWith(".obj")) {
 				// json
 //				final String modelLoc = "effect/" + icon.getModelKey();
-//				IUnbakedModel model = event.getModelLoader().getUnbakedModel(new ResourceLocation(NostrumMagica.MODID, modelLoc));
-//				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, modelLoc), "Failed to get json model for " + modelLoc);
+//				IUnbakedModel model = event.getModelLoader().getUnbakedModel(NostrumMagica.Loc(modelLoc));
+//				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc), "Failed to get json model for " + modelLoc);
 //				
 //				HashSet<String> missingTextureErrors = new HashSet<>();
 //				
 //				if (model != null && model != ModelLoaderRegistry.getMissingModel()) {
 //					model.getTextures(event.getModelLoader()::getUnbakedModel, missingTextureErrors);
 //					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, modelLoc)), bakedModel);
+//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
 //				} else {
 //					model.getClass();
 //				}
 			} else {
 				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
 				final String modelLoc = "effect/" + icon.getKey();
-				IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, modelLoc + ".obj"), "Failed to get obj model for " + modelLoc);
+				IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc + ".obj"), "Failed to get obj model for " + modelLoc);
 				
 				if (model != null && model instanceof OBJModel) {
 					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
 					// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, modelLoc)), bakedModel);
+					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
 				}
 			}
 		}
 		
 		for (String key : new String[] {"block/orb_crystal",
 				"entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
-			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(NostrumMagica.MODID, key + ".obj"), "Failed to get obj model for " + key);
+			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(key + ".obj"), "Failed to get obj model for " + key);
 			
 			if (model != null && model instanceof OBJModel) {
 				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
 				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, key)), bakedModel);
+				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(key)), bakedModel);
 			}
 		}
 		
@@ -1313,7 +1344,7 @@ public class ClientProxy extends CommonProxy {
 //    			"pedestal", "crystal_standing", "crystal_embedded", "crystal_hanging", "mirror"}) {
 //			IUnbakedModel model;
 //			try {
-//				model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/" + key + ".obj"));
+//				model = ModelLoaderRegistry.getModel(NostrumMagica.Loc("block/" + key + ".obj"));
 //				
 //				if (model != null && model instanceof OBJModel) {
 //					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
@@ -1336,7 +1367,7 @@ public class ClientProxy extends CommonProxy {
 //		{
 //			IUnbakedModel model = null;
 //			try {
-//				model = ModelLoaderRegistry.getModel(new ResourceLocation(NostrumMagica.MODID, "block/mirror.obj"));
+//				model = ModelLoaderRegistry.getModel(NostrumMagica.Loc("block/mirror.obj"));
 //			} catch (Exception e) {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
@@ -1367,7 +1398,7 @@ public class ClientProxy extends CommonProxy {
     	
     	// Warlock blade; put obj in place for item model
     	{
-    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(new ResourceLocation(NostrumMagica.MODID, "item/warlock_sword.obj"));
+    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(NostrumMagica.Loc("item/warlock_sword.obj"));
 			if (model != null && model instanceof OBJModel) {
 				IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
                         new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);

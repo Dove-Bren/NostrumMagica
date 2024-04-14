@@ -48,19 +48,6 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IE
 	
 	public MageBlade() {
 		super(ItemTier.DIAMOND, 3, -2.0F, NostrumItems.PropEquipment());
-		
-		this.addPropertyOverride(new ResourceLocation("element"), new IItemPropertyGetter() {
-			@OnlyIn(Dist.CLIENT)
-			@Override
-			public float call(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-				final EMagicElement elem = ((MageBlade) stack.getItem()).getElement(stack);
-				if (elem == null) {
-					return 0;
-				} else {
-					return elem.ordinal() + 1;
-				}
-			}
-		});
 	}
 	
 	public @Nullable EMagicElement getElement(ItemStack stack) {
@@ -126,7 +113,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IE
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
@@ -244,6 +231,16 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IE
 		blade.setElement(stack, element);
 		blade.setCharges(stack, charges);
 		return new Result(true, ItemStack.EMPTY, false);
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelElement(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		final EMagicElement elem = ((MageBlade) stack.getItem()).getElement(stack);
+		if (elem == null) {
+			return 0;
+		} else {
+			return elem.ordinal() + 1;
+		}
 	}
 	
 }

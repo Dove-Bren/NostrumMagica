@@ -21,8 +21,9 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
@@ -35,6 +36,8 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MirrorShield extends ShieldItem implements ISpellActionListener, ILoreTagged {
 
@@ -48,23 +51,16 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	
 	protected MirrorShield(Item.Properties properties) {
 		super(properties);
-//		this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
-//			@OnlyIn(Dist.CLIENT)
-//			public float apply(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-//				return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
-//			}
-//		});
-		
 		NostrumMagica.playerListener.registerMagicEffect(this, null);
 	}
 	
 	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(Attributes.ARMOR.getName(), new AttributeModifier(MOD_ATTACK_UUID, "Offhand Modifier", 1, AttributeModifier.Operation.ADDITION));
-			multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 10, AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ARMOR, new AttributeModifier(MOD_ATTACK_UUID, "Offhand Modifier", 1, AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicResist.instance(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 10, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -158,5 +154,11 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 //		// ItemShield hardcodes item.shield.name lol
 //		return NostrumMagica.instance.proxy.getTranslation(this.getUnlocalizedNameInefficiently(stack) + ".name").trim();
 //	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public static final float ModelBlocking(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+		// Copied from vanilla
+		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+	}
 
 }

@@ -312,14 +312,14 @@
         },
         {
           "predicate": {
-              "charged": 1
+              "nostrummagica:charged": 1
           },
           "model": "nostrummagica:item/true_mirror_shield_charged"
         },
         {
             "predicate": {
                 "blocking": 1,
-                "charged": 1
+                "nostrummagica:charged": 1
             },
             "model": "nostrummagica:item/true_mirror_shield_charged_blocking"
         }

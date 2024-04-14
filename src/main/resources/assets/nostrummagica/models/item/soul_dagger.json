@@ -28,21 +28,21 @@
     "overrides": [
         {
             "predicate": {
-                "charging": 1
+                "nostrummagica:charging": 1
             },
             "model": "nostrummagica:item/soul_dagger_charging_0"
         },
         {
             "predicate": {
-                "charging": 1,
-				"charge": 0.5
+                "nostrummagica:charging": 1,
+				"nostrummagica:charge": 0.5
             },
             "model": "nostrummagica:item/soul_dagger_charging_1"
         },
         {
             "predicate": {
-                "charging": 1,
-				"charge": 1
+                "nostrummagica:charging": 1,
+				"nostrummagica:charge": 1
             },
             "model": "nostrummagica:item/soul_dagger_charging_2"
         }

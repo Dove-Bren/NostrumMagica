@@ -24,43 +24,43 @@
     "overrides": [
         {
             "predicate": {
-                "element": 1
+                "nostrummagica:element": 1
             },
             "model": "nostrummagica:item/mage_blade_physical"
         },
 		{
             "predicate": {
-                "element": 2
+                "nostrummagica:element": 2
             },
             "model": "nostrummagica:item/mage_blade_lightning"
         },
 		{
             "predicate": {
-                "element": 3
+                "nostrummagica:element": 3
             },
             "model": "nostrummagica:item/mage_blade_fire"
         },
 		{
             "predicate": {
-                "element": 4
+                "nostrummagica:element": 4
             },
             "model": "nostrummagica:item/mage_blade_earth"
         },
 		{
             "predicate": {
-                "element": 5
+                "nostrummagica:element": 5
             },
             "model": "nostrummagica:item/mage_blade_ice"
         },
 		{
             "predicate": {
-                "element": 6
+                "nostrummagica:element": 6
             },
             "model": "nostrummagica:item/mage_blade_wind"
         },
 		{
             "predicate": {
-                "element": 7
+                "nostrummagica:element": 7
             },
             "model": "nostrummagica:item/mage_blade_ender"
         }

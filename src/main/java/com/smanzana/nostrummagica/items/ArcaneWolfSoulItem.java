@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.PointOfView;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -23,6 +24,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -91,22 +93,22 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (!playerIn.isCreative()) {
-			return false;
+			return ActionResultType.PASS;
 		}
 		
 		if (playerIn.world.isRemote) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (target instanceof EntityArcaneWolf) {
 			ItemStack newStack = MakeSoulItem((EntityArcaneWolf) target);
 			target.entityDropItem(newStack, 1);
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 	
 	@Override
@@ -156,7 +158,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 			if (NostrumMagica.rand.nextBoolean()) {
 				Vector3d offset;
 				final float rotation;
-				if (player == NostrumMagica.instance.proxy.getPlayer() && Minecraft.getInstance().gameSettings.thirdPersonView == 0) {
+				if (player == NostrumMagica.instance.proxy.getPlayer() && Minecraft.getInstance().gameSettings.getPointOfView() == PointOfView.FIRST_PERSON) {
 					offset = new Vector3d(-.1, player.getEyeHeight() -.05, .2);
 					rotation = -player.rotationYaw % 360f;
 				} else {
@@ -189,8 +191,8 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 		if (name == null || name.isEmpty()) {
 			name = "Unknown Pet";
 		}
-		tooltip.add(new StringTextComponent(name).applyTextStyle(TextFormatting.DARK_RED));
-		tooltip.add(new StringTextComponent(getMana(stack) + " / " + getMaxMana(stack)).applyTextStyle(TextFormatting.BLUE));
+		tooltip.add(new StringTextComponent(name).mergeStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent(getMana(stack) + " / " + getMaxMana(stack)).mergeStyle(TextFormatting.BLUE));
 	}
 	
 	@Override
@@ -274,7 +276,7 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 	@Override
 	public boolean canSpawnEntity(World world, LivingEntity spawner, Vector3d pos, ItemStack stack) {
 		if (this.getMana(stack) < this.getMaxMana(stack)) {
-			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]));
+			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]), Util.DUMMY_UUID);
 			return false;
 		}
 		
