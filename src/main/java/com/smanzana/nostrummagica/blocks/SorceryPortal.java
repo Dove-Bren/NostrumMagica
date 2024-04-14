@@ -71,7 +71,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		}
 		
 		//entityIn.setPortal(entityIn.getPosition());
-		if (!DimensionUtils.DimEquals(worldIn.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
+		if (!DimensionUtils.IsSorceryDim(worldIn)) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
 			if (attr != null) {
 				// Find bottom block

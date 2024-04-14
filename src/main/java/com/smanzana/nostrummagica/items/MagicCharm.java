@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
-import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
 import net.minecraft.block.Block;
@@ -156,7 +155,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doEarth(PlayerEntity player, ServerWorld world) {
 		
-		if (DimensionUtils.DimEquals(world.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
+		if (DimensionUtils.IsSorceryDim(world)) {
 			return false;
 		}
 		
@@ -194,7 +193,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doFire(PlayerEntity player, ServerWorld world) {
 		
-		if (DimensionUtils.DimEquals(world.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
+		if (DimensionUtils.IsSorceryDim(world)) {
 			return false;
 		}
 		
@@ -263,7 +262,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	private boolean doEnder(PlayerEntity player, ServerWorld world) { 
-		if (DimensionUtils.DimEquals(world.getDimensionKey(), World.OVERWORLD)) {
+		if (DimensionUtils.IsOverworld(world)) {
 			Optional<BlockPos> posOpt = player.getBedPosition();
 			BlockPos pos;
 			if (!posOpt.isPresent()) {
@@ -294,7 +293,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 //			
 //			
 //			return true;
-		} else if (DimensionUtils.DimEquals(world.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
+		} else if (DimensionUtils.IsSorceryDim(world)) {
 			// In  sorcery dimension. Return to beginning
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);

@@ -41,10 +41,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.SpellActionSummary;
 import com.smanzana.nostrummagica.spells.components.Transmutation.TransmuteResult;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.HarvestUtil;
 import com.smanzana.nostrummagica.utils.HarvestUtil.ITreeWalker;
 import com.smanzana.nostrummagica.utils.ItemStacks;
-import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -778,7 +778,7 @@ public class SpellAction {
 				return true;
 			}
 			
-			if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+			if (DimensionUtils.IsSorceryDim(world)) {
 				return false;
 			}
 			
@@ -1742,7 +1742,7 @@ public class SpellAction {
 			if (world.isAirBlock(block))
 				return false;
 			
-			if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+			if (DimensionUtils.IsSorceryDim(world)) {
 				return false;
 			}
 			
@@ -1955,7 +1955,7 @@ public class SpellAction {
 			if (world.isAirBlock(block))
 				return false;
 			
-			if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+			if (DimensionUtils.IsSorceryDim(world)) {
 				return false;
 			}
 			

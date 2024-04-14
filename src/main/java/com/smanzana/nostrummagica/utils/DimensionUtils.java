@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.utils;
 
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -46,6 +48,14 @@ public class DimensionUtils {
 	
 	public static final boolean IsEnd(World world) {
 		return IsOverworld(world.getDimensionKey());
+	}
+	
+	public static final boolean IsSorceryDim(RegistryKey<World> dim) {
+		return DimEquals(dim, NostrumDimensions.EmptyDimension);
+	}
+	
+	public static final boolean IsSorceryDim(World world) {
+		return IsSorceryDim(world.getDimensionKey());
 	}
 
 	public static final RegistryKey<World> GetDimKey(ResourceLocation loc) {

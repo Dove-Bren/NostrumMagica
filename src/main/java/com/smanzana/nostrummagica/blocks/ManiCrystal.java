@@ -6,7 +6,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
-import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -106,7 +105,7 @@ public class ManiCrystal extends Block {
 			return;
 		}
 		
-		if (DimensionUtils.DimEquals(worldIn.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
+		if (DimensionUtils.IsSorceryDim(worldIn)) {
 			return;
 		}
 		
