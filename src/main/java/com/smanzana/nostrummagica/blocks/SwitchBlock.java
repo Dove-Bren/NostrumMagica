@@ -4,21 +4,22 @@ import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchTriggerType;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ClockItem;
 import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -45,7 +46,7 @@ public class SwitchBlock extends Block {
 		super(Block.Properties.create(Material.BARRIER)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
-				.lightValue(8)
+				.setLightLevel((state) -> 8)
 				);
 	}
 	
@@ -75,12 +76,6 @@ public class SwitchBlock extends Block {
 		return BlockRenderType.INVISIBLE;
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
-	}
-	
 	@Override
 	public boolean hasTileEntity(BlockState state) {
 		return true;
@@ -92,16 +87,16 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote || !playerIn.isCreative()) {
-			return false;
+			return ActionResultType.PASS;
 		}
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
 		if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-			if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
+			if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
 				TileEntity te = worldIn.getTileEntity(pos);
 				if (te != null) {
 					SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
@@ -109,7 +104,7 @@ public class SwitchBlock extends Block {
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof EnderEyeItem) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
@@ -119,10 +114,10 @@ public class SwitchBlock extends Block {
 				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 				} else {
-					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
+					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.DUMMY_UUID);
 				}
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof SwordItem) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
@@ -130,7 +125,7 @@ public class SwitchBlock extends Block {
 				ent.setHitType(ent.getSwitchHitType() == SwitchBlockTileEntity.SwitchHitType.ANY ? SwitchBlockTileEntity.SwitchHitType.MAGIC : SwitchBlockTileEntity.SwitchHitType.ANY);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		} else if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
@@ -138,8 +133,8 @@ public class SwitchBlock extends Block {
 				ent.setTriggerType(SwitchTriggerType.ONE_TIME);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
-			return true;
-		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ClockItem) {
+			return ActionResultType.SUCCESS;
+		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.CLOCK) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
@@ -151,7 +146,7 @@ public class SwitchBlock extends Block {
 				}
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.LEVER) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te != null) {
@@ -159,10 +154,10 @@ public class SwitchBlock extends Block {
 				ent.setTriggerType(SwitchTriggerType.REPEATABLE);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 	
 }

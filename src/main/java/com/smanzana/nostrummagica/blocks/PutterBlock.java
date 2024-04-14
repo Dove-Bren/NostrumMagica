@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -18,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +26,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
-public class PutterBlock extends ContainerBlock {
+public class PutterBlock extends Block {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
@@ -52,15 +52,15 @@ public class PutterBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		PutterBlockTileEntity te = (PutterBlockTileEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, PutterBlockGui.PutterBlockContainer.Make(te));
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -99,11 +99,5 @@ public class PutterBlock extends ContainerBlock {
 				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

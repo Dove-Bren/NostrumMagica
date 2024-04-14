@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,7 +18,7 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.IHopper;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Mirror;
@@ -40,7 +39,7 @@ import net.minecraftforge.common.ToolType;
  * @author Skyler
  *
  */
-public class ActiveHopper extends ContainerBlock {
+public class ActiveHopper extends Block {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", (facing) -> {
 		return facing != null && facing != Direction.UP;
@@ -102,17 +101,12 @@ public class ActiveHopper extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
 		return new ActiveHopperTileEntity();
 	}
 	
@@ -204,30 +198,17 @@ public class ActiveHopper extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		ActiveHopperTileEntity te = (ActiveHopperTileEntity) worldIn.getTileEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, ActiveHopperGui.ActiveHopperContainer.Make(te));
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isRemote) {
+			ActiveHopperTileEntity te = (ActiveHopperTileEntity) worldIn.getTileEntity(pos);
+			NostrumMagica.instance.proxy.openContainer(player, ActiveHopperGui.ActiveHopperContainer.Make(te));
+		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
-	}
-	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-	
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 }

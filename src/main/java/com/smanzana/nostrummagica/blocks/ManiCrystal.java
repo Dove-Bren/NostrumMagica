@@ -5,6 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
@@ -14,18 +15,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ToolType;
 
 public class ManiCrystal extends Block {
@@ -52,6 +50,7 @@ public class ManiCrystal extends Block {
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(1)
 				.tickRandomly()
+				.setLightLevel(ManiCrystal::getLightValue)
 				);
 		this.level = level;
 		//this.setLightOpacity(0);
@@ -68,9 +67,8 @@ public class ManiCrystal extends Block {
 		builder.add(FACING);
 	}
 	
-	@Override
-	public int getLightValue(BlockState state) {
-		switch (getLevel()) {
+	private static int getLightValue(BlockState state) {
+		switch (((ManiCrystal) state.getBlock()).getLevel()) {
 		case 0:
 		default:
 			return 4;
@@ -103,12 +101,12 @@ public class ManiCrystal extends Block {
 //	}
 	
 	@Override
-	public void randomTick(BlockState state, World worldIn, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
 		if (worldIn.isRemote) {
 			return;
 		}
 		
-		if (worldIn.dimension.getType() == NostrumDimensions.EmptyDimension) {
+		if (DimensionUtils.DimEquals(worldIn.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
 			return;
 		}
 		
@@ -158,18 +156,6 @@ public class ManiCrystal extends Block {
 	}
 	
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
-	}
-	
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean isTranslucent(BlockState state) {
-//		return true;
-//	}
-	
-	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		return this.getDefaultState().with(FACING, context.getFace());
 	}
@@ -183,7 +169,7 @@ public class ManiCrystal extends Block {
 			}
 			
 			if (myFacing == facing.getOpposite()) {
-				if (facingState.isAir(world, facingPos)) {
+				if (world.isAirBlock(facingPos)) {
 					return null;
 				}
 			}

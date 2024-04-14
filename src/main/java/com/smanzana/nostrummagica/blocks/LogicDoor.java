@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -17,20 +18,20 @@ public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote)
-			return true;
+			return ActionResultType.SUCCESS;
 		
 		// Allow creative players to open door
 		if (player.isCreative()) {
 			ItemStack heldItem = player.getHeldItem(hand);
 			if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 				this.trigger(worldIn, pos, state, null);
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -39,11 +40,11 @@ public class RuneShaper extends Block {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		RuneShaperEntity te = (RuneShaperEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, RuneShaperGui.RuneShaperContainer.Make(te));
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

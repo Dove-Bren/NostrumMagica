@@ -18,7 +18,7 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -60,7 +60,7 @@ public class LockedChest extends HorizontalBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote()) {
 			LockedChestEntity chest = (LockedChestEntity) worldIn.getTileEntity(pos);
 			
@@ -73,7 +73,7 @@ public class LockedChest extends HorizontalBlock {
 			}
 		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
@@ -89,11 +89,6 @@ public class LockedChest extends HorizontalBlock {
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
-	}
-	
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.SOLID;
 	}
 	
 	@Override

@@ -20,6 +20,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -170,11 +171,6 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
     }
 	
 	@Override
-	public boolean isSolid(BlockState state) {
-		return true;
-	}
-	
-	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0)
 			return MIRROR_AABB_EW;
@@ -236,8 +232,8 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 		}
 	}
 	
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		return false;
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		return ActionResultType.PASS;
 	}
 	
 	public void clearDoor(World world, BlockPos onePos, BlockState state) {

@@ -6,7 +6,6 @@ import com.smanzana.nostrummagica.tiles.TeleportationPortalTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -22,8 +21,7 @@ import net.minecraft.world.server.ServerWorld;
  * @author Skyler
  *
  */
-@SuppressWarnings("deprecation")
-public class TeleportationPortal extends NostrumPortal implements ITileEntityProvider  {
+public class TeleportationPortal extends NostrumPortal  {
 	
 	public static final String ID = "teleportation_portal";
 
@@ -31,7 +29,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 		this(Block.Properties.create(Material.LEAVES)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
-				.lightValue(14)
+				.setLightLevel((state) -> 14)
 				);
 	}
 	
@@ -40,7 +38,7 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -124,11 +122,4 @@ public class TeleportationPortal extends NostrumPortal implements ITileEntityPro
 	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
 		return true;
 	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }

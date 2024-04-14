@@ -27,7 +27,9 @@ import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -74,7 +76,7 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -95,15 +97,15 @@ public class ShrineBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		if (hand != Hand.MAIN_HAND) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof SymbolTileEntity))
-			return false;
+			return ActionResultType.FAIL;
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
@@ -112,13 +114,13 @@ public class ShrineBlock extends SymbolBlock {
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(heldItem);
 			if (comp != null) {
 				((SymbolTileEntity) te).setComponent(comp);
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr == null)
-			return false;
+			return ActionResultType.FAIL;
 		
 		
 		
@@ -144,22 +146,22 @@ public class ShrineBlock extends SymbolBlock {
 				DoEffect(pos, playerIn, color);
 			} else {
 				if (playerIn.world.isRemote) {
-					playerIn.sendMessage(new TranslationTextComponent("info.shrine.seektrial"));
+					playerIn.sendMessage(new TranslationTextComponent("info.shrine.seektrial"), Util.DUMMY_UUID);
 				}
 			}
 			
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (component.isTrigger()) {
 			if (attr.getTriggers().contains(component.getTrigger()))
-				return false;
+				return ActionResultType.FAIL;
 			
 			if (isExhausted(state)) {
 				if (playerIn.world.isRemote) {
-					playerIn.sendMessage(new TranslationTextComponent("info.shrine.exhausted", new Object[0]));
+					playerIn.sendMessage(new TranslationTextComponent("info.shrine.exhausted", new Object[0]), Util.DUMMY_UUID);
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 			
 			attr.addTrigger(component.getTrigger());
@@ -170,7 +172,7 @@ public class ShrineBlock extends SymbolBlock {
 			ent.setComponent(component);
 			
 			if (playerIn.world.isRemote) {
-				playerIn.sendMessage(new TranslationTextComponent("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}));
+				playerIn.sendMessage(new TranslationTextComponent("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}), Util.DUMMY_UUID);
 			}
 		}
 		
@@ -248,7 +250,7 @@ public class ShrineBlock extends SymbolBlock {
 				attr.addShape(component.getShape());
 				DoEffect(pos, playerIn, 0x8080C0A0);
 				if (playerIn.world.isRemote) {
-					playerIn.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}));
+					playerIn.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}), Util.DUMMY_UUID);
 				}
 				
 				if (!(component.getShape() instanceof SingleShape)) {
@@ -265,17 +267,17 @@ public class ShrineBlock extends SymbolBlock {
 					}
 					
 					TranslationTextComponent trans = new TranslationTextComponent("info.shapehint.preamble", new Object[0]);
-					trans.getStyle().setColor(TextFormatting.DARK_GRAY);
-					playerIn.sendMessage(trans);
+					trans.getStyle().applyFormatting(TextFormatting.DARK_GRAY);
+					playerIn.sendMessage(trans, Util.DUMMY_UUID);
 					
 					trans = new TranslationTextComponent("info.shapehint." + suffix, new Object[0]);
-					trans.getStyle().setColor(TextFormatting.LIGHT_PURPLE);
-					playerIn.sendMessage(trans);
+					trans.getStyle().applyFormatting(TextFormatting.LIGHT_PURPLE);
+					playerIn.sendMessage(trans, Util.DUMMY_UUID);
 				}
 			}
 		}
 		
-		return false;
+		return ActionResultType.SUCCESS;
 	}
 	
 	public static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {

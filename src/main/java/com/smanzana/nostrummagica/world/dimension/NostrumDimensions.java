@@ -5,8 +5,10 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension.EmptyDimensionFactory;
 
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
@@ -18,7 +20,8 @@ import net.minecraftforge.registries.ObjectHolder;
 @EventBusSubscriber(modid = NostrumMagica.MODID, bus = EventBusSubscriber.Bus.FORGE) // for RegisterDimensionsEvent
 public class NostrumDimensions {
 
-	public static DimensionType EmptyDimension;
+	public static DimensionType EmptyDimensionType;
+	public static RegistryKey<World> EmptyDimension;
 	
 	@SubscribeEvent
 	public static void onRegisterDim(@Nonnull final RegisterDimensionsEvent event) {

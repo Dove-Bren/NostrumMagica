@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -20,6 +19,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -27,7 +27,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
-public class ModificationTable extends ContainerBlock {
+public class ModificationTable extends Block {
 	
 	public static final String ID = "modification_table";
 	
@@ -40,26 +40,22 @@ public class ModificationTable extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isRemote()) {
+			ModificationTableEntity te = (ModificationTableEntity) worldIn.getTileEntity(pos);
+			NostrumMagica.instance.proxy.openContainer(player, ModificationTableGui.ModificationTableContainer.Make(te));
+		}
 		
-		ModificationTableEntity te = (ModificationTableEntity) worldIn.getTileEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, ModificationTableGui.ModificationTableContainer.Make(te));
-		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
 		return new ModificationTableEntity();
 	}
 	

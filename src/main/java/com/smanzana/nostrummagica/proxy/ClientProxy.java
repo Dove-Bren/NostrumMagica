@@ -180,6 +180,8 @@ import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -208,7 +210,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IEnviromentBlockReader;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
@@ -336,6 +338,9 @@ public class ClientProxy extends CommonProxy {
 		ScreenManager.registerFactory(NostrumContainers.SpellCreation, SpellCreationGui.SpellGui::new);
 		ScreenManager.registerFactory(NostrumContainers.PetGui, new PetGUIFactory());
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
+		
+		registerBlockRenderLayer();
+		int unused; // Entity render supposed to be here too?
 	}
 	
 	// To get around bounds matching. D:
@@ -387,7 +392,7 @@ public class ClientProxy extends CommonProxy {
 	public void registerColorHandlers(ColorHandlerEvent.Block event) {
 		IBlockColor tinter = new IBlockColor() {
 			@Override
-			public int getColor(BlockState state, IEnviromentBlockReader world, BlockPos pos, int tintIndex) {
+			public int getColor(BlockState state, IBlockDisplayReader world, BlockPos pos, int tintIndex) {
 				BlockState mimickedState = MimicBlock.getMirrorState(state, world, pos).orElse(null);
 				
 				if (mimickedState != null) {
@@ -622,6 +627,35 @@ public class ClientProxy extends CommonProxy {
 				}
 			});
 		}
+	}
+	
+	private static void registerBlockRenderLayer() {
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.activeHopper, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.candle, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.chalk, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedIce, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.dungeonAir, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.itemDuct, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.lockedChest, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.magicWall, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.maniCrystalBlock, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.kaniCrystalBlock, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.vaniCrystalBlock, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoor, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoorUnbreakable, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacade, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacadeUnbreakable, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mineBlock, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.obelisk, RenderType.getSolid());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.singleSpawner, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.matchSpawner, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.triggeredMatchSpawner, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.paradoxMirror, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.spellTable, RenderType.getCutout());
+		//RenderTypeLookup.setRenderLayer(NostrumBlocks.switchBlock, RenderType.getTranslucent());
+		//RenderTypeLookup.setRenderLayer(NostrumBlocks.keySwitch, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.teleportRune, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.triggerRepeater, RenderType.getTranslucent());
 	}
 	
 	@SubscribeEvent

@@ -7,12 +7,11 @@ import com.smanzana.nostrummagica.tiles.ItemDuctTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.INamedContainerProvider;
@@ -23,7 +22,6 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -39,7 +37,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
  *
  */
 @SuppressWarnings("deprecation")
-public class ItemDuct extends SixWayBlock implements ITileEntityProvider, IWaterLoggable {
+public class ItemDuct extends SixWayBlock implements IWaterLoggable {
 	
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	
@@ -191,17 +189,12 @@ public class ItemDuct extends SixWayBlock implements ITileEntityProvider, IWater
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
 		return new ItemDuctTileEntity();
 	}
 	
@@ -337,17 +330,12 @@ public class ItemDuct extends SixWayBlock implements ITileEntityProvider, IWater
 	}
 	
 	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
-	}
-	
-	@Override
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
 	@Override
-	public IFluidState getFluidState(BlockState state) {
+	public FluidState getFluidState(BlockState state) {
 		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
 	}
 }

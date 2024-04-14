@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DyeItem;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -45,19 +46,19 @@ public class KeySwitchBlock extends SwitchBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote || !player.isCreative()) {
-			return false;
+			return ActionResultType.FAIL;
 		}
 
 		if (player.isCreative() && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof DyeItem) {
 			KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) worldIn.getTileEntity(pos);
 			DyeItem dye = (DyeItem) player.getHeldItemMainhand().getItem();
 			ent.setColor(dye.getDyeColor());
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;
+		return ActionResultType.FAIL;
 	}
 	
 }

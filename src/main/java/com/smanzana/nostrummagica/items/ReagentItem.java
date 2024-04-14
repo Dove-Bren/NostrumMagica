@@ -61,13 +61,13 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 		}
 
 		@Override
-		public String getName() {
+		public String getString() {
 			return name().toLowerCase();
 		}
 		
 		@Override
 		public String toString() {
-			return getName();
+			return getString();
 		}
 	}
 	

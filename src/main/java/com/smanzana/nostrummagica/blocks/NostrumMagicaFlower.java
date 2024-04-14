@@ -18,11 +18,12 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -114,7 +115,7 @@ public class NostrumMagicaFlower extends BushBlock {
 //	}
 	
 	@Override
-	public void randomTick(BlockState state, World worldIn, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
 		if (random.nextBoolean()) {
 			// Check if we're on crystadirt and maybe spread
 			BlockPos groundPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());

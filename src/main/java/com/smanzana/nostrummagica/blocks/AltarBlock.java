@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -23,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.IHopper;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -31,8 +31,9 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
-public class AltarBlock extends ContainerBlock {
+public class AltarBlock extends Block {
 	
 	public static final String ID = "altar_block";
 	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
@@ -42,7 +43,7 @@ public class AltarBlock extends ContainerBlock {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(3.5f, 10f)
 				.sound(SoundType.STONE)
-				.lightValue((1))
+				.setLightLevel((state) -> (1))
 			);
 	}
 	
@@ -77,17 +78,12 @@ public class AltarBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
 		return new AltarTileEntity();
 	}
 	
@@ -123,7 +119,9 @@ public class AltarBlock extends ContainerBlock {
 			worldIn.getPendingBlockTicks().scheduleTick(pos, this, TICK_DELAY);
 		}
 		
-		this.tick(oldState, worldIn, pos, this.RANDOM);
+		if (!worldIn.isRemote()) {
+			this.tick(oldState, (ServerWorld) worldIn, pos, this.RANDOM);
+		}
 		
 		super.onBlockAdded(state, worldIn, pos, oldState, isMoving);
 	}
@@ -141,7 +139,7 @@ public class AltarBlock extends ContainerBlock {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem().isEmpty()) {
 			AltarTileEntity altar = (AltarTileEntity) te;
@@ -165,10 +163,14 @@ public class AltarBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isRemote()) {
+			return ActionResultType.SUCCESS;
+		}
+		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null)
-			return false;
+			return ActionResultType.PASS;
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
@@ -177,9 +179,9 @@ public class AltarBlock extends ContainerBlock {
 			// Accepting items
 			if (!heldItem.isEmpty()) {
 				altar.setItem(heldItem.split(1));
-				return true;
+				return ActionResultType.SUCCESS;
 			} else
-				return false;
+				return ActionResultType.PASS;
 		} else {
 			// Has an item
 			if (heldItem.isEmpty()) {
@@ -202,9 +204,9 @@ public class AltarBlock extends ContainerBlock {
 					}
 				}
 				altar.setItem(ItemStack.EMPTY);
-				return true;
+				return ActionResultType.SUCCESS;
 			} else
-				return false;
+				return ActionResultType.FAIL;
 		}
 		
 	}

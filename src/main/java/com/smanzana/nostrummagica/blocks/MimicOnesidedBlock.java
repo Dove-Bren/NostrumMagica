@@ -22,15 +22,15 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -213,7 +213,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
-	public void onBlockHighlight(DrawBlockHighlightEvent event) {
+	public void onBlockHighlight(DrawHighlightEvent.HighlightBlock event) {
 		if (event.getTarget().getType() == RayTraceResult.Type.BLOCK) {
 			BlockPos pos = new BlockPos(event.getTarget().getHitVec());
 			BlockState hit = event.getInfo().getRenderViewEntity().world.getBlockState(pos);

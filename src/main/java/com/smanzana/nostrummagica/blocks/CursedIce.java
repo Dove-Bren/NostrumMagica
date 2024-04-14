@@ -7,6 +7,7 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
@@ -21,10 +22,10 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
@@ -61,11 +62,6 @@ public class CursedIce extends BreakableBlock {
 		return getDefaultState().with(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
-    }
-	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
@@ -76,11 +72,11 @@ public class CursedIce extends BreakableBlock {
 	}
 	
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		int level = state.get(LEVEL);
 		
 		// Don't grow is in Sorcery dim
-		if (worldIn.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+		if (DimensionUtils.DimEquals(worldIn.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
 			return;
 		}
 		

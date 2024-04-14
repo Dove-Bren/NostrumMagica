@@ -17,6 +17,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.DiggingParticle;
 import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -26,18 +27,16 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -100,12 +99,6 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
         return false;
     }
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
-	
 	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
 		return myPos.equals(fromPos.up());
 	}
@@ -142,25 +135,20 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 		return getValue(state, world, pos, BlockState::propagatesSkylightDown, () -> super.propagatesSkylightDown(state, world, pos));
 	}
 
-	@Override
-	public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(state, world, pos, BlockState::isNormalCube, () -> super.isNormalCube(state, world, pos));
-	}
-
-	@Override
-	public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
-		return true; // MimicBlockBakedModel checks wrapped state when rendered
-	}
+//	@Override
+//	public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
+//		return true; // MimicBlockBakedModel checks wrapped state when rendered
+//	}
 	
 	@Override
     public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
         return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getSoundType(reader, pos1, entity), () -> super.getSoundType(state, world, pos, entity));
     }
 
-    @Override
-    public int getPackedLightmapCoords(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
-        return getValue(state, world, pos, BlockState::getPackedLightmapCoords, () -> super.getPackedLightmapCoords(state, world, pos));
-    }
+//    @Override
+//    public int getPackedLightmapCoords(BlockState state, IBlockDisplayReader world, BlockPos pos) {
+//        return getValue(state, world, pos, BlockState::getPackedLightmapCoords, () -> super.getPackedLightmapCoords(state, world, pos));
+//    }
 
     @Nullable
     @Override
@@ -180,17 +168,17 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 
     @Override
     public VoxelShape getRaytraceShape(BlockState state, IBlockReader world, BlockPos pos) {
-        return getValue(state, world, pos, BlockState::getRaytraceShape, () -> super.getRaytraceShape(state, world, pos));
+        return getValue(state, world, pos, BlockState::getRayTraceShape, () -> super.getRaytraceShape(state, world, pos));
     }
 
-    @Nullable
-    @Override
-    public RayTraceResult getRayTraceResult(BlockState state, World world, BlockPos pos, Vector3d start, Vector3d end, RayTraceResult original) {
-        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getBlock().getRayTraceResult(mirror, world, pos, start, end, original), () -> super.getRayTraceResult(state, world, pos, start, end, original));
-    }
+//    @Nullable
+//    @Override
+//    public RayTraceResult getRayTraceResult(BlockState state, World world, BlockPos pos, Vector3d start, Vector3d end, RayTraceResult original) {
+//        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getBlock().getRayTraceResult(mirror, world, pos, start, end, original), () -> super.getRayTraceResult(state, world, pos, start, end, original));
+//    }
 
     @Override
-    public int getLightValue(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
+    public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
         int result = getValue(state, world, pos, BlockState::getLightValue, () -> super.getLightValue(state, world, pos));
         //This is needed so we can control AO. Try to remove this asap
         if ("net.minecraft.client.renderer.BlockModelRenderer".equals(Thread.currentThread().getStackTrace()[3].getClassName())) {
@@ -255,10 +243,10 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 
                     final Minecraft mc = Minecraft.getInstance();
                     mc.particles.addEffect(
-                            new DiggingParticle(world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
+                            new DiggingParticle((ClientWorld) world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
                                     .setBlockPos(pos)
                                     .multiplyVelocity(0.2F)
-                                    .multipleParticleScaleBy(0.6F)
+                                    .multiplyParticleScaleBy(0.6F)
                     );
                 }
             }
@@ -296,7 +284,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
                             
                             final Minecraft mc = Minecraft.getInstance();
                             mc.particles.addEffect(
-                                    new DiggingParticle(world,
+                                    new DiggingParticle((ClientWorld) world,
                                             pos.getX() + xPos,pos.getY() + yPos, pos.getZ() + zPos,
                                             dx - 0.5D, dy - 0.5D,dz - 0.5D, state)
                                             .setBlockPos(pos)

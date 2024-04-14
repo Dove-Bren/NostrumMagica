@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tiles.MatchSpawnerTileEntity;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -15,8 +16,10 @@ import net.minecraft.item.Items;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.StringTextComponent;
@@ -63,7 +66,7 @@ public class NostrumMatchSpawner extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -73,18 +76,18 @@ public class NostrumMatchSpawner extends NostrumSingleSpawner {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (hand != Hand.MAIN_HAND) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof MatchSpawnerTileEntity)) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		MatchSpawnerTileEntity ent = (MatchSpawnerTileEntity) te;
@@ -92,7 +95,7 @@ public class NostrumMatchSpawner extends NostrumSingleSpawner {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getName()));
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getString()), Util.DUMMY_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -126,11 +129,11 @@ public class NostrumMatchSpawner extends NostrumSingleSpawner {
 				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));
 			} else if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-				if (heldPos != null && PositionCrystal.getDimension(heldItem) == worldIn.getDimension().getType().getId()) {
+				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
 					ent.setTriggerPosition(heldPos.getX(), heldPos.getY(), heldPos.getZ());
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			} else if (heldItem.getItem() instanceof EnderEyeItem) {
 				BlockPos loc = (ent.getTriggerOffset() == null ? null : ent.getTriggerOffset().toImmutable().add(pos));
 				if (loc != null) {
@@ -138,13 +141,13 @@ public class NostrumMatchSpawner extends NostrumSingleSpawner {
 					if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 						playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
 					} else {
-						playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"));
+						playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.DUMMY_UUID);
 					}
 				}
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;
+		return ActionResultType.FAIL;
 	}
 }

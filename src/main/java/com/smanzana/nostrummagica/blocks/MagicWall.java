@@ -12,15 +12,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.server.ServerWorld;
 
 public class MagicWall extends BreakableBlock {
 
@@ -46,10 +43,10 @@ public class MagicWall extends BreakableBlock {
         return false;
     }
 	
-	@Override
-	public boolean isSolid(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isSolid(BlockState state) {
+//		return false;
+//	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -66,13 +63,8 @@ public class MagicWall extends BreakableBlock {
 				.with(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
-    }
-	
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 			int decay = state.get(DECAY) + 1;
 			if (decay >= 1) {
 				worldIn.removeBlock(pos, false);

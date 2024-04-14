@@ -9,15 +9,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BreakableBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,35 +39,30 @@ public class DungeonAir extends BreakableBlock {
 		return 1.0F;
 	}
 	
-	@Override
-	public boolean isSolid(BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isSolid(BlockState state) {
+//		return false;
+//	}
 
 	@Override
 	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
 		return true;
 	}
 
-	@Override
-	public boolean causesSuffocation(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		return false;
-	}
+//	@Override
+//	public boolean causesSuffocation(BlockState state, IBlockReader worldIn, BlockPos pos) {
+//		return false;
+//	}
+//
+//	@Override
+//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+//		return false;
+//	}
 
-	@Override
-	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		return false;
-	}
-
-	@Override
-	public boolean canEntitySpawn(BlockState state, IBlockReader worldIn, BlockPos pos, EntityType<?> type) {
-		return false;
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
-    }
+//	@Override
+//	public boolean canEntitySpawn(BlockState state, IBlockReader worldIn, BlockPos pos, EntityType<?> type) {
+//		return false;
+//	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
@@ -142,10 +134,10 @@ public class DungeonAir extends BreakableBlock {
 //		}
 //	}
 	
-	@Override
-	public boolean canBeConnectedTo(BlockState state, IBlockReader world, BlockPos pos, Direction facing) {
-		return false;
-	}
+//	@Override
+//	public boolean canBeConnectedTo(BlockState state, IBlockReader world, BlockPos pos, Direction facing) {
+//		return false;
+//	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {

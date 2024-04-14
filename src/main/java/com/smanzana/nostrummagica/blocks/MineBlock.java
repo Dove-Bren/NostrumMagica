@@ -20,7 +20,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -29,8 +28,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 public class MineBlock extends Block {
@@ -83,14 +80,9 @@ public class MineBlock extends Block {
 		}
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
-	
 	@Override
 	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return func_220055_a(worldIn, pos.offset(state.get(FACING)), state.get(FACING).getOpposite());
+		return hasEnoughSolidSide(worldIn, pos.offset(state.get(FACING)), state.get(FACING).getOpposite());
 	}
 	
 	@SuppressWarnings("deprecation")

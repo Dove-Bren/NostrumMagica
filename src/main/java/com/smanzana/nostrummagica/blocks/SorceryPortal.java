@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.tiles.SorceryPortalTileEntity;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.Block;
@@ -15,7 +16,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.DimensionType;
 
 /**
  * Portal that takes players to and from the Sorcery dimension
@@ -31,7 +31,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		super(Block.Properties.create(Material.LEAVES)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
-				.lightValue(14)
+				.setLightLevel((state) -> 14)
 				);
 	}
 	
@@ -71,7 +71,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 		}
 		
 		//entityIn.setPortal(entityIn.getPosition());
-		if (worldIn.getDimension().getType() != NostrumDimensions.EmptyDimension) {
+		if (!DimensionUtils.DimEquals(worldIn.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entityIn);
 			if (attr != null) {
 				// Find bottom block
@@ -88,11 +88,11 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 						break;
 					}
 				}
-				attr.setSorceryPortalLocation(entityIn.dimension, new BlockPos(savedPos));
+				attr.setSorceryPortalLocation(DimensionUtils.GetDimension(entityIn), new BlockPos(savedPos));
 			}
-			entityIn.changeDimension(NostrumDimensions.EmptyDimension);
+			entityIn.changeDimension(entityIn.getServer().getWorld(NostrumDimensions.EmptyDimension));
 		} else {
-			entityIn.changeDimension(DimensionType.OVERWORLD);
+			entityIn.changeDimension(entityIn.getServer().getWorld(World.OVERWORLD));
 		}
 	}
 	

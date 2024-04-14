@@ -20,7 +20,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -72,19 +74,19 @@ public class TrialBlock extends SymbolBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		if (hand != Hand.MAIN_HAND) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (worldIn.isRemote()) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof TrialBlockTileEntity))
-			return false;
+			return ActionResultType.FAIL;
 		
 		TrialBlockTileEntity trialEntity = ((TrialBlockTileEntity) te);
 		
@@ -94,17 +96,17 @@ public class TrialBlock extends SymbolBlock {
 		if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem) {
 			SpellComponentWrapper comp = new SpellComponentWrapper(InfusedGemItem.GetElement(heldItem));
 			trialEntity.setComponent(comp);
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		// Make sure we have an orb first
 		if (heldItem.isEmpty() || !(heldItem.getItem() instanceof MasteryOrb)) {
-			return false;
+			return ActionResultType.FAIL;
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr == null)
-			return false;
+			return ActionResultType.FAIL;
 		
 		// If the player is a novice, they can do a world trial to become adept.
 		// Otherwise they do a combat trial
@@ -112,12 +114,12 @@ public class TrialBlock extends SymbolBlock {
 		final ElementalMastery mastery = attr.getElementalMastery(element);
 		
 		if (mastery == ElementalMastery.UNKNOWN) {
-			playerIn.sendMessage(new TranslationTextComponent("info.trial.weak"));
+			playerIn.sendMessage(new TranslationTextComponent("info.trial.weak"), Util.DUMMY_UUID);
 		} else if (mastery == ElementalMastery.NOVICE) {
 			WorldTrial trial = WorldTrial.getTrial(element);
 			if (trial == null) {
 				NostrumMagica.logger.error("No trial found for element " + element.name());
-				return false;
+				return ActionResultType.FAIL;
 			} else {
 				if (trial.canTake(playerIn, attr)) {
 					trial.start(playerIn, attr);
@@ -125,14 +127,14 @@ public class TrialBlock extends SymbolBlock {
 						heldItem.split(1);
 					}
 				} else {
-					playerIn.sendMessage(new TranslationTextComponent("info.trial.already_have"));
+					playerIn.sendMessage(new TranslationTextComponent("info.trial.already_have"), Util.DUMMY_UUID);
 				}
 				
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 		} else {
 			if (mastery.isGreaterOrEqual(ElementalMastery.MASTER)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.trial.none"));
+				playerIn.sendMessage(new TranslationTextComponent("info.trial.none"), Util.DUMMY_UUID);
 			} else {
 				trialEntity.startTrial(playerIn);
 				if (!playerIn.isCreative()) {
@@ -141,7 +143,7 @@ public class TrialBlock extends SymbolBlock {
 			}
 		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	public static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {

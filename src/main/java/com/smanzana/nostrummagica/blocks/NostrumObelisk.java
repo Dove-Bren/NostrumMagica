@@ -15,7 +15,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,8 +23,9 @@ import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -33,10 +33,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ToolType;
 
 /**
@@ -50,7 +48,7 @@ import net.minecraftforge.common.ToolType;
  * @author Skyler
  *
  */
-public class NostrumObelisk extends ContainerBlock {
+public class NostrumObelisk extends Block {
 
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	private static final BooleanProperty TILE = BooleanProperty.create("tile");
@@ -83,7 +81,7 @@ public class NostrumObelisk extends ContainerBlock {
     }
 	
 	@Override
-	public int getLightValue(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
+	public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
 		if (state == null)
 			return 0;
 		if (!state.get(TILE))
@@ -115,7 +113,7 @@ public class NostrumObelisk extends ContainerBlock {
 	}
 	
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		;
 	}
 	
@@ -182,11 +180,6 @@ public class NostrumObelisk extends ContainerBlock {
 		// We will be destroyed
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.SOLID;
-	}
-	
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
@@ -208,7 +201,7 @@ public class NostrumObelisk extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -218,11 +211,6 @@ public class NostrumObelisk extends ContainerBlock {
 			return new NostrumObeliskEntity(state.get(MASTER));
 		
 		return null;
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
-		throw new RuntimeException("I have been fooled :(");
 	}
 	
 	@Override
@@ -242,18 +230,18 @@ public class NostrumObelisk extends ContainerBlock {
 //	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (state.get(MASTER) == false) {
-			return false;
+			return ActionResultType.PASS;
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
 			if (worldIn.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"));
+				player.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"), Util.DUMMY_UUID);
 			}
-			return false;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (!worldIn.isRemote()) {
@@ -261,7 +249,7 @@ public class NostrumObelisk extends ContainerBlock {
 		} else {
 			NostrumMagica.instance.proxy.openObeliskScreen(worldIn, pos);
 		}
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	protected static int xs[] = new int[] {-TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH, TILE_OFFSETH};

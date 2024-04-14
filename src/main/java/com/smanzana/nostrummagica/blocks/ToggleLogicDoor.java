@@ -65,10 +65,10 @@ public class ToggleLogicDoor extends LogicDoor {
 		this.toggle(world, pos, state);
 	}
 	
-	@Override
-	public boolean isSolid(BlockState state) {
-		return !isToggled(state);
-	}
+//	@Override
+//	public boolean isSolid(BlockState state) {
+//		return !isToggled(state);
+//	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {

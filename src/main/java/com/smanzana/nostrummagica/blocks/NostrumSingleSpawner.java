@@ -19,7 +19,6 @@ import com.smanzana.nostrummagica.tiles.SingleSpawnerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.MobEntity;
@@ -29,20 +28,19 @@ import net.minecraft.item.Items;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
-public class NostrumSingleSpawner extends ContainerBlock {
+public class NostrumSingleSpawner extends Block {
 	
 	public static enum Type implements IStringSerializable {
 		// Do not change order. Ordinals are used
@@ -58,13 +56,13 @@ public class NostrumSingleSpawner extends ContainerBlock {
 		;
 
 		@Override
-		public String getName() {
+		public String getString() {
 			return this.name().toLowerCase();
 		}
 		
 		@Override
 		public String toString() {
-			return this.name().toLowerCase();
+			return this.getString();
 		}
 	}
 	
@@ -95,21 +93,16 @@ public class NostrumSingleSpawner extends ContainerBlock {
 		return getDefaultState().with(MOB, type);
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
-	
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		if (!worldIn.isRemote())
 		{
-			for (PlayerEntity player : ((ServerWorld) worldIn).getPlayers()) {
+			for (PlayerEntity player : worldIn.getPlayers()) {
 				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < SPAWN_DIST_SQ) {
 					this.spawn(worldIn, pos, state, rand);
 					worldIn.removeBlock(pos, false);
@@ -171,7 +164,7 @@ public class NostrumSingleSpawner extends ContainerBlock {
 
 
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -196,24 +189,24 @@ public class NostrumSingleSpawner extends ContainerBlock {
 //	}
 
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (hand != Hand.MAIN_HAND) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te == null || !(te instanceof SingleSpawnerTileEntity)) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getHeldItem(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getName()));
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getString()), Util.DUMMY_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -246,15 +239,9 @@ public class NostrumSingleSpawner extends ContainerBlock {
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
 				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		// TODO Auto-generated method stub
-		return null;
+		return ActionResultType.PASS;
 	}
 }

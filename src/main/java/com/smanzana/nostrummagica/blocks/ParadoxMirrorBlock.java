@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.tiles.ParadoxMirrorTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -24,15 +23,18 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -45,8 +47,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -54,7 +54,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 /**
  * Magic mirror that links to another and transports items!
  */
-public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
+public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final double BB_DEPTH = 2.0 / 16.0;
@@ -95,7 +95,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	
 	protected boolean canPlaceAt(IWorldReader worldIn, BlockPos pos, Direction side) {
 		BlockState state = worldIn.getBlockState(pos.offset(side.getOpposite()));
-		if (state == null || !(state.func_224755_d(worldIn, pos.offset(side.getOpposite()), side.getOpposite()))) {
+		if (state == null || !(state.isSolidSide(worldIn, pos.offset(side.getOpposite()), side.getOpposite()))) {
 			return false;
 		}
 		
@@ -174,10 +174,10 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
     }
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		if (worldIn.isRemote) {
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
 		ParadoxMirrorTileEntity mirror = getTileEntity(worldIn, pos);
@@ -186,7 +186,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 			if (playerIn.isSneaking()) {
 				@Nonnull ItemStack held = playerIn.getHeldItem(hand);
 				if (held.isEmpty()) {
-					return false;
+					return ActionResultType.FAIL;
 				}
 				
 				// If we have an item, return true even if mirror is on cooldown
@@ -194,13 +194,13 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 					// Item was pushed! Remove from hand!
 					playerIn.setHeldItem(hand, ItemStack.EMPTY);
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 			// Else try and set position from held item
 			else {
 				@Nonnull ItemStack held = playerIn.getHeldItem(hand);
 				if (held.isEmpty()) {
-					return false;
+					return ActionResultType.FAIL;
 				}
 				
 				// If we have an item, return true only if item has a position we can use
@@ -208,19 +208,19 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 					BlockPos heldPos = PositionCrystal.getBlockPosition(held);
 					if (heldPos != null && !heldPos.equals(pos)) {
 						mirror.setLinkedPosition(heldPos);
-						playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"));
+						playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.DUMMY_UUID);
 					}
-					return true; // true even if crystal doesn't have position
+					return ActionResultType.SUCCESS; // true even if crystal doesn't have position
 				}
-				return false;
+				return ActionResultType.FAIL;
 			}
 		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -233,26 +233,6 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
-	
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
-
-//	@Override
-//	public boolean isFullBlock(BlockState state) {
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
 	
 	@Override
 	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -335,7 +315,7 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 		if (pos == null)
 			return;
 		
-		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").applyTextStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").mergeStyle(TextFormatting.GREEN));
 	}
 
 	@Override
@@ -368,11 +348,5 @@ public class ParadoxMirrorBlock extends ContainerBlock implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

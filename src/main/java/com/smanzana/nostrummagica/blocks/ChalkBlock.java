@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -12,8 +11,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ChalkBlock extends Block {
 
@@ -23,7 +20,7 @@ public class ChalkBlock extends Block {
 	public ChalkBlock() {
 		super(Block.Properties.create(Material.CARPET)
 				.hardnessAndResistance(.01f)
-				.lightValue(1)
+				.setLightLevel((state) -> 1)
 				.noDrops()
 				);
 	}
@@ -33,24 +30,9 @@ public class ChalkBlock extends Block {
 		return CHALK_AABB;
 	}
 	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
-	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-	
 	@Override
 	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return func_220055_a(worldIn, pos.down(), Direction.UP);
+		return Block.hasSolidSideOnTop(worldIn, pos.down());
 	}
 	
 	@SuppressWarnings("deprecation")

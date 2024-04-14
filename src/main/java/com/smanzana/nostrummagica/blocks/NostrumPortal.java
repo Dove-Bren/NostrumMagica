@@ -50,11 +50,6 @@ public abstract class NostrumPortal extends Block  {
     }
 	
 	@Override
-	public boolean isSolid(BlockState state) {
-		return false;
-	}
-	
-	@Override
 	public boolean isReplaceable(BlockState state, BlockItemUseContext context) {
         return false;
     }

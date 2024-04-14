@@ -6,7 +6,6 @@ import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
@@ -16,7 +15,7 @@ import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SymbolBlock extends ContainerBlock {
+public class SymbolBlock extends Block {
 	
 	public static final String ID = "symbol_block";
 	
@@ -24,7 +23,7 @@ public class SymbolBlock extends ContainerBlock {
 		this(Block.Properties.create(Material.BARRIER)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
-				.lightValue(16)
+				.setLightLevel((state) -> 16)
 				);
 	}
 	
@@ -59,17 +58,12 @@ public class SymbolBlock extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
 		SymbolTileEntity ent = new SymbolTileEntity(1.0f);
 		return ent;
 	}

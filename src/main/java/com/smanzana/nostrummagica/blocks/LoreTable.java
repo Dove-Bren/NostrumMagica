@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.tiles.LoreTableEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -15,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -22,7 +22,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
-public class LoreTable extends ContainerBlock {
+public class LoreTable extends Block {
 	
 	public static final String ID = "lore_table";
 	
@@ -41,15 +41,25 @@ public class LoreTable extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		LoreTableEntity te = (LoreTableEntity) worldIn.getTileEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, LoreTableGui.LoreTableContainer.Make(te));
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isRemote()) {
+			LoreTableEntity te = (LoreTableEntity) worldIn.getTileEntity(pos);
+			NostrumMagica.instance.proxy.openContainer(player, LoreTableGui.LoreTableContainer.Make(te));
+		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+		super.eventReceived(state, worldIn, pos, eventID, eventParam);
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -86,11 +96,5 @@ public class LoreTable extends ContainerBlock {
 			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

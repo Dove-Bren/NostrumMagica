@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -35,7 +36,7 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(0)
-				.lightValue(4)
+				.setLightLevel((state) -> 4)
 				);
 	}
 	
@@ -46,12 +47,6 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 		BlockPos blockpos = context.getPos();
 		BlockPos blockpos1 = blockpos.offset(direction);
 		return context.getWorld().getBlockState(blockpos1).isReplaceable(context) ? this.getDefaultState().with(HORIZONTAL_FACING, direction) : null;
-	}
-	
-	// todo ??
-	@Override
-	public boolean isSolid(BlockState state) {
-		return true;
 	}
 	
 	@Override
@@ -80,9 +75,9 @@ public class NostrumMirrorBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		NostrumMagica.instance.proxy.openMirrorScreen();
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override

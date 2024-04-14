@@ -10,7 +10,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
@@ -23,19 +22,17 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 @SuppressWarnings("deprecation")
-public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
+public class SpellTable extends HorizontalBlock {
 	
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
@@ -74,8 +71,8 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 		if (!worldIn.isRemote) {
 			BlockPos blockpos = pos.offset(state.get(HORIZONTAL_FACING));
 			worldIn.setBlockState(blockpos, getMaster(state.get(HORIZONTAL_FACING).getOpposite()), 3);
-			worldIn.notifyNeighbors(pos, Blocks.AIR);
-			state.updateNeighbors(worldIn, pos, 3);
+			worldIn.notifyNeighborsOfStateChange(pos, Blocks.AIR);
+			state.updateNeighbours(worldIn, pos, 3);
 		}
 	}
 	
@@ -131,11 +128,6 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 //		return pos.offset(state.get(FACING));
 //	}
 	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
-	
 	public BlockState getSlaveState(Direction direction) {
 		return this.getDefaultState().with(MASTER, false)
 				.with(FACING, direction);
@@ -148,7 +140,7 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
@@ -176,7 +168,7 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
 		
 		if (state.get(MASTER) == false) {
 			pos = pos.offset(state.get(FACING));
@@ -185,13 +177,6 @@ public class SpellTable extends HorizontalBlock implements ITileEntityProvider {
 		SpellTableEntity te = (SpellTableEntity) worldIn.getTileEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, SpellCreationGui.SpellCreationContainer.Make(te));
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
-
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }

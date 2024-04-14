@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
@@ -97,7 +98,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 		BlockState nested = getNestedState(extraData);
 		if (nested == null) {
 			return this.undisguisedModel.getQuads(state, side, rand, extraData);
-		}else if (nested.canRenderInLayer(MinecraftForgeClient.getRenderLayer())) {
+		}else if (RenderTypeLookup.canRenderInLayer(state, MinecraftForgeClient.getRenderLayer())) {
 			return getModelToRender(nested).getQuads(nested, side, rand, extraData);
 		} else {
 			return EmptyQuads;
@@ -141,9 +142,9 @@ public class MimicBlockBakedModel implements IBakedModel {
 	public TextureAtlasSprite getParticleTexture() {
 		return undisguisedModel.getParticleTexture();
 	}
-	
-	
 
-	
-
+	@Override
+	public boolean isSideLit() {
+		return true; // I think this is "!guiLight" aka "is this lit like a block instead of flat like a GUI item?"
+	}
 }

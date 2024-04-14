@@ -11,7 +11,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -41,9 +43,9 @@ public class ProgressionDoor extends NostrumMagicDoor {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (worldIn.isRemote)
-			return true;
+			return ActionResultType.SUCCESS;
 		
 		BlockPos master = this.getMasterPos(worldIn, state, pos);
 		if (master != null && worldIn.getTileEntity(master) != null) {
@@ -54,19 +56,19 @@ public class ProgressionDoor extends NostrumMagicDoor {
 				ItemStack heldItem = playerIn.getHeldItem(hand);
 				if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellRune) {
 					te.require(SpellRune.toComponentWrapper(heldItem));
-					return true;
+					return ActionResultType.SUCCESS;
 				}
 				if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 					te.level((te.getRequiredLevel() + 1) % 15);
-					return true;
+					return ActionResultType.SUCCESS;
 				}
 			}
 			
 			List<ITextComponent> missingDepStrings = new LinkedList<>();
 			if (!((ProgressionDoorTileEntity) worldIn.getTileEntity(master)).meetsRequirements(playerIn, missingDepStrings)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.door.missing.intro"));
+				playerIn.sendMessage(new TranslationTextComponent("info.door.missing.intro"), Util.DUMMY_UUID);
 				for (ITextComponent text : missingDepStrings) {
-					playerIn.sendMessage(text);
+					playerIn.sendMessage(text, Util.DUMMY_UUID);
 				}
 				NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			} else {
@@ -74,6 +76,6 @@ public class ProgressionDoor extends NostrumMagicDoor {
 			}
 		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 }

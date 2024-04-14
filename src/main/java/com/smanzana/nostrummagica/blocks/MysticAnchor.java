@@ -5,6 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.block.Block;
@@ -16,13 +17,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathType;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -100,7 +102,7 @@ public class MysticAnchor extends Block {
 	}
 	
 	protected void teleportEntity(World world, BlockPos pos, Entity entity) {
-		if (entity.dimension == world.getDimension().getType()) {
+		if (DimensionUtils.InDimension(entity, world)) {
 			final Vector3d vecToEnt = entity.getPositionVec().subtract(new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)).normalize();
 			final Direction dirToEnt = Direction.getFacingFromVector(vecToEnt.getX(), vecToEnt.getY(), vecToEnt.getZ());
 			BlockPos toPos = findTeleportSpot(world, pos, dirToEnt);
@@ -128,11 +130,11 @@ public class MysticAnchor extends Block {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote()) {
 			teleportEntity(worldIn, pos, player);
 		}
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 }

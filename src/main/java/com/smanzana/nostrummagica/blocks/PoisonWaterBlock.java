@@ -75,6 +75,7 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 			}
 		}
 		
+		// TODO check this works
 		super.onEntityCollision(state, world, pos, entity);
 	}
 }

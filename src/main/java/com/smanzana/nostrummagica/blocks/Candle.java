@@ -16,7 +16,6 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -29,7 +28,7 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -40,11 +39,12 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 
-public class Candle extends ContainerBlock {
+public class Candle extends Block {
 
 	public static final String ID = "nostrum_candle";
 	public static BooleanProperty LIT = BooleanProperty.create("lit");
@@ -65,6 +65,7 @@ public class Candle extends ContainerBlock {
 		super(Block.Properties.create(Material.CARPET)
 				.hardnessAndResistance(.1f, 10.0f)
 				.sound(SoundType.PLANT)
+				.setLightLevel((state) -> state == null || !state.get(LIT) ? 0 : 10)
 				);
 		this.setDefaultState(this.stateContainer.getBaseState().with(LIT, false));
 	}
@@ -73,7 +74,7 @@ public class Candle extends ContainerBlock {
 		// copied from WallTorchBlock
 		BlockPos blockpos = pos.offset(facing.getOpposite());
 		BlockState blockstate = worldIn.getBlockState(blockpos);
-		return blockstate.func_224755_d(worldIn, blockpos, facing);
+		return blockstate.isSolidSide(worldIn, blockpos, facing);
 	}
 	
 	@Override
@@ -128,34 +129,9 @@ public class Candle extends ContainerBlock {
 	}
 	
 	@Override
-	public int getLightValue(BlockState state) {
-		if (state == null)
-			return 0;
-		if (!state.get(LIT))
-			return 0;
-		
-		return 10;
-	}
-	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-	
-	@OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
-	
-	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
-	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -184,8 +160,8 @@ public class Candle extends ContainerBlock {
     	}
     	
     	if (!world.isRemote) {
-			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType().getId(), pos, null),
-					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.getDimension().getType()));
+			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimensionKey(), pos, null),
+					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.getDimensionKey()));
 		}
     	
     	if (!force && Candle.IsCandleEnhanced(world, pos)) {
@@ -199,17 +175,12 @@ public class Candle extends ContainerBlock {
     }
 
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
 		return null;
 		
 		// We don't create when the block is placed.
@@ -284,7 +255,7 @@ public class Candle extends ContainerBlock {
 	}
 	
 	@Override
-	public void tick(BlockState state, World worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
 		// Check for a reagent item over the candle
 		if (state.get(LIT) && worldIn.getTileEntity(pos) == null) {
 			List<ItemEntity> items = worldIn.getEntitiesWithinAABB(ItemEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).expand(0, 1, 0));
@@ -314,24 +285,24 @@ public class Candle extends ContainerBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 
-//		if (worldIn.isRemote)
-//			return true;
+		if (worldIn.isRemote())
+			return ActionResultType.SUCCESS;
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		
 		if (!state.get(LIT)) {
 			if (heldItem.isEmpty())
-				return false;
+				return ActionResultType.FAIL;
 			
 			if (heldItem.getItem() instanceof FlintAndSteelItem) {
 				light(worldIn, pos, state);
 				ItemStacks.damageItem(heldItem, playerIn, hand, 1);
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 			
-			return false;
+			return ActionResultType.FAIL;
 		}
 		
 		// it's lit
@@ -342,28 +313,28 @@ public class Candle extends ContainerBlock {
 			if (hand == Hand.MAIN_HAND && (playerIn.getHeldItemMainhand().isEmpty())) {
 				// putting it out
 				extinguish(worldIn, pos, state, true);
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 			
-			return false;
+			return ActionResultType.FAIL;
 		}
 
 		if (!(heldItem.getItem() instanceof ReagentItem))
-			return false;
+			return ActionResultType.FAIL;
 		
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te != null)
-			return false;
+			return ActionResultType.FAIL;
 		
 		ReagentType type = ReagentItem.FindType(heldItem);
 		heldItem.split(1);
 		
 		if (type == null)
-			return false;
+			return ActionResultType.FAIL;
 		
 		setReagent(worldIn, pos, state, type);
 		
-		return true;
+		return ActionResultType.SUCCESS;
 	}
 	
 	public static void setReagent(World world, BlockPos pos, BlockState state, ReagentType type) {
@@ -392,8 +363,8 @@ public class Candle extends ContainerBlock {
 		candle.setReagentType(type);
 		
 		if (!world.isRemote) {
-			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimension().getType().getId(), pos, type),
-					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.getDimension().getType()));
+			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.getDimensionKey(), pos, type),
+					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.getDimensionKey()));
 		}
 	}
 	

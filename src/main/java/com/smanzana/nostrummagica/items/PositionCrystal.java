@@ -19,12 +19,13 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -89,7 +90,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	 * @param stack
 	 * @return
 	 */
-	public static int getDimension(ItemStack stack) {
+	public static RegistryKey<World> getDimension(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return 0;
 		
@@ -100,7 +101,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		return nbt.getInt(NBT_DIMENSION);
 	}
 	
-	public static void setPosition(ItemStack stack, DimensionType dimension, BlockPos pos) {
+	public static void setPosition(ItemStack stack, RegistryKey<World> dimension, BlockPos pos) {
 		setPosition(stack, dimension.getId(), pos);
 	}
 	

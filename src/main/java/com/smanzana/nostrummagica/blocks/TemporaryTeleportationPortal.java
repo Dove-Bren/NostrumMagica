@@ -28,12 +28,12 @@ public class TemporaryTeleportationPortal extends TeleportationPortal  {
 		super(Block.Properties.create(Material.LEAVES)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
-				.lightValue(14)
+				.setLightLevel((state) -> 14)
 				);
 	}
 	
 	@Override
-	public boolean hasTileEntity() {
+	public boolean hasTileEntity(BlockState state) {
 		return true;
 	}
 	
