@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.IElytraRenderer;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.item.ItemStack;
@@ -54,8 +55,8 @@ public class NostrumElytraWrapper {
 		}
 	}
 	
-	public static final void AddElytraModifier(Multimap<String, AttributeModifier> map, AttributeModifier modifier) {
-		map.put(CaelusAPI.ELYTRA_FLIGHT.getName(), modifier);
+	public static final void AddElytraModifier(Multimap<Attribute, AttributeModifier> map, AttributeModifier modifier) {
+		map.put(CaelusAPI.ELYTRA_FLIGHT, modifier);
 	}
 	
 	public static final void RemoveElytraModifier(LivingEntity entity, AttributeModifier modifier) {

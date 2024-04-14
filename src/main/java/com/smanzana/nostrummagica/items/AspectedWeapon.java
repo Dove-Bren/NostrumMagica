@@ -28,8 +28,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
@@ -236,11 +237,11 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot) {
-		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot);
+		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(slot);
 
 		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
 			double amt = typeScale(this.type)* .1;
-			multimap.put(Attributes.ATTACK_SPEED.getName(), new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -551,7 +552,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				entity.fallDistance = 0; // Reset any fall distance
 				
 				// Only affect caster if they jump
-				if (entity.onGround || entity.isSneaking()) {
+				if (entity.isOnGround() || entity.isSneaking()) {
 					return;
 				}
 			}
@@ -625,7 +626,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			// Try and only affect jumping or falling entities
 			final float minY = .1f;
 			final float maxY = 2f;
-			if (!entity.onGround && entity.getMotion().y > minY && entity.getMotion().y < maxY) {
+			if (!entity.isOnGround() && entity.getMotion().y > minY && entity.getMotion().y < maxY) {
 				entity.setMotion(entity.getMotion().x, Math.min(maxY, entity.getMotion().y + .5f), entity.getMotion().z);
 				entity.velocityChanged = true;
 			} else if (entity.getMotion().y < 0) {
@@ -657,7 +658,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			return false;
 		}
 		
-		((ServerWorld)entity.world).addLightningBolt(
+		((ServerWorld)entity.world).addEntity(
 				new NostrumTameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ())
 				);
 		attr.addMana(-30);
@@ -699,7 +700,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		for (int i = 0; i < count; i++) {
 			
 			if (i == 0) {
-				((ServerWorld) world).addLightningBolt(
+				((ServerWorld) world).addEntity(
 						new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, pos.x, pos.y, pos.z)
 						);
 			} else {
@@ -716,7 +717,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				}
 				
 				if (world.isAirBlock(cursor)) {
-					((ServerWorld) world).addLightningBolt(
+					((ServerWorld) world).addEntity(
 						new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 						);
 				}
@@ -737,10 +738,10 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			fly.push(5.0f, typeScale(this.type));
 			fly.apply(target, 1.0f);
 			ItemStacks.damageItem(stack, playerIn, hand, 2);
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 
-        return false;
+        return ActionResultType.PASS;
 	}
 	
 	public static void spawnWhirlwindParticle(World world, int count, Vector3d pos, EntityAreaEffect cloud, int color, float gravity) {

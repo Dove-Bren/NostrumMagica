@@ -110,7 +110,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 			for (SpellTomeEnhancementWrapper enhance : enhancements) {
 				tooltip.add(
 						new TranslationTextComponent(enhance.getEnhancement().getNameFormat())
-						.appendSibling(new StringTextComponent(" " + toRoman(enhance.getLevel())))
+						.append(new StringTextComponent(" " + toRoman(enhance.getLevel())))
 				);
 			}
 		}

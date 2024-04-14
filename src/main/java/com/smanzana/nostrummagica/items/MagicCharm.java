@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.items;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -10,6 +11,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
 
@@ -18,6 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +30,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -36,6 +38,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.IServerWorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -153,7 +156,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doEarth(PlayerEntity player, ServerWorld world) {
 		
-		if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+		if (DimensionUtils.DimEquals(world.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
 			return false;
 		}
 		
@@ -191,7 +194,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	private boolean doFire(PlayerEntity player, ServerWorld world) {
 		
-		if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+		if (DimensionUtils.DimEquals(world.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
 			return false;
 		}
 		
@@ -211,8 +214,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 				if (world.isAirBlock(pos))
 					break; // Skip whole column
 				
-				BlockState state = world.getBlockState(pos);
-				if (!Block.hasSolidSide(state, world, pos, Direction.UP))
+				if (!Block.hasSolidSideOnTop(world, pos))
 					break; // Same if it's not a solid block
 				
 				continue;
@@ -261,13 +263,16 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	private boolean doEnder(PlayerEntity player, ServerWorld world) { 
-		if (world.getDimension().getType().getId() == 0) {
-			BlockPos pos = player.getBedLocation(world.getDimension().getType());
-			if (pos == null) {
+		if (DimensionUtils.DimEquals(world.getDimensionKey(), World.OVERWORLD)) {
+			Optional<BlockPos> posOpt = player.getBedPosition();
+			BlockPos pos;
+			if (!posOpt.isPresent()) {
 				pos = world.getSpawnPoint();
 				while (!world.isAirBlock(pos)) {
 					pos = pos.add(0, 2, 0);
 				}
+			} else {
+				pos = posOpt.get();
 			}
 			
 			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false)) {
@@ -289,7 +294,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 //			
 //			
 //			return true;
-		} else if (world.getDimension().getType() == NostrumDimensions.EmptyDimension) {
+		} else if (DimensionUtils.DimEquals(world.getDimensionKey(), NostrumDimensions.EmptyDimension)) {
 			// In  sorcery dimension. Return to beginning
 			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
@@ -328,11 +333,14 @@ public class MagicCharm extends Item implements ILoreTagged {
 			List<Entity> entities = world.getEntitiesWithinAABB(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
-					world.addLightningBolt(new LightningBoltEntity(world, e.getPosX(), e.getPosY(), e.getPosZ(), false)); // TODO nostrum lightning?
+					LightningBoltEntity bolt = new LightningBoltEntity(EntityType.LIGHTNING_BOLT, world);
+					bolt.setPosition(e.getPosX(), e.getPosY(), e.getPosZ());
+					bolt.setEffectOnly(false);
+					world.addEntity(bolt); // TODO nostrum lightning?
 				}
 		} else {
 			world.getWorldInfo().setRaining(true);
-			world.getWorldInfo().setThundering(true);
+			((IServerWorldInfo) world.getWorldInfo()).setThundering(true);
 		}
 		
 		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.getPosX(), player.getPosY(), player.getPosZ());

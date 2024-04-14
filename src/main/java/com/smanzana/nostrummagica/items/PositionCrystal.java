@@ -9,7 +9,9 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -24,7 +26,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -42,7 +43,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	private static final String NBT_Y = "y";
 	private static final String NBT_Z = "z";
 
-	private static Map<Integer, String> DimensionNames = new HashMap<>();
+	private static Map<RegistryKey<World>, String> DimensionNames = new HashMap<>();
 
 	public PositionCrystal() {
 		super(NostrumItems.PropUnstackable());
@@ -51,7 +52,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		int dim = getDimension(stack);
+		RegistryKey<World> dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
 		
 		if (pos == null)
@@ -61,8 +62,8 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (dimName == null)
 			dimName = "An Unknown Dimension";
 		
-		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").applyTextStyle(TextFormatting.GREEN));
-		tooltip.add(new StringTextComponent(dimName).applyTextStyle(TextFormatting.DARK_GREEN));
+		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").mergeStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent(dimName).mergeStyle(TextFormatting.DARK_GREEN));
 	}
 	
 	public static BlockPos getBlockPosition(ItemStack stack) {
@@ -92,20 +93,16 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	 */
 	public static RegistryKey<World> getDimension(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
-			return 0;
+			return World.OVERWORLD;
 		
 		CompoundNBT nbt = stack.getTag();
 		if (nbt == null)
-			return 0;
+			return World.OVERWORLD;
 		
-		return nbt.getInt(NBT_DIMENSION);
+		return DimensionUtils.GetDimKey(nbt.getString(NBT_DIMENSION));
 	}
 	
 	public static void setPosition(ItemStack stack, RegistryKey<World> dimension, BlockPos pos) {
-		setPosition(stack, dimension.getId(), pos);
-	}
-	
-	public static void setPosition(ItemStack stack, int dimension, BlockPos pos) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;
 		
@@ -118,7 +115,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		else
 			tag = stack.getTag();
 		
-		tag.putInt(NBT_DIMENSION, dimension);
+		tag.putString(NBT_DIMENSION, dimension.getLocation().toString());
 		tag.putInt(NBT_X, pos.getX());
 		tag.putInt(NBT_Y, pos.getY());
 		tag.putInt(NBT_Z, pos.getZ());
@@ -156,7 +153,7 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		if (pos == null)
 			return ActionResultType.PASS;
 		
-		setPosition(stack, playerIn.dimension.getId(), pos);
+		setPosition(stack, DimensionUtils.GetDimension(playerIn), pos);
 		return ActionResultType.SUCCESS;
 	}
 	
@@ -192,34 +189,32 @@ public class PositionCrystal extends Item implements ILoreTagged {
 		return new Lore().add("Geogems form strong bonds with the ground, making them valuable for storing location information.", "One common use for a Geogem is to mark the location of an obelisk for use in a teleportation ritual.");
 	}
 	
-	public static String getDimensionName(int id) {
-		initDimensions();
+	@OnlyIn(Dist.CLIENT)
+	public static String getDimensionName(RegistryKey<World> dim) {
+		if (DimensionNames.containsKey(dim)) {
+			return DimensionNames.get(dim);
+		}
 		
-		return DimensionNames.get(id);
+		final String name;
+		if (DimensionUtils.IsOverworld(dim)) {
+			name = "Overworld";
+		} else if (DimensionUtils.IsNether(dim)) {
+			name = "Nether";
+		} else if (DimensionUtils.IsEnd(dim)) {
+			name = "The End";
+		} else if (I18n.hasKey(dim.getLocation().toString())) {
+			name = I18n.format(dim.getLocation().toString());
+		} else if (I18n.hasKey(dim.getLocation().toString().replace(':', '.'))) {
+			name = I18n.format(dim.getLocation().toString().replace(':', '.'));
+		} else {
+			String raw = dim.getLocation().getPath();
+			name = raw.substring(0, 1).toUpperCase() + raw.substring(1);
+		}
+		
+		DimensionNames.put(dim, name);
+		return name;
 	}
 	
-	private static void initDimensions() {
-		if (!DimensionNames.isEmpty())
-			return;
-		
-		for (DimensionType dimType : DimensionType.getAll()) {
-			final String name;
-			if (dimType == DimensionType.OVERWORLD) {
-				name = "Overworld";
-			} else if (dimType == DimensionType.THE_NETHER) {
-				name = "Nether";
-			} else if (dimType == DimensionType.THE_END) {
-				name = "The End";
-			//} else if (dimType == NostrumEmptyDimension.SorceryDimension) {
-			//	name = "Sorcery Dimension";
-			} else {
-				name = dimType.toString();
-			}
-			
-			DimensionNames.put(dimType.getId(), name);
-		}
-	}
-
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;

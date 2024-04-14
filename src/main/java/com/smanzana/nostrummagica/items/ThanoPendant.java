@@ -70,7 +70,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.desc"));
 		int charges = thanosGetWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.charges", charges).applyTextStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.charges", charges).mergeStyle(TextFormatting.GREEN));
 	}
 
 	@Override

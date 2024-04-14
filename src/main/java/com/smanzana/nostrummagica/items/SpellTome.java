@@ -49,6 +49,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -257,7 +258,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (tags == null)
 			tags = new ListNBT();
 		
-		tags.add(new IntNBT(spell.getRegistryID()));
+		tags.add(IntNBT.valueOf(spell.getRegistryID()));
 		nbt.put(NBT_SPELLS, tags);
 		
 		itemStack.setTag(nbt);
@@ -505,7 +506,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	public static void setPlayer(ItemStack itemStack, PlayerEntity player) {
-		setPlayer(itemStack, player.getDisplayName().getFormattedText(), player.getUniqueID());
+		setPlayer(itemStack, player.getDisplayName().getString(), player.getUniqueID());
 	}
 	
 	public static void setPlayer(ItemStack itemStack, String name, UUID id) {
@@ -668,7 +669,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 					new PlainTextPage("  This tome is still being bonded.")
 					));
 		} else {
-			String title = stack.getDisplayName().getFormattedText();
+			String title = stack.getDisplayName().getString();
 			int level = getLevel(stack);
 			int maxMana = getMaxMana(stack);
 			List<Spell> spells = getSpells(stack);
@@ -819,7 +820,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (enhances != null && !enhances.isEmpty()) {
 			for (SpellTomeEnhancementWrapper enhance : enhances) {
 				tooltip.add(new TranslationTextComponent(enhance.getEnhancement().getNameFormat())
-						.appendSibling(new StringTextComponent(" " + SpellTomePage.toRoman(enhance.getLevel())))
+						.append(new StringTextComponent(" " + SpellTomePage.toRoman(enhance.getLevel())))
 				);
 			}
 		}
@@ -827,7 +828,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		String name = getPlayerName(stack);
 		if (name != null && !name.isEmpty()) {
 			tooltip.add(new StringTextComponent(""));
-			tooltip.add(new StringTextComponent("Bound to " + name).applyTextStyle(TextFormatting.DARK_RED));
+			tooltip.add(new StringTextComponent("Bound to " + name).mergeStyle(TextFormatting.DARK_RED));
 		}
 	}
 	
@@ -878,7 +879,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		setPlayer(tome, player);
 		NostrumMagicaSounds.SHIELD_APPLY.play(player);
 		if (!world.isRemote) {
-			player.sendMessage(new TranslationTextComponent("info.tome.bond"));
+			player.sendMessage(new TranslationTextComponent("info.tome.bond"), Util.DUMMY_UUID);
 		}
 	}
 	
@@ -984,7 +985,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	private static void doLevelup(ItemStack tome, PlayerEntity player) {
-		player.sendMessage(new TranslationTextComponent("info.tome.levelup", new Object[0]));
+		player.sendMessage(new TranslationTextComponent("info.tome.levelup", new Object[0]), Util.DUMMY_UUID);
 		int mods = getModifications(tome);
 		setModifications(tome, ++mods);
 		int level = getLevel(tome);
@@ -1035,7 +1036,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		if (!SpellTome.isOwner(tome, player)) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.noowner"));
+				player.sendMessage(new TranslationTextComponent("info.tome.noowner"), Util.DUMMY_UUID);
 				
 			}
 			return false;
@@ -1043,7 +1044,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		if (!hasRoom(tome)) {
 			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.full"));
+				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.DUMMY_UUID);
 			}
 			return false;
 		}
@@ -1074,7 +1075,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (quick) {
 			attr.completeBinding(tome);
 		} else if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.bind_start", new Object[] {spell.getName(), compName}));
+				player.sendMessage(new TranslationTextComponent("info.tome.bind_start", new Object[] {spell.getName(), compName}), Util.DUMMY_UUID);
 		}
 		
 		return true;

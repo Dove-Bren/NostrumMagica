@@ -15,9 +15,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Rarity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 /**
  * Dragon spawning egg
@@ -44,7 +46,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		if (pos == null)
 			return ActionResultType.PASS;
 		
-		BlockPos.Mutable checkPos = new BlockPos.Mutable(pos);
+		BlockPos.Mutable checkPos = new BlockPos.Mutable().setPos(pos);
 		checkPos.setY(checkPos.getY() + 1);
 		if (!worldIn.isAirBlock(checkPos)) {
 			return ActionResultType.PASS;
@@ -63,7 +65,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		
 		EntityDragonEgg egg = new EntityDragonEgg(NostrumEntityTypes.dragonEgg, worldIn, playerIn, EntityTameDragonRed.rollRandomStats());
 		egg.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
-		egg.onInitialSpawn(worldIn, worldIn.getDifficultyForLocation(pos), SpawnReason.EVENT, null, null);
+		egg.onInitialSpawn((ServerWorld) worldIn, worldIn.getDifficultyForLocation(pos), SpawnReason.EVENT, null, null);
 		worldIn.addEntity(egg);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
@@ -71,7 +73,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 			attr.giveFullLore(egg.getLoreTag());
 		}
 		
-		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"));
+		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"), Util.DUMMY_UUID);
 		
 		if (!playerIn.isCreative()) {
 			context.getItem().shrink(1);

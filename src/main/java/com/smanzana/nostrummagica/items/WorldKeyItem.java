@@ -19,6 +19,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -50,7 +51,7 @@ public class WorldKeyItem extends Item {
 			keyName = key.toString();
 		}
 		
-		tooltip.add(new StringTextComponent(keyName).applyTextStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent(keyName).mergeStyle(TextFormatting.GREEN));
 	}
 	
 	public NostrumWorldKey getKey(ItemStack stack) {
@@ -105,14 +106,14 @@ public class WorldKeyItem extends Item {
 			if (playerIn.isSneaking()) {
 				NostrumWorldKey key = getKey(stack);
 				holder.setWorldKey(key);
-				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)));
+				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
 			} else {
 				if (holder.hasWorldKey()) {
 					NostrumWorldKey key = holder.getWorldKey();
 					setKey(stack, key);
-					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)));
+					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
 				} else {
-					playerIn.sendMessage(new StringTextComponent("No key to take"));
+					playerIn.sendMessage(new StringTextComponent("No key to take"), Util.DUMMY_UUID);
 				}
 			}
 			return ActionResultType.SUCCESS;
@@ -122,9 +123,9 @@ public class WorldKeyItem extends Item {
 			// Convert chests to locked chests
 			final NostrumWorldKey key = this.getKey(stack);
 			if (!LockedChestEntity.LockChest(worldIn, pos, key)) {
-				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"));
+				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"), Util.DUMMY_UUID);
 			} else {
-				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8))); 
+				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8)), Util.DUMMY_UUID); 
 			}
 		}
 		
@@ -138,7 +139,7 @@ public class WorldKeyItem extends Item {
 		if (!worldIn.isRemote() && playerIn.isSneaking()) {
 			clearKey(itemStackIn);
 			final NostrumWorldKey key = this.getKey(itemStackIn);
-			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)));
+			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		

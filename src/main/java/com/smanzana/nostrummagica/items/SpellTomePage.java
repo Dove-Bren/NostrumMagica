@@ -76,7 +76,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 		int level = getLevel(stack);
 		
 		tooltip.add(new TranslationTextComponent(enhance.getNameFormat())
-				.appendSibling(new StringTextComponent(" " + toRoman(level))));
+				.append(new StringTextComponent(" " + toRoman(level))));
 	}
 	
 	public static String toRoman(int num) {

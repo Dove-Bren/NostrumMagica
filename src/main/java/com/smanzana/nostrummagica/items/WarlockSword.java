@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.realmsclient.gui.ChatFormatting;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -37,8 +36,9 @@ import com.smanzana.nostrummagica.utils.RayTrace;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemGroup;
@@ -75,12 +75,12 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
+		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-			multimap.put(Attributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
-			multimap.put(Attributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
-			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
+			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicPotency.instance(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
 		}
 
 		return multimap;
@@ -137,7 +137,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 				continue;
 			}
 			
-			String str = " + " + elem.getChatColor() + Math.floor(f) + " " + elem.getName() + ChatFormatting.RESET + " damage";
+			String str = " + " + elem.getChatColor() + Math.floor(f) + " " + elem.getName() + TextFormatting.RESET + " damage";
 			if (extra) {
 				str += " (" + Math.floor(100 * (f - Math.floor(f))) + "%)";
 			}
@@ -147,7 +147,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 		if (extra) {
 			tooltip.add(new StringTextComponent("Capacity: " + getCapacity(stack)));
 			if (hasEnderIOTravel(stack)) {
-				tooltip.add(new StringTextComponent("EnderIO Travel Anchor Support").applyTextStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new StringTextComponent("EnderIO Travel Anchor Support").mergeStyle(TextFormatting.DARK_PURPLE));
 			}
 		} else {
 			tooltip.add(new StringTextComponent("[Hold Shift]"));			

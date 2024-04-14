@@ -425,7 +425,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Trigger").applyTextStyle(TextFormatting.DARK_BLUE));
+			tooltip.add(new StringTextComponent("Trigger").mergeStyle(TextFormatting.DARK_BLUE));
 			
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
@@ -488,7 +488,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Element").applyTextStyle(TextFormatting.DARK_GRAY));
+			tooltip.add(new StringTextComponent("Element").mergeStyle(TextFormatting.DARK_GRAY));
 			
 		}
 		
@@ -535,7 +535,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Alteration").applyTextStyle(TextFormatting.AQUA));
+			tooltip.add(new StringTextComponent("Alteration").mergeStyle(TextFormatting.AQUA));
 		}
 		
 		@Override
@@ -583,7 +583,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Shape Piece").applyTextStyle(TextFormatting.DARK_RED));
+			tooltip.add(new StringTextComponent("Shape Piece").mergeStyle(TextFormatting.DARK_RED));
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getShape().supportsBoolean() && params.flip) {
@@ -635,18 +635,18 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Shape").applyTextStyle(TextFormatting.DARK_RED));
+			tooltip.add(new StringTextComponent("Shape").mergeStyle(TextFormatting.DARK_RED));
 			EMagicElement elem = getNestedElement(stack);
 			if (elem != null) {
-				tooltip.add(new StringTextComponent(elem.getName()).applyTextStyle(TextFormatting.DARK_GRAY));
+				tooltip.add(new StringTextComponent(elem.getName()).mergeStyle(TextFormatting.DARK_GRAY));
 			}
 			int count = getNestedElementCount(stack);
 			if (count != 0) {
-				tooltip.add(new StringTextComponent("Power " + count).applyTextStyle(TextFormatting.DARK_GREEN));
+				tooltip.add(new StringTextComponent("Power " + count).mergeStyle(TextFormatting.DARK_GREEN));
 			}
 			EAlteration alteration = getNestedAlteration(stack);
 			if (alteration != null) {
-				tooltip.add(new StringTextComponent(alteration.getName()).applyTextStyle(TextFormatting.AQUA));
+				tooltip.add(new StringTextComponent(alteration.getName()).mergeStyle(TextFormatting.AQUA));
 			}
 			
 			SpellPartParam params = getPieceParam(stack);

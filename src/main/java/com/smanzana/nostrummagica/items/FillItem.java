@@ -17,6 +17,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -74,7 +75,7 @@ public class FillItem extends Item {
 		
 		if (player == null || !player.isCreative()) {
 			if (player != null) {
-				player.sendMessage(new StringTextComponent("You must be in creative to use this item"));
+				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.DUMMY_UUID);
 			}
 			return ActionResultType.SUCCESS;
 		}
@@ -113,7 +114,7 @@ public class FillItem extends Item {
 			fillAndAdd(player, world, pos, context);
 		}
 		
-		player.sendMessage(new StringTextComponent("Filled " + context.count + " blocks"));
+		player.sendMessage(new StringTextComponent("Filled " + context.count + " blocks"), Util.DUMMY_UUID);
 	}
 	
 	private static final class FillContext {

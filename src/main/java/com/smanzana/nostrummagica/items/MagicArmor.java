@@ -40,6 +40,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -59,13 +60,13 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.EquipmentSlotType.Group;
 import net.minecraft.item.ArmorItem;
@@ -524,15 +525,14 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 	
 	@Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-        Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();	
+        Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();	
 
-        if (equipmentSlot == this.slot)
-        {
-            multimap.put(Attributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.MOVEMENT_SPEED.getName(), new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
-            multimap.put(AttributeMagicResist.instance().getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
-            multimap.put(AttributeMagicReduction.instance(this.element).getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
+        if (equipmentSlot == this.slot) {
+            multimap.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
+            multimap.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            multimap.put(AttributeMagicResist.instance(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
+            multimap.put(AttributeMagicReduction.instance(this.element), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
         }
 
         return multimap;
@@ -1292,7 +1292,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 	protected void onServerTick(World world, PlayerEntity player, ItemStack stack, int setCount) {
 		if (setCount == 4 && this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST) {
 			if (element == EMagicElement.ICE) {
-				if (player.onGround && !ArmorCheckFlying(player)) {
+				if (player.isOnGround() && !ArmorCheckFlying(player)) {
 					final BlockPos pos = player.getPosition();
 					if (world.isAirBlock(pos)) {
 						BlockState belowState = world.getBlockState(pos.down());
@@ -1312,7 +1312,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					}
 					
 					// Refresh nearby tornados
-					if (player.onGround)
+					if (player.isOnGround())
 					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.getPosX(), player.getPosY(), player.getPosZ()).grow(5), (effect) -> {
 						// lol
 						return effect != null
@@ -1415,7 +1415,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			// Figure out attributes and set.
 			// Also capture current armor status and cache it.
 			Map<EquipmentSlotType, ItemStack> cacheMap = new EnumMap<>(EquipmentSlotType.class);
-			Multimap<String, AttributeModifier> attribMap = HashMultimap.<String, AttributeModifier>create();	
+			Multimap<Attribute, AttributeModifier> attribMap = HashMultimap.<Attribute, AttributeModifier>create();	
 
 			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 				if (slot.getSlotType() != Group.ARMOR) {
@@ -1447,12 +1447,12 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					final double reduct = (setCount > 0 && armorElem != null)
 							? calcMagicSetReduct(slot, armorElem, setCount, elem)
 							: 0;
-					attribMap.put(AttributeMagicReduction.instance(elem).getName(), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, AttributeModifier.Operation.ADDITION));
+					attribMap.put(AttributeMagicReduction.instance(elem), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, AttributeModifier.Operation.ADDITION));
 				}
 				final double boost = (setCount > 0 && armorElem != null)
 						? calcArmorMagicBoost(slot, armorElem, setCount)
 						: 0;
-				attribMap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
+				attribMap.put(AttributeMagicPotency.instance(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
 				
 				if (slot == EquipmentSlotType.CHEST) {
 					boolean has = (inSlot.getItem() instanceof MagicArmor) ? ((MagicArmor) inSlot.getItem()).hasElytra(entity) : false;
@@ -1466,7 +1466,8 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			}
 			
 			// Update attributes
-			entity.getAttributes().applyAttributeModifiers(attribMap);
+			int unused; // Check this
+			entity.getAttributeManager().reapplyModifiers(attribMap);
 			
 			// Create and save new map
 			LastEquipState.put(entity, cacheMap);
@@ -1539,7 +1540,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		});
 	}
 	
-	public static Map<IAttribute, Double> FindCurrentSetBonus(@Nullable Map<IAttribute, Double> map, LivingEntity entity, EMagicElement element, Type type) {
+	public static Map<Attribute, Double> FindCurrentSetBonus(@Nullable Map<Attribute, Double> map, LivingEntity entity, EMagicElement element, Type type) {
 		if (map == null) {
 			map = new HashMap<>();
 		}
@@ -1595,7 +1596,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		return map;
 	}
 	
-	private Map<IAttribute, Double> setMapInst = new HashMap<>();
+	private Map<Attribute, Double> setMapInst = new HashMap<>();
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
@@ -1632,7 +1633,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				}
 				
 				if (!setMapInst.isEmpty()) {
-					for (Entry<IAttribute, Double> entry : setMapInst.entrySet()) {
+					for (Entry<Attribute, Double> entry : setMapInst.entrySet()) {
 						Double val = entry.getValue();
 						if (val == null || val == 0) {
 							continue;
@@ -1640,10 +1641,10 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 						
 						// Formatting here copied from Vanilla
 						if (val > 0) {
-							tooltip.add((new TranslationTextComponent("attribute.modifier.plus.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent("attribute.name." + (String)entry.getKey().getName()))).applyTextStyle(TextFormatting.BLUE));
+							tooltip.add((new TranslationTextComponent("attribute.modifier.plus.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent("attribute.name." + entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.BLUE));
 						} else {
 							val = -val;
-							tooltip.add((new TranslationTextComponent("attribute.modifier.take.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent("attribute.name." + (String)entry.getKey().getName()))).applyTextStyle(TextFormatting.RED));
+							tooltip.add((new TranslationTextComponent("attribute.modifier.take.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent("attribute.name." + entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.RED));
 						}
 					}
 				}
@@ -1656,13 +1657,13 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				if (I18n.hasKey(key)) {
 					final String full = I18n.format(key, new Object[0]);
 					for (String line : full.split("\\|"))
-					tooltip.add(new StringTextComponent(line).applyTextStyle(TextFormatting.DARK_PURPLE));
+					tooltip.add(new StringTextComponent(line).mergeStyle(TextFormatting.DARK_PURPLE));
 				}
 			}
 		}
 		
 		if (MagicArmor.GetHasWingUpgrade(stack)) {
-			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").applyTextStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").mergeStyle(TextFormatting.GOLD));
 		}
 	}
 
@@ -1977,7 +1978,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		final boolean flying = ArmorCheckFlying(player);
 		
 		// If we've landed, turn off flying
-		if (flying && (player.onGround || player.isSneaking() || player.isPassenger() || player.isInWater() || player.isInLava())) {
+		if (flying && (player.isOnGround() || player.isSneaking() || player.isPassenger() || player.isInWater() || player.isInLava())) {
 			SetArmorFlying(player, false);
 			SendUpdates(player, null);
 			return;
@@ -1986,7 +1987,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		boolean hasJump = player.movementInput.jump && !jumpPressedEarly;
 		
 		// Start flying
-		if (!flying && hasJump && !player.onGround && player.getMotion().y < 0 && !player.abilities.isFlying) {
+		if (!flying && hasJump && !player.isOnGround() && player.getMotion().y < 0 && !player.abilities.isFlying) {
 			// Does this armor support flying?
 			if (HasElytra(player)) {
 				SetArmorFlying(player, true);
@@ -1997,7 +1998,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		
 		// Mana jump
 		final double MANA_JUMP_AMT = flying ? .6 : .4;
-		if (hasJump && flying && !player.onGround && !lastTickGround && !player.abilities.isFlying && player.getMotion().y < MANA_JUMP_AMT) {
+		if (hasJump && flying && !player.isOnGround() && !lastTickGround && !player.abilities.isFlying && player.getMotion().y < MANA_JUMP_AMT) {
 			// Does this armor have mana jump?
 			if (HasManaJump(player)) {
 				consumeManaJump(player);
@@ -2008,7 +2009,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		}
 		
 		// Dragon flying
-		if (flying && !player.onGround && !player.abilities.isFlying && player.movementInput.forwardKeyDown) {
+		if (flying && !player.isOnGround() && !player.abilities.isFlying && player.movementInput.forwardKeyDown) {
 			// Does this armor have dragon flying?
 			if (HasDragonFlight(player)) {
 				// Check if magnitude of flying is low and if so, boost it with magic
@@ -2069,7 +2070,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			}
 		}
 		
-		lastTickGround = player.onGround;
+		lastTickGround = player.isOnGround();
 	}
 	
 	@SubscribeEvent
@@ -2094,7 +2095,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			} else if (toPlayer != null) {
 				NetworkHandler.sendTo(message, (ServerPlayerEntity) toPlayer);
 			} else {
-				NetworkHandler.sendToDimension(message, player.dimension);
+				NetworkHandler.sendToDimension(message, DimensionUtils.GetDimension(player));
 			}
 		}
 	}
@@ -2280,7 +2281,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				if (growable.canGrow(world, cursor, state, false) && growable.canUseBonemeal(world, random, cursor, state)) {
 					// Only grow 1/4th the time
 					if (random.nextBoolean() && random.nextBoolean()) {
-						growable.grow(world, random, cursor, state);
+						growable.grow((ServerWorld) world, random, cursor, state);
 					}
 					
 					((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
@@ -2433,7 +2434,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					}
 					
 					// Projectiles get turned downward
-					if (entity instanceof IProjectile) {
+					if (entity instanceof ProjectileEntity) {
 						LivingEntity shooter = Projectiles.getShooter(entity);
 						if (shooter == ent) {
 							// Let summoner's projectiles go unharmed

@@ -22,15 +22,14 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -114,10 +113,10 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IE
 	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
+		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(AttributeMagicPotency.instance().getName(), new AttributeModifier(MAGEBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
+			multimap.put(AttributeMagicPotency.instance(), new AttributeModifier(MAGEBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
 		}
 
         return multimap;

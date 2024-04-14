@@ -72,7 +72,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	public void setPet(ItemStack stack, IPetWithSoul pet) {
 		this.setPetSoulID(stack, pet.getPetSoulID());
 		if (pet instanceof LivingEntity) {
-			this.setPetName(stack, ((LivingEntity) pet).getName().getFormattedText());
+			this.setPetName(stack, ((LivingEntity) pet).getName().getString());
 		}
 	}
 	

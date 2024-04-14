@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -22,6 +23,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -64,11 +66,11 @@ public class PositionToken extends PositionCrystal {
 	
 	protected static boolean canPerformRecall(PlayerEntity playerIn, World worldIn, ItemStack token) {
 		BlockPos pos = getBlockPosition(token);
-		int dim = getDimension(token);
+		RegistryKey<World> dim = getDimension(token);
 		return pos != null
 				&& hasRecallUnlocked(playerIn, worldIn, token)
 				&& canAffordRecall(playerIn, worldIn, token)
-				&& dim == playerIn.dimension.getId();
+				&& DimensionUtils.InDimension(playerIn, dim);
 	}
 	
 	protected boolean doRecall(PlayerEntity playerIn, World worldIn, ItemStack token) {
@@ -105,7 +107,7 @@ public class PositionToken extends PositionCrystal {
 			pos = pos.down();
 			state = worldIn.getBlockState(pos);
 		}
-		setPosition(context.getItem(), playerIn.dimension.getId(), pos);
+		setPosition(context.getItem(), DimensionUtils.GetDimension(playerIn), pos);
 		return ActionResultType.SUCCESS;
 	}
 	
@@ -148,7 +150,7 @@ public class PositionToken extends PositionCrystal {
 			return null;
 		
 		BlockPos pos = getBlockPosition(centerItem);
-		int dim = getDimension(centerItem);
+		RegistryKey<World> dim = getDimension(centerItem);
 		
 		if (pos == null)
 			return null;
@@ -179,7 +181,7 @@ public class PositionToken extends PositionCrystal {
 					NostrumObeliskEntity obelisk = ((NostrumObeliskEntity) ent);
 					if (obelisk.canAcceptTarget(storedPos)) {
 						if (entityItem.getItem().hasDisplayName()) {
-							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName().getFormattedText());
+							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName().getString());
 						} else {
 							obelisk.addTarget(storedPos);
 						}
