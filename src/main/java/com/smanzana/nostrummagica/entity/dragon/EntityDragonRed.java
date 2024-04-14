@@ -411,7 +411,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	}
 	
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
         this.getAttribute(Attributes.FLYING_SPEED).setBaseValue(3D);

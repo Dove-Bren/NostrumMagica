@@ -114,7 +114,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreSupplie
     
     public abstract void initGolemAttributes();
 
-    protected void registerAttributes()
+    public static final AttributeModifierMap.MutableAttribute BuildAttributes()
     {
         super.registerAttributes();
         this.getAttributes().registerAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);

@@ -119,7 +119,7 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
     }
 
     @Override
-    protected void registerAttributes()
+    public static final AttributeModifierMap.MutableAttribute BuildAttributes()
     {
         super.registerAttributes();
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);

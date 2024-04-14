@@ -73,7 +73,7 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
     }
     
-    protected void registerAttributes()
+    public static final AttributeModifierMap.MutableAttribute BuildAttributes()
     {
         super.registerAttributes();
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);

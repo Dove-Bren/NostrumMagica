@@ -62,8 +62,9 @@ import com.smanzana.nostrummagica.utils.Inventories;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.BegGoal;
 import net.minecraft.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
@@ -467,8 +468,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 		
 	
-	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
 		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.35D);
 		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50.0D);

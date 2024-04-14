@@ -214,7 +214,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityLux.class));
 	}
 	
-	protected void registerAttributes()
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes()
 	{
 		super.registerAttributes();
 		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.2D);

@@ -66,7 +66,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 	}
 
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
 		
 		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(2D);

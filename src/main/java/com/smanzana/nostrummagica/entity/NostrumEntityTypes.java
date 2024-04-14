@@ -27,6 +27,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -274,6 +275,44 @@ public class NostrumEntityTypes {
 			List<Biome.SpawnListEntry> spawns = biome.getSpawns(classification);
 			spawns.add(new Biome.SpawnListEntry(entityType, itemWeight, minGroupCount, maxGroupCount));
 		}
+	}
+	
+	@SubscribeEvent
+	public static void registerAttributes(EntityAttributeCreationEvent event) {
+		event.put(golemPhysical, EntityGolemPhysical.BuildAttributes());
+		event.put(golemLightning, EntityGolemLightning.BuildAttributes());
+		event.put(golemFire, EntityGolemFire.BuildAttributes());
+		event.put(golemEarth, EntityGolemEarth.BuildAttributes());
+		event.put(golemIce, EntityGolemIce.BuildAttributes());
+		event.put(golemWind, EntityGolemWind.BuildAttributes());
+		event.put(golemEnder, EntityGolemEnder.BuildAttributes());
+		event.put(koid, EntityKoid.BuildAttributes());
+		event.put(dragonRed, EntityDragonRed.BuildAttributes());
+		event.put(dragonRedBodyPart, EntityDragonRed.DragonBodyPart.BuildAttributes());
+		event.put(tameDragonRed, EntityTameDragonRed.BuildAttributes());
+		event.put(shadowDragonRed, EntityShadowDragonRed.BuildAttributes());
+		event.put(dragonEgg, EntityDragonEgg.BuildAttributes());
+		event.put(plantBoss, EntityPlantBoss.BuildAttributes());
+		event.put(plantBossBody, EntityPlantBoss.PlantBossBody.BuildAttributes());
+		event.put(plantBossLeaf, EntityPlantBoss.PlantBossLeafLimb.BuildAttributes());
+		event.put(plantBossBramble, EntityPlantBossBramble.BuildAttributes());
+		event.put(sprite, EntitySprite.BuildAttributes());
+		event.put(lux, EntityLux.BuildAttributes());
+		event.put(wisp, EntityWisp.BuildAttributes());
+		event.put(willo, EntityWillo.BuildAttributes());
+		event.put(arcaneWolf, EntityArcaneWolf.BuildAttributes());
+		event.put(spellProjectile, EntitySpellProjectile.BuildAttributes());
+		event.put(chakramSpellSaucer, EntityChakramSpellSaucer.BuildAttributes());
+		event.put(cyclerSpellSaucer, EntityCyclerSpellSaucer.BuildAttributes());
+		event.put(switchTrigger, EntitySwitchTrigger.BuildAttributes());
+		event.put(tameLightning, NostrumTameLightning.BuildAttributes());
+		event.put(hookShot, EntityHookShot.BuildAttributes());
+		event.put(spellBullet, EntitySpellBullet.BuildAttributes());
+		event.put(spellMortar, EntitySpellMortar.BuildAttributes());
+		event.put(areaEffect, EntityAreaEffect.BuildAttributes());
+		event.put(keySwitchTrigger, EntityKeySwitchTrigger.BuildAttributes());
+		event.put(enderRodBall, EntityEnderRodBall.BuildAttributes());
+		
 	}
 	
 }

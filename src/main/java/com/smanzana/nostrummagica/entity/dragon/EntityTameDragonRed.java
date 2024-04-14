@@ -1370,7 +1370,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.31D);
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0D);

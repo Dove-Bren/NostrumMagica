@@ -224,7 +224,7 @@ public abstract class EntityDragonFlying extends EntityDragon {
 	}
 	
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
 		this.getAttributes().registerAttribute(Attributes.FLYING_SPEED);
 	}

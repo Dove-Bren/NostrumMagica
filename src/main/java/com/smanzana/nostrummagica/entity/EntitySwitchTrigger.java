@@ -34,7 +34,7 @@ public class EntitySwitchTrigger extends MobEntity {
 	}
 	
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
 		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1D);
 	}

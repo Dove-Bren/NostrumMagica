@@ -105,7 +105,7 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 	}
 
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50.0D);

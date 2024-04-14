@@ -146,7 +146,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		}
 	}
 	
-	protected void registerAttributes()
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes()
 	{
 		super.registerAttributes();
 		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.1D);

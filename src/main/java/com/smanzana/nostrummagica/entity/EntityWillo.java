@@ -148,7 +148,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 	}
 	
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
 		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.2D);
 		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);

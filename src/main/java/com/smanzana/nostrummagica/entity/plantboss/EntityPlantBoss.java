@@ -349,7 +349,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	@Override
-	protected void registerAttributes() {
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		super.registerAttributes();
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.00D);
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(800.0D);
