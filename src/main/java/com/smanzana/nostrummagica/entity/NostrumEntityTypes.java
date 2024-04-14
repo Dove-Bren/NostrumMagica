@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
@@ -18,18 +18,26 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.monster.ZombiePigmanEntity;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -110,12 +118,6 @@ public class NostrumEntityTypes {
 			.build("");
 		koidType.setRegistryName(EntityKoid.ID);
 		registry.register(koidType);
-		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
-		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
-		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY));
-		addSpawn(koidType, EntityClassification.MONSTER, 12, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		addSpawn(koidType, EntityClassification.MONSTER, 20, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY));
-		EntitySpawnPlacementRegistry.register(koidType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		
 		registry.register(EntityType.Builder.<EntityDragonRed>create(EntityDragonRed::new, EntityClassification.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -135,8 +137,6 @@ public class NostrumEntityTypes {
 			.build("");
 		tameDragonType.setRegistryName(EntityTameDragonRed.ID);
 		registry.register(tameDragonType);
-		addSpawn(tameDragonType, EntityClassification.MONSTER, 4, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		EntitySpawnPlacementRegistry.register(tameDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ZombiePigmanEntity::func_223324_d);
 		
 		EntityType<EntityShadowDragonRed> shadowRedDragonType = EntityType.Builder.<EntityShadowDragonRed>create(EntityShadowDragonRed::new, EntityClassification.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -145,8 +145,6 @@ public class NostrumEntityTypes {
 			.build("");
 		shadowRedDragonType.setRegistryName(EntityShadowDragonRed.ID);
 		registry.register(shadowRedDragonType);
-		addSpawn(shadowRedDragonType, EntityClassification.MONSTER, 15, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		EntitySpawnPlacementRegistry.register(shadowRedDragonType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ZombiePigmanEntity::func_223324_d);
 		
 		registry.register(EntityType.Builder.<EntityDragonEgg>create(EntityDragonEgg::new, EntityClassification.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -174,10 +172,6 @@ public class NostrumEntityTypes {
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("");
 		spriteType.setRegistryName(EntitySprite.ID);
-		registry.register(spriteType);
-		addSpawn(spriteType, EntityClassification.MONSTER, 15, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		addSpawn(spriteType, EntityClassification.MONSTER, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
-		EntitySpawnPlacementRegistry.register(spriteType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		
 		EntityType<EntityLux> luxType = EntityType.Builder.<EntityLux>create(EntityLux::new, EntityClassification.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -185,9 +179,6 @@ public class NostrumEntityTypes {
 			.build("");
 		luxType.setRegistryName(EntityLux.ID);
 		registry.register(luxType);
-		addSpawn(luxType, EntityClassification.CREATURE, 20, 1, 3, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
-		addSpawn(luxType, EntityClassification.CREATURE, 15, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
-		addSpawn(luxType, EntityClassification.CREATURE, 10, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.JUNGLE));
 		
 		EntityType<EntityWisp> wispType = EntityType.Builder.<EntityWisp>create(EntityWisp::new, EntityClassification.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -195,12 +186,7 @@ public class NostrumEntityTypes {
 			.build("");
 		wispType.setRegistryName(EntityWisp.ID);
 		registry.register(wispType);
-		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
-		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
-		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY));
-		addSpawn(wispType, EntityClassification.AMBIENT, 1, 1, 2, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY));
-		addSpawn(wispType, EntityClassification.MONSTER, 5, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		EntitySpawnPlacementRegistry.register(wispType, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWisp::canSpawnExtraCheck);
+		registry.register(spriteType);
 		
 		EntityType<EntityWillo> willoType = EntityType.Builder.<EntityWillo>create(EntityWillo::new, EntityClassification.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -208,14 +194,6 @@ public class NostrumEntityTypes {
 			.build("");
 		willoType.setRegistryName(EntityWillo.ID);
 		registry.register(willoType);
-		addSpawn(willoType, EntityClassification.MONSTER, 18, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.MAGICAL));
-		addSpawn(willoType, EntityClassification.MONSTER, 10, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
-		addSpawn(willoType, EntityClassification.MONSTER, 8, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SNOWY));
-		addSpawn(willoType, EntityClassification.MONSTER, 14, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.SPOOKY));
-		addSpawn(willoType, EntityClassification.MONSTER, 7, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.DRY));
-		addSpawn(willoType, EntityClassification.MONSTER, 1, 1, 1, BiomeDictionary.getBiomes(BiomeDictionary.Type.NETHER));
-		
-		EntitySpawnPlacementRegistry.register(willoType, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWillo::canSpawnExtraCheck);
 		
 		registry.register(EntityType.Builder.<EntityArcaneWolf>create(EntityArcaneWolf::new, EntityClassification.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -270,10 +248,68 @@ public class NostrumEntityTypes {
 			.build("").setRegistryName(EntityEnderRodBall.ID));
 	}
 	
-	private static void addSpawn(EntityType<? extends MobEntity> entityType, EntityClassification classification, int itemWeight, int minGroupCount, int maxGroupCount, Collection<Biome> biomes) {
-		for (Biome biome : biomes) {
-			List<Biome.SpawnListEntry> spawns = biome.getSpawns(classification);
-			spawns.add(new Biome.SpawnListEntry(entityType, itemWeight, minGroupCount, maxGroupCount));
+	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+		return world.getDifficulty() != Difficulty.PEACEFUL && world.getBlockState(pos.down()).getBlock() != Blocks.NETHER_WART_BLOCK;
+	}
+	
+	@SubscribeEvent
+	public static void registerEntityPlacement(FMLCommonSetupEvent event) {
+		EntitySpawnPlacementRegistry.register(koid, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
+		EntitySpawnPlacementRegistry.register(tameDragonRed, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
+		EntitySpawnPlacementRegistry.register(shadowDragonRed, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
+		EntitySpawnPlacementRegistry.register(sprite, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
+		EntitySpawnPlacementRegistry.register(wisp, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWisp::canSpawnExtraCheck);
+		EntitySpawnPlacementRegistry.register(willo, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWillo::canSpawnExtraCheck);
+	}
+	
+	@SubscribeEvent
+	public static void registerSpawns(BiomeLoadingEvent event) {
+		final Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, event.getName()));
+		
+		final boolean magical = types.contains(BiomeDictionary.Type.MAGICAL);
+		final boolean forest = types.contains(BiomeDictionary.Type.FOREST);
+		final boolean snowy = types.contains(BiomeDictionary.Type.SNOWY);
+		final boolean nether = types.contains(BiomeDictionary.Type.NETHER);
+		final boolean spooky = types.contains(BiomeDictionary.Type.SPOOKY);
+		final boolean jungle = types.contains(BiomeDictionary.Type.JUNGLE);
+		final boolean dry = types.contains(BiomeDictionary.Type.DRY);
+		
+		// koid
+		if (magical || forest || snowy || nether || spooky) {
+			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(koid, nether ? 12 : 20, 1, 1));
+		}
+		
+		// tameable and shadow dragon natural spawns
+		if (nether) {
+			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(tameDragonRed, 4, 1, 1));
+			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(shadowDragonRed, 15, 1, 2));
+		}
+		
+		// sprite
+		if (nether || magical) {
+			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(sprite, nether ? 15 : 10, 1, 3));
+		}
+		
+		// lux
+		if (magical || forest || jungle) {
+			final int weight = magical ? 20 : (forest ? 15 : 10);
+			event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(lux, weight, 1, 3));
+		}
+		
+		// wisp
+		if (magical || forest || snowy || spooky || nether) {
+			event.getSpawns().getSpawner(EntityClassification.AMBIENT).add(new MobSpawnInfo.Spawners(wisp, nether ? 5 : 1, 1, 1));
+		}
+		
+		// willo
+		if (magical || forest || snowy || spooky || dry || nether) {
+			final int weight = magical ? 18
+					: forest ? 10
+					: snowy ? 8
+					: spooky ? 14
+					: dry ? 7
+					: 1;
+			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(willo, weight, 1, 3));
 		}
 	}
 	
