@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
@@ -33,10 +34,9 @@ public class EntitySwitchTrigger extends MobEntity {
 		return false;
 	}
 	
-	@Override
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1D);
+		return MobEntity.func_233666_p_()
+				.createMutableAttribute(Attributes.MAX_HEALTH, 1D);
 	}
 	
 	

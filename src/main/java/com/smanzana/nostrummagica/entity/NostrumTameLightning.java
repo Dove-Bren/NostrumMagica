@@ -16,6 +16,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 // Copy of vanilla with no fire
 public class NostrumTameLightning extends LightningBoltEntity {
@@ -32,10 +33,10 @@ public class NostrumTameLightning extends LightningBoltEntity {
 	}
 
 	public NostrumTameLightning(EntityType<? extends NostrumTameLightning> type, World worldIn, double x, double y, double z) {
-		super(worldIn, x, y, z, true);
+		super(type, worldIn);
+		this.setPosition(x, y, z);
+		this.setEffectOnly(true);
 		this.lightningState = 2;
-		
-		// type is ignored! Which I think means clients will think it's a real bolt?
 	}
 	
 	public NostrumTameLightning setEntityToIgnore(@Nullable LivingEntity entity) {
@@ -61,14 +62,14 @@ public class NostrumTameLightning extends LightningBoltEntity {
 
 		--this.lightningState;
 
-		if (this.lightningState >= 0) {
+		if (this.lightningState >= 0 && this.world instanceof ServerWorld) {
 			List<Entity> list = this.world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(this.getPosX() - 3.0D, this.getPosY() - 3.0D, this.getPosZ() - 3.0D, this.getPosX() + 3.0D, this.getPosY() + 6.0D + 3.0D, this.getPosZ() + 3.0D),
 					Entity::isAlive);
 
 			for (int i = 0; i < list.size(); ++i) {
 				Entity entity = (Entity)list.get(i);
 				if (ignoreEntity != entity && !net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
-					entity.onStruckByLightning(this);
+					entity.func_241841_a((ServerWorld) world, this); //onStruckByLightning(this);
 					entity.setInvulnerable(false);
 					entity.hurtResistantTime = 0;
 				}

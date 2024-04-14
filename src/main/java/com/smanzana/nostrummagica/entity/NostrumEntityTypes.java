@@ -279,39 +279,39 @@ public class NostrumEntityTypes {
 	
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
-		event.put(golemPhysical, EntityGolemPhysical.BuildAttributes());
-		event.put(golemLightning, EntityGolemLightning.BuildAttributes());
-		event.put(golemFire, EntityGolemFire.BuildAttributes());
-		event.put(golemEarth, EntityGolemEarth.BuildAttributes());
-		event.put(golemIce, EntityGolemIce.BuildAttributes());
-		event.put(golemWind, EntityGolemWind.BuildAttributes());
-		event.put(golemEnder, EntityGolemEnder.BuildAttributes());
-		event.put(koid, EntityKoid.BuildAttributes());
-		event.put(dragonRed, EntityDragonRed.BuildAttributes());
-		event.put(dragonRedBodyPart, EntityDragonRed.DragonBodyPart.BuildAttributes());
-		event.put(tameDragonRed, EntityTameDragonRed.BuildAttributes());
-		event.put(shadowDragonRed, EntityShadowDragonRed.BuildAttributes());
-		event.put(dragonEgg, EntityDragonEgg.BuildAttributes());
-		event.put(plantBoss, EntityPlantBoss.BuildAttributes());
-		event.put(plantBossBody, EntityPlantBoss.PlantBossBody.BuildAttributes());
-		event.put(plantBossLeaf, EntityPlantBoss.PlantBossLeafLimb.BuildAttributes());
-		event.put(plantBossBramble, EntityPlantBossBramble.BuildAttributes());
-		event.put(sprite, EntitySprite.BuildAttributes());
-		event.put(lux, EntityLux.BuildAttributes());
-		event.put(wisp, EntityWisp.BuildAttributes());
-		event.put(willo, EntityWillo.BuildAttributes());
-		event.put(arcaneWolf, EntityArcaneWolf.BuildAttributes());
-		event.put(spellProjectile, EntitySpellProjectile.BuildAttributes());
-		event.put(chakramSpellSaucer, EntityChakramSpellSaucer.BuildAttributes());
-		event.put(cyclerSpellSaucer, EntityCyclerSpellSaucer.BuildAttributes());
-		event.put(switchTrigger, EntitySwitchTrigger.BuildAttributes());
-		event.put(tameLightning, NostrumTameLightning.BuildAttributes());
-		event.put(hookShot, EntityHookShot.BuildAttributes());
-		event.put(spellBullet, EntitySpellBullet.BuildAttributes());
-		event.put(spellMortar, EntitySpellMortar.BuildAttributes());
-		event.put(areaEffect, EntityAreaEffect.BuildAttributes());
-		event.put(keySwitchTrigger, EntityKeySwitchTrigger.BuildAttributes());
-		event.put(enderRodBall, EntityEnderRodBall.BuildAttributes());
+		event.put(golemPhysical, EntityGolemPhysical.BuildAttributes().create());
+		event.put(golemLightning, EntityGolemLightning.BuildAttributes().create());
+		event.put(golemFire, EntityGolemFire.BuildAttributes().create());
+		event.put(golemEarth, EntityGolemEarth.BuildAttributes().create());
+		event.put(golemIce, EntityGolemIce.BuildAttributes().create());
+		event.put(golemWind, EntityGolemWind.BuildAttributes().create());
+		event.put(golemEnder, EntityGolemEnder.BuildAttributes().create());
+		event.put(koid, EntityKoid.BuildAttributes().create());
+		event.put(dragonRed, EntityDragonRed.BuildAttributes().create());
+		// No attributes event.put(dragonRedBodyPart, EntityDragonRed.DragonBodyPart.BuildAttributes().create());
+		event.put(tameDragonRed, EntityTameDragonRed.BuildAttributes().create());
+		event.put(shadowDragonRed, EntityShadowDragonRed.BuildAttributes().create());
+		event.put(dragonEgg, EntityDragonEgg.BuildAttributes().create());
+		event.put(plantBoss, EntityPlantBoss.BuildAttributes().create());
+		// No attributes event.put(plantBossBody, EntityPlantBoss.PlantBossBody.BuildAttributes().create());
+		// No attributes event.put(plantBossLeaf, EntityPlantBoss.PlantBossLeafLimb.BuildAttributes().create());
+		// No attributes event.put(plantBossBramble, EntityPlantBossBramble.BuildAttributes().create());
+		event.put(sprite, EntitySprite.BuildAttributes().create());
+		event.put(lux, EntityLux.BuildAttributes().create());
+		event.put(wisp, EntityWisp.BuildAttributes().create());
+		event.put(willo, EntityWillo.BuildAttributes().create());
+		event.put(arcaneWolf, EntityArcaneWolf.BuildAttributes().create());
+		// No attributes event.put(spellProjectile, EntitySpellProjectile.BuildAttributes().create());
+		// No attributes event.put(chakramSpellSaucer, EntityChakramSpellSaucer.BuildAttributes().create());
+		// No attributes event.put(cyclerSpellSaucer, EntityCyclerSpellSaucer.BuildAttributes().create());
+		event.put(switchTrigger, EntitySwitchTrigger.BuildAttributes().create());
+		// No attributes event.put(tameLightning, NostrumTameLightning.BuildAttributes().create());
+		// No attributes event.put(hookShot, EntityHookShot.BuildAttributes().create());
+		// No attributes event.put(spellBullet, EntitySpellBullet.BuildAttributes().create());
+		// No attributes event.put(spellMortar, EntitySpellMortar.BuildAttributes().create());
+		// No attributes event.put(areaEffect, EntityAreaEffect.BuildAttributes().create());
+		event.put(keySwitchTrigger, EntityKeySwitchTrigger.BuildKeySwitchAttributes().create());
+		// No attributes event.put(enderRodBall, EntityEnderRodBall.BuildAttributes().create());
 		
 	}
 	

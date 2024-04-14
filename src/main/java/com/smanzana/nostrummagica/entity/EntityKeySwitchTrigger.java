@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
 import net.minecraft.world.World;
 
 public class EntityKeySwitchTrigger extends EntitySwitchTrigger {
@@ -32,5 +33,9 @@ public class EntityKeySwitchTrigger extends EntitySwitchTrigger {
 						).gravity(-.025f).color(keyEnt.getColor().getColorValue() | 0xAA000000));
 			}
 		}
+	}
+	
+	public static final MutableAttribute BuildKeySwitchAttributes() {
+		return EntitySwitchTrigger.BuildAttributes();
 	}
 }

@@ -51,6 +51,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.Pose;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -67,8 +68,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.BossInfo;
-import net.minecraft.world.ServerBossInfo;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerBossInfo;
 
 public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPartEntity {
 	
@@ -348,18 +349,15 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		this.dataManager.register(BODY_ID, Optional.empty());
 	}
 	
-	@Override
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.00D);
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(800.0D);
-        this.getAttributes().registerAttribute(Attributes.ATTACK_DAMAGE);
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(18.0D);
-        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
-        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(8D);
-        this.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+		return MobEntity.func_233666_p_()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.00D)
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 800.0D)
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 10.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 18.0D)
+	        .createMutableAttribute(Attributes.ATTACK_SPEED, 0.5D)
+	        .createMutableAttribute(Attributes.FOLLOW_RANGE, 8D)
+	        .createMutableAttribute(Attributes.KNOCKBACK_RESISTANCE, 1.0);
     }
 	
 	@Override

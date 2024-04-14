@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
@@ -104,16 +105,14 @@ public class EntityShadowDragonRed extends EntityDragonRedBase {
 		//
 	}
 
-	@Override
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50.0D);
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(5.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(8.0D);
-        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
-        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64D);
+		return EntityDragonRedBase.BuildBaseRedDragonAttributes()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 50.0D)
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 5.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 8.0D)
+	        .createMutableAttribute(Attributes.ATTACK_SPEED, 0.5D)
+	        .createMutableAttribute(Attributes.FOLLOW_RANGE, 64D);
     }
 	
 	@Override

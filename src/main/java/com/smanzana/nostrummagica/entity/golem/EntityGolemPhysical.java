@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
@@ -76,14 +77,14 @@ public class EntityGolemPhysical extends EntityGolem {
 		return true;
 	}
 
-	@Override
-	public void initGolemAttributes() {
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.23D);
-
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(16.0D);
-
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(8.0D);
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+		return EntityGolem.BuildBaseAttributes()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.23D)
+	
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 16.0D)
+	
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 8.0D);
 	}
 
 	@Override

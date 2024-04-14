@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -65,12 +66,10 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 		this.dataManager.register(PLAYER, Optional.<UUID>empty());
 	}
 
-	@Override
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-		
-		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(2D);
-		this.getAttribute(Attributes.ARMOR).setBaseValue(0D);
+		return MobEntity.func_233666_p_()
+				.createMutableAttribute(Attributes.MAX_HEALTH, 2D)
+				.createMutableAttribute(Attributes.ARMOR, 0D);
 	}
 	
 	

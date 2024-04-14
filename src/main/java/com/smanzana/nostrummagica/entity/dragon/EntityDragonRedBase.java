@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -164,6 +165,10 @@ public abstract class EntityDragonRedBase extends EntityDragonFlying {
 				this.dataManager.set(DRAGON_BITE, Boolean.FALSE);
 			}
 		}
+	}
+	
+	protected static final MutableAttribute BuildBaseRedDragonAttributes() {
+		return EntityDragonFlying.BuildBaseFlyingAttributes();
 	}
 	
 }

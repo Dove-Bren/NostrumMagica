@@ -19,6 +19,7 @@ import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Pose;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtGoal;
@@ -73,13 +74,12 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
     }
     
-    public static final AttributeModifierMap.MutableAttribute BuildAttributes()
-    {
-        super.registerAttributes();
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.33D);
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(2.0D);
+    public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+        return MonsterEntity.func_234295_eP_()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 10.0D)
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 2.0D);
     }
 
     protected void playStepSound(BlockPos pos, BlockState blockIn)

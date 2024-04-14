@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effects;
@@ -119,14 +120,14 @@ public class EntityGolemFire extends EntityGolem {
 		return target.getActivePotionEffect(Effects.FIRE_RESISTANCE) == null;
 	}
 
-	@Override
-	public void initGolemAttributes() {
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.22D);
-
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(18.0D);
-
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(6.0D);
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+		return EntityGolem.BuildBaseAttributes()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.22D)
+	
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 18.0D)
+	
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 6.0D);
 	}
 
 	@Override

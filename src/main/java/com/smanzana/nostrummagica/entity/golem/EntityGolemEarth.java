@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
@@ -88,14 +89,14 @@ public class EntityGolemEarth extends EntityGolem {
 				|| target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
 	}
 
-	@Override
-	public void initGolemAttributes() {
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.20D);
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+		return EntityGolem.BuildBaseAttributes()
+				.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.20D)
 
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(24.0D);
+				.createMutableAttribute(Attributes.MAX_HEALTH, 24.0D)
 
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(4.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(12.0D);
+				.createMutableAttribute(Attributes.ATTACK_DAMAGE, 4.0D)
+				.createMutableAttribute(Attributes.ARMOR, 12.0D);
 	}
 
 	@Override

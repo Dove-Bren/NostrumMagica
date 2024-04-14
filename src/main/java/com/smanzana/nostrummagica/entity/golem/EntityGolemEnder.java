@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effects;
 import net.minecraft.world.World;
@@ -96,14 +97,14 @@ public class EntityGolemEnder extends EntityGolem {
 		return target.getActivePotionEffect(Effects.INVISIBILITY) == null;
 	}
 
-	@Override
-	public void initGolemAttributes() {
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.30D);
-
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(30.0D);
-
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(4.0D);
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+		return EntityGolem.BuildBaseAttributes()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.30D)
+	
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 30.0D)
+	
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 4.0D);
 	}
 
 	@Override

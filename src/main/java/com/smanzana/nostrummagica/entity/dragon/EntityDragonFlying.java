@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.nbt.CompoundNBT;
@@ -223,10 +224,9 @@ public abstract class EntityDragonFlying extends EntityDragon {
 		}
 	}
 	
-	@Override
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-		this.getAttributes().registerAttribute(Attributes.FLYING_SPEED);
+	protected static final AttributeModifierMap.MutableAttribute BuildBaseFlyingAttributes() {
+		return EntityDragon.BuildBaseDragonAttributes()
+				.createMutableAttribute(Attributes.FLYING_SPEED);
 	}
 
 }

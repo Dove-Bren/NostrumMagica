@@ -18,6 +18,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.Pose;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
 import net.minecraft.entity.ai.controller.FlyingMovementController;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -702,6 +703,10 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 		} else {		
 			return super.getItemStackFromSlot(slot);
 		}
+	}
+	
+	protected static final MutableAttribute BuildBaseDragonAttributes() {
+		return MonsterEntity.func_234295_eP_();
 	}
 	
 }

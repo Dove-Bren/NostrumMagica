@@ -469,13 +469,13 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.35D);
-		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50.0D);
-		this.getAttribute(Attributes.ARMOR).setBaseValue(10.0D);
-		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(60.0);
-		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(20.0D);
-		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(6.0D);
+		return WolfEntity.func_234233_eS_()
+			.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.35D)
+			.createMutableAttribute(Attributes.MAX_HEALTH, 50.0D)
+			.createMutableAttribute(Attributes.ARMOR, 10.0D)
+			.createMutableAttribute(Attributes.FOLLOW_RANGE, 60.0)
+			.createMutableAttribute(AttributeMagicResist.instance(), 20.0D)
+			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D);
 	}
 	
 	@Override
@@ -1060,7 +1060,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void setMaxHealth(float maxHealth) {
-		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth);
+		.createMutableAttribute(Attributes.MAX_HEALTH, maxHealth)
 	}
 	
 	public int getRuneColor() {

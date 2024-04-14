@@ -39,8 +39,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.Pose;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
@@ -214,15 +215,14 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityLux.class));
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes()
-	{
-		super.registerAttributes();
-		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.2D);
-		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4.0D);
-		this.getAttribute(Attributes.ARMOR).setBaseValue(0.0D);
-		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(30.0);
-		this.getAttribute(AttributeMagicResist.instance()).setBaseValue(0.0D);
-		this.getAttributes().registerAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(1.0D);
+	public static final AttributeModifierMap.MutableAttribute BuildAttributes(){
+		return AnimalEntity.func_233666_p_()
+			.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.2D)
+			.createMutableAttribute(Attributes.MAX_HEALTH, 4.0D)
+			.createMutableAttribute(Attributes.ARMOR, 0.0D)
+			.createMutableAttribute(Attributes.FOLLOW_RANGE, 30.0)
+			.createMutableAttribute(AttributeMagicResist.instance(), 0.0D)
+			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 1.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState blockIn)

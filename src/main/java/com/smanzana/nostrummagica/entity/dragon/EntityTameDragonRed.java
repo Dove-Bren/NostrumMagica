@@ -55,6 +55,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
@@ -1008,7 +1009,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		
 		this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.31D * (1D + (double) bonusSpeed));
 		this.dataManager.set(SYNCED_MAX_HEALTH, maxHealth);
-		//this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth); Synced thr ough data manager
+		//.createMutableAttribute(Attributes.MAX_HEALTH, maxHealth) Synced thr ough data manager
 		this.setHealth(health);
 	}
 	
@@ -1369,16 +1370,14 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		//
 	}
 
-	@Override
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		super.registerAttributes();
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.31D);
-        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0D);
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(10.0D);
-        this.getAttribute(Attributes.ARMOR).setBaseValue(10.0D);
-        this.getAttributes().registerAttribute(Attributes.ATTACK_SPEED);
-        this.getAttribute(Attributes.ATTACK_SPEED).setBaseValue(0.5D);
-        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64D);
+		return EntityDragonRedBase.BuildBaseRedDragonAttributes()
+	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.31D)
+	        .createMutableAttribute(Attributes.MAX_HEALTH, 100.0D)
+	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 10.0D)
+	        .createMutableAttribute(Attributes.ARMOR, 10.0D)
+	        .createMutableAttribute(Attributes.ATTACK_SPEED, 0.5D)
+	        .createMutableAttribute(Attributes.FOLLOW_RANGE, 64D);
     }
 	
 	@Override

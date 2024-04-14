@@ -20,6 +20,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.Pose;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.entity.ai.goal.HurtByTargetGoal;
@@ -112,14 +113,10 @@ public abstract class EntityGolem extends TameableEntity implements ILoreSupplie
         this.targetSelector.addGoal(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
-    public abstract void initGolemAttributes();
-
-    public static final AttributeModifierMap.MutableAttribute BuildAttributes()
-    {
-        super.registerAttributes();
-        this.getAttributes().registerAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2.0D);
-        
-        this.initGolemAttributes();
+    protected static final AttributeModifierMap.MutableAttribute BuildBaseAttributes() {
+    	return AnimalEntity.func_233666_p_()
+    			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0)
+    			;
     }
 
     protected void updateAITasks() {
