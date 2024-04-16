@@ -78,7 +78,7 @@ public class ArcaneWolfAIStormTask extends Goal {
 	
 	protected void blastEntity(EntityArcaneWolf wolf, LivingEntity target) {
 		for (int i = 0; i < 2; i++) {
-			((ServerWorld) target.world).addLightningBolt(
+			((ServerWorld) target.world).addEntity(
 					(new NostrumTameLightning(NostrumEntityTypes.tameLightning, target.world,
 							target.getPosX() + (wolf.getRNG().nextFloat()-.5f),
 							target.getPosY(),

@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -106,7 +107,7 @@ public class ArcaneWolfAIHellTask extends Goal {
 	
 	protected void startBurnEffect(EntityArcaneWolf wolf, LivingEntity target, int duration) {
 		NetworkHandler.sendToAllTracking(
-				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, target.dimension, target.getEntityId()),
+				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, DimensionUtils.GetDimension(target), target.getEntityId()),
 				target);
 	}
 	

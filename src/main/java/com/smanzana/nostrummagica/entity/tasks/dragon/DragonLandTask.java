@@ -25,13 +25,13 @@ public class DragonLandTask extends Goal {
 	@Override
 	public boolean shouldExecute() {
 		
-		return dragon.isTryingToLand() && !dragon.onGround;
+		return dragon.isTryingToLand() && !dragon.isOnGround();
 	}
 	
 	@Override
 	public boolean shouldContinueExecuting() {
 		
-		if (dragon.onGround || dragon.isInWater()) {
+		if (dragon.isOnGround() || dragon.isInWater()) {
 			return false;
 		}
 		
@@ -52,7 +52,7 @@ public class DragonLandTask extends Goal {
 	public void startExecuting() {
 		
 		// Don't trust heightmap; just loop. Not that bad.
-		BlockPos.BlockPos.Mutable pos = new BlockPos.BlockPos.Mutable(dragon.getPosition());
+		BlockPos.Mutable pos = new BlockPos.Mutable().setPos(dragon.getPosition());
 		while(pos.getY() > 0) {
 			if (dragon.world.isAirBlock(pos)) {
 				pos.setY(pos.getY() - 1);

@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.utils;
 
+import javax.annotation.Nonnull;
+
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.entity.Entity;
@@ -64,6 +66,14 @@ public class DimensionUtils {
 	
 	public static final RegistryKey<World> GetDimKey(String locString) {
 		return GetDimKey(new ResourceLocation(locString));
+	}
+
+	public static boolean SameDimension(@Nonnull Entity a, @Nonnull Entity b) {
+		return SameDimension(a.getEntityWorld(), b.getEntityWorld());
+	}
+	
+	public static boolean SameDimension(@Nonnull World a, @Nonnull World b) {
+		return DimEquals(a.getDimensionKey(), b.getDimensionKey());
 	}
 	
 }

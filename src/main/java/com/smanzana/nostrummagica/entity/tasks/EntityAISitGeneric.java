@@ -25,7 +25,7 @@ public class EntityAISitGeneric<T extends CreatureEntity & ITameableEntity> exte
 			return false;
 		} else if (this.entity.isInWater()) {
 			return false;
-		} else if (!this.entity.onGround) {
+		} else if (!this.entity.isOnGround()) {
 			return false;
 		} else {
 			LivingEntity entitylivingbase = this.entity.getLivingOwner();

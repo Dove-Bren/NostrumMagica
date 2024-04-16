@@ -64,7 +64,7 @@ public class DragonFlyRandomTask extends Goal {
         // Find y
         double y;
         {
-        	BlockPos.BlockPos.Mutable pos = new BlockPos.BlockPos.Mutable(this.parentEntity.getPosition());
+        	BlockPos.Mutable pos = new BlockPos.Mutable().setPos(this.parentEntity.getPosition());
     		while(pos.getY() > 0) {
     			if (this.parentEntity.world.isAirBlock(pos)) {
     				pos.setY(pos.getY() - 1);

@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -91,7 +92,7 @@ public class ArcaneWolfAIEldrichTask extends Goal {
 	
 	protected void startEffect(EntityArcaneWolf wolf, LivingEntity target, int duration) {
 		NetworkHandler.sendToAllTracking(
-				new SpawnPredefinedEffectMessage(PredefinedEffect.ELDRICH_BLAST, duration, target.dimension, target.getEntityId()),
+				new SpawnPredefinedEffectMessage(PredefinedEffect.ELDRICH_BLAST, duration, DimensionUtils.GetDimension(target), target.getEntityId()),
 				target);
 	}
 	

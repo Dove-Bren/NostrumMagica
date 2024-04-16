@@ -84,7 +84,7 @@ public class DragonFlyEvasionTask extends Goal {
         // Find y
         double y;
         {
-        	BlockPos.BlockPos.Mutable pos = new BlockPos.BlockPos.Mutable(this.dragon.getPosition());
+        	BlockPos.Mutable pos = new BlockPos.Mutable().setPos(this.dragon.getPosition());
         	
         	// First, find the ground
     		while(pos.getY() > 0) {

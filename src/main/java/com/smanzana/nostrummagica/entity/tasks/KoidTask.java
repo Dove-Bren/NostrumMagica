@@ -518,7 +518,7 @@ public class KoidTask extends Goal {
                     this.strafeBack = true;
                 }
                 
-                if (koid.onGround) {
+                if (koid.isOnGround()) {
                 	Vector3d forward = getForward(koid);
                 	Vector3d right = getForward(koid).rotatePitch(90.0f);
                 	double mag = strafeBack ? -.1 : 0;
@@ -532,7 +532,7 @@ public class KoidTask extends Goal {
                 	z += right.z * mag;
                 	y += .8;
                 	koid.addVelocity(x, y, z);
-                	koid.onGround = false;
+                	koid.setOnGround(false);
                 }
                 koid.faceEntity(target, 30.0F, 30.0F);
                 

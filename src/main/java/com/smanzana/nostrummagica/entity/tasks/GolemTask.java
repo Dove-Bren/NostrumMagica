@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -57,7 +58,7 @@ public class GolemTask extends Goal {
 			return true;
 		
 		double distOwner = 0;
-		if (owner.dimension == golem.dimension) {
+		if (DimensionUtils.SameDimension(owner, golem)) {
 			distOwner = owner.getDistanceSq(golem);
 		}
 		
@@ -124,7 +125,7 @@ public class GolemTask extends Goal {
 		if (owner == null)
 			owner = golem;
 		double distOwner = 0;
-		if (owner.dimension == golem.dimension) {
+		if (DimensionUtils.SameDimension(owner, golem)) {
 			distOwner = owner.getDistanceSq(golem);
 		}
 		

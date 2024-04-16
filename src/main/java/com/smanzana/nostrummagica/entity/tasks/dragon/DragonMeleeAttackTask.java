@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonFlying;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class DragonMeleeAttackTask extends MeleeAttackGoal {
 	
@@ -109,6 +110,16 @@ public class DragonMeleeAttackTask extends MeleeAttackGoal {
 	}
 	
 	@Override
+	protected void func_234039_g_() { // Reset cooldown
+		// field 'attackTick' is field_234037_i_
+		// but it's private...
+		// same with attackInterval, except that's never used in the vanilla class either
+		final int attackInterval = 20;
+		final int attackTick = (int) ((double) attackInterval * (1/attacker.getAttribute(Attributes.ATTACK_SPEED).getValue()));
+		ObfuscationReflectionHelper.setPrivateValue(MeleeAttackGoal.class, this, attackTick, "field_234037_i_");
+	}
+	
+	@Override
 	protected void checkAndPerformAttack(LivingEntity entity, double dist) {
 		double reach = this.getAttackReachSqr(entity);
 		boolean flying = false;
@@ -128,14 +139,14 @@ public class DragonMeleeAttackTask extends MeleeAttackGoal {
 					this.biteTick = dragon.getRNG().nextInt(20 * 3) + (20 * 5);
 					attacked = true;
 				}
-			} else if (!flying && this.attackTick <= 0) {
+			} else if (!flying && this.func_234040_h_()) {
 				dragon.slash(entity);
 				attacked = true;
 			}
 			
 			// In either case, reset attackTick
 			if (attacked) {
-				this.attackTick = (int) ((double) this.attackInterval * (1/attacker.getAttribute(Attributes.ATTACK_SPEED).getValue()));
+				
 			}
 		}
 		
