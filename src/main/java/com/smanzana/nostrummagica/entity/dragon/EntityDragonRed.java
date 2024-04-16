@@ -534,7 +534,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 //					new Vector3d(0, .25, 0), Vector3d.ZERO)
 //					.color(0xFFFF0022));
 			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
-					posX, posY + this.getHeight() / 2, posZ,
+					getPosX(), getPosY() + this.getHeight() / 2, getPosZ(),
 					5,
 					30, 5,
 					this.getEntityId())
@@ -633,7 +633,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	
 	@Override
 	@Nullable
-	public Entity[] getParts() {
+	public Entity[] getEnityParts() {
 		return bodyParts.values().toArray(new Entity[0]);
 	}
 	

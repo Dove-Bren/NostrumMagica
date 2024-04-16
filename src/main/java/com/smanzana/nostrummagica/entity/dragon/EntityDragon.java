@@ -29,6 +29,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.pathfinding.FlyingNodeProcessor;
 import net.minecraft.pathfinding.FlyingPathNavigator;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
@@ -110,7 +111,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
 
     @Override
     public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand) {
-        return false;
+        return ActionResultType.PASS;
     }
 
 	@Override
@@ -119,8 +120,8 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
     }
 
 	@Override
-	public void fall(float distance, float damageMulti) {
-		; // No fall damage
+	public boolean onLivingFall(float distance, float damageMulti) {
+		return false; // No fall damage
 	}
 	
 	@Override
@@ -143,7 +144,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
         //private int courseChangeCooldown;
 
         public DragonFlyMoveHelper(EntityDragon dragon) {
-            super(dragon);
+            super(dragon, 5, false);
             this.parentEntity = dragon;
         }
         

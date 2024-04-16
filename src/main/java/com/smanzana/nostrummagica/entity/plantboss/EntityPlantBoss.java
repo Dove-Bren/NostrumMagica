@@ -55,7 +55,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -431,7 +431,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			final double z = this.getPosZ() + Math.sin(limbRot) * radius;
 			
 			final float pitch = calcTargetLeafPitch(limb);
-			limb.setLocationAndAngles(x, posY, z, yawProg * 360f, pitch);
+			limb.setLocationAndAngles(x, getPosY(), z, yawProg * 360f, pitch);
 			
 			this.setLeafPitch(limb.getLeafIndex(), pitch);
 		}
@@ -546,7 +546,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 				spawnLimbs();
 			}
 			
-			getBody().setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
+			getBody().setLocationAndAngles(getPosX(), getPosY(), getPosZ(), rotationYaw, rotationPitch);
 			positionLeaves(limbs);
 			this.tickStateMachine();
 		}
@@ -749,7 +749,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	@Override
 	@Nullable
-	public Entity[] getParts() {
+	public Entity[] getEnityParts() {
 		return this.parts;
 	}
 	
@@ -946,8 +946,8 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		for (int x = arenaMin.getX(); x <= arenaMax.getX(); x++)
 		for (int z = arenaMin.getZ(); z <= arenaMax.getZ(); z++) {
 			
-			if (Math.abs(x - (int) posX) <= 4
-					&& Math.abs(z - (int) posZ) <= 4) {
+			if (Math.abs(x - (int) getPosX()) <= 4
+					&& Math.abs(z - (int) getPosZ()) <= 4) {
 				continue;
 			}
 			
@@ -995,7 +995,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		
 	}
 	
-	protected boolean isArenaBlock(IFluidState state) {
+	protected boolean isArenaBlock(FluidState state) {
 		return state.getFluid() instanceof FluidPoisonWater;
 	}
 	

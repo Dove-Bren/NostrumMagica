@@ -170,7 +170,7 @@ public class EntityPlantBossBramble extends Entity {
 			entity.removePotionEffect(NostrumEffects.rooted);
 			entity.attackEntityAsMob(this);
 			entity.attackEntityFrom(new BrambleDamageSource(this.plant), 6f);
-			entity.knockBack(this, 1f, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
+			entity.applyKnockback(1f, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
 		}
 	}
 	
@@ -189,10 +189,10 @@ public class EntityPlantBossBramble extends Entity {
 					this.remove();
 				}
 				
-				Vector3d motion = new Vector3d(this.getFacing().getDirectionVec())
+				Vector3d motion = Vector3d.copy(this.getFacing().getDirectionVec())
 						.scale(.2)
 						;
-				this.setPositionAndUpdate(posX + motion.x, posY + motion.y, posZ + motion.z);
+				this.setPositionAndUpdate(getPosX() + motion.x, getPosY() + motion.y, getPosZ() + motion.z);
 			}
 			
 			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), (ent) -> {

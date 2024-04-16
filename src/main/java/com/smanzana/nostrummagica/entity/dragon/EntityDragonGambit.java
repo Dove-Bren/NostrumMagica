@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.entity.dragon;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -50,10 +50,10 @@ public enum EntityDragonGambit {
 	@OnlyIn(Dist.CLIENT)
 	public List<String> getDesc() {
 		if (this.desc == null) {
-			String raw = I18n.format("gambit." + getUnlocName() + ".desc", "" + ChatFormatting.DARK_GREEN + ChatFormatting.BOLD, ChatFormatting.RESET);
+			String raw = I18n.format("gambit." + getUnlocName() + ".desc", "" + TextFormatting.DARK_GREEN + TextFormatting.BOLD, TextFormatting.RESET);
 			String[] lines = raw.split("\\|");
 			
-			this.desc = Lists.asList("" + ChatFormatting.BLUE + ChatFormatting.BOLD + getName() + ChatFormatting.RESET, lines);
+			this.desc = Lists.asList("" + TextFormatting.BLUE + TextFormatting.BOLD + getName() + TextFormatting.RESET, lines);
 			
 		}
 		

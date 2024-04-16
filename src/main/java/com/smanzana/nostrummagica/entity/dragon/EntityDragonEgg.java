@@ -23,6 +23,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -74,13 +75,13 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 	
 	
 	@Override
-	public void knockBack(Entity entityIn, float strenght, double xRatio, double zRatio) {
+	public void applyKnockback(float strenght, double xRatio, double zRatio) {
 		return; // Do not get knocked around
 	}
 	
 	@Override
-	public void fall(float distance, float damageMultiplier) {
-		this.attackEntityFrom(DamageSource.FALL, 9999f);
+	public boolean onLivingFall(float distance, float damageMultiplier) {
+		return this.attackEntityFrom(DamageSource.FALL, 9999f);
 	}
 	
 	@Override
@@ -175,7 +176,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 				if (this.getHeat() <= 0f) {
 					PlayerEntity player = this.getPlayer();
 					if (player != null) {
-						player.sendMessage(new TranslationTextComponent("info.egg.death.cold"));
+						player.sendMessage(new TranslationTextComponent("info.egg.death.cold"), Util.DUMMY_UUID);
 					}
 					
 					this.attackEntityFrom(DamageSource.STARVE, 9999f);
@@ -226,11 +227,11 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 	private void hatch() {
 		
 		if (this.spawnData != null) {
-			this.world.addEntity((LivingEntity) this.spawnData.spawnDragon(world, posX, posY, posZ));
+			this.world.addEntity((LivingEntity) this.spawnData.spawnDragon(world, getPosX(), getPosY(), getPosZ()));
 			
 			PlayerEntity player = this.getPlayer();
 			if (player != null) {
-				player.sendMessage(new TranslationTextComponent("info.egg.hatch"));
+				player.sendMessage(new TranslationTextComponent("info.egg.hatch"), Util.DUMMY_UUID);
 			}
 		}
 		

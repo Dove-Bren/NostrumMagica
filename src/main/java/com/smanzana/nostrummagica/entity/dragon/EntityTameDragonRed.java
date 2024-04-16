@@ -82,9 +82,11 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.management.PreYggdrasilConverter;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -518,7 +520,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 							this.setBond(1f);
 						}
 					}
-					return true;
+					return ActionResultType.SUCCESS;
 				} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(stack)) {
 					if (!this.world.isRemote) {
 						this.heal(5f);
@@ -528,13 +530,13 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 							player.getHeldItem(hand).shrink(1);
 						}
 					}
-					return true;
+					return ActionResultType.SUCCESS;
 				} else if (this.isEntitySitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
 						NostrumMagica.instance.proxy.openPetGUI(player, this);
 					}
-					return true;
+					return ActionResultType.SUCCESS;
 				} else if (isBreedingItem(stack) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
 					if (!this.world.isRemote) {
 						layEgg();
@@ -542,20 +544,20 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 							stack.shrink(1);
 						}
 					}
-					return true;
+					return ActionResultType.SUCCESS;
 				} else if (stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						if (this.getBond() >= BOND_LEVEL_ALLOW_RIDE) {
 							if (this.getHealth() < DRAGON_MIN_HEALTH) {
-								player.sendMessage(new TranslationTextComponent("info.tamed_dragon.low_health", this.getName()));
+								player.sendMessage(new TranslationTextComponent("info.tamed_dragon.low_health", this.getName()), Util.DUMMY_UUID);
 							} else {
 								player.startRiding(this);
 							}
 						} else {
-							player.sendMessage(new TranslationTextComponent("info.tamed_dragon.no_ride", this.getName()));
+							player.sendMessage(new TranslationTextComponent("info.tamed_dragon.no_ride", this.getName()), Util.DUMMY_UUID);
 						}
 					}
-					return true;
+					return ActionResultType.SUCCESS;
 				}
 				else {
 					; // fall through; we didn't handle it
@@ -567,23 +569,23 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				if (!this.world.isRemote) {
 					this.tame(player, player.isCreative());
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 		} else if (this.isTamed() && player.isCreative() && hand == Hand.MAIN_HAND && player.isSneaking()) {
 			if (!this.world.isRemote) {
 				this.tame(player, true);
 				this.setBond(1f);
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		} else if (this.isTamed() && hand == Hand.MAIN_HAND) {
 			// Someone other than the owner clicked
 			if (!this.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.not_yours", this.getName()));
+				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.not_yours", this.getName()), Util.DUMMY_UUID);
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;			
+		return ActionResultType.PASS;			
 	}
 	
 	@Nullable
@@ -757,19 +759,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	@Override
 	public void readAdditional(CompoundNBT compound) {
 		super.readAdditional(compound);
-		String s;
+		UUID id;
 
 		if (compound.contains("OwnerUUID", 8)) {
-			s = compound.getString("OwnerUUID");
+			id = UUID.fromString(compound.getString("OwnerUUID"));
 		}
 		else {
 			String s1 = compound.getString("Owner");
-			s = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.getServer(), s1);
+			id = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.getServer(), s1);
 		}
 
-		if (!s.isEmpty()) {
+		if (id != null) {
 			try {
-				this.setOwnerId(UUID.fromString(s));
+				this.setOwnerId(id);
 				this.setTamed(true);
 			}
 			catch (Throwable var4) {
@@ -874,7 +876,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		
 		if (force || this.getHealth() < DRAGON_MIN_HEALTH) {
 			if (force || this.getRNG().nextInt(10) == 0) {
-				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.wild.tame_success", this.getName()));
+				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.wild.tame_success", this.getName()), Util.DUMMY_UUID);
 				
 				this.setTamed(true);
 				this.navigator.clearPath();
@@ -890,11 +892,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				success = true;
 			} else {
 				// Failed
-				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.wild.tame_fail", this.getName()));
+				player.sendMessage(new TranslationTextComponent("info.tamed_dragon.wild.tame_fail", this.getName()), Util.DUMMY_UUID);
 				this.heal(5.0f);
 			}
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.tamed_dragon.wild.high_health", this.getName()));
+			player.sendMessage(new TranslationTextComponent("info.tamed_dragon.wild.high_health", this.getName()), Util.DUMMY_UUID);
 		}
 
 		if (!this.world.isRemote) {
@@ -1236,7 +1238,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		LivingEntity owner = this.getOwner();
 		if (owner != null) {
 			NostrumMagicaSounds.DRAGON_DEATH.play(owner);
-			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"));
+			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"), Util.DUMMY_UUID);
 		}
 	}
 	
@@ -1308,7 +1310,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	@Override
 	public void onDeath(DamageSource cause) {
 		if (this.getOwner() != null && !this.world.isRemote && this.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES) && this.getOwner() instanceof ServerPlayerEntity) {
-			this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
+			this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage(), Util.DUMMY_UUID);
 		}
 		
 		dropInventory();
@@ -1578,10 +1580,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		super.fall(distance, damageMulti);
+	public boolean onLivingFall(float distance, float damageMulti) {
 		this.jumpCount = 0;
 		this.setFlyState(FlyState.LANDED);
+		return super.onLivingFall(distance, damageMulti);
 	}
 	
 	@Override
@@ -1618,7 +1620,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			float health = this.getHealth();
 			if (health > 0f && health < DRAGON_MIN_HEALTH) {
 				if (owner != null && owner instanceof PlayerEntity) {
-					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_dragon.hurt", this.getName()));
+					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_dragon.hurt", this.getName()), Util.DUMMY_UUID);
 				}
 				this.stopRiding();
 			} else if (health > 0f) {
@@ -1896,12 +1898,12 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			player = (PlayerEntity) owner;
 		}
 		EntityDragonEgg egg = new EntityDragonEgg(NostrumEntityTypes.dragonEgg, world, player, this.rollInheritedStats());
-		egg.setPosition((int) posX + .5, (int) posY, (int) posZ + .5);
+		egg.setPosition((int) getPosX() + .5, (int) getPosY(), (int) getPosZ() + .5);
 		if (world.addEntity(egg)) {
 			this.setEggId(egg.getUniqueID());
 			
 			if (player != null) {
-				player.sendMessage(new TranslationTextComponent("info.egg.lay", this.getDisplayName()));
+				player.sendMessage(new TranslationTextComponent("info.egg.lay", this.getDisplayName()), Util.DUMMY_UUID);
 			}
 			
 			this.setBond(this.getBond() - .5f);
