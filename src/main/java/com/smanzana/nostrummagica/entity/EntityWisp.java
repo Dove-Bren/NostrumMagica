@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -62,6 +63,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -72,10 +74,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.NetherBiome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -132,7 +133,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		
 		priority = 1;
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityWisp.class));
-		if (world != null && this.rand.nextBoolean() && world.getBiome(this.getPosition()) instanceof NetherBiome) {
+		if (world != null && this.rand.nextBoolean() && DimensionUtils.IsNether(world)) {
 			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 		} else {
 			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<MonsterEntity>(this, MonsterEntity.class, 10, true, false, (mob) -> {
@@ -156,36 +157,30 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			.createMutableAttribute(AttributeMagicResist.instance(), 50.0D);
 	}
 
-	protected void playStepSound(BlockPos pos, BlockState blockIn)
-	{
+	protected void playStepSound(BlockPos pos, BlockState blockIn) {
 		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
 	}
 
-	protected SoundEvent getHurtSound(DamageSource source)
-	{
+	protected SoundEvent getHurtSound(DamageSource source) {
 		return NostrumMagicaSounds.CAST_FAIL.getEvent();
 	}
 
-	protected SoundEvent getDeathSound()
-	{
+	protected SoundEvent getDeathSound() {
 		return NostrumMagicaSounds.SHIELD_BREAK.getEvent();
 	}
 
 	/**
 	 * Returns the volume for the sounds this mob makes.
 	 */
-	protected float getSoundVolume()
-	{
+	protected float getSoundVolume() {
 		return 1F;
 	}
 
-	protected float getStandingEyeHeight(Pose pose, EntitySize size)
-	{
+	protected float getStandingEyeHeight(Pose pose, EntitySize size) {
 		return this.getHeight() * 0.5F;
 	}
 
-	public boolean attackEntityAsMob(Entity entityIn)
-	{
+	public boolean attackEntityAsMob(Entity entityIn) {
 		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
@@ -196,13 +191,11 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		return flag;
 	}
 
-	public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
-	{
-		return false;
+	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+		return ActionResultType.PASS;
 	}
 
-	public boolean canBeLeashedTo(PlayerEntity player)
-	{
+	public boolean canBeLeashedTo(PlayerEntity player) {
 		return false;
 	}
 	
@@ -228,7 +221,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 					cursor.move(Direction.DOWN);
 				}
 				
-				final int diff = (int) (posY) - cursor.getY();
+				final int diff = (int) (getPosY()) - cursor.getY();
 				if (diff > 30) {
 					perilLoc = this.getPosition().toImmutable();
 				}
@@ -259,7 +252,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			if (element == null) element = EMagicElement.PHYSICAL;
 			int color = element.getColor();
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-					1, posX, posY + getHeight()/2f, posZ, 0, 40, 0,
+					1, getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
 					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
@@ -346,8 +339,8 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		; // No fall damage
+	public boolean onLivingFall(float distance, float damageMulti) {
+		return false; // No fall damage
 	}
 	
 	@Override
@@ -462,9 +455,9 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		@Override
 		public void tick() {
 			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.getPosX() - this.parentEntity.getPosX();
-				double d1 = this.getPosY() - this.parentEntity.getPosY();
-				double d2 = this.getPosZ() - this.parentEntity.getPosZ();
+				double d0 = this.getX() - this.parentEntity.getPosX();
+				double d1 = this.getY() - this.parentEntity.getPosY();
+				double d2 = this.getZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				
 				if (d3 < 6) {
@@ -476,7 +469,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 					this.courseChangeCooldown += this.parentEntity.getRNG().nextInt(5) + 2;
 					d3 = (double)MathHelper.sqrt(d3);
 
-					if (this.isNotColliding(this.getPosX(), this.getPosY(), this.getPosZ(), d3)) {
+					if (this.isNotColliding(this.getX(), this.getY(), this.getZ(), d3)) {
 						this.parentEntity.setMotion(this.parentEntity.getMotion().add(
 								d0 / d3 * 0.005D,
 								d1 / d3 * 0.005D,
@@ -501,7 +494,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
 
-				if (!this.parentEntity.world.isCollisionBoxesEmpty(this.parentEntity, axisalignedbb)) {
+				if (!this.parentEntity.world.hasNoCollisions(this.parentEntity, axisalignedbb)) {
 					return false;
 				}
 			}
@@ -573,33 +566,30 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			return false;
 		}
 		
-		if (world.getDimension().getType() == DimensionType.OVERWORLD) {
-			BlockPos blockpos = new BlockPos(this.getPosX(), this.getBoundingBox().minY, this.getPosZ());
-			
-			if (world.getLight(blockpos) > .75f) {
+		return true;
+	}
+	
+	public static boolean canSpawnExtraCheck(EntityType<EntityWisp> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+		AxisAlignedBB bb = new AxisAlignedBB(pos).grow(20);
+		if (DimensionUtils.IsOverworld(world.getWorld())) {
+			if (world.getLight(pos) > .75f) {
 				return false;
 			}
 	
-			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox().grow(20, 20, 20), (w) -> {
-				return w !=  EntityWisp.this;
-			});
+			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, bb, null);
 			return wisps.size() < 20;
 		} else {
+			// Nether has smaller pool, so make it harder to spawn there than simply using weight (cause a weight of 1 is still too large)
+			if (DimensionUtils.IsNether(world.getWorld())) {
+				if (world.getDifficulty() == Difficulty.PEACEFUL || rand.nextInt(30) != 0) {
+					return false;
+				}
+			}
+			
 			// Other dimensions, just check nearby wisp count
-			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, this.getBoundingBox().grow(20, 20, 20), (w) -> {
-				return w !=  EntityWisp.this;
-			});
+			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, bb, null);
 			
 			return wisps.size() < 20;
-		}
-	}
-	
-	public static boolean canSpawnExtraCheck(EntityType<EntityWisp> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
-		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
-		if (world.getDimension().getType() == DimensionType.THE_NETHER) {
-			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(30) == 0;// && canSpawnOn(type, world, reason, pos, rand);
-		} else {
-			return true;
 		}
 	}
 	

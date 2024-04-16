@@ -45,17 +45,21 @@ import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.BiomeDictionary;
 
 public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	
@@ -173,9 +177,8 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
         return flag;
     }
 
-    public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
-    {
-        return false;
+    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+        return ActionResultType.PASS;
     }
 
     /**
@@ -248,8 +251,8 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 				// Lift up players in a large radius. Lift up other entities at a much smaller one
 				
 				// Non-players
-				AxisAlignedBB bb = new AxisAlignedBB(posX - 6, posY - 40, posZ - 6,
-						posX + 6, posY + 40, posZ + 6);
+				AxisAlignedBB bb = new AxisAlignedBB(getPosX() - 6, getPosY() - 40, getPosZ() - 6,
+						getPosX() + 6, getPosY() + 40, getPosZ() + 6);
 				List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, bb);
 				
 				for (Entity entity : entities) {
@@ -341,8 +344,8 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		; // No fall damage
+	public boolean onLivingFall(float distance, float damageMulti) {
+		return false; // No fall damage
 	}
 	
 	@Override
@@ -439,8 +442,14 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	
 	@Override
 	public float getBlockPathWeight(BlockPos pos, IWorldReader worldIn) {
-		if (worldIn.getDimension().getType() == DimensionType.THE_NETHER) {
-			return 0; // Nether is very bright
+		// Want to use dimension key but not available with IWorldReadyer
+		RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, worldIn.getBiome(pos).getRegistryName());
+		
+//		if (DimensionUtils.IsNether(worldIn.)) {
+//			return 0; // Nether is very bright
+//		}
+		if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.NETHER)) {
+			return 0;
 		}
 		
 		// most monsters do 0.5 - worldIn.getBrightness(pos);

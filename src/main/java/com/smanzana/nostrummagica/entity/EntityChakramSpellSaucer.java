@@ -10,7 +10,6 @@ import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -127,7 +126,9 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	        // Add accel to motionX for raytracing
 			this.setMotion(this.getMotion().add(accel.x, accel.y, accel.z));
 	        
-			RayTraceResult raytraceresult = ProjectileHelper.func_221266_a(this, true, this.ticksInAir >= 25, this.shootingEntity, BlockMode.COLLIDER);
+			RayTraceResult raytraceresult = this.ticksInAir >= 25
+						? ProjectileHelper.func_234618_a_(this, (ent) -> ent != this.shootingEntity)
+						: null;
 			
 			// Also calc pitch and yaw
 			final Vector3d prevMotion = this.getMotion();
@@ -142,12 +143,10 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	            this.onImpact(raytraceresult);
 	        }
 	        
-	        this.getPosX() += this.getMotion().x;
-	        this.getPosY() += this.getMotion().y;
-	        this.getPosZ() += this.getMotion().z;
-	        this.getPosX() += accel.x;
-	        this.getPosY() += accel.y;
-	        this.getPosZ() += accel.z;
+	        {
+	        	final Vector3d motion = this.getMotion();
+	        	this.setPosition(getPosX() + motion.x + accel.x, getPosY() + motion.y + accel.y, getPosZ() + motion.z + accel.z);
+	        }
 	        
 	        // Apply air-friction, making motion's sort-of our initial motion
 	        this.setMotion(this.getMotion().scale(0.8));
@@ -157,8 +156,6 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 //					trigger.onFizzle(this.getPosition());
 //					this.remove();
 //				}
-			
-			this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 			
 			// Check for motion boundaries
 			if (this.returning) {

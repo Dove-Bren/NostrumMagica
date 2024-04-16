@@ -13,8 +13,8 @@ import com.smanzana.nostrummagica.utils.Entities;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.DamagingProjectileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.particles.ParticleTypes;
@@ -28,7 +28,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-public abstract class EntitySpellSaucer extends Entity implements IProjectile {
+public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	
 	public static interface ISpellSaucerTrigger {
 
@@ -75,7 +75,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 		
 		if (this.ticksExisted % 5 == 0 && world.isRemote) {
 			this.world.addParticle(ParticleTypes.CRIT,
-					posX - .5 + rand.nextFloat(), posY, posZ - .5 + rand.nextFloat(), 0, 0, 0);
+					getPosX() - .5 + rand.nextFloat(), getPosY(), getPosZ() - .5 + rand.nextFloat(), 0, 0, 0);
 		}
 	}
 	
@@ -149,7 +149,7 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 
 	@Override
 	public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
-		this.shoot(posX, posY, posZ, x, y, z, velocity, inaccuracy);
+		this.shoot(getPosX(), getPosY(), getPosZ(), x, y, z, velocity, inaccuracy);
 	}
 
 	@Override
@@ -163,14 +163,14 @@ public abstract class EntitySpellSaucer extends Entity implements IProjectile {
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT compound) {
+	public void readAdditional(CompoundNBT compound) {
 		this.speed = compound.getFloat("speed");
 		UUID uuid = compound.getUniqueId("shooterID");
 		this.shootingEntity = Entities.FindLiving(world, uuid);
 	}
 
 	@Override
-	protected void writeAdditional(CompoundNBT compound) {
+	public void writeAdditional(CompoundNBT compound) {
 		compound.putFloat("speed", this.speed);
 		compound.putUniqueId("shooterID", shootingEntity.getUniqueID());
 	}

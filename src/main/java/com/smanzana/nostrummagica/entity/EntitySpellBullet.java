@@ -28,7 +28,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
@@ -87,7 +86,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		{ // copied out from super since it hardcodes type now
 			ObfuscationReflectionHelper.setPrivateValue(ShulkerBulletEntity.class, this, shooter, "field_184570_a"); // owner
 			//this.owner = ownerIn;
-			BlockPos blockpos = new BlockPos(shooter);
+			BlockPos blockpos = shooter.getPosition();
 			double d0 = (double)blockpos.getX() + 0.5D;
 			double d1 = (double)blockpos.getY() + 0.5D;
 			double d2 = (double)blockpos.getZ() + 0.5D;
@@ -132,7 +131,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	protected void bulletHit(RayTraceResult result) {
+	protected void onImpact(RayTraceResult result) {
 		Entity entityHit = RayTrace.entFromRaytrace(result);
 		if (entityHit == null) {
 			//trigger.onProjectileHit(result.getBlockPos());
@@ -170,7 +169,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 
 		if (this.target == null)
 		{
-			targetPos = (new BlockPos(this)).down();
+			targetPos = this.getPosition().down();
 		}
 		else
 		{
@@ -186,7 +185,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
 		if (blockyPath && targetPos.distanceSq(this.getPosX(), this.getPosY(), this.getPosZ(), true) >= 4.0D) {
-			BlockPos blockpos1 = new BlockPos(this);
+			BlockPos blockpos1 = this.getPosition();
 			List<Direction> list = Lists.<Direction>newArrayList();
 
 			if (currentAxis != Direction.Axis.X)
@@ -225,13 +224,13 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				}
 			}
 
-			enumfacing = Direction.random(this.rand);
+			enumfacing = Direction.getRandomDirection(this.rand);
 
 			if (list.isEmpty())
 			{
 				for (int i = 5; !this.world.isAirBlock(blockpos1.offset(enumfacing)) && i > 0; --i)
 				{
-					enumfacing = Direction.random(this.rand);
+					enumfacing = Direction.getRandomDirection(this.rand);
 				}
 			}
 			else
@@ -298,12 +297,12 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				}
 				
 				if (dist < .5) {
-					this.bulletHit(new EntityRayTraceResult(target));
+					this.onImpact(new EntityRayTraceResult(target));
 				} else {
-					RayTraceResult raytraceresult = ProjectileHelper.func_221266_a(this, true, false, this.shooter, BlockMode.COLLIDER);
+					RayTraceResult raytraceresult = ProjectileHelper.func_234618_a_(this, (ent) -> ent != this.shooter);
 	
 					if (raytraceresult != null) {
-						this.bulletHit(raytraceresult);
+						this.onImpact(raytraceresult);
 					}
 				}
 			}
@@ -323,13 +322,13 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 				}
 
 				if (this.direction != null) {
-					BlockPos blockpos = new BlockPos(this);
+					BlockPos blockpos = this.getPosition();
 					Direction.Axis enumfacing$axis = this.direction.getAxis();
 
-					if (this.world.func_217400_a(blockpos.offset(this.direction), this)) {
+					if (this.world.isTopSolid(blockpos.offset(this.direction), this)) {
 						this.selectNextMoveDirection(enumfacing$axis);
 					} else {
-						BlockPos blockpos1 = new BlockPos(this.target);
+						BlockPos blockpos1 = this.target.getPosition();
 
 						if (enumfacing$axis == Direction.Axis.X && blockpos.getX() == blockpos1.getX() || enumfacing$axis == Direction.Axis.Z && blockpos.getZ() == blockpos1.getZ() || enumfacing$axis == Direction.Axis.Y && blockpos.getY() == blockpos1.getY()) {
 							this.selectNextMoveDirection(enumfacing$axis);

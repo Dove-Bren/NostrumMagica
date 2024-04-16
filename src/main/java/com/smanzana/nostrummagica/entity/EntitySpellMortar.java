@@ -55,7 +55,7 @@ public class EntitySpellMortar extends FireballEntity {
 		this.accelerationY = 0;
 		this.accelerationZ = 0;
 		this.setMotion(velocity);
-		this.shootingEntity = shooter;
+		this.setShooter(shooter);
 		
 		this.trigger = trigger;
 		this.origin = start;
@@ -106,7 +106,7 @@ public class EntitySpellMortar extends FireballEntity {
 			color = (0x19000000) | (color & 0x00FFFFFF);
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					2,
-					posX, posY + getHeight()/2f, posZ, 0, 40, 0,
+					getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
 					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 				).color(color));
 		}
@@ -139,7 +139,7 @@ public class EntitySpellMortar extends FireballEntity {
 		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
 			final Entity entityHit = RayTrace.entFromRaytrace(result);
 			if (filter == null || filter.apply(entityHit)) {
-				if ((entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(entityHit))
+				if ((entityHit != this.func_234616_v_() && !this.func_234616_v_().isRidingOrBeingRiddenBy(entityHit))
 						|| this.ticksExisted > 20) {
 					trigger.onProjectileHit(entityHit);
 					this.remove();

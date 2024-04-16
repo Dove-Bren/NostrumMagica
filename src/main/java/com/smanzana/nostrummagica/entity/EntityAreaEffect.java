@@ -268,7 +268,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	}
 	
 	protected void onFall(double prevY) {
-		this.setRadius(this.getRadius() + (float) (Math.ceil(Math.abs(posY - prevY)) * radiusPerFall));
+		this.setRadius(this.getRadius() + (float) (Math.ceil(Math.abs(getPosY() - prevY)) * radiusPerFall));
 	}
 	
 	protected void onClimb(double prevY) {
@@ -300,9 +300,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 		
 		// Motion
 		this.waddle();
-		this.getPosX() += this.getMotion().x;
-        this.getPosY() += this.getMotion().y;
-        this.getPosZ() += this.getMotion().z;
+		final Vector3d motion = this.getMotion();
+		this.setPosition(getPosX() + motion.x, getPosY() + motion.y, getPosZ() + motion.z);
         
         boolean elevated = false;
         BlockPos.Mutable pos = new BlockPos.Mutable();
@@ -321,7 +320,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	        		}
 	        	}
 	        	
-	        	this.getPosY() += 1;
+	        	this.setPosition(getPosX(), getPosY() + 1, getPosZ());
 	        	elevated = true;
         	}
         	
@@ -334,8 +333,8 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
     	// Skip doing if we just elevated because that means there was a solid block.
         if (this.hasGravity() && !elevated) {
         	double left = this.gravitySpeed;
-        	while (posY > 1 && left > 0) {
-        		pos.setPos(posX, posY - 1, posZ);
+        	while (getPosY() > 1 && left > 0) {
+        		pos.setPos(getPosX(), getPosY() - 1, getPosZ());
         		BlockState state = world.getBlockState(pos);
 	        	if (state != null && state.getMaterial().blocksMovement()) {
 	        		// Done
@@ -348,10 +347,10 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 	        	}
 	        	
         		if (left >= 1) {
-	        		this.getPosY() -= 1;
+        			this.setPosition(getPosX(), getPosY() - 1, getPosZ());
 	        		left -= 1;
         		} else {
-        			this.getPosY() -= left;
+        			this.setPosition(getPosX(), getPosY() - left, getPosZ());
         			left = 0;
         		}
         		elevated = true;
@@ -371,7 +370,7 @@ public class EntityAreaEffect extends AreaEffectCloudEntity {
 //	        	prevHeight = this.getHeight();
 //	        }
         }
-        this.setPosition(posX, posY, posZ);
+        //this.setPosition(posX, posY, posZ);
 	}
 	
 	@Override

@@ -41,7 +41,7 @@ public class EntitySwitchTrigger extends MobEntity {
 	
 	
 	@Override
-	public void knockBack(Entity entityIn, float strenght, double xRatio, double zRatio) {
+	public void applyKnockback(float strenght, double xRatio, double zRatio) {
 		return; // Do not get knocked around
 	}
 	

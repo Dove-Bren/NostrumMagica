@@ -57,6 +57,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -265,13 +266,11 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		return flag;
 	}
 
-	public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
-	{
-		return false;
+	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+		return ActionResultType.PASS;
 	}
 
-	public boolean canBeLeashedTo(PlayerEntity player)
-	{
+	public boolean canBeLeashedTo(PlayerEntity player) {
 		return false;
 	}
 	
@@ -289,7 +288,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
-							posX, posY + getHeight()/2, posZ,
+							getPosX(), getPosY() + getHeight()/2, getPosZ(),
 							0.05, 40, 10,
 							new Vector3d(0, -.1, 0),
 							null
@@ -301,7 +300,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
-							posX, posY + getHeight()/2, posZ,
+							getPosX(), getPosY() + getHeight()/2, getPosZ(),
 							1, 15, 0,
 							this.getEntityId()
 							).color(.4f, .2f - darken, 1f - darken, .4f - darken));
@@ -332,7 +331,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					
 					// Poll for nearby lux and update community score
 					final AxisAlignedBB bb = new AxisAlignedBB(
-							posX - 32, posY - 32, posZ - 32, posX + 32, posY + 32, posZ + 32
+							getPosX() - 32, getPosY() - 32, getPosZ() - 32, getPosX() + 32, getPosY() + 32, getPosZ() + 32
 							);
 					final int count = world.getEntitiesWithinAABB(EntityLux.class, bb).size();
 					this.incrCommunityScore(count);
@@ -447,8 +446,8 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		; // No fall damage
+	public boolean onLivingFall(float distance, float damageMulti) {
+		return false; // No fall damage
 	}
 	
 	@Override
@@ -502,9 +501,9 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		@Override
 		public void tick() {
 			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.getPosX() - this.parentEntity.getPosX();
-				double d1 = this.getPosY() - this.parentEntity.getPosY();
-				double d2 = this.getPosZ() - this.parentEntity.getPosZ();
+				double d0 = this.getX() - this.parentEntity.getPosX();
+				double d1 = this.getY() - this.parentEntity.getPosY();
+				double d2 = this.getZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
 				d3 = (double)MathHelper.sqrt(d3);
@@ -1113,9 +1112,9 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			}
 			
 			((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
-					posX,
-					posY + getHeight() / 2,
-					posZ,
+					getPosX(),
+					getPosY() + getHeight() / 2,
+					getPosZ(),
 					5,
 					.25,
 					.25,
@@ -1222,7 +1221,8 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 
 	@Override
-	public AgeableEntity createChild(AgeableEntity ageable) {
+	public AgeableEntity /*createChild*/ func_241840_a(ServerWorld world, AgeableEntity ageable) {
 		return null;
 	}
+
 }

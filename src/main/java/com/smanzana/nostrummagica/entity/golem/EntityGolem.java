@@ -37,12 +37,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public abstract class EntityGolem extends TameableEntity implements ILoreSupplier {
 
@@ -104,7 +106,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreSupplie
         //this.goalSelector.addGoal(3, new EntityAIAttackMelee(this, 1.0D, true));
         gTask = new GolemTask(this);
         this.goalSelector.addGoal(2, gTask);
-        this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
         this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
@@ -129,80 +131,68 @@ public abstract class EntityGolem extends TameableEntity implements ILoreSupplie
         this.dataManager.register(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
     }
 
-    protected void playStepSound(BlockPos pos, BlockState blockIn)
-    {
+    protected void playStepSound(BlockPos pos, BlockState blockIn) {
         this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
     }
 
-    protected SoundEvent getHurtSound(DamageSource source)
-    {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return NostrumMagicaSounds.GOLEM_HURT.getEvent();
     }
 
-    protected SoundEvent getDeathSound()
-    {
+    protected SoundEvent getDeathSound() {
     	return NostrumMagicaSounds.GOLEM_HURT.getEvent();
     }
 
     /**
      * Returns the volume for the sounds this mob makes.
      */
-    protected float getSoundVolume()
-    {
+    protected float getSoundVolume() {
         return 0.4F;
     }
 
-    protected float getStandingEyeHeight(Pose pose, EntitySize size)
-    {
+    protected float getStandingEyeHeight(Pose pose, EntitySize size) {
         return this.getHeight() * 0.8F;
     }
 
-    public boolean attackEntityAsMob(Entity entityIn)
-    {
+    public boolean attackEntityAsMob(Entity entityIn) {
         boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
-        if (flag)
-        {
+        if (flag) {
             this.applyEnchantments(this, entityIn);
         }
 
         return flag;
     }
 
-    public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
-    {
-        return false;
+    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+        return ActionResultType.PASS;
     }
 
     /**
      * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
      * the animal type)
      */
-    public boolean isBreedingItem(@Nonnull ItemStack stack)
-    {
+    public boolean isBreedingItem(@Nonnull ItemStack stack) {
         return false;
     }
 
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(AnimalEntity otherAnimal)
-    {
+    public boolean canMateWith(AnimalEntity otherAnimal) {
         return false;
     }
 
-    public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner)
-    {
+    public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner) {
         return target != owner;
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player)
-    {
+    public boolean canBeLeashedTo(PlayerEntity player) {
         return false;
     }
 
 	@Override
-	public AgeableEntity createChild(AgeableEntity ageable) {
+	public AgeableEntity /*createChild*/ func_241840_a(ServerWorld world, AgeableEntity ageable) {
 		return null;
 	}
 	

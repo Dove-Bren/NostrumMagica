@@ -43,6 +43,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -69,22 +70,27 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class EntityWillo extends MonsterEntity implements ILoreTagged {
@@ -198,13 +204,11 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		return flag;
 	}
 
-	public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
-	{
-		return false;
+	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+		return ActionResultType.PASS;
 	}
 
-	public boolean canBeLeashedTo(PlayerEntity player)
-	{
+	public boolean canBeLeashedTo(PlayerEntity player) {
 		return false;
 	}
 	
@@ -244,9 +248,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 //			final double yOffset =  Math.sin(2 * Math.PI * ((double) ticksExisted % 20.0) / 20.0) * (height/2);
 //			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 //					1,
-//					posX + offset.x,
-//					posY + height/2f + offset.y + yOffset,
-//					posZ + offset.z,
+//					getPosX() + offset.x,
+//					getPosY() + height/2f + offset.y + yOffset,
+//					getPosZ() + offset.z,
 //					0, 40, 0,
 //					offset.scale(rand.nextFloat() * .2f),
 //					false
@@ -258,9 +262,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 					.scale(rand.nextFloat() * 3 + 1f);
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					1,
-					posX + offset.x,
-					posY + getHeight()/2f + offset.y,
-					posZ + offset.z,
+					getPosX() + offset.x,
+					getPosY() + getHeight()/2f + offset.y,
+					getPosZ() + offset.z,
 					0, 40, 0,
 					//offset.scale(rand.nextFloat() * .2f),
 					new Vector3d(0, -.05, 0),
@@ -339,8 +343,8 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		; // No fall damage
+	public boolean onLivingFall(float distance, float damageMulti) {
+		return false; // No fall damage
 	}
 	
 	@Override
@@ -482,9 +486,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		@Override
 		public void tick() {
 			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.getPosX() - this.parentEntity.getPosX();
-				double d1 = this.getPosY() - this.parentEntity.getPosY();
-				double d2 = this.getPosZ() - this.parentEntity.getPosZ();
+				double d0 = this.getX() - this.parentEntity.getPosX();
+				double d1 = this.getY() - this.parentEntity.getPosY();
+				double d2 = this.getZ() - this.parentEntity.getPosZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
 				d3 = (double)MathHelper.sqrt(d3);
@@ -516,7 +520,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 					this.parentEntity.setMotion(Vector3d.ZERO);
 					this.action = MovementController.Action.WAIT;
 					return;
-				} else if (this.isNotColliding(this.getPosX(), this.getPosY(), this.getPosZ(), d3)) {
+				} else if (this.isNotColliding(this.getX(), this.getY(), this.getZ(), d3)) {
 					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 					//speed *= 3f;
 					this.parentEntity.setMotion(
@@ -546,7 +550,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
 
-				if (!this.parentEntity.world.isCollisionBoxesEmpty(this.parentEntity, axisalignedbb)) {
+				if (!this.parentEntity.world.hasNoCollisions(this.parentEntity, axisalignedbb)) {
 					return false;
 				}
 			}
@@ -618,7 +622,13 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			return false;
 		}
 		
-		if (this.world.getDimension().getType() != DimensionType.OVERWORLD && this.world.getDimension().getType() != DimensionType.THE_NETHER) {
+		// Want to use dimension key but not available with IWorldReadyer
+		RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, world.getBiome(this.getPosition()).getRegistryName());
+		
+//		if (!DimensionUtils.IsOverworld(world) && !DimensionUtils.IsNether(world)) {
+//			return false;
+//		}
+		if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.END)) {
 			return false;
 		}
 		
@@ -1023,15 +1033,16 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	
 	@Override
 	@Nullable
-	public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
+	public ILivingEntityData onInitialSpawn(IServerWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
 		setElement(elem);
 		return super.onInitialSpawn(world, difficulty, reason, livingdata, dataTag);
 	}
 	
-	public static boolean canSpawnExtraCheck(EntityType<EntityWillo> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+	public static boolean canSpawnExtraCheck(EntityType<EntityWillo> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
 		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
-		if (world.getDimension().getType() == DimensionType.THE_NETHER) {
+		
+		if (DimensionUtils.IsNether(world.getWorld())) {
 			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(35) == 0 && canSpawnOn(type, world, reason, pos, rand);
 		} else {
 			return true;

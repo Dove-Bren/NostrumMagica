@@ -27,7 +27,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
@@ -196,7 +195,7 @@ public class EntityHookShot extends Entity {
 	
 	protected void onFlightUpdate() {
 		LivingEntity caster = this.getCaster();
-		if (this.world.isRemote || (caster == null || caster.isAlive()) && NostrumMagica.isBlockLoaded(world, new BlockPos(this)))
+		if (this.world.isRemote || (caster == null || caster.isAlive()) && NostrumMagica.isBlockLoaded(world, this.getPosition()))
 		{
 			super.tick();
 
@@ -206,9 +205,8 @@ public class EntityHookShot extends Entity {
 				this.onImpact(raytraceresult);
 			}
 
-			this.getPosX() += this.getMotion().x;
-			this.getPosY() += this.getMotion().y;
-			this.getPosZ() += this.getMotion().z;
+			final Vector3d motion = this.getMotion();
+			this.setPosition(getPosX() + motion.x, getPosY() + motion.y, getPosZ() + motion.z);
 			ProjectileHelper.rotateTowardsMovement(this, 0.2F);
 			float f = getMovementFactor();
 
@@ -228,7 +226,7 @@ public class EntityHookShot extends Entity {
 					this.velocityZ * f
 					);
 			//this.world.addParticle(this.getParticleType(), this.getPosX(), this.getPosY() + 0.5D, this.getPosZ(), 0.0D, 0.0D, 0.0D);
-			this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
+			//this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 		}
 		else
 		{
@@ -282,15 +280,12 @@ public class EntityHookShot extends Entity {
 			
 			Vector3d diff = caster.getPositionVec().add(0, caster.getEyeHeight(), 0).subtract(this.getPositionVec());
 			Vector3d velocity = diff.normalize().scale(0.75);
-			this.getPosX() += velocity.x;
-			this.getPosY() += velocity.y;
-			this.getPosZ() += velocity.z;
 			
 			if (attachedEntity instanceof ItemEntity) {
 				attachedEntity.setMotion(velocity.x, velocity.y, velocity.z);
 				attachedEntity.velocityChanged = true;
 			}
-			this.setPositionAndUpdate(posX, posY, posZ);
+			this.setPositionAndUpdate(getPosX() + velocity.x, getPosY() + velocity.y, getPosZ() + velocity.z);
 			
 			attachedEntity.setPositionAndUpdate(this.getPosX(), this.getPosY() - (attachedEntity.getHeight() / 2), this.getPosZ());
 		} else {
@@ -305,7 +300,7 @@ public class EntityHookShot extends Entity {
 			}
 			
 			if (caster != null) {
-				if ((ticksExisted - tickHooked) > 6 && caster.onGround) {
+				if ((ticksExisted - tickHooked) > 6 && caster.isOnGround()) {
 					this.remove();
 					return;
 				}

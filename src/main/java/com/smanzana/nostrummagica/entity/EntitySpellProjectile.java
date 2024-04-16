@@ -63,7 +63,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 		this.accelerationX = accel.x;
 		this.accelerationY = accel.y;
 		this.accelerationZ = accel.z;
-		this.shootingEntity = shooter;
+		this.setShooter(shooter);
 		
 		this.trigger = trigger;
 		this.maxDistance = Math.pow(maxDistance, 2);
@@ -116,7 +116,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 			color = (0x19000000) | (color & 0x00FFFFFF);
 			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 					2,
-					posX, posY + getHeight()/2f, posZ, 0, 40, 0,
+					getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
 					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 				).color(color));
 		}
@@ -144,7 +144,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
 			Entity entityHit = RayTrace.entFromRaytrace(result);
 			if (filter == null || filter.apply(entityHit)) {
-				if ((entityHit != shootingEntity && !shootingEntity.isRidingOrBeingRiddenBy(entityHit))
+				if ((entityHit != this.func_234616_v_() && !this.func_234616_v_().isRidingOrBeingRiddenBy(entityHit))
 						|| this.ticksExisted > 20) {
 					trigger.onProjectileHit(entityHit);
 					this.remove();

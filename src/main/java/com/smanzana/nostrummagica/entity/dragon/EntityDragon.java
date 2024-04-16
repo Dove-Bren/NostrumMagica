@@ -109,7 +109,7 @@ public abstract class EntityDragon extends MonsterEntity implements ILoreTagged 
     }
 
     @Override
-    public boolean processInteract(PlayerEntity player, Hand hand) {
+    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand) {
         return false;
     }
 

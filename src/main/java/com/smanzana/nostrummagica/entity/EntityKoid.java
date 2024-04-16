@@ -34,6 +34,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
@@ -122,9 +123,8 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
         return flag;
     }
 
-    public boolean processInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack)
-    {
-        return false;
+    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+        return ActionResultType.PASS;
     }
 
     /**
@@ -252,8 +252,8 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		; // No fall damage
+	public boolean onLivingFall(float distance, float damageMulti) {
+		return false; // No fall damage
 	}
 	
 	@Override

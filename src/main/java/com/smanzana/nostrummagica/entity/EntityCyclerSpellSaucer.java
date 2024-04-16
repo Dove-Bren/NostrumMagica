@@ -207,7 +207,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 						&& (int) _lastBlockVector.z == (int) this.getPosZ())) {
 					
 					// Only trigger on non-air
-					BlockPos blockPos = new BlockPos(posX, posY, posZ); // not using getPosition() since it adds .5 y 
+					BlockPos blockPos = new BlockPos(getPosX(), getPosY(), getPosZ()); // not using getPosition() since it adds .5 y 
 					if (this.canImpact(blockPos)) {
 						RayTraceResult bundledResult = new BlockRayTraceResult(
 								this.getPositionVec(), Direction.UP, blockPos, false);
@@ -215,7 +215,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 						if (_lastBlockVector == null) {
 							_lastBlockVector = new Vector();
 						}
-						_lastBlockVector.set(posX, posY, posZ);
+						_lastBlockVector.set(getPosX(), getPosY(), getPosZ());
 						this.onImpact(bundledResult);
 					}
 				}

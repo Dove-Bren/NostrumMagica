@@ -503,7 +503,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	}
 	
 	@Override
-	public boolean processInteract(PlayerEntity player, Hand hand) {
+	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand) {
 		// Shift-right click toggles the dragon sitting.
 		// When not sitting, right-click mounts the dragon.
 		// When sitting, right-click opens the GUI

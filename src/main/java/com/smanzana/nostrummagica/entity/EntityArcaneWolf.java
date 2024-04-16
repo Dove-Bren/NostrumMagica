@@ -94,10 +94,12 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.Effects;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
@@ -497,11 +499,9 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	protected void registerGoals() {
 		//super.initEntityAI();
 		
-		this.sitGoal = new SitGoal(this);
-		
 		int priority = 1;
 		this.goalSelector.addGoal(priority++, new SwimGoal(this));
-		this.goalSelector.addGoal(priority++, this.sitGoal);
+		this.goalSelector.addGoal(priority++, new SitGoal(this));
 		this.goalSelector.addGoal(priority++, new ArcaneWolfAIBarrierTask(this, 5));
 		this.goalSelector.addGoal(priority++, new ArcaneWolfAIStormTask(this, 35));
 		this.goalSelector.addGoal(priority++, new ArcaneWolfAIEldrichTask(this, 40));
@@ -513,7 +513,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			@Override
 			protected void checkAndPerformAttack(LivingEntity target, double dist) {
 
-				if (this.attackTick <= 0 && dist > this.getAttackReachSqr(target)) {
+				if (this.func_234040_h_() /*attackTick <= 0*/ && dist > this.getAttackReachSqr(target)) {
 					// Too far
 					if (EntityArcaneWolf.this.hasWolfCapability(WolfTypeCapability.WOLF_BLINK)
 							&& EntityArcaneWolf.this.rand.nextFloat() < .05) {
@@ -616,7 +616,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 		});
 		this.goalSelector.addGoal(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
-		this.goalSelector.addGoal(priority++, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+		this.goalSelector.addGoal(priority++, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
 		//this.goalSelector.addGoal(7, new EntityAIMate(this, 1.0D));
 		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
 		this.goalSelector.addGoal(priority++, new BegGoal(this, 8.0F));
@@ -804,7 +804,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public boolean processInteract(PlayerEntity player, Hand hand) {
+	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand) {
 		// Shift-right click toggles sitting.
 		// When not sitting, right-click mounts the wolf
 		// When sitting, will eventually open a GUI
@@ -817,7 +817,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 						this.setBond(1f);
 					}
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(stack)) {
 				if (!this.world.isRemote) {
 					this.heal(5f);
@@ -827,27 +827,27 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 						player.getHeldItem(hand).shrink(1);
 					}
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			} else if (this.isSitting() && stack.isEmpty()) {
 				if (!this.world.isRemote) {
 					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
 					NostrumMagica.instance.proxy.openPetGUI(player, this);
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			} else if (stack.isEmpty()) {
 				if (!this.world.isRemote) {
 					if (this.hasWolfCapability(WolfBondCapability.RIDEABLE)) {
 						if (this.getHealth() < ARCANE_WOLF_WARN_HEALTH) {
-							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()));
+							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()), Util.DUMMY_UUID);
 						} else {
 							addTrainingXP(200);
 							player.startRiding(this);
 						}
 					} else {
-						player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.no_ride", this.getName()));
+						player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.no_ride", this.getName()), Util.DUMMY_UUID);
 					}
 				}
-				return true;
+				return ActionResultType.SUCCESS;
 			}
 			else {
 				; // fall through; we didn't handle it
@@ -856,16 +856,16 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			if (!world.isRemote) {
 				this.setTamedBy(player);
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		} else {
 			// Someone other than the owner clicked
 			if (!this.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.not_yours", this.getName()));
+				player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.not_yours", this.getName()), Util.DUMMY_UUID);
 			}
-			return true;
+			return ActionResultType.SUCCESS;
 		}
 		
-		return false;
+		return ActionResultType.PASS;
 	}
 	
 	@Nullable
@@ -910,10 +910,13 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void setSitting(boolean sitting) {
-		super.setSitting(sitting);
-		this.sitGoal.setSitting(sitting); // Idk why this isn't in the base class
+	public void func_233687_w_(boolean sitting) { // SetSitting
+		super.func_233687_w_(sitting); // SetSitting
 		setPetAction(PetAction.SITTING);
+	}
+	
+	public void setSitting(boolean sitting) {
+		func_233687_w_(sitting);
 	}
 	
 	public int getLevel() {
@@ -1060,7 +1063,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void setMaxHealth(float maxHealth) {
-		.createMutableAttribute(Attributes.MAX_HEALTH, maxHealth)
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHealth);
 	}
 	
 	public int getRuneColor() {
@@ -1279,9 +1282,9 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void fall(float distance, float damageMulti) {
-		super.fall(Math.max(0, distance-this.getFallReduction()), damageMulti);
+	public boolean onLivingFall(float distance, float damageMulti) {
 		this.jumpCount = 0;
+		return super.onLivingFall(Math.max(0, distance-this.getFallReduction()), damageMulti);
 	}
 	
 	public void writeAdditional(CompoundNBT compound) {
@@ -1454,7 +1457,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			float health = this.getHealth();
 			if (health > 0f && health < ARCANE_WOLF_WARN_HEALTH) {
 				if (owner != null && owner instanceof PlayerEntity) {
-					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.hurt", this.getName()));
+					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.hurt", this.getName()), Util.DUMMY_UUID);
 				}
 				this.stopRiding();
 			} else if (health > 0f) {
@@ -1617,7 +1620,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		LivingEntity owner = this.getOwner();
 		if (owner != null) {
 			this.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, 1f);
-			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"));
+			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"), Util.DUMMY_UUID);
 		}
 	}
 	
@@ -1653,7 +1656,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		if (!this.world.isRemote) {
 			this.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, 1f);
 			NostrumParticles.GLOW_ORB.spawn(this.world, new SpawnParams(
-					50, posX, posY, posZ, 3.0, 30, 10, this.getEntityId()
+					50, this.getPosX(), this.getPosY(), this.getPosZ(), 3.0, 30, 10, this.getEntityId()
 					).color(element.getColor()).dieOnTarget(true));
 		}
 	}
@@ -1676,7 +1679,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		if (!world.isRemote) {
 			this.playSound(SoundEvents.ENTITY_WOLF_HOWL, 1f, 1f);
 			NostrumParticles.FILLED_ORB.spawn(this.world, new SpawnParams(
-					100, posX, posY, posZ, 3.0, 60, 20, this.getEntityId()
+					100, this.getPosX(), this.getPosY(), this.getPosZ(), 3.0, 60, 20, this.getEntityId()
 					).color(element.getColor()));
 		}
 	}
@@ -1690,7 +1693,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			// Earth upgrades inventory size!
 			ensureInventorySize(); // Auto resizes
 			// And adds armor
-			this.getAttribute(Attributes.ARMOR).applyModifier(new AttributeModifier(
+			this.getAttribute(Attributes.ARMOR).applyPersistentModifier(new AttributeModifier(
 					UUID.fromString(UUID_EXTRA_ARMOR_MOD),
 					"ArcaneWolfEarthArmor",
 					5.0D,
@@ -1699,7 +1702,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		}
 		if (element == EMagicElement.LIGHTNING) {
 			// Lightning gives bonus magic resistance!
-			this.getAttribute(AttributeMagicResist.instance()).applyModifier(new AttributeModifier(
+			this.getAttribute(AttributeMagicResist.instance()).applyPersistentModifier(new AttributeModifier(
 					UUID.fromString(UUID_MAGIC_RESIST_MOD),
 					"ArcaneWolfLightningResist",
 					30.0D,
