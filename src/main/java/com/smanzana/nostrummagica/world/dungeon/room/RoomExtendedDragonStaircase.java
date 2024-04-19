@@ -66,7 +66,7 @@ public class RoomExtendedDragonStaircase implements IDungeonRoom {
         	blockpos1 = blockpos.down();
         	BlockState state = chunk.getBlockState(blockpos1);
             
-            if (state.getMaterial().isLiquid() || (state.getMaterial().blocksMovement() && state.getMaterial() != Material.LEAVES && !state.isFoliage(world, blockpos1))) {
+            if (state.getMaterial().isLiquid() || (state.getMaterial().blocksMovement() && state.getMaterial() != Material.LEAVES && state.getBlockHardness(world, blockpos1) != 0)) {
             	break;
             }
         }

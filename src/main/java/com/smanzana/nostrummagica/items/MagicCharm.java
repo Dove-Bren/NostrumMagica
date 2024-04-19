@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
-import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
+import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -295,7 +295,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 //			return true;
 		} else if (DimensionUtils.IsSorceryDim(world)) {
 			// In  sorcery dimension. Return to beginning
-			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
+			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
 			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
 			// Allow this type of teleportation by updating last coords...
 			player.lastTickPosX = player.getPosX();

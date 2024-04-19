@@ -528,4 +528,8 @@ public class ModConfig {
 	public boolean usingEasierThano() {
 		return common.configEasierThano.get();
 	}
+	
+	public String getSorceryDimension() {
+		return common.configSorceryDimensionKey.get();
+	}
 }

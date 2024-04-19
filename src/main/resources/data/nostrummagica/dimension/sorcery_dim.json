@@ -1,0 +1,7 @@
+{
+	"type": "nostrummagica:emptydim",
+	"generator": {
+		"type": "nostrummagica:emptychunks",
+		"biome": "nostrummagica:sorcery_biome"
+	}
+}

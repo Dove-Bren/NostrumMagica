@@ -9,6 +9,7 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
@@ -82,6 +83,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_SORCERYPORTAL_DIM = "sorcery_portal_dim";
 	private static final String NBT_SORCERYPORTAL_POS = "sorcery_portal_pos";
+	
+	private static final String NBT_SAVEDRESPAWN_DIM = "saved_respawn_dim";
+	private static final String NBT_SAVEDRESPAWN_POS = "saved_respawn_pos";
+	private static final String NBT_SAVEDRESPAWN_YAW = "saved_respawn_yaw";
+	private static final String NBT_SAVEDRESPAWN_FORCE = "saved_respawn_force";
 	
 	private static final String NBT_TRANSMUTE_KNOWLEDGE = "transmute_knowledge";
 	
@@ -295,6 +301,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			nbt.put(NBT_SORCERYPORTAL_POS, NBTUtil.writeBlockPos(instance.getSorceryPortalPos()));
 		}
 		
+		final VanillaRespawnInfo respawnInfo = instance.getSavedRespawnInfo();
+		if (respawnInfo != null) {
+			nbt.putString(NBT_SAVEDRESPAWN_DIM, respawnInfo.dimension.getLocation().toString());
+			nbt.put(NBT_SAVEDRESPAWN_POS, NBTUtil.writeBlockPos(respawnInfo.pos));
+			nbt.putFloat(NBT_SAVEDRESPAWN_YAW, respawnInfo.yaw);
+			nbt.putBoolean(NBT_SAVEDRESPAWN_FORCE, respawnInfo.forced);
+		}
+		
 		list = new ListNBT();
 		for (Entry<TransmuteKnowledge, Boolean> entry : instance.getTransmuteKnowledge().entrySet()) {
 			if (entry.getValue() == null || !entry.getValue()) {
@@ -477,6 +491,16 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			instance.setSorceryPortalLocation(
 					dim,
 					NBTUtil.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
+		}
+		
+		if (tag.contains(NBT_SAVEDRESPAWN_DIM)) {
+			final RegistryKey<World> dim = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString(NBT_SAVEDRESPAWN_DIM)));
+			final BlockPos pos = NBTUtil.readBlockPos(tag.getCompound(NBT_SAVEDRESPAWN_POS));
+			final float yaw = tag.getFloat(NBT_SAVEDRESPAWN_YAW);
+			final boolean forced = tag.getBoolean(NBT_SAVEDRESPAWN_FORCE);
+			instance.setSavedRespawnInfo(new VanillaRespawnInfo(dim, pos, yaw, forced));
+		} else {
+			instance.setSavedRespawnInfo(null);
 		}
 		
 		// Modifiers

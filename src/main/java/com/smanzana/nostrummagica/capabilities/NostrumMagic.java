@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -122,6 +124,7 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
 	private RegistryKey<World> sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
+	private @Nullable VanillaRespawnInfo savedRespawnInfo;
 	private Map<TransmuteKnowledge, Boolean> transmuteKnowledge;
 	
 	private LivingEntity entity;
@@ -145,6 +148,7 @@ public class NostrumMagic implements INostrumMagic {
 		familiars = new LinkedList<>();
 		sorceryPortalDim = World.OVERWORLD;
 		sorceryPortalPos = null;
+		savedRespawnInfo = null;
 		enhancedTeleport = false;
 		transmuteKnowledge = new HashMap<>();
 		
@@ -1074,5 +1078,15 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public Map<UUID, Float> getManaRegenModifiers() {
 		return this.modManaRegen;
+	}
+
+	@Override
+	public @Nullable VanillaRespawnInfo getSavedRespawnInfo() {
+		return savedRespawnInfo;
+	}
+
+	@Override
+	public void setSavedRespawnInfo(VanillaRespawnInfo info) {
+		this.savedRespawnInfo = info;
 	}
 }

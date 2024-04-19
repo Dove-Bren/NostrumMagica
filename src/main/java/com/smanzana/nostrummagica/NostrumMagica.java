@@ -131,7 +131,7 @@ import com.smanzana.nostrummagica.utils.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
-import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension;
+import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientWorld;
@@ -2773,7 +2773,7 @@ public class NostrumMagica {
 		NostrumDimensionMapper mapper = getDimensionMapper(player.world);
 
 		// Either register or fetch existing mapping
-		return mapper.register(player.getUniqueID()).getCenterPos(NostrumEmptyDimension.SPAWN_Y);
+		return mapper.register(player.getUniqueID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
 	}
 
 	public static NostrumDimensionMapper getDimensionMapper(World worldAccess) {

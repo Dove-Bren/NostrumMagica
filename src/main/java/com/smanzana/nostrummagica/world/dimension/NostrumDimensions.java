@@ -1,47 +1,32 @@
 package com.smanzana.nostrummagica.world.dimension;
 
-import javax.annotation.Nonnull;
-
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.world.dimension.NostrumEmptyDimension.EmptyDimensionFactory;
+import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ModDimension;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.RegisterDimensionsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.registries.ObjectHolder;
 
-@EventBusSubscriber(modid = NostrumMagica.MODID, bus = EventBusSubscriber.Bus.FORGE) // for RegisterDimensionsEvent
 public class NostrumDimensions {
 
-	public static DimensionType EmptyDimensionType;
-	public static RegistryKey<World> EmptyDimension;
+	//public static RegistryKey<World> EmptyDimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, NostrumMagica.Loc(NostrumEmptyDimension.DIMENSION_ID));
 	
-	@SubscribeEvent
-	public static void onRegisterDim(@Nonnull final RegisterDimensionsEvent event) {
-		EmptyDimension = DimensionManager.registerOrGetDimension(new ResourceLocation(NostrumMagica.MODID, NostrumEmptyDimension.TYPE_ID), NostrumDimensionWrappers.EmptyDimensionWrapper,
-				null, false);
+	public static void init() {
+		Registry.register(Registry.CHUNK_GENERATOR_CODEC, NostrumMagica.Loc(EmptyChunkGen.ID), EmptyChunkGen.CODEC);
+
+		NostrumSorceryDimension.RegisterListener();
 	}
 	
-	@EventBusSubscriber(modid = NostrumMagica.MODID, bus = EventBusSubscriber.Bus.MOD) // for ModDimension registry event
-	@ObjectHolder(NostrumMagica.MODID)
-	protected static class NostrumDimensionWrappers {
-		
-		private static final String EMPTY_DIM_WRAPPER_ID = NostrumEmptyDimension.TYPE_ID + "_moddim";
-		
-		@ObjectHolder(EMPTY_DIM_WRAPPER_ID) public static EmptyDimensionFactory EmptyDimensionWrapper;
-		
-		@SubscribeEvent
-		public static void onRegisterDimType(@Nonnull final RegistryEvent.Register<ModDimension> event) {
-			event.getRegistry().register(new EmptyDimensionFactory().setRegistryName(EMPTY_DIM_WRAPPER_ID));
+	private static RegistryKey<World> DimensionCache = null;
+	private static String DimensionCacheInput = null;
+	public static final RegistryKey<World> GetSorceryDimension() {
+		final String name = ModConfig.config.getSorceryDimension();
+		if (!name.equals(DimensionCacheInput)) {
+			DimensionCacheInput = name;
+			DimensionCache = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(name));
 		}
-
+		return DimensionCache;
 	}
 	
 }

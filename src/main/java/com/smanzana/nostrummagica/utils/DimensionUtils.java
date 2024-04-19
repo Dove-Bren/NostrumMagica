@@ -15,6 +15,10 @@ public class DimensionUtils {
 	public static final RegistryKey<World> GetDimension(Entity ent) {
 		return ent.getEntityWorld().getDimensionKey();
 	}
+	
+	public static RegistryKey<World> GetDimension(World world) {
+		return world.getDimensionKey();
+	}
 
 	public static final boolean InDimension(Entity ent, RegistryKey<World> dimension) {
 		return DimEquals(GetDimension(ent), dimension);
@@ -25,7 +29,7 @@ public class DimensionUtils {
 	}
 
 	public static final boolean InDimension(Entity ent, World world) {
-		return InDimension(ent, world.getDimensionKey());
+		return InDimension(ent, GetDimension(world));
 	}
 	
 	public static final boolean IsOverworld(RegistryKey<World> dim) {
@@ -33,7 +37,7 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsOverworld(World world) {
-		return IsOverworld(world.getDimensionKey());
+		return IsOverworld(GetDimension(world));
 	}
 	
 	public static final boolean IsNether(RegistryKey<World> dim) {
@@ -41,7 +45,7 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsNether(World world) {
-		return IsOverworld(world.getDimensionKey());
+		return IsOverworld(GetDimension(world));
 	}
 	
 	public static final boolean IsEnd(RegistryKey<World> dim) {
@@ -49,15 +53,15 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsEnd(World world) {
-		return IsOverworld(world.getDimensionKey());
+		return IsOverworld(GetDimension(world));
 	}
 	
 	public static final boolean IsSorceryDim(RegistryKey<World> dim) {
-		return DimEquals(dim, NostrumDimensions.EmptyDimension);
+		return DimEquals(dim, NostrumDimensions.GetSorceryDimension());
 	}
 	
 	public static final boolean IsSorceryDim(World world) {
-		return IsSorceryDim(world.getDimensionKey());
+		return IsSorceryDim(GetDimension(world));
 	}
 
 	public static final RegistryKey<World> GetDimKey(ResourceLocation loc) {
@@ -73,7 +77,6 @@ public class DimensionUtils {
 	}
 	
 	public static boolean SameDimension(@Nonnull World a, @Nonnull World b) {
-		return DimEquals(a.getDimensionKey(), b.getDimensionKey());
+		return DimEquals(GetDimension(a), GetDimension(b));
 	}
-	
 }

@@ -1,0 +1,40 @@
+{
+	"effects": {
+		"mood_sound": {
+			"sound": "minecraft:ambient.cave",
+			"tick_delay": 6000,
+			"block_search_extent": 8,
+			"offset": 2.0
+		},
+		"sky_color": 3342387,
+		"foliage_color": 3890751,
+		"grass_color": 4941652,
+		"fog_color": 3355443,
+		"water_color": 4159204,
+		"water_fog_color": 329011
+	},
+	"carvers": {
+		
+	},
+	"features": [
+	
+	],
+	"starts": [
+	
+	],
+	"spawners": {
+		"monster": [],
+		"creature": [],
+		"ambient": [],
+		"water_creature": [],
+		"water_ambient": [],
+		"misc": []
+	},
+	"spawn_costs": {},
+	"player_spawn_friendly": false,
+	"forge:registry_name": "nostrummagica:sorcery_biome",
+	"precipitation": "none",
+	"temperature": 0.7,
+	"downfall": 0.8,
+	"category": "none"
+}

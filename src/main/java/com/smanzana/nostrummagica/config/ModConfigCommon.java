@@ -11,7 +11,7 @@ public class ModConfigCommon {
 	
 		OBELISK_REQ_MAGIC(ModConfig.Category.SERVER, "obelisk_req_magic", true, "Magic must be unlocked before obelisks can be used or teleported to."),
 		//NOSTRUM_WORLDS(ModConfig.Category.SERVER, "nostrum_worlds", new int[]{0}, "Which worlds to generate Nostrum dungeons in"),
-		//NOSTRUM_DIMENSION_ID(ModConfig.Category.SERVER, "nostrum_dimension_id", 244, "Dimension ID for Nostrum's Sorcery dimension. Change if other mods want to use the same id."),
+		NOSTRUM_SORCERY_DIM(ModConfig.Category.SERVER, "sorcery_dimension", "sorcery_dim", "Name of dimension to treat as Sorcery dimension, including changing how players enter and what's allowed there."),
 		NOSTRUM_OVERRIDE_ELYTRA(ModConfig.Category.SERVER, "nostrum_elytra_override", true, "If true, Nostrum will override (via ASM transformation) elytra flying."),
 		
 		HIGHER_BALANCED(ModConfig.Category.SERVER, "balance_armor_higher", false, "If true, set armor values to higher. Useful when other armor mods auto balance down armor values. I'm writing this while looking at First Aid and RLCraft."),
@@ -27,7 +27,6 @@ public class ModConfigCommon {
 		
 		//private Object def;
 		
-		private ForgeConfigSpec.ConfigValue<?> configField;
 		
 		private Key(ModConfig.Category Category, String key, Object def, String desc) {
 			//this.Category = Category;
@@ -49,6 +48,7 @@ public class ModConfigCommon {
 	ForgeConfigSpec.BooleanValue configHigherBalancedArmor;
 	ForgeConfigSpec.BooleanValue configEasierThano;
 	ForgeConfigSpec.BooleanValue configBagSneakVacuum;
+	ForgeConfigSpec.ConfigValue<String> configSorceryDimensionKey;
 	
 	
 	public ModConfigCommon(ForgeConfigSpec.Builder builder) {
@@ -127,11 +127,12 @@ public class ModConfigCommon {
 					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
 					.worldRestart()
 					.define(Key.BAG_VACUUM_ON_SNEAK.key, false); // Default pulled out
+			configSorceryDimensionKey = builder
+					.comment(Key.NOSTRUM_SORCERY_DIM.desc)
+					//.translation
+					.worldRestart()
+					.define(Key.NOSTRUM_SORCERY_DIM.desc, "sorcery_dim");
 		}
 		builder.pop();
-	}
-	
-	public Object getValue(Key key) {
-		return key.configField.get();
 	}
 }

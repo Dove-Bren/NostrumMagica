@@ -56,6 +56,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -375,7 +376,7 @@ public class RoomBlueprint {
 				if (!type.isEmpty()) {
 					Block block = CHECK_BLOCK_CACHE(type);
 					if (block == null) {
-						block = Registry.BLOCK.getValue(new ResourceLocation(type)).orElse(null);
+						block = Registry.BLOCK.getOptional(new ResourceLocation(type)).orElse(null);
 						
 						// Another chance with manual fixup
 						if (block == null) {
@@ -421,12 +422,12 @@ public class RoomBlueprint {
 					
 					// Detect missing ones
 					if (id != null) {
-						Optional<TileEntityType<?>> teType = Registry.BLOCK_ENTITY_TYPE.getValue(new ResourceLocation(id));
+						Optional<TileEntityType<?>> teType = Registry.BLOCK_ENTITY_TYPE.getOptional(new ResourceLocation(id));
 						if (!teType.isPresent()) {
 							
 							// Try to fix up
 							String otherID = FindTileEntityWithOldName(id);
-							if (otherID != null && Registry.BLOCK_ENTITY_TYPE.getValue(new ResourceLocation(otherID)).isPresent()) {
+							if (otherID != null && Registry.BLOCK_ENTITY_TYPE.getOptional(new ResourceLocation(otherID)).isPresent()) {
 								teData.putString("id", otherID);
 							} else {
 								NostrumMagica.logger.warn("Can't find tile entity with id: " + id);
@@ -881,23 +882,23 @@ public class RoomBlueprint {
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
-					TileEntity te = TileEntity.create(tileEntityData.copy());
+					TileEntity te = TileEntity.readTileEntity(placeState, tileEntityData.copy());
 					if (te == null) {
 						// Before 1.12.2 ids weren't namespaced. Now they are. Check if it's an old Nostrum TE
 						final CompoundNBT copy = tileEntityData.copy();
 						final String newID = NostrumMagica.MODID + ":" + copy.getString("id");
 						copy.putString("id", newID);
-						te = TileEntity.create(copy);
+						te = TileEntity.readTileEntity(placeState, copy);
 						if (te != null) {
 							block.fixupOldTEs(newID);
 						}
 					}
 					
 					if (te != null) {
-						if (worldGen) {
+						if (worldGen || !(context.world instanceof IServerWorld)) {
 							context.world.getChunk(at).addTileEntity(at, te);
 						} else {
-							context.world.getWorld().setTileEntity(at, te);
+							((IServerWorld) context.world).getWorld().setTileEntity(at, te);
 						}
 						if (te instanceof IOrientedTileEntity) {
 							// Let tile ent respond to rotation
@@ -959,7 +960,7 @@ public class RoomBlueprint {
 		// To get actual least-x leastz coordinates, we need to add offset rotated to proper orientation
 		BlockPos origin;
 		{
-			BlockPos.Mutable rotOffset = new BlockPos.Mutable(applyRotation(offset, modDir));
+			BlockPos.Mutable rotOffset = new BlockPos.Mutable().setPos(applyRotation(offset, modDir));
 			//BlockPos rotOffset = applyRotation(offset, modDir.getHorizontalIndex() % 2 == 1 ? modDir.getOpposite() : modDir);
 			
 			// To get proper offset, need to move so that our old origin (0,0) is at the real one, which is encoded in our adjusted dimensions

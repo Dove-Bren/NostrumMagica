@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
@@ -262,6 +265,22 @@ public interface INostrumMagic {
 	public BlockPos getSorceryPortalPos();
 	public void clearSorceryPortal();
 	public void setSorceryPortalLocation(RegistryKey<World> dimension, BlockPos pos);
+	
+	// Sorcery dimension respawn support
+	public static final class VanillaRespawnInfo {
+		public final @Nonnull RegistryKey<World> dimension;
+		public final @Nonnull BlockPos pos;
+		public final float yaw;
+		public final boolean forced;
+		public VanillaRespawnInfo(RegistryKey<World> dimension, BlockPos pos, float yaw, boolean forced) {
+			this.dimension = dimension;
+			this.pos = pos;
+			this.yaw = yaw;
+			this.forced = forced;
+		}
+	}
+	public @Nullable VanillaRespawnInfo getSavedRespawnInfo();
+	public void setSavedRespawnInfo(@Nullable VanillaRespawnInfo info);
 	
 	// Refresh attributes and rescan for them
 	public void refresh(ServerPlayerEntity player);
