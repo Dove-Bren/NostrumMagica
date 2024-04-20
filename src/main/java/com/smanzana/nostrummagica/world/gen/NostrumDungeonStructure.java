@@ -2,11 +2,9 @@ package com.smanzana.nostrummagica.world.gen;
 
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
@@ -22,89 +20,83 @@ import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.NostrumDungeonConfig;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IWorld;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.IStructurePieceType;
 import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 
-public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonConfig> {
+public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig> {
 	
-	public static final class NostrumDungeonConfig implements IFeatureConfig {
-
-		public static NostrumDungeonConfig deserialize(Dynamic<?> dynamic) {
-			return new NostrumDungeonConfig();
-		}
-
-		@Override
-		public <T> Dynamic<T> serialize(DynamicOps<T> ops) {
-			return new Dynamic<>(ops);
-		}
-		
-		public boolean allowedInDimension(DimensionType dimension) {
-			return dimension == DimensionType.OVERWORLD;
-		}
-		
-		public boolean allowedAtPos(IWorld world, BlockPos pos) {
-			return true;
-		}
-		
+//	public static final class NostrumDungeonConfig implements IFeatureConfig {
+//		
+////		public static final Codec<EmptyChunkGen> CODEC = RecordCodecBuilder.create(instance -> instance.group( 
+////				RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).forGetter(EmptyChunkGen::getBiomeRegistry),
+////				ResourceLocation.CODEC.xmap(s -> RegistryKey.getOrCreateKey(Registry.BIOME_KEY, s), k -> k.getLocation()).fieldOf("biome").forGetter(EmptyChunkGen::getBiome)
+////			).apply(instance, EmptyChunkGen::new));
+//		
+//		public static Codec<NostrumDungeonConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+//				Codec.INT.optionalFieldOf("dummy", 1).forGetter(NostrumDungeonConfig::getDummy)
+//			).apply(instance, NostrumDungeonConfig::new));
+//
+//		public NostrumDungeonConfig(int dummy) {
+//			;
+//		}
+//		
+//		public int getDummy() {
+//			return 1;
+//		}
+//
+//		public boolean allowedInDimension(RegistryKey<World> dimension) {
+//			return DimensionUtils.IsOverworld(dimension);
+//		}
+//		
+//		public boolean allowedAtPos(IWorld world, BlockPos pos) {
+//			return true;
+//		}
+//		
+//	}
+	
+	public NostrumDungeonStructure() {
+		super(NoFeatureConfig.field_236558_a_);
 	}
 	
-	public NostrumDungeonStructure(Function<Dynamic<?>, ? extends NostrumDungeonConfig> dynamic) {
-		super(dynamic);
+	@Override
+	protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
+		return super.func_230363_a_(generator, biomeProvider, seed, rand, x, z, biome, pos, config);
 	}
 	
 //	@Override
-//	public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
-//		// Should start to generate one at this chunk?
-//		// Note: Other structures are deterministic based on the chunk they're being rolled for.
-//		// Could copy village/woodland manor's version and use a deterministic seeded random.
-//		// Keeping original determination for now; roll for every new chunk.
-//		
-//		if (rand.nextInt(200*200) < 4) {
-//			// Portal
-//			
-//		} else if (rand.nextInt(100*100) < 1) {
-//			// Dragon
-//		} else if (rand.nextInt(100*100) < 1) {
-//			// PlantBoss
-//		}
+//	public int getSize() {
+//		return 8;
 //	}
-//	
-//	public Structure.IStartFactory getStartFactory() {
-//		return Start::new;
-//	}
-
-	@Override
-	public int getSize() {
-		return 8;
-	}
 	
 	// What is basically an 'instance' of the struct in MC gen. Doesn't have to do much besides generate logical dungeon and populate children list.
-	public static class Start extends StructureStart {
+	public static class Start extends StructureStart<NoFeatureConfig> {
 		
 		private final NostrumDungeon dungeon;
 		
-		public Start(NostrumDungeon dungeon, Structure<?> parent, int i1, int i2, Biome biome, MutableBoundingBox bounds, int i3, long l1) {
-			super(parent, i1, i2, biome, bounds, i3, l1);
+		public Start(NostrumDungeon dungeon, Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1) {
+			super(parent, i1, i2, bounds, i3, l1);
 			this.dungeon = dungeon;
 		}
 
 		@Override
-		public void init(ChunkGenerator<?> generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn) {
+		public void /*init*/ func_230364_a_(DynamicRegistries registries, ChunkGenerator generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn, NoFeatureConfig config) {
 			// Pick random Y between 30 and 60 to start
 			final int y = this.rand.nextInt(30) + 30;
 			// Center in chunk to try and avoid some 'CanSpawnHere' chunk spillage
@@ -140,10 +132,12 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 		}
 
 		@Override
-		public boolean addComponentParts(IWorld worldIn, Random randomIn, MutableBoundingBox structureBoundingBoxIn,
-				ChunkPos chunkPosIn) {
+		public boolean /*addComponentParts*/ func_230383_a_(ISeedReader worldIn, StructureManager manager, ChunkGenerator chunkGen,
+				Random randomIn, MutableBoundingBox structureBoundingBoxIn,
+				ChunkPos chunkPosIn, BlockPos something) {
+			
 			// Stop gap: is this the overworld?
-			if (worldIn.getDimension().getType() != DimensionType.OVERWORLD) {
+			if (!DimensionUtils.IsOverworld(worldIn.getWorld())) {
 				return false;
 			}
 			
@@ -174,20 +168,21 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 	
 	public static class DragonStructure extends NostrumDungeonStructure {
 
-		public DragonStructure(Function<Dynamic<?>, ? extends NostrumDungeonConfig> dynamic) {
-			super(dynamic);
+		public DragonStructure() {
+			super();
 		}
-
+		
 		@Override
-		public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
+			int unused; // I think this is way too big now
 			return rand.nextInt(100*100) < 1;
 		}
 
 		@Override
-		public IStartFactory getStartFactory() {
-			return (Structure<?> parent, int i1, int i2, Biome biome, MutableBoundingBox bounds, int i3, long l1)
+		public IStartFactory<NoFeatureConfig> getStartFactory() {
+			return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
 					-> {
-						return new Start(DRAGON_DUNGEON, parent, i1, i2, biome, bounds, i3, l1);
+						return new Start(DRAGON_DUNGEON, parent, i1, i2, bounds, i3, l1);
 					};
 		}
 		
@@ -200,16 +195,15 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 	
 	public static class PortalStructure extends NostrumDungeonStructure {
 
-		public PortalStructure(Function<Dynamic<?>, ? extends NostrumDungeonConfig> dynamic) {
-			super(dynamic);
+		public PortalStructure() {
+			super();
 		}
-
+		
 		@Override
-		public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 			// Spawn a portal shrine somewhere in the 32x32 chunks around 0
-			long seed = chunkGen.getSeed();
-			if (chunkPosX == (int) ((seed & (0x1F << 14)) >> 14) - 16
-					&& chunkPosZ == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
+			if (x == (int) ((seed & (0x1F << 14)) >> 14) - 16
+					&& z == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
 				return true;
 			}
 			
@@ -217,10 +211,10 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 		}
 
 		@Override
-		public IStartFactory getStartFactory() {
-			return (Structure<?> parent, int i1, int i2, Biome biome, MutableBoundingBox bounds, int i3, long l1)
+		public IStartFactory<NoFeatureConfig> getStartFactory() {
+			return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
 					-> {
-						return new Start(PORTAL_DUNGEON, parent, i1, i2, biome, bounds, i3, l1);
+						return new Start(PORTAL_DUNGEON, parent, i1, i2, bounds, i3, l1);
 					};
 		}
 		
@@ -233,20 +227,20 @@ public abstract class NostrumDungeonStructure extends Structure<NostrumDungeonCo
 	
 	public static class PlantBossStructure extends NostrumDungeonStructure {
 
-		public PlantBossStructure(Function<Dynamic<?>, ? extends NostrumDungeonConfig> dynamic) {
-			super(dynamic);
+		public PlantBossStructure() {
+			super();
 		}
 
 		@Override
-		public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 			return rand.nextInt(100*100) < 1;
 		}
 
 		@Override
-		public IStartFactory getStartFactory() {
-			return (Structure<?> parent, int i1, int i2, Biome biome, MutableBoundingBox bounds, int i3, long l1)
+		public IStartFactory<NoFeatureConfig> getStartFactory() {
+			return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
 					-> {
-						return new Start(PLANTBOSS_DUNGEON, parent, i1, i2, biome, bounds, i3, l1);
+						return new Start(PLANTBOSS_DUNGEON, parent, i1, i2, bounds, i3, l1);
 					};
 		}
 		

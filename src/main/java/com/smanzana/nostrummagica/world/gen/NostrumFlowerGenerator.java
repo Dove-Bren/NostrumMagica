@@ -1,36 +1,24 @@
 package com.smanzana.nostrummagica.world.gen;
 
-import java.util.Random;
-import java.util.function.Function;
+import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
+import net.minecraft.world.gen.feature.DefaultFlowersFeature;
 
-import com.mojang.datafixers.Dynamic;
-import com.smanzana.nostrummagica.blocks.NostrumBlocks;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.feature.FlowersFeature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-
-public class NostrumFlowerGenerator extends FlowersFeature {
+public class NostrumFlowerGenerator extends DefaultFlowersFeature {
 	
-	public NostrumFlowerGenerator(Function<Dynamic<?>, ? extends NoFeatureConfig> dynamic) {
-		super(dynamic);
+	int unused; // DELETE?
+	public NostrumFlowerGenerator() {
+		super(BlockClusterFeatureConfig.field_236587_a_);
 	}
 
-	@Override
-	public BlockState getRandomFlower(Random random, BlockPos pos) {
-		final Block[] FLOWERS = new Block[] {NostrumBlocks.crystabloom, NostrumBlocks.midnightIris};
-		
-		double d0 = MathHelper.clamp((1.0D + Biome.INFO_NOISE.getValue((double)pos.getX() / 48.0D, (double)pos.getZ() / 48.0D)) / 2.0D, 0.0D, 0.9999D);
-		Block block = FLOWERS[(int)(d0 * (double)FLOWERS.length)];
-		return block == Blocks.BLUE_ORCHID ? Blocks.POPPY.getDefaultState() : block.getDefaultState();
-	}
-	
-	
+//	@Override
+//	public BlockState getFlowerToPlace(Random random, BlockPos pos, BlockClusterFeatureConfig config) {
+//		final Block[] FLOWERS = new Block[] {NostrumBlocks.crystabloom, NostrumBlocks.midnightIris};
+//		
+//		double d0 = MathHelper.clamp((1.0D + Biome.INFO_NOISE.getValue((double)pos.getX() / 48.0D, (double)pos.getZ() / 48.0D)) / 2.0D, 0.0D, 0.9999D);
+//		Block block = FLOWERS[(int)(d0 * (double)FLOWERS.length)];
+//		return block == Blocks.BLUE_ORCHID ? Blocks.POPPY.getDefaultState() : block.getDefaultState();
+//	}
+
 //	public static final class NostrumFlowerConfig implements IFeatureConfig {
 //		
 //		public static NostrumFlowerConfig deserialize(Dynamic<?> dynamic) {
