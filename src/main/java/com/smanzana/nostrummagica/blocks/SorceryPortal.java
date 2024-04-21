@@ -90,7 +90,7 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 				}
 				attr.setSorceryPortalLocation(DimensionUtils.GetDimension(entityIn), new BlockPos(savedPos));
 			}
-			entityIn.changeDimension(entityIn.getServer().getWorld(NostrumDimensions.EmptyDimension));
+			entityIn.changeDimension(entityIn.getServer().getWorld(NostrumDimensions.GetSorceryDimension()));
 		} else {
 			entityIn.changeDimension(entityIn.getServer().getWorld(World.OVERWORLD));
 		}

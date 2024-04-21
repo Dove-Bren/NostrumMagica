@@ -16,13 +16,13 @@ public interface ClientEffectForm {
 	
 	public static void drawModel(IBakedModel model, int color) {
 		GlStateManager.disableBlend();
-		GlStateManager.disableAlphaTest();
+		//GlStateManager.disableAlphaTest();
 		GlStateManager.disableTexture();
 		GlStateManager.enableBlend();
-		GlStateManager.enableAlphaTest();
+		//GlStateManager.enableAlphaTest();
 		GlStateManager.enableTexture();
 		//GlStateManager.depthMask(false);
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
 //		{

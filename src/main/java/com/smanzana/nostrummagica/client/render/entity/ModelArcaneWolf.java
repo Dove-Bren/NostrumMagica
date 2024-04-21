@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 
-import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.entity.model.WolfModel;
 import net.minecraft.util.math.MathHelper;
 
