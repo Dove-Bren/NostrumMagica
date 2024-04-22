@@ -4,14 +4,14 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.EntityLux;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class ModelLux extends EntityModel<EntityLux> {
 	
-	private RendererModel main;
+	private ModelRenderer main;
 	
 	public ModelLux() {
-		main = new RendererModel(this);
+		main = new ModelRenderer(this);
 		main.setTextureSize(64, 64);
 		
 		main.addBox(-2f, -16f, -2f, 4, 32, 4);

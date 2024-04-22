@@ -20,7 +20,7 @@ public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRender
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntitySpellSaucer entity) {
+	public ResourceLocation getEntityTexture(EntitySpellSaucer entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/magic_blade.png"
 				);

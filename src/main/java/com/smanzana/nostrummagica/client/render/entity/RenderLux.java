@@ -22,7 +22,7 @@ public class RenderLux extends MobRenderer<EntityLux, ModelLux> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityLux entity) {
+	public ResourceLocation getEntityTexture(EntityLux entity) {
 		return new ResourceLocation(NostrumMagica.MODID, "textures/entity/sprite_core.png");
 	}
 	

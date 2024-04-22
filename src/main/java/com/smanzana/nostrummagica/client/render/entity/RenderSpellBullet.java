@@ -25,7 +25,7 @@ public class RenderSpellBullet extends EntityRenderer<EntitySpellBullet> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntitySpellBullet entity) {
+	public ResourceLocation getEntityTexture(EntitySpellBullet entity) {
 		return LOC_TEXT;
 	}
 	

@@ -18,7 +18,7 @@ public abstract class RenderInvisibleMultiPartEntity<T extends Entity> extends E
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(T entity) {
+	public ResourceLocation getEntityTexture(T entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}

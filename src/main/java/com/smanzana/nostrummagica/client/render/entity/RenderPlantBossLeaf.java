@@ -92,7 +92,7 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(EntityPlantBoss.PlantBossLeafLimb entity) {
+	public ResourceLocation getEntityTexture(EntityPlantBoss.PlantBossLeafLimb entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

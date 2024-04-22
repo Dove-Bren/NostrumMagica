@@ -39,7 +39,7 @@ public class RenderWisp extends EntityRenderer<EntityWisp> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityWisp entity) {
+	public ResourceLocation getEntityTexture(EntityWisp entity) {
 		return null;
 	}
 	

@@ -28,7 +28,7 @@ public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(T entity) {
+	public ResourceLocation getEntityTexture(T entity) {
 		// TODO fixme?
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/koid.png"

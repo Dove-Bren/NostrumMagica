@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class ModelDragonEgg extends EntityModel<EntityDragonEgg> {
 
-	private RendererModel main;
+	private ModelRenderer main;
+	private float coldScale;
 	
 	private static final int textureHeight = 32;
 	private static final int textureWidth = 32;
@@ -20,7 +20,7 @@ public class ModelDragonEgg extends EntityModel<EntityDragonEgg> {
 	}
 	
 	public ModelDragonEgg() {
-		main = new RendererModel(this, 0, 0);
+		main = new ModelRenderer(this, 0, 0);
 		int y = 28;
 		
 		main.setTextureSize(textureWidth, textureHeight);
@@ -37,22 +37,30 @@ public class ModelDragonEgg extends EntityModel<EntityDragonEgg> {
 		addCyl(y--, 1, 2);
 	}
 	
+	public void setColdScale(float scale) {
+		this.coldScale = scale; // Wish renderer could just pass color to render...
+	}
+	
 	@Override
-	public void render(EntityDragonEgg entity, float time, float swingProgress,
-			float swing, float headAngleY, float headAngleX, float scale) {
-		setRotationAngles(entity, time, swingProgress, swing, headAngleY, headAngleX, scale);
+	public void render(MatrixStack matrixStack, IVertexBuilder buffer,
+            int light, int overlay, float red, float green, float blue, float alpha) {
 		
-		GL11.glPushMatrix();
+		// Tint based on how cold it is
+		red *= 1f - (coldScale * .4f);
+		green *= 1f - (coldScale * .1f);
+		blue *= 1f - (coldScale * .1f);
 		
-		float modelScale = 0.5f;
-		GL11.glScalef(modelScale, modelScale, modelScale);
+		final float modelScale = 0.5f;
+		matrixStack.push();
+		matrixStack.scale(modelScale, modelScale, modelScale);
+		main.render(matrixStack, buffer, light, overlay, red, green, blue, alpha);
+		matrixStack.pop();
+	}
+
+	@Override
+	public void setRotationAngles(EntityDragonEgg entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+			float netHeadYaw, float headPitch) {
+		// TODO Auto-generated method stub
 		
-		float coldScale = 1f - (entity.getHeat() / EntityDragonEgg.HEAT_MAX);
-		
-		GlStateManager.color4f(1f - (coldScale * .4f), 1f - (coldScale * .1f), 1f - (coldScale * .1f), 1f);
-		
-		main.render(scale);
-		
-		GL11.glPopMatrix();
 	}
 }

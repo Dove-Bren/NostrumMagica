@@ -56,7 +56,7 @@ public class RenderPlantBossBramble extends EntityRenderer<EntityPlantBossBrambl
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(EntityPlantBossBramble entity) {
+	public ResourceLocation getEntityTexture(EntityPlantBossBramble entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

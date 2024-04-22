@@ -1,20 +1,21 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.items.MagicArmor;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 
 public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<T> {
 
-	private /* final */ RendererModel rightWing;
-	private final RendererModel leftWing;
+	private /* final */ ModelRenderer rightWing;
+	private final ModelRenderer leftWing;
 	
-	private static final <T extends LivingEntity> RendererModel createWing(EntityModel<T> base) {
-		RendererModel wing = new RendererModel(base);
+	private static final <T extends LivingEntity> ModelRenderer createWing(EntityModel<T> base) {
+		ModelRenderer wing = new ModelRenderer(base);
 		wing.setRotationPoint(0.0F, 0, 0.0F);
 		wing.setTextureOffset(1, 10).addBox(-19, -13, 0, 19, 2, 1, false);
 		wing.setTextureOffset(3, 8).addBox(-17, -14, 0, 15, 1, 1, false);
@@ -52,15 +53,15 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	/**
 	 * Sets the models various rotation angles then renders the model.
 	 */
-	public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
-	{
+	@Override
+	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 //		{
 //			this.rightWing = createWing(this);
 //		}
-		GlStateManager.disableRescaleNormal();
+//		GlStateManager.disableRescaleNormal();
 		//GlStateManager.disableCull();
-		this.rightWing.render(scale);
-		this.leftWing.render(scale);
+		this.rightWing.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.leftWing.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 
 	/**
@@ -69,8 +70,8 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	 * "far" arms and legs can swing at most.
 	 */
 	@Override
-	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
-		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
+	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+		//super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 		
 		final float livingJitterPeriod = 100f;
 		// 0f - 1f
@@ -82,9 +83,6 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 		final float wingFlapMod = MathHelper.sin(3.1415f * 2 * wingFlapPerc);
 		
 		rightWing.rotateAngleX = rightWing.rotateAngleZ = 0;
-		rightWing.offsetY = entityIn.getHeight() * .3f;
-		rightWing.offsetX = -entityIn.getWidth() * .25f;
-		rightWing.offsetZ = entityIn.getWidth() * .3f;
 		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isElytraFlying()) {
 			rightWing.rotateAngleY = (float) (Math.PI * (.20 + livingJitterMod * .005 + wingFlapMod * .25));
 		} else {
@@ -97,9 +95,6 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 		leftWing.rotateAngleX = rightWing.rotateAngleX;
 		leftWing.rotateAngleY = (float) (-rightWing.rotateAngleY + Math.PI);
 		leftWing.rotateAngleZ = rightWing.rotateAngleZ;
-		leftWing.offsetX = -rightWing.offsetX;
-		leftWing.offsetY = rightWing.offsetY;
-		leftWing.offsetZ = rightWing.offsetZ;
 		
 //		float f = 0.2617994F;
 //		float f1 = -0.2617994F;

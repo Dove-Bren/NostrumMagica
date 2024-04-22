@@ -4,11 +4,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class ModelPlantBossBramble extends EntityModel<EntityPlantBossBramble> {
 	
-	private RendererModel main;
+	private ModelRenderer main;
 	
 	public ModelPlantBossBramble() {
 		
@@ -17,7 +17,7 @@ public class ModelPlantBossBramble extends EntityModel<EntityPlantBossBramble> {
 		
 		this.textureHeight = 256;
 		this.textureWidth = 256;
-		main = new RendererModel(this, 0, 0);
+		main = new ModelRenderer(this, 0, 0);
 		
 		// Main horizontal stretch
 		main.setTextureOffset(0, 157);

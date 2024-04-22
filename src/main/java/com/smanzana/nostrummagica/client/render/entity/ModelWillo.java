@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.entity.EntityWillo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class ModelWillo extends EntityModel<EntityWillo> {
@@ -19,14 +19,14 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 	private static final int SEGMENTS = 8;
 	private static final float PERIOD = 20f * 2;
 	
-	private RendererModel main;
-	private List<RendererModel> armLeft;
-	private List<RendererModel> armRight;
+	private ModelRenderer main;
+	private List<ModelRenderer> armLeft;
+	private List<ModelRenderer> armRight;
 	
 	public ModelWillo() {
 		this.textureHeight = 64;
 		this.textureWidth = 64;
-		main = new RendererModel(this, 0, 0);
+		main = new ModelRenderer(this, 0, 0);
 		
 		//main.addBox(-8f, -8f, -8f, 16, 16, 16);
 		
@@ -36,7 +36,7 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 		final float offset = .75f;
 		final float spacing = .75f;
 		for (int i = 0; i < SEGMENTS; i++) {
-			RendererModel render = new RendererModel(this, 0, 0);
+			ModelRenderer render = new ModelRenderer(this, 0, 0);
 			render.setTextureOffset(0, 18);
 			render.addBox(-4.5f, -4.5f, -4.5f, 9, 9, 9);
 			render.offsetX = offset + (i+1) * spacing;
@@ -45,7 +45,7 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 		}
 		
 		for (int i = 0; i < SEGMENTS; i++) {
-			RendererModel render = new RendererModel(this, 0, 0);
+			ModelRenderer render = new ModelRenderer(this, 0, 0);
 			render.setTextureOffset(0, 18);
 			render.addBox(-4.5f, -4.5f, -4.5f, 9, 9, 9);
 			render.offsetX = -offset + (i+1) * -spacing;

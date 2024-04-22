@@ -254,7 +254,7 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(EntityPlantBoss entity) {
+	public ResourceLocation getEntityTexture(EntityPlantBoss entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

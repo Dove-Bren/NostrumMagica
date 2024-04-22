@@ -1,10 +1,11 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -30,19 +31,24 @@ public class RenderArcaneWolf extends MobRenderer<EntityArcaneWolf, ModelArcaneW
 	}
 	
 	@Override
-	public void doRender(EntityArcaneWolf entity, double x, double y, double z, float entityYaw, float partialTicks) {
+	public void render(EntityArcaneWolf entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		if (entity.isWolfWet()) {
-			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
-			GlStateManager.color3f(f, f, f);
+			//float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
+			float f = entity.getShadingWhileWet(partialTicks);
+			this.entityModel.setTint(f, f, f);
 		}
 		
-		this.entityModel = new ModelArcaneWolf();
+		//this.entityModel = new ModelArcaneWolf();
+		super.render(entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
-		super.doRender(entity, x, y, z, entityYaw, partialTicks);
+		// Vanilla sets this back every time. Not sure why
+		if (entity.isWolfWet()) {
+			this.entityModel.setTint(1f, 1f, 1f);
+		}
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(EntityArcaneWolf entity) {
+	public ResourceLocation getEntityTexture(EntityArcaneWolf entity) {
 		return ARCANE_WOLF_TEXTURE_BASE;
 	}
 	

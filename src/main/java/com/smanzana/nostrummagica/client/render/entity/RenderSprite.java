@@ -18,7 +18,7 @@ public class RenderSprite extends MobRenderer<EntitySprite, ModelSpriteCore> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntitySprite entity) {
+	public ResourceLocation getEntityTexture(EntitySprite entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/sprite_core.png"
 				);

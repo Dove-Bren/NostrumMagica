@@ -15,7 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.Model;
@@ -31,7 +31,7 @@ import net.minecraftforge.client.model.obj.OBJModel.OBJBakedModel;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 
 /**
- * An OBJ Model (like what you get with OBJLoader) but as a RendererModel, and sped up using OpenGL's compiled instruction lists.
+ * An OBJ Model (like what you get with OBJLoader) but as a ModelRenderer, and sped up using OpenGL's compiled instruction lists.
  * 
  * This class originally adapted from 
  * https://github.com/2piradians/Minewatch/blob/1.12.1/src/main/java/twopiradians/minewatch/client/render/entity/RenderOBJModel.java.
@@ -39,12 +39,12 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
  *
  * @param <T>
  */
-public class RenderObj extends RendererModel {
+public class RenderObj extends ModelRenderer {
 
 	private ModelResourceLocation resource;
 	
 	// The GL display list rendered by the Tessellator for this model
-	// RendererModel does not expose, so we have to basically dupe
+	// ModelRenderer does not expose, so we have to basically dupe
 	// One display list per model. Matches resources[]
     private int compiledList;
     
@@ -244,7 +244,7 @@ public class RenderObj extends RendererModel {
 		super.render(scale); // Any boxes and stuff that was added (and children!!!!!!!)
 	}
 	
-	// This is a copy of RendererModel's render method, but using our display list
+	// This is a copy of ModelRenderer's render method, but using our display list
 	private void renderInternal(float scale, int displayList) {
 		if (!this.isHidden) {
 			if (this.showModel) {

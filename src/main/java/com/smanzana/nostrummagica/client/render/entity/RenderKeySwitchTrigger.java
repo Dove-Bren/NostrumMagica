@@ -19,7 +19,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityKeySwitchTrigger entity) {
+	public ResourceLocation getEntityTexture(EntityKeySwitchTrigger entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/block/key_cage.png"
 				);

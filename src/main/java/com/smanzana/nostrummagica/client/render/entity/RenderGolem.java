@@ -20,7 +20,7 @@ public class RenderGolem<T extends EntityGolem> extends MobRenderer<T, ModelGole
 	}
 	
 	@Override
-	protected ResourceLocation getEntityTexture(T entity) {
+	public ResourceLocation getEntityTexture(T entity) {
 		ResourceLocation loc = texCache.get(entity.getTextureKey());
 		if (loc == null) {
 			loc = new ResourceLocation(NostrumMagica.MODID,

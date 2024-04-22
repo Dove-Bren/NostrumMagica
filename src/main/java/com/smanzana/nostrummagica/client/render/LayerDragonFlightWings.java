@@ -2,17 +2,20 @@ package com.smanzana.nostrummagica.client.render;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.entity.ModelDragonFlightWings;
 import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -30,10 +33,10 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 	}
 	
 	@Override
-	public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (shouldRender(player)) {
 			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EquipmentSlotType.CHEST); 
-			render(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, (!chestpiece.isEmpty() && chestpiece.isEnchanted()));
+			render(stack, typeBuffer, packedLight, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, (!chestpiece.isEmpty() && chestpiece.isEnchanted()));
 		}
 	}
 	
@@ -88,43 +91,21 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		return 0xFF000000;
 	}
 	
-	public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, boolean enchanted) {
-		final int color = getColor(player);
-		GlStateManager.color4f((float)((color >> 16) & 0xFF) / 255f,
-				(float)((color >> 8) & 0xFF) / 255f,
-				(float)((color >> 0) & 0xFF) / 255f,
-					(float)((color >> 24) & 0xFF) / 255f);
+	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, boolean enchanted) {
 		
-		GlStateManager.disableBlend();
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableBlend();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.disableTexture();
-		GlStateManager.enableTexture();
-		GlStateManager.enableLighting();
-		GlStateManager.disableLighting();
-		GlStateManager.disableColorLogicOp();
-		GlStateManager.enableColorMaterial();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-
-		this.renderPlayer.bindTexture(TEXTURE_WINGS);
+		final float colors[] = ColorUtil.ARGBToColor(getColor(player));
+		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.getEntitySolid(TEXTURE_WINGS));
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
-		model.setRotationAngles(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-		model.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-
-		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		stack.push();
+		stack.translate(0, 0, .125f);
+		stack.translate(-player.getWidth() * .25f, player.getHeight() * .3f, player.getWidth() * .3f);
+		model.setRotationAngles(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+		model.render(stack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colors[0], colors[1], colors[2], colors[3]);
+		
 //		if (enchanted) {
-//			LayerArmorBase.renderEnchantedGlint(this.renderPlayer, player, model, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-//		}
-
-		GlStateManager.popMatrix();
+//		LayerArmorBase.renderEnchantedGlint(this.renderPlayer, player, model, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+//	}
+		
+		stack.pop();
 	}
-
-	@Override
-	public boolean shouldCombineTextures() {
-		return false;
-	}
-	
 }

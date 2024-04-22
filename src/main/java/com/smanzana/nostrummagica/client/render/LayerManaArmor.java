@@ -2,15 +2,14 @@ package com.smanzana.nostrummagica.client.render;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
@@ -28,9 +27,9 @@ public class LayerManaArmor extends LayerRenderer<AbstractClientPlayerEntity, Pl
 	}
 	
 	@Override
-	public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (shouldRender(player)) {
-			renderInternal(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+			renderInternal(stack, typeBuffer, packedLight, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 		}
 	}
 	
@@ -44,17 +43,12 @@ public class LayerManaArmor extends LayerRenderer<AbstractClientPlayerEntity, Pl
 	}
 	
 	private boolean recurseMarker = false;
-	public void renderInternal(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void renderInternal(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		
 		if (!recurseMarker) {
 			recurseMarker = true;
-		
-			final int color = getColor(player);
-			GlStateManager.color4f((float)((color >> 16) & 0xFF) / 255f,
-					(float)((color >> 8) & 0xFF) / 255f,
-					(float)((color >> 0) & 0xFF) / 255f,
-						(float)((color >> 24) & 0xFF) / 255f);
 			
+			final float[] color = ColorUtil.ARGBToColor(getColor(player));
 			final float progPeriod = 3 * 20;
 			final float growScale = .03f;
 			
@@ -62,57 +56,16 @@ public class LayerManaArmor extends LayerRenderer<AbstractClientPlayerEntity, Pl
 			final float progAdj = (prog % progPeriod) / progPeriod;
 			final float growAmt = (MathHelper.sin(progAdj * 3.1415f * 2) * growScale) + growScale;
 			
-			GlStateManager.disableBlend();
-			GlStateManager.disableAlphaTest();
-			GlStateManager.enableBlend();
-			GlStateManager.enableAlphaTest();
-			GlStateManager.disableTexture();
-			GlStateManager.enableTexture();
-			GlStateManager.enableLighting();
-			GlStateManager.disableLighting();
-			GlStateManager.disableColorLogicOp();
-			GlStateManager.enableColorMaterial();
-			GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-	
-			this.renderPlayer.bindTexture(TEXTURE_ARMOR);
+			IVertexBuilder buffer = typeBuffer.getBuffer(NostrumRenderTypes.MANA_ARMOR);
 			
-			GlStateManager.pushMatrix();
-			GlStateManager.scaled(1.0 + growAmt, 1.0 + growAmt, 1.0 + growAmt);
+			stack.push();
+			stack.scale(1.002f + growAmt, 1.002f + growAmt, 1.002f + growAmt);
 			
-			GlStateManager.matrixMode(GL11.GL_TEXTURE);
-			GlStateManager.pushMatrix();
-			GlStateManager.loadIdentity();
-			GlStateManager.translated(0 + (ageInTicks + partialTicks) * .001, 0, 0);
+			this.renderPlayer.getEntityModel().render(stack, buffer, packedLight, packedLight, color[0], color[1], color[2], color[3]);
 			
-			GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-			
-			{
-				this.renderPlayer.getEntityModel().render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale + .002f);
-				
-				//this.renderPlayer.doRender(player, 0, 0, 0, netHeadYaw, partialTicks);
-			}
-			
-			GlStateManager.matrixMode(GL11.GL_TEXTURE);
-			GlStateManager.popMatrix();
-			GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-	//		GlStateManager.translatef(0.0F, 0.0F, 0.125F);
-	//		model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
-	//		model.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-	
-			GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-	//		if (enchanted) {
-	//			LayerArmorBase.renderEnchantedGlint(this.renderPlayer, player, model, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-	//		}
-	
-			GlStateManager.popMatrix();
+			stack.pop();
 			recurseMarker = false;
 		}
 		
 	}
-
-	@Override
-	public boolean shouldCombineTextures() {
-		return false;
-	}
-	
 }

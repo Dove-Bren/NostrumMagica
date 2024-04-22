@@ -4,17 +4,17 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class ModelPlantBossLeaf extends EntityModel<EntityPlantBoss.PlantBossLeafLimb> {
 	
-	private RendererModel main;
+	private ModelRenderer main;
 	
 	public ModelPlantBossLeaf() {
 		
 		this.textureHeight = 256;
 		this.textureWidth = 256;
-		main = new RendererModel(this, 92, 250);
+		main = new ModelRenderer(this, 92, 250);
 		
 		main.setTextureOffset(92, 250);
 		main.addBox(-16, -4, 0, 32, 2, 4);

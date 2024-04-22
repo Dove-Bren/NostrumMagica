@@ -22,7 +22,7 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityEnderRodBall entity) {
+	public ResourceLocation getEntityTexture(EntityEnderRodBall entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/koid.png"
 				);

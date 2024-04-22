@@ -14,7 +14,7 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelKoid> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityKoid entity) {
+	public ResourceLocation getEntityTexture(EntityKoid entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/entity/koid.png"
 				);

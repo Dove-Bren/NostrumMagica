@@ -30,7 +30,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelWillo> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityWillo entity) {
+	public ResourceLocation getEntityTexture(EntityWillo entity) {
 		return RES_TEXT;
 	}
 	

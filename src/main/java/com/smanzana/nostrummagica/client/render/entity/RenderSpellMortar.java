@@ -25,7 +25,7 @@ public class RenderSpellMortar extends EntityRenderer<EntitySpellMortar> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntitySpellMortar entity) {
+	public ResourceLocation getEntityTexture(EntitySpellMortar entity) {
 		return LOC_TEXT;
 	}
 	
