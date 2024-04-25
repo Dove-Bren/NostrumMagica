@@ -1,17 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellMortar;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderSpellMortar extends EntityRenderer<EntitySpellMortar> {
 	
@@ -29,59 +32,25 @@ public class RenderSpellMortar extends EntityRenderer<EntitySpellMortar> {
 		return LOC_TEXT;
 	}
 	
-	public void doRender(EntitySpellMortar entity, double x, double y, double z, float entityYaw, float partialTicks) {
+	@Override
+	public void render(EntitySpellMortar entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
-		final int color = entity.getElement().getColor();
-		final float brightness = 1f;
-		
-		GlStateManager.pushMatrix();
-		this.bindEntityTexture(entity);
-		GlStateManager.translatef((float)x, (float)y, (float)z);
-		GlStateManager.enableRescaleNormal();
-		GlStateManager.scalef(1.5f * this.scale, 1.5f * this.scale, 1.5f * this.scale);
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		GlStateManager.rotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotatef((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-
-		if (this.renderOutlines) {
-			GlStateManager.enableColorMaterial();
-			//GlStateManager.enableOutlineMode(this.getTeamColor(entity));
-			GlStateManager.setupSolidRenderingTextureCombine(this.getTeamColor(entity));
-		}
-		GlStateManager.enableBlend();
-		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.enableAlphaTest();
-		GlStateManager.disableTexture();
-		GlStateManager.enableTexture();
-		GlStateManager.depthMask(false);
-		GlStateManager.color4f(
-				brightness * (float)((color >> 16) & 0xFF) / 255f,
-				brightness * (float)((color >> 8) & 0xFF) / 255f,
-				brightness * (float)((color >> 0) & 0xFF) / 255f,
-				1f
-				);
-
-		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
-		bufferbuilder.pos(-0.5D, -0.25D, 0.0D).tex(0, 1f).normal(0.0F, 1.0F, 0.0F).endVertex();
-		bufferbuilder.pos(0.5D, -0.25D, 0.0D).tex(1f, 1f).normal(0.0F, 1.0F, 0.0F).endVertex();
-		bufferbuilder.pos(0.5D, 0.75D, 0.0D).tex(1f, 0f).normal(0.0F, 1.0F, 0.0F).endVertex();
-		bufferbuilder.pos(-0.5D, 0.75D, 0.0D).tex(0f, 0f).normal(0.0F, 1.0F, 0.0F).endVertex();
-		tessellator.draw();
-
-		if (this.renderOutlines) {
-			//GlStateManager.disableOutlineMode();
-			GlStateManager.tearDownSolidRenderingTextureCombine();
-			GlStateManager.disableColorMaterial();
-		}
-
-		GlStateManager.depthMask(true);
-		GlStateManager.disableBlend();
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		GlStateManager.disableRescaleNormal();
-		GlStateManager.popMatrix();
-		super.doRender(entity, x, y, z, entityYaw, partialTicks);
+		// Copied from DragonFireballRenderer.
+		// Just render a billboard
+		matrixStackIn.push();
+		matrixStackIn.scale(1.5f * this.scale, 1.5f * this.scale, 1.5f * this.scale);
+		matrixStackIn.rotate(this.renderManager.getCameraOrientation());
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180.0F));
+		Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		Matrix3f normal = matrixStackIn.getLast().getNormal();
+		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(getEntityTexture(entityIn)));
+		buffer.pos(transform, -0.5f, -0.25f, 0.0f).tex(0, 1f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, 0.5f, -0.25f, 0.0f).tex(1f, 1f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, 0.5f, 0.75f, 0.0f).tex(1f, 0f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, -0.5f, 0.75f, 0.0f).tex(0f, 0f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
+		matrixStackIn.pop();
+		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 	
 }

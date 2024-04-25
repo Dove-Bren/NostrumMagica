@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.smanzana.nostrummagica.client.render.entity.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
 
 import net.minecraft.client.renderer.RenderState;
@@ -17,6 +18,8 @@ public class NostrumRenderTypes {
 	
 	public static final RenderType HOOKSHOT_CHAIN;
 	public static final RenderType MANA_ARMOR;
+	public static final RenderType SWITCH_TRIGGER_BASE;
+	public static final RenderType SWITCH_TRIGGER_CAGE;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -40,6 +43,8 @@ public class NostrumRenderTypes {
 	            = new RenderState.WriteMaskState(ENABLE_DEPTH_WRITING, ENABLE_COLOUR_COMPONENTS_WRITING);
 	    
 	    final RenderState.CullState NO_CULL = new RenderState.CullState(false);
+	    
+	    final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
 	    
 	    final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
 	    
@@ -79,36 +84,6 @@ public class NostrumRenderTypes {
 			.build(false);
 		HOOKSHOT_CHAIN = RenderType.makeType(Name("hookshot_chain"), DefaultVertexFormats.POSITION_TEX, GL11.GL_QUAD_STRIP, 128, glState);
 		
-		
-		/*
-//			GlStateManager.disableBlend();
-//			GlStateManager.disableAlphaTest();
-//			GlStateManager.enableBlend();
-//			GlStateManager.enableAlphaTest();
-//			GlStateManager.disableTexture();
-//			GlStateManager.enableTexture();
-//			GlStateManager.enableLighting();
-//			GlStateManager.disableLighting();
-//			GlStateManager.disableColorLogicOp();
-//			GlStateManager.enableColorMaterial();
-//			GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-//	
-//			this.renderPlayer.bindTexture(TEXTURE_ARMOR);
-//			
-//			GlStateManager.pushMatrix();
-//			GlStateManager.scaled(1.0 + growAmt, 1.0 + growAmt, 1.0 + growAmt);
-//			
-//			GlStateManager.matrixMode(GL11.GL_TEXTURE);
-//			GlStateManager.pushMatrix();
-//			GlStateManager.loadIdentity();
-//			GlStateManager.translated(0 + (ageInTicks + partialTicks) * .001, 0, 0);
-//			
-//			GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-		 */
-		
-		//makeType("armor_entity_glint", DefaultVertexFormats.POSITION_TEX, 7, 256, RenderType.State.getBuilder().texture(new RenderState.TextureState(ItemRenderer.RES_ITEM_GLINT, true, false)).writeMask(COLOR_WRITE).cull(CULL_DISABLED).depthTest(DEPTH_EQUAL).transparency(GLINT_TRANSPARENCY).texturing(ENTITY_GLINT_TEXTURING).layer(field_239235_M_).build(false));
-		//RenderType.State.getBuilder().texture(new RenderState.TextureState(LocationIn, false, false)).transparency(TRANSLUCENT_TRANSPARENCY).diffuseLighting(DIFFUSE_LIGHTING_ENABLED).alpha(DEFAULT_ALPHA).cull(CULL_DISABLED).lightmap(LIGHTMAP_ENABLED).overlay(OVERLAY_ENABLED).build(outlineIn);
-	      //return makeType("entity_translucent", DefaultVertexFormats.ENTITY, 7, 256, true, true, rendertype$state);
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(LayerManaArmor.TEXTURE_ARMOR, true, false))
 				.transparency(TRANSLUCENT_TRANSPARENCY)
@@ -118,5 +93,24 @@ public class NostrumRenderTypes {
 				.texturing(MANAARMOR_GLINT)
 			.build(false);
 		MANA_ARMOR = RenderType.makeType(Name("manaarmor"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 128, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(ModelSwitchTrigger.TEXT, false, true))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+			.build(false);
+		SWITCH_TRIGGER_BASE = RenderType.makeType(Name("switch_trigger_base"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(ModelSwitchTrigger.CAGE_TEXT, false, true))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.depthTest(DEPTH_EQUAL)
+				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+			.build(false);
+		SWITCH_TRIGGER_CAGE = RenderType.makeType(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
 	}
 }

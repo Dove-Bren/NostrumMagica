@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
@@ -33,23 +34,18 @@ public class ModelPlantBossBramble extends EntityModel<EntityPlantBossBramble> {
 	}
 	
 	@Override
-	public void render(EntityPlantBossBramble entity, float time, float swingProgress,
-			float swing, float headAngleY, float headAngleX, float scale) {
-		GlStateManager.pushMatrix();
-		GlStateManager.scalef(1f, 1f, 1f);
-		GlStateManager.translatef(0, 0, 0);
-		//GlStateManager.rotatef(90f, 0, 1, 0);
-		main.render(scale);
-		GlStateManager.popMatrix();
+	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
 	@Override
 	public void setLivingAnimations(EntityPlantBossBramble entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
-	
+
 	@Override
-	public void setRotationAngles(EntityPlantBossBramble entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
-		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
+	public void setRotationAngles(EntityPlantBossBramble entityIn, float limbSwing, float limbSwingAmount,
+			float ageInTicks, float netHeadYaw, float headPitch) {
+		;
 	}
 }

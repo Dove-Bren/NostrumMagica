@@ -1,33 +1,29 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
 
-public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss> {
+public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShiv<EntityPlantBoss>> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
-	protected ModelPlantBossLeaf leafModels[];
+	private ModelPlantBoss mainModel;
 	
 	public RenderPlantBoss(EntityRendererManager renderManagerIn, float shadowSizeIn) {
-		super(renderManagerIn, new ModelPlantBoss(), shadowSizeIn);
-		
-		leafModels = new ModelPlantBossLeaf[EntityPlantBoss.NumberOfLeaves];
-		for (int i = 0; i < leafModels.length; i++) {
-			leafModels[i] = new ModelPlantBossLeaf();
-		}
+		super(renderManagerIn, new ModelRenderShiv<>(), shadowSizeIn);
+		this.mainModel = new ModelPlantBoss();
 	}
 	
 	/**
@@ -39,119 +35,140 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 	@Override
 	protected float handleRotationFloat(EntityPlantBoss livingBase, float partialTicks) {
 		return super.handleRotationFloat(livingBase, partialTicks);
-		//return livingBase.getTailRotation();
 	}
 	
 	@Override
-	public void doRender(EntityPlantBoss plant, double x, double y, double z, float entityYaw, float partialTicks) {
-//		if (entity.isWolfWet()) {
-//			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
-//			GlStateManager.color4f(f, f, f);
-//		}
-		
-		//this.mainModel = new ModelPlantBoss();
-		
-//		for (int i = 0; i < leafModels.length; i++) {
-//			leafModels[i] = new ModelPlantBossLeaf();
-//		}
-		
-		super.doRender(plant, x, y, z, entityYaw, partialTicks);
+	public void render(EntityPlantBoss entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+		this.entityModel.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
+			// Could pass through bufferIn to allow access to different buffer types, but only need the base one
+			this.renderModel(entityIn, deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha);
+		});
+		//
+		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	
-	protected void renderTrimming(EntityPlantBoss plant, float partialTicks) {
+	protected void renderTrimming(EntityPlantBoss plant, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
+			float red, float green, float blue, float alpha) {
 		if (plant.getBody() == null) {
 			return;
 		}
 		
-		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-		
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, -plant.getBody().getHeight()/2, 0);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-		
 		// 4 faces
-		final double uBase = 0;
-		final double vBase = (96f / 256f);
-		final double uLen = (48f) / 256f;
-		final double vLen = (16f) / 256f;
+		final float uBase = 0;
+		final float vBase = (96f / 256f);
+		final float uLen = (48f) / 256f;
+		final float vLen = (16f) / 256f;
 		
-		final double hMin = -1.5;
-		final double hMax = 1.5;
-		final double yMin = -1;
-		final double yMax = 0;
+		// Scaled back to this from unit cube
+//		final double hMin = -1.5;
+//		final double hMax = 1.5;
+//		final double yMin = -1;
+//		final double yMax = 0;
 		
-		double umin;
-		double umax;
-		double vmin = vBase;
-		double vmax = vBase + vLen;
+		float umin;
+		float umax;
+		float vmin = vBase;
+		float vmax = vBase + vLen;
+		
+		// Copied from RenderFuncs' unit box
+		final float mind = -1.5f;
+		final float maxd = 1.5f;
+		
+		final float minn = -.5773f;
+		final float maxn = .5773f;
+		
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		
+		matrixStackIn.push();
+		matrixStackIn.translate(0, -plant.getBody().getHeight()/2, 0);
+		
+		// Adapt to 3 wide (from -1.5 to 1.5) and 1 tall (from -1 to 0)
+		matrixStackIn.scale(1f, (float) (1.0/3.0), 1f);
+		matrixStackIn.translate(0, -.5, 0);
 		
 		// North
 		umin = uBase;
 		umax = umin + uLen;
-		buffer.pos(hMin, yMax, hMin).tex(umin,vmax).normal(0, 0, -1).endVertex();
-		buffer.pos(hMin, yMin, hMin).tex(umin,vmin).normal(0, 0, -1).endVertex();
-		buffer.pos(hMax, yMin, hMin).tex(umax,vmin).normal(0, 0, -1).endVertex();
-		buffer.pos(hMax, yMax, hMin).tex(umax,vmax).normal(0, 0, -1).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).tex(umax,vmin).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).tex(umax,vmax).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, mind).tex(umin,vmax).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).tex(umin,vmin).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
 		
 		// East
 		umin += uLen;
 		umax += uLen;
-		buffer.pos(hMax, yMax, hMin).tex(umin,vmax).normal(1, 0, 0).endVertex();
-		buffer.pos(hMax, yMin, hMin).tex(umin,vmin).normal(1, 0, 0).endVertex();
-		buffer.pos(hMax, yMin, hMax).tex(umax,vmin).normal(1, 0, 0).endVertex();
-		buffer.pos(hMax, yMax, hMax).tex(umax,vmax).normal(1, 0, 0).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).tex(umax,vmax).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).tex(umin,vmax).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).tex(umin,vmin).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).tex(umax,vmin).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
 		
 		// South
 		umin += uLen;
 		umax += uLen;
-		buffer.pos(hMax, yMax, hMax).tex(umin,vmax).normal(0, 0, 1).endVertex();
-		buffer.pos(hMax, yMin, hMax).tex(umin,vmin).normal(0, 0, 1).endVertex();
-		buffer.pos(hMin, yMin, hMax).tex(umax,vmin).normal(0, 0, 1).endVertex();
-		buffer.pos(hMin, yMax, hMax).tex(umax,vmax).normal(0, 0, 1).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).tex(umin,vmax).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).tex(umin,vmin).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).tex(umax,vmin).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).tex(umax,vmax).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
 		
 		// West
 		umin += uLen;
 		umax += uLen;
-		buffer.pos(hMin, yMax, hMax).tex(umin,vmax).normal(-1, 0, 0).endVertex();
-		buffer.pos(hMin, yMin, hMax).tex(umin,vmin).normal(-1, 0, 0).endVertex();
-		buffer.pos(hMin, yMin, hMin).tex(umax,vmin).normal(-1, 0, 0).endVertex();
-		buffer.pos(hMin, yMax, hMin).tex(umax,vmax).normal(-1, 0, 0).endVertex();
+		buffer.pos(transform, mind, maxd, mind).tex(umin,vmin).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, mind).tex(umax,vmin).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).tex(umax,vmax).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).tex(umin,vmax).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		
+//		// North
+//		buffer.pos(hMin, yMax, hMin).tex(umin,vmax).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMin, yMin, hMin).tex(umin,vmin).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMax, yMin, hMin).tex(umax,vmin).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMax, yMax, hMin).tex(umax,vmax).normal(0, 0, -1).endVertex();
+//		
+//		// East
+//		buffer.pos(hMax, yMax, hMin).tex(umin,vmax).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMin, hMin).tex(umin,vmin).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMin, hMax).tex(umax,vmin).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMax, hMax).tex(umax,vmax).normal(1, 0, 0).endVertex();
+//		
+//		// South
+//		buffer.pos(hMax, yMax, hMax).tex(umin,vmax).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMax, yMin, hMax).tex(umin,vmin).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMin, yMin, hMax).tex(umax,vmin).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMin, yMax, hMax).tex(umax,vmax).normal(0, 0, 1).endVertex();
+//		
+//		// West
+//		buffer.pos(hMin, yMax, hMax).tex(umin,vmax).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMin, hMax).tex(umin,vmin).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMin, hMin).tex(umax,vmin).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMax, hMin).tex(umax,vmax).normal(-1, 0, 0).endVertex();
 			
-		Tessellator.getInstance().draw();
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 	}
 	
-	protected void renderHeadTree(EntityPlantBoss plant, float ageInTicks) {
+	protected void renderHeadTree(EntityPlantBoss plant, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
+			float red, float green, float blue, float alpha) {
 		if (plant.getBody() == null) {
 			return;
 		}
 		
 		final PlantBossTreeType treeType = plant.getTreeType();
+		final float uBase = (192f / 256f);
+		final float vBase = 0;
+		final float uLen = (16f) / 256f;
+		final float vLen = (48f) / 256f;
 		
-		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+		final float uOrbBase = uBase + uLen * 3;
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, -plant.getBody().getHeight()/2, 0);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
+		final float hMin = -.5f;
+		final float hMax = .5f;
+		final float yMin = -2f;
+		final float yMax = 0f;
 		
-		final double uBase = (192f / 256f);
-		final double vBase = 0;
-		final double uLen = (16f) / 256f;
-		final double vLen = (48f) / 256f;
-		
-		final double uOrbBase = uBase + uLen * 3;
-		
-		final double hMin = -.5;
-		final double hMax = .5;
-		final double yMin = -2;
-		final double yMax = 0;
-		
-		double umin = 0;
-		double umax;
-		double vmin = vBase;
-		double vmax = vBase + vLen;
+		float umin = 0;
+		float umax;
+		float vmin = vBase;
+		float vmax = vBase + vLen;
 		
 		switch (treeType) {
 		case NORMAL:
@@ -167,71 +184,65 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelPlantBoss
 		}
 		umax = umin + uLen;
 		
+		matrixStackIn.push();
+		matrixStackIn.translate(0, -plant.getBody().getHeight()/2, 0);
+		
 		// Two panes centered but orthog like regular mc plants.
 		// For each pane, do base tree, and maybe elemental orb
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		// NOTE: nromals are wrong
 		
 		// North
-		buffer.pos(hMin, yMax, 0).tex(umin,vmax).normal(0, 0, -1).endVertex();
-		buffer.pos(hMin, yMin, 0).tex(umin,vmin).normal(0, 0, -1).endVertex();
-		buffer.pos(hMax, yMin, 0).tex(umax,vmin).normal(0, 0, -1).endVertex();
-		buffer.pos(hMax, yMax, 0).tex(umax,vmax).normal(0, 0, -1).endVertex();
+		buffer.pos(transform, hMin, yMax, 0).tex(umin,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, hMin, yMin, 0).tex(umin,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, hMax, yMin, 0).tex(umax,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, hMax, yMax, 0).tex(umax,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
 		
 		// East
-		buffer.pos(0, yMax, hMin).tex(umin,vmax).normal(1, 0, 0).endVertex();
-		buffer.pos(0, yMin, hMin).tex(umin,vmin).normal(1, 0, 0).endVertex();
-		buffer.pos(0, yMin, hMax).tex(umax,vmin).normal(1, 0, 0).endVertex();
-		buffer.pos(0, yMax, hMax).tex(umax,vmax).normal(1, 0, 0).endVertex();
+		buffer.pos(transform, 0, yMax, hMin).tex(umin,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, 0, yMin, hMin).tex(umin,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, 0, yMin, hMax).tex(umax,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, 0, yMax, hMax).tex(umax,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
 
-		Tessellator.getInstance().draw();
 		
 		if (treeType == PlantBossTreeType.ELEMENTAL) {
 			final EMagicElement element = plant.getTreeElement();
-			final int color = element.getColor();
-			final float brightness = 1f;
-			GlStateManager.color4f(
-					brightness * (float)((color >> 16) & 0xFF) / 255f,
-					brightness * (float)((color >> 8) & 0xFF) / 255f,
-					brightness * (float)((color >> 0) & 0xFF) / 255f,
-					1f
-					);
-			
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
+			final float color[] = ColorUtil.ARGBToColor(element.getColor());
 			
 			// North
 			umin = uOrbBase;
 			umax = umin + uLen;
-			buffer.pos(hMin, yMax, 0).tex(umin,vmax).normal(0, 0, -1).endVertex();
-			buffer.pos(hMin, yMin, 0).tex(umin,vmin).normal(0, 0, -1).endVertex();
-			buffer.pos(hMax, yMin, 0).tex(umax,vmin).normal(0, 0, -1).endVertex();
-			buffer.pos(hMax, yMax, 0).tex(umax,vmax).normal(0, 0, -1).endVertex();
+			buffer.pos(transform, hMin, yMax, 0).tex(umin,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, hMin, yMin, 0).tex(umin,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, hMax, yMin, 0).tex(umax,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, hMax, yMax, 0).tex(umax,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
 			
 			// East
 			umin = uOrbBase;
 			umax = umin + uLen;
-			buffer.pos(0, yMax, hMin).tex(umin,vmax).normal(1, 0, 0).endVertex();
-			buffer.pos(0, yMin, hMin).tex(umin,vmin).normal(1, 0, 0).endVertex();
-			buffer.pos(0, yMin, hMax).tex(umax,vmin).normal(1, 0, 0).endVertex();
-			buffer.pos(0, yMax, hMax).tex(umax,vmax).normal(1, 0, 0).endVertex();
-
-			Tessellator.getInstance().draw();
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			buffer.pos(transform, 0, yMax, hMin).tex(umin,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, 0, yMin, hMin).tex(umin,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, 0, yMin, hMax).tex(umax,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, 0, yMax, hMax).tex(umax,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
 		}
 		
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 	}
 	
-	@Override
-	protected void renderModel(EntityPlantBoss plant, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor) {
-		super.renderModel(plant, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
-		if (plant.getBody() == null) {
+	protected void renderModel(EntityPlantBoss entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
+			int packedOverlayIn, float red, float green, float blue, float alpha) {
+		
+		this.mainModel.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if (entityIn.getBody() == null) {
 			return;
 		}
 		
 		// Render top of main body as 4 double-sided quads
-		renderTrimming(plant, ageInTicks);
+		renderTrimming(entityIn, matrixStackIn, bufferIn, packedLightIn, red, green, blue, alpha);
 		
 		// Render tree at top
-		renderHeadTree(plant, ageInTicks);
+		renderHeadTree(entityIn, matrixStackIn, bufferIn, packedLightIn, red, green, blue, alpha);
 		
 		// Also render leaf models. Do it here so I don't have to repeat all the rotations and scaling
 //		GlStateManager.pushMatrix();

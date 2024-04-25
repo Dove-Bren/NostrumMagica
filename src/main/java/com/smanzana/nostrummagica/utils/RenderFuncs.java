@@ -25,8 +25,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.math.vector.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -659,68 +662,140 @@ public final class RenderFuncs {
 			.normal(0, 0, 1).endVertex();
 	}
 	
-	public static final void renderSpaceQuad(BufferBuilder buffer, double relX, double relY, double relZ,
-			double rX, double rXZ, double rZ, double rYZ, double rXY,
-			double radius,
-			float red, float green, float blue, float alpha
+	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer, float relX, float relY, float relZ,
+			Quaternion rotation,
+			float radius,
+			float red, float green, float blue, float alpha, int lightmap
 			) {
 		
-		buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
-			.tex(0, 0)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
-			.tex(0, 1)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
-			.tex(1, 1)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
-			.tex(1, 0)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		
-		{
-			buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
-				.tex(0, 0)
-				.color(red, green, blue, alpha)
-				.normal(0, 0, -1).endVertex();
-			buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
-				.tex(0, 1)
-				.color(red, green, blue, alpha)
-				.normal(0, 0, -1).endVertex();
-			buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
-				.tex(1, 1)
-				.color(red, green, blue, alpha)
-				.normal(0, 0, -1).endVertex();
-			buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
-				.tex(1, 0)
-				.color(red, green, blue, alpha)
-				.normal(0, 0, -1).endVertex();
+		// Copied and adapted from vanilla particle instead of manually drawing a space quad
+		Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+		Vector4f offset = new Vector4f(relX, relY, relZ, 1f);
+		offset.transform(stack.getLast().getMatrix());
+
+		for(int i = 0; i < 4; ++i) {
+			Vector3f vector3f = avector3f[i];
+			vector3f.transform(rotation);
+			vector3f.mul(radius);
+			vector3f.add(offset.getX(), offset.getY(), offset.getZ());
 		}
+
+		final float uMin = 0;
+		final float uMax = 1;
+		final float vMin = 0;
+		final float vMax = 1;
+		buffer.pos((double)avector3f[0].getX(), (double)avector3f[0].getY(), (double)avector3f[0].getZ()).tex(uMax, vMax).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
+		buffer.pos((double)avector3f[1].getX(), (double)avector3f[1].getY(), (double)avector3f[1].getZ()).tex(uMax, vMin).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
+		buffer.pos((double)avector3f[2].getX(), (double)avector3f[2].getY(), (double)avector3f[2].getZ()).tex(uMin, vMin).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
+		buffer.pos((double)avector3f[3].getX(), (double)avector3f[3].getY(), (double)avector3f[3].getZ()).tex(uMin, vMax).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
+		
+//		buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
+//			.tex(0, 0)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
+//			.tex(0, 1)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
+//			.tex(1, 1)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
+//			.tex(1, 0)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		
+//		{
+//			buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
+//				.tex(0, 0)
+//				.color(red, green, blue, alpha)
+//				.normal(0, 0, -1).endVertex();
+//			buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
+//				.tex(0, 1)
+//				.color(red, green, blue, alpha)
+//				.normal(0, 0, -1).endVertex();
+//			buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
+//				.tex(1, 1)
+//				.color(red, green, blue, alpha)
+//				.normal(0, 0, -1).endVertex();
+//			buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
+//				.tex(1, 0)
+//				.color(red, green, blue, alpha)
+//				.normal(0, 0, -1).endVertex();
+//		}
 	}
 	
-	public static final void renderSpaceQuadFacingCamera(BufferBuilder buffer, ActiveRenderInfo renderInfo,
-			double relX, double relY, double relZ,
-			double radius,
-			float red, float green, float blue, float alpha) {
-		float rotationX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
-		float rotationYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
-		float rotationXY = -rotationYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
-		float rotationXZ = rotationX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
-		float rotationZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
+	public static final void renderSpaceQuadFacingCamera(MatrixStack stack, IVertexBuilder buffer, ActiveRenderInfo renderInfo,
+			float relX, float relY, float relZ,
+			float radius,
+			float red, float green, float blue, float alpha, int lightmap) {
+//		float rotationX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
+//		float rotationYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
+//		float rotationXY = -rotationYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+//		float rotationXZ = rotationX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
+//		float rotationZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
 		
-		//f, f4, f1, f2, f3
-		//float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ
-		// double rX, double rXZ, double rZ, double rYZ, double rXY
+		Quaternion rotation = renderInfo.getRotation();
 		
-		renderSpaceQuad(buffer, relX, relY, relZ,
-				rotationX, rotationXZ, rotationZ, rotationYZ, rotationXY,
+		renderSpaceQuad(stack, buffer, relX, relY, relZ,
+				rotation,
 				radius,
-				red, green, blue, alpha
+				red, green, blue, alpha, lightmap
 				);
+	}
+	
+	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
+		drawUnitCube(stack, buffer, 0, 1, 0, 1, packedLightIn, red, green, blue, alpha);
+	}
+	
+	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, float minU, float maxU, float minV, float maxV, int packedLightIn,
+			float red, float green, float blue, float alpha) {
+		
+		final float mind = -.5f;
+		final float maxd = .5f;
+		
+		final float minn = -.5773f;
+		final float maxn = .5773f;
+		
+		final Matrix4f transform = stack.getLast().getMatrix();
+		final Matrix3f normal = stack.getLast().getNormal();
+		
+		// Top
+		buffer.pos(transform, mind, maxd, mind).tex(minU,minV).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).tex(minU,maxV).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).tex(maxU,maxV).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).tex(maxU,minV).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		
+		// North
+		buffer.pos(transform, maxd, maxd, mind).tex(maxU,minV).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).tex(maxU,maxV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, mind).tex(minU,maxV).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).tex(minU,minV).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		
+		// East
+		buffer.pos(transform, maxd, maxd, maxd).tex(maxU,maxV).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).tex(minU,maxV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).tex(minU,minV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).tex(maxU,minV).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		
+		// South
+		buffer.pos(transform, mind, maxd, maxd).tex(minU,maxV).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).tex(minU,minV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).tex(maxU,minV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).tex(maxU,maxV).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		
+		// West
+		buffer.pos(transform, mind, maxd, mind).tex(minU,minV).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, mind).tex(maxU,minV).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).tex(maxU,maxV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).tex(minU,maxV).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		
+		// Bottom
+		buffer.pos(transform, mind, mind, mind).tex(maxU,minV).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).tex(minU,minV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).tex(minU,maxV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).tex(maxU,maxV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
 	}
 	
 //	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {

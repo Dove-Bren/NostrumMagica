@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.entity.EntityLux;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
@@ -19,25 +20,16 @@ public class ModelLux extends EntityModel<EntityLux> {
 		
 	}
 	
-	private float getSwingRot(float swingProgress) {
-		return (float) (Math.sin(Math.PI * 2 * swingProgress) * 30.0);
-	}
-	
 	@Override
-	public void render(EntityLux entity, float time, float swingProgress,
-			float swing, float headAngleY, float headAngleX, float scale) {
-		final EntityLux lux = (EntityLux) entity;
+	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	}
+
+	@Override
+	public void setRotationAngles(EntityLux entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+			float netHeadYaw, float headPitch) {
+		// TODO Auto-generated method stub
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(0, 1.5, 0);
-		GlStateManager.translatef(0, -entity.getHeight() / 2, 0);
-		if (!lux.isRoosting()) {
-			GlStateManager.rotatef(getSwingRot(lux.getSwingProgress(time % 1)), 0, 0, 1);
-		}
-		GlStateManager.scaled(.25, .25, .25);
-		main.render(scale);
-		GlStateManager.popMatrix();
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
 }

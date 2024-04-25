@@ -1,14 +1,15 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBossLeafLimb> {
 
@@ -20,75 +21,39 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossLeaf();
-		
-		// TODO shadow? nah
 	}
 	
 	@Override
-	public void doRender(EntityPlantBoss.PlantBossLeafLimb entity, double x, double y, double z, float entityYaw, float partialTicks) {
-		float f = 0.0625F;
-//		if (entity.isWolfWet()) {
-//			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
-//			GlStateManager.color4f(f, f, f);
-//		}
+	public void render(EntityPlantBoss.PlantBossLeafLimb entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
-		//this.mainModel = new ModelPlantBoss();
-//		GlStateManager.pushMatrix();
-//		GlStateManager.translated(x, y, z);
-//		
-//		GlStateManager.rotatef(180.0F - entityYaw, 0.0F, 1.0F, 0.0F);
-//		
-//		GlStateManager.enableRescaleNormal();
-//		GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
-//		GlStateManager.scalef(.125f, .125f, .125f);
-//		//this.preRenderCallback(entitylivingbaseIn, partialTicks);
-//		GlStateManager.translatef(0.0F, -1.501F, 0.0F);
-//	    //return 0.0625F;
-//		this.bindEntityTexture(entity);
-//		mainModel.render(entity, partialTicks, 0f, 0f, entityYaw, 0f, f);
-//		GlStateManager.popMatrix();
-		
-		super.doRender(entity, x, y, z, entityYaw, partialTicks);
-		
-		EntityPlantBoss plant = entity.getParent();
+		EntityPlantBoss plant = entityIn.getParent();
 		if (plant == null || plant.getBody() == null) {
 			return;
 		}
 		
-		this.bindEntityTexture(entity);
-		GlStateManager.pushMatrix();
+		final int i = entityIn.getLeafIndex();
+		//EntityPlantBoss.PlantBossLeafLimb leaf = plant.getLeafLimb(i);
+		final double offsetRadius = (entityIn.getPitch() >= 85f) ? 1.25 : 1;
+		final double offsetCenter = (i % 2 == 0 ? offsetRadius : offsetRadius * 1.25) * plant.getBody().getWidth();
+		final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
 		
-		// Offset to body center
-		Vector3d cameraOffsetToParent = plant.getPositionVec().subtract(
-				TileEntityRendererDispatcher.staticPlayerX,
-				TileEntityRendererDispatcher.staticPlayerY,
-				TileEntityRendererDispatcher.staticPlayerZ
-				);
-		GlStateManager.translated(cameraOffsetToParent.x, cameraOffsetToParent.y, cameraOffsetToParent.z);
+		// Previously, was changing offset to be to the parent, and then doing another offset
+		// TODO does this look hacky now?
+		matrixStackIn.push();
 		
-		// Standard transformations that LivingRenderer does
-		GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
-		GlStateManager.translatef(0.0F, -1.501F, 0.0F);
+		// Standard transformation that LivingRenderer does
+		matrixStackIn.scale(-1f, -1f, 1f);
+		matrixStackIn.translate(0f, -1.5f, 0f);
 		
-		//final float existingRotation = RenderFuncs.interpolateRotation(plant.prevRenderYawOffset, plant.renderYawOffset, entity.ticksExisted % 1);
-		//GlStateManager.rotatef((180.0F + existingRotation), 0, 1, 0); // undo existing rotation
-		GlStateManager.translatef(0, plant.getBody().getHeight()/2, 0);
-		//for (int i = 0; i < leafModels.length; i++) {
-		final int i = entity.getLeafIndex();
-			//EntityPlantBoss.PlantBossLeafLimb leaf = plant.getLeafLimb(i);
-			final double offsetRadius = (entity.getPitch() >= 85f) ? 1.25 : 1;
-			final double offsetCenter = (i % 2 == 0 ? offsetRadius : offsetRadius * 1.25) * plant.getBody().getWidth();
-			final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
-			
-			GlStateManager.pushMatrix();
-			GlStateManager.rotatef(180 + entity.getYawOffset(), 0, 1, 0);
-			GlStateManager.translated(offset, -.001 * i, 0);
-			GlStateManager.rotatef(-entity.getPitch(), 0, 0, 1);
-			//GlStateManager.scalef(1f/16f, 1f/16f, 1f/16f);
-			mainModel.render(entity, 0f, 0f, entity.ticksExisted, 0f, 0f, f);
-			GlStateManager.popMatrix();
-		//}
-		GlStateManager.popMatrix();
+		matrixStackIn.translate(0, plant.getBody().getHeight() / 2, 0);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180 + entityIn.getYawOffset()));
+		matrixStackIn.translate(offset, -.001 * i, 0);
+		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-entityIn.getPitch()));
+		
+		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		
+		matrixStackIn.pop();
 	}
 	
 	@Override
