@@ -18,6 +18,8 @@ import net.minecraft.util.ResourceLocation;
  */
 public class ModelRenderShiv<T extends Entity> extends EntityModel<T> {
 
+	private int unused; // Uhhh could I have just used LivingRenderer#preRenderCallback?
+	
 	public static interface RenderRunnable {
 		public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 				float red, float green, float blue, float alpha);
@@ -29,7 +31,7 @@ public class ModelRenderShiv<T extends Entity> extends EntityModel<T> {
 		this(RenderType::getEntityCutoutNoCull);
 	}
 	
-	public ModelRenderShiv(Function<ResourceLocation, RenderType> renderTypeMap) {
+	protected ModelRenderShiv(Function<ResourceLocation, RenderType> renderTypeMap) {
 		super(renderTypeMap);
 		payload = null;
 	}

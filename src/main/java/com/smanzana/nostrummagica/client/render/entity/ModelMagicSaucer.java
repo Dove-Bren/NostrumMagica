@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelMagicSaucer<T extends EntitySpellSaucer> extends ModelOBJ<T> {
+public class ModelMagicSaucer<T extends EntitySpellSaucer> extends ModelBaked<T> {
 
 	public ModelMagicSaucer() {
 		super();

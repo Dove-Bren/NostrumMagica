@@ -83,29 +83,39 @@ public final class RenderFuncs {
 		tessellator.draw();
 	}
 	
-	private static final Vector3f Vec3fZero = new Vector3f();
+//	private static final Vector3f Vec3fZero = new Vector3f();
 	
 	public static void RenderModelWithColor(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int color, int combinedLight) {
-		RenderModelWithColor(stack, buffer, model, color, combinedLight, Vec3fZero);
+//		RenderModelWithColor(stack, buffer, model, color, combinedLight, Vec3fZero);
+		final float colors[] = ColorUtil.ARGBToColor(color);
+		RenderModel(stack, buffer, model, combinedLight, colors[0], colors[1], colors[2], colors[3]);
 	}
 	
 	private static final Random RenderModelRandom = new Random();
 	
-	public static void RenderModelWithColor(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int color, int combinedLight, Vector3f offset) {
-		final float colors[] = ColorUtil.ARGBToColor(color);
+//	public static void RenderModelWithColor(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int color, int combinedLight, Vector3f offset) {
+//		final float colors[] = ColorUtil.ARGBToColor(color);
+//		RenderModel(stack, buffer, model, combinedLight, colors[0], colors[1], colors[2], colors[3], offset);
+//	}
+	
+	public static void RenderModel(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int combinedLight, float red, float green, float blue, float alpha) {
+		RenderModel(stack.getLast(), buffer, model, combinedLight, red, green, blue, alpha);
+	}
+	
+	public static void RenderModel(MatrixStack.Entry stackLast, IVertexBuilder buffer, IBakedModel model, int combinedLight, float red, float green, float blue, float alpha) {
 		
 		for(Direction side : Direction.values()) {
 			List<BakedQuad> quads = model.getQuads(null, side, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE);
 			if(!quads.isEmpty()) 
 				for(BakedQuad quad : quads) {
-					buffer.addVertexData(stack.getLast(), quad, colors[0], colors[1], colors[2], colors[3], combinedLight, OverlayTexture.NO_OVERLAY, true);
+					buffer.addVertexData(stackLast, quad, red, green, blue, alpha, combinedLight, OverlayTexture.NO_OVERLAY, true);
 //					LightUtil.renderQuadColor(buffer, quad, color);
 				}
 		}
 		List<BakedQuad> quads = model.getQuads(null, null, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE);
 		if(!quads.isEmpty()) {
 			for(BakedQuad quad : quads) 
-				buffer.addVertexData(stack.getLast(), quad, colors[0], colors[1], colors[2], colors[3], combinedLight, OverlayTexture.NO_OVERLAY, true);
+				buffer.addVertexData(stackLast, quad, red, green, blue, alpha, combinedLight, OverlayTexture.NO_OVERLAY, true);
 				//LightUtil.renderQuadColor(buffer, quad, color);
 		}
 

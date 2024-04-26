@@ -69,10 +69,10 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 	
 	protected static final MemoryPool<DragonArmorKey> KeyPool = new MemoryPool<>(() -> { return new DragonArmorKey(); });
 
-	private Map<EDragonPart, RenderObj> renderers;
-	private Map<DragonArmorKey, RenderObj> overlays;
+	private Map<EDragonPart, ModelRendererBaked> renderers;
+	private Map<DragonArmorKey, ModelRendererBaked> overlays;
 	private Map<EDragonArmorPart, EDragonOverlayMaterial> overlayMaterial;
-	private RenderObj baseRenderer;
+	private ModelRendererBaked baseRenderer;
 	
 	public ModelDragonRed(int color) {
 		super();
@@ -80,7 +80,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		renderers = new EnumMap<>(EDragonPart.class);
 		
 		for (EDragonPart part : EDragonPart.values()) {
-			RenderObj render = new RenderObj(this, RenderFuncs.makeDefaultModelLocation(part.getLoc())) {
+			ModelRendererBaked render = new ModelRendererBaked(this, RenderFuncs.makeDefaultModelLocation(part.getLoc())) {
 				@Override
 				protected int getColor() {
 					return color;
@@ -100,7 +100,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 					baseRenderer = render;
 				}
 			} else {
-				RenderObj parent = renderers.get(part.parent);
+				ModelRendererBaked parent = renderers.get(part.parent);
 				if (null == parent) {
 					NostrumMagica.logger.error("Dragon part iteration did not set up parents right!");
 				} else {
@@ -121,7 +121,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 				}
 				
 				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
-				RenderObj render = new RenderObj(this, RenderFuncs.makeDefaultModelLocation(loc)) {
+				ModelRendererBaked render = new ModelRendererBaked(this, RenderFuncs.makeDefaultModelLocation(loc)) {
 					@Override
 					protected int getColor() {
 						return color;
@@ -135,7 +135,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 				if (part.parent == null) {
 					NostrumMagica.logger.error("What part is " + part.name() + "   and why isn't it parented?");
 				} else {
-					RenderObj parent = renderers.get(part.parent);
+					ModelRendererBaked parent = renderers.get(part.parent);
 					if (null == parent) {
 						NostrumMagica.logger.error("Dragon part iteration did not set up parents right!");
 					} else {
@@ -331,7 +331,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		
 		// Update overlay visiblility
 		for (DragonArmorKey key : overlays.keySet()) {
-			final RenderObj renderer = overlays.get(key);
+			final ModelRendererBaked renderer = overlays.get(key);
 			final EDragonOverlayMaterial material = overlayMaterial.get(key.part);
 			renderer.isHidden = (material != key.material);
 		}
@@ -359,13 +359,13 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		
 		// Reset all rotations to 0
 		for (EDragonPart part : EDragonPart.values()) {
-			RenderObj render = renderers.get(part);
+			ModelRendererBaked render = renderers.get(part);
 			render.rotateAngleX = render.rotateAngleY = render.rotateAngleZ = 0f;
 		}
 		
-		RenderObj wing_left = renderers.get(EDragonPart.WING_LEFT);
-		RenderObj wing_right = renderers.get(EDragonPart.WING_RIGHT);
-		RenderObj body = renderers.get(EDragonPart.BODY);
+		ModelRendererBaked wing_left = renderers.get(EDragonPart.WING_LEFT);
+		ModelRendererBaked wing_right = renderers.get(EDragonPart.WING_RIGHT);
+		ModelRendererBaked body = renderers.get(EDragonPart.BODY);
 		
 		final long now = System.currentTimeMillis();
 		long stateTime = now - dragon.getFlyStateTime();
@@ -514,18 +514,18 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		
 		
 		
-		RenderObj head = renderers.get(EDragonPart.HEAD);
+		ModelRendererBaked head = renderers.get(EDragonPart.HEAD);
 		head.rotateAngleY = (float) (netHeadYaw / -360f * 2 * Math.PI);
 		head.rotateAngleX = (float) (headPitch / 360f * 2 * Math.PI);
 		
-		RenderObj frontleg_left = renderers.get(EDragonPart.LEG_FRONT_LEFT);
-		RenderObj frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
-		RenderObj backleg_left = renderers.get(EDragonPart.LEG_BACK_LEFT);
-		RenderObj backleg_right = renderers.get(EDragonPart.LEG_BACK_RIGHT);
+		ModelRendererBaked frontleg_left = renderers.get(EDragonPart.LEG_FRONT_LEFT);
+		ModelRendererBaked frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
+		ModelRendererBaked backleg_left = renderers.get(EDragonPart.LEG_BACK_LEFT);
+		ModelRendererBaked backleg_right = renderers.get(EDragonPart.LEG_BACK_RIGHT);
 		
-		RenderObj body = renderers.get(EDragonPart.BODY);
-		RenderObj wing_left = renderers.get(EDragonPart.WING_LEFT);
-		RenderObj wing_right = renderers.get(EDragonPart.WING_RIGHT);
+		ModelRendererBaked body = renderers.get(EDragonPart.BODY);
+		ModelRendererBaked wing_left = renderers.get(EDragonPart.WING_LEFT);
+		ModelRendererBaked wing_right = renderers.get(EDragonPart.WING_RIGHT);
 
 		backleg_left.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_LEFT.offsetY; 
 		backleg_right.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_RIGHT.offsetY;
@@ -595,7 +595,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 			head.rotateAngleX += ang;
 		}
 		
-		RenderObj tail = renderers.get(EDragonPart.TAIL);
+		ModelRendererBaked tail = renderers.get(EDragonPart.TAIL);
 		
 		period = 80.0f;
 		frac = (float) (ageInTicks % period) / period;
@@ -610,7 +610,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 				continue;
 			}
 			DragonArmorKey key = KeyPool.claim().set(EDragonArmorPart.HEAD, mat);
-			RenderObj headArmor = overlays.get(key); //TODO why is this needed?
+			ModelRendererBaked headArmor = overlays.get(key); //TODO why is this needed?
 			headArmor.rotateAngleY = head.rotateAngleY;
 			headArmor.rotateAngleX = head.rotateAngleX;
 			KeyPool.release(key);

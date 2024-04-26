@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelSpriteCore extends ModelOBJ<EntitySprite> {
+public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 
 	public ModelSpriteCore() {
 		super();
