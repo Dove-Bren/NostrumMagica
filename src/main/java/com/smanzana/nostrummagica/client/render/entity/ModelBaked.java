@@ -9,13 +9,10 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.utils.ModelUtils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -40,22 +37,11 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 		
 		List<ModelRendererBaked> list = new ArrayList<>(modelLocations.length);
 		for (ModelResourceLocation loc : modelLocations) {
-			list.add(new ModelRendererBaked(this, LookupModel(loc)));
+			list.add(new ModelRendererBaked(this, ModelUtils.GetBakedModel(loc)));
 		}
 		return list;
 	}
 	
-	protected static final IBakedModel LookupModel(ModelResourceLocation loc) {
-		final ModelManager manager = Minecraft.getInstance().getModelManager();
-		IBakedModel model = manager.getModel(loc);
-		if (model == null || model == manager.getMissingModel()) {
-			NostrumMagica.logger.error("Could not find model to match " + loc);
-			model = manager.getMissingModel();
-		}
-		
-		return model;
-	}
-
 	@Override
 	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {

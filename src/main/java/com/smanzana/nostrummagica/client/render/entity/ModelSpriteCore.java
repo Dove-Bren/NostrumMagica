@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.utils.ModelUtils;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.model.ModelResourceLocation;
@@ -18,8 +19,8 @@ public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 	public ModelSpriteCore() {
 		super(); // Only a child class to use LookupModel
 		
-		core = new ModelRendererBaked(this, ModelBaked.LookupModel(MODEL_CORE));
-		arms = new ModelRendererBaked(this, ModelBaked.LookupModel(MODEL_ARMS));
+		core = new ModelRendererBaked(this, ModelUtils.GetBakedModel(MODEL_CORE));
+		arms = new ModelRendererBaked(this, ModelUtils.GetBakedModel(MODEL_ARMS));
 		this.children.add(core);
 		this.children.add(arms);
 	}

@@ -23,8 +23,7 @@ public class ModelRendererBaked extends ModelRenderer {
 
 	private final IBakedModel bakedModel;
 	
-
-	protected ModelRendererBaked(Model base, IBakedModel model) {
+	public ModelRendererBaked(Model base, IBakedModel model) {
 		super(base);
 		
 		this.bakedModel = model;

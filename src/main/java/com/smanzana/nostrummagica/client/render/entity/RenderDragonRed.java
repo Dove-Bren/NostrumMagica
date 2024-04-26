@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed.EDragonArmorPart;
 import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed.EDragonOverlayMaterial;
@@ -9,6 +10,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<T, ModelDragonRed<T>> {
 
+	private static final ResourceLocation TEXTURE = NostrumMagica.Loc("textures/entity/koid.png");
+	
 	protected final ModelDragonRed<T> dragonModel;
 	
 	public RenderDragonRed(EntityRendererManager renderManagerIn, float shadowSizeIn) {
@@ -29,17 +33,14 @@ public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<
 
 	@Override
 	public ResourceLocation getEntityTexture(T entity) {
-		// TODO fixme?
-		return new ResourceLocation(NostrumMagica.MODID,
-				"textures/entity/koid.png"
-				);
+		return TEXTURE;
 	}
 	
 	@Override
-	public void doRender(T dragon, double x, double y, double z, float entityYaw, float partialTicks) {
+	public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Set up armor visiblity
-		@Nonnull final ItemStack chestArmor = dragon.getDragonEquipment(DragonEquipmentSlot.BODY);
-		@Nonnull final ItemStack headArmor = dragon.getDragonEquipment(DragonEquipmentSlot.HELM);
+		@Nonnull final ItemStack chestArmor = entityIn.getDragonEquipment(DragonEquipmentSlot.BODY);
+		@Nonnull final ItemStack headArmor = entityIn.getDragonEquipment(DragonEquipmentSlot.HELM);
 		final EDragonOverlayMaterial chestMaterial;
 		final EDragonOverlayMaterial headMaterial;
 		if (chestArmor.isEmpty() || !(chestArmor.getItem() instanceof DragonArmor)) {
@@ -84,7 +85,7 @@ public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<
 		}
 		this.dragonModel.setOverlayMaterial(EDragonArmorPart.HEAD, headMaterial);
 		
-		super.doRender(dragon, x, y, z, entityYaw, partialTicks);
+		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 
 }
