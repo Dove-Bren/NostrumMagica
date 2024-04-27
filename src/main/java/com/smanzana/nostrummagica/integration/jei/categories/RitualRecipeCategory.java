@@ -121,8 +121,8 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		GlStateManager.color4f(red, green, blue, alpha);
 		GlStateManager.enableBlend();
 		minecraft.getTextureManager().bindTexture(TEXT_RING);
-		RenderFuncs.drawModalRectWithCustomSizedTexture(0, 0, 0, 0,
-				RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, 0, 0, 0,
+				0, RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT);
 		
 		GlStateManager.popMatrix();
 		

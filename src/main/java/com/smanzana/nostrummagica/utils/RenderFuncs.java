@@ -6,16 +6,19 @@ import java.util.Random;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
@@ -220,8 +223,8 @@ public final class RenderFuncs {
 	}
 	
 	// can use blit here: blit(x, y, 0, u, v, width, height, texWidth, texHeight)
-	public static void drawModalRectWithCustomSizedTexture(MatrixStack stack, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-		Screen.blit(stack, x, y, u, v, width, height, textureWidth, textureHeight);
+	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+		Screen.blit(matrixStackIn, x, y, u, v, width, height, textureWidth, textureHeight);
 //		float f = 1.0F / textureWidth;
 //		float f1 = 1.0F / textureHeight;
 //		Tessellator tessellator = Tessellator.getInstance();
@@ -235,17 +238,28 @@ public final class RenderFuncs {
 	}
 	
 	// Different from the above in that this includes scaling on what's drawn
-	public static void drawScaledCustomSizeModalRect(MatrixStack stack, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
-		float f = 1.0F / tileWidth;
-		float f1 = 1.0F / tileHeight;
+	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-		bufferbuilder.pos((double)x, (double)(y + height), 0.0D).tex(u * f, (v + (float)vHeight) * f1).endVertex();
-		bufferbuilder.pos((double)(x + width), (double)(y + height), 0.0D).tex((u + (float)uWidth) * f, (v + (float)vHeight) * f1).endVertex();
-		bufferbuilder.pos((double)(x + width), (double)y, 0.0D).tex((u + (float)uWidth) * f, v * f1).endVertex();
-		bufferbuilder.pos((double)x, (double)y, 0.0D).tex((u * f), (v * f1)).endVertex();
-		tessellator.draw();
+		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
+		
+		drawScaledCustomSizeModalRect(matrixStackIn, bufferbuilder, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight,
+				red, green, blue, alpha);
+
+		bufferbuilder.finishDrawing();
+		RenderSystem.enableAlphaTest();
+		WorldVertexBufferUploader.draw(bufferbuilder);
+	}
+	
+	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
+		final float f = 1.0F / tileWidth;
+		final float f1 = 1.0F / tileHeight;
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		
+		buffer.pos(transform, x, y + height, 0.0f)			.tex(u * f, (v + vHeight) * f1)				.color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, x + width, y + height, 0.0f)	.tex((u + uWidth) * f, (v + vHeight) * f1)	.color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, x + width, y, 0.0f)			.tex((u + uWidth) * f, v * f1)				.color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, x, y, 0.0f)					.tex((u * f), (v * f1))						.color(red, green, blue, alpha).endVertex();
 	}
 	
 	public static void drawRect(MatrixStack stack, int minX, int minY, int maxX, int maxY, int colorARGB) {
@@ -497,6 +511,32 @@ public final class RenderFuncs {
 				buffer.pos(transform, vx, vy, 0f).tex(u, v).normal(normal, 0, 0, -1f).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
 				
 			}
+		}
+	}
+	
+	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, Entity entityIn, String info, FontRenderer fonter, int packedLightIn, float yOffsetExtra, ActiveRenderInfo renderInfo) {
+		final float offsetY = yOffsetExtra + (entityIn == null ? 0 : (entityIn.getHeight() + 0.5f));
+		final boolean discrete = entityIn == null ? false : entityIn.isDiscrete();
+		drawNameplate(matrixStackIn, bufferIn, info, fonter, packedLightIn, offsetY, discrete, renderInfo);
+	}
+	
+	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, String info, FontRenderer fonter, int packedLightIn, float yOffset, boolean discrete, ActiveRenderInfo renderInfo) {
+		matrixStackIn.push();
+		matrixStackIn.translate(0.0D, yOffset, 0.0D);
+		matrixStackIn.rotate(renderInfo.getRotation());
+		drawNameplate(matrixStackIn, bufferIn, info, fonter, packedLightIn, discrete);
+		matrixStackIn.pop();
+	}
+	
+	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, String info, FontRenderer fontrenderer, int packedLightIn, boolean discrete) {
+		final Minecraft mc = Minecraft.getInstance();
+		final Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
+		float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
+		int j = (int)(f1 * 255.0F) << 24;
+		float f2 = (float)(-fontrenderer.getStringWidth(info) / 2);
+		fontrenderer.renderString(info, f2, 0, 553648127, false, matrix4f, bufferIn, !discrete, j, packedLightIn);
+		if (!discrete) {
+			fontrenderer.renderString(info, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
 		}
 	}
 	

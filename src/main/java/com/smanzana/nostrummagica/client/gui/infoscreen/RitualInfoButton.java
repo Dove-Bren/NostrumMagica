@@ -45,9 +45,9 @@ public class RitualInfoButton extends InfoButton {
 		GL11.glColor4f(tint, tint, tint, 1f);
 		mc.getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
-				width, height,
-				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
+				0, width,
+				height, InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
 		
 		final int itemLength = 16;

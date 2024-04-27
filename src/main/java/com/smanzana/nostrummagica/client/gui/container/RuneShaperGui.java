@@ -505,32 +505,32 @@ public class RuneShaperGui {
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			// Draw guiding shadows on empty slots
 			{
 				GlStateManager.color4f(1.0F,  1.0F, 1.0F, .4f);
-				RenderFuncs.drawScaledCustomSizeModalRect(horizontalMargin + SLOT_INPUT_HOFFSET + 1, verticalMargin + SLOT_INPUT_VOFFSET + 1,
-						RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET, RUNE_BLANK_TEXT_WIDTH, RUNE_BLANK_TEXT_HEIGHT,
-						14, 14, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_INPUT_HOFFSET + 1,
+						verticalMargin + SLOT_INPUT_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET, RUNE_BLANK_TEXT_WIDTH,
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
 				
 				
-				RenderFuncs.drawScaledCustomSizeModalRect(horizontalMargin + SLOT_ELEM1_HOFFSET + 1, verticalMargin + SLOT_ELEM1_VOFFSET + 1,
-						RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH, RUNE_BLANK_TEXT_HEIGHT,
-						14, 14, 256, 256);
-				RenderFuncs.drawScaledCustomSizeModalRect(horizontalMargin + SLOT_ELEM2_HOFFSET + 1, verticalMargin + SLOT_ELEM2_VOFFSET + 1,
-						RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH, RUNE_BLANK_TEXT_HEIGHT,
-						14, 14, 256, 256);
-				RenderFuncs.drawScaledCustomSizeModalRect(horizontalMargin + SLOT_ELEM3_HOFFSET + 1, verticalMargin + SLOT_ELEM3_VOFFSET + 1,
-						RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH, RUNE_BLANK_TEXT_HEIGHT,
-						14, 14, 256, 256);
-				RenderFuncs.drawScaledCustomSizeModalRect(horizontalMargin + SLOT_ELEM4_HOFFSET + 1, verticalMargin + SLOT_ELEM4_VOFFSET + 1,
-						RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH, RUNE_BLANK_TEXT_HEIGHT,
-						14, 14, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM1_HOFFSET + 1,
+						verticalMargin + SLOT_ELEM1_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM2_HOFFSET + 1,
+						verticalMargin + SLOT_ELEM2_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM3_HOFFSET + 1,
+						verticalMargin + SLOT_ELEM3_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM4_HOFFSET + 1,
+						verticalMargin + SLOT_ELEM4_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
 				
-				RenderFuncs.drawScaledCustomSizeModalRect(horizontalMargin + SLOT_ALTER_HOFFSET + 1, verticalMargin + SLOT_ALTER_VOFFSET + 1,
-						RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH, RUNE_BLANK_TEXT_HEIGHT,
-						14, 14, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ALTER_HOFFSET + 1,
+						verticalMargin + SLOT_ALTER_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
 			}
 			
 			// Draw info about elements

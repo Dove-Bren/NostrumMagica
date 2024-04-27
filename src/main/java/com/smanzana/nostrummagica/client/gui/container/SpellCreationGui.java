@@ -587,8 +587,8 @@ public class SpellCreationGui {
 					x += 20;
 				
 				GlStateManager.color3f(tint, tint, tint);
-				RenderFuncs.drawScaledCustomSizeModalRect(this.x, this.y, ICON_LBUTTON_HOFFSET + x, ICON_LBUTTON_VOFFSET,
-						20, 20, this.width, this.height, 256, 256);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y, ICON_LBUTTON_HOFFSET + x,
+						ICON_LBUTTON_VOFFSET, 20, 20, this.width, this.height, 256, 256);
 				
 				GlStateManager.color3f(tint, tint, tint);
 				SpellIcon.get(this.value).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
@@ -660,7 +660,7 @@ public class SpellCreationGui {
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int x = (width - MESSAGE_WIDTH) / 2;
 			int y = verticalMargin + MESSAGE_DISPLAY_VOFFSET;
@@ -675,9 +675,9 @@ public class SpellCreationGui {
 					u += STATUS_WIDTH;
 				}
 				
-				RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, u, v,
-						STATUS_WIDTH, STATUS_HEIGHT,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, u,
+						v, STATUS_WIDTH,
+						STATUS_HEIGHT, 256, 256);
 				
 				GL11.glPushMatrix();
 //				mc.fontRenderer.drawString(container.name.toString(), 
@@ -749,11 +749,11 @@ public class SpellCreationGui {
 				mc.getTextureManager().bindTexture(TEXT);
 				GlStateManager.enableAlphaTest();
 				GlStateManager.enableBlend();
-				RenderFuncs.drawModalRectWithCustomSizedTexture((GUI_WIDTH - MESSAGE_WIDTH) / 2,
-						MESSAGE_DISPLAY_VOFFSET,
-						MESSAGE_VALID_HOFFSET, MESSAGE_VALID_VOFFSET,
-						MESSAGE_WIDTH, MESSAGE_HEIGHT,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
+						(GUI_WIDTH - MESSAGE_WIDTH) / 2,
+						MESSAGE_DISPLAY_VOFFSET, MESSAGE_VALID_HOFFSET,
+						MESSAGE_VALID_VOFFSET, MESSAGE_WIDTH,
+						MESSAGE_HEIGHT, 256, 256);
 				GlStateManager.popMatrix();
 			}
 			

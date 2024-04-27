@@ -45,8 +45,8 @@ public class HSplitPage implements IClickableBookPage {
 		//draw dividing line on bottom (if applicable)
 		if (drawSplit) {
 			Minecraft.getInstance().getTextureManager().bindTexture(divide);
-			RenderFuncs.drawModalRectWithCustomSizedTexture(xoffset, yoffset + (subheight + (divideSize / 2)),
-					0, 0, width, divideSize, TEXT_WIDTH, TEXT_HEIGHT);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, xoffset,
+					yoffset + (subheight + (divideSize / 2)), 0, 0, width, divideSize, TEXT_WIDTH, TEXT_HEIGHT);
 		}
 		
 		top.draw(parent, fonter, xoffset, yoffset, width, subheight);

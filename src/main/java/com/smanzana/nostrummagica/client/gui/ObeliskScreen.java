@@ -137,7 +137,7 @@ public class ObeliskScreen extends Screen {
 		double time = (float) ((double) System.currentTimeMillis() / 15000.0);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
 		
-		RenderFuncs.drawScaledCustomSizeModalRect(0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
@@ -164,12 +164,12 @@ public class ObeliskScreen extends Screen {
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			RenderFuncs.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			RenderFuncs.drawScaledCustomSizeModalRect(left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		}
 		
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -382,8 +382,8 @@ public class ObeliskScreen extends Screen {
                 GL11.glColor4f(val, 1.0f, val, val);
                 mc.getTextureManager().bindTexture(background);
                 GlStateManager.enableBlend();
-                RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
-        				TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+                RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
+        				textureY, TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 GlStateManager.disableBlend();
                 
                 if (!isCenter) {

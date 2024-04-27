@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.client.render.entity.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
 
@@ -23,10 +24,14 @@ public class NostrumRenderTypes {
 	public static final RenderType SWITCH_TRIGGER_CAGE;
 	public static final RenderType NOSTRUM_PORTAL;
 	public static final RenderType PROGRESSION_DOOR_LOCK;
+	public static final RenderType LOCKEDCHEST_LOCK;
+	public static final RenderType LOCKEDCHEST_CHAIN;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
 	}
+	
+	// Could make func that took a texture and returns a render type for flat, unlit icons
 	
 	static {
 		// Set up states that we use. Pull some from RenderState itself, and make some custom ones/ones not worth the effort to pull out.
@@ -34,7 +39,7 @@ public class NostrumRenderTypes {
 		
 		//final RenderState.TransparencyState LIGHTNING_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228512_d_");
 		final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
-		//final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
+		final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
 
 		final RenderState.LayerState VIEW_OFFSET_Z_LAYERING = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_239235_M_");
 
@@ -135,6 +140,23 @@ public class NostrumRenderTypes {
 				.layer(VIEW_OFFSET_Z_LAYERING)
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
-		PROGRESSION_DOOR_LOCK = RenderType.makeType(Name("prog_door_lock"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		PROGRESSION_DOOR_LOCK = RenderType.makeType(Name("prog_door_lock"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_LOCK_LOC, false, true))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(LIGHTMAP_ENABLED)
+				.cull(NO_CULL)
+			.build(false);
+		LOCKEDCHEST_LOCK = RenderType.makeType(Name("lockedchest_lock"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_QUADS, 32, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
+				.transparency(NO_TRANSPARENCY)
+				.lightmap(LIGHTMAP_ENABLED)
+				.cull(NO_CULL)
+			.build(false);
+		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_QUADS, 64, glState);
 	}
 }

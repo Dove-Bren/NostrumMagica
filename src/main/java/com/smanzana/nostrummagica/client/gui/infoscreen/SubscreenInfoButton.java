@@ -46,9 +46,9 @@ public class SubscreenInfoButton extends InfoButton {
 		GL11.glColor4f(tint, tint, tint, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(InfoScreen.background);
 		GlStateManager.enableBlend();
-		RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0,
-				width, height,
-				InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
+				0, width,
+				height, InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
 		GlStateManager.disableBlend();
 		
 		final int itemLength = 16;

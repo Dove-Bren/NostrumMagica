@@ -70,9 +70,9 @@ public class ImagePage implements IBookPage {
 		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		GlStateManager.enableBlend();
 		if (textWidth == -1 || textHeight == -1)
-			RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, uoffset, voffset, this.width, this.height, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, uoffset, voffset, this.width, this.height, 256, 256);
 		else
-			RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, uoffset, voffset, this.width, this.height, textWidth, textHeight);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, uoffset, voffset, this.width, this.height, textWidth, textHeight);
 		GlStateManager.disableBlend();
 	}
 

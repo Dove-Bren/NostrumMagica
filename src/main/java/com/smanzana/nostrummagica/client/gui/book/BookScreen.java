@@ -166,8 +166,8 @@ public class BookScreen extends Screen {
 		//float hscale = ((float) this.width / (float) TEXT_WIDTH);
 		//float vscale = ((float) this.height / (float) TEXT_HEIGHT);
 		
-		RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset, topOffset, 0, 0,
-				TEXT_WIDTH, TEXT_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset, topOffset, 0,
+				0, TEXT_WIDTH, TEXT_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
 		pages.get(currentPage * 2).draw(this, font, leftOffset + PAGE_HOFFSET, topOffset + PAGE_VOFFSET,
 				PAGE_WIDTH, PAGE_HEIGHT);
@@ -328,8 +328,8 @@ public class BookScreen extends Screen {
                     textureY += 13;
                 }
                 
-                RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
-        				23, 13, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+                RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
+        				textureY, 23, 13, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 
             }
         }
@@ -370,8 +370,8 @@ public class BookScreen extends Screen {
                 	textureX += 16;
                 }
 
-                RenderFuncs.drawModalRectWithCustomSizedTexture(x, y, textureX, textureY,
-                		16, 16, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+                RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
+                		textureY, 16, 16, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 
             }
         }

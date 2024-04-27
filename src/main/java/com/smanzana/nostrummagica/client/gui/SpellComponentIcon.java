@@ -263,7 +263,7 @@ public class SpellComponentIcon {
 //		else
 		{
 			Minecraft.getInstance().getTextureManager().bindTexture(this.getModelLocation());
-			RenderFuncs.drawScaledCustomSizeModalRect(xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height);
 		}
 		
 		GL11.glPopMatrix();

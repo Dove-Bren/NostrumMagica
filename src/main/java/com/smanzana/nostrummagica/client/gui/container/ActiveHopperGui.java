@@ -141,7 +141,7 @@ public class ActiveHopperGui {
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		
 		@Override

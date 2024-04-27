@@ -43,9 +43,9 @@ public enum PotionIcon {
 	public void draw(Minecraft mc, int posX, int posY) {
 		mc.getRenderManager().textureManager.bindTexture(text);
 		
-		RenderFuncs.drawModalRectWithCustomSizedTexture(posX, posY,
-				TEXT_OFFSETU + (u * 18), TEXT_OFFSETV + (v * 18),
-				18, 18, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, posX,
+				posY, TEXT_OFFSETU + (u * 18),
+				TEXT_OFFSETV + (v * 18), 18, 18, TEXT_WIDTH, TEXT_HEIGHT);
 	}
 	
 }

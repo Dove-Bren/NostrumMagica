@@ -396,10 +396,10 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				{
 					// Draw background
 					GlStateManager.color4f(1f, 1f, 1f, 1f);
-					RenderFuncs.drawModalRectWithCustomSizedTexture((width-GUI_CENTER_GEM_SOCKET_WIDTH)/2, upperOffset + (upperHeight-GUI_CENTER_GEM_SOCKET_HEIGHT)/2,
-							GUI_CENTER_GEM_SOCKET_HOFFSET, GUI_CENTER_GEM_SOCKET_VOFFSET,
-							GUI_CENTER_GEM_SOCKET_WIDTH, GUI_CENTER_GEM_SOCKET_HEIGHT,
-							256, 256);
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_CENTER_GEM_SOCKET_WIDTH)/2,
+							upperOffset + (upperHeight-GUI_CENTER_GEM_SOCKET_HEIGHT)/2, GUI_CENTER_GEM_SOCKET_HOFFSET,
+							GUI_CENTER_GEM_SOCKET_VOFFSET, GUI_CENTER_GEM_SOCKET_WIDTH,
+							GUI_CENTER_GEM_SOCKET_HEIGHT, 256, 256);
 					
 					// Then draw inner
 					EMagicElement inner;
@@ -437,10 +437,10 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 					
 					GlStateManager.color4f(red, green, blue, 1f);
 					
-					RenderFuncs.drawModalRectWithCustomSizedTexture((width-GUI_CENTER_GEM_WIDTH)/2, upperOffset + (upperHeight-GUI_CENTER_GEM_HEIGHT)/2,
-							GUI_CENTER_GEM_HOFFSET + ((level-1) * GUI_CENTER_GEM_WIDTH), GUI_CENTER_GEM_VOFFSET,
-							GUI_CENTER_GEM_WIDTH, GUI_CENTER_GEM_HEIGHT,
-							256, 256);
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_CENTER_GEM_WIDTH)/2,
+							upperOffset + (upperHeight-GUI_CENTER_GEM_HEIGHT)/2, GUI_CENTER_GEM_HOFFSET + ((level-1) * GUI_CENTER_GEM_WIDTH),
+							GUI_CENTER_GEM_VOFFSET, GUI_CENTER_GEM_WIDTH,
+							GUI_CENTER_GEM_HEIGHT, 256, 256);
 					
 					// Inner spark that's always 'bright'
 					GlStateManager.color4f(
@@ -449,10 +449,10 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 							(float)((color >> 0) & 0xFF) / 255f,
 							1f
 							);
-					RenderFuncs.drawModalRectWithCustomSizedTexture((width-GUI_GEM_SPARK_WIDTH)/2, upperOffset + (upperHeight-GUI_GEM_SPARK_HEIGHT)/2,
-							GUI_GEM_SPARK_HOFFSET, GUI_GEM_SPARK_VOFFSET,
-							GUI_GEM_SPARK_WIDTH, GUI_GEM_SPARK_HEIGHT,
-							256, 256);
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_GEM_SPARK_WIDTH)/2,
+							upperOffset + (upperHeight-GUI_GEM_SPARK_HEIGHT)/2, GUI_GEM_SPARK_HOFFSET,
+							GUI_GEM_SPARK_VOFFSET, GUI_GEM_SPARK_WIDTH,
+							GUI_GEM_SPARK_HEIGHT, 256, 256);
 				}
 				
 				// Outer
@@ -496,27 +496,27 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 
 					// Level 1
 					{
-						RenderFuncs.drawModalRectWithCustomSizedTexture((width-GUI_GEM_EXTRAS_1_WIDTH)/2,
-								upperOffset + (upperHeight-GUI_GEM_EXTRAS_1_HEIGHT)/2,
-								GUI_GEM_EXTRAS_1_HOFFSET, GUI_GEM_EXTRAS_1_VOFFSET,
-								GUI_GEM_EXTRAS_1_WIDTH, GUI_GEM_EXTRAS_1_HEIGHT,
-								256, 256);
+						RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
+								(width-GUI_GEM_EXTRAS_1_WIDTH)/2,
+								upperOffset + (upperHeight-GUI_GEM_EXTRAS_1_HEIGHT)/2, GUI_GEM_EXTRAS_1_HOFFSET,
+								GUI_GEM_EXTRAS_1_VOFFSET, GUI_GEM_EXTRAS_1_WIDTH,
+								GUI_GEM_EXTRAS_1_HEIGHT, 256, 256);
 					}
 					
 					if (level >= 2) {
-						RenderFuncs.drawModalRectWithCustomSizedTexture((width-GUI_GEM_EXTRAS_2_WIDTH)/2,
-								upperOffset + (upperHeight-GUI_GEM_EXTRAS_2_HEIGHT)/2,
-								GUI_GEM_EXTRAS_2_HOFFSET, GUI_GEM_EXTRAS_2_VOFFSET,
-								GUI_GEM_EXTRAS_2_WIDTH, GUI_GEM_EXTRAS_2_HEIGHT,
-								256, 256);
+						RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
+								(width-GUI_GEM_EXTRAS_2_WIDTH)/2,
+								upperOffset + (upperHeight-GUI_GEM_EXTRAS_2_HEIGHT)/2, GUI_GEM_EXTRAS_2_HOFFSET,
+								GUI_GEM_EXTRAS_2_VOFFSET, GUI_GEM_EXTRAS_2_WIDTH,
+								GUI_GEM_EXTRAS_2_HEIGHT, 256, 256);
 					}
 					
 					if (level >= 3) {
-						RenderFuncs.drawModalRectWithCustomSizedTexture((width-GUI_GEM_EXTRAS_3_WIDTH)/2,
-								upperOffset + (upperHeight-GUI_GEM_EXTRAS_3_HEIGHT)/2 + 35,
-								GUI_GEM_EXTRAS_3_HOFFSET, GUI_GEM_EXTRAS_3_VOFFSET,
-								GUI_GEM_EXTRAS_3_WIDTH, GUI_GEM_EXTRAS_3_HEIGHT,
-								256, 256);
+						RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
+								(width-GUI_GEM_EXTRAS_3_WIDTH)/2,
+								upperOffset + (upperHeight-GUI_GEM_EXTRAS_3_HEIGHT)/2 + 35, GUI_GEM_EXTRAS_3_HOFFSET,
+								GUI_GEM_EXTRAS_3_VOFFSET, GUI_GEM_EXTRAS_3_WIDTH,
+								GUI_GEM_EXTRAS_3_HEIGHT, 256, 256);
 					}
 				}
 			}
@@ -533,17 +533,17 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				if (i == 0) {
 					// Draw center slot
 					mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-					RenderFuncs.drawModalRectWithCustomSizedTexture(x - 1, upperOffset + y - 1,
-							PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-							cellWidth, cellWidth,
-							256, 256);
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x - 1,
+							upperOffset + y - 1, PetGUI.GUI_TEX_CELL_HOFFSET,
+							PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+							cellWidth, 256, 256);
 				} else {
 					// Draw bowl
 					mc.getTextureManager().bindTexture(TEX_LOC);
-					RenderFuncs.drawModalRectWithCustomSizedTexture(x + bowlHOffset, upperOffset + y + bowlVOffset,
-							GUI_SLOT_ICON_HOFFSET, GUI_SLOT_ICON_VOFFSET,
-							bowlWidth, bowlHeight,
-							256, 256);
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x + bowlHOffset,
+							upperOffset + y + bowlVOffset, GUI_SLOT_ICON_HOFFSET,
+							GUI_SLOT_ICON_VOFFSET, bowlWidth,
+							bowlHeight, 256, 256);
 				}
 			}
 			
@@ -579,10 +579,10 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 			for (int i = 0; i < playerInvSize; i++) {
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
-						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-						cellWidth, cellWidth,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
+						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
+						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+						cellWidth, 256, 256);
 			}
 			mc.getTextureManager().bindTexture(TEX_LOC);
 			

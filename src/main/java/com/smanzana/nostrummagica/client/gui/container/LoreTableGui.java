@@ -212,15 +212,15 @@ public class LoreTableGui {
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float progress = container.table.getProgress();
 			if (progress > 0f) {
 				int y = (int) ((1f - progress) * PROGRESS_HEIGHT);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(
+						matrixStackIn,
 						horizontalMargin + PROGRESS_GUI_HOFFSET,
-						verticalMargin + PROGRESS_GUI_VOFFSET + y,
-						0, GUI_HEIGHT + y, PROGRESS_WIDTH, PROGRESS_HEIGHT - y, 256, 256);
+						verticalMargin + PROGRESS_GUI_VOFFSET + y, 0, GUI_HEIGHT + y, PROGRESS_WIDTH, PROGRESS_HEIGHT - y, 256, 256);
 			}
 			
 			
@@ -240,11 +240,11 @@ public class LoreTableGui {
 				
 				GlStateManager.color4f(0, 1, 1, alpha);
 				GlStateManager.enableBlend();
-				RenderFuncs.drawModalRectWithCustomSizedTexture(
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(
+						matrixStackIn,
 						SLOT_INPUT_HOFFSET,
-						SLOT_INPUT_VOFFSET - 20,
-						u, v,
-						SHINE_LENGTH, SHINE_LENGTH, 256, 256);
+						SLOT_INPUT_VOFFSET - 20, u,
+						v, SHINE_LENGTH, SHINE_LENGTH, 256, 256);
 				
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
 			}

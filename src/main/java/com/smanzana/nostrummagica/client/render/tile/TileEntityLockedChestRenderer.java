@@ -1,13 +1,10 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.LockedChest;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.items.WorldKeyItem;
 import com.smanzana.nostrummagica.tiles.LockedChestEntity;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
@@ -15,22 +12,19 @@ import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChestEntity> {
 	
-	private static final ResourceLocation TEXT_LOCK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/lock_plate.png");
-	private static final ResourceLocation TEXT_CHAINLINK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/chain_link.png");
+	public static final ResourceLocation TEXT_LOCK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/lock_plate.png");
+	public static final ResourceLocation TEXT_CHAINLINK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/chain_link.png");
 
 	public TileEntityLockedChestRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
@@ -64,11 +58,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final double yWiggleProg = ((ticks % yWigglePeriod) / yWigglePeriod);
 		final double yWiggle = .5 * Math.sin(yWiggleProg * Math.PI * 2);
 
-//		GlStateManager.disableCull();
-//		GlStateManager.disableLighting();
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-//		GlStateManager.color4f(red, green, blue, .25f + glow);
+		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
 		
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rot)); // Rotate arm that's centered in the block
@@ -78,20 +68,18 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		
 		// Wiggle a bit
 		matrixStackIn.translate(xWiggle, yWiggle, 0); // center
-		
-		this.bindTexture(TEXT_LOCK_LOC);
-		RenderFuncs.drawScaledCustomSizeModalRect(0, 0, 0, 0, 16, 16, 6, 6, 16, 16);
+		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, 16, 16, 6, 6, 16, 16, red, green, blue, .25f + glow);
 		
 		matrixStackIn.pop();
 	}
 	
-	protected void renderChains(LockedChestEntity te, double ticks) {
+	protected void renderChains(LockedChestEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Direction direction = te.getBlockState().get(LockedChest.FACING);
 		float rot = direction.getHorizontalAngle();
 		
-		final double armLen = 10;
+		final float armLen = 10;
 		final int points = 8;
-		final double linkWidth = 3;
+		final float linkWidth = 3;
 		
 		final double minorWigglePeriod = 140;
 		final double minorWiggleProg = 1 - ((ticks % minorWigglePeriod) / minorWigglePeriod);
@@ -101,91 +89,95 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final double majorWiggleProg = 1 - ((ticks % majorWigglePeriod) / majorWigglePeriod);
 		final float majorWiggle = (float) (2 * Math.sin(2 * Math.PI * majorWiggleProg));
 		
-		this.bindTexture(TEXT_CHAINLINK_LOC);
-		GlStateManager.pushMatrix();
-		GlStateManager.rotatef(rot, 0, -1, 0); // Rotate to match block's orientation
+		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_CHAIN);
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.rotatef(-115f - majorWiggle, 0, 0, 1);
-		renderChain(te, ticks, armLen, points, linkWidth);
-		GlStateManager.popMatrix();
+		matrixStackIn.push();
+		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rot)); // Rotate to match block's orientation
+		
+		matrixStackIn.push();
+		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-115f - majorWiggle));
+		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		matrixStackIn.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.rotatef(-30f - minorWiggle, 0, 0, 1);
-		renderChain(te, ticks, armLen, points, linkWidth);
-		GlStateManager.popMatrix();
+		matrixStackIn.push();
+		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-30f - minorWiggle));
+		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		matrixStackIn.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.rotatef(30f + minorWiggle, 0, 0, 1); // Is this faster than pushing and popping matrix?
-		renderChain(te, ticks, armLen, points, linkWidth);
-		GlStateManager.popMatrix();
+		matrixStackIn.push();
+		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(30f + minorWiggle)); // Is this faster than pushing and popping matrix?
+		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		matrixStackIn.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.rotatef(115f + majorWiggle, 0, 0, 1); // Is this faster than pushing and popping matrix?
-		renderChain(te, ticks, armLen, points, linkWidth);
-		GlStateManager.popMatrix();
+		matrixStackIn.push();
+		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(115f + majorWiggle)); // Is this faster than pushing and popping matrix?
+		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		matrixStackIn.pop();
 
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 	}
 	
-	protected void renderChain(LockedChestEntity te, double ticks, double armLen, int points, double linkWidth) {
+	protected void renderChain(LockedChestEntity te, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, double ticks, float armLen, int points, float linkWidth) {
 		// Two ribbons perpendicular to each other offset by half a v on texture
 			
-		GlStateManager.disableLighting();
-		GlStateManager.disableCull();
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		
-		BufferBuilder wr = Tessellator.getInstance().getBuffer();
-		
-		final double colorPeriod = 140;
-		final double colorProg = 1 - ((ticks % colorPeriod) / colorPeriod); 
+		final float colorPeriod = 140;
+		final float colorProg = (float) (1 - ((ticks % colorPeriod) / colorPeriod));
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		//final Matrix3f normal = matrixStackIn.getLast().getNormal();
 		
 		{
-			wr.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
-			
-			for (int i = 0; i <= points; i++) {
-				final double prog = ((double) i / (double)points);
-				final double px = 0;
-				final double py = armLen * Math.sin(prog * Math.PI); // half circle
-				final double pz = armLen * Math.cos(prog * Math.PI); //half circle
-				final double colorDist = Math.min(Math.abs(colorProg - prog), 1 - Math.abs(colorProg - prog));
-				final float alpha = Math.max(.2f, 1f - 4f *(float) colorDist);
-				
-				final double v = (i % 2 == 0 ? 0 : 1);
-				
-				wr.pos(px - (linkWidth / 2), py, pz).tex(0, v).color(1f, 1f, 1f, alpha).endVertex();
-				wr.pos(px + (linkWidth / 2), py, pz).tex(1, v).color(1f, 1f, 1f, alpha).endVertex();
-			}
-			
-			Tessellator.getInstance().draw();
-		}
-		
-		{
-			wr.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
-			
 			for (int i = 0; i < points; i++) {
-				final double prog = (((double) i + .5) / (double)points);
-				final double px = 0;
-				final double py = armLen * Math.sin(prog * Math.PI); // half circle
-				final double pz = armLen * Math.cos(prog * Math.PI); //half circle
-				final double colorDist = Math.min(Math.abs(colorProg - prog), 1 - Math.abs(colorProg - prog));
-				final float alpha = Math.max(.2f, 1f - 4f *(float) colorDist);
+				final float prog1 = ((float) i / (float)points);
+				final float px1 = 0;
+				final float py1 = (float) (armLen * Math.sin(prog1 * Math.PI)); // half circle
+				final float pz1 = (float) (armLen * Math.cos(prog1 * Math.PI)); //half circle
+				final float colorDist1 = Math.min(Math.abs(colorProg - prog1), 1 - Math.abs(colorProg - prog1));
+				final float alpha1 = Math.max(.2f, 1f - 4f * colorDist1);
+				final float v1 = (i % 2 == 0 ? 0 : 1);
+				final float offY1 = (float) ((linkWidth/2) * Math.sin(prog1 * Math.PI));
+				final float offZ1 = (float) ((linkWidth/2) * Math.cos(prog1 * Math.PI));
 				
-				final double v = (i % 2 == 0 ? 0 : 1);
-				final double offY = (linkWidth/2) * Math.sin(prog * Math.PI);
-				final double offZ = (linkWidth/2) * Math.cos(prog * Math.PI);
+				final float prog2 = ((float) (i+1) / (float)points);
+				final float px2 = 0;
+				final float py2 = (float) (armLen * Math.sin(prog2 * Math.PI)); // half circle
+				final float pz2 = (float) (armLen * Math.cos(prog2 * Math.PI)); //half circle
+				final float colorDist2 = Math.min(Math.abs(colorProg - prog2), 1 - Math.abs(colorProg - prog2));
+				final float alpha2 = Math.max(.2f, 1f - 4f * colorDist2);
+				final float v2 = ((i+1) % 2 == 0 ? 0 : 1);
+				final float offY2 = (float) ((linkWidth/2) * Math.sin(prog2 * Math.PI));
+				final float offZ2 = (float) ((linkWidth/2) * Math.cos(prog2 * Math.PI));
 				
-				wr.pos(px, py - offY, pz - offZ).tex(0, v).color(1f, 1f, 1f, alpha).endVertex();
-				wr.pos(px, py + offY, pz + offZ).tex(1, v).color(1f, 1f, 1f, alpha).endVertex();
+				buffer.pos(transform, px1 - (linkWidth / 2), py1, pz1).tex(0, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px1 + (linkWidth / 2), py1, pz1).tex(1, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2 - (linkWidth / 2), py2, pz2).tex(0, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2 + (linkWidth / 2), py2, pz2).tex(1, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
+				
+				// Cross quad
+				buffer.pos(transform, px1, py1 - offY1, pz1 - offZ1).tex(0, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px1, py1 + offY1, pz1 + offZ1).tex(1, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2, py2 - offY2, pz2 - offZ2).tex(0, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2, py2 + offY2, pz2 + offZ2).tex(1, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
 			}
-			
-			Tessellator.getInstance().draw();
 		}
-		
-		GlStateManager.enableCull();
+//		{
+//			wr.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+//			
+//			for (int i = 0; i < points; i++) {
+//				final double prog = (((double) i + .5) / (double)points);
+//				final double px = 0;
+//				final double py = armLen * Math.sin(prog * Math.PI); // half circle
+//				final double pz = armLen * Math.cos(prog * Math.PI); //half circle
+//				final double colorDist = Math.min(Math.abs(colorProg - prog), 1 - Math.abs(colorProg - prog));
+//				final float alpha = Math.max(.2f, 1f - 4f *(float) colorDist);
+//				
+//				final double v = (i % 2 == 0 ? 0 : 1);
+//				final double offY = (linkWidth/2) * Math.sin(prog * Math.PI);
+//				final double offZ = (linkWidth/2) * Math.cos(prog * Math.PI);
+//				
+//				wr.pos(px, py - offY, pz - offZ).tex(0, v).color(1f, 1f, 1f, alpha).endVertex();
+//				wr.pos(px, py + offY, pz + offZ).tex(1, v).color(1f, 1f, 1f, alpha).endVertex();
+//			}
+//		}
 	}
 	
 	@Override
@@ -195,15 +187,15 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final double ticks = tileEntityIn.getWorld().getGameTime() + partialTicks;
 		final Minecraft mc = Minecraft.getInstance();
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + .5, z + .5);
-		GlStateManager.scaled(1.0/16.0, 1.0/16.0, 1.0/16.0); // Down to block scale, where 1 block is 16 units/pixels
+		matrixStackIn.push();
+		matrixStackIn.translate(.5, .5, .5);
+		matrixStackIn.scale(1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f); // Down to block scale, where 1 block is 16 units/pixels
 		
 		// Draw chain links
-		this.renderChains(tileEntityIn, ticks);
+		this.renderChains(tileEntityIn, ticks, matrixStackIn, bufferIn, combinedLightIn);
 		
 		// Draw lock icon
-		this.renderLock(tileEntityIn, ticks);
+		this.renderLock(tileEntityIn, ticks, matrixStackIn, bufferIn, combinedLightIn);
 
 		
 		// Draw lock info
@@ -223,12 +215,9 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 				lockStr = "No lock info found";
 			}
 			
-			GlStateManager.scaled(8, 8, 8);
+			matrixStackIn.scale(8, 8, 8);
 			ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
-			float viewerYaw = renderInfo.getYaw();
-			float viewerPitch = renderInfo.getPitch();
 			float yOffset = 1.4f;
-			int i = 0;
 			
 			if (matches) {
 				final double matchWigglePeriod = 20;
@@ -236,10 +225,11 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 				yOffset += (float) (.05 * Math.sin(2 * Math.PI * matchWiggleProg));
 			}
 			
-			GameRenderer.drawNameplate(mc.fontRenderer, lockStr, (float)0, (float)0 + yOffset, (float)0, i, viewerYaw, viewerPitch, false);
+			RenderFuncs.drawNameplate(matrixStackIn, bufferIn, lockStr, mc.fontRenderer, combinedLightIn, yOffset, false, renderInfo);
+			//GameRenderer.drawNameplate(mc.fontRenderer, lockStr, (float)0, (float)0 + yOffset, (float)0, i, viewerYaw, viewerPitch, false);
 		}
 
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 		
 	}
 }

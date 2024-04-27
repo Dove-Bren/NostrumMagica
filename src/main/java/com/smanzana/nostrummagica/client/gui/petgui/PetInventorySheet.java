@@ -67,19 +67,19 @@ public abstract class PetInventorySheet<T extends IEntityPet> implements IPetGUI
 			
 			for (int i = 0; i < petInv.getSizeInventory(); i++) {
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), dragonTopOffset - 1 + (cellWidth * (i / invRow)),
-						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-						cellWidth, cellWidth,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
+						dragonTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
+						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+						cellWidth, 256, 256);
 			}
 			
 			final int playerTopOffset = 100;
 			for (int i = 0; i < playerInvSize; i++) {
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
-						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-						cellWidth, cellWidth,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
+						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
+						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+						cellWidth, 256, 256);
 			}
 			
 			GlStateManager.popMatrix();

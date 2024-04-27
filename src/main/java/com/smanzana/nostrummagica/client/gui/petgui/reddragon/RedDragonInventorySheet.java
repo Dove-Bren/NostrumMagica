@@ -80,10 +80,10 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 				
 				final int i = slot.ordinal();
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)),
-						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-						cellWidth, cellWidth,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 - (cellWidth + 4),
+						dragonTopOffset - 1 + (cellWidth * (i * 2)), PetGUI.GUI_TEX_CELL_HOFFSET,
+						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+						cellWidth, 256, 256);
 			}
 			
 			GlStateManager.popMatrix();

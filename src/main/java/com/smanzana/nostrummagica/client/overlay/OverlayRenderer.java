@@ -552,8 +552,8 @@ public class OverlayRenderer extends AbstractGui {
 			GlStateManager.translatef(-1, -10, 0);
 			GlStateManager.color4f(1f, 1f, 1f, 1f - ratio);
 			//blit(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE); // -10, 10, 
-			RenderFuncs.drawScaledCustomSizeModalRect(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY,
-					-GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, GUI_WING_SIZE,
+					GUI_WING_OFFSETY, -GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
 			GlStateManager.popMatrix();
 			
 			GlStateManager.pushMatrix();
@@ -564,8 +564,8 @@ public class OverlayRenderer extends AbstractGui {
 			GlStateManager.translatef(-10, -10, 0);
 			GlStateManager.color4f(1f, 1f, 1f, 1f - ratio);
 			//blit(0, 0, 0, offsetX, offsetY, width, height, texWidth, texHeight); // -10, 10, 
-			RenderFuncs.drawScaledCustomSizeModalRect(0, 0, 0, GUI_WING_OFFSETY,
-					GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0,
+					GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f);
 			GlStateManager.popMatrix();
 			
 			
@@ -1289,7 +1289,7 @@ public class OverlayRenderer extends AbstractGui {
 		if (loreIsDeep != null) {
 			final int u = (160 + (loreIsDeep ? 0 : 32));
 			mc.getTextureManager().bindTexture(GUI_ICONS);
-			RenderFuncs.drawScaledCustomSizeModalRect(8, 8, u, 0, 32, 32, 8, 8, 256, 256);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, u, 0, 32, 32, 8, 8, 256, 256);
 		}
 	}
 	
@@ -1298,7 +1298,7 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		mc.getTextureManager().bindTexture(GUI_ICONS);
-		RenderFuncs.drawScaledCustomSizeModalRect(6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
@@ -1307,7 +1307,7 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		mc.getTextureManager().bindTexture(GUI_ICONS);
-		RenderFuncs.drawScaledCustomSizeModalRect(8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 	}
 	
@@ -1316,7 +1316,7 @@ public class OverlayRenderer extends AbstractGui {
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		mc.getTextureManager().bindTexture(GUI_ICONS);
-		RenderFuncs.drawScaledCustomSizeModalRect(8, 8, 224, 32, 32, 32, 8, 8, 256, 256);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 224, 32, 32, 32, 8, 8, 256, 256);
 	}
 	
 	@SubscribeEvent

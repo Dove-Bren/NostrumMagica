@@ -140,10 +140,10 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	private void drawCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
-				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-				cellWidth, cellWidth,
-				256, 256);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
+				y, PetGUI.GUI_TEX_CELL_HOFFSET,
+				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+				cellWidth, 256, 256);
 	}
 	
 	private static @Nonnull ItemStack scrollShadow = ItemStack.EMPTY;
@@ -156,10 +156,10 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		}
 		
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
-				PetGUI.GUI_TEX_CELL_HOFFSET + cellWidth, PetGUI.GUI_TEX_CELL_VOFFSET,
-				cellWidth, cellWidth,
-				256, 256);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
+				y, PetGUI.GUI_TEX_CELL_HOFFSET + cellWidth,
+				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+				cellWidth, 256, 256);
 		
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 	}
@@ -167,19 +167,19 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	private void drawShadowCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		GlStateManager.color4f(.7f, .71f, .7f, .4f);
-		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
-				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-				cellWidth, cellWidth,
-				256, 256);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
+				y, PetGUI.GUI_TEX_CELL_HOFFSET,
+				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+				cellWidth, 256, 256);
 	}
 	
 	private void drawFadedCell(Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		GlStateManager.color4f(.2f, .2f, .2f, .4f);
-		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
-				PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-				cellWidth, cellWidth,
-				256, 256);
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
+				y, PetGUI.GUI_TEX_CELL_HOFFSET,
+				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+				cellWidth, 256, 256);
 	}
 	
 	private void drawGambit(Minecraft mc, float partialTicks, int x, int y, EntityDragonGambit gambit) {
@@ -189,11 +189,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		}
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		RenderFuncs.drawModalRectWithCustomSizedTexture(x, y,
+		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
+				y,
 				PetGUI.GUI_TEX_TOGGLE_HOFFSET + texOffset,
-				PetGUI.GUI_TEX_TOGGLE_VOFFSET,
-				toggleSize, toggleSize,
-				256, 256);
+				PetGUI.GUI_TEX_TOGGLE_VOFFSET, toggleSize,
+				toggleSize, 256, 256);
 	}
 	
 	private void drawRow(Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
@@ -261,10 +261,10 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			final int playerTopOffset = dragonTopOffset + (rowIncr * 3) + 10;
 			for (int i = 0; i < playerInvSize; i++) {
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				RenderFuncs.drawModalRectWithCustomSizedTexture(leftOffset - 1 + (cellWidth * (i % invRow)), (i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)),
-						PetGUI.GUI_TEX_CELL_HOFFSET, PetGUI.GUI_TEX_CELL_VOFFSET,
-						cellWidth, cellWidth,
-						256, 256);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
+						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
+						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
+						cellWidth, 256, 256);
 			}
 			
 			GlStateManager.popMatrix();

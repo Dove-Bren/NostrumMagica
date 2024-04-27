@@ -6,16 +6,15 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
 import com.smanzana.nostrummagica.items.WorldKeyItem;
 import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 
@@ -72,27 +71,28 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 		}
 		
 		//renderLivingLabel(entityIn, info, x, y + yOffset, z, 64);
-		{
-			boolean flag = !entityIn.isDiscrete();
-			float y = entityIn.getHeight() + 0.5F;
-			
-			matrixStackIn.push();
-			matrixStackIn.translate(0.0D, (double)y + yOffset, 0.0D);
-			matrixStackIn.rotate(this.renderManager.getCameraOrientation());
-			matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
-			
-			Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
-			float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
-			int j = (int)(f1 * 255.0F) << 24;
-			FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
-			float f2 = (float)(-fontrenderer.getStringWidth(info) / 2);
-			fontrenderer.renderString(info, f2, 0, 553648127, false, matrix4f, bufferIn, flag, j, packedLightIn);
-			if (flag) {
-				fontrenderer.renderString(info, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
-			}
-			
-			matrixStackIn.pop();
-		}
+//		{
+//			boolean flag = !entityIn.isDiscrete();
+//			float y = entityIn.getHeight() + 0.5F;
+//			
+//			matrixStackIn.push();
+//			matrixStackIn.translate(0.0D, (double)y + yOffset, 0.0D);
+//			matrixStackIn.rotate(this.renderManager.getCameraOrientation());
+//			matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
+//			
+//			Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
+//			float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
+//			int j = (int)(f1 * 255.0F) << 24;
+//			FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
+//			float f2 = (float)(-fontrenderer.getStringWidth(info) / 2);
+//			fontrenderer.renderString(info, f2, 0, 553648127, false, matrix4f, bufferIn, flag, j, packedLightIn);
+//			if (flag) {
+//				fontrenderer.renderString(info, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
+//			}
+//			
+//			matrixStackIn.pop();
+//		}
+		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, info, this.getFontRendererFromRenderManager(), packedLightIn, yOffset, this.renderManager.info);
 	}
 	
 	@Override

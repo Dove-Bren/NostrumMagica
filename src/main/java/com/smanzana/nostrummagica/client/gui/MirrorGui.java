@@ -281,7 +281,7 @@ public class MirrorGui extends Screen {
 		float inv = .2f - extra;
 		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -305,7 +305,7 @@ public class MirrorGui extends Screen {
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.disableLighting();
-		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		// DRAW STATS
 		int y = 2;
@@ -415,7 +415,7 @@ public class MirrorGui extends Screen {
 		float inv = .2f - extra;
 		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -438,7 +438,7 @@ public class MirrorGui extends Screen {
 		GlStateManager.disableBlend();
     	GlStateManager.enableAlphaTest();
 		GlStateManager.disableLighting();
-		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -483,7 +483,7 @@ public class MirrorGui extends Screen {
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLOUD);
-		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		int y = 0;
 		String str = "Magic Not Yet Unlocked";
@@ -505,7 +505,7 @@ public class MirrorGui extends Screen {
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		GlStateManager.disableBlend();
 		GlStateManager.disableLighting();
-		RenderFuncs.drawScaledCustomSizeModalRect(leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		// DRAW ICONS
@@ -989,8 +989,8 @@ public class MirrorGui extends Screen {
             	GlStateManager.enableAlphaTest();
             	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
-        				TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
+                RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
+        				textureY, TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
                 GlStateManager.pushMatrix();
@@ -1033,8 +1033,8 @@ public class MirrorGui extends Screen {
                 
             	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
-                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
-        				TEXT_ICON_BUTTON_LENGTH, TEXT_ICON_BUTTON_LENGTH, this.width, this.height, 256, 256);
+                RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
+        				textureY, TEXT_ICON_BUTTON_LENGTH, TEXT_ICON_BUTTON_LENGTH, this.width, this.height, 256, 256);
             }
         }
 	}
@@ -1181,16 +1181,16 @@ public class MirrorGui extends Screen {
             	GlStateManager.disableLighting();
             	GlStateManager.disableBlend();
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
-                		TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256);
+                RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
+                		textureY, TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256);
                 
                 if (icon != null) {
                 	icon.draw(this, font, x + 2, y + 3, 12, 12);
                 } else {
                 	GlStateManager.enableBlend();
                 	GlStateManager.color4f(1f, 1f, 1f, .8f);
-                	RenderFuncs.drawScaledCustomSizeModalRect(x + 4, y + 5, iconOffset, TEXT_ICON_BUTTON_VOFFSET,
-                		TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256);
+                	RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x + 4, y + 5, iconOffset,
+                		TEXT_ICON_BUTTON_VOFFSET, TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256);
                 }
             }
         }
@@ -1365,8 +1365,8 @@ public class MirrorGui extends Screen {
             	RenderHelper.disableStandardItemLighting();
             	GlStateManager.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
-                		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
+                RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
+                		textureY, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
                 GlStateManager.pushMatrix();
@@ -1381,8 +1381,8 @@ public class MirrorGui extends Screen {
                 	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 	RenderHelper.disableStandardItemLighting();
                     mc.getTextureManager().bindTexture(RES_ICONS);
-                    RenderFuncs.drawScaledCustomSizeModalRect(x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_VOFFSET,
-                    		TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
+                    RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH,
+                    		TEXT_ICON_MINORBUTTON_VOFFSET, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 }
             }
         }
@@ -1575,8 +1575,8 @@ public class MirrorGui extends Screen {
             GlStateManager.enableBlend();
             GlStateManager.color4f(1f, 1f, 1f, alpha);
             mc.getTextureManager().bindTexture(RES_ICONS);
-            RenderFuncs.drawScaledCustomSizeModalRect(-(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET, TEXT_ICON_ARROW_VOFFSET,
-            		TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256);
+            RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET,
+            		TEXT_ICON_ARROW_VOFFSET, TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256);
             GlStateManager.enableDepthTest();
 			GlStateManager.popMatrix();
 		}
@@ -1651,8 +1651,8 @@ public class MirrorGui extends Screen {
                 GlStateManager.enableBlend();
                 GlStateManager.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
-                RenderFuncs.drawScaledCustomSizeModalRect(x, y, textureX, textureY,
-                		textureW, textureH, this.width, this.height, 256, 256);
+                RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
+                		textureY, textureW, textureH, this.width, this.height, 256, 256);
                 
                 // Now draw icon
                 RenderHelper.enableGUIStandardItemLighting();

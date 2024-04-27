@@ -44,23 +44,23 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 		GlStateManager.enableBlend();
 		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		if (item != null) {
-			RenderFuncs.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, xPosition,
+					yPosition,
 					RITUAL_TEXT_TABLET_WIDTH,
 					RITUAL_TEXT_TABLET_VOFFSET,
 					RITUAL_TEXT_TABLET_WIDTH,
 					RITUAL_TEXT_TABLET_WIDTH,
-					RITUAL_TEXT_WIDTH,
-					RITUAL_TEXT_HEIGHT);
+					RITUAL_TEXT_WIDTH, RITUAL_TEXT_HEIGHT);
 			
 			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(item, xPosition + 1, yPosition + 1);
 		} else {
-			RenderFuncs.drawModalRectWithCustomSizedTexture(xPosition, yPosition,
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, xPosition,
+					yPosition,
 					0,
 					RITUAL_TEXT_TABLET_VOFFSET,
 					RITUAL_TEXT_TABLET_WIDTH,
 					RITUAL_TEXT_TABLET_WIDTH,
-					RITUAL_TEXT_WIDTH,
-					RITUAL_TEXT_HEIGHT);
+					RITUAL_TEXT_WIDTH, RITUAL_TEXT_HEIGHT);
 		}
 	}
 

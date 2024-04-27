@@ -163,8 +163,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 					textureY += 13;
 				}
 
-				RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
-						23, 13, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, textureX,
+						textureY, 23, 13, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
 
 			}
 		}
@@ -204,8 +204,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
                 	textureX += 16;
                 }
 
-                RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, textureX, textureY,
-                		16, 16, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
+                RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, textureX,
+                		textureY, 16, 16, BookScreen.TEXT_WHOLE_WIDTH, BookScreen.TEXT_WHOLE_HEIGHT);
                 
             }
         }

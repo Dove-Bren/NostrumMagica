@@ -307,19 +307,19 @@ public class RuneBagGui {
 			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin, verticalMargin, 0,0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int guiU = 0;
 			if (RuneBag.isVacuumEnabled(bag.stack)) {
 				guiU += BUTTON_WIDTH;
 			}
 			
-			RenderFuncs.drawModalRectWithCustomSizedTexture(horizontalMargin + BUTTON_HOFFSET,
+			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
+					horizontalMargin + BUTTON_HOFFSET,
 					verticalMargin + BUTTON_VOFFSET,
 					guiU,
-					BUTTON_TEXT_VOFFSET,
-					BUTTON_WIDTH, BUTTON_WIDTH,
-					256, 256);
+					BUTTON_TEXT_VOFFSET, BUTTON_WIDTH,
+					BUTTON_WIDTH, 256, 256);
 			
 			int left = (width - xSize) / 2;
 			int top = (height - ySize) / 2;

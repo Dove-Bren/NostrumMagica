@@ -366,8 +366,8 @@ public class InfoScreen extends StackableScreen {
                 GL11.glColor4f(tint, tint, tint, 1f);
                 minecraft.getTextureManager().bindTexture(background);
                 GlStateManager.enableBlend();
-                RenderFuncs.drawModalRectWithCustomSizedTexture(this.x, this.y, 0, TEXT_BUTTON_TAB_VOFFSET,
-                		TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+                RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
+                		TEXT_BUTTON_TAB_VOFFSET, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
                 GlStateManager.disableBlend();
                 
                 RenderHelper.enableGUIStandardItemLighting();

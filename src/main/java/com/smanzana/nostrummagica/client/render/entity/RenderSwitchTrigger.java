@@ -9,16 +9,14 @@ import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchHitType;
 import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchTriggerType;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 
@@ -81,26 +79,27 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 	}
 	
 	protected void renderLivingLabel(Entity entityIn, String label, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, float yOffset) {
-		final Minecraft mc = Minecraft.getInstance();
-		boolean flag = !entityIn.isDiscrete();
-		float y = entityIn.getHeight() + 0.5F;
-		
-		matrixStackIn.push();
-		matrixStackIn.translate(0.0D, (double)y + yOffset, 0.0D);
-		matrixStackIn.rotate(this.renderManager.getCameraOrientation());
-		matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
-		
-		Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
-		float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
-		int j = (int)(f1 * 255.0F) << 24;
-		FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
-		float f2 = (float)(-fontrenderer.getStringWidth(label) / 2);
-		fontrenderer.renderString(label, f2, 0, 553648127, false, matrix4f, bufferIn, flag, j, packedLightIn);
-		if (flag) {
-			fontrenderer.renderString(label, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
-		}
-		
-		matrixStackIn.pop();
+//		final Minecraft mc = Minecraft.getInstance();
+//		boolean flag = !entityIn.isDiscrete();
+//		float y = entityIn.getHeight() + 0.5F;
+//		
+//		matrixStackIn.push();
+//		matrixStackIn.translate(0.0D, (double)y + yOffset, 0.0D);
+//		matrixStackIn.rotate(this.renderManager.getCameraOrientation());
+//		matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
+//		
+//		Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
+//		float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
+//		int j = (int)(f1 * 255.0F) << 24;
+//		FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
+//		float f2 = (float)(-fontrenderer.getStringWidth(label) / 2);
+//		fontrenderer.renderString(label, f2, 0, 553648127, false, matrix4f, bufferIn, flag, j, packedLightIn);
+//		if (flag) {
+//			fontrenderer.renderString(label, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
+//		}
+//		
+//		matrixStackIn.pop();
+		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, label, this.getFontRendererFromRenderManager(), packedLightIn, yOffset, this.renderManager.info);
 	}
 	
 	public ModelSwitchTrigger getEntityModel(EntitySwitchTrigger trigger) {
