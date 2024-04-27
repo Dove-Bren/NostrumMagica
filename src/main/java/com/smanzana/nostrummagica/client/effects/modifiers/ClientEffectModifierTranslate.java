@@ -1,8 +1,9 @@
 package com.smanzana.nostrummagica.client.effects.modifiers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class ClientEffectModifierTranslate implements ClientEffectModifier {
 
@@ -31,18 +32,18 @@ public class ClientEffectModifierTranslate implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void apply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (yaw != 0f) {
-			GlStateManager.rotatef(yaw, 0f, 1f, 0f);
+			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(yaw));
 		}
 		if (pitch != 0f) {
-			GlStateManager.rotatef(pitch, 1f, 0f, 0f);
+			matrixStackIn.rotate(Vector3f.XP.rotation(pitch));
 		}
-		GlStateManager.translatef(x, y, z);
+		matrixStackIn.translate(x, y, z);
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void earlyApply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 }

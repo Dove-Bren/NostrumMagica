@@ -190,6 +190,16 @@ public final class RenderFuncs {
 //		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 	}
 	
+	public static void ItemRenderer(ItemStack stack, MatrixStack matrix) {
+		// light and overlay constants taken from ItemRenderer and GameRenderer
+		final int combinedLight = 15728880;
+		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+		
+		IRenderTypeBuffer.Impl typebuffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+		ItemRenderer(stack, matrix, typebuffer, combinedLight, combinedOverlay);
+		typebuffer.finish();
+	}
+	
 	/**
 	 * Renders an item. Basically a wrapper for rendering classes.
 	 * Making now because transform type is deprecated but required :P and I'd rather have one warning than a bunch.

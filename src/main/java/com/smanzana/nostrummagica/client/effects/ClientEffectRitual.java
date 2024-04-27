@@ -3,8 +3,7 @@ package com.smanzana.nostrummagica.client.effects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -18,13 +17,12 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
-
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -113,7 +111,7 @@ public class ClientEffectRitual extends ClientEffect {
 		}
 	}
 	
-	protected void drawFloatingItem(Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nonnull ItemStack stack) {
+	protected void drawFloatingItem(MatrixStack matrixStackIn, Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nonnull ItemStack stack) {
 		if (stack.isEmpty()) {
 			return;
 		}
@@ -123,22 +121,22 @@ public class ClientEffectRitual extends ClientEffect {
 		//final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
 		float rot = 360f * (float) ((double)(mc.world.getGameTime() % 200) / 200.0);
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(pos.x, pos.y, pos.z);
-		GlStateManager.rotatef(rot, 0, 1f, 0);
+		matrixStackIn.push();
+		matrixStackIn.translate(pos.x, pos.y, pos.z);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
 		
-		GlStateManager.scalef(scale, scale, scale);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		matrixStackIn.scale(scale, scale, scale);
+//		GlStateManager.enableBlend();
+//		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//		GlStateManager.disableLighting();
+//		GlStateManager.enableAlphaTest();
+//		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 		RenderHelper.enableStandardItemLighting();
 		
-		RenderFuncs.ItemRenderer(stack);
+		RenderFuncs.ItemRenderer(stack, matrixStackIn);
 		
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 		
 		if (NostrumMagica.rand.nextBoolean()
 				&& NostrumMagica.rand.nextBoolean()) {
@@ -152,29 +150,28 @@ public class ClientEffectRitual extends ClientEffect {
 		}
 	}
 	
-	protected void drawCandleTrail(Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nullable ReagentType type) {
+	protected void drawCandleTrail(MatrixStack matrixStackIn, Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nullable ReagentType type) {
 		
 		if (type != null) {
 			final float scale = .75f;
 			final float rotPeriod = .5f;
 			final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
 			
-			GlStateManager.pushMatrix();
-			GlStateManager.translated(pos.x, pos.y, pos.z);
-			GlStateManager.rotatef(rot, 0, 1f, 0);
+			matrixStackIn.push();
+			matrixStackIn.translate(pos.x, pos.y, pos.z);
+			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
 			
-			GlStateManager.scalef(scale, scale, scale);
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			GlStateManager.disableLighting();
-			GlStateManager.enableAlphaTest();
-			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+			matrixStackIn.scale(scale, scale, scale);
+//			GlStateManager.enableBlend();
+//			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//			GlStateManager.disableLighting();
+//			GlStateManager.enableAlphaTest();
+//			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderHelper.enableStandardItemLighting();
 			
-			RenderFuncs.ItemRenderer(getReagentItem(type));
-			// TODO 1.14 check
+			RenderFuncs.ItemRenderer(getReagentItem(type), matrixStackIn);
 			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 		
 		if (
@@ -185,20 +182,17 @@ public class ClientEffectRitual extends ClientEffect {
 					1, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 45, 15,
 					new Vector3d(0, -.02, 0), null
 					)).color(.4f, .3f, .2f, .4f));
-			
-			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-			//Vector3d velocity, boolean unused
 		}
 	}
 	
-	protected void drawRevealCloud(Minecraft mc, float adjProgress, float partialTicks, Vector3d pos) {
+	protected void drawRevealCloud(MatrixStack matrixStackIn, Minecraft mc, float adjProgress, float partialTicks, Vector3d pos) {
 		NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
 				10, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 40, 20,
 				Vector3d.ZERO, new Vector3d(.1, .1, .1)
 				)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 	}
 	
-	protected void drawPhase1(ClientEffectRenderDetail detail, Minecraft mc, float adjProgress, float partialTicks) {
+	protected void drawPhase1(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float adjProgress, float partialTicks) {
 		// For tier 2 or tier 3 rituals:
 		// Reagents don't render but instead make a trail of smoke that comes in to the center (in a circle?)
 		// Center item slowly raises and sparkles
@@ -207,7 +201,7 @@ public class ClientEffectRitual extends ClientEffect {
 			//Center item
 			{
 				final double yDiff = (adjProgress * .5);
-				drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(0, yDiff + .35, 0), center);
+				drawFloatingItem(matrixStackIn, mc, adjProgress, partialTicks, new Vector3d(0, yDiff + .35, 0), center);
 			}
 			
 			// Extras
@@ -240,7 +234,7 @@ public class ClientEffectRitual extends ClientEffect {
 					final double x = Math.cos(angle) * dist;
 					final double z = Math.sin(angle) * dist;
 					
-					drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(
+					drawFloatingItem(matrixStackIn, mc, adjProgress, partialTicks, new Vector3d(
 							x,
 							y,
 							z
@@ -276,7 +270,7 @@ public class ClientEffectRitual extends ClientEffect {
 					final double x = Math.cos(angle) * dist;
 					final double z = Math.sin(angle) * dist;
 					
-					drawCandleTrail(mc, adjProgress, partialTicks, new Vector3d(x, y, z), type);
+					drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, new Vector3d(x, y, z), type);
 //					drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(
 //							x,
 //							y,
@@ -326,23 +320,23 @@ public class ClientEffectRitual extends ClientEffect {
 						hDist * 2,
 						hDist * Math.sin(rotYawRad + (i * RadDiff))
 						);
-				drawCandleTrail(mc, adjProgress, partialTicks, pos, null);
+				drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, pos, null);
 			}
 		}
 	}
 	
-	protected void drawPhase2(ClientEffectRenderDetail detail, Minecraft mc, float adjProgress, float partialTicks) {
+	protected void drawPhase2(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float adjProgress, float partialTicks) {
 		// For tier 2 and tier 3 rituals:
 		// 
 		if (center != null && !center.isEmpty()) {
 			// If item output, draw that and lower it to the platform
 			if (this.output != null && !this.output.isEmpty()) {
 				final double yDiff = ((1.0-adjProgress) * .65);
-				drawFloatingItem(mc, adjProgress/4f, partialTicks, new Vector3d(0, yDiff + .2, 0), output);
+				drawFloatingItem(matrixStackIn, mc, adjProgress/4f, partialTicks, new Vector3d(0, yDiff + .2, 0), output);
 			}
 			// Else cause an explosion of particles that just move outward
 			else {
-				drawRevealCloud(mc, adjProgress, partialTicks, new Vector3d(0, 1.15, 0));
+				drawRevealCloud(matrixStackIn, mc, adjProgress, partialTicks, new Vector3d(0, 1.15, 0));
 			}
 			
 			// Ambient particles
@@ -375,26 +369,26 @@ public class ClientEffectRitual extends ClientEffect {
 						hDist * 2,
 						hDist * Math.sin(rotYawRad + (i * RadDiff))
 						);
-				drawCandleTrail(mc, adjProgress, partialTicks, pos, null);
+				drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, pos, null);
 			}
 			if (adjProgress > .5f) {
-				drawRevealCloud(mc, adjProgress, partialTicks, Vector3d.ZERO);
+				drawRevealCloud(matrixStackIn, mc, adjProgress, partialTicks, Vector3d.ZERO);
 			}
 		}
 	}
 	
 	@Override
-	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 			for (ClientEffectModifier mod : modifiers) {
-				mod.apply(detail, progress, partialTicks);
+				mod.apply(matrixStackIn, detail, progress, partialTicks);
 			}
 		
 		// Draw items, if there, or smoke from reagents, and old center until it's 'done' (.90) and then reveal result.
 		if (progress < .8f) {
-			drawPhase1(detail, mc, progress/.8f, partialTicks);
+			drawPhase1(matrixStackIn, detail, mc, progress/.8f, partialTicks);
 		} else {
-			drawPhase2(detail, mc, (progress-.8f)/.2f, partialTicks);
+			drawPhase2(matrixStackIn, detail, mc, (progress-.8f)/.2f, partialTicks);
 		}
 	}
 

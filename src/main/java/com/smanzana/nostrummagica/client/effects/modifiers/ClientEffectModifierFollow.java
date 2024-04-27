@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.client.effects.modifiers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,13 +18,13 @@ public class ClientEffectModifierFollow implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void apply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void earlyApply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		Vector3d pos = entity.getEyePosition(partialTicks).subtract(0, entity.getEyeHeight(), 0);
-		GlStateManager.translated(pos.x, pos.y, pos.z);
+		matrixStackIn.translate(pos.x, pos.y, pos.z);
 	}
 }

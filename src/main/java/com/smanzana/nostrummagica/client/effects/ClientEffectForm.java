@@ -1,29 +1,30 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public interface ClientEffectForm {
 	
-	public static void drawModel(IBakedModel model, int color) {
-		GlStateManager.disableBlend();
-		//GlStateManager.disableAlphaTest();
-		GlStateManager.disableTexture();
-		GlStateManager.enableBlend();
-		//GlStateManager.enableAlphaTest();
-		GlStateManager.enableTexture();
-		//GlStateManager.depthMask(false);
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
-		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+	public static void drawModel(MatrixStack matrixStackIn, IBakedModel model, int color, int packedLightIn) {
+//		GlStateManager.disableBlend();
+//		//GlStateManager.disableAlphaTest();
+//		GlStateManager.disableTexture();
+//		GlStateManager.enableBlend();
+//		//GlStateManager.enableAlphaTest();
+//		GlStateManager.enableTexture();
+//		//GlStateManager.depthMask(false);
+//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
+//		Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
 //		{
 //			List<BakedQuad> listQuads = model.getQuads(null, null, 0);
@@ -46,11 +47,24 @@ public interface ClientEffectForm {
 //			}
 //		}
 		{
-			RenderFuncs.RenderModelWithColor(model, color);
+			RenderFuncs.RenderModelWithColorNoBatch(matrixStackIn, model, color, packedLightIn);
 		}
 		//GlStateManager.depthMask(true);
 	}
+	
+	public static int InferLightmap(MatrixStack matrixStackIn, Minecraft mc) {
+		if (mc.world != null) {
+			// Get position from final transform on matrix stack
+			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Vector4f origin = new Vector4f(1, 1, 1, 1); // I think this is right...
+			origin.transform(transform);
+			final BlockPos pos = new BlockPos(origin.getX(), origin.getY(), origin.getZ());
+			return WorldRenderer.getCombinedLight(mc.world, pos);
+		} else {
+			return 0; // Same default as particle
+		}
+	}
 
-	public void draw(Minecraft mc, float partialTicks, int color);
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color);
 	
 }

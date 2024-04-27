@@ -4,7 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
+
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -34,7 +35,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		}
 		
 		@Override
-		public void draw(Minecraft mc, float partialTicks, int color) {
+		public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 			
 			final IBakedModel model;
 			if (cloudy) {
@@ -51,29 +52,30 @@ public class ClientEffectMajorSphere extends ClientEffect {
 				model = MODEL_SCALY;
 			}
 			
-			GlStateManager.disableBlend();
-			GlStateManager.enableBlend();
-			GlStateManager.disableAlphaTest();
-			GlStateManager.enableAlphaTest();
-			GlStateManager.disableTexture();
-			GlStateManager.enableTexture();
-			GlStateManager.color4f(0f, 0f, 0f, 0f);
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
+//			GlStateManager.disableBlend();
+//			GlStateManager.enableBlend();
+//			GlStateManager.disableAlphaTest();
+//			GlStateManager.enableAlphaTest();
+//			GlStateManager.disableTexture();
+//			GlStateManager.enableTexture();
+//			GlStateManager.color4f(0f, 0f, 0f, 0f);
+//			GlStateManager.color4f(1f, 1f, 1f, 1f);
 			Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+			final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 			
 			// outside
-			GlStateManager.pushMatrix();
-			GlStateManager.scalef(scale * 2, scale * 2, scale * 2); // input scale is 'blocks radius' vs model is default to .5 blocks.
-			ClientEffectForm.drawModel(model, color);
-			GlStateManager.popMatrix();
+			matrixStackIn.push();
+			matrixStackIn.scale(scale * 2, scale * 2, scale * 2); // input scale is 'blocks radius' vs model is default to .5 blocks.
+			ClientEffectForm.drawModel(matrixStackIn, model, color, light);
+			matrixStackIn.pop();
 			
 			// inside
-			GlStateManager.pushMatrix();
-			GlStateManager.scalef(scale * -2, scale * -2, scale * -2); // input scale is 'blocks radius' vs model is default to .5 blocks.
-			ClientEffectForm.drawModel(model, color);
-			GlStateManager.popMatrix();
+			matrixStackIn.push();
+			matrixStackIn.scale(scale * -2, scale * -2, scale * -2); // input scale is 'blocks radius' vs model is default to .5 blocks.
+			ClientEffectForm.drawModel(matrixStackIn, model, color, light);
+			matrixStackIn.pop();
 			
-			GlStateManager.disableBlend();
+//			GlStateManager.disableBlend();
 			
 		}
 		

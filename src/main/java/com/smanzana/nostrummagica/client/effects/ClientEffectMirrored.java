@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -15,16 +17,16 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ClientEffectMirrored extends ClientEffect {
 
 	private int count;
-	private Vector3d eulers;
+	private Vector3f eulers;
 	
 	// Nice cached math
 	private float dAngle;
 	
 	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, int ticks, int count) {
-		this(origin, form, ticks, count, new Vector3d(0.0, 1.0, 0.0));
+		this(origin, form, ticks, count, new Vector3f(0, 1, 0));
 	}
 	
-	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, int ticks, int count, Vector3d angles) {
+	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, int ticks, int count, Vector3f angles) {
 		super(origin, form, ticks);
 		this.count = count;
 		this.dAngle = (float) (360f) / (float) count;
@@ -32,10 +34,10 @@ public class ClientEffectMirrored extends ClientEffect {
 	}
 	
 	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, long ms, int count) {
-		this(origin, form, ms, count, new Vector3d(0, 1, 0));
+		this(origin, form, ms, count, new Vector3f(0, 1, 0));
 	}
 	
-	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, long ms, int count, Vector3d angles) {
+	public ClientEffectMirrored(Vector3d origin, ClientEffectForm form, long ms, int count, Vector3f angles) {
 		super(origin, form, ms);
 		this.count = count;
 		this.dAngle = (float) (360f) / (float) count;
@@ -43,7 +45,7 @@ public class ClientEffectMirrored extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		for (int i = 0; i < this.count; i++) {
 			ClientEffectRenderDetail newDetail = new ClientEffectRenderDetail();
 			newDetail.alpha = detail.alpha;
@@ -51,10 +53,10 @@ public class ClientEffectMirrored extends ClientEffect {
 			newDetail.green = detail.green;
 			newDetail.blue = detail.blue;
 			
-			GlStateManager.pushMatrix();
-			GlStateManager.rotatef(dAngle * (float) i, (float) eulers.x, (float) eulers.y, (float) eulers.z);
-			super.drawForm(newDetail, mc, progress, partialTicks);
-			GlStateManager.popMatrix();
+			matrixStackIn.push();
+			matrixStackIn.rotate(this.eulers.rotationDegrees(dAngle * (float) i));
+			super.drawForm(matrixStackIn, newDetail, mc, progress, partialTicks);
+			matrixStackIn.pop();
 		}
 		
 	}

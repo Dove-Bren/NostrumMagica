@@ -1,16 +1,15 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 
 /**
  * Effect made up of multiple copies of another effect
@@ -28,19 +27,19 @@ public class ClientEffectBeam extends ClientEffect {
 		}
 		
 		@Override
-		public void draw(Minecraft mc, float partialTicks, int color) {
+		public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 			final int detailCount = Minecraft.isFancyGraphicsEnabled()
 					? 20
 					: 3;
 			final float alphaMax = .15f;
 			Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-			GlStateManager.disableBlend();
-			GlStateManager.disableAlphaTest();
-			GlStateManager.enableBlend();
-			GlStateManager.enableAlphaTest();
-			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			GlStateManager.enableTexture();
-			GlStateManager.disableTexture();
+//			GlStateManager.disableBlend();
+//			GlStateManager.disableAlphaTest();
+//			GlStateManager.enableBlend();
+//			GlStateManager.enableAlphaTest();
+//			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//			GlStateManager.enableTexture();
+//			GlStateManager.disableTexture(); // !!!!!!!
 			for (int i = 0; i < detailCount; i++) {
 				float frac = (float) i / (float) detailCount;
 				float alpha = alphaMax;
@@ -56,42 +55,41 @@ public class ClientEffectBeam extends ClientEffect {
 				IBakedModel model = renderer.getBlockModelShapes().getModelManager()
 						.getModel(new ModelResourceLocation(
 						NostrumMagica.MODID + ":effects/cyl", "normal"));
-				GlStateManager.pushMatrix();
+				matrixStackIn.push();
 				
 				//GlStateManager.translatef(mc.thePlayer.getPosX(), mc.thePlayer.getPosY(), mc.thePlayer.getPosZ());
 				// Model is length 1 and points y+
-				double len = end.length();
+				float len = (float) end.length();
 				Vector3d norm = end.normalize();
 				double xzdist = Math.min(1.0, Math.max(-1.0, Math.sqrt(norm.x * norm.x + norm.z * norm.z)));
 				float angle = (float) (Math.asin(xzdist) / (2.0 * Math.PI));
 				float x = (float) (Math.asin(norm.x) / (2.0 * Math.PI));
 				float z = (float) (Math.asin(norm.z) / (2.0 * Math.PI));
-				GlStateManager.rotatef((norm.y > 0 ? 1 : -1f) * 360f * angle, z, 0, -x);
+				matrixStackIn.rotate(new Vector3f(z, 0, -x).rotationDegrees((norm.y > 0 ? 1 : -1f) * 360f * angle));
 				if (norm.y < 0) {
-					GlStateManager.rotatef(180f, 1, 0, 1);
+					matrixStackIn.rotate(new Vector3f(1, 0, 1).rotationDegrees(180f));
 				}
-				GlStateManager.scaled(.2 * radius, len, .2 * radius);
+				matrixStackIn.scale(.2f * radius, len, .2f * radius);
 
 				// Model is centered on 0. Shift
-				GlStateManager.translatef(0f, .5f, 0f);
+				matrixStackIn.translate(0f, .5f, 0f);
 				
 				// Avoid z fighting by shifting up just a tiiiiiiny but
-				GlStateManager.translatef(0f, (float) -i / 10000f, 0f);
+				matrixStackIn.translate(0f, (float) -i / 10000f, 0f);
 
 				int newcolor =   ((int) (red * 255) << 16)
 						| ((int) (green * 255) << 8)
 						| ((int) (blue * 255) << 0)
 						| ((int) (alpha * 255) << 24);
 				
-				ClientEffectForm.drawModel(model, newcolor);
+				final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
+				ClientEffectForm.drawModel(matrixStackIn, model, newcolor, light);
 				
-				//GlStateManager.color4f(.5f, 0f, 0f, .5f); // WHY DOESNT THIS WORK??
-				//draw(model.getQuads(null, null, 0), color);
-				GlStateManager.popMatrix();
+				matrixStackIn.pop();
 				
 			}
-			GlStateManager.enableTexture();
-			GlStateManager.disableBlend();
+//			GlStateManager.enableTexture();
+//			GlStateManager.disableBlend();
 		}
 		
 	}

@@ -2,13 +2,14 @@ package com.smanzana.nostrummagica.client.effects;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
@@ -39,37 +40,32 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int color) {
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 		final float blue = (float) (color & 0xFF) / 255f;
 		final float green = (float) ((color >>> 8) & 0xFF) / 255f;
 		final float red = (float) ((color >>> 16) & 0xFF) / 255f;
 		final float alpha = (float) ((color >>> 24) & 0xFF) / 255f;
 		
-		final double x = 0;
-		final double y = 0;
-		final double z = 0;
+		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		
 		
 		mc.getTextureManager().bindTexture(texture);
+		matrixStackIn.push();
 		
 		if (this.offset != null) {
-			GlStateManager.translated(offset.x, offset.y, offset.z);
+			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
-		
-		GlStateManager.enableBlend();
-		GlStateManager.disableCull();
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
 		
-		RenderFuncs.renderSpaceQuad(buffer, x, y, z,
+		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer,
 				-1,
-				red, green, blue, alpha);
+				light, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		
 		tessellator.draw();
 		
-		GlStateManager.enableCull();
-		GlStateManager.disableBlend();
+		matrixStackIn.pop();
 	}
 }

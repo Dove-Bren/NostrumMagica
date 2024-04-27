@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.client.effects.modifiers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -27,25 +27,24 @@ public class ClientEffectModifierMove implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void apply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (progress < this.startTime) {
-			GlStateManager.translated(startPos.x, startPos.y, startPos.z);
+			matrixStackIn.translate(startPos.x, startPos.y, startPos.z);
 		} else if (progress < this.endTime) {
 			// Stage 1
 			final float frac = (progress - startTime) / (endTime - startTime);
-			GlStateManager.translated(
+			matrixStackIn.translate(
 					startPos.x + frac * (endPos.x - startPos.x),
 					startPos.y + frac * (endPos.y - startPos.y),
 					startPos.z + frac * (endPos.z - startPos.z)
 					);
 		} else {
-			GlStateManager.translated(endPos.x, endPos.y, endPos.z);
-			
+			matrixStackIn.translate(endPos.x, endPos.y, endPos.z);
 		}
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void earlyApply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 

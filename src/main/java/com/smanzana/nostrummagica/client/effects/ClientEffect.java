@@ -5,10 +5,11 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -65,7 +66,7 @@ public class ClientEffect {
 		return this;
 	}
 	
-	public boolean displayTick(Minecraft mc, float partialTicks) {
+	public boolean displayTick(Minecraft mc, MatrixStack matrixStackIn, float partialTicks) {
 		long sysTime = System.currentTimeMillis();
 		if (startTime == 0)
 			startTime = sysTime;
@@ -79,44 +80,58 @@ public class ClientEffect {
 				: (float) (((double) existedMS + (partialTicks * (1000 / 20))) / (double) durationMS);
 		
 		
-		GlStateManager.pushMatrix();
+		matrixStackIn.push();
 		
 		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
 		detail.alpha = detail.red = detail.green = detail.blue = 1f;
 		
-		preModHook(detail, progress, partialTicks);
+		preModHook(matrixStackIn, detail, progress, partialTicks);
 		
-		GlStateManager.disableBlend();
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableBlend();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		drawForm(detail, mc, progress, partialTicks);
-		GlStateManager.enableBlend();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.enableColorMaterial();
+		setupRenderState();
+		drawForm(matrixStackIn, detail, mc, progress, partialTicks);
+		teardownRenderState();
 		
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 		return progress < 1f;
 	}
 	
-	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void setupRenderState() {
+		RenderSystem.enableBlend();
+		RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.disableLighting();
+	}
+	
+	protected void teardownRenderState() {
+		RenderSystem.disableBlend();
+		RenderSystem.defaultAlphaFunc();
+		RenderSystem.depthMask(true);
+		RenderSystem.depthFunc(GL11.GL_LEQUAL); // ???
+		
+		// RenderManager has:
+//		RenderSystem.depthMask(true);
+//		RenderSystem.depthFunc(515);
+//		RenderSystem.disableBlend();
+//		RenderSystem.defaultAlphaFunc();
+//		lightTextureIn.disableLightmap();
+//		RenderSystem.disableFog();
+	}
+	
+	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
-			mod.apply(detail, progress, partialTicks);
+			mod.apply(matrixStackIn, detail, progress, partialTicks);
 		}
 		
-		form.draw(mc, partialTicks, detail.getColor());
+		form.draw(matrixStackIn, mc, partialTicks, detail.getColor());
 	}
 	
-	protected void preModHook(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	protected void preModHook(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
-			mod.earlyApply(detail, progress, partialTicks);
+			mod.earlyApply(matrixStackIn, detail, progress, partialTicks);
 		}
-		GlStateManager.translated(origin.x, origin.y, origin.z);
+		matrixStackIn.translate(origin.x, origin.y, origin.z);
 	}
 	
 	public void onStart() {

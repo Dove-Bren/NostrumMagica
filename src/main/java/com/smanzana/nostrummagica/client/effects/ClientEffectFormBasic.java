@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -41,13 +41,12 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int color) {
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 		if (this.offset != null) {
-			GlStateManager.translated(offset.x, offset.y, offset.z);
+			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
 		
-		GlStateManager.enableBlend();
-		ClientEffectForm.drawModel(model, color);
-		GlStateManager.disableBlend();
+		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
+		ClientEffectForm.drawModel(matrixStackIn, model, color, light);
 	}
 }

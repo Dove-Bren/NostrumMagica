@@ -7,19 +7,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Displays effects in the world
@@ -76,25 +76,26 @@ public class ClientEffectRenderer {
 			return;
 		}
 		
-		GlStateManager.pushMatrix();
+		MatrixStack stack = new MatrixStack();
 		Minecraft mc = Minecraft.getInstance();
 		
-		Vector3d playerOffset = mc.player.getEyePosition(event.getPartialTicks());
-		//Vector3d playerOffset = mc.thePlayer.getPositionVec();
-		GlStateManager.translated(-playerOffset.x, -playerOffset.y, -playerOffset.z);
+		// Set up render space. Effects want to render at absolute world positions,
+		// so don't actually offset at all
+//		Vector3d playerOffset = mc.player.getEyePosition(event.getPartialTicks());
+//		//Vector3d playerOffset = mc.thePlayer.getPositionVec();
+//		stack.translate(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		
 		synchronized(activeEffects) {
 			Iterator<ClientEffect> it = activeEffects.iterator();
 			while (it.hasNext()) {
 				ClientEffect ef = it.next();
-				if (!ef.displayTick(mc, event.getPartialTicks())) {
+				if (!ef.displayTick(mc, stack, event.getPartialTicks())) {
 					ef.onEnd();
 					it.remove();
 				}
 			}
 		}
 		
-		GlStateManager.popMatrix();
 	}
 	
 	public void registerEffect(SpellComponentWrapper component, ClientEffectFactory factory) {

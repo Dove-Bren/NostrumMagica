@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.client.effects.modifiers;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,23 +30,23 @@ public class ClientEffectModifierGrow implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void apply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (progress < this.plateau) {
 			// Stage 1
 			final float frac = progress / plateau;
 			final float scale = startScale + ((endScale - startScale) * frac);
 			final float alpha = startAlpha + ((endAlpha - startAlpha) * frac);
-			GlStateManager.scalef(scale, scale, scale);
+			matrixStackIn.scale(scale, scale, scale);
 			detail.alpha *= alpha;
 		} else {
-			GlStateManager.scalef(endScale, endScale, endScale);
+			matrixStackIn.scale(endScale, endScale, endScale);
 			detail.alpha *= endAlpha;
 			
 		}
 	}
 
 	@Override
-	public void earlyApply(ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void earlyApply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 

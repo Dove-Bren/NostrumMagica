@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.util.math.vector.Vector3d;
 
 /**
@@ -32,7 +32,7 @@ public class ClientEffectEchoed extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		// Span is centered on actual progress.
 		// So at start and at end there will be part chopped off
 		// Calculate that part now and ignore in loop
@@ -50,14 +50,14 @@ public class ClientEffectEchoed extends ClientEffect {
 			
 			float diff = (float) (i - center) * progDiff;
 			
-			GlStateManager.pushMatrix();
+			matrixStackIn.push();
 			if (!this.modifiers.isEmpty())
 				for (ClientEffectModifier mod : modifiers) {
-					mod.apply(newDetail, progress + diff, partialTicks);
+					mod.apply(matrixStackIn, newDetail, progress + diff, partialTicks);
 				}
 			
-			effect.drawForm(newDetail, mc, progress + diff, partialTicks);
-			GlStateManager.popMatrix();
+			effect.drawForm(matrixStackIn, newDetail, mc, progress + diff, partialTicks);
+			matrixStackIn.pop();
 		}
 		
 	}

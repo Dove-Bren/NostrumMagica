@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -55,10 +56,10 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 			for (ClientEffectModifier mod : modifiers) {
-				mod.apply(detail, progress, partialTicks);
+				mod.apply(matrixStackIn, detail, progress, partialTicks);
 			}
 		
 		if (this.entity.isAlive()) {

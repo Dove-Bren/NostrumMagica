@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.effects;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
@@ -72,7 +73,7 @@ public class ClientEffectAnimated extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		// Figure out which frame we're on.
 		// I'm tempted to make this keep a little local int so we don't have to scan through each time, but am also interested
 		// in keeping 'progress' absolute. Maybe a little int of the last index AND the last float progress we cached off of?
@@ -84,10 +85,10 @@ public class ClientEffectAnimated extends ClientEffect {
 		
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
-			mod.apply(detail, progress, partialTicks);
+			mod.apply(matrixStackIn, detail, progress, partialTicks);
 		}
 		
-		frame.effect.drawForm(detail, mc, partialTicks, detail.getColor());
+		frame.effect.drawForm(matrixStackIn, detail, mc, partialTicks, detail.getColor());
 	}
 	
 }
