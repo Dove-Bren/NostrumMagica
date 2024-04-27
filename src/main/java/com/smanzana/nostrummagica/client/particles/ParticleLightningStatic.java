@@ -1,18 +1,21 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
 
 public class ParticleLightningStatic extends BatchRenderParticle {
 	
@@ -37,7 +40,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	protected int type;
 	protected int ticksExisted;
 	
-	public ParticleLightningStatic(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleLightningStatic(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		particleRed = red;
@@ -116,18 +119,21 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 
 	@Override
-	public void setupRender() {
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.enableLighting();
-		GlStateManager.disableLighting();
-		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.color4f(1f, 1f, 1f, .75f);
-		GlStateManager.depthMask(false);
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+	public void setupBatchedRender() {
+		RenderSystem.depthMask(false);
+		RenderSystem.enableBlend();
+		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
+		RenderSystem.disableLighting();
+		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
+		
+	}
+	
+	@Override
+	public void teardownBatchedRender() {
+		RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
+		RenderSystem.disableBlend();
+		RenderSystem.depthMask(true);
 	}
 	
 	@Override
@@ -143,8 +149,8 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(BufferBuilder buffer, float partialTicks) {
-		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
+	public void renderBatched(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+		BatchRenderParticle.RenderQuad(buffer, this, renderInfo, partialTicks, .05f);
 	}
 	
 	@Override
@@ -179,7 +185,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	public static final class Factory implements INostrumParticleFactory<ParticleLightningStatic> {
 
 		@Override
-		public ParticleLightningStatic createParticle(World world, SpawnParams params) {
+		public ParticleLightningStatic createParticle(ClientWorld world, SpawnParams params) {
 			ParticleLightningStatic particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;

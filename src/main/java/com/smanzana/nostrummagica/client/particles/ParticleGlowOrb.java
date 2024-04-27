@@ -1,19 +1,22 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
 
 public class ParticleGlowOrb extends BatchRenderParticle {
 	
@@ -27,7 +30,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	protected float orbitRadius;
 	private float fixedRandom; // Only generated when needed, hopefully. -1 means not generated
 	
-	public ParticleGlowOrb(World worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleGlowOrb(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		particleRed = red;
@@ -111,18 +114,21 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	}
 
 	@Override
-	public void setupRender() {
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableAlphaTest();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.enableLighting();
-		GlStateManager.disableLighting();
-		GlStateManager.alphaFunc(516, 0);
-		GlStateManager.color4f(1f, 1f, 1f, .75f);
-		GlStateManager.depthMask(false);
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+	public void setupBatchedRender() {
+		RenderSystem.depthMask(false);
+		RenderSystem.enableBlend();
+		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
+		RenderSystem.disableLighting();
+		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
+		
+	}
+	
+	@Override
+	public void teardownBatchedRender() {
+		RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
+		RenderSystem.disableBlend();
+		RenderSystem.depthMask(true);
 	}
 	
 	@Override
@@ -136,9 +142,9 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(BufferBuilder buffer, float partialTicks) {
-		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .1f);
-		BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
+	public void renderBatched(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+		BatchRenderParticle.RenderQuad(buffer, this, renderInfo, partialTicks, .1f);
+		BatchRenderParticle.RenderQuad(buffer, this, renderInfo, partialTicks, .05f);
 	}
 	
 	@Override
@@ -223,7 +229,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	public static final class Factory implements INostrumParticleFactory<ParticleGlowOrb> {
 
 		@Override
-		public ParticleGlowOrb createParticle(World world, SpawnParams params) {
+		public ParticleGlowOrb createParticle(ClientWorld world, SpawnParams params) {
 			ParticleGlowOrb particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;

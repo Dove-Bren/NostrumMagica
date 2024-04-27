@@ -1,34 +1,36 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.util.math.vector.Vector3d;
 
 public abstract class BatchRenderParticle extends Particle implements Comparable<BatchRenderParticle> {
 
-	protected final RenderParams renderParams;
+	private int unused; // Remove this whole class and replace with one of the other IParticleRenderTypes (sprite one?)
 	
-	public BatchRenderParticle(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
+	public BatchRenderParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 			double ySpeedIn, double zSpeedIn) {
 		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-		this.renderParams = new RenderParams();
 	}
 	
-	public BatchRenderParticle(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn) {
+	public BatchRenderParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn) {
 		super(worldIn, xCoordIn, yCoordIn, zCoordIn);
-		this.renderParams = new RenderParams();
 	}
 
 	/**
 	 * Render to the provided vertex buffer in a nice cached manner.
 	 * Note: rotation should be saved from original render call
+	 * @param renderInfo TODO
 	 */
-	public abstract void renderBatched(BufferBuilder wr, float partialTicks);
+	public abstract void renderBatched(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks);
 	
 	/**
 	 * Return the texture to use when rendering this particle
@@ -42,7 +44,14 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	 * Note: only called and used once every time the compare function with the last
 	 * particle returns non-zero. Not intended to be unique texture per _instance_ of a particle.
 	 */
-	public abstract void setupRender();
+	public abstract void setupBatchedRender();
+	
+	/**
+	 * Tear down the GL stack to render this type of particle after all of this type have been rendered.
+	 * Note: only called and used once every time the compare function with the last
+	 * particle returns non-zero. Not intended to be unique texture per _instance_ of a particle.
+	 */
+	public abstract void teardownBatchedRender();
 	
 	/**
 	 * Check if two particles have the same texture and render setup.
@@ -56,18 +65,18 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	public abstract int compareTo(BatchRenderParticle o);
 	
 	@Override
-	public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
 		
 		// Just don't render if too far away
 		final double maxDistSQ = 60 * 60;
-		if (entityIn.getProjectedView().squareDistanceTo(posX, posY, posZ) < maxDistSQ) {
-			renderParams.rotX = rotationX;
-			renderParams.rotXZ = rotationXZ;
-			renderParams.rotZ = rotationZ;
-			renderParams.rotYZ = rotationYZ;
-			renderParams.rotXY = rotationXY;
-			
-			ParticleBatchRenderer.instance().queueParticle(this);
+		if (renderInfo.getProjectedView().squareDistanceTo(posX, posY, posZ) < maxDistSQ) {
+//			renderParams.rotX = rotationX;
+//			renderParams.rotXZ = rotationXZ;
+//			renderParams.rotZ = rotationZ;
+//			renderParams.rotYZ = rotationYZ;
+//			renderParams.rotXY = rotationXY;
+//			
+//			ParticleBatchRenderer.instance().queueParticle(this);
 		}
 	}
 	
@@ -76,29 +85,30 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		return IParticleRenderType.CUSTOM;
 	}
 	
-	/**
-	 * Utility class for particles to stash their render params
-	 */
-	public static final class RenderParams {
-		public float rotX;
-		public float rotXZ;
-		public float rotZ;
-		public float rotYZ;
-		public float rotXY;
+	public double getPosX() {
+		return this.posX;
 	}
 	
-	public static void RenderQuad(BufferBuilder buffer, BatchRenderParticle particle, RenderParams params, float partialTicks, float scale) {
-		final float offsetX = (float)(particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks - Particle.interpPosX);
-		final float offsetY = (float)(particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks - Particle.interpPosY);
-		final float offsetZ = (float)(particle.prevPosZ + (particle.getPosZ() - particle.prevPosZ) * partialTicks - Particle.interpPosZ);
-		final float rX = params.rotX;
-		final float rXZ = params.rotXZ;
-		final float rZ = params.rotZ;
-		final float rYZ = params.rotYZ;
-		final float rXY = params.rotXY;
+	public double getPosY() {
+		return this.posY;
+	}
+	
+	public double getPosZ() {
+		return this.posZ;
+	}
+	
+	public static void RenderQuad(IVertexBuilder buffer, BatchRenderParticle particle, ActiveRenderInfo renderInfo, float partialTicks, float scale) {
+		Vector3d originPos = renderInfo.getProjectedView();
+		final float offsetX = (float)(particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks - originPos.getX()); // could use MathHelper.lerp
+		final float offsetY = (float)(particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks - originPos.getY());
+		final float offsetZ = (float)(particle.prevPosZ + (particle.getPosZ() - particle.prevPosZ) * partialTicks - originPos.getZ());
 		final float radius = /*particle.particleScale*/1 * scale;
+		final int lightmap = particle.getBrightnessForRender(partialTicks);
 		
-		RenderFuncs.renderSpaceQuad(buffer, offsetX, offsetY, offsetZ, rX, rXZ, rZ, rYZ, rXY, radius, particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha);
+		final MatrixStack stack = new MatrixStack();
+		stack.translate(offsetX, offsetY, offsetZ);
+		
+		RenderFuncs.renderSpaceQuadFacingCamera(stack, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha);
 		
 //		buffer.pos(offsetX - (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ - (rYZ * radius) - (rXZ * radius))
 //			.tex(0, 0)

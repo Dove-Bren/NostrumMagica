@@ -7,8 +7,8 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -47,39 +47,43 @@ public class ParticleBatchRenderer {
 		if (!batch.isEmpty()) {
 			Collections.sort(batch);
 			BatchRenderParticle last = null;
+			final Minecraft mc = Minecraft.getInstance();
+			final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
 			
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder buffer = tessellator.getBuffer();
-			
-			GlStateManager.pushLightingAttributes();
 			
 			for (BatchRenderParticle next : batch) {
 				if (last == null || next.compareTo(last) != 0) {
 					
 					if (last != null) {
 						tessellator.draw();
+						last.teardownBatchedRender();
 					}
 					
-					Minecraft.getInstance().getTextureManager().bindTexture(next.getTexture());
-					next.setupRender();
-					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+					mc.getTextureManager().bindTexture(next.getTexture());
+					next.setupBatchedRender();
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 				}
 				
-				next.renderBatched(buffer, partialTicks);
+				next.renderBatched(buffer, renderInfo, partialTicks);
 				last = next;
 			}
 			
 			tessellator.draw();
+			if (last != null) {
+				last.teardownBatchedRender();
+			}
 
-			GlStateManager.popAttributes();
-			GlStateManager.depthMask(true);
-			GlStateManager.enableLighting();
-			GlStateManager.disableBlend();
-			GlStateManager.enableAlphaTest();
-			GlStateManager.alphaFunc(516, .1f);
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
-			GlStateManager.enableTexture();
-			GlStateManager.enableColorMaterial();
+//			GlStateManager.popAttributes();
+//			GlStateManager.depthMask(true);
+//			GlStateManager.enableLighting();
+//			GlStateManager.disableBlend();
+//			GlStateManager.enableAlphaTest();
+//			GlStateManager.alphaFunc(516, .1f);
+//			GlStateManager.color4f(1f, 1f, 1f, 1f);
+//			GlStateManager.enableTexture();
+//			GlStateManager.enableColorMaterial();
 			
 			batch.clear();
 		}

@@ -2,12 +2,16 @@ package com.smanzana.nostrummagica.client.particles;
 
 import javax.annotation.Nullable;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.utils.ColorUtil;
+import com.smanzana.nostrummagica.utils.NetUtils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.util.math.vector.Vector3d;
@@ -79,7 +83,7 @@ public enum NostrumParticles {
 	public static void Spawn(NostrumParticles type, World world, SpawnParams params) {
 		if (!world.isRemote) {
 			NetworkHandler.sendToAllAround(new SpawnNostrumParticleMessage(type, params),
-					new TargetPoint(params.spawnX, params.spawnY, params.spawnZ, 50, world.getDimension().getType())
+					new TargetPoint(params.spawnX, params.spawnY, params.spawnZ, 50, world.getDimensionKey())
 					);
 		} else {
 			final Minecraft mc = Minecraft.getInstance();
@@ -87,7 +91,7 @@ public enum NostrumParticles {
 					<  50 * 50) {
 				INostrumParticleFactory<?> factory = type.getFactory();
 				if (factory != null) {
-					factory.createParticle(world, params);
+					factory.createParticle((ClientWorld) world, params);
 				}
 			}
 		}
@@ -99,6 +103,26 @@ public enum NostrumParticles {
 			JOIN, // Fly towards and into the target (ent: x, y + h/2, z, pos: x, y, z)
 			ORBIT, // Fly towards and then orbit the entity (r = w*2 by default for ents, 1 for pos)
 		}
+		
+		public static final Codec<SpawnParams> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.INT.fieldOf("count").forGetter((p) -> p.count),
+				Codec.DOUBLE.fieldOf("spawnX").forGetter((p) -> p.spawnX),
+				Codec.DOUBLE.fieldOf("spawnY").forGetter((p) -> p.spawnY),
+				Codec.DOUBLE.fieldOf("spawnZ").forGetter((p) -> p.spawnZ),
+				Codec.DOUBLE.fieldOf("spawnJitterRadius").forGetter((p) -> p.spawnJitterRadius),
+				Codec.INT.fieldOf("lifetime").forGetter((p) -> p.lifetime),
+				Codec.INT.fieldOf("lifetimeJitter").forGetter((p) -> p.lifetimeJitter),
+				NetUtils.CODEC_VECTOR3D.fieldOf("velocity").forGetter((p) -> p.velocity),
+				NetUtils.CODEC_VECTOR3D.fieldOf("targetPos").forGetter((p) -> p.targetPos),
+				NetUtils.CODEC_VECTOR3D.fieldOf("velocityJitter").forGetter((p) -> p.velocityJitter),
+				Codec.INT.fieldOf("targetEntID").forGetter((p) -> p.targetEntID),
+				Codec.INT.optionalFieldOf("color", 0xFFFFFFFF).forGetter((p) -> p.color),
+				Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieOnTarget),
+				Codec.FLOAT.fieldOf("gravityStrength").forGetter((p) -> p.gravityStrength),
+				Codec.STRING.xmap(s -> TargetBehavior.valueOf(s.toUpperCase()), e -> e.name()).fieldOf("").forGetter((p) -> p.targetBehavior),
+				Codec.FLOAT.fieldOf("orbitRadius").forGetter((p) -> p.orbitRadius)
+			).apply(instance, SpawnParams::UnpackSpawnParams));
+		
 		
 		// Required params
 		public final int count;
@@ -181,6 +205,32 @@ public enum NostrumParticles {
 			this.gravityStrength = 0f;
 			this.orbitRadius = 0f;
 			this.targetBehavior = TargetBehavior.JOIN;
+		}
+		
+		protected static SpawnParams UnpackSpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
+				@Nullable Vector3d velocity, @Nullable Vector3d velocityJitter, @Nullable Vector3d targetPos, int targetEntID,
+				@Nullable Integer color, boolean dieOnTarget, float gravityStrength, TargetBehavior targetBehavior, float orbitRadius
+				) {
+			final SpawnParams params;
+			// For CODEC, prefer velocity, then targetPos, then targetEntID
+			if (velocity != null) {
+				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,
+						velocity, velocityJitter);
+			} else if (targetPos != null) {
+				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,
+						targetPos);
+			} else {
+				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,
+						targetEntID);
+			}
+			
+			params.color = color;
+			params.dieOnTarget = dieOnTarget;
+			params.gravityStrength = gravityStrength;
+			params.targetBehavior = targetBehavior;
+			params.orbitRadius = orbitRadius;
+			
+			return params;
 		}
 		
 		public SpawnParams color(int color) {

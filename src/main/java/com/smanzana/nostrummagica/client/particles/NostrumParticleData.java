@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
@@ -33,6 +35,17 @@ public class NostrumParticleData implements IParticleData {
 		}
 		
 	};
+	
+	public static final Codec<NostrumParticleData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			ResourceLocation.CODEC.fieldOf("particle_type").forGetter((d) -> d.getType().getRegistryName()),
+			SpawnParams.CODEC.fieldOf("params").forGetter(NostrumParticleData::getParams)
+		).apply(instance, NostrumParticleData::Load));
+	
+	@SuppressWarnings("unchecked")
+	private static final NostrumParticleData Load(ResourceLocation name, SpawnParams params) {
+		final ParticleType<?> type = ForgeRegistries.PARTICLE_TYPES.getValue(name);
+		return new NostrumParticleData((ParticleType<NostrumParticleData>) type, params);
+	}
 	
 	private final ParticleType<NostrumParticleData> type;
 	private final SpawnParams params;
