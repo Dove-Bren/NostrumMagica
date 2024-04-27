@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.gui.FontRenderer;
 
 /**
@@ -26,22 +28,22 @@ public class TitlePage implements IBookPage {
 	}
 
 	@Override
-	public void draw(BookScreen parent, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 		if (image == null) {
 			if (hoffset == -1) {
 				int w = fonter.getStringWidth(this.text);
 				hoffset = w/2; 
 			}
-			fonter.drawString(text, xoffset + ( (width / 2) - hoffset ), yoffset + 20, 0xFF106020);
+			fonter.drawString(matrixStackIn, text, xoffset + ( (width / 2) - hoffset ), yoffset + 20, 0xFF106020);
 		} else {
-			image.draw(parent, fonter, xoffset, yoffset, width, height);
+			image.draw(parent, matrixStackIn, fonter, xoffset, yoffset, width, height);
 		}
 	}
 
 	@Override
-	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		if (image != null)
-			image.overlay(parent, fonter, mouseX, mouseY, trueX, trueY);
+			image.overlay(parent, matrixStackIn, fonter, mouseX, mouseY, trueX, trueY);
 	}
 	
 	public String getTitle() {

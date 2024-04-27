@@ -865,7 +865,7 @@ public class ModificationTableGui {
 //								this.width, this.height);
 						
 						GlStateManager.color3f(tint, tint, tint);
-						SpellIcon.get(this.val).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
+						SpellIcon.get(this.val).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
 					}
 				}
 			}

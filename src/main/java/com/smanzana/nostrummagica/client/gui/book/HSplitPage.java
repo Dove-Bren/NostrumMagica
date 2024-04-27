@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -34,7 +35,7 @@ public class HSplitPage implements IClickableBookPage {
 	}
 
 	@Override
-	public void draw(BookScreen parent, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 		heightCache = height;
 		
 		int divideSize = 10; //amount in middle as seperation.
@@ -49,24 +50,24 @@ public class HSplitPage implements IClickableBookPage {
 					yoffset + (subheight + (divideSize / 2)), 0, 0, width, divideSize, TEXT_WIDTH, TEXT_HEIGHT);
 		}
 		
-		top.draw(parent, fonter, xoffset, yoffset, width, subheight);
+		top.draw(parent, matrixStackIn, fonter, xoffset, yoffset, width, subheight);
 		
 		if (bottom != null) {
 			yoffset += (subheight + divideSize); //offset a subheight + divide length down
-			bottom.draw(parent, fonter, xoffset, yoffset, width, subheight);
+			bottom.draw(parent, matrixStackIn, fonter, xoffset, yoffset, width, subheight);
 		}
 	}
 
 	@Override
-	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		int divideSize = 10; //amount in middle as seperation.
 		int subheight = (heightCache - divideSize) / 2;
 		
 		//find out of in top of bottom
 		if (mouseY < subheight) {
-			top.overlay(parent, fonter, mouseX, mouseY, trueX, trueY);
+			top.overlay(parent, matrixStackIn, fonter, mouseX, mouseY, trueX, trueY);
 		} else if (bottom != null && mouseY > subheight + divideSize) {
-			bottom.overlay(parent, fonter, mouseX, mouseY - (subheight + divideSize), trueX, trueY);
+			bottom.overlay(parent, matrixStackIn, fonter, mouseX, mouseY - (subheight + divideSize), trueX, trueY);
 		}
 	}
 

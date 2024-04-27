@@ -3,9 +3,8 @@ package com.smanzana.nostrummagica.client.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -35,16 +34,17 @@ public class SpellIcon {
 		v = TEX_ICON_WIDTH * (index / TEX_HCOUNT);
 	}
 	
-	public void render(Minecraft mc, int x, int y, int width, int height) {
-		GL11.glPushMatrix();
+	public void render(Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height) {
+		matrixStackIn.push();
 
 		Minecraft.getInstance().getTextureManager().bindTexture(TEX);
 		
-		GlStateManager.enableBlend();
-		GlStateManager.enableAlphaTest();
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH);
+		RenderSystem.enableBlend();
+		RenderSystem.enableAlphaTest();
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH,
+				1f, 1f, 1f, 1f);
 		
-		GL11.glPopMatrix();
+		matrixStackIn.pop();
 	}
 	
 	// Make it easy to pool these

@@ -666,7 +666,7 @@ public class OverlayRenderer extends AbstractGui {
 				
 				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				final int drawY = (window.getScaledHeight() - (slideHeight + iconSize) / 2);
-				SpellIcon.get(current.getIconIndex()).render(Minecraft.getInstance(), iconMargin, drawY, iconSize, iconSize);
+				SpellIcon.get(current.getIconIndex()).render(Minecraft.getInstance(), matrixStackIn, iconMargin, drawY, iconSize, iconSize);
 			}
 			
 			// Draw name (and maybe xp)

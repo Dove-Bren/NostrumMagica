@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -37,7 +37,7 @@ public class ItemPage implements IBookPage {
 	}
 	
 	@Override
-	public void draw(BookScreen parent, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 		widthCache = width;
 		heightCache = height;
 		
@@ -50,10 +50,11 @@ public class ItemPage implements IBookPage {
 		displayIndex %= itemImages.length;
 		ItemStack item = itemImages[displayIndex];
 		
-		GlStateManager.pushMatrix();
+		int unused; // uh oh; matrix stack isn't used?
+		matrixStackIn.push();
 		
 		ItemRenderer itemRender = parent.getItemRenderer();
-		GlStateManager.translatef(0.0F, 0.0F, 32.0F);
+		matrixStackIn.translate(0.0F, 0.0F, 32.0F);
         itemRender.zLevel = 200.0F;
         FontRenderer font = null;
         if (!item.isEmpty()) font = item.getItem().getFontRenderer(item);
@@ -61,11 +62,11 @@ public class ItemPage implements IBookPage {
         itemRender.renderItemAndEffectIntoGUI(item, centerx, centery);
         itemRender.zLevel = 0.0F;
 		
-		GlStateManager.popMatrix();
+        matrixStackIn.pop();
 	}
 
 	@Override
-	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		int displayIndex = (int) (System.currentTimeMillis() / 1500);
 		displayIndex %= itemImages.length;
 		ItemStack item = itemImages[displayIndex];
@@ -77,7 +78,7 @@ public class ItemPage implements IBookPage {
 			
 			if (mouseX > x && mouseX < x + 16)
 			if (mouseY > y && mouseY < y + 16)
-				parent.renderTooltip(item, trueX, trueY);
+				parent.renderTooltip(matrixStackIn, item, trueX, trueY);
 		}
 		
 		

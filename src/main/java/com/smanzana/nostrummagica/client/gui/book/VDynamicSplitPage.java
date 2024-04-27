@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.gui.FontRenderer;
 
 public class VDynamicSplitPage implements IBookPage {
@@ -17,21 +19,21 @@ public class VDynamicSplitPage implements IBookPage {
 	}
 
 	@Override
-	public void draw(BookScreen parent, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 		
-		left.draw(parent, fonter, xoffset, yoffset, leftWidth, height);
+		left.draw(parent, matrixStackIn, fonter, xoffset, yoffset, leftWidth, height);
 		
 		xoffset += leftWidth; //move offset to the right
-		right.draw(parent, fonter, xoffset, yoffset, width - leftWidth, height);
+		right.draw(parent, matrixStackIn, fonter, xoffset, yoffset, width - leftWidth, height);
 	}
 
 	@Override
-	public void overlay(BookScreen parent, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		//find out of in left or right
 		if (mouseX < leftWidth) {
-			left.overlay(parent, fonter, mouseX, mouseY, trueX, trueY);
+			left.overlay(parent, matrixStackIn, fonter, mouseX, mouseY, trueX, trueY);
 		} else {
-			right.overlay(parent, fonter, mouseX - leftWidth, mouseY, trueX, trueY);
+			right.overlay(parent, matrixStackIn, fonter, mouseX - leftWidth, mouseY, trueX, trueY);
 		}
 	}
 	

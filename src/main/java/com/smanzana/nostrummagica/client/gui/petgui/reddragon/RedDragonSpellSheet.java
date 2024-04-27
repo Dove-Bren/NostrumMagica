@@ -312,7 +312,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						GlStateManager.color4f(1f, 1f, 1f, alpha);
-						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
 					}
 				}
 			}
@@ -332,7 +332,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						GlStateManager.color4f(1f, 1f, 1f, alpha);
-						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
 					}
 				}
 			}
@@ -352,7 +352,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						GlStateManager.color4f(1f, 1f, 1f, alpha);
-						icon.render(mc, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
 					}
 				}
 			}

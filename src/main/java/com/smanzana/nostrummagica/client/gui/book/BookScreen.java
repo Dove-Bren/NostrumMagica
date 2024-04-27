@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +8,8 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
@@ -21,6 +23,7 @@ import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -156,9 +159,9 @@ public class BookScreen extends Screen {
 	}
 	
 	@Override
-	public void render(int parWidth, int parHeight, float p_73863_3_) {
+	public void render(MatrixStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
 
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
@@ -169,26 +172,26 @@ public class BookScreen extends Screen {
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset, topOffset, 0,
 				0, TEXT_WIDTH, TEXT_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
 		
-		pages.get(currentPage * 2).draw(this, font, leftOffset + PAGE_HOFFSET, topOffset + PAGE_VOFFSET,
-				PAGE_WIDTH, PAGE_HEIGHT);
+		pages.get(currentPage * 2).draw(this, matrixStackIn, font, leftOffset + PAGE_HOFFSET,
+				topOffset + PAGE_VOFFSET, PAGE_WIDTH, PAGE_HEIGHT);
 		
 		if (pages.size() > (currentPage * 2) + 1)
-			pages.get((currentPage * 2) + 1).draw(this, font, leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE, topOffset + PAGE_VOFFSET,
-					PAGE_WIDTH, PAGE_HEIGHT);
+			pages.get((currentPage * 2) + 1).draw(this, matrixStackIn, font, leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE,
+					topOffset + PAGE_VOFFSET, PAGE_WIDTH, PAGE_HEIGHT);
 		
 		// Do buttons and other parent stuff
-		super.render(parWidth, parHeight, p_73863_3_);
+		super.render(matrixStackIn, parWidth, parHeight, p_73863_3_);
 		
 		//now do overlays
 		if (parWidth > (leftOffset + PAGE_HOFFSET) && parWidth < (leftOffset + TEXT_WIDTH) - PAGE_HOFFSET
 				&& parHeight > topOffset + PAGE_VOFFSET && parHeight < (topOffset + TEXT_HEIGHT) + PAGE_VOFFSET) {
 			//in bounds. Now figure out which it is
 			if (parWidth < (width/2) - PAGE_HOFFSET) {
-				pages.get(currentPage * 2).overlay(this, font,
-						parWidth - (leftOffset + PAGE_HOFFSET), parHeight - (topOffset + PAGE_VOFFSET), parWidth, parHeight);
+				pages.get(currentPage * 2).overlay(this, matrixStackIn,
+						font, parWidth - (leftOffset + PAGE_HOFFSET), parHeight - (topOffset + PAGE_VOFFSET), parWidth, parHeight);
 			} else if (pages.size() > (currentPage * 2) + 1 && parWidth > (width / 2) + PAGE_HOFFSET) {
-				pages.get((currentPage * 2) + 1).overlay(this, font,
-						parWidth - (leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE), parHeight - (topOffset + PAGE_VOFFSET), parWidth, parHeight); 
+				pages.get((currentPage * 2) + 1).overlay(this, matrixStackIn,
+						font, parWidth - (leftOffset + PAGE_HOFFSET + PAGE_WIDTH + PAGE_DISTANCE), parHeight - (topOffset + PAGE_VOFFSET), parWidth, parHeight); 
 			}
 		}
 		
@@ -222,20 +225,28 @@ public class BookScreen extends Screen {
 	}
 	
 	@Override
-	public void renderTooltip(ItemStack item, int x, int y) {
-		GlStateManager.pushLightingAttributes();
-		super.renderTooltip(item, x, y);
-		GlStateManager.popAttributes();
-		GlStateManager.enableBlend();
+	protected void renderTooltip(MatrixStack matrixStackIn, ItemStack item, int x, int y) {
+		//GlStateManager.pushLightingAttributes();
+		super.renderTooltip(matrixStackIn, item, x, y);
+		//GlStateManager.popAttributes();
+		//GlStateManager.enableBlend();
 	}
 	
-	@Override
-	public void renderTooltip(List<String> lines, int x, int y) {
-		GlStateManager.pushLightingAttributes();
-		super.renderTooltip(lines, x, y, this.font);
-		GlStateManager.popAttributes();
-		GlStateManager.enableBlend();
+	public void renderTooltipLines(MatrixStack matrixStackIn, List<String> lines, int x, int y) {
+		List<ITextProperties> text = new ArrayList<>(lines.size());
+		for (String raw : lines) {
+			text.add(ITextProperties.func_240652_a_(raw));
+		}
+		this.renderWrappedToolTip(matrixStackIn, text, x, y, font);
 	}
+	
+//	@Override
+//	protected void renderTooltip(MatrixStack matrixStackIn, List<String> lines, int x, int y) {
+//		//GlStateManager.pushLightingAttributes();
+//		super.renderTooltip(matrixStackIn, lines, x, y, this.font);
+//		//GlStateManager.popAttributes();
+//		//GlStateManager.enableBlend();
+//	}
 	
 	public void requestPageChange(int newIndex) {
 		// index is page index. Not book index.
@@ -290,9 +301,8 @@ public class BookScreen extends Screen {
         
         private final BookScreen screen;
 
-        public NextPageButton(BookScreen screen, int parPosX, int parPosY, boolean parIsNextButton)
-        {
-            super(parPosX, parPosY, 23, 13, "");
+        public NextPageButton(BookScreen screen, int parPosX, int parPosY, boolean parIsNextButton) {
+            super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
             isNextButton = parIsNextButton;
             this.screen = screen;
         }
@@ -301,10 +311,8 @@ public class BookScreen extends Screen {
          * Draws this button to the screen.
          */
         @Override
-        public void render(int parX, int parY, float partialTicks)
-        {
-            if (visible)
-            {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+        	if (visible) {
                 boolean isButtonPressed = (parX >= x 
 
                       && parY >= y 
@@ -313,13 +321,12 @@ public class BookScreen extends Screen {
 
                       && parY < y + height);
 
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 Minecraft.getInstance().getTextureManager().bindTexture(background);
                 int textureX = 0;
                 int textureY = 223;
 
-                if (isButtonPressed)
-                {
+                if (isButtonPressed) {
                     textureX += 23;
                 }
 
@@ -346,7 +353,7 @@ public class BookScreen extends Screen {
 		 private final BookScreen screen;
 		
 		public HomeButton(BookScreen screen, int parPosX, int parPosY) {
-            super(parPosX, parPosY, 23, 13, "");
+            super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
             this.screen = screen;
 		}
 
@@ -354,7 +361,7 @@ public class BookScreen extends Screen {
 		 *Draws this button to the screen.
 		 */
         @Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
         	if (visible) {
         		boolean isButtonPressed = (parX >= x 
         				&& parY >= y 

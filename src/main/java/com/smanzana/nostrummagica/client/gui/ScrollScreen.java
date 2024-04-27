@@ -96,7 +96,7 @@ public class ScrollScreen extends Screen {
 			RenderFuncs.drawRect(left - 2, topOffset + iconYOffset - 2, left + iconLen + 2, topOffset + iconYOffset + iconLen + 2, 0xFF000000);
 			RenderFuncs.drawRect(left, topOffset + iconYOffset, left + iconLen, topOffset + iconYOffset + iconLen, 0xFFE2DDCC);
 			GlStateManager.color4f(1f, 1f, 1f, 1f);
-			icon.render(Minecraft.getInstance(), left, topOffset + iconYOffset, iconLen, iconLen);
+			icon.render(Minecraft.getInstance(), matrixStackIn, left, topOffset + iconYOffset, iconLen, iconLen);
 		}
 		
 		int i = 0;

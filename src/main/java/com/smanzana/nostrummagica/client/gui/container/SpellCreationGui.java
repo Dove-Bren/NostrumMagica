@@ -591,7 +591,7 @@ public class SpellCreationGui {
 						ICON_LBUTTON_VOFFSET, 20, 20, this.width, this.height, 256, 256);
 				
 				GlStateManager.color3f(tint, tint, tint);
-				SpellIcon.get(this.value).render(mc, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
+				SpellIcon.get(this.value).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
 			}
 			
 		}
