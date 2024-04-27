@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
@@ -29,7 +30,6 @@ import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.math.vector.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -120,381 +120,12 @@ public final class RenderFuncs {
 		}
 
 	}
+	
+	public static void RenderBlockState(BlockState state, MatrixStack stack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		// Could get model and turn around and call RenderModel() on it
+		 Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(state, stack, bufferIn, combinedLightIn, combinedOverlayIn, EmptyModelData.INSTANCE);
+	}
 
-//	private static void renderQuadsColor(BufferBuilder buffer, List<BakedQuad> quads, int color) {
-//
-//		int i = 0;
-//		for (int j = quads.size(); i < j; ++i) {
-//			BakedQuad bakedquad = quads.get(i);
-//
-//			if (bakedquad.hasTintIndex()) {
-//				if (EntityRenderer.anaglyphEnable) {
-//					color = TextureUtil.anaglyphColor(color);
-//				}
-//
-//				color = color | -16777216;
-//			}
-//
-//			net.minecraftforge.client.model.pipeline.LightUtil.renderQuadColor(buffer, bakedquad, color);
-//		}
-//	}
-	
-//	/**
-//	 * Taken from https://github.com/Cadiboo/Example-Mod/blob/5fe80fde8a41cd571593c02897b06b5822e9a738/src/main/java/io/github/cadiboo/examplemod/client/ClientUtil.java#L240
-//	 * Renders a collection of BakedQuads into the BufferBuilder given. This method allows you to render any model in game in the FastTESR, be it a block model or an item model.
-//	 * Alternatively a custom list of quads may be constructed at runtime to render things like text.
-//	 * Drawbacks: doesn't transform normals as they are not guaranteed to be present in the buffer. Not relevant for a FastTESR but may cause issues with Optifine's shaders.
-//	 *
-//	 * @param quads      the iterable of BakedQuads. This may be any iterable object.
-//	 * @param baseOffset the base position offset for the rendering. This position will not be transformed by the model matrix.
-//	 * @param pipeline   the vertex consumer object. It is a parameter for optimization reasons. It may simply be constructed as new VertexBufferConsumer(buffer) and may be reused indefinately in the scope of the render pass.
-//	 * @param buffer     the buffer to upload vertices to.
-//	 * @param transform  the model matrix that is used to transform quad vertices.
-//	 * @param brightness the brightness of the model. The packed lightmap coordinate system is pretty complex and a lot of parameters are not necessary here so only the dominant one is implemented.
-//	 * @param color      the color of the quad. This is a color multiplier in the ARGB format.
-//	 */
-//	public static void renderQuads(Iterable<BakedQuad> quads, Vector3f baseOffset, VertexBufferConsumer pipeline, BufferBuilder buffer, Matrix4f transform, float brightness, int color) {
-//		// Get the raw int buffer of the buffer builder object.
-//		IntBuffer intBuf = getIntBuffer(buffer);
-//
-//		// Iterate the iterable
-//		for (BakedQuad quad : quads) {
-//			// Push the quad to the consumer so it can be uploaded onto the buffer.
-//			LightUtil.putBakedQuad(pipeline, quad);
-//
-//			// After the quad has been uploaded the buffer contains enough info to apply the model matrix transformation.
-//			// Getting the vertex size for the given format.
-//			int vertexSize = buffer.getVertexFormat().getIntegerSize();
-//
-//			// Getting the offset for the current quad.
-//			int quadOffset = (buffer.getVertexCount() - 4) * vertexSize;
-//
-//			// Each quad is made out of 4 vertices, so looping 4 times.
-//			for (int k = 0; k < 4; ++k) {
-//				// Getting the offset for the current vertex.
-//				int vertexIndex = quadOffset + k * vertexSize;
-//
-//				// Grabbing the position vector from the buffer.
-//				float vertX = Float.intBitsToFloat(intBuf.get(vertexIndex));
-//				float vertY = Float.intBitsToFloat(intBuf.get(vertexIndex + 1));
-//				float vertZ = Float.intBitsToFloat(intBuf.get(vertexIndex + 2));
-//				Vector4f vert = new Vector4f(vertX, vertY, vertZ, 1);
-//
-//				// Transforming it by the model matrix.
-//				Vector4f copy = new Vector4f(vert);
-//				transform.transform(copy, vert);
-//
-//				// Uploading the difference back to the buffer. Have to use the helper function since the provided putX methods upload the data for a quad, not a vertex and this data is vertex-dependent.
-//				putPositionForVertex(buffer, intBuf, vertexIndex, new Vector3f(vert.x - vertX, vert.y - vertY, vert.z - vertZ));
-//				//putColor4ForVertex(buffer, intBuf, vertexIndex, color);
-//				//buffer.putColor4(color);
-//				{
-//					for (int i = 0; i < 4; ++i) {
-//						int idx = buffer.getColorIndex(i+1);
-//						int r = color >> 16 & 255;
-//						int g = color >> 8 & 255;
-//						int b = color & 255;
-//						int a = color >> 24 & 255;
-//						{
-//							IntBuffer rawIntBuffer = getIntBuffer(buffer);
-//							if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-//								rawIntBuffer.put(idx, a << 24 | b << 16 | g << 8 | r);
-//							} else {
-//								rawIntBuffer.put(idx, r << 24 | g << 16 | b << 8 | a);
-//							}
-//							//System.out.print(",");
-//						}
-//						//buffer.putColorRGBA(idx, r, g, b);
-//					}
-//				}
-//				//buffer.putColorRGBA(vertexIndex, red, green, blue, alpha);
-//			}
-//
-//			// Uploading the origin position to the buffer. This is an addition operation.
-//			buffer.putPosition(baseOffset.x, baseOffset.y, baseOffset.z);
-//
-//			// Constructing the most basic packed lightmap data with a mask of 0x00FF0000.
-//			//int bVal = ((byte) (brightness * 255)) << 16;
-//
-////			// Uploading the brightness to the buffer.
-////			buffer.putBrightness4(bVal, bVal, bVal, bVal);
-//
-//			// Uploading the color multiplier to the buffer
-//			//buffer.putColor4(color); Vanilla sucks and now ignores the alpha bit
-//			//buffer.putColor4(argb);
-//			
-//			//putColor4(buffer, intBuf,  color);
-//		}
-//	}
-	
-//	/**
-//	 * A setter for the vertex-based positions for a given BufferBuilder object.
-//	 *
-//	 * @param buffer the buffer to set the positions in.
-//	 * @param intBuf the raw int buffer.
-//	 * @param offset the offset for the int buffer, in ints.
-//	 * @param pos    the position to add to the buffer.
-//	 */
-//	public static void putPositionForVertex(BufferBuilder buffer, IntBuffer intBuf, int offset, Vector3f pos) {
-//		// Getting the old position data in the buffer currently.
-//		float ox = Float.intBitsToFloat(intBuf.get(offset));
-//		float oy = Float.intBitsToFloat(intBuf.get(offset + 1));
-//		float oz = Float.intBitsToFloat(intBuf.get(offset + 2));
-//
-//		// Converting the new data to ints.
-//		int x = Float.floatToIntBits(pos.x + ox);
-//		int y = Float.floatToIntBits(pos.y + oy);
-//		int z = Float.floatToIntBits(pos.z + oz);
-//
-//		// Putting the data into the buffer
-//		intBuf.put(offset, x);
-//		intBuf.put(offset + 1, y);
-//		intBuf.put(offset + 2, z);
-//	}
-//	
-//	
-//	public static void putColor4(BufferBuilder buffer, IntBuffer intBuf, int colorARGB) {
-//		// got to get to RGBA
-//		int color = colorARGB << 8
-//				| ((colorARGB >> 24) & 255);
-//		
-//		if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-//			// swap color around
-//			color = Integer.reverse(color);
-//		}
-//		for (int i = 0; i < 4; ++i) {
-//			int colorIdx = buffer.getColorIndex(i + 1);
-//			intBuf.put(colorIdx, color);
-//		}
-//	}
-//	
-//	public static void putColor4ForVertex(BufferBuilder buffer, IntBuffer intBuf, int offset, int color) {
-//		int colorIdx = buffer.getColorIndex(offset);
-//		intBuf.put(colorIdx, color);
-//	}
-//	
-//	private static final Field bufferBuilder_rawIntBuffer = ObfuscationReflectionHelper.findField(BufferBuilder.class, "field_178999_b");
-//	
-//	/**
-//	 * A getter for the rawIntBuffer field value of the BufferBuilder.
-//	 *
-//	 * @param buffer the buffer builder to get the buffer from
-//	 * @return the rawIntbuffer component
-//	 */
-//	@Nonnull
-//	public static IntBuffer getIntBuffer(BufferBuilder buffer) {
-//		try {
-//			return (IntBuffer) bufferBuilder_rawIntBuffer.get(buffer);
-//		} catch (IllegalAccessException exception) {
-//			// Some other mod messed up and reset the access flag of the field.
-//			CrashReport crashReport = new CrashReport("An impossible error has occurred!", exception);
-//			crashReport.makeCategory("Reflectively Accessing BufferBuilder#rawIntBuffer");
-//			throw new ReportedException(crashReport);
-//		}
-//	}
-	
-//	public static void renderWeather(BlockPos at, float partialTicks, boolean snow) {
-//		//throw new RuntimeException("Not finished implementing");
-//		final Minecraft mc = Minecraft.getInstance();
-//		//enableLightmap();
-//		disableLightmap();
-//		Entity entity = mc.getRenderViewEntity();
-//		World world = mc.world;
-////		int entPosX = MathHelper.floor_double(entity.getPosX());
-//		int entPosY = MathHelper.floor(entity.getPosY());
-////		int entPosZ = MathHelper.floor_double(entity.getPosZ());
-//		Tessellator tessellator = Tessellator.getInstance();
-//		BufferBuilder vertexbuffer = tessellator.getBuffer();
-//		GlStateManager.disableCull();
-//		GlStateManager.normal3f(0.0F, 1.0F, 0.0F);
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-//		GlStateManager.alphaFunc(516, 0.1F);
-//		GlStateManager.color4f(1f, 1f, 1f, 1f);
-//		GlStateManager.disableTexture();
-//		GlStateManager.enableTexture();
-//		double entPosDX = entity.lastTickPosX + (entity.getPosX() - entity.lastTickPosX) * (double)partialTicks;
-//		double entPosDY = entity.lastTickPosY + (entity.getPosY() - entity.lastTickPosY) * (double)partialTicks;
-//		double entPosDZ = entity.lastTickPosZ + (entity.getPosZ() - entity.lastTickPosZ) * (double)partialTicks;
-//		int entPosDYFloor = MathHelper.floor(entPosDY);
-//		int radius = 5;
-//
-//		if (mc.gameSettings.fancyGraphics)
-//		{
-//			radius = 10;
-//		}
-//
-//		float f1 = (float)getRendererUpdateCount() + partialTicks;
-//		vertexbuffer.setTranslation(-entPosDX, -entPosDY, -entPosDZ);
-//		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-//
-//		Biome biome = world.getBiome(at);
-//
-//		if (biome.getPrecipitation() != RainType.NONE)
-//		{
-//			int percipWorldY = world.getHeight(Heightmap.Type.MOTION_BLOCKING, at).getY();
-//			int percipMinY = entPosY - radius;
-//			int percipMaxY = entPosY + radius;
-//
-//			if (percipMinY < percipWorldY)
-//			{
-//				percipMinY = percipWorldY;
-//			}
-//
-//			if (percipMaxY < percipWorldY)
-//			{
-//				percipMaxY = percipWorldY;
-//			}
-//
-//			int lightSampleY = percipWorldY;
-//
-//			if (percipWorldY < entPosDYFloor)
-//			{
-//				lightSampleY = entPosDYFloor;
-//			}
-//
-//			if (percipMinY != percipMaxY)
-//			{
-//				mc.getTextureManager().bindTexture(SNOW_TEXTURES);
-//				vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
-//				if (!snow)
-//				{
-//					mc.getTextureManager().bindTexture(RAIN_TEXTURES);
-//					double d5 = -((double)(getRendererUpdateCount() + 0 * 0 * 3121 + 0 * 45238971 + 0 * 0 * 418711 + 0 * 13761 & 31) + (double)partialTicks) / 32.0D * (3.0D + 0);
-//					double d6 = (double)((float)at.getX() + 0.5F) - entity.getPosX();
-//					double d7 = (double)((float)at.getZ() + 0.5F) - entity.getPosZ();
-//					float f3 = MathHelper.sqrt(d6 * d6 + d7 * d7) / (float)radius;
-//					float f4 = ((1.0F - f3 * f3) * 0.5F + 0.5F) * .5f;
-//					cursor.setPos(at.getX(), lightSampleY, at.getZ());
-//					int j3 = world.getCombinedLight(cursor, 0);
-//					int k3 = j3 >> 16 & 65535;
-//					int l3 = j3 & 65535;
-//					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMaxY, (double)at.getZ() - 0 + 0.5D).tex(0.0D, (double)percipMinY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
-//					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMaxY, (double)at.getZ() + 0 + 0.5D).tex(1.0D, (double)percipMinY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
-//					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMinY, (double)at.getZ() + 0 + 0.5D).tex(1.0D, (double)percipMaxY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
-//					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMinY, (double)at.getZ() - 0 + 0.5D).tex(0.0D, (double)percipMaxY * 0.25D + d5).color(1.0F, 1.0F, 1.0F, f4).lightmap(k3, l3).endVertex();
-//				}
-//				else
-//				{
-//					double d8 = (double)(-((float)(getRendererUpdateCount() & 511) + partialTicks) / 512.0F);
-//					double d9 = 0 + (double)f1 * 0.01D * (double)((float) .5D);
-//					double d10 = 0 + (double)(f1 * (float) .5D) * 0.001D;
-//					double d11 = (double)((float)at.getX() + 0.5F) - entity.getPosX();
-//					double d12 = (double)((float)at.getZ() + 0.5F) - entity.getPosZ();
-//					float f6 = MathHelper.sqrt(d11 * d11 + d12 * d12) / (float)radius;
-//					float f5 = ((1.0F - f6 * f6) * 0.3F + 0.5F) * .5f;
-//					cursor.setPos(at.getX(), lightSampleY, at.getZ());
-//					int i4 = (world.getCombinedLight(cursor, 0) * 3 + 15728880) / 4;
-//					int j4 = i4 >> 16 & 65535;
-//					int k4 = i4 & 65535;
-//					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMaxY, (double)at.getZ() - 0 + 0.5D).tex(0.0D + d9, (double)percipMinY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
-//					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMaxY, (double)at.getZ() + 0 + 0.5D).tex(1.0D + d9, (double)percipMinY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
-//					vertexbuffer.pos((double)at.getX() + 0 + 0.5D, (double)percipMinY, (double)at.getZ() + 0 + 0.5D).tex(1.0D + d9, (double)percipMaxY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
-//					vertexbuffer.pos((double)at.getX() - 0 + 0.5D, (double)percipMinY, (double)at.getZ() - 0 + 0.5D).tex(0.0D + d9, (double)percipMaxY * 0.25D + d8 + d10).color(1.0F, 1.0F, 1.0F, f5).lightmap(j4, k4).endVertex();
-//				}
-//				tessellator.draw();
-//			}
-//		}
-//		
-//		// End of old double loop
-//
-//		vertexbuffer.setTranslation(0.0D, 0.0D, 0.0D);
-//		GlStateManager.enableCull();
-//		GlStateManager.disableBlend();
-//		GlStateManager.alphaFunc(516, 0.1F);
-//		//disableLightmap();
-//	}
-	
-//	public static void disableLightmap() {
-//		Minecraft mc = Minecraft.getInstance();
-//		mc.gameRenderer.disableLightmap();
-////		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-////		GlStateManager.disableTexture();
-////		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-//	}
-//
-//	public static void enableLightmap() {
-//		Minecraft mc = Minecraft.getInstance();
-//		mc.gameRenderer.enableLightmap();
-////		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-////		GlStateManager.matrixMode(5890);
-////		GlStateManager.loadIdentity();
-////		GlStateManager.scalef(0.00390625F, 0.00390625F, 0.00390625F);
-////		GlStateManager.translatef(8.0F, 8.0F, 8.0F);
-////		GlStateManager.matrixMode(5888);
-////		Minecraft.getInstance().getTextureManager().bindTexture(getLocationLightMap());
-////		GlStateManager.glTexParameteri(3553, 10241, 9729);
-////		GlStateManager.glTexParameteri(3553, 10240, 9729);
-////		GlStateManager.glTexParameteri(3553, 10242, 10496);
-////		GlStateManager.glTexParameteri(3553, 10243, 10496);
-////		GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-////		GlStateManager.enableTexture();
-////		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-//    }
-	
-//	private static @Nullable GameRenderer cachedRenderer; // Renderer pulled and modified to expose internal maps and resources
-////	private static @Nullable Field cachedLightMapField; // Pulled from renderer above
-//	private static @Nullable Field cachedRendererUpdateCountField; // Pulled from renderer above
-//	private static final ResourceLocation RAIN_TEXTURES = new ResourceLocation("textures/environment/rain.png");
-//	private static final ResourceLocation SNOW_TEXTURES = new ResourceLocation("textures/environment/snow.png");
-//	
-//	private static final GameRenderer getCachedRenderer() {
-//		Minecraft mc = Minecraft.getInstance();
-//		final GameRenderer cur = mc.gameRenderer;
-//		if (cur != cachedRenderer) {
-//			// Refresh cache
-//			NostrumMagica.logger.info("Refreshing entity renderer cache");
-//			cachedRenderer = cur;
-//			//cachedLightMapField = ObfuscationReflectionHelper.findField(EntityRenderer.class, "field_110922_T"); //"locationLightMap");
-//			cachedRendererUpdateCountField = ObfuscationReflectionHelper.findField(GameRenderer.class, "field_78529_t"); //"rendererUpdateCount");
-//			//cachedLightMapField.setAccessible(true); // done for us in reflection helper
-//		}
-//		
-//		return cachedRenderer;
-//	}
-//	
-//	private static final @Nullable ResourceLocation getLocationLightMap() {
-//		final EntityRenderer renderer = getCachedRenderer(); // Also sets up field
-//		try {
-//			return (ResourceLocation) cachedLightMapField.get(renderer);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
-	
-//	private static final int getRendererUpdateCount() {
-//		final GameRenderer renderer = getCachedRenderer(); // Also sets up field
-//		try {
-//			return (int) cachedRendererUpdateCountField.get(renderer);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return 0;
-//	}
-	
-//	private static @Nullable RenderGlobal cachedRenderGlobal = null;
-//	private static @Nullable Field cachedRenderGlobal_outlineFrameBuffer = null;
-//	private static @Nullable Field cachedRenderGlobal_outlineShader = null;
-//	
-//	private static final RenderGlobal getCachedRenderGlobal() {
-//		if (cachedRenderGlobal == null) {
-//			// Pull fields and methods from new Global
-//			try {
-//				cachedRenderGlobal_outlineFrameBuffer = ObfuscationReflectionHelper.findField(RenderGlobal.class, "field_175015_z"); // "entityOutlineFramebuffer"
-//				cachedRenderGlobal_outlineShader = ObfuscationReflectionHelper.findField(RenderGlobal.class, "field_174991_A"); // "entityOutlineShader"
-//			} catch (Exception e) {
-//				NostrumMagica.logger.error("Failed to get renderer fields. Highlighting will not work!");
-//				cachedRenderGlobal_outlineFrameBuffer = null;
-//				cachedRenderGlobal_outlineShader = null;
-//			}
-//		}
-//		cachedRenderGlobal = Minecraft.getInstance().renderGlobal;
-//			
-//		return cachedRenderGlobal;
-//	}
-	
 	public static final void renderEntityOutline(Entity e, float partialTicks) {
 		if (!e.world.isRemote) {
 			return;
@@ -650,54 +281,55 @@ public final class RenderFuncs {
 //		GlStateManager.enableTexture2D();
 //    }
 	
-	public static final void renderSpaceQuad(BufferBuilder buffer, double relX, double relY, double relZ,
-			double radius,
-			float red, float green, float blue, float alpha) {
-		// Billboard no rot
-		buffer.pos(relX - radius, relY - radius, relZ)
-			.tex(0, 0)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		buffer.pos(relX - radius, relY + radius, relZ)
-			.tex(0, 1)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		buffer.pos(relX + radius, relY + radius, relZ)
-			.tex(1, 1)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-		buffer.pos(relX + radius, relY - radius, relZ)
-			.tex(1, 0)
-			.color(red, green, blue, alpha)
-			.normal(0, 0, 1).endVertex();
-	}
+//	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer, double relX, double relY, double relZ,
+//			double radius,
+//			float red, float green, float blue, float alpha) {
+//		// Billboard no rot
+//		buffer.pos(relX - radius, relY - radius, relZ)
+//			.tex(0, 0)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(relX - radius, relY + radius, relZ)
+//			.tex(0, 1)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(relX + radius, relY + radius, relZ)
+//			.tex(1, 1)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//		buffer.pos(relX + radius, relY - radius, relZ)
+//			.tex(1, 0)
+//			.color(red, green, blue, alpha)
+//			.normal(0, 0, 1).endVertex();
+//	}
 	
-	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer, float relX, float relY, float relZ,
-			Quaternion rotation,
+	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer,
 			float radius,
-			float red, float green, float blue, float alpha, int lightmap
+			int combinedLightmapIn, int combinedOverlayIn, float red, float green, float blue, float alpha
 			) {
 		
-		// Copied and adapted from vanilla particle instead of manually drawing a space quad
+		// Copied and adapted from vanilla particle instead of manually drawing a space quad.
+		// One big difference is it pushes to global render state the transform first, and in it's render
+		// func just draws the little particle.
+		// We pass that through instead of using global state.
 		Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
-		Vector4f offset = new Vector4f(relX, relY, relZ, 1f);
-		offset.transform(stack.getLast().getMatrix());
 
 		for(int i = 0; i < 4; ++i) {
 			Vector3f vector3f = avector3f[i];
-			vector3f.transform(rotation);
 			vector3f.mul(radius);
-			vector3f.add(offset.getX(), offset.getY(), offset.getZ());
 		}
+		
+		final Matrix4f transform = stack.getLast().getMatrix();
+		final Matrix3f normal = stack.getLast().getNormal();
 
 		final float uMin = 0;
 		final float uMax = 1;
 		final float vMin = 0;
 		final float vMax = 1;
-		buffer.pos((double)avector3f[0].getX(), (double)avector3f[0].getY(), (double)avector3f[0].getZ()).tex(uMax, vMax).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
-		buffer.pos((double)avector3f[1].getX(), (double)avector3f[1].getY(), (double)avector3f[1].getZ()).tex(uMax, vMin).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
-		buffer.pos((double)avector3f[2].getX(), (double)avector3f[2].getY(), (double)avector3f[2].getZ()).tex(uMin, vMin).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
-		buffer.pos((double)avector3f[3].getX(), (double)avector3f[3].getY(), (double)avector3f[3].getZ()).tex(uMin, vMax).color(red, green, blue, alpha).lightmap(lightmap).endVertex();
+		buffer.pos(transform, avector3f[0].getX(), avector3f[0].getY(), avector3f[0].getZ()).normal(normal, 0, 0, 1).tex(uMax, vMax).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
+		buffer.pos(transform, avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ()).normal(normal, 0, 0, 1).tex(uMax, vMin).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
+		buffer.pos(transform, avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ()).normal(normal, 0, 0, 1).tex(uMin, vMin).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
+		buffer.pos(transform, avector3f[3].getX(), avector3f[3].getY(), avector3f[3].getZ()).normal(normal, 0, 0, 1).tex(uMin, vMax).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
 		
 //		buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
 //			.tex(0, 0)
@@ -737,9 +369,9 @@ public final class RenderFuncs {
 	}
 	
 	public static final void renderSpaceQuadFacingCamera(MatrixStack stack, IVertexBuilder buffer, ActiveRenderInfo renderInfo,
-			float relX, float relY, float relZ,
 			float radius,
-			float red, float green, float blue, float alpha, int lightmap) {
+			int lightmap, int overlay,
+			float red, float green, float blue, float alpha) {
 //		float rotationX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
 //		float rotationYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
 //		float rotationXY = -rotationYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
@@ -748,11 +380,15 @@ public final class RenderFuncs {
 		
 		Quaternion rotation = renderInfo.getRotation();
 		
-		renderSpaceQuad(stack, buffer, relX, relY, relZ,
-				rotation,
+		stack.push();
+		stack.rotate(rotation);
+		
+		renderSpaceQuad(stack, buffer,
 				radius,
-				red, green, blue, alpha, lightmap
+				lightmap, overlay,
+				red, green, blue, alpha
 				);
+		stack.pop();
 	}
 	
 	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
@@ -806,6 +442,62 @@ public final class RenderFuncs {
 		buffer.pos(transform, maxd, mind, mind).tex(minU,minV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
 		buffer.pos(transform, maxd, mind, maxd).tex(minU,maxV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
 		buffer.pos(transform, mind, mind, maxd).tex(maxU,maxV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+	}
+	
+	/**
+	 * 
+	 * @param width
+	 * @param height
+	 * @param matrixStackIn
+	 * @param buffer should be set up to draw TRIANGLES
+	 * @param packedLightIn
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @param alpha
+	 */
+	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
+		drawEllipse(horizontalRadius, verticalRadius, points, 0f, matrixStackIn, buffer, packedLightIn, red, green, blue, alpha);
+	}
+	
+	/**
+	 * 
+	 * @param width
+	 * @param height
+	 * @param rotationPercent float from 0 to 1 with how far the uvs should be rotated, with 1 being a full rotation
+	 * @param matrixStackIn
+	 * @param buffer should be set up to draw TRIANGLES
+	 * @param packedLightIn
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @param alpha
+	 */
+	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, float rotationPercent, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
+		
+		final double angleOffset = rotationPercent * Math.PI;
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		
+		for (int i = 2; i < points; i++) {
+			
+			// For each (point-2) triangles, draw points for 0, i-1, and i
+			// for (int j : new int[]{0, i-1, i}) {
+			for (int j = i-2; j <= i; j++) {
+				double angle = (2*Math.PI) * ((double) (j == i-2 ? 0 : j) / (double) points);
+				float vx = (float) (Math.cos(angle) * horizontalRadius);
+				float vy = (float) (Math.sin(angle) * verticalRadius);
+				
+				double aheadAngle = angle + angleOffset;
+				double ux = Math.cos(aheadAngle) * horizontalRadius;
+				double uy = Math.sin(aheadAngle) * verticalRadius;
+				float u = (float) ((ux + (horizontalRadius)) / (horizontalRadius * 2));
+				float v = (float) ((uy + (verticalRadius)) / (verticalRadius * 2));
+				
+				buffer.pos(transform, vx, vy, 0f).tex(u, v).normal(normal, 0, 0, -1f).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+				
+			}
+		}
 	}
 	
 //	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {

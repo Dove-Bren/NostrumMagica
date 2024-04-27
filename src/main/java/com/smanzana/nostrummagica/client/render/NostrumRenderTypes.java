@@ -5,6 +5,8 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.client.render.entity.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
 
 import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
@@ -19,6 +21,8 @@ public class NostrumRenderTypes {
 	public static final RenderType MANA_ARMOR;
 	public static final RenderType SWITCH_TRIGGER_BASE;
 	public static final RenderType SWITCH_TRIGGER_CAGE;
+	public static final RenderType NOSTRUM_PORTAL;
+	public static final RenderType PROGRESSION_DOOR_LOCK;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -44,8 +48,10 @@ public class NostrumRenderTypes {
 	    final RenderState.CullState NO_CULL = new RenderState.CullState(false);
 	    
 	    final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
+	    final RenderState.DepthTestState NO_DEPTH_TEST = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
 	    
 	    final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
+	    final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
 	    
 	    final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
 	    	//setupGlintTexturing(0.16F);
@@ -90,6 +96,7 @@ public class NostrumRenderTypes {
 				.layer(VIEW_OFFSET_Z_LAYERING)
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 				.texturing(MANAARMOR_GLINT)
+				// depth test?
 			.build(false);
 		MANA_ARMOR = RenderType.makeType(Name("manaarmor"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 128, glState);
 		
@@ -111,5 +118,23 @@ public class NostrumRenderTypes {
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
 		SWITCH_TRIGGER_CAGE = RenderType.makeType(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(TileEntityPortalRenderer.TEX_LOC, false, true))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.cull(NO_CULL)
+				.depthTest(NO_DEPTH_TEST)
+			.build(false);
+		NOSTRUM_PORTAL = RenderType.makeType(Name("nostrum_portal"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(TileEntityProgressionDoorRenderer.TEX_GEM_LOC, false, true))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(LIGHTMAP_ENABLED)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+			.build(false);
+		PROGRESSION_DOOR_LOCK = RenderType.makeType(Name("prog_door_lock"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
 	}
 }

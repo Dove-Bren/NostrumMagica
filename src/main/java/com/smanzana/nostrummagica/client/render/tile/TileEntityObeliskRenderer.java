@@ -1,60 +1,30 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObeliskEntity> {
 
-	private static final ModelResourceLocation MODEL_LOC = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "block/orb_crystal"));
-	private static final ResourceLocation TEXT_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ender.png");
-	private static IBakedModel model = null;
-	private static boolean attemptedLoading = false;
-	
-	
-	public TileEntityObeliskRenderer() {
-		
+	public TileEntityObeliskRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(NostrumObeliskEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(NostrumObeliskEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
-		if (!attemptedLoading && model == null) {
-			//IModel raw;
-			attemptedLoading = true;
-//			try {
-//				raw = OBJLoader.INSTANCE.loadModel(MODEL_LOC);
-//				model = raw.bake(TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
-//						new Function<ResourceLocation, TextureAtlasSprite>() {
-//
-//					@Override
-//					public TextureAtlasSprite apply(ResourceLocation location) {
-//						return Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(location.toString());
-//					}
-//				});
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				System.out.println("Failed to load obelisk tile model");
-//			}
-			model = Minecraft.getInstance().getModelManager().getModel(MODEL_LOC);
-		}
-		
-		if (model == null)
+		if (tileEntityIn.isMaster())
 			return;
 		
-		if (te.isMaster())
-			return;
-		
-		long time = System.currentTimeMillis();
+		final BlockState state = tileEntityIn.getBlockState();
+		final long time = System.currentTimeMillis();
 		float rotY = (float) (time % 3000) / 3000f;
 		float rotX = (float) (time % 5000) / 5000f;
 		
@@ -62,26 +32,11 @@ public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObelisk
 		rotY *= 360f;
 		rotX *= 360f;
 		
-		//GlStateManager.pushLightingAttributes();
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + .5, z + .5);
-		GlStateManager.rotatef(rotY, 0, 1f, 0);
-		GlStateManager.rotatef(rotX, 1f, 0, 0);
-		
-		RenderHelper.disableStandardItemLighting();
-		
-		this.bindTexture(TEXT_LOC);
-		
-		World world = te.getWorld();
-
-        int li = 0xF0;
-        
-        Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
-        		model, world.getBlockState(te.getPos()), li, true);
-
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.popMatrix();
-		
+		matrixStackIn.push();
+		matrixStackIn.translate(.5, .5, .5);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
+		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
+		RenderFuncs.RenderBlockState(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn); // Used to fetch custom model and render itself
+		matrixStackIn.pop();
 	}
-	
 }

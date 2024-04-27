@@ -1,21 +1,25 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.tiles.CandleTileEntity;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntity> {
 
 	private NonNullEnumMap<ReagentType, ItemStack> itemCache;
 	
-	public TileEntityCandleRenderer() {
+	public TileEntityCandleRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
+		
 		itemCache = new NonNullEnumMap<>(ReagentType.class, ItemStack.EMPTY);
 		for (ReagentType type : ReagentType.values()) {
 			itemCache.put(type, ReagentItem.CreateStack(type, 1));
@@ -23,24 +27,21 @@ public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntit
 	}
 	
 	@Override
-	public void render(CandleTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(CandleTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
-		ItemStack item = itemCache.get(te.getReagentType());
+		final ItemStack item = itemCache.get(tileEntityIn.getReagentType());
 		
-		float rot = 360f * (float) ((double)(te.getWorld().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
+		final float rot = 360f * (float) ((double)(tileEntityIn.getWorld().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
 		//float rot = 2.0f * (System.currentTimeMillis() / 50 + partialTicks);
-		float scale = .75f;
+		final float scale = .75f;
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + 1.25, z + .5);
-		GlStateManager.rotatef(rot, 0, 1f, 0);
-		GlStateManager.scalef(scale, scale, scale);
-		
-		RenderFuncs.renderItemStandard(item);
-		RenderHelper.disableStandardItemLighting();
-		
-		GlStateManager.popMatrix();
+		matrixStackIn.push();
+		matrixStackIn.translate(.5, 1.25, .5);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.scale(scale, scale, scale);
+		RenderFuncs.renderItemStandard(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+		matrixStackIn.pop();
 		
 	}
-	
 }

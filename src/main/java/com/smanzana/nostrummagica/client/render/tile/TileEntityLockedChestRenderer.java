@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
@@ -16,23 +17,26 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChestEntity> {
 	
 	private static final ResourceLocation TEXT_LOCK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/lock_plate.png");
 	private static final ResourceLocation TEXT_CHAINLINK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/chain_link.png");
 
-	public TileEntityLockedChestRenderer() {
-		
+	public TileEntityLockedChestRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 	}
 	
-	protected void renderLock(LockedChestEntity te, double ticks) {
+	protected void renderLock(LockedChestEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Direction direction = te.getBlockState().get(LockedChest.FACING);
 		float rot = direction.getHorizontalAngle() + 90f;
 		
@@ -51,32 +55,34 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final float red = ((float) ((colorRGB >> 16) & 0xFF) / 255f);
 		final float green = ((float) ((colorRGB >> 8) & 0xFF) / 255f);
 		final float blue = ((float) ((colorRGB >> 0) & 0xFF) / 255f);
+		
 
-		GlStateManager.disableCull();
-		GlStateManager.disableLighting();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		GlStateManager.color4f(red, green, blue, .25f + glow);
-		
-		GlStateManager.pushMatrix();
-		GlStateManager.rotatef(rot, 0, -1, 0); // Rotate arm that's centered in the block
-		GlStateManager.translated(10.5, 0, 0); // distance from center of block (so it's outside it)
-		GlStateManager.rotatef(-90f, 0, 1, 0); // Rotate so it's facing away from block instead of perpendicular
-		GlStateManager.translated(-3, -3, 0); // center
-		
-		// Wiggle a bit
 		final double xWigglePeriod = 160;
 		final double xWiggleProg = ((ticks % xWigglePeriod) / xWigglePeriod);
 		final double xWiggle = .5 * Math.sin(xWiggleProg * Math.PI * 2);
 		final double yWigglePeriod = 200;
 		final double yWiggleProg = ((ticks % yWigglePeriod) / yWigglePeriod);
 		final double yWiggle = .5 * Math.sin(yWiggleProg * Math.PI * 2);
-		GlStateManager.translated(xWiggle, yWiggle, 0); // center
+
+//		GlStateManager.disableCull();
+//		GlStateManager.disableLighting();
+//		GlStateManager.enableBlend();
+//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+//		GlStateManager.color4f(red, green, blue, .25f + glow);
+		
+		matrixStackIn.push();
+		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rot)); // Rotate arm that's centered in the block
+		matrixStackIn.translate(10.5, 0, 0); // distance from center of block (so it's outside it)
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(-90f)); // Rotate so it's facing away from block instead of perpendicular
+		matrixStackIn.translate(-3, -3, 0); // center
+		
+		// Wiggle a bit
+		matrixStackIn.translate(xWiggle, yWiggle, 0); // center
 		
 		this.bindTexture(TEXT_LOCK_LOC);
 		RenderFuncs.drawScaledCustomSizeModalRect(0, 0, 0, 0, 16, 16, 6, 6, 16, 16);
-		GlStateManager.popMatrix();
-		GlStateManager.enableCull();
+		
+		matrixStackIn.pop();
 	}
 	
 	protected void renderChains(LockedChestEntity te, double ticks) {
@@ -183,9 +189,10 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	}
 	
 	@Override
-	public void render(LockedChestEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(LockedChestEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
-		final double ticks = te.getWorld().getGameTime() + partialTicks;
+		final double ticks = tileEntityIn.getWorld().getGameTime() + partialTicks;
 		final Minecraft mc = Minecraft.getInstance();
 		
 		GlStateManager.pushMatrix();
@@ -193,10 +200,10 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		GlStateManager.scaled(1.0/16.0, 1.0/16.0, 1.0/16.0); // Down to block scale, where 1 block is 16 units/pixels
 		
 		// Draw chain links
-		this.renderChains(te, ticks);
+		this.renderChains(tileEntityIn, ticks);
 		
 		// Draw lock icon
-		this.renderLock(te, ticks);
+		this.renderLock(tileEntityIn, ticks);
 
 		
 		// Draw lock info
@@ -204,8 +211,8 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		{
 			final String lockStr;
 			boolean matches = false;
-			if (te.hasWorldKey()) {
-				NostrumWorldKey key = te.getWorldKey();
+			if (tileEntityIn.hasWorldKey()) {
+				NostrumWorldKey key = tileEntityIn.getWorldKey();
 				lockStr = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
 				
 				final ItemStack held = mc.player.getHeldItemMainhand();
@@ -235,5 +242,4 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		GlStateManager.popMatrix();
 		
 	}
-	
 }

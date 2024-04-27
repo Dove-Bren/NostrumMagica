@@ -1,30 +1,31 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntity> {
 
-	public TileEntitySymbolRenderer() {
-		
+	public TileEntitySymbolRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(SymbolTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void render(SymbolTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		// Get the model from the tile entity
-		SpellComponentWrapper comp = te.getComponent();
+		SpellComponentWrapper comp = tileEntityIn.getComponent();
 		SpellComponentIcon icon;
 		if (comp.isTrigger())
 			icon = SpellComponentIcon.get(comp.getTrigger());
@@ -35,56 +36,20 @@ public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntit
 		else
 			icon = SpellComponentIcon.get(comp.getElement());
 		ResourceLocation textLoc = icon.getModelLocation();
-		float rot = 2.0f * (float)((double) te.getWorld().getGameTime() / 2.5);
-		float scale = te.getScale();
-		BufferBuilder wr = Tessellator.getInstance().getBuffer();
+		float rot = 2.0f * (float)((double) tileEntityIn.getWorld().getGameTime() / 2.5);
+		float scale = tileEntityIn.getScale();
 		
-		Minecraft.getInstance().getTextureManager().bindTexture(textLoc);
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + 1.25, z + .5);
-		GlStateManager.rotatef(rot, 0, 10, 0);
+		// Before this was disabling lighting...
+		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(textLoc));
 		
-		GlStateManager.scalef(scale, scale, scale);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		GlStateManager.enableAlphaTest();
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
-		wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-		
-		double min = -.5;
-		double max = .5;
-		
-		// +z
-		wr.pos(max, 0.0, 0.0).tex(0.0, 1.0).normal(0, 0, -1).endVertex();
-		wr.pos(min, 0.0, 0.0).tex(1.0, 1.0).normal(0, 0, -1).endVertex();
-		wr.pos(min, 1.0, 0.0).tex(1.0, 0.0).normal(0, 0, -1).endVertex();
-		wr.pos(max, 1.0, 0.0).tex(0.0, 0.0).normal(0, 0, -1).endVertex();
-		
-		// -z
-		wr.pos(min, 0.0, 0.0).tex(1.0, 1.0).normal(0, 0, 1).endVertex();
-        wr.pos(max, 0.0, 0.0).tex(0.0, 1.0).normal(0, 0, 1).endVertex();
-        wr.pos(max, 1.0, 0.0).tex(0.0, 0.0).normal(0, 0, 1).endVertex();
-        wr.pos(min, 1.0, 0.0).tex(1.0, 0.0).normal(0, 0, 1).endVertex();
-        
-    	// -x
-    	wr.pos(0.0, 0.0, min).tex(0.0, 1.0).normal(-1, 0, 0).endVertex();
-    	wr.pos(0.0, 0.0, max).tex(1.0, 1.0).normal(-1, 0, 0).endVertex();
-    	wr.pos(0.0, 1.0, max).tex(1.0, 0.0).normal(-1, 0, 0).endVertex();
-    	wr.pos(0.0, 1.0, min).tex(0.0, 0.0).normal(-1, 0, 0).endVertex();
-		
-		// +x
-		wr.pos(0.0, 0.0, max).tex(1.0, 1.0).normal(1, 0, 0).endVertex();
-        wr.pos(0.0, 0.0, min).tex(0.0, 1.0).normal(1, 0, 0).endVertex();
-        wr.pos(0.0, 1.0, min).tex(0.0, 0.0).normal(1, 0, 0).endVertex();
-        wr.pos(0.0, 1.0, max).tex(1.0, 0.0).normal(1, 0, 0).endVertex();
-		
-		//wr.finishDrawing();
-		Tessellator.getInstance().draw();
-		GlStateManager.popMatrix();
-		
+		matrixStackIn.push();
+		matrixStackIn.translate(.5, 1.25, .5);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.scale(scale, scale, scale);
+		matrixStackIn.translate(0, .5, 0); // x: [-.5, .5] y: [0, 1]
+		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer, .5f, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(90f));
+		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer, .5f, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
+		matrixStackIn.pop();
 	}
-	
 }

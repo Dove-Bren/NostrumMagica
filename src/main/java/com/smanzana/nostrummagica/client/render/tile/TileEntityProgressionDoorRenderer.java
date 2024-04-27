@@ -1,122 +1,120 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<ProgressionDoorTileEntity> {
 
-	private static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
-	private static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
+	public static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
+	public static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
 	
-	public TileEntityProgressionDoorRenderer() {
-		
+	public TileEntityProgressionDoorRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(ProgressionDoorTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
-		Minecraft mc = Minecraft.getInstance();
-		double time = (double)te.getWorld().getGameTime() + partialTicks;
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
+	public void render(ProgressionDoorTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		final Minecraft mc = Minecraft.getInstance();
+		final double time = (double)tileEntityIn.getWorld().getGameTime() + partialTicks;
+		final INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(x + .5, y + 1.2, z + .5);
+		matrixStackIn.push();
+		matrixStackIn.translate(.5, 1.2, .5);
 		
 		// Render centered on bottom-center of door, not TE (in case they're different)
 		{
-			BlockPos pos = te.getPos();
-			BlockPos targ = te.getBottomCenterPos();
-			GlStateManager.translatef(targ.getX() - pos.getX(), targ.getY() - pos.getY(), targ.getZ() - pos.getZ());
+			BlockPos pos = tileEntityIn.getPos();
+			BlockPos targ = tileEntityIn.getBottomCenterPos();
+			matrixStackIn.translate(targ.getX() - pos.getX(), targ.getY() - pos.getY(), targ.getZ() - pos.getZ());
 		}
 		
-		float rotY = te.getFace().getOpposite().getHorizontalAngle();
-		
-		GlStateManager.rotatef((float) rotY, 0, -1, 0);
-		
-		
-		BufferBuilder wr = Tessellator.getInstance().getBuffer();
-		
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableLighting();
-		GlStateManager.enableAlphaTest();
-		
-		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+		final float rotY = tileEntityIn.getFace().getOpposite().getHorizontalAngle();
+		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rotY));
 		
 		// Draw lock symbol
 		{
-			GlStateManager.pushMatrix();
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.PROGRESSION_DOOR_LOCK);
+			
+			matrixStackIn.push();
 			
 			
-			final double horizontalRadius = .2;
-			final double verticalRadius = .4;
+			final float horizontalRadius = .2f;
+			final float verticalRadius = .4f;
 			final int points = 4;
-			final double depth = .2;
+			final float depth = .2f;
 			final double spinRate = 60.0;
+			final float[] color;
+			
+			if (tileEntityIn.meetsRequirements(mc.player, null)) {
+				color = new float[] {0f, 1f, 1f, .8f};
+			} else {
+				color = new float[] {1f, .3f, .6f, .8f};
+			}
 
-			GlStateManager.translated(0, 0.25, -.3);
-			GlStateManager.rotatef((float) (360.0 * (time % spinRate) / spinRate),
-					0, 1, 0);
+			matrixStackIn.translate(0, 0.25, -.3);
+			matrixStackIn.rotate(Vector3f.YP.rotationDegrees((float) (360.0 * (time % spinRate) / spinRate)));
 			
-			if (te.meetsRequirements(mc.player, null))
-				GlStateManager.color4f(0f, 1f, 1f, .8f);
-			else
-				GlStateManager.color4f(1f, .3f, .6f, .8f);
-			
-			Minecraft.getInstance().getTextureManager().bindTexture(TEX_GEM_LOC);
-			
-			wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
-			wr.pos(0, 0, -depth).tex(.5, .5).endVertex();
-			for (int i = points; i >= 0; i--) {
+			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			for (int i = 0; i < points; i++) {
 				double angle = (2*Math.PI) * ((double) i / (double) points);
-				double vx = Math.cos(angle) * horizontalRadius;
-				double vy = Math.sin(angle) * verticalRadius;
 				
-				double u = (vx + (horizontalRadius)) / (horizontalRadius * 2);
-				double v = (vy + (verticalRadius)) / (verticalRadius * 2);
-				wr.pos(vx, vy, 0).tex(u, v).endVertex();
-			}
-			Tessellator.getInstance().draw();
-			
-			wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
-			wr.pos(0, 0, depth).tex(.5, .5).endVertex();
-			for (int i = 0; i <= points; i++) {
-				double angle = (2*Math.PI) * ((double) i / (double) points);
-				double vx = Math.cos(angle) * horizontalRadius;
-				double vy = Math.sin(angle) * verticalRadius;
+				final float vx1 = (float) (Math.cos(angle) * horizontalRadius);
+				final float vy1 = (float) (Math.sin(angle) * verticalRadius);
+				final float u1 = (vx1 + (horizontalRadius)) / (horizontalRadius * 2);
+				final float v1 = (vy1 + (verticalRadius)) / (verticalRadius * 2);
 				
-				double u = (vx + (horizontalRadius)) / (horizontalRadius * 2);
-				double v = (vy + (verticalRadius)) / (verticalRadius * 2);
-				wr.pos(vx, vy, 0).tex(u, v).endVertex();
+				angle = (2*Math.PI) * ((double) ((i+1)%points) / (double) points);
+				
+				final float vx2 = (float) (Math.cos(angle) * horizontalRadius);
+				final float vy2 = (float) (Math.sin(angle) * verticalRadius);
+				final float u2 = (vx2 + (horizontalRadius)) / (horizontalRadius * 2);
+				final float v2 = (vy2 + (verticalRadius)) / (verticalRadius * 2);
+				
+				// For znegative, add in ZN, HIGH ANGLE, LOW ANGLE
+				buffer.pos(transform, 0, 0, -depth).tex(.5f, .5f).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).color(color[0], color[1], color[2], color[3]).endVertex();
+				
+				// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
+				buffer.pos(transform, 0, 0, depth).tex(.5f, .5f).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).color(color[0], color[1], color[2], color[3]).endVertex();
 			}
-			Tessellator.getInstance().draw();
-			
-			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 		
+
 		// Draw requirement icons
-		if (!te.getRequiredComponents().isEmpty()) {
-			GlStateManager.pushMatrix();
-			GlStateManager.translated(0, 0, -.2);
-			
-			final float angleDiff = (float) (Math.PI/(float)te.getRequiredComponents().size());
+		if (!tileEntityIn.getRequiredComponents().isEmpty()) {
+			final float angleDiff = (float) (Math.PI/(float)tileEntityIn.getRequiredComponents().size());
 			float angle = (float) (Math.PI + angleDiff/2);
-			for (SpellComponentWrapper comp : te.getRequiredComponents()) {
+			
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0, -.2);
+			
+			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Matrix3f normal = matrixStackIn.getLast().getNormal();
+			
+			for (SpellComponentWrapper comp : tileEntityIn.getRequiredComponents()) {
 				boolean has = false;
 				SpellComponentIcon icon;
 				if (comp.isTrigger()) {
@@ -137,81 +135,68 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 				
 				if (icon != null && icon.getModelLocation() != null) {
 					// Draw background
-					Minecraft.getInstance().getTextureManager().bindTexture(TEX_PLATE_LOC);
+					float[] color;
 					if (has)
-						GlStateManager.color4f(.4f, .4f, .4f, .4f);
+						color = new float[] {.4f, .4f, .4f, .4f};
 					else
-						GlStateManager.color4f(.8f, .6f, .6f, .8f);
-					
-					wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
+						color = new float[] {8f, .6f, .6f, .8f};
 					
 					final double wiggleTicks = 100;
-					final double imageHalfLength = .15;
-					final double plateHalfLength = imageHalfLength * 2;
-					final double radius = .75;
+					final float imageHalfLength = .15f;
+					final float plateHalfLength = imageHalfLength * 2;
+					final float radius = .75f;
+					
+					IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(TEX_PLATE_LOC));
 					
 					double effAngle = angle + (.04f * Math.cos(2 * Math.PI * (time % wiggleTicks) / wiggleTicks));
-					double vx = Math.cos(effAngle) * radius;
-					double vy = Math.sin(effAngle) * radius;
+					float vx = (float) (Math.cos(effAngle) * radius);
+					float vy = (float) (Math.sin(effAngle) * radius);
 					
 					// +z
-					wr.pos(vx, vy + plateHalfLength, 0.0005).tex(0.0, 1.0).normal(0, 0, -1).endVertex();
-					wr.pos(vx + plateHalfLength, vy, 0.0005).tex(1.0, 1.0).normal(0, 0, -1).endVertex();
-					wr.pos(vx, vy - plateHalfLength, 0.0005).tex(1.0, 0.0).normal(0, 0, -1).endVertex();
-					wr.pos(vx - plateHalfLength, vy, 0.0005).tex(0.0, 0.0).normal(0, 0, -1).endVertex();
+					buffer.pos(transform, vx, vy + plateHalfLength, 0.0005f).tex(0.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx + plateHalfLength, vy, 0.0005f).tex(1.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx, vy - plateHalfLength, 0.0005f).tex(1.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx - plateHalfLength, vy, 0.0005f).tex(0.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
 					
-					//wr.finishDrawing();
-					Tessellator.getInstance().draw();
 					
 					// Draw icon
-					Minecraft.getInstance().getTextureManager().bindTexture(icon.getModelLocation());
+					buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(icon.getModelLocation()));
 					if (has)
-						GlStateManager.color4f(1, 1, 1, .2f);
+						color = new float[] {1, 1, 1, .2f};
 					else
-						GlStateManager.color4f(1, 1, 1, .8f);
-					
-					wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
+						color = new float[] {1, 1, 1, .8f};
 					
 					// +z
-					wr.pos(vx + imageHalfLength, vy - imageHalfLength, 0.0).tex(0.0, 1.0).normal(0, 0, -1).endVertex();
-					wr.pos(vx - imageHalfLength, vy - imageHalfLength, 0.0).tex(1.0, 1.0).normal(0, 0, -1).endVertex();
-					wr.pos(vx - imageHalfLength, vy + imageHalfLength, 0.0).tex(1.0, 0.0).normal(0, 0, -1).endVertex();
-					wr.pos(vx + imageHalfLength, vy + imageHalfLength, 0.0).tex(0.0, 0.0).normal(0, 0, -1).endVertex();
+					buffer.pos(transform, vx + imageHalfLength, vy - imageHalfLength, 0.0f).tex(0.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx - imageHalfLength, vy - imageHalfLength, 0.0f).tex(1.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx - imageHalfLength, vy + imageHalfLength, 0.0f).tex(1.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx + imageHalfLength, vy + imageHalfLength, 0.0f).tex(0.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
 					
-					//wr.finishDrawing();
-					Tessellator.getInstance().draw();
 				}
 				angle += angleDiff;
 			}
-			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 		
 		// Draw required level
-		if (te.getRequiredLevel() > 0) {
-			GlStateManager.pushMatrix();
-			double drawZ = -.5;
-			
-			GlStateManager.translated(0, 1, drawZ);
+		if (tileEntityIn.getRequiredLevel() > 0) {
+			final double drawZ = -.5;
 			final float VANILLA_FONT_SCALE = 0.010416667f;
+			String val = "Level: " + tileEntityIn.getRequiredLevel();
+			final int color = (attr != null && attr.getLevel() >= tileEntityIn.getRequiredLevel())
+					? 0x50A0FFA0
+					: 0xFFFFFFFF;
 			
-			GlStateManager.scalef(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 1, drawZ);
+			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
-			String val = "Level: " + te.getRequiredLevel();
-			
-			int color = 0xFFFFFFFF;
-			if (attr != null && attr.getLevel() >= te.getRequiredLevel()) {
-				color = 0x50A0FFA0;
-			}
-			
-			this.getFontRenderer().drawString(val, this.getFontRenderer().getStringWidth(val) / -2, 0, color);
-			GlStateManager.popMatrix();
+			FontRenderer fonter = this.renderDispatcher.fontRenderer;
+			fonter.renderString(val, fonter.getStringWidth(val) / -2, 0, color, false, matrixStackIn.getLast().getMatrix(), bufferIn, true, 0x0, combinedLightIn);
+			matrixStackIn.pop();
 		}
-		
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.enableCull();
-        GlStateManager.popMatrix();
+
+		matrixStackIn.pop();
 		
 	}
-	
 }
