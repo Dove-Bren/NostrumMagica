@@ -1,9 +1,10 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 
@@ -12,14 +13,14 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 	private static final int TEXTURE_WIDTH = 129;
 	private static final int TEXTURE_HEIGHT = 96;
 
-	private RendererModel head;
-	private RendererModel body;
-	private RendererModel armLeft;
-	private RendererModel armRight;
-	private RendererModel legLeft;
-	private RendererModel legRight;
-	private RendererModel bootLeft;
-	private RendererModel bootRight;
+	private ModelRenderer head;
+	private ModelRenderer body;
+	private ModelRenderer armLeft;
+	private ModelRenderer armRight;
+	private ModelRenderer legLeft;
+	private ModelRenderer legRight;
+	private ModelRenderer bootLeft;
+	private ModelRenderer bootRight;
 	
 	// Level is number of other set pieces. 0 is base, 4 is max coolness.
 	public ModelEnchantedArmorBase(float scale, int level) {
@@ -27,7 +28,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		
 		scale = 0.01f;
 		
-		head = new RendererModel(this, 0, 0);
+		head = new ModelRenderer(this, 0, 0);
 		head.addBox(-5, -9, -5, 10, 10, 10, scale);
 		head.setTextureOffset(0, 0);
 		head.addBox(-6, -9, -2, 1, 5, 4, scale);
@@ -77,7 +78,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		
 
 		
-		body = new RendererModel(this, 0, 27);
+		body = new ModelRenderer(this, 0, 27);
 		body.addBox(-5.0F, 0F, -3.01F, 10, 12, 6);
 		
 		// Test feature growth 2
@@ -114,32 +115,32 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			
 			// Belt Tassels
 			{
-				RendererModel tasselRight = new RendererModel(this, 0, 0);
+				ModelRenderer tasselRight = new ModelRenderer(this, 0, 0);
 				// Lie about texture size to get more resolution on tassels
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 48 / 3);
-				tasselRight.addBox(0, 0, 0, 1, 5, 4, scale);
-				tasselRight.offsetX = (-7F/16F);
-				tasselRight.offsetY = (12F/16F);
-				tasselRight.offsetZ = (-2F/16F);
+				tasselRight.addBox(0 + (-7F/16F), 0 + (12F/16F), 0 + (-2F/16F), 1, 5, 4, scale);
+//				tasselRight.offsetX = (-7F/16F);
+//				tasselRight.offsetY = (12F/16F);
+//				tasselRight.offsetZ = (-2F/16F);
 				tasselRight.rotateAngleZ = 0.125f;
 				body.addChild(tasselRight);
 				
-				RendererModel tasselLeft = new RendererModel(this, 0, 0);
+				ModelRenderer tasselLeft = new ModelRenderer(this, 0, 0);
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 48 / 3);
 				tasselLeft.mirror = true;
-				tasselLeft.addBox(0, 0, 0, 1, 5, 4, scale);
-				tasselLeft.offsetX = (6F/16F);
-				tasselLeft.offsetY = (12F/16F);
-				tasselLeft.offsetZ = (-2F/16F);
+				tasselLeft.addBox(0 + (6F/16F), 0 + (12F/16F), 0 + (-2F/16F), 1, 5, 4, scale);
+//				tasselLeft.offsetX = (6F/16F);
+//				tasselLeft.offsetY = (12F/16F);
+//				tasselLeft.offsetZ = (-2F/16F);
 				tasselLeft.rotateAngleZ = -0.125f;
 				body.addChild(tasselLeft);
 			}
 		}
 		
 		
-		armLeft = new RendererModel(this, 0, 45);
+		armLeft = new ModelRenderer(this, 0, 45);
 		armLeft.addBox(-1F, -2.50F, -3F, 4, 9, 6, scale);
 		armLeft.setTextureOffset(20, 45);
 		armLeft.addBox(3.0F, -3.50F, -2F, 1, 3, 4, scale);
@@ -165,7 +166,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			body.addBox(5, -3.5f, -1, 2, 1, 3, scale * 1.5f);
 		}
 		
-		armRight = new RendererModel(this, 0, 45);
+		armRight = new ModelRenderer(this, 0, 45);
 		armRight.addBox(-3.0F, -2.50F, -3F, 4, 9, 6, scale);
 		armRight.setTextureOffset(20, 45);
 		armRight.addBox(-4.0F, -3.50F, -2F, 1, 3, 4, scale);
@@ -199,52 +200,52 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		if (level >= 4) {
 			// Shoulder Tassels
 			{
-				RendererModel tasselRight = new RendererModel(this, 0, 0);
+				ModelRenderer tasselRight = new ModelRenderer(this, 0, 0);
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 0 / 3);
-				tasselRight.addBox(0, 0, 0, 1, 5, 5, scale);
-				tasselRight.offsetX = (-11F/16F);
-				tasselRight.offsetY = (.5F/16F);
-				tasselRight.offsetZ = (-2F/16F);
+				tasselRight.addBox(0 + (-11F/16F), 0 + (.5F/16F), 0 + (-2F/16F), 1, 5, 5, scale);
+//				tasselRight.offsetX = (-11F/16F);
+//				tasselRight.offsetY = (.5F/16F);
+//				tasselRight.offsetZ = (-2F/16F);
 				body.addChild(tasselRight);
-				tasselRight = new RendererModel(this, 0, 0);
+				tasselRight = new ModelRenderer(this, 0, 0);
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 30 / 3);
-				tasselRight.addBox(0, 0, 0.01f, 6, 5, 1, scale);
-				tasselRight.offsetX = (-11F/16F);
-				tasselRight.offsetY = (.5F/16F);
-				tasselRight.offsetZ = (3F/16F);
+				tasselRight.addBox(0 + (-11F/16F), 0 + (.5F/16F), 0.01f + (3F/16F), 6, 5, 1, scale);
+//				tasselRight.offsetX = (-11F/16F);
+//				tasselRight.offsetY = (.5F/16F);
+//				tasselRight.offsetZ = (3F/16F);
 				body.addChild(tasselRight);
 				
-				RendererModel tasselLeft = new RendererModel(this, 0, 0);
+				ModelRenderer tasselLeft = new ModelRenderer(this, 0, 0);
 				tasselLeft.mirror = true;
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 0 / 3);
-				tasselLeft.addBox(0, 0, 0, 1, 5, 5, scale);
-				tasselLeft.offsetX = (10F/16F);
-				tasselLeft.offsetY = (.5F/16F);
-				tasselLeft.offsetZ = (-2F/16F);
+				tasselLeft.addBox(0 + (10F/16F), 0 + (.5F/16F), 0 + (-2F/16F), 1, 5, 5, scale);
+//				tasselLeft.offsetX = (10F/16F);
+//				tasselLeft.offsetY = (.5F/16F);
+//				tasselLeft.offsetZ = (-2F/16F);
 				body.addChild(tasselLeft);
 				tasselLeft.mirror = true;
-				tasselLeft = new RendererModel(this, 0, 0);
+				tasselLeft = new ModelRenderer(this, 0, 0);
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 30 / 3);
-				tasselLeft.addBox(0, 0, 0.01f, 6, 5, 1, scale);
-				tasselLeft.offsetX = (5F/16F);
-				tasselLeft.offsetY = (.5F/16F);
-				tasselLeft.offsetZ = (3F/16F);
+				tasselLeft.addBox(0 + (5F/16F), 0 + (.5F/16F), 0.01f + (3F/16F), 6, 5, 1, scale);
+//				tasselLeft.offsetX = (5F/16F);
+//				tasselLeft.offsetY = (.5F/16F);
+//				tasselLeft.offsetZ = (3F/16F);
 				body.addChild(tasselLeft);
 			}
 		}
 		
-		legLeft = new RendererModel(this, 0, 60);
+		legLeft = new ModelRenderer(this, 0, 60);
 		legLeft.addBox(-2F, -.95F, -3F, 5, 10, 6, scale);
 		
-		legRight = new RendererModel(this, 0, 60);
+		legRight = new ModelRenderer(this, 0, 60);
 		legRight.addBox(-3F, -.99F, -3F, 5, 10, 6, scale);
 		legRight.mirror = true;
 		
-		bootLeft = new RendererModel(this, 0, 76);
+		bootLeft = new ModelRenderer(this, 0, 76);
 		bootLeft.addBox(-2F, 10F, -4F, 4, 2, 7, scale * .9f);
 		bootLeft.setTextureOffset(0, 85);
 		bootLeft.addBox(-2F, 7F, -3F, 5, 3, 6, scale * .9f);
@@ -259,7 +260,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			bootLeft.addBox(4, 8, 0, 1, 1, 4, scale * .9f);
 		}
 		
-		bootRight = new RendererModel(this, 0, 76);
+		bootRight = new ModelRenderer(this, 0, 76);
 		bootRight.addBox(-2F, 10.1F, -4F, 4, 2, 7, scale * .9f);
 		bootRight.setTextureOffset(0, 85);
 		bootRight.addBox(-3F, 7.1F, -3F, 5, 3, 6, scale * .9f);
@@ -290,7 +291,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 	}
 	
 	@Override
-	public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		bipedBody.showModel = false;
 		bipedHead.showModel = false;
 		bipedHeadwear.showModel = false;
@@ -298,116 +299,116 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		bipedRightArm.showModel = false;
 		bipedLeftLeg.showModel = false;
 		bipedRightLeg.showModel = false;
-		// We actually set parent to be invisible so this just gets angles and stuff
-		super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+		// We actually set parent to be invisible so this just gets angles and stuff... or it used to and now does nothing?
+		super.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
 		//this.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, entityIn);
-		GlStateManager.pushMatrix();
+		matrixStackIn.push();
 
 		if (this.isChild)
 		{
-			GlStateManager.scalef(0.75F, 0.75F, 0.75F);
-			GlStateManager.translatef(0.0F, 16.0F * scale, 0.0F);
+			matrixStackIn.scale(0.75F, 0.75F, 0.75F);
+			matrixStackIn.translate(0.0F, 16.0F, 0.0F);
 			if (head.showModel) {
 				copyOffsetAndRots(head, bipedHead);
-				this.head.render(scale);
+				this.head.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
-			GlStateManager.popMatrix();
-			GlStateManager.pushMatrix();
-			GlStateManager.scalef(0.5F, 0.5F, 0.5F);
-			GlStateManager.translatef(0.0F, 24.0F * scale, 0.0F);
+			matrixStackIn.pop();
+			matrixStackIn.push();
+			matrixStackIn.scale(0.5F, 0.5F, 0.5F);
+			matrixStackIn.translate(0.0F, 24.0F, 0.0F);
 			if (body.showModel) {
 				copyOffsetAndRots(body, bipedBody);
-				this.body.render(scale);
+				this.body.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (armRight.showModel) {
 				copyOffsetAndRots(armRight, bipedRightArm);
-				this.armRight.render(scale);
+				this.armRight.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (armLeft.showModel) {
 				copyOffsetAndRots(armLeft, bipedLeftArm);
-				this.armLeft.render(scale);
+				this.armLeft.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 
 			if (legRight.showModel) {
 				copyOffsetAndRots(legRight, bipedRightLeg);
-				this.legRight.render(scale);
+				this.legRight.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (legLeft.showModel) {
 				copyOffsetAndRots(legLeft, bipedLeftLeg);
-				this.legLeft.render(scale);
+				this.legLeft.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			// Boots are based off of leg model. Copy from biped's legs
 			if (bootRight.showModel) {
 				copyOffsetAndRots(bootRight, bipedRightLeg);
-				this.bootRight.render(scale);
+				this.bootRight.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (bootLeft.showModel) {
 				copyOffsetAndRots(bootLeft, bipedLeftLeg);
-				this.bootLeft.render(scale);
+				this.bootLeft.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 		}
 		else
 		{
-			if (entityIn.isSneaking())
+			if (isSneak)
 			{
-				GlStateManager.translatef(0.0F, 0.2F, 0.0F);
+				matrixStackIn.translate(0.0F, 0.2F, 0.0F);
 			}
 			
 			if (head.showModel) {
 				copyOffsetAndRots(head, bipedHead);
-				this.head.render(scale);
+				this.head.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 
 			if (body.showModel) {
 				copyOffsetAndRots(body, bipedBody);
-				this.body.render(scale);
+				this.body.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (armRight.showModel) {
 				copyOffsetAndRots(armRight, bipedRightArm);
-				this.armRight.render(scale);
+				this.armRight.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (armLeft.showModel) {
 				copyOffsetAndRots(armLeft, bipedLeftArm);
-				this.armLeft.render(scale);
+				this.armLeft.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 
 			if (legRight.showModel) {
 				copyOffsetAndRots(legRight, bipedRightLeg);
-				this.legRight.render(scale);
+				this.legRight.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (legLeft.showModel) {
 				copyOffsetAndRots(legLeft, bipedLeftLeg);
-				this.legLeft.render(scale);
+				this.legLeft.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			// Boots are based off of leg model. Copy from biped's legs
 			if (bootRight.showModel) {
 				copyOffsetAndRots(bootRight, bipedRightLeg);
-				this.bootRight.render(scale);
+				this.bootRight.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 			
 			if (bootLeft.showModel) {
 				copyOffsetAndRots(bootLeft, bipedLeftLeg);
-				this.bootLeft.render(scale);
+				this.bootLeft.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 		}
 
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 	}
 	
-	protected void copyOffsetAndRots(RendererModel to, RendererModel from) {
-		to.offsetX = from.offsetX;
-		to.offsetY = from.offsetY;
-		to.offsetZ = from.offsetZ;
+	protected void copyOffsetAndRots(ModelRenderer to, ModelRenderer from) {
+//		to.offsetX = from.offsetX;
+//		to.offsetY = from.offsetY;
+//		to.offsetZ = from.offsetZ;
 		to.rotationPointX = from.rotationPointX;
 		to.rotationPointY = from.rotationPointY;
 		to.rotationPointZ = from.rotationPointZ;
