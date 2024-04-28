@@ -1534,7 +1534,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 				UpdateEntity(living);
 				
 				if (living.isElytraFlying() && living.isSneaking() && living instanceof ServerPlayerEntity) {
-					((ServerPlayerEntity) living).clearElytraFlying();
+					((ServerPlayerEntity) living).stopFallFlying();
 				}
 			}
 		});

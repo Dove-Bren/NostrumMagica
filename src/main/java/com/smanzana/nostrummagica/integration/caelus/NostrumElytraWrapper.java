@@ -12,14 +12,14 @@ import com.smanzana.nostrummagica.items.IElytraRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import top.theillusivec4.caelus.api.CaelusAPI;
-import top.theillusivec4.caelus.api.event.RenderElytraEvent;
+import top.theillusivec4.caelus.api.CaelusApi;
+import top.theillusivec4.caelus.api.RenderElytraEvent;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class NostrumElytraWrapper {
@@ -45,22 +45,22 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void AddElytraModifier(LivingEntity entity, AttributeModifier modifier) {
-		final IAttributeInstance inst = entity.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
+		final ModifiableAttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 		if (inst == null) {
 			throw new RuntimeException("Caelus is required for NostrumMagica, but no Caelus attribute found.");
 		}
 		
 		if (!inst.hasModifier(modifier)) {
-			inst.applyModifier(modifier);
+			inst.applyPersistentModifier(modifier);
 		}
 	}
 	
 	public static final void AddElytraModifier(Multimap<Attribute, AttributeModifier> map, AttributeModifier modifier) {
-		map.put(CaelusAPI.ELYTRA_FLIGHT, modifier);
+		map.put(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
 	}
 	
 	public static final void RemoveElytraModifier(LivingEntity entity, AttributeModifier modifier) {
-		final IAttributeInstance inst = entity.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
+		final ModifiableAttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 		if (inst == null) {
 			throw new RuntimeException("Caelus is required for NostrumMagica, but no Caelus attribute found.");
 		}
@@ -70,8 +70,8 @@ public class NostrumElytraWrapper {
 		}
 	}
 	
-	public static final void RemoveElytraModifier(Multimap<String, AttributeModifier> map, AttributeModifier modifier) {
-		map.remove(CaelusAPI.ELYTRA_FLIGHT.getName(), modifier);
+	public static final void RemoveElytraModifier(Multimap<Attribute, AttributeModifier> map, AttributeModifier modifier) {
+		map.remove(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
 	}
 	
 	@SubscribeEvent(priority=EventPriority.LOWEST)
@@ -82,13 +82,13 @@ public class NostrumElytraWrapper {
 		final boolean flying = entity.isElytraFlying();
 		ItemStack cape = LayerAetherCloak.ShouldRender(entity);
 		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(entity, cape)) {
-			event.setRenderElytra(false);
-			event.setRenderEnchantmentGlow(false);
+			event.setRender(false);
+			event.setEnchanted(false);
 			return;
 		}
 		
 		// Everything from here can only turn ON rendering, so if it's already on go ahead and skip the work.
-		if (event.getRenderElytra()) {
+		if (event.canRender()) {
 			return;
 		}
 		
@@ -96,8 +96,8 @@ public class NostrumElytraWrapper {
 		for (@Nonnull ItemStack stack : entity.getEquipmentAndArmor()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IElytraRenderer) {
 				if (((IElytraRenderer) stack.getItem()).shouldRenderElyta(entity, stack)) {
-					event.setRenderElytra(true);
-					event.setRenderEnchantmentGlow(true);
+					event.setRender(true);
+					event.setEnchanted(true);
 					return;
 				}
 			}

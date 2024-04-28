@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.Entities;
-import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PaneBlock;
@@ -151,7 +150,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 				}
 			} else {
 				if (!worldIn.isRemote) {
-					if (DimensionUtils.InDimension(playerIn, NostrumDimensions.EmptyDimension)) {
+					if (DimensionUtils.IsSorceryDim(DimensionUtils.GetDimension(playerIn))) {
 						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"), Util.DUMMY_UUID);
 					} else {
 						EntityHookShot hook = new EntityHookShot(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
@@ -297,7 +296,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 				// Assumes previous check that we must be in mainhand or offhand to be extended has happened
 				final Hand hand = (itemSlot == 0 ? Hand.OFF_HAND : Hand.MAIN_HAND);
 				if (isPulling(player, hand)) {
-					((ServerPlayerEntity) player).setElytraFlying();
+					((ServerPlayerEntity) player).startFallFlying();
 				}
 			}
 		}
