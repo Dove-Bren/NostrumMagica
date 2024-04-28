@@ -95,6 +95,7 @@ import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
@@ -110,6 +111,7 @@ import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityPet;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
@@ -216,6 +218,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.renderer.entity.AreaEffectCloudRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
@@ -228,6 +231,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -445,209 +449,39 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private void registerEntityRenderers() {
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntitySpellProjectile.class, new IRenderFactory<EntitySpellProjectile>() {
-			@Override
-			public EntityRenderer<? super EntitySpellProjectile> createRenderFor(EntityRendererManager manager) {
-				return new RenderSpellProjectile(manager, 1f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntitySpellBullet.class, new IRenderFactory<EntitySpellBullet>() {
-			@Override
-			public EntityRenderer<? super EntitySpellBullet> createRenderFor(EntityRendererManager manager) {
-				return new RenderSpellBullet(manager, 1f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemEarth.class, new IRenderFactory<EntityGolemEarth>() {
-			@Override
-			public EntityRenderer<? super EntityGolemEarth> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemEarth>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemFire.class, new IRenderFactory<EntityGolemFire>() {
-			@Override
-			public EntityRenderer<? super EntityGolemFire> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemFire>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemIce.class, new IRenderFactory<EntityGolemIce>() {
-			@Override
-			public EntityRenderer<? super EntityGolemIce> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemIce>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemLightning.class, new IRenderFactory<EntityGolemLightning>() {
-			@Override
-			public EntityRenderer<? super EntityGolemLightning> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemLightning>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemEnder.class, new IRenderFactory<EntityGolemEnder>() {
-			@Override
-			public EntityRenderer<? super EntityGolemEnder> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemEnder>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemPhysical.class, new IRenderFactory<EntityGolemPhysical>() {
-			@Override
-			public EntityRenderer<? super EntityGolemPhysical> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemPhysical>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityGolemWind.class, new IRenderFactory<EntityGolemWind>() {
-			@Override
-			public EntityRenderer<? super EntityGolemWind> createRenderFor(EntityRendererManager manager) {
-				return new RenderGolem<EntityGolemWind>(manager, new ModelGolem<>(), .8f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityKoid.class, new IRenderFactory<EntityKoid>() {
-			@Override
-			public EntityRenderer<? super EntityKoid> createRenderFor(EntityRendererManager manager) {
-				return new RenderKoid(manager, .3f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityDragonRed.class, new IRenderFactory<EntityDragonRed>() {
-			@Override
-			public EntityRenderer<? super EntityDragonRed> createRenderFor(EntityRendererManager manager) {
-				return new RenderDragonRed<EntityDragonRed>(manager, 5);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityDragonRed.DragonBodyPart.class, new IRenderFactory<EntityDragonRed.DragonBodyPart>() {
-			@Override
-			public EntityRenderer<? super EntityDragonRed.DragonBodyPart> createRenderFor(EntityRendererManager manager) {
-				return new RenderDragonRedPart(manager);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityTameDragonRed.class, new IRenderFactory<EntityTameDragonRed>() {
-			@Override
-			public EntityRenderer<? super EntityTameDragonRed> createRenderFor(EntityRendererManager manager) {
-				return new RenderTameDragonRed(manager, 2);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityShadowDragonRed.class, new IRenderFactory<EntityShadowDragonRed>() {
-			@Override
-			public EntityRenderer<? super EntityShadowDragonRed> createRenderFor(EntityRendererManager manager) {
-				return new RenderShadowDragonRed(manager, 2);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntitySprite.class, new IRenderFactory<EntitySprite>() {
-			@Override
-			public EntityRenderer<? super EntitySprite> createRenderFor(EntityRendererManager manager) {
-				return  new RenderSprite(manager, .7f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityDragonEgg.class, new IRenderFactory<EntityDragonEgg>() {
-			@Override
-			public EntityRenderer<? super EntityDragonEgg> createRenderFor(EntityRendererManager manager) {
-				return new RenderDragonEgg(manager, .45f);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityChakramSpellSaucer.class, new IRenderFactory<EntityChakramSpellSaucer>() {
-			@Override
-			public EntityRenderer<? super EntityChakramSpellSaucer> createRenderFor(EntityRendererManager manager) {
-				return new RenderMagicSaucer<EntityChakramSpellSaucer>(manager);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntityCyclerSpellSaucer.class, new IRenderFactory<EntityCyclerSpellSaucer>() {
-			@Override
-			public EntityRenderer<? super EntityCyclerSpellSaucer> createRenderFor(EntityRendererManager manager) {
-				return new RenderMagicSaucer<EntityCyclerSpellSaucer>(manager);
-			}
-		});				
-		RenderingRegistry.registerEntityRenderingHandler(EntitySwitchTrigger.class, new IRenderFactory<EntitySwitchTrigger>() {
-			@Override
-			public EntityRenderer<? super EntitySwitchTrigger> createRenderFor(EntityRendererManager manager) {
-				return new RenderSwitchTrigger(manager);
-			}
-		});			
-		RenderingRegistry.registerEntityRenderingHandler(EntityKeySwitchTrigger.class, new IRenderFactory<EntityKeySwitchTrigger>() {
-			@Override
-			public EntityRenderer<? super EntityKeySwitchTrigger> createRenderFor(EntityRendererManager manager) {
-				return new RenderKeySwitchTrigger(manager);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(NostrumTameLightning.class, new IRenderFactory<NostrumTameLightning>() {
-			@Override
-			public EntityRenderer<? super NostrumTameLightning> createRenderFor(EntityRendererManager manager) {
-				return new LightningBoltRenderer(manager);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityHookShot.class, new IRenderFactory<EntityHookShot>() {
-			@Override
-			public EntityRenderer<? super EntityHookShot> createRenderFor(EntityRendererManager manager) {
-				return new RenderHookShot(manager);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityWisp.class, new IRenderFactory<EntityWisp>() {
-			@Override
-			public EntityRenderer<? super EntityWisp> createRenderFor(EntityRendererManager manager) {
-				return new RenderWisp(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityLux.class, new IRenderFactory<EntityLux>() {
-			@Override
-			public EntityRenderer<? super EntityLux> createRenderFor(EntityRendererManager manager) {
-				return new RenderLux(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityWillo.class, new IRenderFactory<EntityWillo>() {
-			@Override
-			public EntityRenderer<? super EntityWillo> createRenderFor(EntityRendererManager manager) {
-				return new RenderWillo(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityArcaneWolf.class, new IRenderFactory<EntityArcaneWolf>() {
-			@Override
-			public EntityRenderer<? super EntityArcaneWolf> createRenderFor(EntityRendererManager manager) {
-				return new RenderArcaneWolf(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBoss.class, new IRenderFactory<EntityPlantBoss>() {
-			@Override
-			public EntityRenderer<? super EntityPlantBoss> createRenderFor(EntityRendererManager manager) {
-				return new RenderPlantBoss(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBoss.PlantBossLeafLimb.class, new IRenderFactory<EntityPlantBoss.PlantBossLeafLimb>() {
-			@Override
-			public EntityRenderer<? super EntityPlantBoss.PlantBossLeafLimb> createRenderFor(EntityRendererManager manager) {
-				return new RenderPlantBossLeaf(manager);
-			}
-		});
-		RenderingRegistry.registerEntityRenderingHandler(EntitySpellMortar.class, new IRenderFactory<EntitySpellMortar>() {
-			@Override
-			public EntityRenderer<? super EntitySpellMortar> createRenderFor(EntityRendererManager manager) {
-				return new RenderSpellMortar(manager, 1f);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBossBramble.class, new IRenderFactory<EntityPlantBossBramble>() {
-			@Override
-			public EntityRenderer<? super EntityPlantBossBramble> createRenderFor(EntityRendererManager manager) {
-				return new RenderPlantBossBramble(manager);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlantBoss.PlantBossBody.class, new IRenderFactory<EntityPlantBoss.PlantBossBody>() {
-			@Override
-			public EntityRenderer<? super EntityPlantBoss.PlantBossBody> createRenderFor(EntityRendererManager manager) {
-				return new RenderPlantBossBody(manager);
-			}
-		});
-		
-		RenderingRegistry.registerEntityRenderingHandler(EntityEnderRodBall.class, new IRenderFactory<EntityEnderRodBall>() {
-			@Override
-			public EntityRenderer<? super EntityEnderRodBall> createRenderFor(EntityRendererManager manager) {
-				return new RenderEnderRodBall(manager);
-			}
-		});
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellProjectile, (manager) -> new RenderSpellProjectile(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellBullet, (manager) -> new RenderSpellBullet(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemEarth, (manager) -> new RenderGolem<EntityGolemEarth>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemFire, (manager) -> new RenderGolem<EntityGolemFire>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemIce, (manager) -> new RenderGolem<EntityGolemIce>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemLightning, (manager) -> new RenderGolem<EntityGolemLightning>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemEnder, (manager) -> new RenderGolem<EntityGolemEnder>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemPhysical, (manager) -> new RenderGolem<EntityGolemPhysical>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemWind, (manager) -> new RenderGolem<EntityGolemWind>(manager, new ModelGolem<>(), .8f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.koid, (manager) -> new RenderKoid(manager, .3f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.dragonRed, (manager) ->  new RenderDragonRed<EntityDragonRed>(manager, 5));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.dragonRedBodyPart, (manager) -> new RenderDragonRedPart(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tameDragonRed, (manager) -> new RenderTameDragonRed(manager, 2));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.shadowDragonRed, (manager) -> new RenderShadowDragonRed(manager, 2));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.sprite, (manager) -> new RenderSprite(manager, .7f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.dragonEgg, (manager) -> new RenderDragonEgg(manager, .45f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.chakramSpellSaucer, (manager) -> new RenderMagicSaucer<EntityChakramSpellSaucer>(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.cyclerSpellSaucer, (manager) -> new RenderMagicSaucer<EntityCyclerSpellSaucer>(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.switchTrigger, (manager) -> new RenderSwitchTrigger(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.keySwitchTrigger, (manager) -> new RenderKeySwitchTrigger(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tameLightning, (manager) -> new LightningBoltRenderer(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.hookShot, (manager) -> new RenderHookShot(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.wisp, (manager) -> new RenderWisp(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.lux, (manager) -> new RenderLux(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.willo, (manager) -> new RenderWillo(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.arcaneWolf, (manager) -> new RenderArcaneWolf(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBoss, (manager) -> new RenderPlantBoss(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossLeaf, (manager) -> new RenderPlantBossLeaf(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellMortar, (manager) -> new RenderSpellMortar(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossBramble, (manager) -> new RenderPlantBossBramble(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossBody, (manager) -> new RenderPlantBossBody(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.enderRodBall, (manager) -> new RenderEnderRodBall(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.areaEffect, (manager) -> new AreaEffectCloudRenderer(manager));
 	}
 	
 	@SubscribeEvent
