@@ -12,9 +12,10 @@ import java.util.Set;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -57,9 +58,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class MirrorGui extends Screen {
 	
@@ -273,38 +277,37 @@ public class MirrorGui extends Screen {
 		refreshButtons();
 	}
 	
-	private void drawCharacterScreenBackground(int mouseX, int mouseY, float partialTicks) {
+	private void drawCharacterScreenBackground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		float extra = .2f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .2f - extra;
-		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT,
+				.8f + extra, 1f, .8f + inv, 1f);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof QuestButton)
-				((QuestButton) button).drawTreeLines(mc);
+				((QuestButton) button).drawTreeLines(matrixStackIn, mc);
 		}
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof QuestButton)
-				button.render(mouseX, mouseY, partialTicks);
+				button.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 	}
 	
-	private void drawCharacterScreenForeground(int mouseX, int mouseY, float partialTicks) {
+	private void drawCharacterScreenForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int KEY_HEIGHT = 15;
 		int KEY_VOFFSET = 9;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		GlStateManager.disableBlend();
-		GlStateManager.disableLighting();
+//		GlStateManager.disableBlend();
+//		GlStateManager.disableLighting();
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		// DRAW STATS
@@ -316,17 +319,17 @@ public class MirrorGui extends Screen {
 		
 		str = "Level " + level;
 		len = font.getStringWidth(str);
-		this.font.drawStringWithShadow(str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF);
+		this.font.drawStringWithShadow(matrixStackIn, str, (this.width - len) / 2, topOffset + TEXT_BOTTOM_VOFFSET, 0xFFFFFFFF);
 		y += font.FONT_HEIGHT + 10;
 		int yTop = y = KEY_VOFFSET + topOffset + TEXT_BOTTOM_VOFFSET;
 		
 		//leftOffset + TEXT_BOTTOM_HOFFSET, y + topOffset + TEXT_BOTTOM_VOFFSET, colorKey
 		// XP, points
-		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "XP: ";
 		len = font.getStringWidth(String.format("%.02f%%", 100f * xp/maxXP));
-		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.font.drawString(String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
+		this.font.drawString(matrixStackIn, str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString(matrixStackIn, String.format("%.02f%%", 100f * xp/maxXP), leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
 //					RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, topOffset + TEXT_BOTTOM_VOFFSET + y - 2, leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth + 2, topOffset + TEXT_BOTTOM_VOFFSET + y + this.font.FONT_HEIGHT, 0xD0000000);
@@ -336,39 +339,39 @@ public class MirrorGui extends Screen {
 //					this.font.drawString("" + attr.getTech(), leftOffset + TEXT_BOTTOM_HOFFSET + keyWidth - (len), y + topOffset + TEXT_BOTTOM_VOFFSET, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + TEXT_BOTTOM_HOFFSET - 2, y, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Skill Points: ";
 		len = font.getStringWidth("" + skillPoints);
-		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.font.drawString("" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
+		this.font.drawString(matrixStackIn, str, leftOffset + TEXT_BOTTOM_HOFFSET, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString(matrixStackIn, "" + skillPoints, leftOffset + TEXT_BOTTOM_HOFFSET + KEY_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
 		// stats
 		y = yTop;
-		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Control: ";
 		len = font.getStringWidth("" + control);
-		this.font.drawString(str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.font.drawString("" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
+		this.font.drawString(matrixStackIn, str, leftOffset + TEXT_BOTTOM_WIDTH + TEXT_BOTTOM_HOFFSET - (KEY_WIDTH), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString(matrixStackIn, "" + control, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Technique: ";
 		len = font.getStringWidth("" + technique);
-		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.font.drawString("" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
+		this.font.drawString(matrixStackIn, str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString(matrixStackIn, "" + technique, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		RenderFuncs.drawRect(leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (2 + KEY_WIDTH), y, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH + 2, y + KEY_HEIGHT, 0xD0000000);
 		str = "Finess: ";
 		len = font.getStringWidth("" + finesse);
-		this.font.drawString(str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
-		this.font.drawString("" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
+		this.font.drawString(matrixStackIn, str, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - KEY_WIDTH, y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorKey);
+		this.font.drawString(matrixStackIn, "" + finesse, leftOffset + TEXT_BOTTOM_HOFFSET + TEXT_BOTTOM_WIDTH - (len), y + (KEY_HEIGHT - font.FONT_HEIGHT) / 2 + 1, colorVal);
 		y += KEY_HEIGHT + 5;
 		
-		buttonControl.render(mouseX, mouseY, partialTicks);
-		buttonTechnique.render(mouseX, mouseY, partialTicks);
-		buttonFinesse.render(mouseX, mouseY, partialTicks);
+		buttonControl.render(matrixStackIn, mouseX, mouseY, partialTicks);
+		buttonTechnique.render(matrixStackIn, mouseX, mouseY, partialTicks);
+		buttonFinesse.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		int mana = attr.getMana();
@@ -377,24 +380,24 @@ public class MirrorGui extends Screen {
 		float bonusManaRegen = attr.getManaRegenModifier();
 		float bonusManaCost = attr.getManaCostModifier();
 		int fh = font.FONT_HEIGHT;
-		this.font.drawString("Mana:",
+		this.font.drawString(matrixStackIn, "Mana:",
 				leftOffset + TEXT_WIDTH, topOffset + 5, 0xFFFFFFFF);
-		this.font.drawString(" " + mana + "/" + maxMana,
+		this.font.drawString(matrixStackIn, " " + mana + "/" + maxMana,
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh, 0xFFFFFFFF);
 		
-		this.font.drawString("Bonus Mana:",
+		this.font.drawString(matrixStackIn, "Bonus Mana:",
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 4, 0xFFFFFFFF);
-		this.font.drawString(String.format("%+.1f%%", bonusMana * 100f),
+		this.font.drawString(matrixStackIn, String.format("%+.1f%%", bonusMana * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 5, 0xFFFFFFFF);
 
-		this.font.drawString("Mana Regen:",
+		this.font.drawString(matrixStackIn, "Mana Regen:",
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 6, 0xFFFFFFFF);
-		this.font.drawString(String.format("%+.1f%%", bonusManaRegen * 100f),
+		this.font.drawString(matrixStackIn, String.format("%+.1f%%", bonusManaRegen * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 7, 0xFFFFFFFF);
 
-		this.font.drawString("Mana Cost:",
+		this.font.drawString(matrixStackIn, "Mana Cost:",
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 8, 0xFFFFFFFF);
-		this.font.drawString(String.format("%+.1f%%", bonusManaCost * 100f),
+		this.font.drawString(matrixStackIn, String.format("%+.1f%%", bonusManaCost * 100f),
 				leftOffset + TEXT_WIDTH, topOffset + 5 + fh * 9, 0xFFFFFFFF);
 		
 		if (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
@@ -402,66 +405,66 @@ public class MirrorGui extends Screen {
 			for (int i = 0; i < this.buttons.size(); ++i) {
 				Button button = (Button)this.buttons.get(i);
 				if (button instanceof QuestButton)
-					((QuestButton) button).drawOverlay(mc, mouseX, mouseY);
+					((QuestButton) button).drawOverlay(matrixStackIn, mc, mouseX, mouseY);
 			}
 		}
 	}
 	
-	private void drawResearchScreenBackground(int mouseX, int mouseY, float partialTicks) {
+	private void drawResearchScreenBackground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		float extra = .2f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .2f - extra;
-		GlStateManager.color4f(.8f + extra, 1f, .8f + inv, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT,
+				.8f + extra, 1f, .8f + inv, 1f);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton)
-				button.render(mouseX, mouseY, partialTicks);
+				button.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton)
-				((ResearchButton) button).drawTreeLines(mc);
+				((ResearchButton) button).drawTreeLines(matrixStackIn, mc);
 		}
 	}
 	
-	private void drawResearchScreenForeground(int mouseX, int mouseY, float partialTicks) {
+	private void drawResearchScreenForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		GlStateManager.disableBlend();
-    	GlStateManager.enableAlphaTest();
-		GlStateManager.disableLighting();
+//		GlStateManager.color4f(1f, 1f, 1f, 1f);
+//		GlStateManager.disableBlend();
+//    	GlStateManager.enableAlphaTest();
+//		GlStateManager.disableLighting();
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchTabButton) {
-				button.render(mouseX, mouseY, partialTicks);
+				button.render(matrixStackIn, mouseX, mouseY, partialTicks);
 			}
 		}
 		
 		int y = topOffset + TEXT_BOTTOM_VOFFSET + BUTTON_MINOR_HEIGHT + 10;
 		int centerX = leftOffset + (TEXT_WIDTH / 2);
 		int width = 200;
-		RenderFuncs.drawRect(centerX - (width/2), y - 4, centerX + (width / 2), y + font.FONT_HEIGHT + 2, 0xD0000000);
+		RenderFuncs.drawRect(matrixStackIn, centerX - (width/2), y - 4, centerX + (width / 2), y + font.FONT_HEIGHT + 2, 0xD0000000);
 		String str = "Points: " + researchPoints;
 		width = font.getStringWidth(str);
-		this.font.drawString(str, centerX - (width/2), y, 0xFFFFFFFF);
+		this.font.drawString(matrixStackIn, str, centerX - (width/2), y, 0xFFFFFFFF);
 		
 		width = 200;
 		int knowledgeHeight = 4;
 		y += font.FONT_HEIGHT + 2;
 		final int x = Math.round(((float) knowledge / (float) maxKnowledge) * (float) width);
-		RenderFuncs.drawRect(centerX - (width/2), y, centerX + (width / 2), y + 2 + knowledgeHeight, 0xFF555555);
-		RenderFuncs.drawRect(centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
-		RenderFuncs.drawRect(centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);
+		RenderFuncs.drawRect(matrixStackIn, centerX - (width/2), y, centerX + (width / 2), y + 2 + knowledgeHeight, 0xFF555555);
+		RenderFuncs.drawRect(matrixStackIn, centerX - (width/2) + 1, y + 1, centerX + (width / 2) - 1, y + 1 + knowledgeHeight, 0xFF000000);
+		RenderFuncs.drawRect(matrixStackIn, centerX - (width/2) + 1, y + 1, centerX - (width/2) + 1 + x, y + 1 + knowledgeHeight, 0xFFFFFF00);
 		
 		boolean mouseContent =  (mouseX >= leftOffset + TEXT_CONTENT_HOFFSET && mouseX <= leftOffset + TEXT_CONTENT_HOFFSET + TEXT_CONTENT_WIDTH
 				&& mouseY >= topOffset + TEXT_CONTENT_VOFFSET && mouseY <= topOffset + TEXT_CONTENT_VOFFSET + TEXT_CONTENT_HEIGHT);
@@ -469,42 +472,42 @@ public class MirrorGui extends Screen {
 			Button button = (Button)this.buttons.get(i);
 			if (button instanceof ResearchButton) {
 				if (mouseContent) {
-					((ResearchButton) button).drawOverlay(mc, mouseX, mouseY);
+					((ResearchButton) button).drawOverlay(matrixStackIn, mc, mouseX, mouseY);
 				}
 			} else if (button instanceof ResearchTabButton) {
-				((ResearchTabButton) button).drawOverlay(mc, mouseX, mouseY);
+				((ResearchTabButton) button).drawOverlay(matrixStackIn, mc, mouseX, mouseY);
 			}
 		}
 	}
 	
-	private void drawLockedScreenBackground(int mouseX, int mouseY, float partialTicks) {
+	private void drawLockedScreenBackground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
+//		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLOUD);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT);
 		
 		int y = 0;
 		String str = "Magic Not Yet Unlocked";
 		int len = this.font.getStringWidth(str);
-		this.font.drawStringWithShadow(str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF);
+		this.font.drawStringWithShadow(matrixStackIn, str, (this.width - len) / 2, topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFFFFFFF);
 		
 		y = font.FONT_HEIGHT + 2;
 		
 		len = this.font.getStringWidth(unlockPrompt);
-		this.font.drawString(unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000);
+		this.font.drawString(matrixStackIn, unlockPrompt, (this.width - len) / 2, y + topOffset + (TEXT_CONTENT_HEIGHT / 2), 0xFFDFD000);
 	}
 	
-	private void drawLockedScreenForeground(int mouseX, int mouseY, float partialTicks) {
+	private void drawLockedScreenForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_FORE);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		GlStateManager.disableBlend();
-		GlStateManager.disableLighting();
+//		GlStateManager.color4f(1f, 1f, 1f, 1f);
+//		GlStateManager.disableBlend();
+//		GlStateManager.disableLighting();
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -537,119 +540,120 @@ public class MirrorGui extends Screen {
 		int strLen;
 		String str;
 
-		GlStateManager.enableBlend();
-		RenderFuncs.drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+//		GlStateManager.enableBlend();
+		RenderFuncs.drawRect(matrixStackIn, x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		float[] color;
 		if (element != null)
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			color = new float[] {1f, 1f, 1f, 1f};
 		else {
-			GlStateManager.color4f(.8f, .5f, .5f, .5f);
+			color = new float[] {8f, .5f, .5f, .5f};
 			element = EMagicElement.values()[
                   (int) (System.currentTimeMillis() / cycle) % EMagicElement.values().length
 			      ];
 		}
-		SpellComponentIcon.get(element).draw(this, this.font, x, y, width, width);
+		SpellComponentIcon.get(element).draw(this, matrixStackIn, this.font, x, y, width, width, color[0], color[1], color[2], color[3]);
 		str = I18n.format("element.name", new Object[0]);
 		strLen = this.font.getStringWidth(str);
-		this.font.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
+		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
 		
 		x += width + space;
-		RenderFuncs.drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		RenderFuncs.drawRect(matrixStackIn, x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
 		if (trigger != null)
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			color = new float[] {1f, 1f, 1f, 1f};
 		else {
-			GlStateManager.color4f(.8f, .5f, .5f, .5f);
+			color = new float[] {8f, .5f, .5f, .5f};
 			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
 			SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
 			trigger = trigArray[
                   (int) (System.currentTimeMillis() / cycle) % trigArray.length
 			      ];
 		}
-		SpellComponentIcon.get(trigger).draw(this, this.font, x, y, width, width);
+		SpellComponentIcon.get(trigger).draw(this, matrixStackIn, this.font, x, y, width, width, color[0], color[1], color[2], color[3]);
 		str = I18n.format("trigger.name", new Object[0]);
 		strLen = this.font.getStringWidth(str);
-		this.font.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
+		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
 		
 		x += width + space;
-		RenderFuncs.drawRect(x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
+		RenderFuncs.drawRect(matrixStackIn, x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
 		if (shape != null)
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			color = new float[] {1f, 1f, 1f, 1f};
 		else {
-			GlStateManager.color4f(.8f, .5f, .5f, .5f);
+			color = new float[] {.8f, .5f, .5f, .5f};
 			Collection<SpellShape> shapes = SpellShape.getAllShapes();
 			SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
 			shape = shapeArray[
                   (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 			      ];
 		}
-		SpellComponentIcon.get(shape).draw(this, this.font, x, y, width, width);
+		SpellComponentIcon.get(shape).draw(this, matrixStackIn, this.font, x, y, width, width, color[0], color[1], color[2], color[3]);
 		str = I18n.format("shape.name", new Object[0]);
 		strLen = this.font.getStringWidth(str);
-		this.font.drawString(str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
+		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
 	}
 	
-	private void drawResearchPages(int mouseX, int mouseY, float partialTicks) {
-		GlStateManager.enableAlphaTest();
-		GlStateManager.enableBlend();
-		GlStateManager.disableLighting();
-		RenderFuncs.drawRect(0, 0, this.width, this.height, 0x60000000);
-		currentInfoScreen.render(mouseX, mouseY, partialTicks);
+	private void drawResearchPages(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		RenderSystem.enableAlphaTest();
+		RenderSystem.enableBlend();
+		RenderSystem.disableLighting();
+		RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width, this.height, 0x60000000);
+		currentInfoScreen.render(matrixStackIn, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
 		
 		if (unlocked) {
 			if (isCharacter) {
-				drawCharacterScreenBackground(mouseX, mouseY, partialTicks);
+				drawCharacterScreenBackground(matrixStackIn, mouseX, mouseY, partialTicks);
 			} else {
-				drawResearchScreenBackground(mouseX, mouseY, partialTicks);
+				drawResearchScreenBackground(matrixStackIn, mouseX, mouseY, partialTicks);
 			}
 		} else {
-			drawLockedScreenBackground(mouseX, mouseY, partialTicks);
+			drawLockedScreenBackground(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, 0, 50);
+		matrixStackIn.push();
+		matrixStackIn.translate(0, 0, 50);
 		
 		// Black out surrounding screen
 		int color = 0xFF000000;
-		RenderFuncs.drawRect(0, 0, this.width, topOffset, color);
-		RenderFuncs.drawRect(0, topOffset + GUI_HEIGHT, this.width, this.height, color);
-		RenderFuncs.drawRect(0, 0, leftOffset, this.height, color);
-		RenderFuncs.drawRect(leftOffset + TEXT_WIDTH - 1, 0, this.width, this.height, color);
+		RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width, topOffset, color);
+		RenderFuncs.drawRect(matrixStackIn, 0, topOffset + GUI_HEIGHT, this.width, this.height, color);
+		RenderFuncs.drawRect(matrixStackIn, 0, 0, leftOffset, this.height, color);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + TEXT_WIDTH - 1, 0, this.width, this.height, color);
 		
 		if (unlocked) {
 			if (isCharacter) {
-				drawCharacterScreenForeground(mouseX, mouseY, partialTicks);
+				drawCharacterScreenForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			} else {
-				drawResearchScreenForeground(mouseX, mouseY, partialTicks);
+				drawResearchScreenForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			}
 		} else {
-			drawLockedScreenForeground(mouseX, mouseY, partialTicks);
+			drawLockedScreenForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 		if (unlocked) {
 			// Draw major tab buttons
-			tabCharacter.render(mouseX, mouseY, partialTicks);
-			tabResearch.render(mouseX, mouseY, partialTicks);
+			tabCharacter.render(matrixStackIn, mouseX, mouseY, partialTicks);
+			tabResearch.render(matrixStackIn, mouseX, mouseY, partialTicks);
 			if (MirrorGui.currentInfoScreen == null) {
-				tabCharacter.drawOverlay(mc, mouseX, mouseY);
-				tabResearch.drawOverlay(mc, mouseX, mouseY);
+				tabCharacter.drawOverlay(matrixStackIn, mc, mouseX, mouseY);
+				tabResearch.drawOverlay(matrixStackIn, mc, mouseX, mouseY);
 			}
 			
 			
 			if (MirrorGui.currentInfoScreen != null) {
-				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, 0, 500);
-				drawResearchPages(mouseX, mouseY, partialTicks);
-				GlStateManager.popMatrix();
+				matrixStackIn.push();
+				matrixStackIn.translate(0, 0, 500);
+				drawResearchPages(matrixStackIn, mouseX, mouseY, partialTicks);
+				matrixStackIn.pop();
 			}
 		}
 
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 		
 		//super.render(mouseX, mouseY, partialTicks);
 	}
@@ -961,18 +965,18 @@ public class MirrorGui extends Screen {
 		
 		private final ItemStack icon;
 		private boolean mouseOver;
-		private List<String> tooltip;
+		private ITextComponent tooltip;
 		
 		public MajorTabButton(MirrorGui gui, String name, ItemStack icon, int parPosX, int parPosY) {
-			super(parPosX, parPosY, BUTTON_MAJOR_WIDTH, BUTTON_MAJOR_HEIGHT, "", (b) -> {
+			super(parPosX, parPosY, BUTTON_MAJOR_WIDTH, BUTTON_MAJOR_HEIGHT, StringTextComponent.EMPTY, (b) -> {
 				gui.onButtonMajorTab(b);
 			});
 			this.icon = icon;
-			tooltip = Lists.newArrayList(I18n.format("mirror.tab." + name + ".name", new Object[0]));
+			tooltip = new TranslationTextComponent("mirror.tab." + name + ".name", new Object[0]);
 		}
 		
 		@Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = TEXT_ICON_MAJORBUTTON_HOFFSET;
 				int textureY = TEXT_ICON_MAJORBUTTON_VOFFSET;
@@ -985,28 +989,27 @@ public class MirrorGui extends Screen {
             		mouseOver = true;
             	}
             	RenderHelper.disableStandardItemLighting();
-            	GlStateManager.disableLighting();
-            	GlStateManager.enableAlphaTest();
-            	GlStateManager.color4f(1f, 1f, 1f, 1f);
+            	RenderSystem.disableLighting();
+            	RenderSystem.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
         				textureY, TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
-                GlStateManager.pushMatrix();
-                RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.translatef(0, 0, -50);
+                matrixStackIn.push();
+                RenderHelper.disableStandardItemLighting();
+                matrixStackIn.translate(0, 0, -50); int unused; // not using matrixStack
                 mc.getItemRenderer().renderItemIntoGUI(icon, x + (width - 16) / 2, y + (height - 16) / 2);
                 RenderHelper.disableStandardItemLighting();
-                GlStateManager.popMatrix();
+                matrixStackIn.pop();
             }
         }
 		
-		public void drawOverlay(Minecraft mc, int parX, int parY) {
+		public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
-				GlStateManager.pushMatrix();
-				renderTooltip(tooltip, parX, parY);
-				GlStateManager.popMatrix();
+				matrixStackIn.push();
+				renderTooltip(matrixStackIn, tooltip, parX, parY);
+				matrixStackIn.pop();
 			}
 		}
 	}
@@ -1014,13 +1017,13 @@ public class MirrorGui extends Screen {
     static class ImproveButton extends Button {
 		
 		public ImproveButton(MirrorGui gui, int parPosX, int parPosY) {
-			super(parPosX, parPosY, 12, 12,"", (b) -> {
+			super(parPosX, parPosY, 12, 12, StringTextComponent.EMPTY, (b) -> {
 				gui.onImproveControl(b);
 			});
 		}
 		
 		@Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = 0;
 				int textureY = TEXT_ICON_BUTTON_VOFFSET;
@@ -1031,7 +1034,7 @@ public class MirrorGui extends Screen {
             		textureX += TEXT_ICON_BUTTON_LENGTH;
             	}
                 
-            	GlStateManager.color4f(1f, 1f, 1f, 1f);
+            	//GlStateManager.color4f(1f, 1f, 1f, 1f);
                 Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
         				textureY, TEXT_ICON_BUTTON_LENGTH, TEXT_ICON_BUTTON_LENGTH, this.width, this.height, 256, 256);
@@ -1048,7 +1051,7 @@ public class MirrorGui extends Screen {
     
     private static abstract class GuiObscuredButton extends Button {
 
-		public GuiObscuredButton(int x, int y, int widthIn, int heightIn, String buttonText, Button.IPressable action) {
+		public GuiObscuredButton(int x, int y, int widthIn, int heightIn, ITextComponent buttonText, Button.IPressable action) {
 			super(x, y, widthIn, heightIn, buttonText, action);
 		}
 		
@@ -1076,7 +1079,7 @@ public class MirrorGui extends Screen {
     	private int offsetX;
     	private int offsetY;
     	
-    	private List<String> tooltip;
+    	private List<ITextComponent> tooltip;
     	private boolean mouseOver;
     	private final float fontScale = 0.75f;
     	private boolean canTurnin;
@@ -1085,7 +1088,7 @@ public class MirrorGui extends Screen {
 		
 		public QuestButton(MirrorGui gui, int parPosX, int parPosY,
 				NostrumQuest quest, QuestState state) {
-			super(parPosX, parPosY, BUTTON_QUEST_WIDTH, BUTTON_QUEST_HEIGHT, "", (b) -> {
+			super(parPosX, parPosY, BUTTON_QUEST_WIDTH, BUTTON_QUEST_HEIGHT, StringTextComponent.EMPTY, (b) -> {
 				gui.onButtonQuest(b);
 			});
 			this.quest = quest;
@@ -1101,7 +1104,7 @@ public class MirrorGui extends Screen {
 			getIcon();
 		}
 		
-		public void drawTreeLines(Minecraft mc) {
+		public void drawTreeLines(MatrixStack matrixStackIn, Minecraft mc) {
 			if (quest.getParentKeys() != null && quest.getParentKeys().length != 0) {
 				for (String key : quest.getParentKeys()) {
 					NostrumQuest quest = NostrumQuest.lookup(key);
@@ -1110,33 +1113,33 @@ public class MirrorGui extends Screen {
 					
 					QuestButton other = questButtons.get(quest);
 					if (other != null)
-						renderLine(other);
+						renderLine(matrixStackIn, other);
 				}
 			}
 		}
 		
-		private void renderLine(QuestButton other) {
-			GlStateManager.pushMatrix();
-			GlStateManager.pushLightingAttributes();
-			GlStateManager.translatef(width / 2, height / 2, 0);
+		private void renderLine(MatrixStack matrixStackIn, QuestButton other) {
+			matrixStackIn.push();
+//			GlStateManager.pushLightingAttributes();
+			matrixStackIn.translate(width / 2, height / 2, 0);
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 			//GlStateManager.enableBlend();
-	        GlStateManager.disableTexture();
+//	        GlStateManager.disableTexture();
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-	        buf.pos(x - 1, y, 0).endVertex();
-	        buf.pos(other.x - 1, other.y, 0).endVertex();
+//	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
+	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+	        buf.pos(x - 1, y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.pos(other.x - 1, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
 	        Tessellator.getInstance().draw();
-	        GlStateManager.enableTexture();
+//	        GlStateManager.enableTexture();
 	        //GlStateManager.disableBlend();
 			
-	        GlStateManager.popAttributes();
-			GlStateManager.popMatrix();
+//	        GlStateManager.popAttributes();
+	        matrixStackIn.pop();
 		}
 		
 		@Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 			mouseOver = false;
 			if (visible) {
 				int textureX = 0;
@@ -1157,12 +1160,13 @@ public class MirrorGui extends Screen {
             	}
             	textureX += TEXT_ICON_QUEST_LENGTH * quest.getType().ordinal();
                 
+            	float[] color = {1, 1, 1, 1};
             	switch (state) {
 				case COMPLETED:
-					GlStateManager.color4f(.2f, 2f/3f, .2f, 1f);
+					color = new float[] {.2f, 2f/3f, .2f, 1f};
 					break;
 				case INACTIVE:
-					GlStateManager.color4f(2f/3f, 0f, 2f/3f, .8f);
+					color = new float[] {2f/3f, 0f, 2f/3f, .8f};
 					break;
 				case TAKEN: {
 					float amt = 0f;
@@ -1170,38 +1174,39 @@ public class MirrorGui extends Screen {
 						amt = (float) Math.sin(2.0 * Math.PI * (double) (System.currentTimeMillis() % 1000) / 1000.0);
 						amt *= .1f;
 					}
-					GlStateManager.color4f(1f/3f + amt, .2f + amt, 2f/3f + amt, 1f);
+					color = new float[] {1f/3f + amt, .2f + amt, 2f/3f + amt, 1f};
 					break;
 				}
 				case UNAVAILABLE:
-					GlStateManager.color4f(.8f, .0f, .0f, .6f);
+					color = new float[] {.8f, .0f, .0f, .6f};
 					break;
             	}
                 
-            	GlStateManager.disableLighting();
-            	GlStateManager.disableBlend();
+            	RenderSystem.disableLighting();
+            	RenderSystem.disableBlend();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
-                		textureY, TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256);
+                		textureY, TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256,
+                		color[0], color[1], color[2], color[3]);
                 
                 if (icon != null) {
-                	icon.draw(this, font, x + 2, y + 3, 12, 12);
+                	icon.draw(this, matrixStackIn, font, x + 2, y + 3, 12, 12); // Blend with color?
                 } else {
-                	GlStateManager.enableBlend();
-                	GlStateManager.color4f(1f, 1f, 1f, .8f);
+                	RenderSystem.enableBlend();
                 	RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x + 4, y + 5, iconOffset,
-                		TEXT_ICON_BUTTON_VOFFSET, TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256);
+                		TEXT_ICON_BUTTON_VOFFSET, TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256,
+                		1f, 1f, 1f, .8f);
                 }
             }
         }
 		
-		public void drawOverlay(Minecraft mc, int parX, int parY) {
+		public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
-				GlStateManager.pushMatrix();
-				GlStateManager.scalef(fontScale, fontScale, 1f);
-				GlStateManager.translatef((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
-				renderTooltip(tooltip, parX, parY);
-				GlStateManager.popMatrix();
+				matrixStackIn.push();
+				matrixStackIn.scale(fontScale, fontScale, 1f);
+				matrixStackIn.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
+				MirrorGui.this.func_243308_b(matrixStackIn, tooltip, parX, parY); // drawTooltip with array of text components
+				matrixStackIn.pop();
 			}
 		}
 		
@@ -1222,28 +1227,27 @@ public class MirrorGui extends Screen {
 			}
 		}
 		
-		private List<String> genTooltip() {
+		private List<ITextComponent> genTooltip() {
 			int maxWidth = 200; 
 			tooltip = new LinkedList<>();
-			String title = I18n.format("quest." + quest.getKey() + ".name", new Object[0]);
-			title = TextFormatting.BLUE + title + TextFormatting.RESET;
-            tooltip.add(title);
+			tooltip.add(new TranslationTextComponent("quest." + quest.getKey() + ".name", new Object[0])
+					.mergeStyle(TextFormatting.BLUE));
             
             TextFormatting bad = TextFormatting.RED;
             TextFormatting good = TextFormatting.GREEN;
             TextFormatting unique = TextFormatting.DARK_AQUA;
             if (quest.getReqLevel() > 0)
-            	tooltip.add("" + (level >= quest.getReqLevel() ? good : bad)
-            			+ I18n.format("level.name") + ": " + quest.getReqLevel() + TextFormatting.RESET);
+            	tooltip.add(new TranslationTextComponent("level.name").mergeStyle(level >= quest.getReqLevel() ? good : bad)
+            			.append(new StringTextComponent("" + quest.getReqLevel())));
             if (quest.getReqControl() > 0)
-            	tooltip.add("" + (control >= quest.getReqControl() ? good : bad)
-            			+ I18n.format("control.name") + ": " + quest.getReqControl() + TextFormatting.RESET);
+            	tooltip.add(new TranslationTextComponent("control.name").mergeStyle(control >= quest.getReqControl() ? good : bad)
+            			.append(new StringTextComponent("" + quest.getReqControl())));
             if (quest.getReqTechnique() > 0)
-            	tooltip.add("" + (technique >= quest.getReqTechnique() ? good : bad)
-            			+ I18n.format("technique.name") + ": " + quest.getReqTechnique() + TextFormatting.RESET);
+            	tooltip.add(new TranslationTextComponent("technique.name").mergeStyle(technique >= quest.getReqTechnique() ? good : bad)
+            			.append(new StringTextComponent("" + quest.getReqTechnique())));
             if (quest.getReqFinesse() > 0)
-            	tooltip.add("" + (finesse >= quest.getReqFinesse() ? good : bad)
-            			+ I18n.format("finesse.name") + ": " + quest.getReqFinesse() + TextFormatting.RESET);
+            	tooltip.add(new TranslationTextComponent("finesse.name").mergeStyle(technique >= quest.getReqFinesse() ? good : bad)
+            			.append(new StringTextComponent("" + quest.getReqFinesse())));
             
             // Lore reqs?
             if (quest.getLoreKeys() != null) {
@@ -1251,48 +1255,47 @@ public class MirrorGui extends Screen {
             		ILoreTagged loreItem = LoreRegistry.instance().lookup(loreKey);
             		if (loreItem != null) {
             			if (!lore.contains(loreItem)) {
-            				tooltip.add(bad
-            						+ I18n.format("info.quest.lore_missing", new Object[]{unique + loreItem.getLoreDisplayName() + bad})
-            						+ TextFormatting.RESET);
+            				tooltip.add(new TranslationTextComponent("info.quest.lore_missing", new Object[]{unique + loreItem.getLoreDisplayName()})
+            						.mergeStyle(bad));
             			}
             		}
             	}
             }
             
             if (quest.getObjective() != null) {
-            	tooltip.add(quest.getObjective().getDescription());
+            	tooltip.add(new StringTextComponent(quest.getObjective().getDescription()));
             }
             
             if (quest.getRewards() != null && quest.getRewards().length != 0)
             for (IReward reward : quest.getRewards()) {
             	String desc = reward.getDescription();
             	if (desc != null && !desc.isEmpty())
-            		tooltip.add(TextFormatting.GOLD + desc + TextFormatting.RESET);
+            		tooltip.add(new StringTextComponent(desc).mergeStyle(TextFormatting.GOLD));
             }
             
             if (this.state == QuestState.INACTIVE && NostrumMagica.canTakeQuest(player, quest)) {
-            	tooltip.add(TextFormatting.GREEN + I18n.format("info.quest.accept") + TextFormatting.RESET);
+            	tooltip.add(new TranslationTextComponent("info.quest.accept").mergeStyle(TextFormatting.GREEN));
             }
             
             if (this.state == QuestState.TAKEN || this.state == QuestState.COMPLETED) {
-	            for (String line : tooltip) {
-	            	int width = font.getStringWidth(line);
+	            for (ITextComponent line : tooltip) {
+	            	int width = font.getStringPropertyWidth(line);
 	            	if (width > maxWidth)
 	            		maxWidth = width;
 	            }
 	            
 	            String desc = I18n.format("quest." + quest.getKey() + ".desc", new Object[0]);
 	            if (desc != null && !desc.isEmpty()) {
-	            	tooltip.add("");
+	            	tooltip.add(new StringTextComponent(""));
 	            	StringBuffer buf = new StringBuffer();
 	            	int index = 0;
 	            	while (index < desc.length()) {
 	            		if (desc.charAt(index) == '|') {
-	            			tooltip.add(buf.toString());
+	            			tooltip.add(new StringTextComponent(buf.toString()));
 	            			buf = new StringBuffer();
 	            		} else {
 		            		int oldlen = font.getStringWidth(buf.toString());
-		            		if (oldlen + font.getCharWidth(desc.charAt(index)) > maxWidth) {
+		            		if (oldlen + font.getStringWidth("" + desc.charAt(index)) > maxWidth) {
 		            			// Go back until we find a space
 		            			boolean isSpace = desc.charAt(index) == ' ';
 		            			if (!isSpace) {
@@ -1302,16 +1305,16 @@ public class MirrorGui extends Screen {
 		            				
 		            				if (last == 0) {
 		            					// oh well
-		            					tooltip.add(buf.toString());
+		            					tooltip.add(new StringTextComponent(buf.toString()));
 		            					buf = new StringBuffer();
 		            				} else {
-		            					tooltip.add(buf.substring(0, last));
+		            					tooltip.add(new StringTextComponent(buf.substring(0, last)));
 		            					StringBuffer oldbuf = buf;
 		            					buf = new StringBuffer();
 		            					buf.append(oldbuf.substring(last + 1));
 		            				}
 		            			} else {
-		            				tooltip.add(buf.toString());
+		            				tooltip.add(new StringTextComponent(buf.toString()));
 			            			buf = new StringBuffer();
 		            				index++;
 			            			continue; // Don't add it
@@ -1323,7 +1326,7 @@ public class MirrorGui extends Screen {
 	            		index++;
 	            	}
 	            	if (buf.length() > 0)
-	            		tooltip.add(buf.toString());
+	            		tooltip.add(new StringTextComponent(buf.toString()));
 	            }
             }
             
@@ -1335,18 +1338,18 @@ public class MirrorGui extends Screen {
 		
 		private final NostrumResearchTab tab;
 		private boolean mouseOver;
-		private List<String> tooltip;
+		private List<ITextComponent> tooltip;
 		
 		public ResearchTabButton(MirrorGui gui, NostrumResearchTab tab, int parPosX, int parPosY) {
-			super(parPosX, parPosY, BUTTON_MINOR_WIDTH, BUTTON_MINOR_HEIGHT, "", (b) -> {
+			super(parPosX, parPosY, BUTTON_MINOR_WIDTH, BUTTON_MINOR_HEIGHT, StringTextComponent.EMPTY, (b) -> {
 				gui.onButtonResearchTab(b);
 			});
 			this.tab = tab;
-			tooltip = Lists.newArrayList(I18n.format(tab.getNameKey(), new Object[0]));
+			tooltip = Lists.newArrayList(new TranslationTextComponent(tab.getNameKey(), new Object[0]));
 		}
 		
 		@Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 			if (visible) {
 				int textureX = TEXT_ICON_MINORBUTTON_HOFFSET;
 				int textureY = TEXT_ICON_MINORBUTTON_VOFFSET;
@@ -1361,24 +1364,23 @@ public class MirrorGui extends Screen {
             		mouseOver = true;
             	}
                 
-            	GlStateManager.color4f(1f, 1f, 1f, 1f);
+            	//GlStateManager.color4f(1f, 1f, 1f, 1f);
             	RenderHelper.disableStandardItemLighting();
-            	GlStateManager.enableAlphaTest();
+            	RenderSystem.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
                 		textureY, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
-                GlStateManager.pushMatrix();
-                RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.translatef(0, 0, -50);
-                mc.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2);
+                matrixStackIn.push();
                 RenderHelper.disableStandardItemLighting();
-                GlStateManager.popMatrix();
+                matrixStackIn.translate(0, 0, -50);
+                mc.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2); int unused; // not using matrix
+                RenderHelper.disableStandardItemLighting();
+                matrixStackIn.pop();
                 
                 // Draw new tab if there's something new
                 if (tab.hasNew()) {
-                	GlStateManager.color4f(1f, 1f, 1f, 1f);
                 	RenderHelper.disableStandardItemLighting();
                     mc.getTextureManager().bindTexture(RES_ICONS);
                     RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH,
@@ -1387,11 +1389,11 @@ public class MirrorGui extends Screen {
             }
         }
 		
-		public void drawOverlay(Minecraft mc, int parX, int parY) {
+		public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
-				GlStateManager.pushMatrix();
-				renderTooltip(tooltip, parX, parY);
-				GlStateManager.popMatrix();
+				matrixStackIn.push();
+				MirrorGui.this.func_243308_b(matrixStackIn, tooltip, parX, parY); // drawTooltip with array of text components
+				matrixStackIn.pop();
 			}
 		}
 	}
@@ -1409,13 +1411,13 @@ public class MirrorGui extends Screen {
     	private final int offsetX;
     	private final int offsetY;
     	
-    	private List<String> tooltip;
+    	private List<ITextComponent> tooltip;
     	private boolean mouseOver;
     	private long animStartMS;
 		
 		public ResearchButton(MirrorGui gui, int parPosX, int parPosY,
 				NostrumResearch research, ResearchState state) {
-			super(parPosX, parPosY, WidthForSize(research.getSize()), HeightForSize(research.getSize()), "", (b) -> {
+			super(parPosX, parPosY, WidthForSize(research.getSize()), HeightForSize(research.getSize()), StringTextComponent.EMPTY, (b) -> {
 				gui.onButtonResearch(b);
 			});
 			this.research = research;
@@ -1429,7 +1431,7 @@ public class MirrorGui extends Screen {
 			animStartMS = System.currentTimeMillis();
 		}
 		
-		public void drawTreeLines(Minecraft mc) {
+		public void drawTreeLines(MatrixStack matrixStackIn, Minecraft mc) {
 			if (research.getParentKeys() != null && research.getParentKeys().length != 0) {
 				for (String key : research.getParentKeys()) {
 					NostrumResearch parentResearch = NostrumResearch.lookup(key);
@@ -1442,51 +1444,50 @@ public class MirrorGui extends Screen {
 					
 					ResearchButton other = researchButtons.get(parentResearch);
 					if (other != null)
-						renderLine(other);
+						renderLine(matrixStackIn, other);
 				}
 			}
 		}
 		
-		private void renderLine(ResearchButton other) {
+		private void renderLine(MatrixStack matrixStackIn, ResearchButton other) {
 			// Render 2 flat lines with a nice circle-arc between them
 			
 			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 			
-			GlStateManager.pushMatrix();
+			matrixStackIn.push();
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
-	        GlStateManager.enableBlend();
-	        GlStateManager.enableAlphaTest();
-	        GlStateManager.disableColorMaterial();
-	        GlStateManager.disableColorLogicOp();
-	        GlStateManager.disableTexture();
-	        GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-			GlStateManager.disableLighting();
+	        RenderSystem.enableBlend();
+	        RenderSystem.enableAlphaTest();
+	        RenderSystem.disableColorMaterial();
+	        RenderSystem.disableColorLogicOp();
+	        RenderSystem.disableTexture();
+	        RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+	        RenderSystem.disableLighting();
 	        //GlStateManager.disableDepth();
-	        GlStateManager.lineWidth(3.5f);
-	        GlStateManager.color4f(.8f, .8f, .8f, alpha);
+	        RenderSystem.lineWidth(3.5f);
 	        
-	        Vec2f child = new Vec2f(x + ((float) width / 2f), y + ((float) height / 2f));
-	        Vec2f parent = new Vec2f(other.x + ((float) other.width / 2f), other.y + ((float) other.height / 2f));
-	        Vec2f diff = new Vec2f(child.x - parent.x, child.y - parent.y);
+	        Vector2f child = new Vector2f(x + ((float) width / 2f), y + ((float) height / 2f));
+	        Vector2f parent = new Vector2f(other.x + ((float) other.width / 2f), other.y + ((float) other.height / 2f));
+	        Vector2f diff = new Vector2f(child.x - parent.x, child.y - parent.y);
 	        
-	        Vec2f myCenter = child; // Stash for later
+	        Vector2f myCenter = child; // Stash for later
 	        
 	        if (child.x == parent.x || child.y == parent.y) {
 	        	// Straight line
 	        	
 	        	if (child.x == parent.x) {
 	        		// vertical line. Shrink both sides in y
-	        		child = new Vec2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
-	        		parent = new Vec2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
+	        		child = new Vector2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
+	        		parent = new Vector2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
 	        	} else {
 	        		// horizional. "" x
-	        		child = new Vec2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
-	        		parent = new Vec2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
+	        		child = new Vector2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
+	        		parent = new Vector2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 	        	
-	        	buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		        buf.pos(child.x, child.y, 0).endVertex();
-		        buf.pos(parent.x, parent.y, 0).endVertex();
+	        	buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+		        buf.pos(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        buf.pos(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 		        Tessellator.getInstance().draw();
 	        } else {
 		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
@@ -1503,32 +1504,32 @@ public class MirrorGui extends Screen {
 		        radius = Math.min(Math.max(radius * .5f, 12), 12);//*= .5f;
 		        double radiusX = (diff.x < 0 ? -1 : 1) * radius;
 		        double radiusY = (diff.y < 0 ? -1 : 1) * radius;
-		        Vec2f center = new Vec2f(vertical ? parent.x : child.x, vertical ? child.y : parent.y);
+		        Vector2f center = new Vector2f(vertical ? parent.x : child.x, vertical ? child.y : parent.y);
 		        
-		        Vec2f childTo = new Vec2f(vertical ? center.x + (float) radiusX : center.x, vertical ? center.y : center.y + (float) radiusY);
-		        Vec2f parentTo = new Vec2f(vertical ? center.x : center.x - (float) radiusX, vertical ? center.y - (float) radiusY : center.y);
+		        Vector2f childTo = new Vector2f(vertical ? center.x + (float) radiusX : center.x, vertical ? center.y : center.y + (float) radiusY);
+		        Vector2f parentTo = new Vector2f(vertical ? center.x : center.x - (float) radiusX, vertical ? center.y - (float) radiusY : center.y);
 		        
 		        if (vertical) {
 	        		// vertical at parent. Shrink parent y and child x
-		        	child = new Vec2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
-	        		parent = new Vec2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
+		        	child = new Vector2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
+	        		parent = new Vector2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
 	        	} else {
 	        		// inverse of above
-	        		child = new Vec2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
-	        		parent = new Vec2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
+	        		child = new Vector2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
+	        		parent = new Vector2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 		        
-		        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		        buf.pos(child.x, child.y, 0).endVertex();
-		        buf.pos(childTo.x, childTo.y, 0).endVertex();
-		        buf.pos(parentTo.x, parentTo.y, 0).endVertex();
-		        buf.pos(parent.x, parent.y, 0).endVertex();
+		        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+		        buf.pos(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        buf.pos(childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        buf.pos(parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        buf.pos(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 		        Tessellator.getInstance().draw();
 		        
 		        // Draw inside curve
 		        int points = 30;
-		        GlStateManager.pushMatrix();
-		        GlStateManager.translatef(parentTo.x, parentTo.y, 0);
+		        matrixStackIn.push();
+		        matrixStackIn.translate(parentTo.x, parentTo.y, 0);
 		        float rotate = 0f;
 		        boolean flip = false;
 		        if (!vertical) {
@@ -1548,41 +1549,41 @@ public class MirrorGui extends Screen {
 		        		flip = (diff.x >= 0);
 		        	}
 		        }
-		        GlStateManager.rotatef(rotate, 0, 0, 1);
-		        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
+		        matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(rotate));
+		        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 		        for (int i = 0; i <= points; i++) {
 		        	float progress = (float) i / (float) points;
-		        	Vec2f point = Curves.alignedArc2D(progress, Vec2f.ZERO, radius, flip);
-		        	buf.pos(point.x, point.y, 0).endVertex();
+		        	Vector2f point = Curves.alignedArc2D(progress, Vector2f.ZERO, radius, flip);
+		        	buf.pos(point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 		        }
 		        Tessellator.getInstance().draw();
-		        GlStateManager.popMatrix();
+		        matrixStackIn.pop();
 	        }
 	        
-	        GlStateManager.translated(child.x, child.y, .1);
+	        matrixStackIn.translate(child.x, child.y, .1);
 	        if (child.x < myCenter.x) {
 	        	// from left
-	        	GlStateManager.rotatef(-90f, 0, 0, 1);
+	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-90f));
 	        } else if (child.x > myCenter.x) {
 	        	// from right
-	        	GlStateManager.rotatef(90f, 0, 0, 1);
+	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(90f));
 	        } else if (child.y > myCenter.y) {
 	        	// from bottom
-	        	GlStateManager.rotatef(180f, 0, 0, 1);
+	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
 	        }
-	        GlStateManager.disableLighting();
-            GlStateManager.enableTexture();
-            GlStateManager.enableBlend();
-            GlStateManager.color4f(1f, 1f, 1f, alpha);
+	        RenderSystem.disableLighting();
+	        RenderSystem.enableTexture();
+            RenderSystem.enableBlend();
             mc.getTextureManager().bindTexture(RES_ICONS);
             RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -(TEXT_ICON_ARROW_WIDTH/2) - 1, -(TEXT_ICON_ARROW_HEIGHT/2), TEXT_ICON_ARROW_HOFFSET,
-            		TEXT_ICON_ARROW_VOFFSET, TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256);
-            GlStateManager.enableDepthTest();
-			GlStateManager.popMatrix();
+            		TEXT_ICON_ARROW_VOFFSET, TEXT_ICON_ARROW_WIDTH, TEXT_ICON_ARROW_HEIGHT, 14, 7, 256, 256,
+            		1f, 1f, 1f, alpha);
+            RenderSystem.enableDepthTest();
+            matrixStackIn.pop();
 		}
 		
 		@Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 			mouseOver = false;
 			if (visible) {
 				float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
@@ -1633,61 +1634,63 @@ public class MirrorGui extends Screen {
             	}
             	
 
-                GlStateManager.pushMatrix();
+            	matrixStackIn.push();
+            	float[] color = {1f, 1f, 1f, 1f};
             	switch (state) {
 				case COMPLETED:
-					GlStateManager.color4f(.2f, 2f/3f, .2f, alpha);
+					color = new float[] {.2f, 2f/3f, .2f, alpha};
 					break;
 				case INACTIVE:
-					GlStateManager.color4f(2f/3f, 0f, 2f/3f, alpha);
+					color = new float[] {2f/3f, 0f, 2f/3f, alpha};
 					break;
 				case UNAVAILABLE:
-					GlStateManager.color4f(.8f, .0f, .0f, alpha);
+					color = new float[] {.8f, .0f, .0f, alpha};
 					break;
             	}
                 
-            	GlStateManager.disableLighting();
-                GlStateManager.enableTexture();
-                GlStateManager.enableBlend();
-                GlStateManager.enableAlphaTest();
+            	RenderSystem.disableLighting();
+            	RenderSystem.enableTexture();
+            	RenderSystem.enableBlend();
+            	RenderSystem.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
-                		textureY, textureW, textureH, this.width, this.height, 256, 256);
+                		textureY, textureW, textureH, this.width, this.height, 256, 256,
+                		color[0], color[1], color[2], color[3]);
                 
                 // Now draw icon
-                RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.translated(0, 0, -140.5);
+                RenderHelper.enableStandardItemLighting();
+                matrixStackIn.translate(0, 0, -140.5);
                 mc.getItemRenderer().renderItemAndEffectIntoGUI(research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2);
                 mc.getItemRenderer().renderItemOverlayIntoGUI(font, research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2, null);
                 RenderHelper.disableStandardItemLighting();
-                GlStateManager.enableDepthTest();
-                GlStateManager.enableBlend();
+                RenderSystem.enableDepthTest();
+                RenderSystem.enableBlend(); // this isn't standard...
                 
 //                RenderHelper.enableGUIStandardItemLighting();
 //                mc.getItemRenderer().renderItemIntoGUI(research.getIconItem(), x + (width -16) / 2, y + (height -16) / 2);
 //                RenderHelper.disableStandardItemLighting();
 //            	GlStateManager.enableBlend();
                 
-                GlStateManager.popMatrix();
+                matrixStackIn.pop();
             }
         }
 		
-		public void drawOverlay(Minecraft mc, int parX, int parY) {
+		public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
-		        GlStateManager.enableBlend();
-		        GlStateManager.enableAlphaTest();
-				GlStateManager.pushMatrix();
-				GlStateManager.scalef(fontScale, fontScale, 1f);
-				GlStateManager.translatef((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
-				renderTooltip(tooltip, parX, parY);
-				GlStateManager.popMatrix();
+		        RenderSystem.enableBlend();
+		        RenderSystem.enableAlphaTest();
+		        matrixStackIn.push();
+		        matrixStackIn.scale(fontScale, fontScale, 1f);
+		        matrixStackIn.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);
+				MirrorGui.this.func_243308_b(matrixStackIn, tooltip, parX, parY); // drawTooltip with array of text components
+				matrixStackIn.pop();
 			}
 		}
 		
-		private List<String> genTooltip() {
+		private List<ITextComponent> genTooltip() {
 			tooltip = new LinkedList<>();
-            tooltip.add(TextFormatting.BLUE + I18n.format(research.getNameKey(), new Object[0]) + TextFormatting.RESET);
-            tooltip.add(TextFormatting.GRAY + I18n.format(research.getDescKey(), new Object[0]) + TextFormatting.RESET);
+            tooltip.add(new TranslationTextComponent(research.getNameKey(), new Object[0]).mergeStyle(TextFormatting.BLUE));
+            tooltip.add(new TranslationTextComponent(research.getDescKey(), new Object[0]).mergeStyle(TextFormatting.GRAY));
             
             TextFormatting bad = TextFormatting.RED;
             TextFormatting missingQuest = TextFormatting.DARK_PURPLE;
@@ -1700,15 +1703,13 @@ public class MirrorGui extends Screen {
         			if (!questsCompleted.contains(questKey)) {
         				if (!first) {
         					first = true;
-        					tooltip.add("");
+        					tooltip.add(new StringTextComponent(""));
         				}
         				
         				NostrumQuest questItem = NostrumQuest.lookup(questKey);
         				String display = questItem == null ? questKey : I18n.format("quest." + questItem.getKey() + ".name");
         				
-        				tooltip.add(bad
-        						+ I18n.format("info.research.quest_missing", new Object[]{missingQuest + display + bad})
-        						+ TextFormatting.RESET);
+        				tooltip.add(new TranslationTextComponent("info.research.quest_missing", new Object[]{missingQuest + display + bad}).mergeStyle(bad));
         			}
 	        	}
 	        }
@@ -1721,12 +1722,10 @@ public class MirrorGui extends Screen {
             			if (!lore.contains(loreItem)) {
             				if (!first) {
             					first = true;
-            					tooltip.add("");
+            					tooltip.add(new StringTextComponent(""));
             				}
             				
-            				tooltip.add(bad
-            						+ I18n.format("info.research.lore_missing", new Object[]{missingLore + loreItem.getLoreDisplayName() + bad})
-            						+ TextFormatting.RESET);
+            				tooltip.add(new TranslationTextComponent("info.research.lore_missing", new Object[]{missingLore + loreItem.getLoreDisplayName() + bad}).mergeStyle(bad));
             			}
             		}
             	}
@@ -1734,11 +1733,11 @@ public class MirrorGui extends Screen {
             
             
             if (this.state == ResearchState.INACTIVE && researchPoints > 0 && NostrumMagica.canPurchaseResearch(player, research)) {
-            	tooltip.add("");
-            	tooltip.add(TextFormatting.GREEN + I18n.format("info.research.purchase") + TextFormatting.RESET);
+            	tooltip.add(new StringTextComponent(""));
+            	tooltip.add(new TranslationTextComponent("info.research.purchase").mergeStyle(TextFormatting.GREEN));
             } else if (this.state == ResearchState.COMPLETED) {
-            	tooltip.add("");
-            	tooltip.add(TextFormatting.GREEN + I18n.format("info.research.view") + TextFormatting.RESET);
+            	tooltip.add(new StringTextComponent(""));
+            	tooltip.add(new TranslationTextComponent("info.research.view").mergeStyle(TextFormatting.GREEN));
             }
             
             return tooltip;

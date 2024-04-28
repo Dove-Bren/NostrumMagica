@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -72,7 +72,7 @@ public class ScrollScreen extends Screen {
 	}
 	
 	@Override
-	public void render(int parWidth, int parHeight, float p_73863_3_) {
+	public void render(MatrixStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
 		
 		final int leftOffset = (this.width - TEXT_BACK_WIDTH) / 2; //distance from left
 		final int topOffset = (this.height - TEXT_BACK_HEIGHT) / 2;
@@ -82,30 +82,31 @@ public class ScrollScreen extends Screen {
 		final int listYOffset = 80;
 		final int listXOffset = 25;
 		
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		//RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+				1f, 1f, 1f, 1f);
 		
 		final int nameWidth = this.font.getStringWidth(this.name);
-		this.font.drawString(this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
+		this.font.drawString(matrixStackIn, this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
 		
 		if (this.icon != null) {
 			final int iconLen = 32;
 			final int left = leftOffset + ((TEXT_BACK_WIDTH - iconLen) / 2);
-			RenderFuncs.drawRect(left - 2, topOffset + iconYOffset - 2, left + iconLen + 2, topOffset + iconYOffset + iconLen + 2, 0xFF000000);
-			RenderFuncs.drawRect(left, topOffset + iconYOffset, left + iconLen, topOffset + iconYOffset + iconLen, 0xFFE2DDCC);
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			RenderFuncs.drawRect(matrixStackIn, left - 2, topOffset + iconYOffset - 2, left + iconLen + 2, topOffset + iconYOffset + iconLen + 2, 0xFF000000);
+			RenderFuncs.drawRect(matrixStackIn, left, topOffset + iconYOffset, left + iconLen, topOffset + iconYOffset + iconLen, 0xFFE2DDCC);
+			//GlStateManager.color4f(1f, 1f, 1f, 1f);
 			icon.render(Minecraft.getInstance(), matrixStackIn, left, topOffset + iconYOffset, iconLen, iconLen);
 		}
 		
 		int i = 0;
 		for (String line : this.components) {
-			this.font.drawString(line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.font.FONT_HEIGHT + 2), 0xFF000000);
+			this.font.drawString(matrixStackIn, line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.font.FONT_HEIGHT + 2), 0xFF000000);
 			i++;
 		}
 		
-		super.render(parWidth, parHeight, p_73863_3_);
+		super.render(matrixStackIn, parWidth, parHeight, p_73863_3_);
 	}
 	
 	@Override

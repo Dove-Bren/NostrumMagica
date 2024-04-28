@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
@@ -129,57 +130,60 @@ public class ObeliskScreen extends Screen {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 
-		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bindTexture(background);
 		
 		double time = (float) ((double) System.currentTimeMillis() / 15000.0);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
 		
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, (TEXT_BACK_PAN / 2) + panX, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, width, height, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+				1f, 1f, 1f, 1f);
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
-			this.font.drawSplitString(errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, this.width / 2, 0xFFFFFF);
+			this.font.drawString(matrixStackIn, errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, 0xFFFFFF);
 			return;
 		}
 		
 		for (DestinationButton other : floatingButtons)
 		{
-			renderLine(centralButton, other);
+			renderLine(matrixStackIn, centralButton, other);
 		}
 		
 		// Do buttons
-		centralButton.render(mouseX, mouseY, partialTicks);
+		centralButton.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		for (DestinationButton butt : floatingButtons) {
-			butt.render(mouseX, mouseY, partialTicks);
+			butt.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 		if (drawList) {
-			GlStateManager.pushLightingAttributes();
-			RenderFuncs.drawRect(0, 0, this.width / 3, this.height, 0xFF304060);
-			GlStateManager.popAttributes();
+//			GlStateManager.pushLightingAttributes();
+			RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width / 3, this.height, 0xFF304060);
+//			GlStateManager.popAttributes();
 			
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+					1f, 1f, 1f, 1f);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+					1f, 1f, 1f, 1f);
 		}
 		
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
-		GlStateManager.enableBlend();
-		GlStateManager.disableLighting();
-		this.font.drawString("<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
-		this.font.drawString("Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
+		//GlStateManager.color4f(1f, 1f, 1f, 1f);
+		//GlStateManager.enableBlend();
+		//GlStateManager.disableLighting();
+		this.font.drawString(matrixStackIn, "<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
+		this.font.drawString(matrixStackIn, "Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
 		
 		for (DestinationButton butt : listButtons) {
-			butt.render(mouseX, mouseY, partialTicks);
+			butt.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 	}
@@ -296,24 +300,24 @@ public class ObeliskScreen extends Screen {
 		
 	}
 	
-	private void renderLine(DestinationButton center, DestinationButton other) {
-		GlStateManager.pushMatrix();
-		GlStateManager.pushLightingAttributes();
-		GlStateManager.translatef(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
+	private void renderLine(MatrixStack matrixStackIn, DestinationButton center, DestinationButton other) {
+		matrixStackIn.push();
+		//GlStateManager.pushLightingAttributes();
+		matrixStackIn.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
 		BufferBuilder buf = Tessellator.getInstance().getBuffer();
-		//GlStateManager.enableBlend();
-        GlStateManager.disableTexture();
+		RenderSystem.enableBlend();
+        //GlStateManager.disableTexture();
         //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-        buf.pos(center.x, center.y, 0).endVertex();
-        buf.pos(other.x, other.y, 0).endVertex();
+        //GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
+        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        buf.pos(center.x, center.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+        buf.pos(other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
         Tessellator.getInstance().draw();
-        GlStateManager.enableTexture();
-        //GlStateManager.disableBlend();
+        //GlStateManager.enableTexture();
+        RenderSystem.disableBlend();
 		
-        GlStateManager.popAttributes();
-		GlStateManager.popMatrix();
+//        GlStateManager.popAttributes();
+        matrixStackIn.pop();
 	}
 	
 	protected void onDestinationClicked(Button button) {
@@ -344,7 +348,7 @@ public class ObeliskScreen extends Screen {
         public DestinationButton(ObeliskScreen screen, int parPosX, int parPosY, 
               BlockPos pos, int index, boolean isCenter, boolean isListed, String title,
               boolean isValid) {
-            super(parPosX, parPosY, 13, 13, "", (b) -> {
+            super(parPosX, parPosY, 13, 13, StringTextComponent.EMPTY, (b) -> {
             	screen.onDestinationClicked(b);
             });
             this.pos = pos;
@@ -359,7 +363,7 @@ public class ObeliskScreen extends Screen {
          * Draws this button to the screen.
          */
         @Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
             if (visible) {
                 int textureX = 0;
                 int textureY = TEXT_BACK_HEIGHT;
@@ -381,10 +385,10 @@ public class ObeliskScreen extends Screen {
                 float val = isValid ? 1.0f : .6f;
                 GL11.glColor4f(val, 1.0f, val, val);
                 mc.getTextureManager().bindTexture(background);
-                GlStateManager.enableBlend();
+                RenderSystem.enableBlend();
                 RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
         				textureY, TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
-                GlStateManager.disableBlend();
+                RenderSystem.disableBlend();
                 
                 if (!isCenter) {
                 	// Draw the name below
@@ -394,11 +398,11 @@ public class ObeliskScreen extends Screen {
                 	int color = isValid ? 0xB0B0B0 : 0xB05050;
                 	if (isListed) {
                 		// Draw to the right
-                		fonter.drawString(title, x + buttonWidth + 5, y + ((buttonWidth - fonter.FONT_HEIGHT + 1) / 2), color);
+                		fonter.drawString(matrixStackIn, title, x + buttonWidth + 5, y + ((buttonWidth - fonter.FONT_HEIGHT + 1) / 2), color);
                 	} else {
                 		// Draw above
                 		int xPos = x + (buttonWidth / 2) - (textWidth / 2);
-                		fonter.drawString(title, xPos, y - (5 + fonter.FONT_HEIGHT), color);
+                		fonter.drawString(matrixStackIn, title, xPos, y - (5 + fonter.FONT_HEIGHT), color);
                 	}
                 	
                 }

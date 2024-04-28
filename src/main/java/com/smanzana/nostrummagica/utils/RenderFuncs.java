@@ -248,6 +248,10 @@ public final class RenderFuncs {
 	}
 	
 	// Different from the above in that this includes scaling on what's drawn
+	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
+		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, uWidth, v, uWidth, vHeight, width, vHeight, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
+	}
+	
 	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();

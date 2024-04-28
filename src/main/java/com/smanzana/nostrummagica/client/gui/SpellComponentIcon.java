@@ -4,8 +4,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -238,8 +237,13 @@ public class SpellComponentIcon {
 				"textures/models/symbol/shape_" + shape.getShapeKey().toLowerCase() + ".png");
 	}
 	
-	public void draw(AbstractGui parent, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
-		GL11.glPushMatrix();
+	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
+		draw(parent, matrixStackIn, fonter, xOffset, yOffset, width, height, 1f, 1f, 1f, 1f);
+	}
+	
+	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height,
+			float red, float green, float blue, float alpha) {
+		matrixStackIn.push();
 		
 		
 
@@ -263,10 +267,11 @@ public class SpellComponentIcon {
 //		else
 		{
 			Minecraft.getInstance().getTextureManager().bindTexture(this.getModelLocation());
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height,
+					red, green, blue, alpha);
 		}
 		
-		GL11.glPopMatrix();
+		matrixStackIn.pop();
 	}
 	
 	public ResourceLocation getModelLocation() {
