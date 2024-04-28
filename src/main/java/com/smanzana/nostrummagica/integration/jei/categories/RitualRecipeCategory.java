@@ -3,9 +3,8 @@ package com.smanzana.nostrummagica.integration.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.realmsclient.gui.ChatFormatting;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
@@ -35,6 +34,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 
 public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 
@@ -95,9 +98,9 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	}
 
 	@Override
-	public void draw(RitualRecipe recipe, double mouseX, double mouseY) {
+	public void draw(RitualRecipe recipe, MatrixStack matrixStackIn, double mouseX, double mouseY) {
 		final Minecraft minecraft = Minecraft.getInstance();
-		GlStateManager.pushMatrix();
+		matrixStackIn.push();
 		
 		float red, green, blue, alpha, angle;
 		alpha = 1f;
@@ -114,26 +117,26 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		red = ((float) ((color >> 16) & 0xFF) / 255f);
 		green = ((float) ((color >> 8) & 0xFF) / 255f);
 		blue = ((float) (color & 0xFF) / 255f);
-		GlStateManager.translatef(48, 70, 0);
-		GlStateManager.rotatef(angle, 0, 0, 1f);
-		GlStateManager.translatef(-RING_WIDTH / 2, -RING_HEIGHT/2, 0);
+		matrixStackIn.translate(48, 70, 0);
+		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(angle));
+		matrixStackIn.translate(-RING_WIDTH / 2, -RING_HEIGHT/2, 0);
 		
-		GlStateManager.color4f(red, green, blue, alpha);
-		GlStateManager.enableBlend();
+		RenderSystem.enableBlend();
 		minecraft.getTextureManager().bindTexture(TEXT_RING);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, 0, 0, 0,
-				0, RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT);
+				0, RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT,
+				red, green, blue, alpha);
 		
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 		
 		if (!canPerform(recipe)) {
-			minecraft.fontRenderer.drawString(ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
+			minecraft.fontRenderer.drawString(matrixStackIn, TextFormatting.BOLD + "x" + TextFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
 		
 		String title = recipeName;
 		int len = minecraft.fontRenderer.getStringWidth(title);
-		minecraft.fontRenderer.drawString(title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
+		minecraft.fontRenderer.drawString(matrixStackIn, title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
 	
 	@Override
@@ -261,18 +264,22 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	}
 	
 	private String tooltipInvalidKey = null;
-	private List<String> tooltipInvalid = null;
-	private List<String> tooltipEmpty = new ArrayList<>();
+	private List<ITextComponent> tooltipInvalid = null;
+	private List<ITextComponent> tooltipEmpty = new ArrayList<>();
 
 	@Override
-	public List<String> getTooltipStrings(RitualRecipe ritual, double mouseX, double mouseY) {
+	public List<ITextComponent> getTooltipStrings(RitualRecipe ritual, double mouseX, double mouseY) {
 		//108, 70
 		if (!canPerform(ritual)
 				&& mouseX > 101 && mouseX < 124
 				&& mouseY > 66 && mouseY < 85) {
-			if (tooltipInvalidKey == null || !tooltipInvalidKey.equals(I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK))) {
-				tooltipInvalidKey = I18n.format("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK);;
-				tooltipInvalid = Lists.newArrayList(tooltipInvalidKey.split("\\|"));
+			if (tooltipInvalidKey == null || !tooltipInvalidKey.equals(I18n.format("info.jei.recipe.ritual.invalid", TextFormatting.BOLD + "" + TextFormatting.RED, TextFormatting.BLACK))) {
+				tooltipInvalidKey = I18n.format("info.jei.recipe.ritual.invalid", TextFormatting.BOLD + "" + TextFormatting.RED, TextFormatting.BLACK);
+				final String[] lines = tooltipInvalidKey.split("\\|");
+				tooltipInvalid = new ArrayList<>(lines.length);
+				for (String line : lines) {
+					tooltipInvalid.add(new StringTextComponent(line));
+				}
 			}
 			return tooltipInvalid;
 		}

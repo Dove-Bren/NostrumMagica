@@ -4,7 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
 public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutcomeWrapper> {
 	
@@ -36,13 +38,12 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 	
 	@Override
-	public void render(int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
+	public void render(MatrixStack matrixStackIn, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return;
 		Minecraft.getInstance().getTextureManager().bindTexture(RITUAL_TEXTURE);
 		ItemStack item = fetchItem(ingredient.getOutcome());
-		GlStateManager.enableBlend();
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.enableBlend();
 		if (item != null) {
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, xPosition,
 					yPosition,
@@ -65,7 +66,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public List<String> getTooltip(RitualOutcomeWrapper ingredient, ITooltipFlag flag) {
+	public List<ITextComponent> getTooltip(RitualOutcomeWrapper ingredient, ITooltipFlag flag) {
 		if (ingredient == null)
 			return new LinkedList<>();
 		
@@ -73,7 +74,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 		if (item == null)
 			return ingredient.getOutcome().getDescription();
 		else
-			return Lists.newArrayList(item.getDisplayName().toString());
+			return Lists.newArrayList(item.getDisplayName());
 	}
 
 	@Override

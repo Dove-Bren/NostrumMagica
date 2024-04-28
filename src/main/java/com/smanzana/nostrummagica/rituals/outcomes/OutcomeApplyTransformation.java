@@ -5,13 +5,12 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.TextUtils;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -19,6 +18,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -57,9 +57,8 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	}
 
 	@Override
-	public List<String> getDescription() {
-		return Lists.newArrayList(I18n.format("ritual.outcome.transformation_effect.desc")
-				.split("\\|"));
+	public List<ITextComponent> getDescription() {
+		return TextUtils.GetTranslatedList("ritual.outcome.transformation_effect.desc");
 	}
 	
 	@Override

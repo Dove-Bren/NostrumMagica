@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceIngredientType;
 import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationRecipe;
@@ -77,13 +78,13 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	}
 
 	@Override
-	public void draw(TransmutationRecipe recipe, double mouseX, double mouseY) {
+	public void draw(TransmutationRecipe recipe, MatrixStack matrixStackIn, double mouseX, double mouseY) {
 		// Only thing to draw is the transmutation jump power
 		
 		final int jump = recipe.getLevel();
 		final Minecraft minecraft = Minecraft.getInstance();
 		final String label = "" + jump;
-		minecraft.fontRenderer.drawStringWithShadow(label, (BACK_WIDTH/2) - 4, BACK_HEIGHT/2 - 4, 0xFFFFFFFF);
+		minecraft.fontRenderer.drawStringWithShadow(matrixStackIn, label, (BACK_WIDTH/2) - 4, BACK_HEIGHT/2 - 4, 0xFFFFFFFF);
 	}
 	
 	@Override

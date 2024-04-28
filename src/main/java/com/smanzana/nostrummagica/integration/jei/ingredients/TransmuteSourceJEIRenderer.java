@@ -3,15 +3,17 @@ package com.smanzana.nostrummagica.integration.jei.ingredients;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationSource;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class TransmuteSourceJEIRenderer implements IIngredientRenderer<TransmutationSource> {
 	
@@ -24,15 +26,15 @@ public class TransmuteSourceJEIRenderer implements IIngredientRenderer<Transmuta
 	}
 	
 	@Override
-	public void render(int xPosition, int yPosition, TransmutationSource ingredient) {
+	public void render(MatrixStack matrixStackIn, int xPosition, int yPosition, TransmutationSource ingredient) {
 		if (ingredient == null)
 			return;
 		
 		// Note: we only use TransmutationSources as ingredients to mean MISSING/UNKNOWN sources.
 		// So draw a "i dunno :3" icon
 		
-		RenderFuncs.drawRect(xPosition - 1, yPosition - 1, xPosition + 16 + 1, yPosition + 16 + 1, 0xFF000000);
-		RenderFuncs.drawRect(xPosition, yPosition, xPosition + 16, yPosition + 16, 0xFF666666);
+		RenderFuncs.drawRect(matrixStackIn, xPosition - 1, yPosition - 1, xPosition + 16 + 1, yPosition + 16 + 1, 0xFF000000);
+		RenderFuncs.drawRect(matrixStackIn, xPosition, yPosition, xPosition + 16, yPosition + 16, 0xFF666666);
 		
 		final double iconPeriodMS = 3000;
 		double alphaIcon1 = (0.0 + (((double) (System.currentTimeMillis() % iconPeriodMS)) / (double) iconPeriodMS)) % 1.0;
@@ -54,15 +56,15 @@ public class TransmuteSourceJEIRenderer implements IIngredientRenderer<Transmuta
 		final int alpha3 = ((int) (255 * alphaIcon3)) << 24;
 		
 		Minecraft mc = Minecraft.getInstance();
-		GlStateManager.enableBlend();
-		if (alpha1 > 0) mc.fontRenderer.drawString("?", xPosition + 10, yPosition + 3, 0x00FF0000 | alpha1 | 0x4000000);
-		if (alpha2 > 0) mc.fontRenderer.drawString("?", xPosition + 1, yPosition + 1, 0x0000FF00 | alpha2 | 0x4000000);
-		if (alpha3 > 0) mc.fontRenderer.drawString("?", xPosition + 5, yPosition + 8, 0x000000FF | alpha3 | 0x4000000);
+		RenderSystem.enableBlend();
+		if (alpha1 > 0) mc.fontRenderer.drawString(matrixStackIn, "?", xPosition + 10, yPosition + 3, 0x00FF0000 | alpha1 | 0x4000000);
+		if (alpha2 > 0) mc.fontRenderer.drawString(matrixStackIn, "?", xPosition + 1, yPosition + 1, 0x0000FF00 | alpha2 | 0x4000000);
+		if (alpha3 > 0) mc.fontRenderer.drawString(matrixStackIn, "?", xPosition + 5, yPosition + 8, 0x000000FF | alpha3 | 0x4000000);
 	}
 
 	@Override
-	public List<String> getTooltip(TransmutationSource ingredient, ITooltipFlag flag) {
-		return Lists.newArrayList(I18n.format("info.jei.recipe.transmute.unknown"));
+	public List<ITextComponent> getTooltip(TransmutationSource ingredient, ITooltipFlag flag) {
+		return Lists.newArrayList(new TranslationTextComponent("info.jei.recipe.transmute.unknown"));
 	}
 
 	@Override

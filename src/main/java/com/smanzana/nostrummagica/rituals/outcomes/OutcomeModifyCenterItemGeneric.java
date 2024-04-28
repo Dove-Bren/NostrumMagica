@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.rituals.outcomes;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
@@ -9,6 +10,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
@@ -18,9 +21,13 @@ public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 	}
 
 	private ItemModification modification;
-	private List<String> description;
+	private List<ITextComponent> description;
 	
 	public OutcomeModifyCenterItemGeneric(ItemModification modification, List<String> description) {
+		this(modification, description.stream().map(s -> new StringTextComponent(s)).collect(Collectors.toList()), false);
+	}
+	
+	public OutcomeModifyCenterItemGeneric(ItemModification modification, List<ITextComponent> description, boolean dummy) {
 		this.modification = modification;
 		this.description = description;
 	}
@@ -47,7 +54,7 @@ public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 	}
 
 	@Override
-	public List<String> getDescription() {
+	public List<ITextComponent> getDescription() {
 		return description;
 	}
 

@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.rituals.outcomes;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.utils.TextUtils;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +13,7 @@ import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
 public class OutcomePotionEffect implements IRitualOutcome {
@@ -35,13 +36,12 @@ public class OutcomePotionEffect implements IRitualOutcome {
 	}
 
 	@Override
-	public List<String> getDescription() {
+	public List<ITextComponent> getDescription() {
 		String name = I18n.format(effect.getEffectName(), (Object[]) null);
 		String display = SpellPlate.toRoman(effect.getAmplifier() + 1);
 		String secs = "" + (effect.getDuration() / 20);
 		
-		return Lists.newArrayList(I18n.format("ritual.outcome.potion_effect.desc",
-				new Object[] {name, display, secs})
-				.split("\\|"));
+		return TextUtils.GetTranslatedList("ritual.outcome.potion_effect.desc",
+				new Object[] {name, display, secs});
 	}
 }
