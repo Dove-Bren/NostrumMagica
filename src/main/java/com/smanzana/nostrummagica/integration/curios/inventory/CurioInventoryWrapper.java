@@ -1,7 +1,8 @@
 package com.smanzana.nostrummagica.integration.curios.inventory;
 
 import java.util.ArrayList;
-import java.util.SortedMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
@@ -10,21 +11,20 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 public class CurioInventoryWrapper {
 	
 	public static final ItemStackArrayWrapper EMPTY_INV = new ItemStackArrayWrapper(new ItemStack[0]);
 	
 	public static IInventory getCuriosInventory(PlayerEntity entity) {
-		LazyOptional<ItemStackArrayWrapper> opt = CuriosAPI.getCuriosHandler(entity).map((handler) -> {
-			CurioStackHandler[] stackHandlers = handler.getCurioMap().values().toArray(new CurioStackHandler[0]);
+		Optional<ItemStackArrayWrapper> opt = CuriosApi.getCuriosHelper().getCuriosHandler(entity).map((handler) -> {
+			ICurioStacksHandler[] stackHandlers = handler.getCurios().values().toArray(new ICurioStacksHandler[0]);
 			ArrayList<ItemStack> itemList = new ArrayList<>();
-			for (CurioStackHandler h : stackHandlers) {
+			for (ICurioStacksHandler h : stackHandlers) {
 				for (int i = 0; i < h.getSlots(); i++) {
-					itemList.add(h.getStackInSlot(i));
+					itemList.add(h.getStacks().getStackInSlot(i));
 				}
 			}
 			
@@ -34,11 +34,11 @@ public class CurioInventoryWrapper {
 	}
 
 	public static void forEach(LivingEntity entity, Predicate<ItemStack> action) {
-		CuriosAPI.getCuriosHandler(entity).ifPresent((handler) -> {
-			SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
-			for (CurioStackHandler h : curioMap.values()) {
+		CuriosApi.getCuriosHelper().getCuriosHandler(entity).ifPresent((handler) -> {
+			Map<String, ICurioStacksHandler> curioMap = handler.getCurios();
+			for (ICurioStacksHandler h : curioMap.values()) {
 				for (int i = 0; i < h.getSlots(); i++) {
-					ItemStack stack = h.getStackInSlot(i);
+					ItemStack stack = h.getStacks().getStackInSlot(i);
 					if (!stack.isEmpty()) {
 						// Perform action. Cancel iteration if action returns true
 						if (action.test(stack)) {

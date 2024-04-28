@@ -3,9 +3,12 @@ package com.smanzana.nostrummagica.integration.curios.items;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.integration.curios.NostrumCurioCapability;
 
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -15,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import top.theillusivec4.curios.api.capability.CuriosCapability;
+import top.theillusivec4.curios.api.CuriosCapability;
 
 public interface INostrumCurio {
 	
@@ -34,12 +37,12 @@ public interface INostrumCurio {
 
 	public boolean canEquip(ItemStack stack, LivingEntity entity);
 	
-	public Multimap<String, AttributeModifier> getEquippedAttributeModifiers(ItemStack stack);
+	public Multimap<Attribute,AttributeModifier> getEquippedAttributeModifiers(ItemStack stack);
 
 	@OnlyIn(Dist.CLIENT)
 	public boolean hasRender(ItemStack stack, LivingEntity living);
 
 	@OnlyIn(Dist.CLIENT)
-	public void doRender(ItemStack stack, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale);
+	public void doRender(ItemStack stack, MatrixStack matrixStackIn, int index, IRenderTypeBuffer bufferIn, int packedLightIn, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch);
 	
 }

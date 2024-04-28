@@ -1,13 +1,16 @@
 package com.smanzana.nostrummagica.integration.curios;
 
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class NostrumCurioCapability implements ICurio {
 
@@ -22,17 +25,17 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public void onCurioTick(String identifier, LivingEntity entity) {
+	public void curioTick(String identifier, int index, LivingEntity entity) {
 		getItem().onWornTick(stack, entity);
 	}
 
 	@Override
-	public void onEquipped(String identifier, LivingEntity entity) {
+	public void onEquip(String identifier, int index, LivingEntity entity) {
 		getItem().onEquipped(stack, entity);
 	}
 
 	@Override
-	public void onUnequipped(String identifier, LivingEntity entity) {
+	public void onUnequip(String identifier, int index, LivingEntity entity) {
 		getItem().onUnequipped(stack, entity);
 	}
 
@@ -47,12 +50,12 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public boolean shouldSyncToTracking(String identifier, LivingEntity entity) {
+	public boolean canSync(String identifier, int index, LivingEntity entity) {
 		return true;
 	}
 
 	@Override
-	public void playEquipSound(LivingEntity entity) {
+	public void playRightClickEquipSound(LivingEntity entity) {
 		NostrumMagicaSounds.BAUBLE_EQUIP.play(entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ());
 		//entity.world.playSound(null, entity.getPosX(), entity.getPosY(), entity.getPosZ(), NostrumMagicaSounds.BAUBLE_EQUIP, entity.getSoundCategory(), 0.1F, 1.3F);
 	}
@@ -63,13 +66,15 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public boolean hasRender(String identifier, LivingEntity entity) {
+	public boolean canRender(String identifier, int index, LivingEntity entity) {
 		return getItem().hasRender(stack, entity);
 	}
 
 	@Override
-	public void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		getItem().doRender(stack, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+	public void render(String identifier, int index, MatrixStack matrixStackIn,
+			IRenderTypeBuffer bufferIn, int light,
+			LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+		getItem().doRender(stack, matrixStackIn, index, bufferIn, light, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 	}
 	
 }

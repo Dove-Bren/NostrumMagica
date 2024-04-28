@@ -9,6 +9,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -19,9 +20,11 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -217,7 +220,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	}
 
 	@Override
-	public Multimap<String, AttributeModifier> getEquippedAttributeModifiers(ItemStack stack) {
+	public Multimap<Attribute,AttributeModifier> getEquippedAttributeModifiers(ItemStack stack) {
 		return HashMultimap.create();
 	}
 
@@ -233,6 +236,6 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void doRender(ItemStack stack, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {}
+	public void doRender(ItemStack stack, MatrixStack matrixStackIn, int index, IRenderTypeBuffer bufferIn, int packedLightIn, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {}
 	
 }
