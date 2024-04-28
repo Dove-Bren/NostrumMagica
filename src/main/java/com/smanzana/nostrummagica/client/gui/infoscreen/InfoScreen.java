@@ -7,9 +7,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.IForegroundRenderable;
@@ -21,9 +20,11 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class InfoScreen extends StackableScreen {
 	
@@ -145,9 +146,9 @@ public class InfoScreen extends StackableScreen {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 
-		RenderFuncs.drawRect(0, 0, width, height, 0xFF000000);
+		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		
 		if (this.subscreen != null) {
 			
@@ -162,25 +163,25 @@ public class InfoScreen extends StackableScreen {
 			
 			yOffset += POS_SUBSCREEN_VOFFSET;
 			
-			this.subscreen.draw(attribute, minecraft, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
+			this.subscreen.draw(attribute, minecraft, matrixStackIn, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
 		}
 		
 		// Do buttons and other parent stuff
 		for (int i = 0; i < this.buttons.size(); ++i) {
-			((AbstractButton)this.buttons.get(i)).render(mouseX, mouseY, partialTicks);
+			((AbstractButton)this.buttons.get(i)).render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 		// Mask out any partial buttons or buttons that are above button line, since we support scrolling
-		GlStateManager.pushMatrix();
-		GlStateManager.translatef(0, 0, 500);
+		matrixStackIn.push();
+		matrixStackIn.translate(0, 0, 500);
 		if (scrollY > 0) {
-			RenderFuncs.drawRect(0, 0, width, POS_SUBSCREEN_VOFFSET, 0xFF000000);
+			RenderFuncs.drawRect(matrixStackIn, 0, 0, width, POS_SUBSCREEN_VOFFSET, 0xFF000000);
 		}
 		
 		for (int i = 0; i < this.tabs.size(); ++i) {
-			((AbstractButton)this.tabs.get(i)).render(mouseX, mouseY, partialTicks);
+			((AbstractButton)this.tabs.get(i)).render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
-		GlStateManager.popMatrix();
+		matrixStackIn.pop();
 
 //		for (int j = 0; j < this.labelList.size(); ++j) {
 //			((GuiLabel)this.labelList.get(j)).drawLabel(this.minecraft, mouseX, mouseY);
@@ -191,7 +192,7 @@ public class InfoScreen extends StackableScreen {
 			for (int i = 0; i < this.buttons.size(); ++i) {
 				Widget w = this.buttons.get(i);
 				if (w instanceof IForegroundRenderable) {
-					((IForegroundRenderable)this.buttons.get(i)).renderForeground(mouseX, mouseY, partialTicks);
+					((IForegroundRenderable)this.buttons.get(i)).renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 				}
 			}
 		}
@@ -199,7 +200,7 @@ public class InfoScreen extends StackableScreen {
 		for (int i = 0; i < this.tabs.size(); ++i) {
 			Widget w = this.buttons.get(i);
 			if (w instanceof IForegroundRenderable) {
-				((IForegroundRenderable)this.buttons.get(i)).renderForeground(mouseX, mouseY, partialTicks);
+				((IForegroundRenderable)this.buttons.get(i)).renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			}
 		}
 		
@@ -324,11 +325,11 @@ public class InfoScreen extends StackableScreen {
 		private static final int TEXT_BUTTON_TAB_WIDTH = 32;
         private InfoScreenTab tab;
         private List<InfoButton> buttons;
-        private List<String> desc;
+        private List<ITextComponent> desc;
 
         public TabButton(int parPosX, int parPosY, 
         		INostrumMagic attr, InfoScreenTab tab) {
-            super(parPosX, parPosY, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, "");
+            super(parPosX, parPosY, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, StringTextComponent.EMPTY);
             this.tab = tab;
             this.buttons = tab.getButtons(InfoScreen.this, attr);
             
@@ -340,7 +341,7 @@ public class InfoScreen extends StackableScreen {
             if (name.contains("_")) {
             	name = name.substring(name.indexOf('_') + 1);
             }
-            desc.add(name.substring(0, 1).toUpperCase() + name.toLowerCase().substring(1));
+            desc.add(new StringTextComponent(name.substring(0, 1).toUpperCase() + name.toLowerCase().substring(1)));
         }
         
         public List<InfoButton> getButtons() {
@@ -351,7 +352,7 @@ public class InfoScreen extends StackableScreen {
          * Draws this button to the screen.
          */
         @Override
-        public void render(int parX, int parY, float partialTicks) {
+        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
             if (visible)
             {
             	final int itemLength = 18;
@@ -363,14 +364,14 @@ public class InfoScreen extends StackableScreen {
             		tint = .75f;
             	}
                 
-                GL11.glColor4f(tint, tint, tint, 1f);
                 minecraft.getTextureManager().bindTexture(background);
-                GlStateManager.enableBlend();
+                RenderSystem.enableBlend();
                 RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
-                		TEXT_BUTTON_TAB_VOFFSET, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
-                GlStateManager.disableBlend();
+                		TEXT_BUTTON_TAB_VOFFSET, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+                		tint, tint, tint, 1f);
+                RenderSystem.disableBlend();
                 
-                RenderHelper.enableGUIStandardItemLighting();
+                RenderHelper.enableStandardItemLighting();
                 int x = this.x + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
                 int y = this.y + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
                 minecraft.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x, y);
@@ -379,16 +380,16 @@ public class InfoScreen extends StackableScreen {
             }
         }
         
-    	public void renderForeground(int mouseX, int mouseY, float partialTicks) {
+    	public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
     		if (mouseX >= this.x && mouseY > this.y
     			&& mouseX <= this.x + this.width
     			&& mouseY <= this.y + this.height) {
     			Minecraft minecraft = Minecraft.getInstance();
-    			GuiUtils.drawHoveringText(desc,
+    			GuiUtils.drawHoveringText(matrixStackIn, desc,
     					mouseX,
     					mouseY,
-    					minecraft.mainWindow.getWidth(),
-    					minecraft.mainWindow.getHeight(),
+    					minecraft.getMainWindow().getWidth(),
+    					minecraft.getMainWindow().getHeight(),
     					100,
     					minecraft.fontRenderer);
     		}

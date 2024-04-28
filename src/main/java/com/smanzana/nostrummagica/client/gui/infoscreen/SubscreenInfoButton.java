@@ -5,15 +5,15 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class SubscreenInfoButton extends InfoButton {
 
@@ -34,7 +34,7 @@ public class SubscreenInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		float tint = 1f;
 		if (mouseX >= this.x
 			&& mouseY >= this.y 
@@ -43,13 +43,13 @@ public class SubscreenInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		GL11.glColor4f(tint, tint, tint, 1f);
 		Minecraft.getInstance().getTextureManager().bindTexture(InfoScreen.background);
-		GlStateManager.enableBlend();
+		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,
-				height, InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
-		GlStateManager.disableBlend();
+				height, InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT,
+				tint, tint, tint, 1f);
+		RenderSystem.disableBlend();
 		
 		final int itemLength = 16;
 		
@@ -60,11 +60,11 @@ public class SubscreenInfoButton extends InfoButton {
 		}
 	}
 	
-	private List<String> desc = new ArrayList<>(1);
+	private List<ITextComponent> desc = new ArrayList<>(1);
 	@Override
-	public List<String> getDescription() {
+	public List<ITextComponent> getDescription() {
 		if (desc.isEmpty())
-			desc.add(I18n.format("info." + descKey + ".name", new Object[0]));
+			desc.add(new TranslationTextComponent("info." + descKey + ".name", new Object[0]));
 		
 		return desc;
 	}

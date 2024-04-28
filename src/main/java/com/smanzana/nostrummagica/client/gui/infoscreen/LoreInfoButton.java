@@ -5,9 +5,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -23,6 +22,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class LoreInfoButton extends InfoButton {
 
@@ -43,7 +44,7 @@ public class LoreInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
 		float tint = 1f;
 		if (mouseX >= this.x 
@@ -53,13 +54,13 @@ public class LoreInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		GL11.glColor4f(tint, tint, tint, 1f);
 		mc.getTextureManager().bindTexture(InfoScreen.background);
-		GlStateManager.enableBlend();
+		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,
-				height, InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT);
-		GlStateManager.disableBlend();
+				height, InfoScreen.TEXT_WHOLE_WIDTH, InfoScreen.TEXT_WHOLE_HEIGHT,
+				tint, tint, tint, 1f);
+		RenderSystem.disableBlend();
 		
 		final int itemLength = 16;
 		
@@ -104,11 +105,11 @@ public class LoreInfoButton extends InfoButton {
 		}
 	}
 
-	private List<String> desc = new ArrayList<>(1);
+	private List<ITextComponent> desc = new ArrayList<>(1);
 	@Override
-	public List<String> getDescription() {
+	public List<ITextComponent> getDescription() {
 		if (desc.isEmpty())
-			desc.add(lore.getLoreDisplayName());
+			desc.add(new StringTextComponent(lore.getLoreDisplayName()));
 		
 		return desc;
 	}

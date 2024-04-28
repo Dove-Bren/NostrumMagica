@@ -247,6 +247,13 @@ public final class RenderFuncs {
 //		tessellator.draw();
 	}
 	
+	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
+		// hack for now
+		RenderSystem.color4f(red, green, blue, alpha);
+		drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, blue, v, width, height, textureWidth, textureHeight);
+		RenderSystem.color4f(1f, 1f, 1f, 1f);
+	}
+	
 	// Different from the above in that this includes scaling on what's drawn
 	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
 		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, uWidth, v, uWidth, vHeight, width, vHeight, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
