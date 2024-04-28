@@ -102,8 +102,8 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.NostrumDungeonConfig;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
+import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.enchantment.Enchantment;
@@ -120,24 +120,17 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
-import net.minecraft.world.gen.placement.CountRangeConfig;
-import net.minecraft.world.gen.placement.FrequencyConfig;
-import net.minecraft.world.gen.placement.IPlacementConfig;
-import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 import net.minecraftforge.registries.DataSerializerEntry;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
@@ -203,35 +196,35 @@ public class CommonProxy {
 		CommandSetManaArmor.register(dispatcher);
 	}
 	
-	public void registerWorldGen() {
-		// Note: features registered in NostrumFeatures
-		for(Biome biome : ForgeRegistries.BIOMES) {
-			
-			if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)) {
-				continue;
-			}
-			
-			if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)) {
-				continue;
-			}
-			
-			// Filter this list maybe?
-			biome.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Biome.createDecoratedFeature(NostrumFeatures.flowers, IFeatureConfig.NO_FEATURE_CONFIG, Placement.COUNT_HEIGHTMAP_32, new FrequencyConfig(1)));
-			
-			biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(Feature.ORE, new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.maniOre.getDefaultState(), 9), Placement.COUNT_RANGE, new CountRangeConfig(20, 0, 0, 240)));
-			biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(Feature.ORE, new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.essenceOre.getDefaultState(), 3), Placement.COUNT_RANGE, new CountRangeConfig(10, 20, 20, 60)));
-			
-			//  Have to add structures as structures AND features.
-			// Vanilla adds all structs as features and then only some as structures to turn them on for different biomes.
-			// Adding as struct makes the world generate starts and the logical part. Adding as features makes them actually place in the world.
-			biome.addStructure(NostrumFeatures.portalDungeon, new NostrumDungeonConfig());
-			biome.addStructure(NostrumFeatures.dragonDungeon, new NostrumDungeonConfig());
-			biome.addStructure(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig());
-			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.portalDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
-			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.dragonDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
-			biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
-			
+	@SubscribeEvent
+	public void onBiomeLoad(BiomeLoadingEvent event) {
+		Biome.Category category = event.getCategory();
+		
+		if (category == Biome.Category.THEEND) {
+			return;
 		}
+		
+		if (category == Biome.Category.NETHER) {
+			return;
+		}
+		
+		// Filter this list maybe?
+		final BiomeGenerationSettingsBuilder gen = event.getGeneration();
+		gen.withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_CRYSTABLOOM);
+		gen.withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_MIDNIGHTIRIS);
+		
+		gen.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_MANI);
+		gen.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_ESSORE);
+		
+		gen.withStructure(NostrumStructures.CONFIGURED_DUNGEON_PORTAL);
+		gen.withStructure(NostrumStructures.CONFIGURED_DUNGEON_DRAGON);
+		gen.withStructure(NostrumStructures.CONFIGUREDDUNGEON_PLANTBOSS);
+////		  Have to add structures as structures AND features.
+////		 Vanilla adds all structs as features and then only some as structures to turn them on for different biomes.
+////		 Adding as struct makes the world generate starts and the logical part. Adding as features makes them actually place in the world.
+//		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.portalDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+//		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.dragonDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+//		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
 	}
     
     private void registerShapes() {
@@ -411,7 +404,7 @@ public class CommonProxy {
 		if (target != null) {
 			NetworkHandler.sendToAllTracking(message, target);
 		} else {
-			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimension().getType()));
+			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimensionKey()));
 		}
 		
 //		if (caster != null) {
@@ -484,7 +477,7 @@ public class CommonProxy {
 		if (!players.isEmpty()) {
 			SpawnNostrumRitualEffectMessage message = new SpawnNostrumRitualEffectMessage(
 					//int dimension, BlockPos pos, ReagentType[] reagents, ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output
-					world.getDimension().getType(),
+					world.getDimensionKey(),
 					pos, element, types, center, extras, output
 					);
 			for (PlayerEntity player : players) {
@@ -494,15 +487,15 @@ public class CommonProxy {
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vector3d position) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), position), world, position);
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimensionKey(), position), world, position);
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Entity entity) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimension().getType(), entity.getEntityId()), world, entity.getPositionVec());
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimensionKey(), entity.getEntityId()), world, entity.getPositionVec());
 	}
 	
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {
 		final double MAX_RANGE = 50.0;
-		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimension().getType()));
+		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimensionKey()));
 	}
 }

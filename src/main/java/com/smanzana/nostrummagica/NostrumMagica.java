@@ -295,8 +295,6 @@ public class NostrumMagica {
 		//enderIO.postInit();
 		musica.postInit();
 		
-		proxy.registerWorldGen();
-
 		initFinished = true;
 
 		MinecraftForge.EVENT_BUS.register(this);
