@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +30,7 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 
 	@Override
 	public boolean shouldPlay(ClientPlayerEntity player) {
-		return player != null && player.dimension.getId() == 1;
+		return player != null && DimensionUtils.IsOverworld(DimensionUtils.GetDimension(player));
 	}
 	
 	@Override
