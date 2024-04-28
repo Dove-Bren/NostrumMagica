@@ -8,15 +8,12 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.antlr.v4.runtime.atn.BasicState;
 import org.lwjgl.glfw.GLFW;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
-import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBase;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
@@ -95,28 +92,12 @@ import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
-import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
-import com.smanzana.nostrummagica.entity.EntityHookShot;
-import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityLux;
-import com.smanzana.nostrummagica.entity.EntitySpellBullet;
-import com.smanzana.nostrummagica.entity.EntitySpellMortar;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
-import com.smanzana.nostrummagica.entity.EntitySprite;
-import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
-import com.smanzana.nostrummagica.entity.EntityWillo;
-import com.smanzana.nostrummagica.entity.EntityWisp;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
@@ -126,8 +107,6 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
 import com.smanzana.nostrummagica.items.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.items.AspectedFireWeapon;
@@ -171,36 +150,8 @@ import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
-import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
-import com.smanzana.nostrummagica.tiles.AltarTileEntity;
-import com.smanzana.nostrummagica.tiles.CandleTileEntity;
-import com.smanzana.nostrummagica.tiles.DelayLoadedMimicBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.ItemDuctTileEntity;
-import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.LockedChestEntity;
-import com.smanzana.nostrummagica.tiles.LoreTableEntity;
-import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
-import com.smanzana.nostrummagica.tiles.MatchSpawnerTileEntity;
-import com.smanzana.nostrummagica.tiles.MimicBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
-import com.smanzana.nostrummagica.tiles.ObeliskPortalTileEntity;
-import com.smanzana.nostrummagica.tiles.ParadoxMirrorTileEntity;
-import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
-import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.RuneShaperEntity;
-import com.smanzana.nostrummagica.tiles.SingleSpawnerTileEntity;
-import com.smanzana.nostrummagica.tiles.SorceryPortalTileEntity;
-import com.smanzana.nostrummagica.tiles.SpellTableEntity;
-import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
-import com.smanzana.nostrummagica.tiles.TeleportRuneTileEntity;
-import com.smanzana.nostrummagica.tiles.TeleportationPortalTileEntity;
-import com.smanzana.nostrummagica.tiles.TemporaryPortalTileEntity;
-import com.smanzana.nostrummagica.tiles.TrialBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.TriggerRepeaterEntity;
-import com.smanzana.nostrummagica.tiles.TriggeredMatchSpawnerTileEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
@@ -219,19 +170,15 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.entity.AreaEffectCloudRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -240,12 +187,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockDisplayReader;
@@ -258,20 +206,14 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.PerspectiveMapWrapper;
-import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.registries.ObjectHolder;
 
 @SuppressWarnings("deprecation")
 public class ClientProxy extends CommonProxy {
@@ -410,7 +352,39 @@ public class ClientProxy extends CommonProxy {
 //					NostrumMagica.MODID, "effect/" + icon.getModelKey()), "")
 //					);
 //    	}
-    	
+		
+		
+		for (ClientEffectIcon icon : ClientEffectIcon.values()) {
+			if (!icon.getModelKey().endsWith(".obj")) {
+				// json
+//				final String modelLoc = "effect/" + icon.getModelKey();
+//				IUnbakedModel model = event.getModelLoader().getUnbakedModel(NostrumMagica.Loc(modelLoc));
+//				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc), "Failed to get json model for " + modelLoc);
+//				
+//				HashSet<String> missingTextureErrors = new HashSet<>();
+//				
+//				if (model != null && model != ModelLoaderRegistry.getMissingModel()) {
+//					model.getTextures(event.getModelLoader()::getUnbakedModel, missingTextureErrors);
+//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
+//				} else {
+//					model.getClass();
+//				}
+				int unused; // why dont I need this?
+			} else {
+				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
+				final String modelLoc = "effect/" + icon.getKey();
+				ModelLoader.addSpecialModel(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)));
+			}
+		}
+		
+		for (String key : new String[] {"block/orb_crystal", "entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
+			ModelLoader.addSpecialModel(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(key)));
+		}
+		
+		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
+			ModelLoader.addSpecialModel(RenderFuncs.makeDefaultModelLocation(loc));
+		}
 	}
 	
 	@SubscribeEvent
@@ -492,7 +466,7 @@ public class ClientProxy extends CommonProxy {
 		for (NostrumParticles particle : NostrumParticles.values()) {
 			manager.registerFactory(particle.getType(), new IParticleFactory<NostrumParticleData>() {
 				@Override
-				public Particle makeParticle(NostrumParticleData typeIn, World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+				public Particle makeParticle(NostrumParticleData typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
 					return particle.getFactory().createParticle(worldIn, typeIn.getParams());
 				}
 			});
@@ -721,7 +695,7 @@ public class ClientProxy extends CommonProxy {
 			int cap = SpellTome.getMaxMana(tome);
 			if (cap < cost) {
 				player.sendMessage(new TranslationTextComponent(
-						"info.spell.tome_weak", new Object[0]));
+						"info.spell.tome_weak", new Object[0]), Util.DUMMY_UUID);
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				System.out.println("LOUD tome weak"); // TODO remove
 				return;
@@ -807,20 +781,17 @@ public class ClientProxy extends CommonProxy {
 			int maxElems = 1 + (3 * att.getControl());
 			if (spell.getComponentCount() > maxComps) {
 				player.sendMessage(new TranslationTextComponent(
-						"info.spell.low_tech", new Object[0]));
-				System.out.println("LOUD LOW TECH"); // TODO remove
+						"info.spell.low_tech", new Object[0]), Util.DUMMY_UUID);
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getElementCount() > maxElems) {
 				player.sendMessage(new TranslationTextComponent(
-						"info.spell.low_control", new Object[0]));
-				System.out.println("LOUD LOW CONTROL"); // TODO remove
+						"info.spell.low_control", new Object[0]), Util.DUMMY_UUID);
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			} else if (spell.getTriggerCount() > maxTriggers) {
 				player.sendMessage(new TranslationTextComponent(
-						"info.spell.low_finesse", new Object[0]));
-				System.out.println("LOUD LOW FINESSE"); // TODO remove
+						"info.spell.low_finesse", new Object[0]), Util.DUMMY_UUID);
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				return;
 			}
@@ -852,7 +823,7 @@ public class ClientProxy extends CommonProxy {
 				final ElementalMastery currentMastery = att.getElementalMastery(elem);
 				if (!currentMastery.isGreaterOrEqual(neededMastery)) {
 					player.sendMessage(new TranslationTextComponent(
-							"info.spell.low_mastery", neededMastery.name().toLowerCase(), elem.getName(), currentMastery.name().toLowerCase()));
+							"info.spell.low_mastery", neededMastery.name().toLowerCase(), elem.getName(), currentMastery.name().toLowerCase()), Util.DUMMY_UUID);
 						NostrumMagicaSounds.CAST_FAIL.play(player);
 				}
 	    	}
@@ -864,8 +835,7 @@ public class ClientProxy extends CommonProxy {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(player, row.getKey());
 					if (count < row.getValue()) {
-						player.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()));
-						System.out.println("LOUD BAD REAGENT"); // TODO remove
+						player.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.DUMMY_UUID);
 						return;
 					}
 				}
@@ -1030,9 +1000,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void stitchEventPre(TextureStitchEvent.Pre event) {
-		// Note: called multiple times for different texture atlases.
-		// Using what Botania does
-		if(event.getMap() != Minecraft.getInstance().getTextureMap()) {
+		if(event.getMap().getTextureLocation() != AtlasTexture.LOCATION_BLOCKS_TEXTURE) {
 			return;
 		}
 		
@@ -1108,192 +1076,102 @@ public class ClientProxy extends CommonProxy {
 				NostrumMagica.MODID, "effects/slate"));
 		event.addSprite(new ResourceLocation(
 				NostrumMagica.MODID, "effects/arrow_slash"));
-		
-		/*
-		SHIELD("shield", false),
-		TING1("ting1", false),
-		TING2("ting2", false),
-		TING3("ting3", false),
-		TING4("ting4", false),
-		TING5("ting5", false),
-		CYL("cyl", true),
-		SHELL("shell", true),
-		ARROWU("arrow_up", false),
-		ARROWD("arrow_down", false),
-		ORB_CLOUDY("orb_cloudy", true),
-		ORB_SCALED("orb_scaled", true),
-		ORB_PURE("orb_pure", true),
-		THORN_0("thorn0", true),
-		THORN_1("thorn1", true),
-		THORN_2("thorn2", true),
-		THORN_3("thorn3", true),
-		THORN_4("thorn4", true),
-		 */
     }
-    
-//	private static final TRSRTransformation THIRD_PERSON_BLOCK = Transforms.convert(0, 2.5f, 0, 75, 45, 0, 0.375f);
-//    private static final ImmutableMap<TransformType, TRSRTransformation> BLOCK_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
-//            .put(TransformType.GUI, Transforms.convert(0, 0, 0, 30, 225, 0, 0.625f))
-//            .put(TransformType.GROUND, Transforms.convert(0, 3, 0, 0, 0, 0, 0.25f))
-//            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, 0.5f))
-//            .put(TransformType.THIRD_PERSON_RIGHT_HAND, THIRD_PERSON_BLOCK)
-//            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(THIRD_PERSON_BLOCK))
-//            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 45, 0, 0.4f))
-//            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.convert(0, 0, 0, 0, 225, 0, 0.4f))
-//            .build();
-		
 	
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-		for (ClientEffectIcon icon : ClientEffectIcon.values()) {
-			if (!icon.getModelKey().endsWith(".obj")) {
-				// json
-//				final String modelLoc = "effect/" + icon.getModelKey();
-//				IUnbakedModel model = event.getModelLoader().getUnbakedModel(NostrumMagica.Loc(modelLoc));
-//				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc), "Failed to get json model for " + modelLoc);
-//				
-//				HashSet<String> missingTextureErrors = new HashSet<>();
-//				
-//				if (model != null && model != ModelLoaderRegistry.getMissingModel()) {
-//					model.getTextures(event.getModelLoader()::getUnbakedModel, missingTextureErrors);
-//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
-//				} else {
-//					model.getClass();
-//				}
-			} else {
-				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
-				final String modelLoc = "effect/" + icon.getKey();
-				IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc + ".obj"), "Failed to get obj model for " + modelLoc);
-				
-				if (model != null && model instanceof OBJModel) {
-					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-					// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
-				}
-			}
-		}
-		
-		for (String key : new String[] {"block/orb_crystal",
-				"entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
-			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(key + ".obj"), "Failed to get obj model for " + key);
-			
-			if (model != null && model instanceof OBJModel) {
-				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(key)), bakedModel);
-			}
-		}
-		
-		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
-			ResourceLocation fullLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
-			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(fullLoc, "Failed to get obj model for " + fullLoc);
-			
-			if (model != null && model instanceof OBJModel) {
-				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
-				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(loc), bakedModel);
-			}
-		}
-		
-		//AllCapeModels
-		
-//    	for (String key : new String[] {
-//    			"pedestal", "crystal_standing", "crystal_embedded", "crystal_hanging", "mirror"}) {
-//			IUnbakedModel model;
-//			try {
-//				model = ModelLoaderRegistry.getModel(NostrumMagica.Loc("block/" + key + ".obj"));
+		// Going to try 'special model'  loading for these
+//		for (ClientEffectIcon icon : ClientEffectIcon.values()) {
+//			if (!icon.getModelKey().endsWith(".obj")) {
+//				// json
+////				final String modelLoc = "effect/" + icon.getModelKey();
+////				IUnbakedModel model = event.getModelLoader().getUnbakedModel(NostrumMagica.Loc(modelLoc));
+////				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc), "Failed to get json model for " + modelLoc);
+////				
+////				HashSet<String> missingTextureErrors = new HashSet<>();
+////				
+////				if (model != null && model != ModelLoaderRegistry.getMissingModel()) {
+////					model.getTextures(event.getModelLoader()::getUnbakedModel, missingTextureErrors);
+////					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+////					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
+////				} else {
+////					model.getClass();
+////				}
+//			} else {
+//				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
+//				final String modelLoc = "effect/" + icon.getKey();
+//				IUnbakedModel model = ModelLoaderRegistry.getModel(NostrumMagica.Loc(modelLoc), "Failed to get obj model for " + modelLoc);
 //				
 //				if (model != null && model instanceof OBJModel) {
-//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
-////					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key), bakedModel);
-////					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":" + key + ".obj"), bakedModel);
-//					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":models/block/" + key), bakedModel);
-////					event.getModelRegistry().put(new ResourceLocation(NostrumMagica.MODID + ":block/" + key + ".obj"), bakedModel);
-//					
-//					IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
-//	                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
-//	                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, BLOCK_TRANSFORMS);
-//	                event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":" + key, "inventory"), bakedInvModel);
-//				}
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				NostrumMagica.logger.warn("Failed to load effect " + key);
-//			}	
-//		}
-    	
-//		{
-//			IUnbakedModel model = null;
-//			try {
-//				model = ModelLoaderRegistry.getModel(NostrumMagica.Loc("block/mirror.obj"));
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//	    	IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.BLOCK);
-//			IBakedModel existing = null;
-//			String[] paths = {"dirt", "block/dirt", "minecraft:dirt", "minecraft:block/dirt"};
-//			String[] variants = {"", "inventory", "normal"};
-//			for (String path : paths) {
-//				for (String variant : variants) {
-//					existing = event.getModelRegistry().get(new ModelResourceLocation(path, variant));
-//					boolean exists = existing != null && existing != event.getModelManager().getMissingModel();
-//					NostrumMagica.logger.info((!exists ? "FAIL: " : "EXIST: ")
-//						+ path + "#" + variant);
-//					System.out.println((!exists ? "FAIL: " : "EXIST: ")
-//							+ path + "#" + variant);
-//					
-//					if (exists) {
-//						event.getModelRegistry().put(new ModelResourceLocation(path, variant), bakedModel);
-//						break;
-//					}
-//				}
-//				if (existing != null && existing != event.getModelManager().getMissingModel()) {
-//					break;
+//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+//					// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
 //				}
 //			}
 //		}
-    	
-    	// Warlock blade; put obj in place for item model
-    	{
-    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(NostrumMagica.Loc("item/warlock_sword.obj"));
-			if (model != null && model instanceof OBJModel) {
-				IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
-                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
-				
-				final ImmutableMap<TransformType, TRSRTransformation> SWORD_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
-			            .put(TransformType.GUI, Transforms.convert(-3.2f, -4f, 0.f, 0, 0, -45f, .125f))
-			            .put(TransformType.GROUND, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
-			            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
-			            .put(TransformType.THIRD_PERSON_RIGHT_HAND, Transforms.convert(0.4f, 0, 0.4f, 0, 90, 0, 1.6f * .125f))
-			            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f)))
-			            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 90, 15, .125f))
-			            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0, 0, 0, 0, 90, 15, .125f)))
-			            .build();
-				
-                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, SWORD_TRANSFORMS);
-				
-				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":warlock_sword", "inventory"), bakedInvModel);
-				
-//				"transform": {
-//		            "scale": 0.125,
-//		            "thirdperson": {
-//		                "scale": 1.6,
-//		                "translation": [0.05, 0, 0.05],
-//		                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 0} ]
-//		            },
-//		            "firstperson": {
-//		                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 15} ]
-//		            },
-//		            "gui": {
-//		                "rotation": [ { "x": 0 }, { "y": 0 }, { "z": -45} ],
-//		                "translation": [-0.2, -0.25, 0]
-//		            }
-//		        }
-				
-				//event.getModelRegistry().put(new ModelResourceLocation("minecraft:item/stick", "inventory"), bakedModel);
-			}
-    	}
+//		
+//		for (String key : new String[] {"block/orb_crystal",
+//				"entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
+//			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(key + ".obj"), "Failed to get obj model for " + key);
+//			
+//			if (model != null && model instanceof OBJModel) {
+//				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+//				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+//				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(key)), bakedModel);
+//			}
+//		}
+//		
+//		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
+//			ResourceLocation fullLoc = new ResourceLocation(loc.getNamespace(), loc.getPath() + ".obj");
+//			IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(fullLoc, "Failed to get obj model for " + fullLoc);
+//			
+//			if (model != null && model instanceof OBJModel) {
+//				IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
+//				// Note: putting as ModelResourceLocation to match RenderObj. Note creating like the various RenderObj users do.
+//				event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(loc), bakedModel);
+//			}
+//		}
+		
+//    	// Warlock blade; put obj in place for item model
+//    	{
+//    		IUnbakedModel model = ModelLoaderRegistry.getModelOrMissing(NostrumMagica.Loc("item/warlock_sword.obj"));
+//			if (model != null && model instanceof OBJModel) {
+//				IBakedModel bakedInvModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(),
+//                        new BasicState(model.getDefaultState(), true), DefaultVertexFormats.ITEM);
+//				
+//				final ImmutableMap<TransformType, TRSRTransformation> SWORD_TRANSFORMS = ImmutableMap.<TransformType, TRSRTransformation>builder()
+//			            .put(TransformType.GUI, Transforms.convert(-3.2f, -4f, 0.f, 0, 0, -45f, .125f))
+//			            .put(TransformType.GROUND, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
+//			            .put(TransformType.FIXED, Transforms.convert(0, 0, 0, 0, 0, 0, .125f))
+//			            .put(TransformType.THIRD_PERSON_RIGHT_HAND, Transforms.convert(0.4f, 0, 0.4f, 0, 90, 0, 1.6f * .125f))
+//			            .put(TransformType.THIRD_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0.05f, 0, 0.05f, 0, 90, 0, 1.6f * .125f)))
+//			            .put(TransformType.FIRST_PERSON_RIGHT_HAND, Transforms.convert(0, 0, 0, 0, 90, 15, .125f))
+//			            .put(TransformType.FIRST_PERSON_LEFT_HAND, Transforms.leftify(Transforms.convert(0, 0, 0, 0, 90, 15, .125f)))
+//			            .build();
+//				
+//                bakedInvModel = new PerspectiveMapWrapper(bakedInvModel, SWORD_TRANSFORMS);
+//				
+//				event.getModelRegistry().put(new ModelResourceLocation(NostrumMagica.MODID + ":warlock_sword", "inventory"), bakedInvModel);
+//				
+////				"transform": {
+////		            "scale": 0.125,
+////		            "thirdperson": {
+////		                "scale": 1.6,
+////		                "translation": [0.05, 0, 0.05],
+////		                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 0} ]
+////		            },
+////		            "firstperson": {
+////		                "rotation": [ { "x": 0 }, { "y": 90 }, { "z": 15} ]
+////		            },
+////		            "gui": {
+////		                "rotation": [ { "x": 0 }, { "y": 0 }, { "z": -45} ],
+////		                "translation": [-0.2, -0.25, 0]
+////		            }
+////		        }
+//				
+//				//event.getModelRegistry().put(new ModelResourceLocation("minecraft:item/stick", "inventory"), bakedModel);
+//			}
+//    	}
     	
     	// Mimic blocks special model
     	putMimicBlockModel(event.getModelRegistry(), NostrumBlocks.mimicDoor);
@@ -1670,7 +1548,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
-							3L * 500L, 6, new Vector3d(1, 0, 0));
+							3L * 500L, 6, new Vector3f(1, 0, 0));
 					
 					if (flavor != null && flavor.isElement()) {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
@@ -1747,7 +1625,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
-							2L * 500L, 6, new Vector3d(.5, .5, 0));
+							2L * 500L, 6, new Vector3f(.5f, .5f, 0));
 					
 					if (flavor != null && flavor.isElement()) {
 						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
@@ -1805,10 +1683,11 @@ public class ClientProxy extends CommonProxy {
 		if (ClientProxy.shownText == false && ModConfig.config.displayLoginText()
 				&& event.getEntity() == Minecraft.getInstance().player) {
 			final Minecraft mc = Minecraft.getInstance();
+			final String translated = I18n.format(this.bindingInfo.getTranslationKey());
 			mc.player.sendMessage(
 					new TranslationTextComponent("info.nostrumwelcome.text", new Object[]{
-							this.bindingInfo.getLocalizedName()
-					}));
+							translated
+					}), Util.DUMMY_UUID);
 			ClientProxy.shownText = true;
 		}
 		
