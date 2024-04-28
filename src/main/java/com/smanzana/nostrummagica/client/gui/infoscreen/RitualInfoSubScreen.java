@@ -252,7 +252,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			
 			int i = 0;
 			for (String line : desc) {
-				mc.fontRenderer.drawString(matrixStackIn, line, x + (int) (width * .75) + 5, i + y + 10, /*(width / 4) - 5,*/ 0xFFFFFFFF);
+				RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, line, x + (int) (width * .75) + 5, i + y + 10, (width / 4) - 5, 0xFFFFFFFF);
 				i += mc.fontRenderer.FONT_HEIGHT * (mc.fontRenderer.getStringWidth(line) / ((width / 4) - 5));
 			}
 		}

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
@@ -29,7 +29,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
@@ -137,9 +137,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		container.clearSlots();
 	}
 	
-	private void drawCell(Minecraft mc, float partialTicks, int x, int y) {
+	private void drawCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y, PetGUI.GUI_TEX_CELL_HOFFSET,
 				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
@@ -148,14 +147,13 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	
 	private static @Nonnull ItemStack scrollShadow = ItemStack.EMPTY;
 	
-	private void drawNextCell(Minecraft mc, float partialTicks, int x, int y) {
+	private void drawNextCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		
 		if (scrollShadow.isEmpty()) {
 			scrollShadow = new ItemStack(NostrumItems.spellScroll);
 		}
 		
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y, PetGUI.GUI_TEX_CELL_HOFFSET + cellWidth,
 				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
@@ -164,31 +162,30 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 	}
 	
-	private void drawShadowCell(Minecraft mc, float partialTicks, int x, int y) {
+	private void drawShadowCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		GlStateManager.color4f(.7f, .71f, .7f, .4f);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y, PetGUI.GUI_TEX_CELL_HOFFSET,
 				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-				cellWidth, 256, 256);
+				cellWidth, 256, 256,
+				.7f, .71f, .7f, .4f);
 	}
 	
-	private void drawFadedCell(Minecraft mc, float partialTicks, int x, int y) {
+	private void drawFadedCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		GlStateManager.color4f(.2f, .2f, .2f, .4f);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y, PetGUI.GUI_TEX_CELL_HOFFSET,
 				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-				cellWidth, 256, 256);
+				cellWidth, 256, 256,
+				.2f, .2f, .2f, .4f);
 	}
 	
-	private void drawGambit(Minecraft mc, float partialTicks, int x, int y, EntityDragonGambit gambit) {
+	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, EntityDragonGambit gambit) {
 		int texOffset = 0;
 		if (gambit != null) {
 			texOffset = gambit.getTexOffsetX();
 		}
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-		GlStateManager.color4f(1f, 1f, 1f, 1f);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y,
 				PetGUI.GUI_TEX_TOGGLE_HOFFSET + texOffset,
@@ -196,14 +193,14 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				toggleSize, 256, 256);
 	}
 	
-	private void drawRow(Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
+	private void drawRow(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
 		
 		final int usedCount = dragonInv.getUsedSlots();
 		final int extraCount = Math.max(0, this.dragon.getMagicMemorySize() - usedCount);
 		int count;
 		int ghostCount;
 		
-		mc.fontRenderer.drawString(title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+		mc.fontRenderer.drawString(matrixStackIn, title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
 		count = 0;
@@ -211,19 +208,19 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		for (int i = 0; i < slots.size(); i++) {
 			if (!slots.get(i).isEmpty()) {
 				count++;
-				this.drawCell(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
-				drawGambit(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)) + cellWidth, y + 1, gambits[i]);
+				this.drawCell(matrixStackIn, mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
+				drawGambit(matrixStackIn, mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)) + cellWidth, y + 1, gambits[i]);
 			} else {
 				// It's empty. The first empty should allow you to plae st uff, while the others are for show
 				if (count < RedDragonSpellInventory.MaxSpellsPerCategory && ghostCount < extraCount) {
 					if (ghostCount == 0) {
-						this.drawNextCell(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
+						this.drawNextCell(matrixStackIn, mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
 					} else {
-						this.drawShadowCell(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
+						this.drawShadowCell(matrixStackIn, mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
 					}
 					ghostCount++;
 				} else if (count < RedDragonSpellInventory.MaxSpellsPerCategory) {
-					drawFadedCell(mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
+					drawFadedCell(matrixStackIn, mc, partialTicks, x + ((cellWidth + rowHMargin) * (i % invRow)), y);
 				} else {
 					break;
 				}
@@ -232,11 +229,9 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
-		
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		// Draw sheet
-		GlStateManager.pushMatrix();
+		matrixStackIn.push();
 		{
 //			final int cellWidth = 18;
 //			final int invRow = 9;
@@ -250,30 +245,29 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 //			final int rowIncr = cellWidth + toggleSize + rowMargin;
 			
 			// Target slots
-			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1, "Enemy", dragonInv.getTargetSpells(), dragonInv.getTargetGambits());
+			drawRow(matrixStackIn, mc, partialTicks, leftOffset - 1, dragonTopOffset - 1, "Enemy", dragonInv.getTargetSpells(), dragonInv.getTargetGambits());
 			
 			// Self slots
-			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr, "Self", dragonInv.getSelfSpells(), dragonInv.getSelfGambits());
+			drawRow(matrixStackIn, mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr, "Self", dragonInv.getSelfSpells(), dragonInv.getSelfGambits());
 			
 			// Ally slots
-			drawRow(mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr + rowIncr, "Ally", dragonInv.getAllySpells(), dragonInv.getAllyGambits());
+			drawRow(matrixStackIn, mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr + rowIncr, "Ally", dragonInv.getAllySpells(), dragonInv.getAllyGambits());
 			
 			final int playerTopOffset = dragonTopOffset + (rowIncr * 3) + 10;
 			for (int i = 0; i < playerInvSize; i++) {
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
 						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
 						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
 						cellWidth, 256, 256);
 			}
 			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 		// Draw spell icon overlays
 		{
@@ -294,8 +288,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			final long period = 2000;
 			final float alpha = .85f + .1f * (float) Math.sin(Math.PI * 2 * (float) (System.currentTimeMillis() % period) / period);
 			
-			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0, 0, 251);
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0, 251);
 			
 			// Target
 			scrolls = dragonInv.getTargetSpells();
@@ -311,8 +305,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
-						GlStateManager.color4f(1f, 1f, 1f, alpha);
-						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
 					}
 				}
 			}
@@ -331,8 +324,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
-						GlStateManager.color4f(1f, 1f, 1f, alpha);
-						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
 					}
 				}
 			}
@@ -351,13 +343,12 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
-						GlStateManager.color4f(1f, 1f, 1f, alpha);
-						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth);
+						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
 					}
 				}
 			}
 			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 		
 		// Draw gambit overlay
@@ -409,16 +400,16 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				break;
 			}
 			
-			GlStateManager.pushMatrix();
-			GlStateManager.translatef(0, 0, 201);
-			RenderFuncs.drawRect(cellX, cellY, cellX + toggleSize, cellY + toggleSize, 0x50FFFFFF);
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0, 201);
+			RenderFuncs.drawRect(matrixStackIn, cellX, cellY, cellX + toggleSize, cellY + toggleSize, 0x50FFFFFF);
 			
 			EntityDragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
-				GuiUtils.drawHoveringText(gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
+				GuiUtils.drawHoveringText(matrixStackIn, gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
 			}
 			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		} while (false);
 	}
 

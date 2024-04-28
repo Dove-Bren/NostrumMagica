@@ -92,9 +92,8 @@ public class SpellPreviewPage implements IClickableBookPage {
 					, 0, yoffset, 0xFF0A3500);
 			yoffset += fonter.FONT_HEIGHT + 3;
 		}
-		int unused; // sad \/
-//		fonter.drawSplitString(description, 0,
-//				yoffset, width, 0xFF000000);
+		RenderFuncs.drawSplitString(matrixStackIn, fonter, description, 0,
+				yoffset, width, 0xFF000000);
 		
 		matrixStackIn.pop();
 		matrixStackIn.pop();

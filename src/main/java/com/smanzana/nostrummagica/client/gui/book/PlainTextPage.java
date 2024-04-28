@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.gui.FontRenderer;
 
@@ -14,7 +15,7 @@ public class PlainTextPage implements IBookPage {
 
 	@Override
 	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
-		//fonter.drawSplitString(text, xoffset, yoffset, width, 0x000000);
+		RenderFuncs.drawSplitString(matrixStackIn, fonter, text, xoffset, yoffset, width, 0x000000);
 	}
 
 	@Override

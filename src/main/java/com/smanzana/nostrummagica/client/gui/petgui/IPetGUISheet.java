@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.petgui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.entity.IEntityPet;
 
 import net.minecraft.client.Minecraft;
@@ -24,10 +25,10 @@ public interface IPetGUISheet<T extends IEntityPet> {
 	
 	// Draw the sheet
 	@OnlyIn(Dist.CLIENT)
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
 	
 	@OnlyIn(Dist.CLIENT)
-	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
+	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY);
 	
 	// Handle a mouse click.
 	// mouseX and mouseY are relative to the sheet, not global.

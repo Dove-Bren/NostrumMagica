@@ -2,10 +2,12 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 
 import java.util.List;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -32,7 +34,7 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 		FontRenderer fonter = mc.fontRenderer;
 		int x = 0;
@@ -58,7 +60,7 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 		str = I18n.format(untrans, new Object[0]);
 		x = 5;
 		
-		fonter.drawSplitString(str, x, y, width - (x * 2), infoColor);
+		RenderFuncs.drawSplitString(matrixStackIn, fonter, str, x, y, width - (x * 2), infoColor);
 		
 		x = 10;
 		y += (h * 4) + 10;
@@ -66,7 +68,7 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 		for (WolfBondCapability cap : capabilities) {
 			if (wolf.hasWolfCapability(cap)) {
 				str = I18n.format("info.tamed_arcane_wolf.capability." + cap.getKey());
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			} else {
 				break;
@@ -95,7 +97,7 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

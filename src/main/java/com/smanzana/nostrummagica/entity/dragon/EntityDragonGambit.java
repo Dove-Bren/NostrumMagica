@@ -1,10 +1,11 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,7 +30,7 @@ public enum EntityDragonGambit {
 	private int texOffsetX;
 	
 	// Only the client uses these
-	private List<String> desc;
+	private List<ITextComponent> desc;
 	private String transName;
 	
 	private EntityDragonGambit(String unlocName, int texOffsetX) {
@@ -48,13 +49,16 @@ public enum EntityDragonGambit {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public List<String> getDesc() {
+	public List<ITextComponent> getDesc() {
 		if (this.desc == null) {
 			String raw = I18n.format("gambit." + getUnlocName() + ".desc", "" + TextFormatting.DARK_GREEN + TextFormatting.BOLD, TextFormatting.RESET);
 			String[] lines = raw.split("\\|");
 			
-			this.desc = Lists.asList("" + TextFormatting.BLUE + TextFormatting.BOLD + getName() + TextFormatting.RESET, lines);
-			
+			this.desc = new ArrayList<>(lines.length + 1);
+			desc.add(new StringTextComponent(getName()).mergeStyle(TextFormatting.BLUE).mergeStyle(TextFormatting.BOLD));
+			for (String line : lines) {
+				desc.add(new StringTextComponent(line));
+			}
 		}
 		
 		return this.desc;

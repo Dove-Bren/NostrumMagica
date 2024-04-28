@@ -143,7 +143,7 @@ public class ObeliskScreen extends Screen {
 		
 		if (this.centralButton == null) {
 			// No targets. Draw error string
-			this.font.drawString(matrixStackIn, errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, 0xFFFFFF);
+			RenderFuncs.drawSplitString(matrixStackIn, this.font, errorString, (this.width - (this.width / 2)) / 2, this.height / 2 - 100, this.width / 2, 0xFFFFFF);
 			return;
 		}
 		

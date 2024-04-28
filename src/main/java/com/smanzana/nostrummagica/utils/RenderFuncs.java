@@ -560,6 +560,35 @@ public final class RenderFuncs {
 			fontrenderer.renderString(info, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
 		}
 	}
+
+	public static void drawSplitString(MatrixStack matrixStackIn, FontRenderer fonter, String str, int x, int y, int width, int infoColor) {
+		int offset = 0;
+		int lineWidth = fonter.getStringWidth(str);
+		while (lineWidth > width) {
+			int subWidth = 0;
+			StringBuffer buffer = new StringBuffer();
+			int i;
+			
+			for (i = 0; i < str.length(); i++) {
+				final char c = str.charAt(i);
+				int charWidth = fonter.getStringWidth("" + c);
+				
+				if (i == 0 || subWidth + charWidth < width) {
+					buffer.append(c);
+				}
+				
+				if (subWidth + charWidth >= width) {
+					break;
+				}
+			}
+			
+			fonter.drawString(matrixStackIn, buffer.toString(), x, y + offset, infoColor);
+			str = str.substring(i);
+			lineWidth = fonter.getStringWidth(str);
+		}
+		
+		fonter.drawString(matrixStackIn, str, x, y + offset, infoColor);
+	}
 	
 //	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
 //		return MathHelper.func_219805_h(partialTicks, prevYawOffset, yawOffset);

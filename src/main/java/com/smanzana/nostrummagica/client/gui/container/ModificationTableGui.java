@@ -550,12 +550,12 @@ public class ModificationTableGui {
 					shadow = pageShadow;
 				}
 				if (!shadow.isEmpty()) {
-					GlStateManager.pushMatrix();
-					GlStateManager.translatef(0, 0, -100);
+					matrixStackIn.push();
+					matrixStackIn.translate(0, 0, -100);
 					mc.getItemRenderer().renderItemIntoGUI(shadow,
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos);
-					GlStateManager.popMatrix();
+					matrixStackIn.pop();
 				}
 			}
 			
@@ -569,23 +569,23 @@ public class ModificationTableGui {
 				final int idx = Math.abs(((int) System.currentTimeMillis() / 1000) % shadows.size());
 				display = shadows.get(idx);
 				
-				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, 0, -100);
+				matrixStackIn.push();
+				matrixStackIn.translate(0, 0, -100);
 				mc.getItemRenderer().renderItemIntoGUI(display,
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET);
-				GlStateManager.popMatrix();
+				matrixStackIn.pop();
 				
 				int color = 0x55FFFFFF;
-				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, 0, 1);
+				matrixStackIn.push();
+				matrixStackIn.translate(0, 0, 1);
 				RenderFuncs.drawRect(
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET,
 						horizontalMargin + SLOT_MAIN_HOFFSET + 16,
 						verticalMargin + SLOT_MAIN_VOFFSET + 16,
 						color);
-				GlStateManager.popMatrix();
+				matrixStackIn.pop();
 			}
 			
 			if (!container.isValid) {
@@ -593,15 +593,15 @@ public class ModificationTableGui {
 				if ((!container.inputSlot.required.isEmpty() && container.inputSlot.getHasStack())
 						|| (container.inputSlot.required.isEmpty() && container.inputSlot.getHasStack()))
 					color = 0x90FF5050;
-				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, 0, 1);
+				matrixStackIn.push();
+				matrixStackIn.translate(0, 0, 1);
 				RenderFuncs.drawRect(
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos,
 						horizontalMargin + container.inputSlot.xPos + 16,
 						verticalMargin + container.inputSlot.yPos + 16,
 						color);
-				GlStateManager.popMatrix();
+				matrixStackIn.pop();
 			}
 		}
 		

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.client.gui.petgui.PetInventorySheet;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
@@ -45,15 +46,15 @@ public class ArcaneWolfInventorySheet extends PetInventorySheet<EntityArcaneWolf
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		super.draw(mc, partialTicks, width, height, mouseX, mouseY);
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		super.draw(matrixStackIn, mc, partialTicks, width, height, mouseX, mouseY);
 		
 //		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 //		
 //		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 //		
 //		// Draw sheet
-//		GlStateManager.pushMatrix();
+//		matrixStackIn.push();
 //		{
 //			final int cellWidth = 18;
 //			final int invRow = 9;
@@ -78,7 +79,7 @@ public class ArcaneWolfInventorySheet extends PetInventorySheet<EntityArcaneWolf
 //						256, 256);
 //			}
 //			
-//			GlStateManager.popMatrix();
+//			matrixStackIn.pop();
 //		}
 	}
 

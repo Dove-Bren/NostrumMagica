@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -29,7 +31,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 		FontRenderer fonter = mc.fontRenderer;
 		int x = 0;
@@ -61,7 +63,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 		str = I18n.format(untrans, new Object[0]);
 		x = 5;
 		
-		fonter.drawSplitString(str, x, y, width - (x * 2), infoColor);
+		RenderFuncs.drawSplitString(matrixStackIn, fonter, str, x, y, width - (x * 2), infoColor);
 		
 		x = 10;
 		y += (h * 4) + 10;
@@ -71,37 +73,37 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 			if (bond >= EntityTameDragonRed.BOND_LEVEL_FOLLOW) {
 				str = "Follows";
 				
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (bond >= EntityTameDragonRed.BOND_LEVEL_PLAYERS) {
 				str = "Respects Other Players";
 				
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (bond >= EntityTameDragonRed.BOND_LEVEL_CHEST) {
 				str = "Can Hold Items";
 				
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (bond >= EntityTameDragonRed.BOND_LEVEL_ALLOW_RIDE) {
 				str = "Rideable";
 				
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (dragon.getCanUseMagic() && bond >= EntityTameDragonRed.BOND_LEVEL_MAGIC) {
 				str = "Spell Tactics";
 				
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (dragon.getDragonMana() > 0 && bond >= EntityTameDragonRed.BOND_LEVEL_MANA ) {
 				str = "Dragon Mana Bond";
 				
-				fonter.drawString(str, x, y, capabilityColor);
+				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 		}
@@ -128,7 +130,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 	}
 
 	@Override
-	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.TextFormatting;
 
 public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 
@@ -29,7 +30,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		FontRenderer fonter = mc.fontRenderer;
 		int x = 0;
 		int y = 5;
@@ -47,9 +48,9 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 		//final int 
 		String str;
 		
-		str = ChatFormatting.BOLD + "Attributes" + ChatFormatting.RESET;
+		str = TextFormatting.BOLD + "Attributes" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(str, x, y, categoryColor);
+		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
 		
 		x = 10;
 		y += h + mediumMargin;
@@ -58,10 +59,10 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 			str = "Health: ";
 			w = fonter.getStringWidth(str);
 			
-			fonter.drawString(str, x, y, labelColor);
+			fonter.drawString(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString("" + (int) dragon.getMaxHealth(), x, y, dataColor);
+			fonter.drawString(matrixStackIn, "" + (int) dragon.getMaxHealth(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
@@ -70,19 +71,19 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 			str = "Mana: ";
 			w = fonter.getStringWidth(str);
 			
-			fonter.drawString(str, x, y, labelColor);
+			fonter.drawString(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString("" + dragon.getDragonMana(), x, y, dataColor);
+			fonter.drawString(matrixStackIn, "" + dragon.getDragonMana(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
 		
 		y += largeMargin;
 		
-		str = ChatFormatting.BOLD + "Movement" + ChatFormatting.RESET;
+		str = TextFormatting.BOLD + "Movement" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(str, x, y, categoryColor);
+		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		x = 10;
@@ -90,12 +91,12 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 			str = "Jumps: ";
 			w = fonter.getStringWidth(str);
 			
-			fonter.drawString(str, x, y, labelColor);
+			fonter.drawString(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
 			int jumps = 1 + dragon.getBonusJumps();
 			
-			fonter.drawString("" + jumps, x, y, jumps > 1 ? goodDataColor : badDataColor);
+			fonter.drawString(matrixStackIn, "" + jumps, x, y, jumps > 1 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
@@ -104,10 +105,10 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 			str = "Speed: ";
 			w = fonter.getStringWidth(str);
 			
-			fonter.drawString(str, x, y, labelColor);
+			fonter.drawString(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(String.format("%+.2f%%", dragon.getSpeedBonus()), x, y, dragon.getSpeedBonus() > 0 ? goodDataColor : badDataColor);
+			fonter.drawString(matrixStackIn, String.format("%+.2f%%", dragon.getSpeedBonus()), x, y, dragon.getSpeedBonus() > 0 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
@@ -116,25 +117,25 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 			str = "Jump Height: ";
 			w = fonter.getStringWidth(str);
 			
-			fonter.drawString(str, x, y, labelColor);
+			fonter.drawString(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(String.format("%+.2f%%", dragon.getJumpHeightBonus()), x, y, dragon.getJumpHeightBonus() > 0 ? goodDataColor : badDataColor);
+			fonter.drawString(matrixStackIn, String.format("%+.2f%%", dragon.getJumpHeightBonus()), x, y, dragon.getJumpHeightBonus() > 0 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
 		y += largeMargin;
 		
-		str = ChatFormatting.BOLD + "Capabilities" + ChatFormatting.RESET;
+		str = TextFormatting.BOLD + "Capabilities" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(str, x, y, categoryColor);
+		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		x = 10;
 		{
 			str = "Rideable";
 			
-			fonter.drawString(str, x, y, capabilityColor);
+			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 			y += h + smallMargin;
 		}
 		
@@ -142,7 +143,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 		if (dragon.getCanFly()) {
 			str = "Weak Flight";
 			
-			fonter.drawString(str, x, y, capabilityColor);
+			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 			y += h + smallMargin;
 		}
 		
@@ -150,7 +151,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 		if (dragon.getCanUseMagic()) {
 			str = "Magic";
 			
-			fonter.drawString(str, x, y, capabilityColor);
+			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 			y += h + smallMargin;
 		}
 		
@@ -158,9 +159,9 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 		
 			y += largeMargin;
 		
-			str = ChatFormatting.BOLD + "Magic" + ChatFormatting.RESET;
+			str = TextFormatting.BOLD + "Magic" + TextFormatting.RESET;
 			x = 5;
-			fonter.drawString(str, x, y, categoryColor);
+			fonter.drawString(matrixStackIn, str, x, y, categoryColor);
 			y += h + mediumMargin;
 			
 			x = 10;
@@ -168,10 +169,10 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 				str = "Memory: ";
 				w = fonter.getStringWidth(str);
 				
-				fonter.drawString(str, x, y, labelColor);
+				fonter.drawString(matrixStackIn, str, x, y, labelColor);
 				x += w;
 				
-				fonter.drawString("" + dragon.getMagicMemorySize(), x, y, goodDataColor);
+				fonter.drawString(matrixStackIn, "" + dragon.getMagicMemorySize(), x, y, goodDataColor);
 				y += h + smallMargin;
 			}
 			
@@ -180,10 +181,10 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 				str = "Mana Regen: ";
 				w = fonter.getStringWidth(str);
 				
-				fonter.drawString(str, x, y, labelColor);
+				fonter.drawString(matrixStackIn, str, x, y, labelColor);
 				x += w;
 				
-				fonter.drawString(String.format("%.2f Mana/Sec", dragon.getManaRegen()), x, y, goodDataColor);
+				fonter.drawString(matrixStackIn, String.format("%.2f Mana/Sec", dragon.getManaRegen()), x, y, goodDataColor);
 				y += h + smallMargin;
 			}
 		}
@@ -211,7 +212,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

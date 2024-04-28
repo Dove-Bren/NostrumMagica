@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.client.gui.petgui.PetInventorySheet;
@@ -53,15 +53,13 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		super.draw(mc, partialTicks, width, height, mouseX, mouseY);
-		
-		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		super.draw(matrixStackIn, mc, partialTicks, width, height, mouseX, mouseY);
 		
 		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
 		// Draw sheet
-		GlStateManager.pushMatrix();
+		matrixStackIn.push();
 		{
 			final int cellWidth = 18;
 			final int invRow = 9;
@@ -79,14 +77,14 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 				// NOT IMPLEMENTED TODO
 				
 				final int i = slot.ordinal();
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 - (cellWidth + 4),
 						dragonTopOffset - 1 + (cellWidth * (i * 2)), PetGUI.GUI_TEX_CELL_HOFFSET,
 						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-						cellWidth, 256, 256);
+						cellWidth, 256, 256,
+						1f, 1f, 1f, 1f);
 			}
 			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 	}
 

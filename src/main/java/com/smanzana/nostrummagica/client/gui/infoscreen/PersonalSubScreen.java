@@ -137,7 +137,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 			}
 			
-			mc.fontRenderer.drawString(matrixStackIn, desc, x + 5, y + 20, /*width - 10,*/ 0xFFFFFFFF);
+			RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, desc, x + 5, y + 20, width - 10, 0xFFFFFFFF);
 			int len;
 			desc = I18n.format("info.discovery.name", (Object[])null);
 			len = mc.fontRenderer.getStringWidth(desc);

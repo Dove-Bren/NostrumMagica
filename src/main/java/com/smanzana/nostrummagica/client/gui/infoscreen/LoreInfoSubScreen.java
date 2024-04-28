@@ -7,6 +7,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 
@@ -29,10 +30,10 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 		List<String> data = lore.getData();
 		int i = 0;
 		for (String line : data)
-			mc.fontRenderer.drawString(matrixStackIn, line,
+			RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, line,
 					x + 5,
 					y + 35 + (i++ * 17),
-					0xFFFFFFFF);
+					width, 0xFFFFFFFF);
 	}
 
 	@Override

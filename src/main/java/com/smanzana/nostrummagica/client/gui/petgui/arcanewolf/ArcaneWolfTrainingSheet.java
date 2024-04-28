@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
 import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
@@ -367,11 +367,9 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void draw(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
-		
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		// Draw sheet
-		GlStateManager.pushMatrix();
+		matrixStackIn.push();
 		{
 			final int cellWidth = 18;
 			final int bowlWidth = GUI_SLOT_ICON_WIDTH;
@@ -395,11 +393,11 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				// Inner glyph for primary
 				{
 					// Draw background
-					GlStateManager.color4f(1f, 1f, 1f, 1f);
 					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_CENTER_GEM_SOCKET_WIDTH)/2,
 							upperOffset + (upperHeight-GUI_CENTER_GEM_SOCKET_HEIGHT)/2, GUI_CENTER_GEM_SOCKET_HOFFSET,
 							GUI_CENTER_GEM_SOCKET_VOFFSET, GUI_CENTER_GEM_SOCKET_WIDTH,
-							GUI_CENTER_GEM_SOCKET_HEIGHT, 256, 256);
+							GUI_CENTER_GEM_SOCKET_HEIGHT, 256, 256,
+							1f, 1f, 1f, 1f);
 					
 					// Then draw inner
 					EMagicElement inner;
@@ -435,24 +433,22 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 						blue = 1f - ((float) db / 255f) * brightness;
 					}
 					
-					GlStateManager.color4f(red, green, blue, 1f);
-					
 					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_CENTER_GEM_WIDTH)/2,
 							upperOffset + (upperHeight-GUI_CENTER_GEM_HEIGHT)/2, GUI_CENTER_GEM_HOFFSET + ((level-1) * GUI_CENTER_GEM_WIDTH),
 							GUI_CENTER_GEM_VOFFSET, GUI_CENTER_GEM_WIDTH,
-							GUI_CENTER_GEM_HEIGHT, 256, 256);
+							GUI_CENTER_GEM_HEIGHT, 256, 256,
+							red, green, blue, 1f);
 					
-					// Inner spark that's always 'bright'
-					GlStateManager.color4f(
-							(float)((color >> 16) & 0xFF) / 255f,
+					
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_GEM_SPARK_WIDTH)/2,
+							upperOffset + (upperHeight-GUI_GEM_SPARK_HEIGHT)/2, GUI_GEM_SPARK_HOFFSET,
+							GUI_GEM_SPARK_VOFFSET, GUI_GEM_SPARK_WIDTH,
+							GUI_GEM_SPARK_HEIGHT, 256, 256,
+							(float)((color >> 16) & 0xFF) / 255f, // Inner spark that's always 'bright'
 							(float)((color >> 8) & 0xFF) / 255f,
 							(float)((color >> 0) & 0xFF) / 255f,
 							1f
 							);
-					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, (width-GUI_GEM_SPARK_WIDTH)/2,
-							upperOffset + (upperHeight-GUI_GEM_SPARK_HEIGHT)/2, GUI_GEM_SPARK_HOFFSET,
-							GUI_GEM_SPARK_VOFFSET, GUI_GEM_SPARK_WIDTH,
-							GUI_GEM_SPARK_HEIGHT, 256, 256);
 				}
 				
 				// Outer
@@ -491,7 +487,6 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 						blue = 1f - ((float) db / 255f) * brightness;
 					}
 					
-					GlStateManager.color4f(red, green, blue, 1f);
 					mc.getTextureManager().bindTexture(TEX_LOC);
 
 					// Level 1
@@ -500,7 +495,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 								(width-GUI_GEM_EXTRAS_1_WIDTH)/2,
 								upperOffset + (upperHeight-GUI_GEM_EXTRAS_1_HEIGHT)/2, GUI_GEM_EXTRAS_1_HOFFSET,
 								GUI_GEM_EXTRAS_1_VOFFSET, GUI_GEM_EXTRAS_1_WIDTH,
-								GUI_GEM_EXTRAS_1_HEIGHT, 256, 256);
+								GUI_GEM_EXTRAS_1_HEIGHT, 256, 256,
+								red, green, blue, 1f);
 					}
 					
 					if (level >= 2) {
@@ -508,7 +504,8 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 								(width-GUI_GEM_EXTRAS_2_WIDTH)/2,
 								upperOffset + (upperHeight-GUI_GEM_EXTRAS_2_HEIGHT)/2, GUI_GEM_EXTRAS_2_HOFFSET,
 								GUI_GEM_EXTRAS_2_VOFFSET, GUI_GEM_EXTRAS_2_WIDTH,
-								GUI_GEM_EXTRAS_2_HEIGHT, 256, 256);
+								GUI_GEM_EXTRAS_2_HEIGHT, 256, 256,
+								red, green, blue, 1f);
 					}
 					
 					if (level >= 3) {
@@ -516,13 +513,13 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 								(width-GUI_GEM_EXTRAS_3_WIDTH)/2,
 								upperOffset + (upperHeight-GUI_GEM_EXTRAS_3_HEIGHT)/2 + 35, GUI_GEM_EXTRAS_3_HOFFSET,
 								GUI_GEM_EXTRAS_3_VOFFSET, GUI_GEM_EXTRAS_3_WIDTH,
-								GUI_GEM_EXTRAS_3_HEIGHT, 256, 256);
+								GUI_GEM_EXTRAS_3_HEIGHT, 256, 256,
+								red, green, blue, 1f);
 					}
 				}
 			}
 			
 			// Then draw inventories
-			GlStateManager.color4f(1f, 1f, 1f, 1f);
 			for (int i = 0; i < localInv.getSizeInventory(); i++) {
 				final int x = getSlotX(pet, i, width);
 				final int y = getSlotY(pet, i, upperHeight);
@@ -551,7 +548,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			{
 				String str = I18n.format("info.wolf_type." + pet.getElementalType().getNameKey() + ".name");
 				int strWidth = mc.fontRenderer.getStringWidth(str);
-				mc.fontRenderer.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
+				mc.fontRenderer.drawStringWithShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
 				
 				if (pet.getTrainingElement() != null) {
 					final String substr;
@@ -569,16 +566,13 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 					}
 					str = pet.getTrainingElement().getName() + " " + substr;
 					strWidth = mc.fontRenderer.getStringWidth(str);
-					mc.fontRenderer.drawStringWithShadow(str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.fontRenderer.FONT_HEIGHT, pet.getTrainingElement().getColor());
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.fontRenderer.FONT_HEIGHT, pet.getTrainingElement().getColor());
 				}
-				
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
 			}
 			
 
 			mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 			for (int i = 0; i < playerInvSize; i++) {
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
 						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
 						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
@@ -586,7 +580,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 			}
 			mc.getTextureManager().bindTexture(TEX_LOC);
 			
-			GlStateManager.popMatrix();
+			matrixStackIn.pop();
 		}
 	}
 
@@ -611,7 +605,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void overlay(Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

@@ -402,7 +402,7 @@ public class SpellCreationGui {
 			String prefix = "";
 			
 			if (locked) {
-				//prefix = ChatFormatting.OBFUSCATED + "";
+				//prefix = TextFormatting.OBFUSCATED + "";
 				spellErrorStrings.add(prefix + "The runes on the board don't respond to your hands");
 				fail = true;
 			}
@@ -744,8 +744,8 @@ public class SpellCreationGui {
 			}
 			
 			if (!container.isValid) {
-				GlStateManager.pushMatrix();
-				GlStateManager.translatef(0, 0, 500);
+				matrixStackIn.push();
+				matrixStackIn.translate(0, 0, 500);
 				mc.getTextureManager().bindTexture(TEXT);
 				GlStateManager.enableAlphaTest();
 				GlStateManager.enableBlend();
@@ -754,7 +754,7 @@ public class SpellCreationGui {
 						MESSAGE_DISPLAY_VOFFSET, MESSAGE_VALID_HOFFSET,
 						MESSAGE_VALID_VOFFSET, MESSAGE_WIDTH,
 						MESSAGE_HEIGHT, 256, 256);
-				GlStateManager.popMatrix();
+				matrixStackIn.pop();
 			}
 			
 		}

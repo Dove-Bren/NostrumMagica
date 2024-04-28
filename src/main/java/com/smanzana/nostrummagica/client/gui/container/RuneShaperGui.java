@@ -489,12 +489,12 @@ public class RuneShaperGui {
 		
 		protected void drawAffectEntity() {
 			SpellComponentIcon.get(SingleShape.instance())
-				.draw(this, this.font, 0, 0, 12, 12);
+				.draw(matrixStackIn, this, this.font, 0, 0, 12, 12);
 		}
 		
 		protected void drawAffectBlock() {
 			SpellComponentIcon.get(ProximityTrigger.instance())
-				.draw(this, this.font, 0, 0, 12, 12);
+				.draw(matrixStackIn, this, this.font, 0, 0, 12, 12);
 		}
 		
 		@Override
@@ -582,8 +582,8 @@ public class RuneShaperGui {
 						0xFFA0A0A0);
 				
 				if (lastProps != null) {
-					GlStateManager.pushMatrix();
-					GlStateManager.translated(horizontalMargin + PANEL_WIDTH - (30), verticalMargin + PANEL_VOFFSET - 3, 0); // duped in foreground
+					matrixStackIn.push();
+					matrixStackIn.translate(horizontalMargin + PANEL_WIDTH - (30), verticalMargin + PANEL_VOFFSET - 3, 0); // duped in foreground
 					if (lastProps.affectsEntity) {
 						GlStateManager.color4f(1f, 1f, 1f, 1f);
 					} else {
@@ -591,7 +591,7 @@ public class RuneShaperGui {
 					}
 					drawAffectEntity();
 					
-					GlStateManager.translated(12 + 4, 0, 0);
+					matrixStackIn.translate(12 + 4, 0, 0);
 					if (lastProps.affectsBlock) {
 						GlStateManager.color4f(1f, 1f, 1f, 1f);
 					} else {
@@ -600,7 +600,7 @@ public class RuneShaperGui {
 					drawAffectBlock();
 					
 					
-					GlStateManager.popMatrix();
+					matrixStackIn.pop();
 				}
 			}
 		}
