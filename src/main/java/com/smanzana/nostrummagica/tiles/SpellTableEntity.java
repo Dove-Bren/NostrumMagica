@@ -20,6 +20,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class SpellTableEntity extends TileEntity implements IInventory {
@@ -219,7 +220,7 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 		}
 		
 		Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-				name, iconIndex, this, crafter, new LinkedList<String>(), new LinkedList<String>(), true, true);
+				name, iconIndex, this, crafter, new LinkedList<ITextComponent>(), new LinkedList<ITextComponent>(), true, true);
 		
 		if (spell != null) {
 			spell.promoteFromTrans();

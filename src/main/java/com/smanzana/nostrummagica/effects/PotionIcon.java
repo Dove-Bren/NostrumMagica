@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -40,7 +41,7 @@ public enum PotionIcon {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public void draw(Minecraft mc, int posX, int posY) {
+	public void draw(MatrixStack matrixStackIn, Minecraft mc, int posX, int posY) {
 		mc.getRenderManager().textureManager.bindTexture(text);
 		
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, posX,

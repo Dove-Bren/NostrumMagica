@@ -42,32 +42,32 @@ public class MagicBuffEffect extends Effect {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack stack, int x, int y, float z) {
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack matrixStackIn, int x, int y, float z) {
 		final Minecraft mc = gui.getMinecraft();
-		PotionIcon.ENCHANT.draw(mc, x + 6, y + 7);
+		PotionIcon.ENCHANT.draw(matrixStackIn, mc, x + 6, y + 7);
 		
 		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
 			int width = mc.fontRenderer.getStringWidth(display);
-			mc.fontRenderer.drawString(stack, "" + count, x + 6 + (20 - width), y + 7 + (20 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
+			mc.fontRenderer.drawString(matrixStackIn, "" + count, x + 6 + (20 - width), y + 7 + (20 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
 		}
 		
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack stack, int x, int y, float z, float alpha) {
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack matrixStackIn, int x, int y, float z, float alpha) {
 		Minecraft mc = Minecraft.getInstance();
-		PotionIcon.ENCHANT.draw(mc, x + 3, y + 3);
+		PotionIcon.ENCHANT.draw(matrixStackIn, mc, x + 3, y + 3);
 		
 		EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
 			int width = mc.fontRenderer.getStringWidth(display);
-			mc.fontRenderer.drawString(stack, "" + count, x + 6 + (16 - width), y + 7 + (16 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
+			mc.fontRenderer.drawString(matrixStackIn, "" + count, x + 6 + (16 - width), y + 7 + (16 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
 		}
 		
 	}

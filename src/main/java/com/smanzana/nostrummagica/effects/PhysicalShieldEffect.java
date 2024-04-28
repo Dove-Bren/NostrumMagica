@@ -49,13 +49,13 @@ public class PhysicalShieldEffect extends Effect {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack stack, int x, int y, float z) {
-		PotionIcon.PHYSICALSHIELD.draw(gui.getMinecraft(), x + 6, y + 7);
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack matrixStackIn, int x, int y, float z) {
+		PotionIcon.PHYSICALSHIELD.draw(matrixStackIn, gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack stack, int x, int y, float z, float alpha) {
-		PotionIcon.PHYSICALSHIELD.draw(Minecraft.getInstance(), x + 3, y + 3);
+    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack matrixStackIn, int x, int y, float z, float alpha) {
+		PotionIcon.PHYSICALSHIELD.draw(matrixStackIn, Minecraft.getInstance(), x + 3, y + 3);
 	}
 }
