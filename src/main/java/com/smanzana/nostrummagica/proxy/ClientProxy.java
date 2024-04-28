@@ -169,13 +169,36 @@ import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
+import com.smanzana.nostrummagica.tiles.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.tiles.CandleTileEntity;
+import com.smanzana.nostrummagica.tiles.DelayLoadedMimicBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.ItemDuctTileEntity;
+import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.LockedChestEntity;
+import com.smanzana.nostrummagica.tiles.LoreTableEntity;
 import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
+import com.smanzana.nostrummagica.tiles.MatchSpawnerTileEntity;
+import com.smanzana.nostrummagica.tiles.MimicBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
+import com.smanzana.nostrummagica.tiles.ObeliskPortalTileEntity;
+import com.smanzana.nostrummagica.tiles.ParadoxMirrorTileEntity;
 import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
+import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.RuneShaperEntity;
+import com.smanzana.nostrummagica.tiles.SingleSpawnerTileEntity;
+import com.smanzana.nostrummagica.tiles.SorceryPortalTileEntity;
+import com.smanzana.nostrummagica.tiles.SpellTableEntity;
+import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
+import com.smanzana.nostrummagica.tiles.TeleportRuneTileEntity;
+import com.smanzana.nostrummagica.tiles.TeleportationPortalTileEntity;
+import com.smanzana.nostrummagica.tiles.TemporaryPortalTileEntity;
+import com.smanzana.nostrummagica.tiles.TrialBlockTileEntity;
+import com.smanzana.nostrummagica.tiles.TriggerRepeaterEntity;
+import com.smanzana.nostrummagica.tiles.TriggeredMatchSpawnerTileEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
@@ -213,6 +236,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -229,14 +253,12 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ForgeBlockStateV1.Transforms;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.PerspectiveMapWrapper;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -245,6 +267,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.registries.ObjectHolder;
 
 @SuppressWarnings("deprecation")
 public class ClientProxy extends CommonProxy {
@@ -328,16 +351,18 @@ public class ClientProxy extends CommonProxy {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SubscribeEvent
 	public void clientSetup(FMLClientSetupEvent event) {
-		OBJLoader.INSTANCE.addDomain(NostrumMagica.MODID);
-		
-		ClientRegistry.bindTileEntitySpecialRenderer(SymbolTileEntity.class, new TileEntitySymbolRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(CandleTileEntity.class, new TileEntityCandleRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(AltarTileEntity.class, new TileEntityAltarRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(NostrumObeliskEntity.class, new TileEntityObeliskRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(NostrumPortalTileEntityBase.class, new TileEntityPortalRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(ProgressionDoorTileEntity.class, new TileEntityProgressionDoorRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(ManaArmorerTileEntity.class, new TileEntityManaArmorerRenderer());
-		ClientRegistry.bindTileEntitySpecialRenderer(LockedChestEntity.class, new TileEntityLockedChestRenderer());
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntitySymbolRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.CandleTileEntityType, TileEntityCandleRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.AltarTileEntityType, TileEntityAltarRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.NostrumObeliskEntityType, TileEntityObeliskRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TeleportationPortalTileEntityType, TileEntityPortalRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ObeliskPortalTileEntityType, TileEntityPortalRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SorceryPortalTileEntityType, TileEntityPortalRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TemporaryPortalTileEntityType, TileEntityPortalRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ProgressionDoorTileEntityType, TileEntityProgressionDoorRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ManaArmorerTileEntityType, TileEntityManaArmorerRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedChestEntityType, TileEntityLockedChestRenderer::new);
 		
 		ScreenManager.registerFactory(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
@@ -350,7 +375,7 @@ public class ClientProxy extends CommonProxy {
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
 		
 		registerBlockRenderLayer();
-		int unused; // Entity render supposed to be here too?
+		registerEntityRenderers();
 		
 		event.enqueueWork(ClientProxy::registerItemModelProperties);
 	}
@@ -369,7 +394,6 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public void registerAllModels(ModelRegistryEvent event) {
-		registerEntityRenderers();
 		
 		// Register models that don't have an item/block associate with them
 		
@@ -653,10 +677,10 @@ public class ClientProxy extends CommonProxy {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.maniCrystalBlock, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.kaniCrystalBlock, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.vaniCrystalBlock, RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoor, RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoorUnbreakable, RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacade, RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacadeUnbreakable, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoor, (t) -> true);//RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoorUnbreakable, (t) -> true);//RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacade, (t) -> true);//RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacadeUnbreakable, (t) -> true);//RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mineBlock, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.obelisk, RenderType.getSolid());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.singleSpawner, RenderType.getCutout());
