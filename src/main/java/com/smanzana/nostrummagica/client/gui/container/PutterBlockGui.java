@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.PutterBlockTileEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -141,19 +141,17 @@ public class PutterBlockGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
-			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-			super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
 		}
 		
 	}

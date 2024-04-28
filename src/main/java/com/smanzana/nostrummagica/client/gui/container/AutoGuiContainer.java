@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -21,10 +23,10 @@ public abstract class AutoGuiContainer<T extends Container> extends ContainerScr
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground();
-		super.render(mouseX, mouseY, partialTicks);
-		this.renderHoveredToolTip(mouseX, mouseY);
+	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		this.renderBackground(matrixStackIn);
+		super.render(matrixStackIn, mouseX, mouseY, partialTicks);
+		this.renderHoveredTooltip(matrixStackIn, mouseX, mouseY);
 	}
 
 }

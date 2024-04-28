@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.RuneBag;
@@ -26,9 +26,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class RuneBagGui {
 	
@@ -300,13 +301,11 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
-			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int guiU = 0;
@@ -329,7 +328,7 @@ public class RuneBagGui {
 			
 			if (mouseX >= left && mouseX <= left + BUTTON_WIDTH && 
 					mouseY >= top && mouseY <= top + BUTTON_WIDTH) {
-				GuiUtils.drawHoveringText(Lists.newArrayList(RuneBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum"),
+				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new StringTextComponent(RuneBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum")),
 						mouseX, mouseY, width, height, 200, this.font);
 			}
 		}

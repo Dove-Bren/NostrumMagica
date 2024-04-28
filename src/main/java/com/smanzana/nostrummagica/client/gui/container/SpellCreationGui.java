@@ -7,9 +7,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -44,6 +43,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -110,8 +110,8 @@ public class SpellCreationGui {
 		protected final PlayerEntity player;
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
-		protected List<String> spellErrorStrings; // Updated on validate(); what's wrong?
-		protected List<String> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
+		protected List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
+		protected List<ITextComponent> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
 		protected String name;
 		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
@@ -391,7 +391,7 @@ public class SpellCreationGui {
 		}
 		
 		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
-				List<String> spellErrorStrings, List<String> reagentStrings,
+				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean isValid, boolean deductReagents) {
 			boolean fail = false;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
@@ -403,28 +403,28 @@ public class SpellCreationGui {
 			
 			if (locked) {
 				//prefix = TextFormatting.OBFUSCATED + "";
-				spellErrorStrings.add(prefix + "The runes on the board don't respond to your hands");
+				spellErrorStrings.add(new StringTextComponent(prefix + "The runes on the board don't respond to your hands"));
 				fail = true;
 			}
 			
 			if (!isValid) {
-				spellErrorStrings.add(prefix + "Missing blank scroll");
+				spellErrorStrings.add(new StringTextComponent(prefix + "Missing blank scroll"));
 				return null; // fatal
 			}
 			
 			if (name.trim().isEmpty()) {
-				spellErrorStrings.add(prefix + "Must have a name");
+				spellErrorStrings.add(new StringTextComponent(prefix + "Must have a name"));
 				fail = true;
 			}
 			
 			if (iconIdx < 0) {
-				spellErrorStrings.add(prefix + "Must have a spell icon selected");
+				spellErrorStrings.add(new StringTextComponent(prefix + "Must have a spell icon selected"));
 				fail = true;
 			}
 			
 			@Nonnull ItemStack stack = inventory.getStackInSlot(1);
 			if (stack.isEmpty() || !SpellRune.isTrigger(stack)) {
-				spellErrorStrings.add(prefix + "Spell must begin with a trigger");
+				spellErrorStrings.add(new StringTextComponent(prefix + "Spell must begin with a trigger"));
 				return null;
 			}
 			
@@ -435,10 +435,10 @@ public class SpellCreationGui {
 					break;
 				}
 				if (!SpellRune.isSpellWorthy(stack)) {
-					spellErrorStrings.add(prefix + "Rune in slot " + (i) + " is not allowed.");
+					spellErrorStrings.add(new StringTextComponent(prefix + "Rune in slot " + (i) + " is not allowed."));
 					
 					// This builds on the assumption that the two spellworthy types are triggers and packed shapes
-					spellErrorStrings.add(prefix + "  -> Shapes, Elements, and Alterations must be combined into a Packed Shape first.");
+					spellErrorStrings.add(new StringTextComponent(prefix + "  -> Shapes, Elements, and Alterations must be combined into a Packed Shape first."));
 					return null;
 				}
 				if (SpellRune.isPackedShape(stack)) {
@@ -448,7 +448,7 @@ public class SpellCreationGui {
 			}
 			
 			if (!flag) {
-				spellErrorStrings.add(prefix + "Must have at least one packed spell shape");
+				spellErrorStrings.add(new StringTextComponent(prefix + "Must have at least one packed spell shape"));
 				return null;
 			}
 			
@@ -462,11 +462,11 @@ public class SpellCreationGui {
 				
 				part = SpellRune.getPart(stack);
 				if (part == null) {
-					spellErrorStrings.add(prefix + "Unfinished spell part in slot " + (i + 1));
+					spellErrorStrings.add(new StringTextComponent(prefix + "Unfinished spell part in slot " + (i + 1)));
 					if (SpellRune.isShape(stack))
-						spellErrorStrings.add(prefix + " -> Spell parts must have an element");
+						spellErrorStrings.add(new StringTextComponent(prefix + " -> Spell parts must have an element"));
 					else
-						spellErrorStrings.add(prefix + " -> This trigger has been corrupted");
+						spellErrorStrings.add(new StringTextComponent(prefix + " -> This trigger has been corrupted"));
 					return null;
 				} else {
 					spell.addPart(part);
@@ -483,10 +483,10 @@ public class SpellCreationGui {
 				
 				int left = takeReagent(inventory, type, count, false);
 				if (left != 0) {
-					spellErrorStrings.add(prefix + "Need " + left + " more " + type.prettyName());
+					spellErrorStrings.add(new StringTextComponent(prefix + "Need " + left + " more " + type.prettyName()));
 					fail = true;
 				} else {
-					reagentStrings.add(prefix + count + " " + type.prettyName());
+					reagentStrings.add(new StringTextComponent(prefix + count + " " + type.prettyName()));
 				}
 				
 			}
@@ -507,7 +507,7 @@ public class SpellCreationGui {
 					int left = takeReagent(inventory, type, count, true);
 					if (left != 0) {
 						System.out.println("Couldn't take all " + type.name());
-						spellErrorStrings.add(prefix + "Need " + left + " more " + type.prettyName());
+						spellErrorStrings.add(new StringTextComponent(prefix + "Need " + left + " more " + type.prettyName()));
 						return null;
 					}
 					
@@ -562,7 +562,7 @@ public class SpellCreationGui {
 			private SpellGui gui;
 			
 			public SpellIconButton(int x, int y, int val, SpellGui gui) {
-				super(x, y, ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, "", (b) -> {
+				super(x, y, ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, StringTextComponent.EMPTY, (b) -> {
 					gui.iconButtonClicked(b);
 				});
 				this.value = val;
@@ -572,7 +572,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void render(int mouseX, int mouseY, float partialTicks) {
+			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
 				mc.getTextureManager().bindTexture(TEXT);
@@ -586,12 +586,12 @@ public class SpellCreationGui {
 				if (gui.container.iconIndex != this.value)
 					x += 20;
 				
-				GlStateManager.color3f(tint, tint, tint);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y, ICON_LBUTTON_HOFFSET + x,
-						ICON_LBUTTON_VOFFSET, 20, 20, this.width, this.height, 256, 256);
+						ICON_LBUTTON_VOFFSET, 20, 20, this.width, this.height, 256, 256,
+						tint, tint, tint, 1f);
 				
-				GlStateManager.color3f(tint, tint, tint);
-				SpellIcon.get(this.value).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
+				SpellIcon.get(this.value).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4,
+						tint, tint, tint, 1f);
 			}
 			
 		}
@@ -606,7 +606,7 @@ public class SpellCreationGui {
 			this.xSize = GUI_WIDTH;
 			this.ySize = GUI_HEIGHT;
 			final Minecraft mc = Minecraft.getInstance();
-			this.nameField = new TextFieldWidget(mc.fontRenderer, 0, 0, NAME_WIDTH, NAME_HEIGHT, container.name);
+			this.nameField = new TextFieldWidget(mc.fontRenderer, 0, 0, NAME_WIDTH, NAME_HEIGHT, new StringTextComponent(container.name));
 			this.nameField.setMaxStringLength(NAME_MAX);
 			this.nameField.setResponder((s) -> {
 				container.name = s;
@@ -653,20 +653,17 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
-			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int x = (width - MESSAGE_WIDTH) / 2;
 			int y = verticalMargin + MESSAGE_DISPLAY_VOFFSET;
 			if (container.isValid) {
 				
-				GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				x = horizontalMargin + STATUS_DISP_HOFFSET;
 				y = verticalMargin + STATUS_DISP_VOFFSET;
 				int u = STATUS_HOFFSET;
@@ -679,7 +676,6 @@ public class SpellCreationGui {
 						v, STATUS_WIDTH,
 						STATUS_HEIGHT, 256, 256);
 				
-				GL11.glPushMatrix();
 //				mc.fontRenderer.drawString(container.name.toString(), 
 //						horizontalMargin + NAME_HOFFSET + 2,
 //						verticalMargin + NAME_VOFFSET + 2, 
@@ -703,17 +699,14 @@ public class SpellCreationGui {
 					String str = "Spell Cost: " + container.lastManaCost;
 					x = this.width / 2;
 					x -= mc.fontRenderer.getStringWidth(str) / 2;
-					mc.fontRenderer.drawString(str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					mc.fontRenderer.drawString(matrixStackIn, str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
 				}
-				
-				GL11.glPopMatrix();
-				
 			}
 			
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			
 			if (container.isValid) {
 				int horizontalMargin = (width - xSize) / 2;
@@ -723,22 +716,20 @@ public class SpellCreationGui {
 					
 					if (mouseX > horizontalMargin + STATUS_DISP_HOFFSET && mouseX <= horizontalMargin + STATUS_DISP_HOFFSET + STATUS_WIDTH
 						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
-						GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
-						
-						this.renderTooltip(container.spellErrorStrings,
+						this.func_243308_b(matrixStackIn, container.spellErrorStrings,
 								mouseX - horizontalMargin, mouseY - verticalMargin);
 					}
 				}
 				
 				if (mouseX > horizontalMargin + NAME_HOFFSET && mouseX <= horizontalMargin + NAME_HOFFSET + NAME_WIDTH
 						 && mouseY > verticalMargin + NAME_VOFFSET && mouseY <= verticalMargin + NAME_VOFFSET + NAME_HEIGHT) {
-					RenderFuncs.drawRect(NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
+					RenderFuncs.drawRect(matrixStackIn, NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
 				}
 				
 				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
 						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
-					RenderFuncs.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
-					this.renderTooltip(container.reagentStrings,
+					RenderFuncs.drawRect(matrixStackIn, SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
+					this.func_243308_b(matrixStackIn, container.reagentStrings,
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
@@ -747,8 +738,8 @@ public class SpellCreationGui {
 				matrixStackIn.push();
 				matrixStackIn.translate(0, 0, 500);
 				mc.getTextureManager().bindTexture(TEXT);
-				GlStateManager.enableAlphaTest();
-				GlStateManager.enableBlend();
+				RenderSystem.enableAlphaTest();
+				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
 						(GUI_WIDTH - MESSAGE_WIDTH) / 2,
 						MESSAGE_DISPLAY_VOFFSET, MESSAGE_VALID_HOFFSET,
@@ -840,8 +831,8 @@ public class SpellCreationGui {
 				this.mc.player.closeScreen();
 			}
 
-			// Copied fromm AnvilScreen
-			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.func_212955_f() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
+			// Copied from AnvilScreen
+			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canWrite() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 		}
 	}
 	

@@ -2,7 +2,8 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.tiles.LoreTableEntity;
@@ -205,13 +206,11 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
-			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float progress = container.table.getProgress();
@@ -227,7 +226,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			if (container.table.hasLore()) {
 				int u, v;
 				v = GUI_HEIGHT;
@@ -238,15 +237,13 @@ public class LoreTableGui {
 				
 				Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 				
-				GlStateManager.color4f(0, 1, 1, alpha);
-				GlStateManager.enableBlend();
+				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(
 						matrixStackIn,
 						SLOT_INPUT_HOFFSET,
 						SLOT_INPUT_VOFFSET - 20, u,
-						v, SHINE_LENGTH, SHINE_LENGTH, 256, 256);
-				
-				GlStateManager.color4f(1f, 1f, 1f, 1f);
+						v, SHINE_LENGTH, SHINE_LENGTH, 256, 256,
+						0, 1, 1, alpha);
 			}
 			
 		}

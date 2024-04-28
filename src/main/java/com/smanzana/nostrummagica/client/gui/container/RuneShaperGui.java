@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -47,6 +47,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -487,50 +488,52 @@ public class RuneShaperGui {
 			super.init();
 		}
 		
-		protected void drawAffectEntity() {
+		protected void drawAffectEntity(MatrixStack matrixStackIn, float[] color) {
 			SpellComponentIcon.get(SingleShape.instance())
-				.draw(matrixStackIn, this, this.font, 0, 0, 12, 12);
+				.draw(this, matrixStackIn, this.font, 0, 0, 12, 12, color[0], color[1], color[2], color[3]);
 		}
 		
-		protected void drawAffectBlock() {
+		protected void drawAffectBlock(MatrixStack matrixStackIn, float[] color) {
 			SpellComponentIcon.get(ProximityTrigger.instance())
-				.draw(matrixStackIn, this, this.font, 0, 0, 12, 12);
+				.draw(this, matrixStackIn, this.font, 0, 0, 12, 12, color[0], color[1], color[2], color[3]);
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			// Draw guiding shadows on empty slots
 			{
-				GlStateManager.color4f(1.0F,  1.0F, 1.0F, .4f);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_INPUT_HOFFSET + 1,
 						verticalMargin + SLOT_INPUT_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET, RUNE_BLANK_TEXT_WIDTH,
-						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
-				
-				
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256,
+						1.0F,  1.0F, 1.0F, .4f);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM1_HOFFSET + 1,
 						verticalMargin + SLOT_ELEM1_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
-						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256,
+						1.0F,  1.0F, 1.0F, .4f);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM2_HOFFSET + 1,
 						verticalMargin + SLOT_ELEM2_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
-						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256,
+						1.0F,  1.0F, 1.0F, .4f);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM3_HOFFSET + 1,
 						verticalMargin + SLOT_ELEM3_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
-						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256,
+						1.0F,  1.0F, 1.0F, .4f);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ELEM4_HOFFSET + 1,
 						verticalMargin + SLOT_ELEM4_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
-						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256,
+						1.0F,  1.0F, 1.0F, .4f);
 				
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, horizontalMargin + SLOT_ALTER_HOFFSET + 1,
 						verticalMargin + SLOT_ALTER_VOFFSET + 1, RUNE_BLANK_HOFFSET, RUNE_BLANK_VOFFSET + RUNE_BLANK_TEXT_HEIGHT + RUNE_BLANK_TEXT_HEIGHT, RUNE_BLANK_TEXT_WIDTH,
-						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256);
+						RUNE_BLANK_TEXT_HEIGHT, 14, 14, 256, 256,
+						1.0F,  1.0F, 1.0F, .4f);
 			}
 			
 			// Draw info about elements
@@ -571,11 +574,11 @@ public class RuneShaperGui {
 				}
 				
 				int len = mc.fontRenderer.getStringWidth(name);
-				mc.fontRenderer.drawStringWithShadow(name,
+				mc.fontRenderer.drawStringWithShadow(matrixStackIn, name,
 						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
 						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
 				
-				mc.fontRenderer.drawSplitString(desc,
+				RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, desc,
 						horizontalMargin + (PANEL_HOFFSET) + 10,
 						verticalMargin + PANEL_VOFFSET + 5 + 15,
 						PANEL_WIDTH - 20,
@@ -584,20 +587,20 @@ public class RuneShaperGui {
 				if (lastProps != null) {
 					matrixStackIn.push();
 					matrixStackIn.translate(horizontalMargin + PANEL_WIDTH - (30), verticalMargin + PANEL_VOFFSET - 3, 0); // duped in foreground
-					if (lastProps.affectsEntity) {
-						GlStateManager.color4f(1f, 1f, 1f, 1f);
-					} else {
-						GlStateManager.color4f(.3f, .3f, .3f, .4f);
+					
+					float color[] = {1f, 1f, 1f, 1f};
+					if (!lastProps.affectsEntity) {
+						color = new float[] {.3f, .3f, .3f, .4f};
 					}
-					drawAffectEntity();
+					drawAffectEntity(matrixStackIn, color);
 					
 					matrixStackIn.translate(12 + 4, 0, 0);
 					if (lastProps.affectsBlock) {
-						GlStateManager.color4f(1f, 1f, 1f, 1f);
+						color = new float[] {1f, 1f, 1f, 1f};
 					} else {
-						GlStateManager.color4f(.3f, .3f, .3f, .4f);
+						color = new float[] {.3f, .3f, .3f, .4f};
 					}
-					drawAffectBlock();
+					drawAffectBlock(matrixStackIn, color);
 					
 					
 					matrixStackIn.pop();
@@ -606,7 +609,7 @@ public class RuneShaperGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			final int horizontalMargin = (width - xSize) / 2;
 			final int verticalMargin = (height - ySize) / 2;
 			
@@ -621,13 +624,13 @@ public class RuneShaperGui {
 				if (lastProps.affectsEntity
 						&& mouseX >= xAffectEntMin && mouseX <= xAffectEntMax
 						&& mouseY >= yAffectMin && mouseY <= yAffectMax) {
-					final String s = I18n.format("info.affects_entities");
-					this.renderTooltip(s, mouseX - horizontalMargin, mouseY - verticalMargin);
+					final ITextComponent s = new TranslationTextComponent("info.affects_entities");
+					this.renderTooltip(matrixStackIn, s, mouseX - horizontalMargin, mouseY - verticalMargin);
 				} else if (lastProps.affectsBlock
 						&& mouseX >= xAffectBlockMin && mouseX <= xAffectBlockMax
 						&& mouseY >= yAffectMin && mouseY <= yAffectMax) {
-					final String s = I18n.format("info.affects_blocks");
-					this.renderTooltip(s, mouseX - horizontalMargin, mouseY - verticalMargin);
+					final ITextComponent s = new TranslationTextComponent("info.affects_blocks");
+					this.renderTooltip(matrixStackIn, s, mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
 		}

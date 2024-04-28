@@ -2,7 +2,8 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.NostrumItems;
@@ -39,6 +40,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
@@ -438,7 +440,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			if (localModIndex != container.modIndex) {
 				this.refreshButtons();
 				this.localModIndex = container.modIndex;
@@ -447,7 +449,6 @@ public class ModificationTableGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			GlStateManager.color4f(1.0F,  1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
@@ -456,7 +457,7 @@ public class ModificationTableGui {
 				// Draw rune sliders or toggles
 				int x, y;
 				int len = mc.fontRenderer.getStringWidth("Rune Modification");
-				mc.fontRenderer.drawStringWithShadow("Rune Modification",
+				mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Rune Modification",
 						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
 						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
 				y = verticalMargin + PANEL_VOFFSET + 20;
@@ -467,7 +468,7 @@ public class ModificationTableGui {
 						boolTitle = container.component.getTrigger().supportedBooleanName();
 					else
 						boolTitle = container.component.getShape().supportedBooleanName();
-					mc.fontRenderer.drawStringWithShadow(boolTitle, x, y, 0xFFa0a0a0);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, boolTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -478,7 +479,7 @@ public class ModificationTableGui {
 						floatTitle = container.component.getTrigger().supportedFloatName();
 					else
 						floatTitle = container.component.getShape().supportedFloatName();
-					mc.fontRenderer.drawStringWithShadow(floatTitle, x, y, 0xFFa0a0a0);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, floatTitle, x, y, 0xFFa0a0a0);
 					
 					y += 25;
 				}
@@ -491,12 +492,12 @@ public class ModificationTableGui {
 				ItemStack tome = container.inventory.getMainSlot();
 				if (!tome.isEmpty()) {
 					ITextComponent nameComp = tome.getDisplayName();
-					String name = nameComp == null ? null : nameComp.getFormattedText();
+					String name = nameComp == null ? null : nameComp.getString();
 					if (name == null || name.length() == 0)
 						name = "Spell Tome";
 					int len = mc.fontRenderer.getStringWidth(name);
 					x = horizontalMargin + PANEL_HOFFSET + (PANEL_WIDTH / 2) - (len / 2);
-					mc.fontRenderer.drawStringWithShadow(name, x, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, name, x, y, 0xFFFFFFFF);
 					y += 20;
 					
 					x = horizontalMargin + PANEL_HOFFSET + 5;
@@ -509,23 +510,23 @@ public class ModificationTableGui {
 					}
 					
 					// Efficiency
-					mc.fontRenderer.drawStringWithShadow("Efficiency: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getEfficiency() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Efficiency: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(matrixStackIn, String.format("%+03.0f%%", (summary.getEfficiency() - 1f) * 100), valX, y, 0xFFFFFFFF);
 					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// LMC
-					mc.fontRenderer.drawStringWithShadow("Mana Cost: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getCostRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Mana Cost: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(matrixStackIn, String.format("%+03.0f%%", (summary.getCostRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
 					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// LRC
-					mc.fontRenderer.drawStringWithShadow("Reagent Cost: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getReagentCost() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Reagent Cost: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(matrixStackIn, String.format("%+03.0f%%", (summary.getReagentCost() - 1f) * 100), valX, y, 0xFFFFFFFF);
 					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// XP
-					mc.fontRenderer.drawStringWithShadow("Bonus XP: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString(String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Bonus XP: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(matrixStackIn, String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
 					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					y = topY;
@@ -533,13 +534,13 @@ public class ModificationTableGui {
 					valX += 100;
 					
 					// Level
-					mc.fontRenderer.drawStringWithShadow("Level: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString("" + SpellTome.getLevel(tome), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Level: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(matrixStackIn, "" + SpellTome.getLevel(tome), valX, y, 0xFFFFFFFF);
 					y += 2 + mc.fontRenderer.FONT_HEIGHT;
 					
 					// Modifications
-					mc.fontRenderer.drawStringWithShadow("Modifications: ", x, y, 0xFFA0A0A0);
-					mc.fontRenderer.drawString("" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
+					mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Modifications: ", x, y, 0xFFA0A0A0);
+					mc.fontRenderer.drawString(matrixStackIn, "" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
 							
 				}
 			}
@@ -579,7 +580,7 @@ public class ModificationTableGui {
 				int color = 0x55FFFFFF;
 				matrixStackIn.push();
 				matrixStackIn.translate(0, 0, 1);
-				RenderFuncs.drawRect(
+				RenderFuncs.drawRect(matrixStackIn, 
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET,
 						horizontalMargin + SLOT_MAIN_HOFFSET + 16,
@@ -595,7 +596,7 @@ public class ModificationTableGui {
 					color = 0x90FF5050;
 				matrixStackIn.push();
 				matrixStackIn.translate(0, 0, 1);
-				RenderFuncs.drawRect(
+				RenderFuncs.drawRect(matrixStackIn, 
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos,
 						horizontalMargin + container.inputSlot.xPos + 16,
@@ -606,7 +607,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			if (container.isValid) {
@@ -617,7 +618,7 @@ public class ModificationTableGui {
 				if (mouseX >= submitX && mouseY >= submitY
 						&& mouseX <= submitX + SUBMIT_WIDTH
 						&& mouseY <= submitY + SUBMIT_HEIGHT) {
-					RenderFuncs.drawRect(SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x20FFFFFF);
+					RenderFuncs.drawRect(matrixStackIn, SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x20FFFFFF);
 				}
 				
 //				if (!container.spellValid) {
@@ -760,7 +761,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public ToggleButton(int x, int y, boolean val, ModificationGui gui) {
-				super(x, y, 200, 20, "", (b) -> {
+				super(x, y, 200, 20, StringTextComponent.EMPTY, (b) -> {
 					gui.onToggleButton((ToggleButton)b);
 				});
 				this.val = val;
@@ -770,7 +771,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void render(int parX, int parY, float partialTicks) {
+			public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
@@ -787,10 +788,11 @@ public class ModificationTableGui {
 					if (val != gui.container.boolIndex)
 						x += BUTTON_WIDTH;
 					
-					GlStateManager.color3f(tint, tint, tint);
-					this.blit(this.x, this.y,
+					RenderSystem.color4f(tint, tint, tint, 1f);
+					this.blit(matrixStackIn, this.x, this.y,
 							BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET,
 							this.width, this.height);
+					RenderSystem.color4f(1f, 1f, 1f, 1f);
 				}
 			}
 		}
@@ -801,7 +803,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public FloatButton(int x, int y, int val, float actual, ModificationGui gui) {
-				super(x, y, 200, 20, "", (b) -> {
+				super(x, y, 200, 20, StringTextComponent.EMPTY, (b) -> {
 					gui.onFloatButton((FloatButton) b);
 				});
 				this.val = val;
@@ -812,7 +814,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void render(int parX, int parY, float partialTicks) {
+			public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					// In rune mode, float buttons are buttons that display the number
@@ -834,12 +836,13 @@ public class ModificationTableGui {
 						String text = String.format("%.1f", actualVal);
 						len = mc.fontRenderer.getStringWidth(text);
 						
-						GlStateManager.color3f(tint, tint, tint);
-						this.blit(this.x, this.y,
+						RenderSystem.color3f(tint, tint, tint);
+						this.blit(matrixStackIn, this.x, this.y,
 								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 								this.width, this.height);
+						RenderSystem.color4f(1f, 1f, 1f, 1f);
 						
-						mc.fontRenderer.drawString(text,
+						mc.fontRenderer.drawString(matrixStackIn, text,
 								this.x + (LARGE_BUTTON_WIDTH / 2) - (len / 2),
 								this.y + 1,
 								0xFF000000);
@@ -857,15 +860,16 @@ public class ModificationTableGui {
 						if (gui.container.floatIndex != this.val)
 							x += LARGE_BUTTON_WIDTH;
 						
-						GlStateManager.color3f(tint, tint, tint);
-						blit(this.x, this.y, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
+						RenderSystem.color3f(tint, tint, tint);
+						blit(matrixStackIn, this.x, this.y, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 								LARGE_BUTTON_WIDTH, LARGE_BUTTON_HEIGHT, this.width, this.height, 256, 256);
 //						this.drawTexturedModalRect(this.x, this.y,
 //								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 //								this.width, this.height);
+						RenderSystem.color4f(1f, 1f, 1f, 1f);
 						
-						GlStateManager.color3f(tint, tint, tint);
-						SpellIcon.get(this.val).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4);
+						SpellIcon.get(this.val).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4, tint, tint, tint, 1f);
+						
 					}
 				}
 			}
@@ -876,7 +880,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public SubmitButton(int x, int y, ModificationGui gui) {
-				super(x, y, 200, 20, "", (b) -> {
+				super(x, y, 200, 20, StringTextComponent.EMPTY, (b) -> {
 					gui.onSubmitButton();
 				});
 				this.width = LARGE_BUTTON_WIDTH;
@@ -885,7 +889,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void render(int parX, int parY, float partialTicks) {
+			public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
@@ -896,13 +900,14 @@ public class ModificationTableGui {
 					}
 					
 					Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
-					GlStateManager.color3f(tint, tint, tint);
+					RenderSystem.color3f(tint, tint, tint);
 					int y = 0;
 					if (gui.container.isValid)
 						y += SUBMIT_HEIGHT;
-					this.blit(this.x, this.y,
+					this.blit(matrixStackIn, this.x, this.y,
 							SUBMIT_TEXT_HOFFSET, SUBMIT_TEXT_VOFFSET + y,
 							this.width, this.height);
+					RenderSystem.color4f(1f, 1f, 1f, 1f);
 				}
 			}
 			
