@@ -31,9 +31,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class RitualRecipe extends ForgeRegistryEntry<RitualRecipe> implements InfoScreenIndexed {
+public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implements InfoScreenIndexed {
 	
 	public static final class RitualMatchInfo {
 		public boolean matched;
@@ -255,8 +254,7 @@ public class RitualRecipe extends ForgeRegistryEntry<RitualRecipe> implements In
 		if (tier == 2) {
 			this.extraItems = NonNullList.withSize(4, Ingredient.EMPTY);
 		}
-		
-		this.setRegistryName(registryName);
+		//this.setRegistryName(registryName);
 	}
 	
 	protected static RitualMatchInfo Capture(World world, BlockPos center, RitualRecipe recipe) {

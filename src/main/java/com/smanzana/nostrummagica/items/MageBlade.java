@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -116,7 +117,10 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IE
 		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(AttributeMagicPotency.instance(), new AttributeModifier(MAGEBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+			builder.put(AttributeMagicPotency.instance(), new AttributeModifier(MAGEBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
+			multimap = builder.build();
 		}
 
         return multimap;

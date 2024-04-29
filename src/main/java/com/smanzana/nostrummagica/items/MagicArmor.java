@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
@@ -528,11 +529,14 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
         Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();	
 
         if (equipmentSlot == this.slot) {
-            multimap.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
-            multimap.put(AttributeMagicResist.instance(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
-            multimap.put(AttributeMagicReduction.instance(this.element), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
+        	ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+            builder.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            builder.put(AttributeMagicResist.instance(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
+            builder.put(AttributeMagicReduction.instance(this.element), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
+            multimap = builder.build();
         }
 
         return multimap;

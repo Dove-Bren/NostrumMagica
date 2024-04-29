@@ -1,11 +1,16 @@
 modLoader="javafml" #mandatory
-loaderVersion="[25,)" #botania has 28+
+loaderVersion="[36,)"
+
+# The license for your mod. This is mandatory and allows for easier comprehension of your redistributive properties.
+# Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
+license="All Rights Reserved"
 
 [[mods]]
 modId="nostrummagica"
 version="${file.jarVersion}"
 displayName="Nostrum Magica"
 #logoFile="examplemod.png" #optional
+authors="Skyler Manzanares"
 description='''
 Immersive & Complex Spellcrafting
 '''
@@ -13,7 +18,7 @@ Immersive & Complex Spellcrafting
 [[dependencies.nostrummagica]]
 	modId="forge"
 	mandatory=true
-	versionRange="[28.1.92,)"
+	versionRange="[36,)"
 	ordering="NONE"
 	side="BOTH"
 
@@ -27,13 +32,13 @@ Immersive & Complex Spellcrafting
 [[dependencies.nostrummagica]]
 	modId="musica"
 	mandatory=false
-	versionRange="[1.14.4-1.0.0,)"
+	versionRange="[1.16.5-1.0.0,)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
 	modId="caelus"
 	mandatory=true
-	versionRange="[FORGE-1.14.4-1.0,)"
+	versionRange="[1.16.4-2.1.0.2,)"
 	ordering="AFTER"
 	side="BOTH"

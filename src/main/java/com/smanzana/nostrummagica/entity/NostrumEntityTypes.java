@@ -32,6 +32,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
@@ -260,9 +261,12 @@ public class NostrumEntityTypes {
 		EntitySpawnPlacementRegistry.register(sprite, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		EntitySpawnPlacementRegistry.register(wisp, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWisp::canSpawnExtraCheck);
 		EntitySpawnPlacementRegistry.register(willo, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWillo::canSpawnExtraCheck);
+		
+		// Can't mix buses, so manually register spawn handling to the game bus
+		MinecraftForge.EVENT_BUS.addListener(NostrumEntityTypes::registerSpawns);
 	}
 	
-	@SubscribeEvent
+	//@SubscribeEvent registered in #registerEntityPlacement above
 	public static void registerSpawns(BiomeLoadingEvent event) {
 		final Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, event.getName()));
 		

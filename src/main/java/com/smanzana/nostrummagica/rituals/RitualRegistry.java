@@ -14,16 +14,11 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RitualRegistry {
 	
 	private static RitualRegistry instance;
@@ -34,31 +29,27 @@ public class RitualRegistry {
 		return instance;
 	}
 	
-	private static IForgeRegistry<RitualRecipe> REGISTRY;
+//	@SubscribeEvent
+//	public static void onRegistryCreate(RegistryEvent.NewRegistry event) {
+//		REGISTRY = new RegistryBuilder<RitualRecipe>()
+//				.setName(new ResourceLocation(NostrumMagica.MODID, "rituals"))
+//				.setType(RitualRecipe.class)
+//				.setMaxID(Integer.MAX_VALUE - 1) // copied from GameData, AKA Forge's registration
+//				//.addCallback(new NamespacedWrapper.Factory<>()) // not sure what this is
+//				.disableSaving()
+//				.create();
+//	}
 	
-	@SubscribeEvent
-	public static void onRegistryCreate(RegistryEvent.NewRegistry event) {
-		REGISTRY = new RegistryBuilder<RitualRecipe>()
-				.setName(new ResourceLocation(NostrumMagica.MODID, "rituals"))
-				.setType(RitualRecipe.class)
-				.setMaxID(Integer.MAX_VALUE - 1) // copied from GameData, AKA Forge's registration
-				//.addCallback(new NamespacedWrapper.Factory<>()) // not sure what this is
-				.disableSaving()
-				.create();
-	}
-	
-	//private List<RitualRecipe> knownRituals;
+	private List<RitualRecipe> ritualRegistry;
 	private Set<IRitualListener> ritualListeners;
 	
 	private RitualRegistry() {
-		//knownRituals = new LinkedList<>();
+		ritualRegistry = new ArrayList<>();
 		ritualListeners = new HashSet<>();
 	}
 
-	// Use the registry event instead
-	@Deprecated
-	public void addRitual(RitualRecipe ritual) {
-		//knownRituals.add(ritual);
+	public void register(RitualRecipe ritual) {
+		ritualRegistry.add(ritual);
 	}
 	
 	public void addRitualListener(IRitualListener listener) {
@@ -87,7 +78,7 @@ public class RitualRegistry {
 			return false;
 		
 		// else it's an altar or a candle
-		for (RitualRecipe ritual : REGISTRY) {
+		for (RitualRecipe ritual : instance().ritualRegistry) {
 			final RitualMatchInfo result = ritual.matches(player, world, pos, element);
 			if (result.matched) {
 					if (ritual.perform(world, player, pos)) {
@@ -113,6 +104,23 @@ public class RitualRegistry {
 	}
 
 	public List<RitualRecipe> getRegisteredRituals() {
-		return new ArrayList<RitualRecipe>(REGISTRY.getValues());
+		return new ArrayList<RitualRecipe>(ritualRegistry);
+	}
+	
+	protected void clear() {
+		this.ritualRegistry.clear();
+	}
+	
+	public static class RitualRegisterEvent extends Event {
+		public final RitualRegistry registry;
+		
+		protected RitualRegisterEvent(RitualRegistry registry) {
+			this.registry = registry;
+		}
+	}
+	
+	public final void reloadRituals() {
+		this.clear();
+		MinecraftForge.EVENT_BUS.post(new RitualRegisterEvent(this));
 	}
 }

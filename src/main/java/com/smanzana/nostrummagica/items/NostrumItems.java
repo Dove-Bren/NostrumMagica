@@ -24,7 +24,6 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Rarity;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -304,10 +303,6 @@ public class NostrumItems {
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
 	
-	
-	public NostrumItems() {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()

@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -47,18 +48,20 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
         Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
-
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		builder.putAll(multimap);
+        
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
         }
         
         if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(AttributeMagicPotency.instance(), new AttributeModifier(THANOSTAFF_POTENCY_UUID, "Potency modifier", 15, AttributeModifier.Operation.ADDITION));
+			builder.put(AttributeMagicPotency.instance(), new AttributeModifier(THANOSTAFF_POTENCY_UUID, "Potency modifier", 15, AttributeModifier.Operation.ADDITION));
 		}
 
-        return multimap;
+        return builder.build();
     }
 	
 	@Override

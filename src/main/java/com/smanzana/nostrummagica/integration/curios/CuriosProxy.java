@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.research.NostrumResearch;
 import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
+import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.rituals.outcomes.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
@@ -30,12 +31,10 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.IForgeRegistry;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
@@ -69,7 +68,7 @@ public class CuriosProxy {
 	}
 	
 	public void init() {
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(this::registerCurioRituals);
 		registerCurioQuests();
 		//registerCurioRituals();
 		registerCurioResearch();
@@ -80,9 +79,8 @@ public class CuriosProxy {
 		
 	}
 	
-	@SubscribeEvent
-	public void registerCurioRituals(RegistryEvent.Register<RitualRecipe> event) {
-		final IForgeRegistry<RitualRecipe> registry = event.getRegistry();
+	public void registerCurioRituals(RitualRegistry.RitualRegisterEvent event) {
+		RitualRegistry registry = event.registry;
 		RitualRecipe recipe;
 		
 		recipe = RitualRecipe.createTier3("small_ribbon",

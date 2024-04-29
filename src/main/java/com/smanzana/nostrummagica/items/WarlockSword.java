@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
@@ -78,9 +79,12 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-			multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
-			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
-			multimap.put(AttributeMagicPotency.instance(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+			builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
+			builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
+			builder.put(AttributeMagicPotency.instance(), new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
+			multimap = builder.build();
 		}
 
 		return multimap;

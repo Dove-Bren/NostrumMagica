@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
@@ -42,7 +43,10 @@ public class MirrorShieldImproved extends MirrorShield {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(AttributeMagicResist.instance(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, AttributeModifier.Operation.ADDITION));
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+			builder.put(AttributeMagicResist.instance(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 20, AttributeModifier.Operation.ADDITION));
+			multimap = builder.build();
 		}
 
 		return multimap;

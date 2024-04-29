@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -71,8 +72,11 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
 
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
-            multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
+        	ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
+            multimap = builder.build();
         }
 
         return multimap;

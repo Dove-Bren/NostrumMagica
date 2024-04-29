@@ -19,6 +19,7 @@ import net.minecraftforge.common.crafting.NBTIngredient;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumPotions {
@@ -60,23 +61,24 @@ public enum NostrumPotions {
 		for (NostrumPotions wrapper : NostrumPotions.values()) {
 			event.getRegistry().register(wrapper.getTypeInternal());
 		}
-		
-		registerPotionMixes();
 	}
 	
-	protected static final void registerPotionMixes() {
-		// Mana regen potion
-    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(Potions.THICK),
-    			Ingredient.fromTag(NostrumTags.Items.ReagentManiDust),
-    			MakePotion(NostrumPotions.MANAREGEN.getType()));
-    	
-    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
-    			Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
-    			MakePotion(NostrumPotions.MANAREGEN_EXTENDED.getType()));
-    	
-    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
-    			Ingredient.fromTag(Tags.Items.DUSTS_GLOWSTONE),
-    			MakePotion(NostrumPotions.MANAREGEN_STRONG.getType()));
+	@SubscribeEvent
+	public static final void registerPotionMixes(FMLCommonSetupEvent event) {
+		event.enqueueWork(() -> {
+			// Mana regen potion
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(Potions.THICK),
+	    			Ingredient.fromTag(NostrumTags.Items.ReagentManiDust),
+	    			MakePotion(NostrumPotions.MANAREGEN.getType()));
+	    	
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
+	    			Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
+	    			MakePotion(NostrumPotions.MANAREGEN_EXTENDED.getType()));
+	    	
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
+	    			Ingredient.fromTag(Tags.Items.DUSTS_GLOWSTONE),
+	    			MakePotion(NostrumPotions.MANAREGEN_STRONG.getType()));
+		});
 	}
 	
 	public static final ItemStack MakePotion(Potion potion) {

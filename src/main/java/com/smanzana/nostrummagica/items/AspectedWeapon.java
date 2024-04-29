@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -240,8 +241,11 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(slot);
 
 		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
 			double amt = typeScale(this.type)* .1;
-			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
+			builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(OFFHAND_ATTACK_SPEED_MODIFIER, "Weapon modifier", amt, AttributeModifier.Operation.ADDITION));
+			multimap = builder.build();
 		}
 
 		return multimap;

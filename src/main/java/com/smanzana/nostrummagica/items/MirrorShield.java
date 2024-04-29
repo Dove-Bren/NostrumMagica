@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
@@ -59,8 +60,11 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.OFFHAND) {
-			multimap.put(Attributes.ARMOR, new AttributeModifier(MOD_ATTACK_UUID, "Offhand Modifier", 1, AttributeModifier.Operation.ADDITION));
-			multimap.put(AttributeMagicResist.instance(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 10, AttributeModifier.Operation.ADDITION));
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+			builder.put(Attributes.ARMOR, new AttributeModifier(MOD_ATTACK_UUID, "Offhand Modifier", 1, AttributeModifier.Operation.ADDITION));
+			builder.put(AttributeMagicResist.instance(), new AttributeModifier(MOD_RESIST_UUID, "Magic Shield Resist", 10, AttributeModifier.Operation.ADDITION));
+			multimap = builder.build();
 		}
 
 		return multimap;
