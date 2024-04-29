@@ -5,11 +5,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelManager;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.util.ResourceLocation;
 
 public class ModelUtils {
 
-	public static final IBakedModel GetBakedModel(ModelResourceLocation loc) {
+	public static final IBakedModel GetBakedModel(ResourceLocation loc) {
 		final ModelManager manager = Minecraft.getInstance().getModelManager();
 		IBakedModel model = manager.getModel(loc);
 		if (model == null || model == manager.getMissingModel()) {

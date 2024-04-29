@@ -2,16 +2,13 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
-import com.smanzana.nostrummagica.utils.ModelUtils;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 	
-	private static final ModelResourceLocation MODEL_CORE = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core"));
-	private static final ModelResourceLocation MODEL_ARMS = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms"));
+	private static final ResourceLocation MODEL_CORE = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core");
+	private static final ResourceLocation MODEL_ARMS = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms");
 	
 	protected ModelRendererBaked core;
 	protected ModelRendererBaked arms;
@@ -19,8 +16,8 @@ public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 	public ModelSpriteCore() {
 		super(); // Only a child class to use LookupModel
 		
-		core = new ModelRendererBaked(this, ModelUtils.GetBakedModel(MODEL_CORE));
-		arms = new ModelRendererBaked(this, ModelUtils.GetBakedModel(MODEL_ARMS));
+		core = new ModelRendererBaked(this, MODEL_CORE);
+		arms = new ModelRendererBaked(this, MODEL_ARMS);
 		this.children.add(core);
 		this.children.add(arms);
 	}

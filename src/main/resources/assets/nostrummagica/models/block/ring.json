@@ -1,3 +1,4 @@
 {
-    "model": "nostrummagica:obj/block/ring.obj"
+	"loader": "forge:obj",
+    "model": "nostrummagica:models//block/ring.obj"
 }

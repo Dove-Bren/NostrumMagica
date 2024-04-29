@@ -1,7 +1,7 @@
 {
 	"forge_marker": 1,
 	"defaults": {
-		"model": "nostrummagica:block/crystal_standing.obj",
+		"model": "nostrummagica:block/crystal_standing",
 		"textures": {
 			"particle": "nostrummagica:model/crystal"
 		}
@@ -9,11 +9,11 @@
     "variants": {
 		"facing": {
 			"up": {},
-			"down": { "model": "nostrummagica:block/crystal_hanging.obj" },
-			"east": { "model": "nostrummagica:block/crystal_embedded.obj", "y": 180 },
-			"south": { "model": "nostrummagica:block/crystal_embedded.obj", "y": 270 },
-			"north": { "model": "nostrummagica:block/crystal_embedded.obj", "y": 90 },
-			"west": { "model": "nostrummagica:block/crystal_embedded.obj" }
+			"down": { "model": "nostrummagica:block/crystal_hanging" },
+			"east": { "model": "nostrummagica:block/crystal_embedded", "y": 180 },
+			"south": { "model": "nostrummagica:block/crystal_embedded", "y": 270 },
+			"north": { "model": "nostrummagica:block/crystal_embedded", "y": 90 },
+			"west": { "model": "nostrummagica:block/crystal_embedded" }
 		}
     }
 }

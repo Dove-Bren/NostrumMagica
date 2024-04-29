@@ -1,3 +1,4 @@
 {
-    "model": "nostrummagica:warlock_sword.obj"
+	"loader": "forge:obj",
+    "model": "nostrummagica:models/item/warlock_sword.obj"
 }

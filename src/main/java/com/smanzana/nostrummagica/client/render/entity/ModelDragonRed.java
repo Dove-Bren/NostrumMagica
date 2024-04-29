@@ -14,12 +14,9 @@ import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.MemoryPool;
-import com.smanzana.nostrummagica.utils.ModelUtils;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.Model;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -49,7 +46,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		protected float offsetY;
 		protected float offsetZ;
 		
-		public ModelRendererBakedWithOffset(Model base, IBakedModel model) {
+		public ModelRendererBakedWithOffset(Model base, ResourceLocation model) {
 			super(base, model);
 		}
 		
@@ -109,7 +106,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		renderers = new EnumMap<>(EDragonPart.class);
 		
 		for (EDragonPart part : EDragonPart.values()) {
-			ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, ModelUtils.GetBakedModel(RenderFuncs.makeDefaultModelLocation(part.getLoc())));
+			ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, part.getLoc());
 			render.setTextureOffset(0, 0); // TODO add texture offsets?
 			// Set offset?
 			render.offsetX = (float) part.getX();
@@ -145,7 +142,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 				}
 				
 				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
-				ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, ModelUtils.GetBakedModel(RenderFuncs.makeDefaultModelLocation(loc)));
+				ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, loc);
 				render.setTextureOffset(0, 0); // TODO add texture offsets?
 				render.offsetX = (float) part.getX();
 				render.offsetY = (float) part.getY();

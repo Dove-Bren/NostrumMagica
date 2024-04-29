@@ -1,6 +1,4 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "nostrummagica:block/magic_wall"
-    }
+	"loader": "forge:obj",
+	"model": "nostrummagica:models/block/pedestal.obj"
 }

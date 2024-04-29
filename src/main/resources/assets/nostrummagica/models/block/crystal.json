@@ -1,3 +1,4 @@
 {
-    "model": "nostrummagica:obj/block/crystal.obj"
+	"loader": "forge:obj",
+    "model": "nostrummagica:models/block/crystal.obj"
 }

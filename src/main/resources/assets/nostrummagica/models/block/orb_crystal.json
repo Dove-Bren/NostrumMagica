@@ -1,0 +1,4 @@
+{
+	"loader": "forge:obj",
+    "model": "nostrummagica:models/block/orb_crystal.obj"
+}

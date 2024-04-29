@@ -1,0 +1,6 @@
+{
+	"loader": "forge:obj",
+	"model": "nostrummagica:models/effect/orb_pure.obj",
+	"textures": {
+	}
+}

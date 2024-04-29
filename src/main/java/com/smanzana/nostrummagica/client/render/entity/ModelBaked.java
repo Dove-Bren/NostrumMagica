@@ -9,11 +9,9 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.utils.ModelUtils;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -21,23 +19,23 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 	
 	protected List<ModelRendererBaked> children;
 	
-	public ModelBaked(ModelResourceLocation ... models) {
+	public ModelBaked(ResourceLocation ... models) {
 		this(RenderType::getEntityCutoutNoCull, models);
 	}
 	
-	public ModelBaked(Function<ResourceLocation, RenderType> renderTypeMap, ModelResourceLocation ... models) {
+	public ModelBaked(Function<ResourceLocation, RenderType> renderTypeMap, ResourceLocation ... models) {
 		super(renderTypeMap);
-		this.children = fetchModels(models);
+		children = fetchModels(models);
 	}
 
-	protected @Nonnull List<ModelRendererBaked> fetchModels(@Nullable ModelResourceLocation[] modelLocations) {
+	protected @Nonnull List<ModelRendererBaked> fetchModels(@Nullable ResourceLocation[] modelLocations) {
 		if (modelLocations == null || modelLocations.length == 0) {
 			return new ArrayList<>();
 		}
 		
 		List<ModelRendererBaked> list = new ArrayList<>(modelLocations.length);
-		for (ModelResourceLocation loc : modelLocations) {
-			list.add(new ModelRendererBaked(this, ModelUtils.GetBakedModel(loc)));
+		for (ResourceLocation loc : modelLocations) {
+			list.add(new ModelRendererBaked(this, loc));
 		}
 		return list;
 	}

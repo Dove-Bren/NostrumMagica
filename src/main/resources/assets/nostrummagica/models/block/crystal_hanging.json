@@ -1,3 +1,4 @@
 {
-    "model": "nostrummagica:obj/block/crystal_hanging.obj"
+	"loader": "forge:obj",
+    "model": "nostrummagica:models/block/crystal_hanging.obj"
 }

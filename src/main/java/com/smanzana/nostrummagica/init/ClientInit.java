@@ -85,7 +85,6 @@ import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -232,16 +231,16 @@ public class ClientInit {
 			} else {
 				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
 				final String modelLoc = "effect/" + icon.getKey();
-				ModelLoader.addSpecialModel(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)));
+				ModelLoader.addSpecialModel(NostrumMagica.Loc(modelLoc));
 			}
 		}
 		
 		for (String key : new String[] {"block/orb_crystal", "entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
-			ModelLoader.addSpecialModel(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(key)));
+			ModelLoader.addSpecialModel(NostrumMagica.Loc(key));
 		}
 		
 		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
-			ModelLoader.addSpecialModel(RenderFuncs.makeDefaultModelLocation(loc));
+			ModelLoader.addSpecialModel(loc);
 		}
 	}
 	

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.effects;
 
 public enum ClientEffectIcon {
 
-	SHIELD("shield", true),
+	SHIELD("shield", false),
 	TING1("ting1", false),
 	TING2("ting2", false),
 	TING3("ting3", false),
@@ -22,6 +22,8 @@ public enum ClientEffectIcon {
 	THORN_4("thorn4", true),
 	ARROW_SLASH("arrow_slash", false)
 	;
+	
+	int unused; // Shield used to be marked as obj and was using the obj. What's wrong with the json version?
 	
 	private String key;
 	private boolean isObj;

@@ -5,19 +5,17 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.utils.ColorUtil;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKoid>> {
 	
 	private static final ResourceLocation TEXTURE =  new ResourceLocation(NostrumMagica.MODID, "textures/entity/koid.png"); 
-	private static final ModelResourceLocation MODEL = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/koid"));
+	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
 	protected ModelBaked<EntityKoid> model;
 

@@ -1,12 +1,16 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import javax.annotation.Nullable;
+
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.smanzana.nostrummagica.utils.ModelUtils;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.Model;
 import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * A BakedModel but as a ModelRenderer.
@@ -21,17 +25,31 @@ import net.minecraft.client.renderer.model.ModelRenderer;
  */
 public class ModelRendererBaked extends ModelRenderer {
 
-	private final IBakedModel bakedModel;
+	private final ResourceLocation modelLocation;
+	private @Nullable IBakedModel bakedModel;
+	private boolean loaded;
 	
-	public ModelRendererBaked(Model base, IBakedModel model) {
+	public ModelRendererBaked(Model base, ResourceLocation modelLocation) {
 		super(base);
 		
-		this.bakedModel = model;
+		this.modelLocation = modelLocation;
+	}
+	
+	protected IBakedModel loadModel(ResourceLocation location) {
+		return ModelUtils.GetBakedModel(location);
+	}
+	
+	protected void checkAndLoadModel() {
+		if (!loaded) {
+			loaded = true;
+			this.bakedModel = loadModel(this.modelLocation);
+		}
 	}
 	
 	// Made public with AT :)
 	@Override
 	public void doRender(MatrixStack.Entry matrixEntryIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		checkAndLoadModel();
 		
 		// Render obj model
 		RenderFuncs.RenderModel(matrixEntryIn, bufferIn, bakedModel, packedLightIn, red, green, blue, alpha);

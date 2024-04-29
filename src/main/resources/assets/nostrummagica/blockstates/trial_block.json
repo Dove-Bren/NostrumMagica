@@ -1,7 +1,7 @@
 {
 	"forge_marker": 1,
 	"defaults": {
-		"model": "nostrummagica:block/pedestal_evil.obj",
+		"model": "nostrummagica:block/pedestal_evil",
 		"x": 270,
 		"textures": {
 			"particle": "nostrummagica:block/stone_generic1"

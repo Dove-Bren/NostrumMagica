@@ -1,6 +1,4 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "nostrummagica:block/mirror"
-    }
+	"loader": "forge:obj",
+	"model": "nostrummagica:models/block/mirror.obj"
 }

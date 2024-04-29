@@ -1,0 +1,6 @@
+{
+	"loader": "forge:obj",
+	"model": "nostrummagica:models/effect/thorn0.obj",
+	"textures": {
+	}
+}
