@@ -32,6 +32,7 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.IStructurePieceType;
 import net.minecraft.world.gen.feature.structure.Structure;
@@ -84,6 +85,15 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 //	public int getSize() {
 //		return 8;
 //	}
+
+	/**
+	 * Generation stage for when to generate the structure. there are 10 stages you can pick from!
+	 * This surface structure stage places the structure before plants and ores are generated.
+	 */
+	@Override
+	public GenerationStage.Decoration getDecorationStage() {
+		return GenerationStage.Decoration.SURFACE_STRUCTURES;
+	}
 	
 	// What is basically an 'instance' of the struct in MC gen. Doesn't have to do much besides generate logical dungeon and populate children list.
 	public static class Start extends StructureStart<NoFeatureConfig> {

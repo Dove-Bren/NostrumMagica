@@ -200,10 +200,14 @@ public class NostrumTags {
 		
 		public static final ITag.INamedTag<Item> SilverIngot = forgeTag(TAG_SILVER_INGOT);
 		
-		public static final ITag.INamedTag<Item> TransmutableItem = tag(TAG_TRANSMUTABLE_ITEM);
+		public static final ITag.INamedTag<Item> TransmutableItem = tagOptional(TAG_TRANSMUTABLE_ITEM);
 		
 		private static ITag.INamedTag<Item> tag(String path) {
 			return ItemTags.makeWrapperTag(new ResourceLocation(NostrumMagica.MODID, path).toString());
+		}
+		
+		private static ITag.INamedTag<Item> tagOptional(String path) {
+			return ItemTags.createOptional(new ResourceLocation(NostrumMagica.MODID, path));
 		}
 		
 		private static ITag.INamedTag<Item> forgeTag(String name) {
@@ -213,7 +217,7 @@ public class NostrumTags {
 				return (ITag.INamedTag<Item>) found;
 			}
 			
-			return ItemTags.makeWrapperTag(loc.toString());
+			return ItemTags.createOptional(loc);
 		}
 	}
 	

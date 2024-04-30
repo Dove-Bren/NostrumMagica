@@ -146,6 +146,7 @@ import com.smanzana.nostrummagica.trials.TrialWind;
 import com.smanzana.nostrummagica.trials.WorldTrial;
 import com.smanzana.nostrummagica.utils.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
+import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
@@ -156,6 +157,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
@@ -180,6 +182,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -197,8 +200,8 @@ public class ModInit {
 		
 		// EARLY phase:
 		////////////////////////////////////////////
-		registerShapes();
-    	registerTriggers();
+//		registerShapes(); Should be here, but end up driving what items are created and have to be called super early!
+//    	registerTriggers();
 		
     	// NOTE: These two registering methods are on the regular gameplay BUS,
     	// because they depend on data and re-fire when data is reloaded?
@@ -250,6 +253,7 @@ public class ModInit {
 	
 	private static final void preinit() {
 		NetworkHandler.getInstance();
+		NostrumDimensions.init();
 	}
 	
 	private static final void init() {
@@ -2109,14 +2113,20 @@ public class ModInit {
 		// NostrumResearchTab tab, Size size, int x, int y, boolean hidden, ItemStack
 		// icon
 	}
-	
-	private static void registerShapes() {
+
+	@SubscribeEvent(priority=EventPriority.HIGH)
+	public static void registerShapes(RegistryEvent.Register<Item> event) {
+		// Note: these are happening in the register<item> phase because they drive what items get
+		// generated!
     	SpellShape.register(SingleShape.instance());
     	SpellShape.register(AoEShape.instance());
     	SpellShape.register(ChainShape.instance());
     }
     
-    private static void registerTriggers() {
+	@SubscribeEvent(priority=EventPriority.HIGH)
+    public static void registerTriggers(RegistryEvent.Register<Item> event) {
+		// Note: these are happening in the register<item> phase because they drive what items get
+		// generated!
     	SpellTrigger.register(SelfTrigger.instance());
     	SpellTrigger.register(TouchTrigger.instance());
     	SpellTrigger.register(AITargetTrigger.instance());
@@ -2239,6 +2249,11 @@ public class ModInit {
 
 			@Override
 			protected void apply(Object objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+				NostrumMagica.logger.info("Got data reload notification");
+				if (ServerLifecycleHooks.getCurrentServer() == null) {
+					NostrumMagica.logger.info("Ignoring data reload with no server");
+					return;
+				}
 				RitualRegistry.instance().reloadRituals();
 			}
 		});
