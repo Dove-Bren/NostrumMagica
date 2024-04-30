@@ -1,18 +1,12 @@
-{
-    "forge_marker": 1,
-    "defaults": {
-        "model": "nostrummagica:block/logic_door"
-    },
-    "variants": {
-        "facing": {
-            "north": {},
-            "south": {},
-            "east": {"y"=90},
-            "west": {"y"=90}
-        },
-        "master": {
-            "true": {},
-            "false": {}
-        }
-    }
+{	
+	"variants": {
+		"facing=north,master=false": { "model": "nostrummagica:block/logic_door" },
+		"facing=north,master=true": { "model": "nostrummagica:block/logic_door" },
+		"facing=south,master=false": { "model": "nostrummagica:block/logic_door" },
+		"facing=south,master=true": { "model": "nostrummagica:block/logic_door" },
+		"facing=east,master=false": { "model": "nostrummagica:block/logic_door", "y":90 },
+		"facing=east,master=true": { "model": "nostrummagica:block/logic_door", "y":90 },
+		"facing=west,master=false": { "model": "nostrummagica:block/logic_door", "y":90 },
+		"facing=west,master=true": { "model": "nostrummagica:block/logic_door", "y":90 }
+	}
 }

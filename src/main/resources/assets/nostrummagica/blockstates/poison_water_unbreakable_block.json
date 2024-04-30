@@ -1,5 +1,5 @@
 {
-	"variants": {
-        "": { "model": "forge:block/fluid" }
+    "variants": {
+        "": { "model": "nostrummagica:block/poison_water" }
     }
 }

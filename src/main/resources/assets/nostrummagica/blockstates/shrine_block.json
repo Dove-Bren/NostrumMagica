@@ -1,14 +1,6 @@
 {
-	"forge_marker": 1,
-	"defaults": {
-		"model": "nostrummagica:block/pedestal",
-		"x": 270,
-		"textures": {
-			"particle": "nostrummagica:block/stone_generic1"
-		}
-	},
     "variants": {
-        "exhausted=false": { "x": 270 },
-        "exhausted=true": { "x": 270 }
+        "exhausted=false": { "model": "nostrummagica:block/pedestal", "x": 270 },
+        "exhausted=true": { "model": "nostrummagica:block/pedestal", "x": 270 }
     }
 }

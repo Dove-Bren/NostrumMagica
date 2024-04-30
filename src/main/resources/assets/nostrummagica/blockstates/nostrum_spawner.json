@@ -1,37 +1,31 @@
 {
-    "forge_marker": 1,
-    "defaults": {
-        "model": "nostrummagica:block/spawner"
-    },
     "variants": {
-        "mob": {
-            "golem_earth": {
-                
-            },
-            "golem_fire": {
-                
-            },
-            "golem_ice": {
-                
-            },
-            "golem_lightning": {
-                
-            },
-            "golem_physical": {
-                
-            },
-            "golem_ender": {
-                
-            },
-            "golem_wind": {
-                
-            },
-            "dragon_red": {
-                
-            },
-			"plant_boss": {
-					
-			}
+		"mob=golem_earth": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_fire": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_ice": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_lightning": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_physical": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_ender": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_wind": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=dragon_red": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=plant_boss": {
+				"model": "nostrummagica:block/spawner"
 		}
-    }
+	}
 }

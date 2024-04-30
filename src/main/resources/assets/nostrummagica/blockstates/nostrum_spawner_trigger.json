@@ -1,45 +1,60 @@
 {
-    "forge_marker": 1,
-    "defaults": {
-        "model": "nostrummagica:block/spawner"
-    },
     "variants": {
-        "mob": {
-            "golem_earth": {
-                
-            },
-            "golem_fire": {
-                
-            },
-            "golem_ice": {
-                
-            },
-            "golem_lightning": {
-                
-            },
-            "golem_physical": {
-                
-            },
-            "golem_ender": {
-                
-            },
-            "golem_wind": {
-                
-            },
-            "dragon_red": {
-                
-            },
-            "plant_boss": {
-                
-            }
-        },
-		"triggered": {
-			"false": {
-				
-			},
-			"true": {
-				"model": "nostrummagica:block/none"
-			}
+		"mob=golem_earth,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_fire,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_ice,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_lightning,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_physical,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_ender,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=golem_wind,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=dragon_red,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		"mob=plant_boss,triggered=false": {
+			"model": "nostrummagica:block/spawner"
+		},
+		
+		
+		"mob=golem_earth,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=golem_fire,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=golem_ice,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=golem_lightning,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=golem_physical,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=golem_ender,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=golem_wind,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=dragon_red,triggered=true": {
+			"model": "nostrummagica:block/none"
+		},
+		"mob=plant_boss,triggered=true": {
+			"model": "nostrummagica:block/none"
 		}
-    }
+	}
 }

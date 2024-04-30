@@ -1,19 +1,14 @@
-{	
-	"forge_marker": 1,
-    "defaults": {
-        "model": "nostrummagica:block/active_hopper_off"
-    },
+{
     "variants": {
-        "enabled": {
-            "true": {"model": "nostrummagica:block/active_hopper_on"},
-            "false": {}
-        },
-        "facing": {
-            "north": {"x": 90, "y":180},
-            "east": {"x": 90, "y": 270},
-            "south": {"x": 90, "y": 0},
-            "west": {"x": 90, "y": 90},
-			"down": {}
-        }
-    }
+		"enabled=false,facing=north": {"model": "nostrummagica:block/active_hopper_off", "x": 90, "y":180},
+		"enabled=false,facing=east": {"model": "nostrummagica:block/active_hopper_off", "x": 90, "y": 270},
+		"enabled=false,facing=south": {"model": "nostrummagica:block/active_hopper_off", "x": 90, "y": 0},
+		"enabled=false,facing=west": {"model": "nostrummagica:block/active_hopper_off", "x": 90, "y": 90},
+		"enabled=false,facing=down": {"model": "nostrummagica:block/active_hopper_off"},
+		"enabled=true,facing=north": {"model": "nostrummagica:block/active_hopper_on", "x": 90, "y":180},
+		"enabled=true,facing=east": {"model": "nostrummagica:block/active_hopper_on", "x": 90, "y": 270},
+		"enabled=true,facing=south": {"model": "nostrummagica:block/active_hopper_on", "x": 90, "y": 0},
+		"enabled=true,facing=west": {"model": "nostrummagica:block/active_hopper_on", "x": 90, "y": 90},
+		"enabled=true,facing=down": {"model": "nostrummagica:block/active_hopper_on"}
+	}
 }
