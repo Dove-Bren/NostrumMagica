@@ -13,9 +13,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
-import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
 import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -48,7 +45,6 @@ import com.smanzana.nostrummagica.utils.Projectiles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.SpiderEntity;
@@ -71,7 +67,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -940,18 +935,6 @@ public class PlayerListener {
 						originalSize = addedItem.getCount();
 					}
 				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public void onAttributeConstruct(EntityAttributeModificationEvent event) {
-		for (EntityType<? extends LivingEntity> type : event.getTypes()) {
-			event.add(type, AttributeMagicResist.instance());
-			event.add(type, AttributeMagicPotency.instance());
-			event.add(type, AttributeManaRegen.instance());
-			for (EMagicElement elem : EMagicElement.values()) {
-				event.add(type, AttributeMagicReduction.instance(elem));
 			}
 		}
 	}

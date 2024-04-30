@@ -10,7 +10,8 @@ import net.minecraft.entity.ai.attributes.RangedAttribute;
 
 public class AttributeMagicReduction extends RangedAttribute {
 	
-	private static final String unlocalized_name_prefix = NostrumMagica.MODID + ".magic_reduct_";
+	public static final String ID_PREFIX = "magic_reduct_";
+	private static final String unlocalized_name_prefix = NostrumMagica.MODID + "." + ID_PREFIX;
 	
 	private static Map<EMagicElement, AttributeMagicReduction> instances = new EnumMap<>(EMagicElement.class);
 	
@@ -29,6 +30,7 @@ public class AttributeMagicReduction extends RangedAttribute {
 	private AttributeMagicReduction(EMagicElement elem) {
 		super(GetUnlocName(elem), 0, -20.0D, 20.0D);
 		this.element = elem;
+		this.setShouldWatch(true);
 	}
 	
 	public EMagicElement getElement() {

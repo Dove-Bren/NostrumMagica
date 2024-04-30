@@ -138,7 +138,9 @@ public class Transmutation {
 		// If dedicated server, use loaded world seed if there is one.
 		if (NostrumMagica.instance.proxy.getPlayer() != null) {
 			World world = NostrumMagica.instance.proxy.getPlayer().world;
-			//return world.getServer().getWorld(DimensionType.OVERWORLD).getSeed();
+			if (world == null || world.getServer() == null) {
+				return -1;
+			}
 			return world.getServer().getWorld(World.OVERWORLD).getSeed(); // Not sure if seed is always the same? might change CLIENT list per dimension? lol
 		} else {
 			try {
