@@ -46,6 +46,7 @@ public class TeleportRune extends Block  {
 				.hardnessAndResistance(0.5f, 5.0f)
 				.sound(SoundType.STONE)
 				.tickRandomly()
+				.notSolid()
 				);
 	}
 	

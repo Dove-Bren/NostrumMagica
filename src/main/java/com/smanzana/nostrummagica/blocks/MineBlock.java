@@ -51,6 +51,7 @@ public class MineBlock extends Block {
 				.noDrops()
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(3)
+				.notSolid()
 				);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP));

@@ -31,6 +31,7 @@ public class MagicWall extends BreakableBlock {
 				.sound(SoundType.GLASS)
 				.tickRandomly()
 				.noDrops()
+				.notSolid()
 				);
 		//this.setLightOpacity(2);
 		

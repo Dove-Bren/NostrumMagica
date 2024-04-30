@@ -41,6 +41,7 @@ public class CursedIce extends BreakableBlock {
 				.sound(SoundType.GLASS)
 				.tickRandomly()
 				.noDrops()
+				.notSolid()
 				);
 		//this.setLightOpacity(14);
 		

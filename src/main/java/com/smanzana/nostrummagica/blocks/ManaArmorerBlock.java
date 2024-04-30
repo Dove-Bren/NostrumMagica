@@ -44,6 +44,7 @@ public class ManaArmorerBlock extends Block {
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(1)
+				.notSolid()
 				);
 	}
 	

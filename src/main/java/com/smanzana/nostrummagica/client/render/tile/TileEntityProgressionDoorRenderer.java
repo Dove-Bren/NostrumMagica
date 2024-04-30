@@ -90,14 +90,14 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 				final float v2 = (vy2 + (verticalRadius)) / (verticalRadius * 2);
 				
 				// For znegative, add in ZN, HIGH ANGLE, LOW ANGLE
-				buffer.pos(transform, 0, 0, -depth).tex(.5f, .5f).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, 0, 0, -depth).tex(.5f, .5f).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
 				
 				// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
-				buffer.pos(transform, 0, 0, depth).tex(.5f, .5f).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, 0, 0, depth).tex(.5f, .5f).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
 			}
 			matrixStackIn.pop();
 		}
@@ -153,10 +153,10 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 					float vy = (float) (Math.sin(effAngle) * radius);
 					
 					// +z
-					buffer.pos(transform, vx, vy + plateHalfLength, 0.0005f).tex(0.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
-					buffer.pos(transform, vx + plateHalfLength, vy, 0.0005f).tex(1.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
-					buffer.pos(transform, vx, vy - plateHalfLength, 0.0005f).tex(1.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
-					buffer.pos(transform, vx - plateHalfLength, vy, 0.0005f).tex(0.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx, vy + plateHalfLength, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.pos(transform, vx + plateHalfLength, vy, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.pos(transform, vx, vy - plateHalfLength, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.pos(transform, vx - plateHalfLength, vy, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
 					
 					
 					// Draw icon
@@ -167,10 +167,10 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 						color = new float[] {1, 1, 1, .8f};
 					
 					// +z
-					buffer.pos(transform, vx + imageHalfLength, vy - imageHalfLength, 0.0f).tex(0.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
-					buffer.pos(transform, vx - imageHalfLength, vy - imageHalfLength, 0.0f).tex(1.0f, 1.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
-					buffer.pos(transform, vx - imageHalfLength, vy + imageHalfLength, 0.0f).tex(1.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
-					buffer.pos(transform, vx + imageHalfLength, vy + imageHalfLength, 0.0f).tex(0.0f, 0.0f).normal(normal, 0, 0, -1).lightmap(combinedLightIn).overlay(combinedOverlayIn).color(color[0], color[1], color[2], color[3]).endVertex();
+					buffer.pos(transform, vx + imageHalfLength, vy - imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.pos(transform, vx - imageHalfLength, vy - imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.pos(transform, vx - imageHalfLength, vy + imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.pos(transform, vx + imageHalfLength, vy + imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
 					
 				}
 				angle += angleDiff;

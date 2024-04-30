@@ -28,6 +28,7 @@ public class ObeliskPortal extends TeleportationPortal {
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
 				.setLightLevel((state) -> 14)
+				.notSolid()
 				);
 	}
 	
