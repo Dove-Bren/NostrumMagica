@@ -60,10 +60,10 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 		final Matrix3f normal = matrixStackIn.getLast().getNormal();
 		
 		// North
-		buffer.pos(transform, .5f, .5f, 0f).tex(umax,vmax).normal(normal, .5773f, .5773f, -.5773f).lightmap(packedLightIn).overlay(packedOverlayIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, .5f, -.5f, 0f).tex(umax,vmin).normal(normal, .5773f, -.5773f, -.5773f).lightmap(packedLightIn).overlay(packedOverlayIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, -.5f, -.5f, 0f).tex(umin,vmin).normal(normal, -.5773f, -.5773f, -.5773f).lightmap(packedLightIn).overlay(packedOverlayIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, -.5f, .5f, 0f).tex(umin,vmax).normal(normal, -.5773f, .5773f, -.5773f).lightmap(packedLightIn).overlay(packedOverlayIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, .5f, .5f, 0f).color(red, green, blue, alpha).tex(umax,vmax).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, .5773f, .5773f, -.5773f).endVertex();
+		buffer.pos(transform, .5f, -.5f, 0f).color(red, green, blue, alpha).tex(umax,vmin).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, .5773f, -.5773f, -.5773f).endVertex();
+		buffer.pos(transform, -.5f, -.5f, 0f).color(red, green, blue, alpha).tex(umin,vmin).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, -.5773f, -.5773f, -.5773f).endVertex();
+		buffer.pos(transform, -.5f, .5f, 0f).color(red, green, blue, alpha).tex(umin,vmax).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, -.5773f, .5773f, -.5773f).endVertex();
 		
 //		// South
 //		buffer.pos(-.5, .5, .01).tex(umin,vmax).normal(-.5773f, .5773f, .5773f).endVertex();

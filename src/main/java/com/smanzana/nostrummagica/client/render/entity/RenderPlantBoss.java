@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.utils.ColorUtil;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
@@ -90,58 +91,58 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 		// North
 		umin = uBase;
 		umax = umin + uLen;
-		buffer.pos(transform, maxd, maxd, mind).tex(umax,vmin).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, mind).tex(umax,vmax).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, mind).tex(umin,vmax).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, maxd, mind).tex(umin,vmin).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).color(red, green, blue, alpha).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, minn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
+		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
 		
 		// East
 		umin += uLen;
 		umax += uLen;
-		buffer.pos(transform, maxd, maxd, maxd).tex(umax,vmax).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, maxd).tex(umin,vmax).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, mind).tex(umin,vmin).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, maxd, mind).tex(umax,vmin).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).color(red, green, blue, alpha).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, minn).endVertex();
 		
 		// South
 		umin += uLen;
 		umax += uLen;
-		buffer.pos(transform, mind, maxd, maxd).tex(umin,vmax).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).tex(umin,vmin).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, maxd).tex(umax,vmin).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, maxd, maxd).tex(umax,vmax).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
 		
 		// West
 		umin += uLen;
 		umax += uLen;
-		buffer.pos(transform, mind, maxd, mind).tex(umin,vmin).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, mind).tex(umax,vmin).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).tex(umax,vmax).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, maxd, maxd).tex(umin,vmax).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
+		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
 		
 //		// North
-//		buffer.pos(hMin, yMax, hMin).tex(umin,vmax).normal(0, 0, -1).endVertex();
-//		buffer.pos(hMin, yMin, hMin).tex(umin,vmin).normal(0, 0, -1).endVertex();
-//		buffer.pos(hMax, yMin, hMin).tex(umax,vmin).normal(0, 0, -1).endVertex();
-//		buffer.pos(hMax, yMax, hMin).tex(umax,vmax).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMin, yMax, hMin).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMin, yMin, hMin).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMax, yMin, hMin).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, -1).endVertex();
+//		buffer.pos(hMax, yMax, hMin).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, -1).endVertex();
 //		
 //		// East
-//		buffer.pos(hMax, yMax, hMin).tex(umin,vmax).normal(1, 0, 0).endVertex();
-//		buffer.pos(hMax, yMin, hMin).tex(umin,vmin).normal(1, 0, 0).endVertex();
-//		buffer.pos(hMax, yMin, hMax).tex(umax,vmin).normal(1, 0, 0).endVertex();
-//		buffer.pos(hMax, yMax, hMax).tex(umax,vmax).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMax, hMin).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMin, hMin).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMin, hMax).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(1, 0, 0).endVertex();
+//		buffer.pos(hMax, yMax, hMax).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(1, 0, 0).endVertex();
 //		
 //		// South
-//		buffer.pos(hMax, yMax, hMax).tex(umin,vmax).normal(0, 0, 1).endVertex();
-//		buffer.pos(hMax, yMin, hMax).tex(umin,vmin).normal(0, 0, 1).endVertex();
-//		buffer.pos(hMin, yMin, hMax).tex(umax,vmin).normal(0, 0, 1).endVertex();
-//		buffer.pos(hMin, yMax, hMax).tex(umax,vmax).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMax, yMax, hMax).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMax, yMin, hMax).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMin, yMin, hMax).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, 1).endVertex();
+//		buffer.pos(hMin, yMax, hMax).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(0, 0, 1).endVertex();
 //		
 //		// West
-//		buffer.pos(hMin, yMax, hMax).tex(umin,vmax).normal(-1, 0, 0).endVertex();
-//		buffer.pos(hMin, yMin, hMax).tex(umin,vmin).normal(-1, 0, 0).endVertex();
-//		buffer.pos(hMin, yMin, hMin).tex(umax,vmin).normal(-1, 0, 0).endVertex();
-//		buffer.pos(hMin, yMax, hMin).tex(umax,vmax).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMax, hMax).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMin, hMax).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMin, hMin).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(-1, 0, 0).endVertex();
+//		buffer.pos(hMin, yMax, hMin).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(-1, 0, 0).endVertex();
 			
 		matrixStackIn.pop();
 	}
@@ -194,16 +195,16 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 		// NOTE: nromals are wrong
 		
 		// North
-		buffer.pos(transform, hMin, yMax, 0).tex(umin,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, hMin, yMin, 0).tex(umin,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, hMax, yMin, 0).tex(umax,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, hMax, yMax, 0).tex(umax,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, hMin, yMax, 0).color(red, green, blue, alpha).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
+		buffer.pos(transform, hMin, yMin, 0).color(red, green, blue, alpha).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
+		buffer.pos(transform, hMax, yMin, 0).color(red, green, blue, alpha).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
+		buffer.pos(transform, hMax, yMax, 0).color(red, green, blue, alpha).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
 		
 		// East
-		buffer.pos(transform, 0, yMax, hMin).tex(umin,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, 0, yMin, hMin).tex(umin,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, 0, yMin, hMax).tex(umax,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, 0, yMax, hMax).tex(umax,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, 0, yMax, hMin).color(red, green, blue, alpha).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
+		buffer.pos(transform, 0, yMin, hMin).color(red, green, blue, alpha).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
+		buffer.pos(transform, 0, yMin, hMax).color(red, green, blue, alpha).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
+		buffer.pos(transform, 0, yMax, hMax).color(red, green, blue, alpha).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
 
 		
 		if (treeType == PlantBossTreeType.ELEMENTAL) {
@@ -213,18 +214,18 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 			// North
 			umin = uOrbBase;
 			umax = umin + uLen;
-			buffer.pos(transform, hMin, yMax, 0).tex(umin,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-			buffer.pos(transform, hMin, yMin, 0).tex(umin,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-			buffer.pos(transform, hMax, yMin, 0).tex(umax,vmin).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-			buffer.pos(transform, hMax, yMax, 0).tex(umax,vmax).normal(normal, 0, 0, -1).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, hMin, yMax, 0).color(color[0], color[1], color[2], color[3]).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
+			buffer.pos(transform, hMin, yMin, 0).color(color[0], color[1], color[2], color[3]).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
+			buffer.pos(transform, hMax, yMin, 0).color(color[0], color[1], color[2], color[3]).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
+			buffer.pos(transform, hMax, yMax, 0).color(color[0], color[1], color[2], color[3]).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1).endVertex();
 			
 			// East
 			umin = uOrbBase;
 			umax = umin + uLen;
-			buffer.pos(transform, 0, yMax, hMin).tex(umin,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-			buffer.pos(transform, 0, yMin, hMin).tex(umin,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-			buffer.pos(transform, 0, yMin, hMax).tex(umax,vmin).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-			buffer.pos(transform, 0, yMax, hMax).tex(umax,vmax).normal(normal, 1, 0, 0).lightmap(packedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+			buffer.pos(transform, 0, yMax, hMin).color(color[0], color[1], color[2], color[3]).tex(umin,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
+			buffer.pos(transform, 0, yMin, hMin).color(color[0], color[1], color[2], color[3]).tex(umin,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
+			buffer.pos(transform, 0, yMin, hMax).color(color[0], color[1], color[2], color[3]).tex(umax,vmin).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
+			buffer.pos(transform, 0, yMax, hMax).color(color[0], color[1], color[2], color[3]).tex(umax,vmax).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 1, 0, 0).endVertex();
 		}
 		
 		matrixStackIn.pop();

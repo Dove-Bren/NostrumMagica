@@ -274,14 +274,19 @@ public final class RenderFuncs {
 	}
 	
 	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
+		
+	}
+	
+	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		final float f = 1.0F / tileWidth;
 		final float f1 = 1.0F / tileHeight;
 		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
 		
-		buffer.pos(transform, x, y + height, 0.0f)			.tex(u * f, (v + vHeight) * f1)				.color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, x + width, y + height, 0.0f)	.tex((u + uWidth) * f, (v + vHeight) * f1)	.color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, x + width, y, 0.0f)			.tex((u + uWidth) * f, v * f1)				.color(red, green, blue, alpha).endVertex();
-		buffer.pos(transform, x, y, 0.0f)					.tex((u * f), (v * f1))						.color(red, green, blue, alpha).endVertex();
+		buffer.pos(transform, x, y + height, 0.0f).color(red, green, blue, alpha).tex(u * f, (v + vHeight) * f1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 0, 1).endVertex();
+		buffer.pos(transform, x + width, y + height, 0.0f).color(red, green, blue, alpha).tex((u + uWidth) * f, (v + vHeight) * f1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 0, 1).endVertex();
+		buffer.pos(transform, x + width, y, 0.0f).color(red, green, blue, alpha).tex((u + uWidth) * f, v * f1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 0, 1).endVertex();
+		buffer.pos(transform, x, y, 0.0f).color(red, green, blue, alpha).tex((u * f), (v * f1)).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 0, 1).endVertex();
 	}
 	
 	public static void drawRect(MatrixStack stack, int minX, int minY, int maxX, int maxY, int colorARGB) {
@@ -362,10 +367,10 @@ public final class RenderFuncs {
 		final float uMax = 1;
 		final float vMin = 0;
 		final float vMax = 1;
-		buffer.pos(transform, avector3f[0].getX(), avector3f[0].getY(), avector3f[0].getZ()).normal(normal, 0, 0, 1).tex(uMax, vMax).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
-		buffer.pos(transform, avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ()).normal(normal, 0, 0, 1).tex(uMax, vMin).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
-		buffer.pos(transform, avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ()).normal(normal, 0, 0, 1).tex(uMin, vMin).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
-		buffer.pos(transform, avector3f[3].getX(), avector3f[3].getY(), avector3f[3].getZ()).normal(normal, 0, 0, 1).tex(uMin, vMax).color(red, green, blue, alpha).lightmap(combinedLightmapIn).overlay(combinedOverlayIn).endVertex();
+		buffer.pos(transform, avector3f[0].getX(), avector3f[0].getY(), avector3f[0].getZ()).color(red, green, blue, alpha).tex(uMax, vMax).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
+		buffer.pos(transform, avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ()).color(red, green, blue, alpha).tex(uMax, vMin).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
+		buffer.pos(transform, avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ()).color(red, green, blue, alpha).tex(uMin, vMin).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
+		buffer.pos(transform, avector3f[3].getX(), avector3f[3].getY(), avector3f[3].getZ()).color(red, green, blue, alpha).tex(uMin, vMax).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
 		
 //		buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
 //			.tex(0, 0)
@@ -426,11 +431,13 @@ public final class RenderFuncs {
 				);
 		stack.pop();
 	}
-	
+
+	// Note: renders in ENTITY vertex formate
 	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
 		drawUnitCube(stack, buffer, 0, 1, 0, 1, packedLightIn, red, green, blue, alpha);
 	}
 	
+	// Note: renders in ENTITY vertex formate
 	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, float minU, float maxU, float minV, float maxV, int packedLightIn,
 			float red, float green, float blue, float alpha) {
 		
@@ -444,40 +451,40 @@ public final class RenderFuncs {
 		final Matrix3f normal = stack.getLast().getNormal();
 		
 		// Top
-		buffer.pos(transform, mind, maxd, mind).tex(minU,minV).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, maxd, maxd).tex(minU,maxV).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, maxd, maxd).tex(maxU,maxV).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, maxd, mind).tex(maxU,minV).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, minn).endVertex();
 		
 		// North
-		buffer.pos(transform, maxd, maxd, mind).tex(maxU,minV).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, mind).tex(maxU,maxV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, mind).tex(minU,maxV).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, maxd, mind).tex(minU,minV).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, minn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(maxU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
+		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(minU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
 		
 		// East
-		buffer.pos(transform, maxd, maxd, maxd).tex(maxU,maxV).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, maxd).tex(minU,maxV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, mind).tex(minU,minV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, maxd, mind).tex(maxU,minV).normal(normal, maxn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
+		buffer.pos(transform, maxd, maxd, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, minn).endVertex();
 		
 		// South
-		buffer.pos(transform, mind, maxd, maxd).tex(minU,maxV).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).tex(minU,minV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, maxd).tex(maxU,minV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, maxd, maxd).tex(maxU,maxV).normal(normal, maxn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(minU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(maxU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
 		
 		// West
-		buffer.pos(transform, mind, maxd, mind).tex(minU,minV).normal(normal, minn, maxn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, mind).tex(maxU,minV).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).tex(maxU,maxV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, maxd, maxd).tex(minU,maxV).normal(normal, minn, maxn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
+		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
 		
 		// Bottom
-		buffer.pos(transform, mind, mind, mind).tex(maxU,minV).normal(normal, minn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, mind).tex(minU,minV).normal(normal, maxn, minn, minn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, maxd, mind, maxd).tex(minU,maxV).normal(normal, maxn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).tex(maxU,maxV).normal(normal, minn, minn, maxn).color(red, green, blue, alpha).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
 	}
 	
 	/**
@@ -530,7 +537,7 @@ public final class RenderFuncs {
 				float u = (float) ((ux + (horizontalRadius)) / (horizontalRadius * 2));
 				float v = (float) ((uy + (verticalRadius)) / (verticalRadius * 2));
 				
-				buffer.pos(transform, vx, vy, 0f).tex(u, v).normal(normal, 0, 0, -1f).lightmap(packedLightIn).color(red, green, blue, alpha).endVertex();
+				buffer.pos(transform, vx, vy, 0f).color(red, green, blue, alpha).tex(u, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0, 0, -1f).endVertex();
 				
 			}
 		}

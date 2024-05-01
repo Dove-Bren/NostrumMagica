@@ -22,6 +22,7 @@ public class ChalkBlock extends Block {
 				.hardnessAndResistance(.01f)
 				.setLightLevel((state) -> 1)
 				.noDrops()
+				.notSolid()
 				);
 	}
 	

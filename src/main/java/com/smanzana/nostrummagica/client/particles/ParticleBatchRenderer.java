@@ -63,7 +63,7 @@ public class ParticleBatchRenderer {
 					
 					mc.getTextureManager().bindTexture(next.getTexture());
 					next.setupBatchedRender();
-					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
 				}
 				
 				next.renderBatched(buffer, renderInfo, partialTicks);

@@ -47,6 +47,7 @@ public class SwitchBlock extends Block {
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
 				.setLightLevel((state) -> 8)
+				.notSolid()
 				);
 	}
 	

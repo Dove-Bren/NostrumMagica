@@ -7,7 +7,9 @@ import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 	
@@ -30,6 +32,8 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		
 		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		final Vector3f[] normals = {new Vector3f(0.5774f, -0.5774f, 0.5774f), new Vector3f(-0.5774f, -0.5774f, 0.5774f), new Vector3f(-0.5774f, -0.5774f, -0.5774f), new Vector3f(0.5774f, -0.5774f, -0.5774f)};
 		
 		matrixStackIn.push();
 		matrixStackIn.translate(0, .6, 0);
@@ -41,6 +45,7 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 			final float vy1 = (float) (Math.sin(angle) * height);
 			final float u1 = (vx1 + (width)) / (width * 2);
 			final float v1 = (vy1 + (height)) / (height * 2);
+			final Vector3f n1 = normals[i];
 			
 			angle = (2*Math.PI) * ((double) ((i+1)%4) / (double) 4);
 			
@@ -48,16 +53,17 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 			final float vy2 = (float) (Math.sin(angle) * height);
 			final float u2 = (vx2 + (width)) / (width * 2);
 			final float v2 = (vy2 + (height)) / (height * 2);
+			final Vector3f n2 = normals[(i+1)%4];
 			
 			// For znegative, add in ZN, HIGH ANGLE, LOW ANGLE
-			bufferIn.pos(transform, 0, 0, -width).tex(.5f, .5f).color(red, green, blue, alpha).endVertex();
-			bufferIn.pos(transform, vx2, vy2, 0).tex(u2, v2).color(red, green, blue, alpha).endVertex();
-			bufferIn.pos(transform, vx1, vy1, 0).tex(u1, v1).color(red, green, blue, alpha).endVertex();
+			bufferIn.pos(transform, 0, 0, -width).color(red, green, blue, alpha).tex(.5f, .5f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n1.getX(), n1.getY(), n1.getZ()).endVertex();
+			bufferIn.pos(transform, vx2, vy2, 0).color(red, green, blue, alpha).tex(u2, v2).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n1.getX(), n1.getY(), n1.getZ()).endVertex();
+			bufferIn.pos(transform, vx1, vy1, 0).color(red, green, blue, alpha).tex(u1, v1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n1.getX(), n1.getY(), n1.getZ()).endVertex();
 			
 			// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
-			bufferIn.pos(transform, 0, 0, width).tex(.5f, .5f).color(red, green, blue, alpha).endVertex();
-			bufferIn.pos(transform, vx1, vy1, 0).tex(u1, v1).color(red, green, blue, alpha).endVertex();
-			bufferIn.pos(transform, vx2, vy2, 0).tex(u2, v2).color(red, green, blue, alpha).endVertex();
+			bufferIn.pos(transform, 0, 0, width).color(red, green, blue, alpha).tex(.5f, .5f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
+			bufferIn.pos(transform, vx1, vy1, 0).color(red, green, blue, alpha).tex(u1, v1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
+			bufferIn.pos(transform, vx2, vy2, 0).color(red, green, blue, alpha).tex(u2, v2).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
 		}
 		
 //		wr.pos(0, 0, -width).tex(.5, .5).endVertex();

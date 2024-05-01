@@ -46,10 +46,10 @@ public class RenderSpellBullet extends EntityRenderer<EntitySpellBullet> {
 		Matrix4f transform = matrixStackIn.getLast().getMatrix();
 		Matrix3f normal = matrixStackIn.getLast().getNormal();
 		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(getEntityTexture(entityIn)));
-		buffer.pos(transform, -0.5f, -0.25f, 0.0f).tex(0, 1f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, 0.5f, -0.25f, 0.0f).tex(1f, 1f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, 0.5f, 0.75f, 0.0f).tex(1f, 0f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
-		buffer.pos(transform, -0.5f, 0.75f, 0.0f).tex(0f, 0f).normal(normal, 0.0F, 1.0F, 0.0F).color(color[0], color[1], color[2], color[3]).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).endVertex();
+		buffer.pos(transform, -0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0, 1f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		buffer.pos(transform, 0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1f, 1f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		buffer.pos(transform, 0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1f, 0f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		buffer.pos(transform, -0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0f, 0f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
 		matrixStackIn.pop();
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

@@ -58,7 +58,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ENTITY);
 		
 		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer,
 				-1,

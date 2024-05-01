@@ -435,7 +435,7 @@ public class OverlayRenderer extends AbstractGui {
 					bufferbuilder.pos(transform, 0, event.getWindow().getScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.pos(transform, event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.pos(transform, event.getWindow().getScaledWidth(), 0, depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.pos(transform, 0, 0, depth).endVertex();
+					bufferbuilder.pos(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.finishDrawing();
 					WorldVertexBufferUploader.draw(bufferbuilder);
 					RenderSystem.enableTexture();

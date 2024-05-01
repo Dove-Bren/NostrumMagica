@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.mojang.blaze3d.vertex.VertexBuilderUtils;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
@@ -171,7 +170,11 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 		
 
 		// Render model to two render types so that cage overlays on the regular model
-		IVertexBuilder buffer = VertexBuilderUtils.newDelegate(bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE), bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE));
+		//IVertexBuilder buffer = VertexBuilderUtils.newDelegate(bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE), bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE));
+		// This doesn't work because the buffers happen to be the same under the hood, and causes an exception
+		// So isntead, render twice
+		IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
+		IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
 		
 		matrixStackIn.push();
 
@@ -184,7 +187,8 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 		
 		matrixStackIn.translate(0, .6f, 0); // Should this be earlier?
 		
-		model.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
+		model.render(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
+		model.render(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
 		matrixStackIn.pop();
 	}

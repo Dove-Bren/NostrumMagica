@@ -112,7 +112,7 @@ public class NostrumRenderTypes {
 				.layer(VIEW_OFFSET_Z_LAYERING)
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
-		SWITCH_TRIGGER_BASE = RenderType.makeType(Name("switch_trigger_base"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		SWITCH_TRIGGER_BASE = RenderType.makeType(Name("switch_trigger_base"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(ModelSwitchTrigger.CAGE_TEXT, false, true))
@@ -122,7 +122,7 @@ public class NostrumRenderTypes {
 				.depthTest(DEPTH_EQUAL)
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
-		SWITCH_TRIGGER_CAGE = RenderType.makeType(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_TEX_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		SWITCH_TRIGGER_CAGE = RenderType.makeType(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(TileEntityPortalRenderer.TEX_LOC, false, true))
@@ -131,7 +131,7 @@ public class NostrumRenderTypes {
 				.cull(NO_CULL)
 				.depthTest(NO_DEPTH_TEST)
 			.build(false);
-		NOSTRUM_PORTAL = RenderType.makeType(Name("nostrum_portal"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		NOSTRUM_PORTAL = RenderType.makeType(Name("nostrum_portal"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(TileEntityProgressionDoorRenderer.TEX_GEM_LOC, false, true))
@@ -140,7 +140,7 @@ public class NostrumRenderTypes {
 				.layer(VIEW_OFFSET_Z_LAYERING)
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
-		PROGRESSION_DOOR_LOCK = RenderType.makeType(Name("prog_door_lock"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_TRIANGLES, 64, glState);
+		PROGRESSION_DOOR_LOCK = RenderType.makeType(Name("prog_door_lock"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
 		
 		
 		glState = RenderType.State.getBuilder()
@@ -149,7 +149,7 @@ public class NostrumRenderTypes {
 				.lightmap(LIGHTMAP_ENABLED)
 				.cull(NO_CULL)
 			.build(false);
-		LOCKEDCHEST_LOCK = RenderType.makeType(Name("lockedchest_lock"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_QUADS, 32, glState);
+		LOCKEDCHEST_LOCK = RenderType.makeType(Name("lockedchest_lock"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
@@ -157,6 +157,6 @@ public class NostrumRenderTypes {
 				.lightmap(LIGHTMAP_ENABLED)
 				.cull(NO_CULL)
 			.build(false);
-		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR, GL11.GL_QUADS, 64, glState);
+		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
 	}
 }

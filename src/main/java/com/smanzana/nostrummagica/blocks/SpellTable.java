@@ -45,6 +45,7 @@ public class SpellTable extends HorizontalBlock {
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(1)
+				.notSolid()
 				);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, true)
