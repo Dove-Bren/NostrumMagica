@@ -29,7 +29,7 @@ public class TileEntityAltarRenderer extends TileEntityRenderer<AltarTileEntity>
 		final float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0)));
 		
 		matrixStackIn.push();
-		matrixStackIn.translate(0, 1.25 + yoffset, 0);
+		matrixStackIn.translate(.5, 1.25 + yoffset, .5);
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
 		matrixStackIn.scale(scale, scale, scale);
 		

@@ -35,7 +35,7 @@ public class SpellIcon {
 	}
 	
 	public void render(Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height) {
-		
+		render(mc, matrixStackIn, x, y, width, height, 1f, 1f, 1f, 1f);
 	}
 	
 	public void render(Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, float red, float green, float blue, float alpha) {

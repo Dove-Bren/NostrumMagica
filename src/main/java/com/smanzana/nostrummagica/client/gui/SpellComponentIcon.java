@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -267,8 +268,10 @@ public class SpellComponentIcon {
 //		else
 		{
 			Minecraft.getInstance().getTextureManager().bindTexture(this.getModelLocation());
+			RenderSystem.enableBlend();
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height,
 					red, green, blue, alpha);
+			RenderSystem.disableBlend();
 		}
 		
 		matrixStackIn.pop();

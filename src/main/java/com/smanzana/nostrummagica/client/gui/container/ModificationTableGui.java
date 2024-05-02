@@ -551,12 +551,12 @@ public class ModificationTableGui {
 					shadow = pageShadow;
 				}
 				if (!shadow.isEmpty()) {
-					matrixStackIn.push();
-					matrixStackIn.translate(0, 0, -100);
+					RenderSystem.pushMatrix();
+					RenderSystem.translated(0, 0, -100);
 					mc.getItemRenderer().renderItemIntoGUI(shadow,
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos);
-					matrixStackIn.pop();
+					RenderSystem.popMatrix();
 				}
 			}
 			
@@ -570,12 +570,12 @@ public class ModificationTableGui {
 				final int idx = Math.abs(((int) System.currentTimeMillis() / 1000) % shadows.size());
 				display = shadows.get(idx);
 				
-				matrixStackIn.push();
-				matrixStackIn.translate(0, 0, -100);
+				RenderSystem.pushMatrix();
+				RenderSystem.translated(0, 0, -100);
 				mc.getItemRenderer().renderItemIntoGUI(display,
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET);
-				matrixStackIn.pop();
+				RenderSystem.popMatrix();
 				
 				int color = 0x55FFFFFF;
 				matrixStackIn.push();
@@ -861,8 +861,8 @@ public class ModificationTableGui {
 							x += LARGE_BUTTON_WIDTH;
 						
 						RenderSystem.color3f(tint, tint, tint);
-						blit(matrixStackIn, this.x, this.y, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
-								LARGE_BUTTON_WIDTH, LARGE_BUTTON_HEIGHT, this.width, this.height, 256, 256);
+						blit(matrixStackIn, this.x, this.y, this.width, this.height, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
+								LARGE_BUTTON_WIDTH, LARGE_BUTTON_HEIGHT, 256, 256);
 //						this.drawTexturedModalRect(this.x, this.y,
 //								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
 //								this.width, this.height);

@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderLux extends MobRenderer<EntityLux, ModelLux> {
 
@@ -16,21 +15,12 @@ public class RenderLux extends MobRenderer<EntityLux, ModelLux> {
 		super(renderManagerIn, new ModelLux(), .33f);
 	}
 	
-
-	
-	private float getSwingRot(float swingProgress) {
-		return (float) (Math.sin(Math.PI * 2 * swingProgress) * 30.0);
-	}
-	
 	@Override
 	public void render(EntityLux lux, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		
+		this.entityModel = new ModelLux();
 		
 		matrixStackIn.push();
-		matrixStackIn.translate(0, 1.5 - (-lux.getHeight() / 2), 0);
-		if (!lux.isRoosting()) {
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(getSwingRot(lux.getSwingProgress(partialTicks))));
-		}
+		matrixStackIn.translate(0, (-lux.getHeight() / 4), 0);
 		matrixStackIn.scale(.25f, .25f, .25f);
 		
 		super.render(lux, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

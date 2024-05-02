@@ -251,13 +251,13 @@ public final class RenderFuncs {
 	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
 		// hack for now
 		RenderSystem.color4f(red, green, blue, alpha);
-		drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, blue, v, width, height, textureWidth, textureHeight);
+		drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, u, v, width, height, textureWidth, textureHeight);
 		RenderSystem.color4f(1f, 1f, 1f, 1f);
 	}
 	
 	// Different from the above in that this includes scaling on what's drawn
 	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
-		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, uWidth, v, uWidth, vHeight, width, vHeight, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
+		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, uWidth, vHeight, width, vHeight, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
 	}
 	
 	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
@@ -274,7 +274,9 @@ public final class RenderFuncs {
 	}
 	
 	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
-		
+		final int combinedLight = 15728880;
+		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+		drawScaledCustomSizeModalRect(matrixStackIn, buffer, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, combinedLight, combinedOverlay, red, green, blue, alpha);
 	}
 	
 	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
@@ -558,6 +560,9 @@ public final class RenderFuncs {
 	}
 	
 	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, String info, FontRenderer fontrenderer, int packedLightIn, boolean discrete) {
+		matrixStackIn.push();
+        matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
+		
 		final Minecraft mc = Minecraft.getInstance();
 		final Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
 		float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
@@ -567,6 +572,7 @@ public final class RenderFuncs {
 		if (!discrete) {
 			fontrenderer.renderString(info, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
 		}
+		matrixStackIn.pop();
 	}
 
 	public static void drawSplitString(MatrixStack matrixStackIn, FontRenderer fonter, String str, int x, int y, int width, int infoColor) {
@@ -574,25 +580,40 @@ public final class RenderFuncs {
 		int lineWidth = fonter.getStringWidth(str);
 		while (lineWidth > width) {
 			int subWidth = 0;
-			StringBuffer buffer = new StringBuffer();
+			StringBuffer lineBuffer = new StringBuffer();
+			StringBuffer wordBuffer = new StringBuffer();
 			int i;
+			boolean hasWord = false;
 			
 			for (i = 0; i < str.length(); i++) {
 				final char c = str.charAt(i);
-				int charWidth = fonter.getStringWidth("" + c);
-				
-				if (i == 0 || subWidth + charWidth < width) {
-					buffer.append(c);
-				}
-				
-				if (subWidth + charWidth >= width) {
-					break;
+				if (Character.isSpaceChar(c)) {
+					wordBuffer.append(c);
+					lineBuffer.append(wordBuffer);
+					wordBuffer = new StringBuffer();
+					
+					subWidth = fonter.getStringWidth(lineBuffer.toString());
+					hasWord = true;
+				} else {
+					wordBuffer.append(c);
+					
+					if (subWidth + fonter.getStringWidth(wordBuffer.toString()) >= width) {
+						if (!hasWord) {
+							// Didn't find single word to split, so just add what we have and tear the string
+							lineBuffer.append(wordBuffer);
+						} else {
+							// Word is too big and hasn't hit a space, so ditch it and just take current linebuffer and roll back i
+							i -= wordBuffer.length()-1; // -1 chops off space
+						}
+						break;
+					}
 				}
 			}
 			
-			fonter.drawString(matrixStackIn, buffer.toString(), x, y + offset, infoColor);
+			fonter.drawString(matrixStackIn, lineBuffer.toString(), x, y + offset, infoColor);
 			str = str.substring(i);
 			lineWidth = fonter.getStringWidth(str);
+			offset += fonter.FONT_HEIGHT;
 		}
 		
 		fonter.drawString(matrixStackIn, str, x, y + offset, infoColor);

@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.world.gen;
 import java.util.List;
 import java.util.Random;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -196,10 +195,10 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 					};
 		}
 		
-		@Override
-		public String getStructureName() {
-			return NostrumMagica.MODID + ":OverworldDragonDungeon";
-		}
+//		@Override
+//		public String getStructureName() {
+//			return NostrumMagica.MODID + ":OverworldDragonDungeon";
+//		}
 		
 	}
 	
@@ -228,10 +227,10 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 					};
 		}
 		
-		@Override
-		public String getStructureName() {
-			return NostrumMagica.MODID + ":OverworldPortalDungeon";
-		}
+//		@Override
+//		public String getStructureName() {
+//			return NostrumMagica.MODID + ":OverworldPortalDungeon";
+//		}
 		
 	}
 	
@@ -254,10 +253,10 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 					};
 		}
 		
-		@Override
-		public String getStructureName() {
-			return NostrumMagica.MODID + ":OverworldPlantBossDungeon";
-		}
+//		@Override
+//		public String getStructureName() {
+//			return NostrumMagica.MODID + ":OverworldPlantBossDungeon";
+//		}
 		
 	}
 	

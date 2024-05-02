@@ -43,6 +43,9 @@ public class CommandForceBind {
 		}
 		if (attr.isBinding()) {
 			attr.completeBinding(stack);
+		} if (SpellTome.getPlayerID(stack) == null) {
+			// bonding tome. Force it!
+			SpellTome.bond(stack, player.world, player);
 		} else {
 			ItemStack offhand = player.getHeldItemOffhand();
 			if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)

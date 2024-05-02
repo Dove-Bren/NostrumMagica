@@ -33,6 +33,8 @@ public abstract class InfoButton extends AbstractButton implements IForegroundRe
 			&& mouseX <= this.x + this.width
 			&& mouseY <= this.y + this.height) {
 			Minecraft mc = Minecraft.getInstance();
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0, 500);
 			GuiUtils.drawHoveringText(matrixStackIn, getDescription(),
 					mouseX,
 					mouseY,
@@ -40,6 +42,7 @@ public abstract class InfoButton extends AbstractButton implements IForegroundRe
 					mc.getMainWindow().getHeight(),
 					100,
 					mc.fontRenderer);
+			matrixStackIn.pop();
 		}
 	}
 	

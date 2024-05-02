@@ -359,6 +359,9 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.triggerRepeater, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.midnightIris, RenderType.getCutoutMipped());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.crystabloom, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mandrakeCrop, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.ginsengCrop, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.essenceCrop, RenderType.getCutoutMipped());
 	}
 	
 	private static final void registerItemModelProperties() {

@@ -18,7 +18,6 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -30,8 +29,8 @@ public class InfoScreen extends StackableScreen {
 	
 	protected static final ResourceLocation background = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/infoscreen.png");
 	
-	protected static final int TEXT_WHOLE_WIDTH = 64;
-	protected static final int TEXT_WHOLE_HEIGHT = 64;
+	protected static final int TEXT_WHOLE_WIDTH = 256;
+	protected static final int TEXT_WHOLE_HEIGHT = 256;
 	protected static final int TEXT_BUTTON_TAB_VOFFSET = 24;
 	
 	protected static final int POS_TABS_HEIGHT = 36;
@@ -371,10 +370,13 @@ public class InfoScreen extends StackableScreen {
                 		tint, tint, tint, 1f);
                 RenderSystem.disableBlend();
                 
-                RenderHelper.enableStandardItemLighting();
+                //RenderHelper.enableStandardItemLighting();
                 int x = this.x + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
                 int y = this.y + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
+                RenderSystem.pushMatrix();
+                RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
                 minecraft.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x, y);
+                RenderSystem.popMatrix();
                 
                 //drawButtonForegroundLayer(parX, parY);
             }
@@ -385,6 +387,8 @@ public class InfoScreen extends StackableScreen {
     			&& mouseX <= this.x + this.width
     			&& mouseY <= this.y + this.height) {
     			Minecraft minecraft = Minecraft.getInstance();
+    			matrixStackIn.push();
+    			matrixStackIn.translate(0, 0, 500);
     			GuiUtils.drawHoveringText(matrixStackIn, desc,
     					mouseX,
     					mouseY,
@@ -392,6 +396,7 @@ public class InfoScreen extends StackableScreen {
     					minecraft.getMainWindow().getHeight(),
     					100,
     					minecraft.fontRenderer);
+    			matrixStackIn.pop();
     		}
     	}
 

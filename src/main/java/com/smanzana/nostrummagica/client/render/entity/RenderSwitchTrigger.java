@@ -78,26 +78,6 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 	}
 	
 	protected void renderLivingLabel(Entity entityIn, String label, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, float yOffset) {
-//		final Minecraft mc = Minecraft.getInstance();
-//		boolean flag = !entityIn.isDiscrete();
-//		float y = entityIn.getHeight() + 0.5F;
-//		
-//		matrixStackIn.push();
-//		matrixStackIn.translate(0.0D, (double)y + yOffset, 0.0D);
-//		matrixStackIn.rotate(this.renderManager.getCameraOrientation());
-//		matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
-//		
-//		Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
-//		float f1 = mc.gameSettings.getTextBackgroundOpacity(0.25F);
-//		int j = (int)(f1 * 255.0F) << 24;
-//		FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
-//		float f2 = (float)(-fontrenderer.getStringWidth(label) / 2);
-//		fontrenderer.renderString(label, f2, 0, 553648127, false, matrix4f, bufferIn, flag, j, packedLightIn);
-//		if (flag) {
-//			fontrenderer.renderString(label, f2, 0, -1, false, matrix4f, bufferIn, false, 0, packedLightIn);
-//		}
-//		
-//		matrixStackIn.pop();
 		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, label, this.getFontRendererFromRenderManager(), packedLightIn, yOffset, this.renderManager.info);
 	}
 	
@@ -167,30 +147,28 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 		final float bobAngle = (float) (2 * Math.PI * (time % 60 / 60));
 		final float verticalBob = (float) (Math.sin(bobAngle) * .1f);
 		
-		
-
 		// Render model to two render types so that cage overlays on the regular model
 		//IVertexBuilder buffer = VertexBuilderUtils.newDelegate(bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE), bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE));
 		// This doesn't work because the buffers happen to be the same under the hood, and causes an exception
 		// So isntead, render twice
-		IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
-		IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
 		
 		matrixStackIn.push();
 
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(spinAngle));
 		
 		// also bob up and down
 		matrixStackIn.translate(0, verticalBob, 0);
 		
+		
+		matrixStackIn.translate(0, 1f, 0); // Should this be earlier?
+		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(spinAngle));
 		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(turnAngle)); // GlStateManager.rotated(angle, 1, 0, 1); WAS x and z?
-		
-		matrixStackIn.translate(0, .6f, 0); // Should this be earlier?
-		
+
+		IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
 		model.render(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
-		model.render(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
-		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
+		IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
+		model.render(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		matrixStackIn.pop();
+		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
 	}
 	
 }

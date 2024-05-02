@@ -30,13 +30,12 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 	
 	@Override
 	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		
+
+		matrixStackIn.push();
 		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
 		final Matrix3f normal = matrixStackIn.getLast().getNormal();
 		final Vector3f[] normals = {new Vector3f(0.5774f, -0.5774f, 0.5774f), new Vector3f(-0.5774f, -0.5774f, 0.5774f), new Vector3f(-0.5774f, -0.5774f, -0.5774f), new Vector3f(0.5774f, -0.5774f, -0.5774f)};
 		
-		matrixStackIn.push();
-		matrixStackIn.translate(0, .6, 0);
 		
 		for (int i = 0; i < 4; i++) {
 			double angle = (2*Math.PI) * ((double) i / (double) 4);
@@ -65,30 +64,6 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 			bufferIn.pos(transform, vx1, vy1, 0).color(red, green, blue, alpha).tex(u1, v1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
 			bufferIn.pos(transform, vx2, vy2, 0).color(red, green, blue, alpha).tex(u2, v2).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
 		}
-		
-//		wr.pos(0, 0, -width).tex(.5, .5).endVertex();
-//		for (int i = 4; i >= 0; i--) {
-//			double angle = (2*Math.PI) * ((double) i / (double) 4);
-//			double vx = Math.cos(angle) * width;
-//			double vy = Math.sin(angle) * height;
-//			
-//			double u = (vx + (width)) / (width * 2);
-//			double v = (vy + (height)) / (height * 2);
-//			wr.pos(vx, vy, 0).tex(u, v).endVertex();
-//		}
-//		Tessellator.getInstance().draw();
-//		
-//		wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
-//		wr.pos(0, 0, width).tex(.5, .5).endVertex();
-//		for (int i = 0; i <= 4; i++) {
-//			double angle = (2*Math.PI) * ((double) i / (double) 4);
-//			double vx = Math.cos(angle) * width;
-//			double vy = Math.sin(angle) * height;
-//			
-//			double u = (vx + (width)) / (width * 2);
-//			double v = (vy + (height)) / (height * 2);
-//			wr.pos(vx, vy, 0).tex(u, v).endVertex();
-//		}
 		
 		matrixStackIn.pop();
 	}

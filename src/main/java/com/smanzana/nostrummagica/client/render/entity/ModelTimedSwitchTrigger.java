@@ -54,72 +54,21 @@ public class ModelTimedSwitchTrigger extends ModelSwitchTrigger {
 		}
 		
 		// Top and bottom 'quads'
-		bufferIn.pos(transform, -width, (height/4f), -width).color(red, green, blue, alpha).tex(0f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, width, (height/4f), -width).color(red, green, blue, alpha).tex(1f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, width, (height/4f), width).color(red, green, blue, alpha).tex(1f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, -width, height, 0).color(red, green, blue, alpha).tex(0f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, 0, height, width).color(red, green, blue, alpha).tex(1f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, width, height, 0).color(red, green, blue, alpha).tex(1f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		//
-		bufferIn.pos(transform, width, (height/4f), width).color(red, green, blue, alpha).tex(1f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, -width, (height/4f), width).color(red, green, blue, alpha).tex(0f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, -width, (height/4f), -width).color(red, green, blue, alpha).tex(0f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, width, height, 0).color(red, green, blue, alpha).tex(1f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, 0, height, -width).color(red, green, blue, alpha).tex(0f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, -width, height, 0).color(red, green, blue, alpha).tex(0f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		
-		bufferIn.pos(transform, -width, -(height/4f), -width).color(red, green, blue, alpha).tex(1f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, -width, -(height/4f), width).color(red, green, blue, alpha).tex(1f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, width, -(height/4f), width).color(red, green, blue, alpha).tex(0f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, -width, -height, 0).color(red, green, blue, alpha).tex(1f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, 0, -height, -width).color(red, green, blue, alpha).tex(1f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, width, -height, 0).color(red, green, blue, alpha).tex(0f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		//
-		bufferIn.pos(transform, width, -(height/4f), width).color(red, green, blue, alpha).tex(0f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, width, -(height/4f), -width).color(red, green, blue, alpha).tex(0f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.pos(transform, -width, -(height/4f), -width).color(red, green, blue, alpha).tex(1f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		
-		
-//		wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
-//		wr.pos(0, (height/4), 0).tex(.5, .5).endVertex();
-//		for (int i = 4; i >= 0; i--) {
-//			double angle = (2*Math.PI) * ((double) i / (double) 4);
-//			double vx = Math.cos(angle) * width;
-//			double vz = Math.sin(angle) * width;
-//			
-//			double u = (vx + (width)) / (width * 2);
-//			double v = (vz + (width)) / (width * 2);
-//			wr.pos(vx, -height, vz).tex(u, v).endVertex();
-//		}
-//		Tessellator.getInstance().draw();
-//		
-//		wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-//		for (int i = 4; i >= 0; i--) {
-//			double angle = (2*Math.PI) * ((double) i / (double) 4);
-//			double vx = Math.cos(angle) * width;
-//			double vz = Math.sin(angle) * width;
-//			
-//			double u = (vx + (width)) / (width * 2);
-//			double v = (vz + (width)) / (width * 2);
-//			wr.pos(vx, -height, vz).tex(u, v).endVertex();
-//		}
-//		Tessellator.getInstance().draw();
-//		
-//		wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX);
-//		wr.pos(0, (-height/4), 0).tex(.5, .5).endVertex();
-//		for (int i = 0; i <= 4; i++) {
-//			double angle = (2*Math.PI) * ((double) i / (double) 4);
-//			double vx = Math.cos(angle) * width;
-//			double vz = Math.sin(angle) * width;
-//			
-//			double u = (vx + (width)) / (width * 2);
-//			double v = (vz + (width)) / (width * 2);
-//			wr.pos(vx, height, vz).tex(u, v).endVertex();
-//		}
-//		Tessellator.getInstance().draw();
-//		
-//		wr.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-//		for (int i = 0; i <= 4; i++) {
-//			double angle = (2*Math.PI) * ((double) i / (double) 4);
-//			double vx = Math.cos(angle) * width;
-//			double vz = Math.sin(angle) * width;
-//			
-//			double u = (vx + (width)) / (width * 2);
-//			double v = (vz + (width)) / (width * 2);
-//			wr.pos(vx, height, vz).tex(u, v).endVertex();
-//		}
-//		Tessellator.getInstance().draw();
+		bufferIn.pos(transform, width, -height, 0).color(red, green, blue, alpha).tex(0f, 1f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, 0, -height, width).color(red, green, blue, alpha).tex(0f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
+		bufferIn.pos(transform, -width, -height, 0).color(red, green, blue, alpha).tex(1f, 0f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		
 		matrixStackIn.pop();
 	}

@@ -90,14 +90,14 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 				final float v2 = (vy2 + (verticalRadius)) / (verticalRadius * 2);
 				
 				// For znegative, add in ZN, HIGH ANGLE, LOW ANGLE
-				buffer.pos(transform, 0, 0, -depth).tex(.5f, .5f).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, 0, 0, -depth).color(color[0], color[1], color[2], color[3]).tex(.5f, .5f).lightmap(combinedLightIn).endVertex();
+				buffer.pos(transform, vx2, vy2, 0).color(color[0], color[1], color[2], color[3]).tex(u2, v2).lightmap(combinedLightIn).endVertex();
+				buffer.pos(transform, vx1, vy1, 0).color(color[0], color[1], color[2], color[3]).tex(u1, v1).lightmap(combinedLightIn).endVertex();
 				
 				// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
-				buffer.pos(transform, 0, 0, depth).tex(.5f, .5f).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx1, vy1, 0).tex(u1, v1).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
-				buffer.pos(transform, vx2, vy2, 0).tex(u2, v2).lightmap(combinedLightIn).color(color[0], color[1], color[2], color[3]).endVertex();
+				buffer.pos(transform, 0, 0, depth).color(color[0], color[1], color[2], color[3]).tex(.5f, .5f).lightmap(combinedLightIn).endVertex();
+				buffer.pos(transform, vx1, vy1, 0).color(color[0], color[1], color[2], color[3]).tex(u1, v1).lightmap(combinedLightIn).endVertex();
+				buffer.pos(transform, vx2, vy2, 0).color(color[0], color[1], color[2], color[3]).tex(u2, v2).lightmap(combinedLightIn).endVertex();
 			}
 			matrixStackIn.pop();
 		}
