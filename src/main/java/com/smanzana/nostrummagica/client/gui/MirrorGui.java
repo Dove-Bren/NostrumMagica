@@ -999,7 +999,7 @@ public class MirrorGui extends Screen {
                 // Now draw icon
                 matrixStackIn.push();
                 RenderHelper.disableStandardItemLighting();
-                matrixStackIn.translate(0, 0, -50); int unused; // not using matrixStack
+                //matrixStackIn.translate(0, 0, -50); int unused; // not using matrixStack
                 mc.getItemRenderer().renderItemIntoGUI(icon, x + (width - 16) / 2, y + (height - 16) / 2);
                 RenderHelper.disableStandardItemLighting();
                 matrixStackIn.pop();
@@ -1379,8 +1379,8 @@ public class MirrorGui extends Screen {
                 // Now draw icon
                 matrixStackIn.push();
                 RenderHelper.disableStandardItemLighting();
-                matrixStackIn.translate(0, 0, -50);
-                mc.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2); int unused; // not using matrix
+                //matrixStackIn.translate(0, 0, -50); int unused; // not using matrix
+                mc.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2);
                 RenderHelper.disableStandardItemLighting();
                 matrixStackIn.pop();
                 
@@ -1671,8 +1671,13 @@ public class MirrorGui extends Screen {
                 // Now draw icon
                 RenderHelper.enableStandardItemLighting();
                 matrixStackIn.translate(0, 0, -140.5);
-                mc.getItemRenderer().renderItemAndEffectIntoGUI(research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2);
-                mc.getItemRenderer().renderItemOverlayIntoGUI(font, research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2, null);
+                {
+                	RenderSystem.pushMatrix();
+                	RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
+                	mc.getItemRenderer().renderItemAndEffectIntoGUI(research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2);
+                	mc.getItemRenderer().renderItemOverlayIntoGUI(font, research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2, null);
+                	RenderSystem.popMatrix();
+                }
                 RenderHelper.disableStandardItemLighting();
                 RenderSystem.enableDepthTest();
                 RenderSystem.enableBlend(); // this isn't standard...

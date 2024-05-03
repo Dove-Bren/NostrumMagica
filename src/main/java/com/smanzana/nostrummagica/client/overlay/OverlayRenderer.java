@@ -1294,13 +1294,20 @@ public class OverlayRenderer extends AbstractGui {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
 		RenderSystem.color4f(.6f, .6f, .6f, .6f);
+		RenderSystem.pushMatrix();
+		RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
 		mc.getItemRenderer().renderItemIntoGUI(new ItemStack(NostrumItems.spellScroll), 0, 0); // not using transform!
+		RenderSystem.popMatrix();
 		RenderSystem.color4f(1f, 1f, 1f, 1f);
 		
 		if (loreIsDeep != null) {
 			final int u = (160 + (loreIsDeep ? 0 : 32));
 			mc.getTextureManager().bindTexture(GUI_ICONS);
+			
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0, 101); // items render z+100
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, u, 0, 32, 32, 8, 8, 256, 256);
+			matrixStackIn.pop();
 		}
 	}
 	
@@ -1365,7 +1372,7 @@ public class OverlayRenderer extends AbstractGui {
 			}
 			
 			matrixStackIn.push();
-			matrixStackIn.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 50);
+			matrixStackIn.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 500);
 			renderLoreIcon(matrixStackIn, hasFullLore);
 			matrixStackIn.pop();
 		}
@@ -1373,7 +1380,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Enchantable?
 		if (SpellAction.isEnchantable(stack)) {
 			matrixStackIn.push();
-			matrixStackIn.translate(event.getX() + event.getWidth() - 8, event.getY() - 16, 50);
+			matrixStackIn.translate(event.getX() + event.getWidth() - 8, event.getY() - 16, 500);
 			renderEnchantableIcon(matrixStackIn);
 			matrixStackIn.pop();
 		}
@@ -1381,7 +1388,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Configurable?
 		if (ModificationTable.IsModifiable(stack)) {
 			matrixStackIn.push();
-			matrixStackIn.translate(event.getX() - 15, event.getY() + event.getHeight() - 8, 50);
+			matrixStackIn.translate(event.getX() - 15, event.getY() + event.getHeight() - 8, 500);
 			renderConfigurableIcon(matrixStackIn);
 			matrixStackIn.pop();
 		}
@@ -1389,7 +1396,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Transmutable?
 		if (Transmutation.IsTransmutable(stack.getItem())) {
 			matrixStackIn.push();
-			matrixStackIn.translate(event.getX() - 15, event.getY() - 16, 50);
+			matrixStackIn.translate(event.getX() - 15, event.getY() - 16, 500);
 			renderTransmutableIcon(matrixStackIn);
 			matrixStackIn.pop();
 		}

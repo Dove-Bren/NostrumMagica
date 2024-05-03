@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumMagicaFlower;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
@@ -222,7 +222,7 @@ public class EntityLux extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			.createMutableAttribute(Attributes.MAX_HEALTH, 4.0D)
 			.createMutableAttribute(Attributes.ARMOR, 0.0D)
 			.createMutableAttribute(Attributes.FOLLOW_RANGE, 30.0)
-			.createMutableAttribute(AttributeMagicResist.instance(), 0.0D)
+			.createMutableAttribute(NostrumAttributes.magicResist, 0.0D)
 			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 1.0D);
 	}
 

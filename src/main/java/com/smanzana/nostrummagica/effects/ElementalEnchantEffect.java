@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.effects;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.client.gui.AbstractGui;
@@ -66,11 +66,11 @@ public class ElementalEnchantEffect extends Effect {
 				if (weakElem == EMagicElement.PHYSICAL) {
 					continue;
 				}
-				this.addAttributesModifier(AttributeMagicReduction.instance(weakElem), GetModID(this.element), -.5D, AttributeModifier.Operation.ADDITION);
+				this.addAttributesModifier(NostrumAttributes.GetReduceAttribute(weakElem), GetModID(this.element), -.5D, AttributeModifier.Operation.ADDITION);
 			}
 		} else {
-			this.addAttributesModifier(AttributeMagicReduction.instance(this.element), GetModID(this.element), 1D, AttributeModifier.Operation.ADDITION);
-			this.addAttributesModifier(AttributeMagicReduction.instance(this.element.getOpposite()), GetModID(this.element), -1D, AttributeModifier.Operation.ADDITION);
+			this.addAttributesModifier(NostrumAttributes.GetReduceAttribute(this.element), GetModID(this.element), 1D, AttributeModifier.Operation.ADDITION);
+			this.addAttributesModifier(NostrumAttributes.GetReduceAttribute(this.element.getOpposite()), GetModID(this.element), -1D, AttributeModifier.Operation.ADDITION);
 		}
 	}
 	

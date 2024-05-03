@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -20,7 +20,7 @@ public class ManaRegenEffect extends Effect {
 	
 	public ManaRegenEffect() {
 		super(EffectType.BENEFICIAL, 0xFFBB6DFF);
-		this.addAttributesModifier(AttributeManaRegen.instance(),
+		this.addAttributesModifier(NostrumAttributes.manaRegen,
 				"74149d64-b22a-4dd9-ab68-030fc195ecfc", 50D, AttributeModifier.Operation.ADDITION);
 	}
 	

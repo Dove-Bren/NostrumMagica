@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
@@ -1017,7 +1017,7 @@ public class PlayerListener {
 		
 		// Pull in character regen bonus
 		bonus += (stats.getManaRegenModifier());
-		bonus += (player.getAttribute(AttributeManaRegen.instance()).getValue()/100.0);
+		bonus += (player.getAttribute(NostrumAttributes.manaRegen).getValue()/100.0);
 		
 		int mana = 1 + (int) (bonus);
 		bonus = bonus - (int) bonus;

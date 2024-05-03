@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DisplayEffectsScreen;
@@ -19,7 +19,7 @@ public class MagicRendEffect extends Effect {
 	
 	public MagicRendEffect() {
 		super(EffectType.HARMFUL, 0xFFE36338);
-		this.addAttributesModifier(AttributeMagicResist.instance(), MOD_UUID, -20D, AttributeModifier.Operation.ADDITION);
+		this.addAttributesModifier(NostrumAttributes.magicResist, MOD_UUID, -20D, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@OnlyIn(Dist.CLIENT)

@@ -11,8 +11,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.blocks.Candle;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -2153,7 +2152,7 @@ public class SpellAction {
 				base *= Math.pow(.75, resEffect.getAmplifier() + 1);
 			}
 			
-			ModifiableAttributeInstance attr = target.getAttribute(AttributeMagicResist.instance());
+			ModifiableAttributeInstance attr = target.getAttribute(NostrumAttributes.magicResist);
 			if (attr != null && attr.getValue() != 0.0D) {
 				base *= Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)));
 			}
@@ -2188,7 +2187,7 @@ public class SpellAction {
 		}
 		
 		// Apply armor reductions
-		ModifiableAttributeInstance attr = target.getAttribute(AttributeMagicReduction.instance(element));
+		ModifiableAttributeInstance attr = target.getAttribute(NostrumAttributes.GetReduceAttribute(element));
 		if (attr != null && attr.getValue() != 0.0D) {
 			base -= attr.getValue();
 		}

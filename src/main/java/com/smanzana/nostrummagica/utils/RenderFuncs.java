@@ -257,7 +257,7 @@ public final class RenderFuncs {
 	
 	// Different from the above in that this includes scaling on what's drawn
 	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
-		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, uWidth, vHeight, width, vHeight, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
+		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
 	}
 	
 	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
@@ -575,7 +575,7 @@ public final class RenderFuncs {
 		matrixStackIn.pop();
 	}
 
-	public static void drawSplitString(MatrixStack matrixStackIn, FontRenderer fonter, String str, int x, int y, int width, int infoColor) {
+	public static int drawSplitString(MatrixStack matrixStackIn, FontRenderer fonter, String str, int x, int y, int width, int infoColor) {
 		int offset = 0;
 		int lineWidth = fonter.getStringWidth(str);
 		while (lineWidth > width) {
@@ -617,6 +617,7 @@ public final class RenderFuncs {
 		}
 		
 		fonter.drawString(matrixStackIn, str, x, y + offset, infoColor);
+		return offset;
 	}
 	
 	// Copies of Vanilla's blit but with color support

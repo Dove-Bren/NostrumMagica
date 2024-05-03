@@ -32,7 +32,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 // Like shulker bullets but have spells in them
@@ -84,8 +83,8 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 		//super(shooter.world, shooter, target, axis);
 		this(type, shooter.world);
 		{ // copied out from super since it hardcodes type now
-			ObfuscationReflectionHelper.setPrivateValue(ShulkerBulletEntity.class, this, shooter, "field_184570_a"); // owner
 			//this.owner = ownerIn;
+			this.setShooter(shooter);
 			BlockPos blockpos = shooter.getPosition();
 			double d0 = (double)blockpos.getX() + 0.5D;
 			double d1 = (double)blockpos.getY() + 0.5D;

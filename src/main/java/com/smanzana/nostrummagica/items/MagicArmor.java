@@ -22,7 +22,7 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.AttributeMagicPotency;
 import com.smanzana.nostrummagica.attributes.AttributeMagicReduction;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -534,8 +534,8 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
             builder.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor modifier", (double)this.armor, AttributeModifier.Operation.ADDITION));
             builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Armor toughness", 4, AttributeModifier.Operation.ADDITION));
             builder.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()], "Armor speed boost", (double)this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
-            builder.put(AttributeMagicResist.instance(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
-            builder.put(AttributeMagicReduction.instance(this.element), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
+            builder.put(NostrumAttributes.magicResist, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Resist", (double)this.magicResistAmount, AttributeModifier.Operation.ADDITION));
+            builder.put(NostrumAttributes.GetReduceAttribute(this.element), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()], "Magic Reduction", (double)this.magicReducAmount, AttributeModifier.Operation.ADDITION));
             multimap = builder.build();
         }
 
@@ -1451,12 +1451,12 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					final double reduct = (setCount > 0 && armorElem != null)
 							? calcMagicSetReduct(slot, armorElem, setCount, elem)
 							: 0;
-					attribMap.put(AttributeMagicReduction.instance(elem), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, AttributeModifier.Operation.ADDITION));
+					attribMap.put(NostrumAttributes.GetReduceAttribute(elem), new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct, AttributeModifier.Operation.ADDITION));
 				}
 				final double boost = (setCount > 0 && armorElem != null)
 						? calcArmorMagicBoost(slot, armorElem, setCount)
 						: 0;
-				attribMap.put(AttributeMagicPotency.instance(), new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
+				attribMap.put(NostrumAttributes.magicPotency, new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost, AttributeModifier.Operation.ADDITION));
 				
 				if (slot == EquipmentSlotType.CHEST) {
 					boolean has = (inSlot.getItem() instanceof MagicArmor) ? ((MagicArmor) inSlot.getItem()).hasElytra(entity) : false;
@@ -1571,7 +1571,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			for (EMagicElement elem : EMagicElement.values()) {
 				final double reduct = calcMagicSetReduct(slot, element, setCount, elem);
 				if (reduct != 0) {
-					final AttributeMagicReduction inst = AttributeMagicReduction.instance(elem);
+					final AttributeMagicReduction inst = NostrumAttributes.GetReduceAttribute(elem);
 					Double cur = map.get(inst);
 					if (cur == null) {
 						cur = 0.0;
@@ -1585,7 +1585,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 
 			final double boost = calcArmorMagicBoost(slot, element, setCount);
 			if (boost != 0) {
-				final AttributeMagicPotency inst = AttributeMagicPotency.instance();
+				final AttributeMagicPotency inst = NostrumAttributes.magicPotency;
 				Double cur = map.get(inst);
 				if (cur == null) {
 					cur = 0.0;
@@ -1627,10 +1627,10 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					// Show total
 					for (EMagicElement targElem : EMagicElement.values()) {
 						final double reduc = calcMagicSetReductTotal(element, 4, targElem);
-						setMapInst.put(AttributeMagicReduction.instance(targElem), reduc);
+						setMapInst.put(NostrumAttributes.GetReduceAttribute(targElem), reduc);
 					}
 					final double boost = calcArmorMagicBoostTotal(element, 4);
-					setMapInst.put(AttributeMagicPotency.instance(), boost);
+					setMapInst.put(NostrumAttributes.magicPotency, boost);
 				} else {
 					// Show current
 					FindCurrentSetBonus(setMapInst, player, element, type); // puts into setMapInst
@@ -1645,10 +1645,10 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 						
 						// Formatting here copied from Vanilla
 						if (val > 0) {
-							tooltip.add((new TranslationTextComponent("attribute.modifier.plus.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent("attribute.name." + entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.BLUE));
+							tooltip.add((new TranslationTextComponent("attribute.modifier.plus.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent(entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.BLUE));
 						} else {
 							val = -val;
-							tooltip.add((new TranslationTextComponent("attribute.modifier.take.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent("attribute.name." + entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.RED));
+							tooltip.add((new TranslationTextComponent("attribute.modifier.take.0", ItemStack.DECIMALFORMAT.format(val), new TranslationTextComponent(entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.RED));
 						}
 					}
 				}

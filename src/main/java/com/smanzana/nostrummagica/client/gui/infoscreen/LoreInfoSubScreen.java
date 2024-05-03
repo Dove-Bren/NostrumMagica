@@ -29,11 +29,15 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 		
 		List<String> data = lore.getData();
 		int i = 0;
-		for (String line : data)
-			RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, line,
+		for (String line : data) {
+			// Draw line, splitting where we have to. Record how much vertical space it took.
+			i += RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, line,
 					x + 5,
-					y + 35 + (i++ * 17),
+					y + 35 + i,
 					width, 0xFFFFFFFF);
+			// Add an extra line break to space out lines.
+			i += mc.fontRenderer.FONT_HEIGHT;
+		}
 	}
 
 	@Override

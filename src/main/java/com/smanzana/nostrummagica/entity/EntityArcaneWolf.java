@@ -10,8 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
-import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
@@ -476,7 +475,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			.createMutableAttribute(Attributes.MAX_HEALTH, 50.0D)
 			.createMutableAttribute(Attributes.ARMOR, 10.0D)
 			.createMutableAttribute(Attributes.FOLLOW_RANGE, 60.0)
-			.createMutableAttribute(AttributeMagicResist.instance(), 20.0D)
+			.createMutableAttribute(NostrumAttributes.magicResist, 20.0D)
 			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D);
 	}
 	
@@ -678,7 +677,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				float amt = this.getManaRegen();
 				
 				// Augment with bonuses
-				amt += this.getAttribute(AttributeManaRegen.instance()).getValue() / 100.0;
+				amt += this.getAttribute(NostrumAttributes.manaRegen).getValue() / 100.0;
 				
 				int mana = (int) (amt);
 				amt = amt - mana; // Get fraction
@@ -1702,7 +1701,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		}
 		if (element == EMagicElement.LIGHTNING) {
 			// Lightning gives bonus magic resistance!
-			this.getAttribute(AttributeMagicResist.instance()).applyPersistentModifier(new AttributeModifier(
+			this.getAttribute(NostrumAttributes.magicResist).applyPersistentModifier(new AttributeModifier(
 					UUID.fromString(UUID_MAGIC_RESIST_MOD),
 					"ArcaneWolfLightningResist",
 					30.0D,

@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeManaRegen;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
@@ -1458,7 +1458,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					float amt = this.getManaRegen();
 					
 					// Augment with bonuses
-					amt += this.getAttribute(AttributeManaRegen.instance()).getValue() / 100.0;
+					amt += this.getAttribute(NostrumAttributes.manaRegen).getValue() / 100.0;
 					
 					int mana = (int) (amt);
 					amt = amt - (int) amt;

@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.attributes.AttributeMagicResist;
+import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -154,7 +154,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			.createMutableAttribute(Attributes.MAX_HEALTH, 5.0D)
 			.createMutableAttribute(Attributes.ARMOR, 0.0D)
 			.createMutableAttribute(Attributes.FOLLOW_RANGE, 30.0)
-			.createMutableAttribute(AttributeMagicResist.instance(), 50.0D);
+			.createMutableAttribute(NostrumAttributes.magicResist, 50.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState blockIn) {
