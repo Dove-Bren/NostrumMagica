@@ -70,13 +70,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		// Just don't render if too far away
 		final double maxDistSQ = 60 * 60;
 		if (renderInfo.getProjectedView().squareDistanceTo(posX, posY, posZ) < maxDistSQ) {
-//			renderParams.rotX = rotationX;
-//			renderParams.rotXZ = rotationXZ;
-//			renderParams.rotZ = rotationZ;
-//			renderParams.rotYZ = rotationYZ;
-//			renderParams.rotXY = rotationXY;
-//			
-//			ParticleBatchRenderer.instance().queueParticle(this);
+			ParticleBatchRenderer.instance().queueParticle(this);
 		}
 	}
 	
@@ -99,13 +93,13 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	
 	public static void RenderQuad(IVertexBuilder buffer, BatchRenderParticle particle, ActiveRenderInfo renderInfo, float partialTicks, float scale) {
 		Vector3d originPos = renderInfo.getProjectedView();
-		final float offsetX = (float)(particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks - originPos.getX()); // could use MathHelper.lerp
-		final float offsetY = (float)(particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks - originPos.getY());
-		final float offsetZ = (float)(particle.prevPosZ + (particle.getPosZ() - particle.prevPosZ) * partialTicks - originPos.getZ());
+		final float offsetX = (float)((particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks) - originPos.getX()); // could use MathHelper.lerp
+		final float offsetY = (float)((particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks) - originPos.getY());
+		final float offsetZ = (float)((particle.prevPosZ + (particle.getPosZ() - particle.prevPosZ) * partialTicks) - originPos.getZ());
 		final float radius = /*particle.particleScale*/1 * scale;
 		final int lightmap = particle.getBrightnessForRender(partialTicks);
 		
-		final MatrixStack stack = new MatrixStack();
+		final MatrixStack stack = RenderFuncs.makeNewMatrixStack(renderInfo);
 		stack.translate(offsetX, offsetY, offsetZ);
 		
 		RenderFuncs.renderSpaceQuadFacingCamera(stack, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha);

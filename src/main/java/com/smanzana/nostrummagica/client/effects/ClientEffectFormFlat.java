@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.effects;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -59,12 +60,16 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ENTITY);
-		
+
+		RenderSystem.disableCull();
+		RenderSystem.alphaFunc(GL11.GL_GREATER, 0f);
 		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer,
 				-1,
 				light, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		
 		tessellator.draw();
+		RenderSystem.defaultAlphaFunc();
+		RenderSystem.enableCull();
 		
 		matrixStackIn.pop();
 	}

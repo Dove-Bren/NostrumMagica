@@ -665,5 +665,18 @@ public final class RenderFuncs {
 	public static final ModelResourceLocation makeDefaultModelLocation(ResourceLocation loc) {
 		return new ModelResourceLocation(loc, "");
 	}
+
+	public static final MatrixStack makeNewMatrixStack(ActiveRenderInfo renderInfo) {
+		MatrixStack stack = new MatrixStack();
+		
+		// World renderer doesn't start with an identity stack; it applies some rotations based on
+		// the camera. These are copied out of GameRenderer#RenderWorld right before calling "this.mc.worldRenderer.updateCameraAndRender"
+		{
+			stack.rotate(Vector3f.ZP.rotationDegrees(0));
+			stack.rotate(Vector3f.XP.rotationDegrees(renderInfo.getPitch()));
+			stack.rotate(Vector3f.YP.rotationDegrees(renderInfo.getYaw() + 180.0F));
+		}
+		return stack;
+	}
 	
 }

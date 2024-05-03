@@ -74,16 +74,6 @@ public class ParticleBatchRenderer {
 			if (last != null) {
 				last.teardownBatchedRender();
 			}
-
-//			GlStateManager.popAttributes();
-//			GlStateManager.depthMask(true);
-//			GlStateManager.enableLighting();
-//			GlStateManager.disableBlend();
-//			GlStateManager.enableAlphaTest();
-//			GlStateManager.alphaFunc(516, .1f);
-//			GlStateManager.color4f(1f, 1f, 1f, 1f);
-//			GlStateManager.enableTexture();
-//			GlStateManager.enableColorMaterial();
 			
 			batch.clear();
 		}

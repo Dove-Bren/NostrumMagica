@@ -17,6 +17,7 @@ public class ModelBillboard extends Model {
 
 	public ModelBillboard(Function<ResourceLocation, RenderType> renderTypeIn) {
 		super(renderTypeIn);
+		this.radius = .5f;
 	}
 	
 	public ModelBillboard() {

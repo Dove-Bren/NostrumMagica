@@ -11,8 +11,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
@@ -75,15 +77,16 @@ public class ClientEffectRenderer {
 			clearEffects();
 			return;
 		}
-		
-		MatrixStack stack = new MatrixStack();
+
 		Minecraft mc = Minecraft.getInstance();
+		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
+		MatrixStack stack = RenderFuncs.makeNewMatrixStack(renderInfo);
 		
-		// Set up render space. Effects want to render at absolute world positions,
-		// so don't actually offset at all
-//		Vector3d playerOffset = mc.player.getEyePosition(event.getPartialTicks());
-//		//Vector3d playerOffset = mc.thePlayer.getPositionVec();
-//		stack.translate(-playerOffset.x, -playerOffset.y, -playerOffset.z);
+//		 Set up render space. Effects want to render at absolute world positions,
+//		 so don't actually offset at all
+		Vector3d playerOffset = renderInfo.getProjectedView();
+		//Vector3d playerOffset = mc.thePlayer.getPositionVec();
+		stack.translate(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		
 		synchronized(activeEffects) {
 			Iterator<ClientEffect> it = activeEffects.iterator();

@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
@@ -28,6 +29,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 	public RenderKeySwitchTrigger(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn, new ModelKeySwitchTrigger(), .1f);
 		iconModel = new ModelBillboard();
+		iconModel.setRadius(.25f);
 	}
 
 	@Override
@@ -110,7 +112,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 		final double bob = Math.sin(bobAngle) * .1;
 		
 		matrixStackIn.push();
-		matrixStackIn.translate(0, bob, 0); // Order might be wrong?
+		matrixStackIn.translate(0, bob, 0);
 		
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(angle));
@@ -118,8 +120,12 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 		matrixStackIn.pop();
 		
 		// Draw key
+		matrixStackIn.push();
+		// replicate the transforms from living rendere. Could be in preRenderCallback
+		matrixStackIn.translate(0, 1.5f, 0);
 		IVertexBuilder buffer = bufferIn.getBuffer(iconModel.getRenderType(KEY_TEXT));
-		iconModel.render(matrixStackIn, buffer, packedLightIn, packedLightIn, 1f, 1f, 1f, 1f);
+		iconModel.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		matrixStackIn.pop();
 		matrixStackIn.pop();
 	}
 	
