@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;

@@ -58,6 +58,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
@@ -281,11 +282,11 @@ public class MirrorGui extends Screen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		float extra = .2f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
-		float inv = .2f - extra;
+		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
+		float inv = .1f - extra;
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT,
-				.8f + extra, 1f, .8f + inv, 1f);
+				.9f + extra, 1f, .8f + inv, 1f);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -414,11 +415,11 @@ public class MirrorGui extends Screen {
 		int GUI_HEIGHT = 242;
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - GUI_HEIGHT) / 2;
-		float extra = .2f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
-		float inv = .2f - extra;
+		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
+		float inv = .1f - extra;
 		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLEAR);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT, TEXT_WIDTH, GUI_HEIGHT,
-				.8f + extra, 1f, .8f + inv, 1f);
+				.9f + extra, 1f, .8f + inv, 1f);
 		
 		for (int i = 0; i < this.buttons.size(); ++i) {
 			Button button = (Button)this.buttons.get(i);
@@ -1122,15 +1123,19 @@ public class MirrorGui extends Screen {
 			matrixStackIn.push();
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
+			
+			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 			//GlStateManager.enableBlend();
-//	        GlStateManager.disableTexture();
+			RenderSystem.disableTexture();
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-	        buf.pos(x - 1, y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        buf.pos(other.x - 1, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.pos(transform, x - 1, y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.pos(transform, other.x - 1, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
 	        Tessellator.getInstance().draw();
+	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
 	        //GlStateManager.disableBlend();
 			
@@ -1519,12 +1524,15 @@ public class MirrorGui extends Screen {
 	        		parent = new Vector2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 		        
-		        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-		        buf.pos(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        buf.pos(childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        buf.pos(parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        buf.pos(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        Tessellator.getInstance().draw();
+		        {
+		        	final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+			        buf.pos(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        buf.pos(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        buf.pos(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        buf.pos(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        Tessellator.getInstance().draw();
+		        }
 		        
 		        // Draw inside curve
 		        int points = 30;
@@ -1550,13 +1558,16 @@ public class MirrorGui extends Screen {
 		        	}
 		        }
 		        matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(rotate));
-		        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-		        for (int i = 0; i <= points; i++) {
-		        	float progress = (float) i / (float) points;
-		        	Vector2f point = Curves.alignedArc2D(progress, Vector2f.ZERO, radius, flip);
-		        	buf.pos(point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        {
+		        	final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+			        for (int i = 0; i <= points; i++) {
+			        	float progress = (float) i / (float) points;
+			        	Vector2f point = Curves.alignedArc2D(progress, Vector2f.ZERO, radius, flip);
+			        	buf.pos(transform, point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        }
+			        Tessellator.getInstance().draw();
 		        }
-		        Tessellator.getInstance().draw();
 		        matrixStackIn.pop();
 	        }
 	        

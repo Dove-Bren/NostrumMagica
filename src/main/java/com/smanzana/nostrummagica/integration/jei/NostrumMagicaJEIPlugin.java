@@ -85,7 +85,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		
 		NostrumMagica.logger.warn("Forcing JEI reload after receiving tag update :(");
 		
-		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
+		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
 			Ingredient.invalidateAll();
 			@Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 			if (player != null && player.world.isRemote() && player instanceof AbstractClientPlayerEntity) {

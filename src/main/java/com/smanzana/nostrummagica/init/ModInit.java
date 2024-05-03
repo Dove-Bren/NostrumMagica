@@ -151,7 +151,6 @@ import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.command.CommandSource;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.passive.WolfEntity;
@@ -162,8 +161,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.Effects;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.vector.Vector3d;
@@ -174,15 +171,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
-import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.DataSerializerEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -207,7 +203,7 @@ public class ModInit {
     	// because they depend on data and re-fire when data is reloaded?
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onBiomeLoad);
-		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDataReloaders);
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, ModInit::registerDataReloaders);
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDefaultRituals);
 		
 		preinit();
@@ -2238,24 +2234,26 @@ public class ModInit {
 //		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
 	}
 	
-	public static final void registerDataReloaders(AddReloadListenerEvent event) {
-		// This event is weird because it's for registering listeners of another event
-		event.addListener(new ReloadListener<Object>() {
-
-			@Override
-			protected Object prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
-				return null;
-			}
-
-			@Override
-			protected void apply(Object objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
-				NostrumMagica.logger.info("Got data reload notification");
-				if (ServerLifecycleHooks.getCurrentServer() == null) {
-					NostrumMagica.logger.info("Ignoring data reload with no server");
-					return;
-				}
-				RitualRegistry.instance().reloadRituals();
-			}
-		});
+	public static final void registerDataReloaders(TagsUpdatedEvent.CustomTagTypes event) {
+		NostrumMagica.logger.info("Got custom tag reload notification");
+		RitualRegistry.instance().reloadRituals();
+//		// This event is weird because it's for registering listeners of another event
+//		event.addListener(new ReloadListener<Object>() {
+//
+//			@Override
+//			protected Object prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
+//				return null;
+//			}
+//
+//			@Override
+//			protected void apply(Object objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+//				NostrumMagica.logger.info("Got data reload notification");
+//				RitualRegistry.instance().reloadRituals();
+//				if (ServerLifecycleHooks.getCurrentServer() == null) {
+//					NostrumMagica.logger.info("Ignoring data reload with no server");
+//					return;
+//				}
+//			}
+//		});
 	}
 }
