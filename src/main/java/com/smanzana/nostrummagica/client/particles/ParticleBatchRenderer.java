@@ -67,8 +67,10 @@ public class ParticleBatchRenderer {
 					next.setupBatchedRender();
 					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
 				}
-				
+
+				matrixStackIn.push();
 				next.renderBatched(matrixStackIn, buffer, renderInfo, partialTicks);
+				matrixStackIn.pop();
 				last = next;
 			}
 			

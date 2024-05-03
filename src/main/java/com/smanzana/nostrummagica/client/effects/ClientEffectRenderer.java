@@ -81,6 +81,8 @@ public class ClientEffectRenderer {
 		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
 		MatrixStack stack = event.getMatrixStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
 		
+		stack.push();
+		
 //		 Set up render space. Effects want to render at absolute world positions,
 //		 so don't actually offset at all
 		Vector3d playerOffset = renderInfo.getProjectedView();
@@ -97,6 +99,8 @@ public class ClientEffectRenderer {
 				}
 			}
 		}
+		
+		stack.pop();
 		
 	}
 	
