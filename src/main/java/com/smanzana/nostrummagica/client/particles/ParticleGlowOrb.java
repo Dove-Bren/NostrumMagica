@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.particles;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -142,9 +143,9 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
-		BatchRenderParticle.RenderQuad(buffer, this, renderInfo, partialTicks, .1f);
-		BatchRenderParticle.RenderQuad(buffer, this, renderInfo, partialTicks, .05f);
+	public void renderBatched(MatrixStack matrixStackIn, IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .1f);
+		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
 	}
 	
 	@Override

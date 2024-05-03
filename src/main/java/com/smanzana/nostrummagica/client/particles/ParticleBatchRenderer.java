@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -36,14 +38,14 @@ public class ParticleBatchRenderer {
 	
 	@SubscribeEvent
 	public void onRender(RenderWorldLastEvent event) {
-		this.renderBatch(event.getPartialTicks());
+		this.renderBatch(event.getMatrixStack(), event.getPartialTicks());
 	}
 	
 	public void queueParticle(BatchRenderParticle particle) {
 		batch.add(particle);
 	}
 	
-	public void renderBatch(float partialTicks) {
+	public void renderBatch(MatrixStack matrixStackIn, float partialTicks) {
 		if (!batch.isEmpty()) {
 			Collections.sort(batch);
 			BatchRenderParticle last = null;
@@ -66,7 +68,7 @@ public class ParticleBatchRenderer {
 					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
 				}
 				
-				next.renderBatched(buffer, renderInfo, partialTicks);
+				next.renderBatched(matrixStackIn, buffer, renderInfo, partialTicks);
 				last = next;
 			}
 			

@@ -80,7 +80,7 @@ public class ClientEffectRenderer {
 
 		Minecraft mc = Minecraft.getInstance();
 		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
-		MatrixStack stack = RenderFuncs.makeNewMatrixStack(renderInfo);
+		MatrixStack stack = event.getMatrixStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
 		
 //		 Set up render space. Effects want to render at absolute world positions,
 //		 so don't actually offset at all

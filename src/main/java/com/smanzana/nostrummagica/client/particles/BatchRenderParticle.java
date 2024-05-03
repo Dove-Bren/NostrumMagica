@@ -30,7 +30,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	 * Note: rotation should be saved from original render call
 	 * @param renderInfo TODO
 	 */
-	public abstract void renderBatched(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks);
+	public abstract void renderBatched(MatrixStack matrixStackIn, IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks);
 	
 	/**
 	 * Return the texture to use when rendering this particle
@@ -91,7 +91,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		return this.posZ;
 	}
 	
-	public static void RenderQuad(IVertexBuilder buffer, BatchRenderParticle particle, ActiveRenderInfo renderInfo, float partialTicks, float scale) {
+	public static void RenderQuad(MatrixStack matrixStackIn, IVertexBuilder buffer, BatchRenderParticle particle, ActiveRenderInfo renderInfo, float partialTicks, float scale) {
 		Vector3d originPos = renderInfo.getProjectedView();
 		final float offsetX = (float)((particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks) - originPos.getX()); // could use MathHelper.lerp
 		final float offsetY = (float)((particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks) - originPos.getY());
@@ -99,10 +99,11 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		final float radius = /*particle.particleScale*/1 * scale;
 		final int lightmap = particle.getBrightnessForRender(partialTicks);
 		
-		final MatrixStack stack = RenderFuncs.makeNewMatrixStack(renderInfo);
-		stack.translate(offsetX, offsetY, offsetZ);
+		matrixStackIn.push();
+		matrixStackIn.translate(offsetX, offsetY, offsetZ);
 		
-		RenderFuncs.renderSpaceQuadFacingCamera(stack, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha);
+		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha);
+		matrixStackIn.pop();
 		
 //		buffer.pos(offsetX - (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ - (rYZ * radius) - (rXZ * radius))
 //			.tex(0, 0)
