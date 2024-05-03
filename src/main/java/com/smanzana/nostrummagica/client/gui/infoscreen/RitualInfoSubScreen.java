@@ -29,6 +29,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraftforge.client.ForgeHooksClient;
 
 @SuppressWarnings("deprecation")
 public class RitualInfoSubScreen implements IInfoSubScreen {
@@ -84,6 +85,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		}
 		tilt = 30;
 		
+		RenderSystem.pushMatrix(); // Save actual render system matrix
 		RenderSystem.viewport((int) (x * mc.getMainWindow().getGuiScaleFactor()), 0, (int) (width * mc.getMainWindow().getGuiScaleFactor()), (int) (height * mc.getMainWindow().getGuiScaleFactor()));
 		RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
         //GlStateManager.clearDepth(1.0D);
@@ -234,14 +236,15 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		RenderSystem.viewport(0, 0, mc.getMainWindow().getWidth(), mc.getMainWindow().getHeight());
 		RenderSystem.matrixMode(GL11.GL_PROJECTION);
 		RenderSystem.loadIdentity();
-		RenderSystem.ortho(0.0D, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 0.0D, 1000.0D, 3000.0D);
+		RenderSystem.ortho(0.0D, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 0.0D, 1000.0D, ForgeHooksClient.getGuiFarPlane());
 		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
 		RenderSystem.loadIdentity();
+		RenderSystem.popMatrix();
 		
 		matrixStackIn.pop();
 		
 		matrixStackIn.push();
-		matrixStackIn.translate(0, 0, 1000);
+		matrixStackIn.translate(0, 0, 500);
 		String title = I18n.format("ritual." + ritual.getTitleKey() + ".name", new Object[0]);
 		int len = mc.fontRenderer.getStringWidth(title);
 		mc.fontRenderer.drawStringWithShadow(matrixStackIn, title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
@@ -267,7 +270,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		
 		matrixStackIn.push();
 		RenderSystem.enableDepthTest();
-		//matrixStackIn.translate(x, y, z);
+		matrixStackIn.translate(x, y, z);
 		RenderSystem.enableCull();
 		RenderSystem.enableRescaleNormal();
 		RenderHelper.disableStandardItemLighting();
@@ -287,6 +290,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			
 		}
 		typebuffer.finish();
+		RenderSystem.disableRescaleNormal();
 		
 		matrixStackIn.pop();
 	}
@@ -300,6 +304,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			RenderFuncs.ItemRenderer(
 					ReagentItem.CreateStack(reagent, 1), matrixStackIn);
 			matrixStackIn.pop();
+			RenderSystem.disableBlend();
 		}
 	}
 	
@@ -315,6 +320,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			RenderFuncs.ItemRenderer(
 					matches[ingIndex], matrixStackIn);
 			matrixStackIn.pop();
+			RenderSystem.disableBlend();
 		}
 	}
 
