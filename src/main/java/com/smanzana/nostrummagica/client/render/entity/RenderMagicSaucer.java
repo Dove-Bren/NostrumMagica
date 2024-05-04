@@ -4,21 +4,20 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRenderer<T> {
 	
-	private static final ResourceLocation TEXTURE = NostrumMagica.Loc("textures/entity/magic_blade.png");
-	private static final ModelResourceLocation MODEL = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer"));
+	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer");
 	
 	private ModelBaked<T> mainModel;
 
@@ -27,9 +26,10 @@ public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRender
 		mainModel = new ModelBaked<>(RenderType::getEntityTranslucent, MODEL);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getEntityTexture(EntitySpellSaucer entity) {
-		return TEXTURE;
+		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	
 	@Override
@@ -48,6 +48,7 @@ public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRender
 //        }
 		
 		final float yOffset = entityIn.getHeight() / 2;
+		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
 		matrixStackIn.push();
 		if (!(entityIn instanceof EntityCyclerSpellSaucer)) {
@@ -59,7 +60,7 @@ public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRender
 		matrixStackIn.translate(0, yOffset, 0);
 		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(-90f));
 		
-		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, color[0], color[1], color[2], 1f);
 		
 		matrixStackIn.pop();
 	}

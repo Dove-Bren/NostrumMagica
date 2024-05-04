@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerTrigger;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -97,6 +98,12 @@ public class MagicCutterTrigger extends SpellTrigger {
 			} else {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null, piercing);
 			}
+		}
+		
+		@Override
+		public EMagicElement getElement() {
+			// Return element on next shape
+			return getState().getNextElement();
 		}
 	}
 

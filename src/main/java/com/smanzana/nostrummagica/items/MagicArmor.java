@@ -1470,7 +1470,6 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			}
 			
 			// Update attributes
-			int unused; // Check this
 			entity.getAttributeManager().reapplyModifiers(attribMap);
 			
 			// Create and save new map

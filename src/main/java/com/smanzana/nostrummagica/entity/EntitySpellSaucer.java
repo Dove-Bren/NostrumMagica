@@ -8,6 +8,8 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.MysticAnchor;
+import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.block.BlockState;
@@ -17,6 +19,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.DamagingProjectileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -30,11 +34,15 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellSaucer.class, MagicElementDataSerializer.instance);
+	
 	public static interface ISpellSaucerTrigger {
 
 		public void onProjectileHit(BlockPos pos);
 		
 		public void onProjectileHit(Entity entity);
+		
+		public EMagicElement getElement();
 		
 	}
 	
@@ -59,6 +67,7 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
         this.speed = speed;
         this.shootingEntity = shooter;
         this.trigger = trigger;
+        this.setElement(trigger.getElement());
 	}
 	
 	@Override
@@ -154,7 +163,8 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 
 	@Override
 	protected void registerData() {
-		
+		super.registerData();
+		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	@Override
@@ -295,5 +305,18 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	
 	public @Nullable LivingEntity getShooter() {
 		return this.shootingEntity;
+	}
+	
+	@Override
+	protected boolean isFireballFiery() {
+		return false;
+	}
+	
+	public void setElement(EMagicElement element) {
+		this.dataManager.set(ELEMENT, element);
+	}
+	
+	public EMagicElement getElement() {
+		return this.dataManager.get(ELEMENT);
 	}
 }

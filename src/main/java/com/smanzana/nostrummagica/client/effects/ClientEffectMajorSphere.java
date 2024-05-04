@@ -1,13 +1,10 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
@@ -23,8 +20,8 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		
 		private static IBakedModel MODEL_CLOUDY;
 		private static IBakedModel MODEL_SCALY;
-		private static ModelResourceLocation LOC_CLOUDY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effect/orb_cloudy"));
-		private static ModelResourceLocation LOC_SCALY = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "effect/orb_scaled"));
+		private static ResourceLocation LOC_CLOUDY = new ResourceLocation(NostrumMagica.MODID, "effect/orb_cloudy");
+		private static ResourceLocation LOC_SCALY = new ResourceLocation(NostrumMagica.MODID, "effect/orb_scaled");
 
 		private float scale;
 		private boolean cloudy;
@@ -34,6 +31,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 			this.cloudy = cloudy;
 		}
 		
+		@SuppressWarnings("deprecation")
 		@Override
 		public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 			

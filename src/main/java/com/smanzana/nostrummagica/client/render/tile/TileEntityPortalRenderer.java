@@ -8,10 +8,12 @@ import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTileEntityBase> {
@@ -29,11 +31,13 @@ public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTi
 		// Want to rotate to camera but only around Y. Before th is was a atan between z and x..
 		// I THINK now it's using the active render info's look vector and chopping out the Y, and then
 		// doing the same thing.
-//		double rotY = (Math.atan2(z+.5, x+.5) / (2 * Math.PI));
-//		rotY *= -360f;
-//		rotY += 180f;
-//		rotY += 90;
-		final float rotY = 0f;
+		final ActiveRenderInfo renderInfo = this.renderDispatcher.renderInfo;
+		Vector3d posOffset = Vector3d.copyCentered(tileEntityIn.getPos()).subtract(renderInfo.getProjectedView());
+		float rotY = (float) (Math.atan2(posOffset.getZ(), posOffset.getX()) / (2 * Math.PI));
+		rotY *= -360f;
+		rotY += 180f;
+		rotY += 90;
+		//final float rotY = 0f;
 		
 		final double time = (double)tileEntityIn.getWorld().getGameTime() + partialTicks;
 		final float rotAngle = (float) (((time / 20.0) % tileEntityIn.getRotationPeriod()) / tileEntityIn.getRotationPeriod());

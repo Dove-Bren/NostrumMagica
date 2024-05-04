@@ -73,6 +73,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	
 	@Override
 	protected void registerData() {
+		super.registerData();
 		this.dataManager.register(SHOOTER, Optional.<UUID>empty());
 	}
 	

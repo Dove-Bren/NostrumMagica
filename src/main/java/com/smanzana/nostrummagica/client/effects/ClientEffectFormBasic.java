@@ -3,12 +3,11 @@ package com.smanzana.nostrummagica.client.effects;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -32,24 +31,29 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 		
 		BlockRendererDispatcher renderer = Minecraft.getInstance().getBlockRendererDispatcher();
 		
-		this.model = renderer.getBlockModelShapes().getModelManager()
-				.getModel(RenderFuncs.makeDefaultModelLocation(new ResourceLocation(
-				NostrumMagica.MODID + ":effect/" + key)));
+		final String modelLoc = "effect/" + key;
+		model = renderer.getBlockModelShapes().getModelManager().getModel(NostrumMagica.Loc(modelLoc));
 	}
 	
 	public ClientEffectFormBasic(ClientEffectIcon icon, double x, double y, double z) {
 		this(icon.getKey(), x, y, z);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+		matrixStackIn.push();
 		if (this.offset != null) {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
+		
+		int unused; // make this be a passed in thing! Not all are objs!
+		mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 		
 		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		RenderSystem.disableCull();
 		ClientEffectForm.drawModel(matrixStackIn, model, color, light);
 		RenderSystem.enableCull();
+		matrixStackIn.pop();
 	}
 }

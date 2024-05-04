@@ -82,9 +82,9 @@ public final class RenderFuncs {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK); // quads hardcode this internally. If not, would need to convert when rendering quad?
-		
 		RenderModelWithColor(stack, buffer, model, color, combinedLight);
-		tessellator.draw();
+		buffer.finishDrawing();
+		WorldVertexBufferUploader.draw(buffer);
 	}
 	
 //	private static final Vector3f Vec3fZero = new Vector3f();

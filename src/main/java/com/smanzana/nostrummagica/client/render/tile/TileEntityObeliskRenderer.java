@@ -1,19 +1,33 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.utils.ModelUtils;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObeliskEntity> {
 
+	protected static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "block/orb_crystal");
+	protected IBakedModel model;
+	
 	public TileEntityObeliskRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
+	}
+	
+	protected void initModel() {
+		if (model == null) {
+			model = ModelUtils.GetBakedModel(MODEL);
+		}
 	}
 	
 	@Override
@@ -21,6 +35,10 @@ public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObelisk
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		if (tileEntityIn.isMaster())
+			return;
+		
+		initModel();
+		if (this.model == null) 
 			return;
 		
 		final BlockState state = tileEntityIn.getBlockState();
@@ -37,6 +55,7 @@ public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObelisk
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
 		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
 		RenderFuncs.RenderBlockState(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn); // Used to fetch custom model and render itself
+		RenderFuncs.RenderModel(matrixStackIn, bufferIn.getBuffer(RenderType.getCutoutMipped()), model, combinedLightIn, 1f, 1f, 1f, 1f);
 		matrixStackIn.pop();
 	}
 }

@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -54,11 +55,12 @@ public interface ClientEffectForm {
 	
 	public static int InferLightmap(MatrixStack matrixStackIn, Minecraft mc) {
 		if (mc.world != null) {
+			final Vector3d camera = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
 			// Get position from final transform on matrix stack
 			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
 			final Vector4f origin = new Vector4f(1, 1, 1, 1); // I think this is right...
 			origin.transform(transform);
-			final BlockPos pos = new BlockPos(origin.getX(), origin.getY(), origin.getZ());
+			final BlockPos pos = new BlockPos(camera.getX() + origin.getX(), camera.getY() + origin.getY(), camera.getZ() + origin.getZ());
 			return WorldRenderer.getCombinedLight(mc.world, pos);
 		} else {
 			return 0; // Same default as particle

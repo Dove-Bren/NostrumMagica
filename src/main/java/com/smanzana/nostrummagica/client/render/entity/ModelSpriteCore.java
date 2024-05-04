@@ -7,8 +7,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 	
-	private static final ResourceLocation MODEL_CORE = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core");
-	private static final ResourceLocation MODEL_ARMS = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms");
+	public static final ResourceLocation MODEL_CORE = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core");
+	public static final ResourceLocation MODEL_ARMS = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms");
 	
 	protected ModelRendererBaked core;
 	protected ModelRendererBaked arms;
@@ -72,9 +72,5 @@ public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 		
 		// This is Z because it's tilted on it's side in the obj?
 		arms.rotateAngleZ = frac * (interval);
-		
-			
-		//frac = (entity.ticksExisted + partialTicks) / (20f * 10f);
-		//GlStateManager.rotatef(360f * frac, 1f, 0, 0);
 	}
 }

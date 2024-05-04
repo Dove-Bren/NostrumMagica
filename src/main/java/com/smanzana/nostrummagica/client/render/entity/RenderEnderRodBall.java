@@ -4,21 +4,19 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 	
-	private static final ModelResourceLocation BALL_MODEL = RenderFuncs.makeDefaultModelLocation(new ResourceLocation(NostrumMagica.MODID, "entity/koid"));
-	private static final ResourceLocation TEXTURE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/koid.png");
+	private static final ResourceLocation BALL_MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
 	protected ModelBaked<EntityEnderRodBall> ballOrb;
 
@@ -27,14 +25,14 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 		this.ballOrb = new ModelBaked<>(RenderType::getEntityTranslucent, BALL_MODEL);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getEntityTexture(EntityEnderRodBall entity) {
-		return TEXTURE;
+		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	
 	@Override
 	public void render(EntityEnderRodBall entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		
 		// Render orb three times with different alphas and sizes to do a glow effect.
 		final float time = entityIn.ticksExisted + partialTicks;
 		//134, 80, 185
@@ -70,17 +68,17 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 		matrixStackIn.scale(scale, scale, scale);
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
 		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .4f);
+		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .2f);
 		matrixStackIn.pop();
 		
 		// Outer glow changes at a different rate and is much lighter
 		frac = time / (20f * .6f);
-        scale = 2f * (1 - (frac % 1f));
+        scale += .2f * (1 - (frac % 1f));
 		matrixStackIn.push();
 		matrixStackIn.scale(scale, scale, scale);
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
 		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .2f);
+		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .05f);
 		matrixStackIn.pop();
 		
 		matrixStackIn.pop();

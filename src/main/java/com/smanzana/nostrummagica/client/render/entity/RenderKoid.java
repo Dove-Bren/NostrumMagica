@@ -9,12 +9,12 @@ import com.smanzana.nostrummagica.utils.ColorUtil;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKoid>> {
 	
-	private static final ResourceLocation TEXTURE =  new ResourceLocation(NostrumMagica.MODID, "textures/entity/koid.png"); 
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
 	protected ModelBaked<EntityKoid> model;
@@ -24,9 +24,10 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKo
 		this.model = new ModelBaked<>(MODEL);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getEntityTexture(EntityKoid entity) {
-		return TEXTURE;
+		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	
 	@Override
@@ -39,8 +40,6 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKo
 	}
 	
 	protected int getColor(EntityKoid koid) {
-		final int bright = 0x00202020;
-		
 		int color = 0x00;
 		
 		switch (koid.getElement()) {
@@ -67,8 +66,8 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKo
 			break;
 		}
 		
-		if (koid.getAttackTarget() != null) // doesn't work on the client :P
-			color += bright;
+		//if (koid.getAttackTarget() != null) // doesn't work on the client :P
+//			color += bright;
 		
 		
 		return color;

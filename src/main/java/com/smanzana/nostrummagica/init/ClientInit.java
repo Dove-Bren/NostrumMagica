@@ -227,7 +227,9 @@ public class ClientInit {
 //				} else {
 //					model.getClass();
 //				}
-				int unused; // why dont I need this?
+				//int unused; // why dont I need this?
+				// Because we don't render them as models, we only load the texture and draw as billboard.
+				// And loading random textures works for any texture even if it's not stitched into the texture atlas
 			} else {
 				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
 				final String modelLoc = "effect/" + icon.getKey();
