@@ -129,7 +129,6 @@ public class NostrumRenderTypes {
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(NO_LIGHTING)
 				.cull(NO_CULL)
-				.depthTest(NO_DEPTH_TEST)
 			.build(false);
 		NOSTRUM_PORTAL = RenderType.makeType(Name("nostrum_portal"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
 		

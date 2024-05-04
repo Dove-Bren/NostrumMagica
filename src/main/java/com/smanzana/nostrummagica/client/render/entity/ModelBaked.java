@@ -49,6 +49,15 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 	@Override
 	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
-		children.forEach(child -> child.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha));
+		int i = 0;
+		for (ModelRendererBaked child : children) {
+			this.renderChild(child, i, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			i++;
+		}
+	}
+	
+	protected void renderChild(ModelRendererBaked child, int index, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+			float red, float green, float blue, float alpha) {
+		child.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 }

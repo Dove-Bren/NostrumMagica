@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.effects;
 
 public enum ClientEffectIcon {
 
-	SHIELD("shield", false),
+	SHIELD("shield", true),
 	TING1("ting1", false),
 	TING2("ting2", false),
 	TING3("ting3", false),
@@ -23,21 +23,24 @@ public enum ClientEffectIcon {
 	ARROW_SLASH("arrow_slash", false)
 	;
 	
-	int unused; // Shield used to be marked as obj and was using the obj. What's wrong with the json version?
+	private final String key;
 	
-	private String key;
-	private boolean isObj;
+	// Whether this 'icon' wants to use a full model and the model should be loaded.
+	// Things like "ClientEffectFormFlat" just draw a quad and don't need a model, whereas
+	// others like "ClientEffectFormBasic" loads and renders a model.
+	// The model may or may not be a .obj model, but that no longer changes much about how it's interacted with!
+	private boolean useModel;
 	
-	private ClientEffectIcon(String key, boolean isObj) {
+	private ClientEffectIcon(String key, boolean useModel) {
 		this.key = key;
-		this.isObj = isObj;
+		this.useModel = useModel;
 	}
 	
 	public String getKey() {
 		return key;
 	}
 	
-	public String getModelKey() {
-		return key + (isObj ? ".obj" : "");
+	public boolean usesModel() {
+		return useModel;
 	}
 }

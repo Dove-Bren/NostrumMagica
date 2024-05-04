@@ -212,27 +212,9 @@ public class ClientInit {
 		
 		
 		for (ClientEffectIcon icon : ClientEffectIcon.values()) {
-			if (!icon.getModelKey().endsWith(".obj")) {
-				// json
-//				final String modelLoc = "effect/" + icon.getModelKey();
-//				IUnbakedModel model = event.getModelLoader().getUnbakedModel(NostrumMagica.Loc(modelLoc));
-//				//IUnbakedModel model = ModelLoaderRegistry.getModelOrLogError(NostrumMagica.Loc(modelLoc), "Failed to get json model for " + modelLoc);
-//				
-//				HashSet<String> missingTextureErrors = new HashSet<>();
-//				
-//				if (model != null && model != ModelLoaderRegistry.getMissingModel()) {
-//					model.getTextures(event.getModelLoader()::getUnbakedModel, missingTextureErrors);
-//					IBakedModel bakedModel = model.bake(event.getModelLoader(), ModelLoader.defaultTextureGetter(), new BasicState(model.getDefaultState(), false), DefaultVertexFormats.ITEM);
-//					event.getModelRegistry().put(RenderFuncs.makeDefaultModelLocation(NostrumMagica.Loc(modelLoc)), bakedModel);
-//				} else {
-//					model.getClass();
-//				}
-				//int unused; // why dont I need this?
-				// Because we don't render them as models, we only load the texture and draw as billboard.
-				// And loading random textures works for any texture even if it's not stitched into the texture atlas
-			} else {
+			if (icon.usesModel()) {
 				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
-				final String modelLoc = "effect/" + icon.getKey();
+				final String modelLoc = "effect/" + icon.getKey(); // This should be hardcoded somewhere else...
 				ModelLoader.addSpecialModel(NostrumMagica.Loc(modelLoc));
 			}
 		}

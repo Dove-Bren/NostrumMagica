@@ -24,9 +24,7 @@ public class RenderSprite extends MobRenderer<EntitySprite, ModelSpriteCore> {
 	
 	@Override
 	public void render(EntitySprite entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		// The core and arms used to be different colors than white
-		//final int bright = 0x00202020;
-		//int color = 0xFF75B589;
+		this.entityModel.setColor(0xFF75B589);
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	

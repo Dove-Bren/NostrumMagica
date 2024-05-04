@@ -1,7 +1,10 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -12,6 +15,11 @@ public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 	
 	protected ModelRendererBaked core;
 	protected ModelRendererBaked arms;
+	
+	protected float red;
+	protected float green;
+	protected float blue;
+	protected float alpha;
 
 	public ModelSpriteCore() {
 		super(); // Only a child class to use LookupModel
@@ -22,18 +30,24 @@ public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 		this.children.add(arms);
 	}
 
-//	@Override
-//	protected int getColor(int i, EntitySprite ent) {
-//		final int bright = 0x00202020;
-//		
-//		int color = 0xFF75B589;
-//		
-//		if (i > 0) {
-//			color |= bright;
-//		}
-//		
-//		return color;
-//	}
+	public void setColor(int color) {
+		final float[] colors = ColorUtil.ARGBToColor(color);
+		setColor(colors[0], colors[1], colors[2], colors[3]);
+	}
+	
+	public void setColor(float red, float green, float blue, float alpha) {
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+		this.alpha = alpha;
+	}
+	
+	@Override
+	protected void renderChild(ModelRendererBaked child, int index, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+			float red, float green, float blue, float alpha) {
+		super.renderChild(child, index, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, 
+				red * this.red, green * this.green, blue * this.blue, alpha * this.alpha);
+	}
 
 	@Override
 	public void setRotationAngles(EntitySprite entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,

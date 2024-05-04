@@ -1,5 +1,4 @@
 {
-    "parent": "item/handheld",
 	"textures": {
 		"texture": "nostrummagica:effects/shield"
 	},
