@@ -24,7 +24,7 @@ public class RenderTameDragonRed extends RenderDragonRed<EntityTameDragonRed> {
 		// 1f makes full-grown touch the ground.
 		// .4 is 40%, which is max we shrink by.
 		// 2.76 is size of full-grown tamed red ragons.
-		matrixStackIn.translate(0f, 1f + ((.4f * entityIn.getHeight()) * (1f - age)), 0f);
+		//matrixStackIn.translate(0f, 1f + ((.4f * entityIn.getHeight()) * (1f - age)), 0f);
 	}
 
 }

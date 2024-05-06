@@ -230,7 +230,23 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		this.dataManager.register(SOULBOUND, false);
 		this.dataManager.register(DATA_ARMOR_BODY, ItemStack.EMPTY);
 		this.dataManager.register(DATA_ARMOR_HELM, ItemStack.EMPTY);
-		
+	}
+	
+	@Override
+	public void notifyDataManagerChange(DataParameter<?> key) {
+		super.notifyDataManagerChange(key);
+		if (key == SYNCED_MAX_HEALTH) {
+			this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(
+					this.dataManager.get(SYNCED_MAX_HEALTH).floatValue()
+					);
+		}
+	}
+	
+	protected void setupTamedAI() {
+		//this.targetTasks.removeTask(aiPlayerTarget);
+	}
+	
+	protected void setupBaseAI() {
 		final EntityTameDragonRed dragon = this;
 		aiPlayerTarget = new DragonAINearestAttackableTarget<PlayerEntity>(this, PlayerEntity.class, true, new Predicate<PlayerEntity>() {
 			@Override
@@ -251,23 +267,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			}
 		});
 		aiRevengeTarget = new HurtByTargetGoal(this);
-	}
-	
-	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
-		if (key == SYNCED_MAX_HEALTH) {
-			this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(
-					this.dataManager.get(SYNCED_MAX_HEALTH).floatValue()
-					);
-		}
-	}
-	
-	protected void setupTamedAI() {
-		//this.targetTasks.removeTask(aiPlayerTarget);
-	}
-	
-	protected void setupBaseAI() {
+		
 		int priority = 0;
 		this.goalSelector.addGoal(priority++, new SwimGoal(this));
 		this.goalSelector.addGoal(priority++, new EntityAISitGeneric<EntityTameDragonRed>(this));
@@ -795,7 +795,10 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		this.setSitting(compound.getBoolean(NBT_SITTING));
 		this.setGrowingAge(compound.getFloat(NBT_AGE));
 		
-		this.setEggId(compound.getUniqueId(NBT_EGG_ID));
+		if (compound.contains(NBT_EGG_ID)) { // 1.16.5 crashes without this if no UUID present, which is awful
+											 // since before there wasn't a tag with this name and instead if was two different longs!
+			this.setEggId(compound.getUniqueId(NBT_EGG_ID));
+		}
 		
 		boolean canFly = compound.getBoolean(NBT_CAP_FLY);
 		byte jumps = compound.getByte(NBT_CAP_JUMP);

@@ -272,10 +272,10 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		}
 		
 		public double getX() {
-			// Special case for 0
-			if (this.offsetX == 0) {
-				return 0;
-			}
+//			// Special case for 0
+//			if (this.offsetX == 0) {
+//				return 0;
+//			}
 			
 			double parX = (this.parent == null ? 0 : this.parent.offsetX);
 			
@@ -347,13 +347,6 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		for (EDragonPart part : EDragonPart.values()) {
 			ModelRendererBakedWithOffset render = renderers.get(part);
 			render.rotateAngleX = render.rotateAngleY = render.rotateAngleZ = 0f;
-		}
-		
-		for (EDragonPart part : EDragonPart.values()) {
-			ModelRendererBakedWithOffset render = renderers.get(part);
-			render.offsetX = (float) part.getX();
-			render.offsetY = (float) part.getY();
-			render.offsetZ = (float) part.getZ();
 		}
 		
 		ModelRendererBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
@@ -603,6 +596,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 			}
 			DragonArmorKey key = KeyPool.claim().set(EDragonArmorPart.HEAD, mat);
 			ModelRendererBakedWithOffset headArmor = overlays.get(key); //TODO why is this needed? It avoids allocating a key each time we access the map
+			
 			headArmor.rotateAngleY = head.rotateAngleY;
 			headArmor.rotateAngleX = head.rotateAngleX;
 			KeyPool.release(key);
