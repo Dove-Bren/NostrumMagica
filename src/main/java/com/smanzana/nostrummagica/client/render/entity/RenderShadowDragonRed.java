@@ -16,7 +16,6 @@ public class RenderShadowDragonRed extends RenderDragonRed<EntityShadowDragonRed
 		super.preRenderCallback(entityIn, matrixStackIn, partialTicks);
 		
 		matrixStackIn.scale(.5f, .5f, .5f);
-		matrixStackIn.translate(0, 1.2f, 0);
 	}
 
 }

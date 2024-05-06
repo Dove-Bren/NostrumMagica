@@ -53,10 +53,10 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		// Made public with AT :)
 		@Override
 		public void translateRotate(MatrixStack matrixStackIn) {
-			super.translateRotate(matrixStackIn);
-			
 			// Apply offset
 			matrixStackIn.translate(offsetX, offsetY, offsetZ);
+			super.translateRotate(matrixStackIn);
+
 		}
 	}
 	
@@ -173,14 +173,14 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 
 	protected static enum EDragonPart {
 		BODY("entity/red_dragon/body", 0, -.889, 0),
-		NECK("entity/red_dragon/neck", 0, -.975, -1.6, EDragonPart.BODY),
+		NECK("entity/red_dragon/neck", .019, -.955, -1.585, EDragonPart.BODY),
 		HEAD("entity/red_dragon/head", 0, -1.90, -1.575, EDragonPart.NECK),
 		//TAIL1("entity/red_dragon/tail1", 0, -.95, 2.9, EDragonPart.BODY),
 		//TAIL2("entity/red_dragon/tail2", 0, .2245, 6.67, EDragonPart.TAIL1),
 		//TAIL3("entity/red_dragon/tail3", 0, .85, 9.9, EDragonPart.TAIL2),
-		TAIL("entity/red_dragon/tail", 0, -.95, 2.5, EDragonPart.BODY),
-		WING_LEFT("entity/red_dragon/wing_left", .35, -1.4, -.75, EDragonPart.BODY),
-		WING_RIGHT("entity/red_dragon/wing_right", -.35, -1.4, -.75, EDragonPart.BODY),
+		TAIL("entity/red_dragon/tail", 0, -.975, 2.81, EDragonPart.BODY),
+		WING_LEFT("entity/red_dragon/wing_left", .275, -1.7, -.95, EDragonPart.BODY),
+		WING_RIGHT("entity/red_dragon/wing_right", -.275, -1.7, -.95, EDragonPart.BODY),
 		LEG_FRONT_LEFT("entity/red_dragon/leg_fl", .75, -.45, -.76, EDragonPart.BODY),
 		LEG_FRONT_RIGHT("entity/red_dragon/leg_fr", -.725, -.45, -.82, EDragonPart.BODY),
 		LEG_BACK_LEFT("entity/red_dragon/leg_bl", .54, -1, 1.78, EDragonPart.BODY),
@@ -326,7 +326,9 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 //		final float modelScale = 1.0f;// / 20.0f; // 16 pixels wide model to .8 blocks
 //		matrixStackIn.push();
 //		matrixStackIn.scale(modelScale, modelScale, modelScale);
+		matrixStackIn.push();
 		this.baseRenderer.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		matrixStackIn.pop();
 //		matrixStackIn.pop();
 	}
 	
@@ -345,6 +347,13 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		for (EDragonPart part : EDragonPart.values()) {
 			ModelRendererBakedWithOffset render = renderers.get(part);
 			render.rotateAngleX = render.rotateAngleY = render.rotateAngleZ = 0f;
+		}
+		
+		for (EDragonPart part : EDragonPart.values()) {
+			ModelRendererBakedWithOffset render = renderers.get(part);
+			render.offsetX = (float) part.getX();
+			render.offsetY = (float) part.getY();
+			render.offsetZ = (float) part.getZ();
 		}
 		
 		ModelRendererBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
@@ -378,8 +387,8 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		} else if (!dragon.isOnGround() && dragon.getMotion().y < -.62f) {
 			// Falling
 			float rotX = (float) (2 * Math.PI * 0.14);
-			float rotY = (float) (2 * Math.PI * 0.12);
-			float rotZ = (float) (2 * Math.PI * 0.05);
+			float rotY = (float) (2 * Math.PI * -0.12);
+			float rotZ = (float) (2 * Math.PI * -0.05);
 			wing_left.rotateAngleX = rotX;
 			wing_left.rotateAngleY = rotY;
 			wing_left.rotateAngleZ = rotZ;
@@ -389,8 +398,8 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 			body.rotateAngleX = -.1f;
 		} else {
 			float rotX = (float) (2 * Math.PI * 0.168);
-			float rotY = (float) (2 * Math.PI * 0.2);
-			float rotZ = (float) (2 * Math.PI * 0.05);
+			float rotY = (float) (2 * Math.PI * -0.2);
+			float rotZ = (float) (2 * Math.PI * -0.05);
 			
 			if (dragon.isFlightTransitioning()) {
 				float scale = (float) (stateTime)
@@ -588,7 +597,6 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		float amt = (float) (weight * (.785398163397)) / 6; // 45degrees in radians
 		tail.rotateAngleY = amt;
 		
-
 		for (EDragonOverlayMaterial mat : EDragonOverlayMaterial.values()) {
 			if (mat == EDragonOverlayMaterial.NONE) {
 				continue;

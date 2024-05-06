@@ -7,6 +7,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.entity.EntityWillo;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
@@ -21,14 +22,15 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 	protected float waveProg;
 	
 	public ModelWillo() {
+		super(RenderType::getEntityTranslucent);
 		this.textureHeight = 64;
 		this.textureWidth = 64;
 		
 		armLeft = new ArrayList<>();
 		armRight = new ArrayList<>();
 		
-		final float offset = .75f;
-		final float spacing = .75f;
+		final float offset = 16f * .75f;
+		final float spacing = 16f * .75f;
 		for (int i = 0; i < SEGMENTS; i++) {
 			ModelRenderer render = new ModelRenderer(this, 0, 0);
 			render.setTextureOffset(0, 18);

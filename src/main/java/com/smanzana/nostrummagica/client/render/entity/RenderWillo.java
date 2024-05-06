@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.entity.EntityWillo;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +22,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 	private ModelWillo mainModel;
 	
 	public RenderWillo(EntityRendererManager renderManagerIn, float scale) {
-		super(renderManagerIn, new ModelRenderShiv<EntityWillo>(), .33f);
+		super(renderManagerIn, new ModelRenderShiv<EntityWillo>(RenderType::getEntityTranslucent), .33f);
 		mainModel = new ModelWillo();
 	}
 	
@@ -60,10 +61,10 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 		final Matrix3f normal = matrixStackIn.getLast().getNormal();
 		
 		// North
-		buffer.pos(transform, .5f, .5f, 0f).color(red, green, blue, alpha).tex(umax,vmax).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, .5773f, .5773f, -.5773f).endVertex();
-		buffer.pos(transform, .5f, -.5f, 0f).color(red, green, blue, alpha).tex(umax,vmin).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, .5773f, -.5773f, -.5773f).endVertex();
-		buffer.pos(transform, -.5f, -.5f, 0f).color(red, green, blue, alpha).tex(umin,vmin).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, -.5773f, -.5773f, -.5773f).endVertex();
-		buffer.pos(transform, -.5f, .5f, 0f).color(red, green, blue, alpha).tex(umin,vmax).lightmap(packedLightIn).overlay(packedOverlayIn).normal(normal, -.5773f, .5773f, -.5773f).endVertex();
+		buffer.pos(transform, .5f, .5f, 0f).color(red, green, blue, alpha).tex(umax,vmax).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, .5773f, .5773f, -.5773f).endVertex();
+		buffer.pos(transform, .5f, -.5f, 0f).color(red, green, blue, alpha).tex(umax,vmin).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, .5773f, -.5773f, -.5773f).endVertex();
+		buffer.pos(transform, -.5f, -.5f, 0f).color(red, green, blue, alpha).tex(umin,vmin).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, -.5773f, -.5773f, -.5773f).endVertex();
+		buffer.pos(transform, -.5f, .5f, 0f).color(red, green, blue, alpha).tex(umin,vmax).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, -.5773f, .5773f, -.5773f).endVertex();
 		
 //		// South
 //		buffer.pos(-.5, .5, .01).tex(umin,vmax).normal(-.5773f, .5773f, .5773f).endVertex();
@@ -79,6 +80,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 		final float vmin = (36f/64f);
 		final float vmax = vmin + (18f/64f);
 		
+		int unused; // need to pass overlay in to get red flash when hurt
 		RenderFuncs.drawUnitCube(matrixStackIn, buffer, umin, umax, vmin, vmax, packedLightIn, red, green, blue, alpha);
 		
 //		// Top
@@ -127,9 +129,11 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 		blue *= .7f;
 		alpha *= 1f;
 		
-		final float rotPeriod = 6f;
+		final float rotPeriod = 6f * 20f;
 		final float time = partialTicks + entityIn.ticksExisted;
 		final float rotX = 360f * (time % rotPeriod) / rotPeriod;
+		
+		this.mainModel.setLivingAnimations(entityIn, 0, 0, partialTicks);
 		
 		matrixStackIn.push();
 		matrixStackIn.translate(0, 1.5f, 0);

@@ -6,7 +6,7 @@ public class ModelShadowDragonRed extends ModelDragonRed<EntityShadowDragonRed> 
 
 	
 	public ModelShadowDragonRed() {
-		super(0x80808080);
+		super(0x40808080);
 	}
 
 	int unused; // Delete me?

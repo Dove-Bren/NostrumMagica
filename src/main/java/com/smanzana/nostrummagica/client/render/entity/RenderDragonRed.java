@@ -13,8 +13,10 @@ import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<T, ModelDragonRed<T>> {
 
@@ -33,7 +35,12 @@ public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<
 
 	@Override
 	public ResourceLocation getEntityTexture(T entity) {
-		return TEXTURE;
+		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	}
+	
+	@Override
+	protected void preRenderCallback(T entitylivingbaseIn, MatrixStack matrixStackIn, float partialTickTime) {
+		super.preRenderCallback(entitylivingbaseIn, matrixStackIn, partialTickTime);
 	}
 	
 	@Override
