@@ -53,7 +53,7 @@ public class ModelRendererBaked extends ModelRenderer {
 		checkAndLoadModel();
 		
 		// Render obj model
-		RenderFuncs.RenderModel(matrixEntryIn, bufferIn, bakedModel, packedLightIn, red, green, blue, alpha);
+		RenderFuncs.RenderModel(matrixEntryIn, bufferIn, bakedModel, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
 		// Render boxes and children renderes that may have been set up
 		super.doRender(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);

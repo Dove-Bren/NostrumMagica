@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -161,7 +162,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 	
 	protected void renderCapeModel(AbstractClientPlayerEntity living, ICapeProvider provider, ItemStack stack, IBakedModel model,
 			MatrixStack matrixStack, IVertexBuilder bufferIn, int packedLightIn, int color) {
-		RenderFuncs.RenderModelWithColor(matrixStack, bufferIn, model, color, packedLightIn);
+		RenderFuncs.RenderModelWithColor(matrixStack, bufferIn, model, color, packedLightIn, OverlayTexture.NO_OVERLAY);
 	}
 	
 }

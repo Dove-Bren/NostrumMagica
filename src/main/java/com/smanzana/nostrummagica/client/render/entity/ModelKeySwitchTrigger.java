@@ -16,7 +16,7 @@ public class ModelKeySwitchTrigger extends EntityModel<EntityKeySwitchTrigger> {
 	@Override
 	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		// Cage is just a textured box
-		RenderFuncs.drawUnitCube(matrixStackIn, bufferIn, packedLightIn, red, green, blue, alpha);
+		RenderFuncs.drawUnitCube(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
 		
 //		GlStateManager.disableBlend();

@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
@@ -48,7 +49,7 @@ public interface ClientEffectForm {
 //			}
 //		}
 		{
-			RenderFuncs.RenderModelWithColorNoBatch(matrixStackIn, model, color, packedLightIn);
+			RenderFuncs.RenderModelWithColorNoBatch(matrixStackIn, model, color, packedLightIn, OverlayTexture.NO_OVERLAY);
 		}
 		//GlStateManager.depthMask(true);
 	}

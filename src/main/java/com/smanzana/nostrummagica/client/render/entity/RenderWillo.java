@@ -80,8 +80,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 		final float vmin = (36f/64f);
 		final float vmax = vmin + (18f/64f);
 		
-		int unused; // need to pass overlay in to get red flash when hurt
-		RenderFuncs.drawUnitCube(matrixStackIn, buffer, umin, umax, vmin, vmax, packedLightIn, red, green, blue, alpha);
+		RenderFuncs.drawUnitCube(matrixStackIn, buffer, umin, umax, vmin, vmax, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
 //		// Top
 //		buffer.pos(-.5, .5, -.5).tex(umin,vmin).normal(-.5773f, .5773f, -.5773f).endVertex();
