@@ -416,7 +416,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		this.targetMana = nbt.getInt(NBT_TARGET_MANA);
 		this.currentMana = nbt.getInt(NBT_MANA);
 		
-		if (nbt.contains(NBT_ENTITY_ID)) {
+		if (nbt.hasUniqueId(NBT_ENTITY_ID)) {
 			UUID id = nbt.getUniqueId(NBT_ENTITY_ID);
 			if (id != null && this.world != null) {
 				PlayerEntity player = this.world.getPlayerByUuid(id);

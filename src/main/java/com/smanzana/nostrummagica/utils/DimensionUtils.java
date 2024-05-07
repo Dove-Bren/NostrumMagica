@@ -45,7 +45,7 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsNether(World world) {
-		return IsOverworld(GetDimension(world));
+		return IsNether(GetDimension(world));
 	}
 	
 	public static final boolean IsEnd(RegistryKey<World> dim) {
@@ -53,7 +53,7 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsEnd(World world) {
-		return IsOverworld(GetDimension(world));
+		return IsEnd(GetDimension(world));
 	}
 	
 	public static final boolean IsSorceryDim(RegistryKey<World> dim) {

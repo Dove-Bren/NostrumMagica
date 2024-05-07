@@ -198,10 +198,10 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 		}
 		
 		if (entity == null) {
+			tag.remove(NBT_HOOK_ID);
 			// Hack: tag.remove removes the passed in string, but putUniqueId creates two for a UUID :(
-			//tag.remove(NBT_HOOK_ID);
-			tag.remove(NBT_HOOK_ID + "Most");
-			tag.remove(NBT_HOOK_ID + "Least");
+//			tag.remove(NBT_HOOK_ID + "Most");
+//			tag.remove(NBT_HOOK_ID + "Least");
 		} else {
 			tag.putUniqueId(NBT_HOOK_ID, entity.getUniqueID());
 		}
@@ -228,8 +228,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 		
 		CompoundNBT tag = stack.getTag();
 		UUID id = null;
-		if (tag != null && tag.contains(NBT_HOOK_ID + "Most")) { // +"Most" because putUniqueId adds two tags
-			id = tag.getUniqueId(NBT_HOOK_ID); // Returns an all-zero UUID if not present
+		if (tag != null && tag.contains(NBT_HOOK_ID)) {
+			id = tag.getUniqueId(NBT_HOOK_ID); // Crashes if tag not present
 		}
 		
 		return id;

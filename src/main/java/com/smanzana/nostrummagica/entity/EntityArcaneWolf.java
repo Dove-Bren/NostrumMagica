@@ -839,7 +839,6 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 						if (this.getHealth() < ARCANE_WOLF_WARN_HEALTH) {
 							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()), Util.DUMMY_UUID);
 						} else {
-							addTrainingXP(200);
 							player.startRiding(this);
 						}
 					} else {
@@ -911,11 +910,14 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	@Override
 	public void func_233687_w_(boolean sitting) { // SetSitting
 		super.func_233687_w_(sitting); // SetSitting
-		setPetAction(PetAction.SITTING);
 	}
 	
 	public void setSitting(boolean sitting) {
 		func_233687_w_(sitting);
+		this.setSleeping(sitting);
+		if (sitting) {
+			setPetAction(PetAction.SITTING);
+		}
 	}
 	
 	public int getLevel() {

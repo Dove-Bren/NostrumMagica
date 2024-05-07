@@ -1080,7 +1080,10 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	
 		//	-> Icon
+		RenderSystem.pushMatrix();
+		RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
 		InventoryScreen.drawEntityOnScreen(GUI_HEALTHBAR_ORB_ENTITY_HOFFSET, GUI_HEALTHBAR_ORB_ENTITY_VOFFSET, GUI_HEALTHBAR_ORB_ENTITY_WIDTH, 0, 0, pet);
+		RenderSystem.popMatrix();
 		mc.getTextureManager().bindTexture(GUI_HEALTHBARS);
 		
 		//	-> Status

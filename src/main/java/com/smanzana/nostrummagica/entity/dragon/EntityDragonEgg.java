@@ -145,7 +145,7 @@ public class EntityDragonEgg extends MobEntity implements ILoreSupplier {
 			this.ageTimer = compound.getInt(NBT_AGE_TIMER);
 		}
 		
-		if (compound.contains(NBT_PLAYER)) {
+		if (compound.hasUniqueId(NBT_PLAYER)) {
 			this.setPlayerUUID(compound.getUniqueId(NBT_PLAYER));
 		}
 		

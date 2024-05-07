@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.client.render.entity;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed.EDragonArmorPart;
 import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed.EDragonOverlayMaterial;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
@@ -16,12 +15,9 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
 
 public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<T, ModelDragonRed<T>> {
 
-	private static final ResourceLocation TEXTURE = NostrumMagica.Loc("textures/entity/koid.png");
-	
 	protected final ModelDragonRed<T> dragonModel;
 	
 	public RenderDragonRed(EntityRendererManager renderManagerIn, float shadowSizeIn) {
@@ -33,6 +29,7 @@ public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<
 		this.dragonModel = modelBase;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getEntityTexture(T entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;

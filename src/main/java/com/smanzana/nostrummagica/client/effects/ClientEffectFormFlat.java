@@ -64,7 +64,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 		RenderSystem.disableCull();
 		RenderSystem.alphaFunc(GL11.GL_GREATER, 0f);
 		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer,
-				-1,
+				1,
 				light, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		
 		tessellator.draw();

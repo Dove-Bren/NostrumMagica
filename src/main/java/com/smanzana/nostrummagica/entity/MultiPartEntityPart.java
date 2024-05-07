@@ -106,7 +106,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	protected void readAdditional(CompoundNBT compound) {
 		// This handles the initial spawn if the server entity has already changed values
 		final String name = compound.getString("name");
-		final UUID parentID = compound.getUniqueId("parentID");
+		final UUID parentID = compound.hasUniqueId("parentID") ? compound.getUniqueId("parentID") : null;
 		this.dataManager.set(PARENT_ID, Optional.of(parentID));
 		this.dataManager.set(PART_NAME, name);
 	}

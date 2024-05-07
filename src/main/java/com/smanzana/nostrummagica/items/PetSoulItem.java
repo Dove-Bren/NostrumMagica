@@ -35,7 +35,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	
 	public @Nullable UUID getPetSoulID(ItemStack stack) {
 		CompoundNBT tag = stack.getTag();
-		if (tag != null) {
+		if (tag != null && tag.hasUniqueId(NBT_PETID)) {
 			return tag.getUniqueId(NBT_PETID);
 		} else {
 			return null;

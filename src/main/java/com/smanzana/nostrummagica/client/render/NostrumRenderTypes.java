@@ -92,7 +92,7 @@ public class NostrumRenderTypes {
 				.target(ITEM_ENTITY_TARGET)
 				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
-		HOOKSHOT_CHAIN = RenderType.makeType(Name("hookshot_chain"), DefaultVertexFormats.POSITION_TEX, GL11.GL_QUAD_STRIP, 128, glState);
+		HOOKSHOT_CHAIN = RenderType.makeType(Name("hookshot_chain"), DefaultVertexFormats.POSITION_TEX, GL11.GL_QUADS, 128, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(LayerManaArmor.TEXTURE_ARMOR, true, false))

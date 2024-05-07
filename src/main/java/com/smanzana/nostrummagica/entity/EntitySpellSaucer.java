@@ -175,8 +175,12 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	@Override
 	public void readAdditional(CompoundNBT compound) {
 		this.speed = compound.getFloat("speed");
-		UUID uuid = compound.getUniqueId("shooterID");
-		this.shootingEntity = Entities.FindLiving(world, uuid);
+		if (compound.hasUniqueId("shooterID")) {
+			UUID uuid = compound.getUniqueId("shooterID");
+			this.shootingEntity = Entities.FindLiving(world, uuid);
+		} else {
+			this.shootingEntity = null;
+		}
 	}
 
 	@Override

@@ -80,7 +80,7 @@ public class PetSoulRegistry extends WorldSavedData {
 		}
 		
 		public static SoulEntry FromNBT(CompoundNBT nbt) {
-			UUID worldID = nbt.getUniqueId(NBT_ENTRY_WORLDID);
+			UUID worldID = nbt.hasUniqueId(NBT_ENTRY_WORLDID) ? nbt.getUniqueId(NBT_ENTRY_WORLDID) : null;
 			if (worldID == null) {
 				NostrumMagica.logger.warn("Failed to deserialize PetSoul key UUID!");
 				worldID = UUID.randomUUID();
