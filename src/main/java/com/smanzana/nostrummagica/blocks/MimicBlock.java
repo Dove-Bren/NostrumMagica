@@ -61,7 +61,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 	public abstract @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos);
 	
 	public MimicBlock(Block.Properties builder) {
-		super(builder);
+		super(builder.notSolid());
 	}
 	
 	@Override

@@ -96,7 +96,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 		// And this model then checks the wrapped model and sees if it should be rendered in the current layer.
 		
 		BlockState nested = getNestedState(extraData);
-		if (nested == null) {
+		if (nested == null || nested.isAir()) {
 			return this.undisguisedModel.getQuads(state, side, rand, extraData);
 		}else if (RenderTypeLookup.canRenderInLayer(state, MinecraftForgeClient.getRenderLayer())) {
 			return getModelToRender(nested).getQuads(nested, side, rand, extraData);

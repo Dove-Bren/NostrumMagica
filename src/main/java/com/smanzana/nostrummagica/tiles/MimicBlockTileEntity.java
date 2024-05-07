@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.blocks.MimicBlock;
@@ -77,7 +79,7 @@ public class MimicBlockTileEntity extends TileEntity {
 			newState = refreshState();
 		}
 		
-		if (!newState.equals(getData().getBlockState())) {
+		if (!Objects.equals(newState, getData().getBlockState())) {
 			setDataBlock(newState);
 			signalBlockUpdate(); // Is this okay?
 		}
@@ -90,7 +92,7 @@ public class MimicBlockTileEntity extends TileEntity {
 		}
 		
 		BlockState newState = refreshState();
-		if (!newState.equals(getData().getBlockState())) {
+		if (!Objects.equals(newState, getData().getBlockState())) {
 			setDataBlock(newState);
 			signalBlockUpdate();
 		}

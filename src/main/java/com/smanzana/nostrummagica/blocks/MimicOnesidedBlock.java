@@ -286,6 +286,9 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 			}
 		}
 		
+		if (state.isAir(world, pos)) {
+			state = null;
+		}
 		return state;
 	}
 	
