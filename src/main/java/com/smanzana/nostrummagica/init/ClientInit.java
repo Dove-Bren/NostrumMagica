@@ -70,6 +70,7 @@ import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
+import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.items.AspectedFireWeapon;
 import com.smanzana.nostrummagica.items.AspectedPhysicalWeapon;
@@ -346,6 +347,13 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mandrakeCrop, RenderType.getCutoutMipped());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.ginsengCrop, RenderType.getCutoutMipped());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.essenceCrop, RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.poisonWaterBlock, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.unbreakablePoisonWaterBlock, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumFluids.poisonWater, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumFluids.poisonWaterFlowing, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumFluids.unbreakablePoisonWater, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumFluids.unbreakablePoisonWaterFlowing, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.manaArmorerBlock, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

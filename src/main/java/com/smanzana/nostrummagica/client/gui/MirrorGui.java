@@ -1243,16 +1243,16 @@ public class MirrorGui extends Screen {
             TextFormatting unique = TextFormatting.DARK_AQUA;
             if (quest.getReqLevel() > 0)
             	tooltip.add(new TranslationTextComponent("level.name").mergeStyle(level >= quest.getReqLevel() ? good : bad)
-            			.append(new StringTextComponent("" + quest.getReqLevel())));
+            			.append(new StringTextComponent(" " + quest.getReqLevel())));
             if (quest.getReqControl() > 0)
             	tooltip.add(new TranslationTextComponent("control.name").mergeStyle(control >= quest.getReqControl() ? good : bad)
-            			.append(new StringTextComponent("" + quest.getReqControl())));
+            			.append(new StringTextComponent(" " + quest.getReqControl())));
             if (quest.getReqTechnique() > 0)
             	tooltip.add(new TranslationTextComponent("technique.name").mergeStyle(technique >= quest.getReqTechnique() ? good : bad)
-            			.append(new StringTextComponent("" + quest.getReqTechnique())));
+            			.append(new StringTextComponent(" " + quest.getReqTechnique())));
             if (quest.getReqFinesse() > 0)
             	tooltip.add(new TranslationTextComponent("finesse.name").mergeStyle(technique >= quest.getReqFinesse() ? good : bad)
-            			.append(new StringTextComponent("" + quest.getReqFinesse())));
+            			.append(new StringTextComponent(" " + quest.getReqFinesse())));
             
             // Lore reqs?
             if (quest.getLoreKeys() != null) {

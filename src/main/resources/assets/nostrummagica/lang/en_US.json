@@ -481,6 +481,9 @@
 
     "itemGroup.nostrummagica": "Nostrum Magica",
     "itemGroup.nostrummagica_enhancements": "Nostrum Enhancements",
+	
+	"container.nostrummagica.putter.name": "Putter",
+	"container.nostrummagica.active_hopper.name": "Active Hopper",
 
     "key.cast.desc": "Cast Spell",
     "key.spellscroll.desc": "Scroll Spells (+ MouseWheel)",

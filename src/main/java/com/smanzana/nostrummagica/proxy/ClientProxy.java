@@ -149,8 +149,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingPetAttack);
 		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", GLFW.GLFW_KEY_L, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingPetAllStop);
-		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", GLFW.GLFW_KEY_L, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingPetAllStop);
 	}
 	
 	@SubscribeEvent

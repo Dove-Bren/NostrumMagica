@@ -570,6 +570,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 		
 		// Render player mana on top
+		if (attr.getMaxMana() > 0)
 		{
 			int playerMana = attr.getMana();
 			int playerMaxMana = attr.getMaxMana();

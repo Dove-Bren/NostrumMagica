@@ -332,6 +332,12 @@ public class RuneBagGui {
 						mouseX, mouseY, width, height, 200, this.font);
 			}
 		}
+		
+		@Override
+		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			// no labels
+			//super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
+		}
 			
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {

@@ -78,7 +78,9 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	public float getManaProgress() {
-		return ((float) this.getCurrentMana()) / ((float) this.getTargetMana());
+		return this.getTargetMana() == 0
+				? 0f
+				: ((float) this.getCurrentMana()) / ((float) this.getTargetMana());
 	}
 	
 	public List<BlockPos> getLinkedCrystals() {
@@ -125,10 +127,14 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		this.currentMana = 0;
 		
 		IManaArmor armor = NostrumMagica.getManaArmor(entity);
-		if (armor != null) {
-			armor.setHasArmor(true, calcManaBurnAmt(entity));
-			if (entity instanceof ServerPlayerEntity) {
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity)entity);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+		if (armor != null && attr != null) {
+			// Re-check requirement before continuing in case player's mana has changed!
+			if (attr.getMaxMana() > this.calcManaBurnAmt(entity)) {
+				armor.setHasArmor(true, calcManaBurnAmt(entity));
+				if (entity instanceof ServerPlayerEntity) {
+					NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity)entity);
+				}
 			}
 		}
 		

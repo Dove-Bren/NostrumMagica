@@ -58,7 +58,7 @@ public class ContainerUtil {
 
 			@Override
 			public ITextComponent getDisplayName() {
-				return new TranslationTextComponent(NostrumMagica.MODID + ":container." + name + ".name");
+				return new TranslationTextComponent("container." + NostrumMagica.MODID + "." + name + ".name");
 			}
 
 			@Override
