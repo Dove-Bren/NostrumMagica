@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.tiles.ParadoxMirrorTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -117,7 +118,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
 		Direction myFacing = state.get(FACING);
 		if (!this.canPlaceAt(worldIn, currentPos, myFacing)) { // should check passed in facing and only re-check if wall we're on changed but I can't remember if facing is wall we're on or the opposite
-			return null;
+			return Blocks.AIR.getDefaultState();
 		}
 		
 		return state;

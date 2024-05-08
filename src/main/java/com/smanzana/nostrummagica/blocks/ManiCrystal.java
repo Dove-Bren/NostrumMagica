@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.utils.DimensionUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItemUseContext;
@@ -169,7 +170,7 @@ public class ManiCrystal extends Block {
 			
 			if (myFacing == facing.getOpposite()) {
 				if (world.isAirBlock(facingPos)) {
-					return null;
+					return Blocks.AIR.getDefaultState();
 				}
 			}
 			

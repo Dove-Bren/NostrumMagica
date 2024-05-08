@@ -29,7 +29,7 @@ public class EntityKeySwitchTrigger extends EntitySwitchTrigger {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						4, this.getPosX(), getPosY() + 1.25, getPosZ(), 1.25,
 						20, 0,
-						this.getPositionVec().add(0, 1.45, 0)
+						this.getPositionVec().add(0, 1, 0)
 						).gravity(-.025f).color(keyEnt.getColor().getColorValue() | 0xAA000000));
 			}
 		}
