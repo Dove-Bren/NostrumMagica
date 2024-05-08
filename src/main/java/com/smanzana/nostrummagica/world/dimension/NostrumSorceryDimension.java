@@ -25,6 +25,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -47,81 +48,6 @@ public class NostrumSorceryDimension {
 		new DimensionListener();
 	}
 	
-//	public static class EmptyDimension extends Dimension {
-		
-//		@OnlyIn(Dist.CLIENT)
-//		@Override
-//		public double getVoidFogYFactor() {
-//			return 0.8D;
-//		}
-//		
-//		@OnlyIn(Dist.CLIENT)
-//		@Override
-//		public boolean doesXZShowFog(int x, int z) {
-//			return true;
-//		}
-		
-//		@Override
-//		protected void generateLightBrightnessTable() {
-//			for (int i = 0; i < 16; i++) {
-//				float prog = ((float) i / 16f);
-//				prog *= prog * prog;
-//				lightBrightnessTable[i] = .8f * prog;
-//			}
-//		}
-//		
-//		@Override
-//		public float[] getLightBrightnessTable() {
-//			return super.getLightBrightnessTable();
-//		}
-		
-		private int unused; // need this?
-//		@OnlyIn(Dist.CLIENT)
-//		@Override
-//		public Vector3d getFogColor(float p_76562_1_, float p_76562_2_) {
-//			fogColor = new Vector3d(.1, 0, .1);
-//			return fogColor;
-//		}
-		
-//		@Override
-//		public void tick() {
-//			// Make sure players aren't teleporting.
-//			// TODO this even is fired before updating, sadly. That feels incorrect.
-//			// Does it act weirdly?
-//			for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers()) {
-//				
-//				// Make sure they aren't falling out of the world
-//				if (player.getPosY() < 1) {
-//					NostrumMagica.logger.info("Respawning player " + player + " because they seem to have fallen out of the world");
-//					DimensionEntryTeleporter.respawnPlayer(player);
-//					continue; // skip rate limitting
-//				}
-//				
-//				if (player.isCreative() || player.isSpectator()) {
-//					continue;
-//				}
-//				
-//				double distSqr = Math.pow(player.getPosX() - player.lastTickPosX, 2)
-//						+ Math.pow(player.getPosZ() - player.lastTickPosZ, 2)
-//						+ Math.pow(player.getPosY() - player.lastTickPosY, 2);
-//				if (distSqr > 25) {
-//					// Player appears to have teleported
-//					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
-//				}
-//			}
-//		}
-
-//		@Override
-//		public BlockPos findSpawn(ChunkPos chunkPosIn, boolean checkValid) {
-//			return findSpawn(chunkPosIn.getXStart(), chunkPosIn.getZStart(), checkValid);
-//		}
-//
-//		@Override
-//		public BlockPos findSpawn(int posX, int posZ, boolean checkValid) {
-//			return new BlockPos(posX, SPAWN_Y, posZ);
-//		}
-//	}
-		
 	private static final class DungeonSpawner {
 		private static RoomBlueprint lobbyBlueprint = null;
 		private static RoomBlueprint wholeBlueprint = null;
@@ -503,6 +429,26 @@ public class NostrumSorceryDimension {
 					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
 				}
 			}
+		}
+		
+		@SubscribeEvent
+		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
+			if (!checkDimension(event.getInfo().getRenderViewEntity().world)) {
+				return;
+			}
+			
+			event.setCanceled(true);
+			event.setDensity(.03f);
+		}
+		
+		@SubscribeEvent
+		public void onFogColorCheck(EntityViewRenderEvent.FogColors event) {
+			if (!checkDimension(event.getInfo().getRenderViewEntity().world)) {
+				return;
+			}
+			event.setRed(.2f);
+			event.setGreen(0f);
+			event.setBlue(.2f);
 		}
 	}
 	

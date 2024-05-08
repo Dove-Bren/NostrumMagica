@@ -67,28 +67,27 @@ public class NostrumStructures {
 		
 		structure = new PortalStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID), 8, 16);
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID), 20, 32, 0x26F1BDCF);
 		CONFIGURED_DUNGEON_PORTAL = configured;
 		
 		structure = new DragonStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 10, 20);
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 20, 64, 0x4558c30e);
 		CONFIGURED_DUNGEON_DRAGON = configured;
 		
 		structure = new PlantBossStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 10, 20);
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 64, 0x2cc3005e);
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
 	}
 	
-	private static void registerStructure(RegistryEvent.Register<Structure<?>> event, Structure<?> structure, StructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName, int min, int max) {
+	private static void registerStructure(RegistryEvent.Register<Structure<?>> event, Structure<?> structure, StructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName, int min, int max, int rand) {
 		// Register structure itself
 		event.getRegistry().register(structure.setRegistryName(structName));
 		Structure.NAME_STRUCTURE_BIMAP.put(structName.toString(), structure);
 		
 		// Create seperation settings for structure
-		final int randOffsetMult = 0x26F1BDCF;
-		StructureSeparationSettings seperation = new StructureSeparationSettings(max, min, randOffsetMult);
+		StructureSeparationSettings seperation = new StructureSeparationSettings(max, min, rand);
 		
 		// Force into dimension structure settings map
 		DimensionStructuresSettings.field_236191_b_ = ImmutableMap.<Structure<?>, StructureSeparationSettings>builder().putAll(DimensionStructuresSettings.field_236191_b_).

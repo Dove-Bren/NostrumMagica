@@ -354,6 +354,7 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumFluids.unbreakablePoisonWater, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumFluids.unbreakablePoisonWaterFlowing, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.manaArmorerBlock, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.dungeonBars, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

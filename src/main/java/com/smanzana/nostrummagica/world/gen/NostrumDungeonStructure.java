@@ -183,8 +183,8 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		
 		@Override
 		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
-			int unused; // I think this is way too big now
-			return rand.nextInt(100*100) < 1;
+			rand.setSeed((long)(x ^ z << 4) ^ seed);
+			return rand.nextInt(2) < 1;
 		}
 
 		@Override
@@ -194,12 +194,6 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 						return new Start(DRAGON_DUNGEON, parent, i1, i2, bounds, i3, l1);
 					};
 		}
-		
-//		@Override
-//		public String getStructureName() {
-//			return NostrumMagica.MODID + ":OverworldDragonDungeon";
-//		}
-		
 	}
 	
 	public static class PortalStructure extends NostrumDungeonStructure {
@@ -211,12 +205,14 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		@Override
 		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 			// Spawn a portal shrine somewhere in the 32x32 chunks around 0
-			if (x == (int) ((seed & (0x1F << 14)) >> 14) - 16
-					&& z == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
-				return true;
-			}
-			
-			return rand.nextInt(200*200) < 4;
+//			if (x == (int) ((seed & (0x1F << 14)) >> 14) - 16
+//					&& z == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
+//				return true;
+//			}
+//			
+//			rand.setSeed((long)(x ^ z << 4) ^ seed);
+//			return rand.nextInt(2) < 1;
+			return true;
 		}
 
 		@Override
@@ -226,12 +222,6 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 						return new Start(PORTAL_DUNGEON, parent, i1, i2, bounds, i3, l1);
 					};
 		}
-		
-//		@Override
-//		public String getStructureName() {
-//			return NostrumMagica.MODID + ":OverworldPortalDungeon";
-//		}
-		
 	}
 	
 	public static class PlantBossStructure extends NostrumDungeonStructure {
@@ -242,7 +232,8 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 
 		@Override
 		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
-			return rand.nextInt(100*100) < 1;
+			rand.setSeed((long)(x ^ z << 4) ^ seed);
+			return rand.nextInt(2) < 1;
 		}
 
 		@Override
@@ -252,36 +243,8 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 						return new Start(PLANTBOSS_DUNGEON, parent, i1, i2, bounds, i3, l1);
 					};
 		}
-		
-//		@Override
-//		public String getStructureName() {
-//			return NostrumMagica.MODID + ":OverworldPlantBossDungeon";
-//		}
-		
 	}
-	
-	
-	
-	
 
-//	public static class WorldGenNostrumShrine {
-//		
-//		private NostrumDungeon dungeon;
-//		
-//		public WorldGenNostrumShrine(NostrumDungeon dungeon) {
-//			this.dungeon = dungeon;
-//		}
-//		
-//		public boolean generate(IWorld worldIn, Random rand, BlockPos position) {
-//	        dungeon.spawn(worldIn,
-//	        		new NostrumDungeon.DungeonExitPoint(position, 
-//	        				Direction.Plane.HORIZONTAL.random(rand)
-//	        				));
-//	        
-//	        return true;
-//	    }
-//	}
-	
 	public static NostrumDungeon DRAGON_DUNGEON = new NostrumLoadedDungeon(
 			"dragon",
 			new DragonStartRoom(),

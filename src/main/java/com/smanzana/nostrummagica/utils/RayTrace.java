@@ -170,7 +170,7 @@ public class RayTrace {
         
         // First, raytrace against blocks.
         // First we hit also will help us lower the range of our raytrace
-        trace = world.rayTraceBlocks(new RayTraceContext(fromPos, toPos, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, tracingEntity));
+        trace = world.rayTraceBlocks(new RayTraceContext(fromPos, toPos, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, tracingEntity));
         
         if (trace != null && trace.getType() != RayTraceResult.Type.MISS) {
         	// limit toPos to position of block hit
