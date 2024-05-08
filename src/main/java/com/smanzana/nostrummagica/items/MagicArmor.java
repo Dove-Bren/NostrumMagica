@@ -2225,6 +2225,10 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 	}
 	
 	private static final boolean DoEnderDash(LivingEntity entity, Vector3d dir) {
+		if (DimensionUtils.IsSorceryDim(entity.world)) {
+			return false;
+		}
+		
 		final float dashDist = 4.0f;
 		final Vector3d idealVec = entity.getPositionVec().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
 		
@@ -2378,7 +2382,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			}
 			break;
 		case ENDER_DASH_BACK:
-			if (!ent.world.isRemote && armor.hasEnderDash(ent)) {
+			if (!ent.world.isRemote && armor.hasEnderDash(ent) && !DimensionUtils.IsSorceryDim(ent.world)) {
 				// If sneaking, attempt to teleport to a rod ball
 				if (ent.isSneaking()) {
 					ItemStack held = ent.getHeldItemMainhand();
@@ -2406,7 +2410,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			}
 			break;
 		case ENDER_DASH_SIDE:
-			if (!ent.world.isRemote && armor.hasEnderDash(ent)) {
+			if (!ent.world.isRemote && armor.hasEnderDash(ent) && !DimensionUtils.IsSorceryDim(ent.world)) {
 				final Vector3d realLook = ent.getLookVec();
 				final Vector3d fakeLook = new Vector3d(realLook.x, 0, realLook.z);
 				final Vector3d dir = fakeLook.rotateYaw((float) ((Math.PI / 2) * (data ? -1 : 1)));

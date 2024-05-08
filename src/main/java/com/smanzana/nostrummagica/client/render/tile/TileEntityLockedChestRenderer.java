@@ -62,7 +62,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rot)); // Rotate arm that's centered in the block
-		matrixStackIn.translate(10.5, 0, 0); // distance from center of block (so it's outside it)
+		matrixStackIn.translate(11.5, 0, 0); // distance from center of block (so it's outside it)
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(-90f)); // Rotate so it's facing away from block instead of perpendicular
 		matrixStackIn.translate(-3, -3, 0); // center
 		
@@ -147,16 +147,16 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 				final float offY2 = (float) ((linkWidth/2) * Math.sin(prog2 * Math.PI));
 				final float offZ2 = (float) ((linkWidth/2) * Math.cos(prog2 * Math.PI));
 				
-				buffer.pos(transform, px1 - (linkWidth / 2), py1, pz1).tex(0, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px1 + (linkWidth / 2), py1, pz1).tex(1, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2 - (linkWidth / 2), py2, pz2).tex(0, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2 + (linkWidth / 2), py2, pz2).tex(1, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px1 - (linkWidth / 2), py1, pz1).color(1f, 1f, 1f, alpha1).tex(0, v1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px1 + (linkWidth / 2), py1, pz1).color(1f, 1f, 1f, alpha1).tex(1, v1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2 + (linkWidth / 2), py2, pz2).color(1f, 1f, 1f, alpha2).tex(1, v2).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2 - (linkWidth / 2), py2, pz2).color(1f, 1f, 1f, alpha2).tex(0, v2).lightmap(packedLightIn).endVertex();
 				
 				// Cross quad
-				buffer.pos(transform, px1, py1 - offY1, pz1 - offZ1).tex(0, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px1, py1 + offY1, pz1 + offZ1).tex(1, v1).color(1f, 1f, 1f, alpha1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2, py2 - offY2, pz2 - offZ2).tex(0, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2, py2 + offY2, pz2 + offZ2).tex(1, v2).color(1f, 1f, 1f, alpha2).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px1, py1 - offY1, pz1 - offZ1).color(1f, 1f, 1f, alpha1).tex(0, v1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px1, py1 + offY1, pz1 + offZ1).color(1f, 1f, 1f, alpha1).tex(1, v1).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2, py2 + offY2, pz2 + offZ2).color(1f, 1f, 1f, alpha2).tex(1, v2).lightmap(packedLightIn).endVertex();
+				buffer.pos(transform, px2, py2 - offY2, pz2 - offZ2).color(1f, 1f, 1f, alpha2).tex(0, v2).lightmap(packedLightIn).endVertex();
 			}
 		}
 //		{

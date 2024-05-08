@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.tiles.SorceryPortalTileEntity;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
+import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -90,9 +91,9 @@ public class SorceryPortal extends NostrumPortal implements ITileEntityProvider 
 				}
 				attr.setSorceryPortalLocation(DimensionUtils.GetDimension(entityIn), new BlockPos(savedPos));
 			}
-			entityIn.changeDimension(entityIn.getServer().getWorld(NostrumDimensions.GetSorceryDimension()));
+			entityIn.changeDimension(entityIn.getServer().getWorld(NostrumDimensions.GetSorceryDimension()), NostrumSorceryDimension.DimensionEntryTeleporter.INSTANCE);
 		} else {
-			entityIn.changeDimension(entityIn.getServer().getWorld(World.OVERWORLD));
+			entityIn.changeDimension(entityIn.getServer().getWorld(World.OVERWORLD), NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
 		}
 	}
 	

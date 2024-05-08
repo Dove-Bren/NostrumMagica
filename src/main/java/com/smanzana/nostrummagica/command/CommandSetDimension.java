@@ -5,6 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -37,8 +39,17 @@ public class CommandSetDimension {
 		if (player.isCreative()) {
 			if (world != null) {
 				System.out.println("Teleport Command!");
-				//player.setPortal(player.getPosition());
-				player.changeDimension(world);
+				
+				if (DimensionUtils.IsSorceryDim(world)) {
+					// Teleporting TO sorcery dimension.
+					player.changeDimension(world, NostrumSorceryDimension.DimensionEntryTeleporter.INSTANCE);
+				} else if (DimensionUtils.IsOverworld(world) && DimensionUtils.IsSorceryDim(player.world)) {
+					// If coming FROM sorcery, use exit
+					player.changeDimension(world, NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
+				} else {
+					//player.setPortal(player.getPosition());
+					player.changeDimension(world);
+				}
 			} else {
 				context.getSource().sendFeedback(new StringTextComponent("That dimension doesn't seem to exist!"), true);
 			}

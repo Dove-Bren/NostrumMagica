@@ -2,16 +2,17 @@ package com.smanzana.nostrummagica.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.AspectedWeapon;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -408,6 +409,34 @@ public class PortingUtil {
 		
 		// Else no fixup
 		return teTag;
+	}
+	
+	public static @Nullable UUID readNBTUUID(CompoundNBT nbt, String key) {
+		if (nbt.contains(key)) {
+			return nbt.getUniqueId(key);
+		}
+		
+		return readNBTUUID_14_4(nbt, key);
+		
+	}
+	
+	public static @Nullable UUID readNBTUUID_14_4(CompoundNBT nbt, String key) {
+		// Prior to 1.16, UUIDs were saved as two longs. It'd do like
+		// "nbt.putUniqueID": nbt.putString(key + "_least", id.highbits); nbt.putString(key + "_most", ...)
+		//
+		// public void putUniqueId(String key, UUID value) {
+		//   this.putLong(key + "Most", value.getMostSignificantBits());
+		//   this.putLong(key + "Least", value.getLeastSignificantBits());
+		// }
+		final String leastKey = key + "Least";
+		final String mostKey = key + "Most";
+		if (nbt.contains(leastKey) && nbt.contains(mostKey)) {
+			final long least = nbt.getLong(leastKey);
+			final long most = nbt.getLong(mostKey);
+			return new UUID(most, least);
+		}
+		
+		return null;
 	}
 	
 }

@@ -131,7 +131,7 @@ public class ModConfigCommon {
 					.comment(Key.NOSTRUM_SORCERY_DIM.desc)
 					//.translation
 					.worldRestart()
-					.define(Key.NOSTRUM_SORCERY_DIM.key, "sorcery_dim");
+					.define(Key.NOSTRUM_SORCERY_DIM.key, "nostrummagica:sorcery_dim");
 		}
 		builder.pop();
 	}

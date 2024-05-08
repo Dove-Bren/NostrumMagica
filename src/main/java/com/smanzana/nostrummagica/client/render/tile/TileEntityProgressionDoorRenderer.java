@@ -192,7 +192,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
 			FontRenderer fonter = this.renderDispatcher.fontRenderer;
-			fonter.renderString(val, fonter.getStringWidth(val) / -2, 0, color, false, matrixStackIn.getLast().getMatrix(), bufferIn, true, 0x0, combinedLightIn);
+			fonter.renderString(val, fonter.getStringWidth(val) / -2, 0, color, false, matrixStackIn.getLast().getMatrix(), bufferIn, false, 0x0, combinedLightIn);
 			matrixStackIn.pop();
 		}
 

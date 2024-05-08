@@ -39,7 +39,7 @@ public class NostrumRenderTypes {
 		
 		//final RenderState.TransparencyState LIGHTNING_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228512_d_");
 		final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
-		final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
+		//final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
 
 		final RenderState.LayerState VIEW_OFFSET_Z_LAYERING = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_239235_M_");
 
@@ -152,7 +152,7 @@ public class NostrumRenderTypes {
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
-				.transparency(NO_TRANSPARENCY)
+				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(LIGHTMAP_ENABLED)
 				.cull(NO_CULL)
 			.build(false);
