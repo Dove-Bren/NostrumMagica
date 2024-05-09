@@ -24,6 +24,7 @@ import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -261,6 +262,7 @@ public class NostrumEntityTypes {
 		EntitySpawnPlacementRegistry.register(sprite, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
 		EntitySpawnPlacementRegistry.register(wisp, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWisp::canSpawnExtraCheck);
 		EntitySpawnPlacementRegistry.register(willo, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWillo::canSpawnExtraCheck);
+		EntitySpawnPlacementRegistry.register(lux, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING, AnimalEntity::canAnimalSpawn);
 		
 		// Can't mix buses, so manually register spawn handling to the game bus
 		MinecraftForge.EVENT_BUS.addListener(NostrumEntityTypes::registerSpawns);
@@ -285,7 +287,7 @@ public class NostrumEntityTypes {
 		
 		// tameable and shadow dragon natural spawns
 		if (nether) {
-			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(tameDragonRed, 4, 1, 1));
+			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(tameDragonRed, 2, 1, 1));
 			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(shadowDragonRed, 15, 1, 2));
 		}
 		
@@ -302,7 +304,7 @@ public class NostrumEntityTypes {
 		
 		// wisp
 		if (magical || forest || snowy || spooky || nether) {
-			event.getSpawns().getSpawner(EntityClassification.AMBIENT).add(new MobSpawnInfo.Spawners(wisp, nether ? 5 : 1, 1, 1));
+			event.getSpawns().getSpawner(EntityClassification.AMBIENT).add(new MobSpawnInfo.Spawners(wisp, nether ? 4 : 1, 1, 1));
 		}
 		
 		// willo

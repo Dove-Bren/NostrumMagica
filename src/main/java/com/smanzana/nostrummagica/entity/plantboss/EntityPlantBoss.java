@@ -708,6 +708,11 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			return false;
 		}
 		
+		if (source == DamageSource.IN_WALL) {
+			//this.moveForced(this.getPositionVec().add(0, 1, 0));
+			return false;
+		}
+		
 		amount = Math.min(amount, 10f);
 		
 		if (this.getWeakElement() != null) {
@@ -765,9 +770,11 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	public boolean isPartOfMe(Entity ent) {
-		for (Entity part : this.getParts()) {
-			if (part != null && part.equals(ent)) {
-				return true;
+		if (this.getParts() != null) {
+			for (Entity part : this.getParts()) {
+				if (part != null && part.equals(ent)) {
+					return true;
+				}
 			}
 		}
 		
@@ -1001,6 +1008,9 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	@Override
 	protected float getStandingEyeHeight(Pose pose, EntitySize size) {
+		if (this.eyeHeight == 0) {
+			return size.height * .85f;
+		}
 		return this.eyeHeight;
 	}
 	

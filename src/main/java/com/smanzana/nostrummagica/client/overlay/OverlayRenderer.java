@@ -841,7 +841,7 @@ public class OverlayRenderer extends AbstractGui {
 		
 		matrixStackIn.translate(-GUI_TARGET_CROSSHAIR_WIDTH / 2, -(GUI_TARGET_CROSSHAIR_WIDTH / 2), 0);
 		
-		matrixStackIn.translate(-1, 0, 0);
+		matrixStackIn.translate(0, -1, 0);
 		
 		RenderFuncs.blit(matrixStackIn, 0, 0,
 				0, GUI_TARGET_CROSSHAIR_OFFSETY, GUI_TARGET_CROSSHAIR_WIDTH, GUI_TARGET_CROSSHAIR_WIDTH,

@@ -570,7 +570,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	public static boolean canSpawnExtraCheck(EntityType<EntityWisp> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
-		AxisAlignedBB bb = new AxisAlignedBB(pos).grow(20);
+		AxisAlignedBB bb = new AxisAlignedBB(pos).grow(40);
 		if (DimensionUtils.IsOverworld(world.getWorld())) {
 			if (world.getLight(pos) > .75f) {
 				return false;
@@ -581,7 +581,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		} else {
 			// Nether has smaller pool, so make it harder to spawn there than simply using weight (cause a weight of 1 is still too large)
 			if (DimensionUtils.IsNether(world.getWorld())) {
-				if (world.getDifficulty() == Difficulty.PEACEFUL || rand.nextInt(30) != 0) {
+				if (world.getDifficulty() == Difficulty.PEACEFUL || rand.nextInt(30) != 0 || pos.getY() > 120) {
 					return false;
 				}
 			}
@@ -589,7 +589,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			// Other dimensions, just check nearby wisp count
 			List<EntityWisp> wisps = world.getEntitiesWithinAABB(EntityWisp.class, bb, null);
 			
-			return wisps.size() < 20;
+			return wisps.size() < 1;
 		}
 	}
 	

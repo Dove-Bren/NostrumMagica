@@ -48,7 +48,7 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 		
 		matrixStackIn.translate(0, plant.getBody().getHeight() / 2, 0);
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180 + entityIn.getYawOffset()));
-		matrixStackIn.translate(offset, -.001 * i, 0);
+		matrixStackIn.translate(-offset + .5, -.001 * i, 0);
 		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-entityIn.getPitch()));
 		
 		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);

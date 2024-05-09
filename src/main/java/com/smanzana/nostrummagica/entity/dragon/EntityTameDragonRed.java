@@ -676,9 +676,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	public void writeAdditional(CompoundNBT compound) {
 		super.writeAdditional(compound);
 
-		if (this.getOwnerId() == null) {
-			compound.putString(NBT_OWNER_ID, "");
-		} else {
+		if (this.getOwnerId() != null) {
 			compound.putString(NBT_OWNER_ID, this.getOwnerId().toString());
 		}
 		
@@ -761,8 +759,8 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		super.readAdditional(compound);
 		UUID id;
 
-		if (compound.contains("OwnerUUID", 8)) {
-			id = UUID.fromString(compound.getString("OwnerUUID"));
+		if (compound.contains(NBT_OWNER_ID, NBT.TAG_STRING)) {
+			id = UUID.fromString(compound.getString(NBT_OWNER_ID));
 		}
 		else {
 			String s1 = compound.getString("Owner");
