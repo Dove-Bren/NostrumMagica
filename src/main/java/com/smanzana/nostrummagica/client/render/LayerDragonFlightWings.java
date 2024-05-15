@@ -20,6 +20,7 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 
 public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
@@ -97,8 +98,10 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.getEntitySolid(TEXTURE_WINGS));
 		
 		stack.push();
+		stack.rotate(Vector3f.XP.rotationDegrees(player.isSneaking() ? 25f : 0));
 		stack.translate(0, 0, .125f);
-		stack.translate(-player.getWidth() * .25f, player.getHeight() * .3f, player.getWidth() * .3f);
+		stack.translate(0, player.getHeight() * .3f, player.getWidth() * .3f);
+		stack.translate(0, player.isSneaking() ? .3 : 0, 0); // This is kind tear-y but things like elytra sore 'last' on the entity to smooth!
 		model.setRotationAngles(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 		model.render(stack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colors[0], colors[1], colors[2], colors[3]);
 		

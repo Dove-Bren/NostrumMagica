@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRe
 import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
@@ -33,53 +34,54 @@ public class NostrumRenderTypes {
 	
 	// Could make func that took a texture and returns a render type for flat, unlit icons
 	
+	// Set up states that we use. Pull some from RenderState itself, and make some custom ones/ones not worth the effort to pull out.
+	//private static final RenderState.TextureState BLOCKATLAS_MIPMAP = new RenderState.TextureState(AtlasTexture.LOCATION_BLOCKS_TEXTURE, false, true);
+	
+	//private static final RenderState.TransparencyState LIGHTNING_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228512_d_");
+	private static final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
+	//private static final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
+
+	private static final RenderState.LayerState VIEW_OFFSET_Z_LAYERING = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_239235_M_");
+
+	private static final RenderState.TargetState ITEM_ENTITY_TARGET = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_241712_U_");
+	
+	private static final boolean ENABLE_DEPTH_WRITING = true;
+	private static final boolean ENABLE_COLOUR_COMPONENTS_WRITING = true;
+	private static final RenderState.WriteMaskState WRITE_TO_DEPTH_AND_COLOR
+            = new RenderState.WriteMaskState(ENABLE_DEPTH_WRITING, ENABLE_COLOUR_COMPONENTS_WRITING);
+    
+	private static final RenderState.CullState NO_CULL = new RenderState.CullState(false);
+    
+	private static final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
+    //final RenderState.DepthTestState NO_DEPTH_TEST = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
+    
+	private static final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
+	private static final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
+    
+    @SuppressWarnings("deprecation")
+    private static final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
+    	//setupGlintTexturing(0.16F);
+		RenderSystem.matrixMode(GL11.GL_TEXTURE);
+		RenderSystem.pushMatrix();
+		RenderSystem.loadIdentity();
+		final long ms = Util.milliTime();
+		final long ticks = ms / (1000/20); // whole ticks
+		final long remain = ms % (1000/20); // partial ticks in ms
+		
+		// old formula for xoffset was "0 + (ageInTicks + partialTicks) * .001"
+		// So we wanted to shift .001 unit for every tick
+		
+		final float offset = (.001f * ticks) + (.000001f * remain);
+		RenderSystem.translatef(offset, 0f, 0f);
+		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+    }, () -> {
+    	RenderSystem.matrixMode(GL11.GL_TEXTURE);
+    	RenderSystem.popMatrix();
+    	RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+    });
+		
+
 	static {
-		// Set up states that we use. Pull some from RenderState itself, and make some custom ones/ones not worth the effort to pull out.
-		//final RenderState.TextureState BLOCKATLAS_MIPMAP = new RenderState.TextureState(AtlasTexture.LOCATION_BLOCKS_TEXTURE, false, true);
-		
-		//final RenderState.TransparencyState LIGHTNING_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228512_d_");
-		final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
-		//final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
-
-		final RenderState.LayerState VIEW_OFFSET_Z_LAYERING = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_239235_M_");
-
-		final RenderState.TargetState ITEM_ENTITY_TARGET = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_241712_U_");
-		
-		final boolean ENABLE_DEPTH_WRITING = true;
-	    final boolean ENABLE_COLOUR_COMPONENTS_WRITING = true;
-	    final RenderState.WriteMaskState WRITE_TO_DEPTH_AND_COLOR
-	            = new RenderState.WriteMaskState(ENABLE_DEPTH_WRITING, ENABLE_COLOUR_COMPONENTS_WRITING);
-	    
-	    final RenderState.CullState NO_CULL = new RenderState.CullState(false);
-	    
-	    final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
-	    //final RenderState.DepthTestState NO_DEPTH_TEST = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
-	    
-	    final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
-	    final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
-	    
-	    final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
-	    	//setupGlintTexturing(0.16F);
-			RenderSystem.matrixMode(GL11.GL_TEXTURE);
-			RenderSystem.pushMatrix();
-			RenderSystem.loadIdentity();
-			final long ms = Util.milliTime();
-			final long ticks = ms / (1000/20); // whole ticks
-			final long remain = ms % (1000/20); // partial ticks in ms
-			
-			// old formula for xoffset was "0 + (ageInTicks + partialTicks) * .001"
-			// So we wanted to shift .001 unit for every tick
-			
-			final float offset = (.001f * ticks) + (.000001f * remain);
-			RenderSystem.translatef(offset, 0f, 0f);
-			RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-	    }, () -> {
-	    	RenderSystem.matrixMode(GL11.GL_TEXTURE);
-	    	RenderSystem.popMatrix();
-	    	RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-	    });
-		
-	    
 	    // Define render types
 		RenderType.State glState;
 		
@@ -158,4 +160,20 @@ public class NostrumRenderTypes {
 			.build(false);
 		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
 	}
+	
+	public static final RenderType GetIconType(ResourceLocation texture) {
+		RenderType.State glState;
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(texture, false, true))
+				.cull(NO_CULL)
+				.lightmap(LIGHTMAP_ENABLED)
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				//.layer(VIEW_OFFSET_Z_LAYERING)
+				//.target(ITEM_ENTITY_TARGET)
+				//.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+			.build(false);
+		return RenderType.makeType(Name("flaticon"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
+	}
+	
 }

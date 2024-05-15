@@ -25,7 +25,7 @@ Immersive & Complex Spellcrafting
 [[dependencies.nostrummagica]]
 	modId="curios"
 	mandatory=false
-	versionRange="[FORGE-1.14.4-1.0.6.1,)"
+	versionRange="[1.16.4-4.0.3.5,)"
 	ordering="AFTER"
 	side="BOTH"
 

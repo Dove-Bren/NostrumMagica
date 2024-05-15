@@ -31,7 +31,7 @@ public class ModelRenderShiv<T extends Entity> extends EntityModel<T> {
 		this(RenderType::getEntityCutoutNoCull);
 	}
 	
-	protected ModelRenderShiv(Function<ResourceLocation, RenderType> renderTypeMap) {
+	public ModelRenderShiv(Function<ResourceLocation, RenderType> renderTypeMap) {
 		super(renderTypeMap);
 		payload = null;
 	}

@@ -199,7 +199,7 @@ public class ModInit {
 //		registerShapes(); Should be here, but end up driving what items are created and have to be called super early!
 //    	registerTriggers();
 		
-    	// NOTE: These two registering methods are on the regular gameplay BUS,
+    	// NOTE: These registering methods are on the regular gameplay BUS,
     	// because they depend on data and re-fire when data is reloaded?
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onBiomeLoad);

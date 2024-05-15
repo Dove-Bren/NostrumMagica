@@ -43,7 +43,6 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.fml.DistExecutor;
 
 @SuppressWarnings("deprecation")
 public abstract class MimicBlock extends Block implements ITileEntityProvider {
@@ -180,17 +179,18 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     @Override
     public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
         int result = getValue(state, world, pos, BlockState::getLightValue, () -> super.getLightValue(state, world, pos));
-        //This is needed so we can control AO. Try to remove this asap
-        if ("net.minecraft.client.renderer.BlockModelRenderer".equals(Thread.currentThread().getStackTrace()[3].getClassName())) {
-            Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
-            if(mirrorState.isPresent()) {
-                Boolean isAoModel = DistExecutor.callWhenOn(Dist.CLIENT, () -> () ->
-                    Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(mirrorState.get()).isAmbientOcclusion());
-                if(isAoModel != null) {
-                    return result == 0 && isAoModel ? 0 : 1;
-                }
-            }
-        }
+        // Copied from secret rooms mod, b ut it's SO SLOW because getting the stacktrace on a thread is not fast. Kills performance!
+//        //This is needed so we can control AO. Try to remove this asap
+//        if ("net.minecraft.client.renderer.BlockModelRenderer".equals(Thread.currentThread().getStackTrace()[3].getClassName())) {
+//            Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
+//            if(mirrorState.isPresent()) {
+//                Boolean isAoModel = DistExecutor.callWhenOn(Dist.CLIENT, () -> () ->
+//                    Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(mirrorState.get()).isAmbientOcclusion());
+//                if(isAoModel != null) {
+//                    return result == 0 && isAoModel ? 0 : 1;
+//                }
+//            }
+//        }
         return result;
     }
     

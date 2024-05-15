@@ -18,19 +18,19 @@ import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
-	protected static final IBakedModel GetModel(ModelResourceLocation model) {
+	protected static final IBakedModel GetModel(ResourceLocation model) {
 		Minecraft mc = Minecraft.getInstance();
 		return mc.getModelManager().getModel(model);
 	}
@@ -111,7 +111,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		final boolean isFlying = player.isElytraFlying();
 		final boolean hasChestpiece = (!player.getItemStackFromSlot(EquipmentSlotType.CHEST).isEmpty());
 		final @Nullable RenderType[] renderTypes = provider.getCapeRenderTypes(player, stack);
-		final ModelResourceLocation[] models = provider.getCapeModels(player, stack);
+		final ResourceLocation[] models = provider.getCapeModels(player, stack);
 		if (renderTypes != null && renderTypes.length != models.length) {
 			throw new RuntimeException("CapeProvider render types array must have same length as model array!");
 		}
@@ -134,12 +134,12 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		
 		matrixStack.push();
 		matrixStack.translate(0.0F, 0.0F, 0.125F);
-		matrixStack.scale(objScale, -objScale, objScale);
+		matrixStack.scale(-objScale, -objScale, objScale);
 		matrixStack.translate(0, player.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);
 		matrixStack.rotate(Vector3f.XP.rotationDegrees(rot));
 		
 		int index = 0;
-		for (ModelResourceLocation model : models) {
+		for (ResourceLocation model : models) {
 			final IBakedModel bakedModel = GetModel(model);
 			final IVertexBuilder buffer = GetBuffer(typeBuffer, renderTypes == null ? null : renderTypes[index]);
 			

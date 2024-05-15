@@ -773,12 +773,16 @@ public class RoomBlueprint {
 	}
 	
 	protected void refreshPreview() {
+		refreshPreview(5, 2, 5);
+	}
+	
+	protected void refreshPreview(int width, int height, int depth) {
 		// Get preview based on 'entry' origin point and blocks around it
 		if (dimensions != null) {
 			BlockPos offset = (entry == null ? BlockPos.ZERO : entry.getPos());
-			for (int xOff = -2; xOff <= 2; xOff++)
-			for (int yOff = 0; yOff <= 1; yOff++)
-			for (int zOff = -2; zOff <= 2; zOff++) {
+			for (int xOff = -(width/2); xOff <= (width-1)/2; xOff++)
+			for (int yOff = 0; yOff <= height; yOff++)
+			for (int zOff = -(depth/2); zOff <= (depth-1)/2; zOff++) {
 				final int x = xOff + offset.getX();
 				final int y = yOff + offset.getY();
 				final int z = zOff + offset.getZ();
@@ -787,7 +791,7 @@ public class RoomBlueprint {
 					|| x >= dimensions.getX()
 					|| y >= dimensions.getY()
 					|| z >= dimensions.getZ()) {
-					previewBlocks[xOff + 2][yOff][zOff + 2] = null;
+					previewBlocks[xOff + (width/2)][yOff][zOff + (depth/2)] = null;
 					continue;
 				}
 				
@@ -795,9 +799,9 @@ public class RoomBlueprint {
 						+ (y * dimensions.getZ())
 						+ z;
 				if (bIndex < 0 || bIndex >= blocks.length) {
-					previewBlocks[xOff + 2][yOff][zOff + 2] = null;
+					previewBlocks[xOff + (width/2)][yOff][zOff + (depth/2)] = null;
 				} else {
-					previewBlocks[xOff + 2][yOff][zOff + 2] =
+					previewBlocks[xOff + (width/2)][yOff][zOff + (depth/2)] =
 							blocks[bIndex];
 				}
 			}

@@ -6,9 +6,11 @@ import java.util.Map;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -49,6 +51,11 @@ public class SpellIcon {
 				red, green, blue, alpha);
 		
 		matrixStackIn.pop();
+	}
+	
+	public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, float red, float green, float blue, float alpha, int width, int height) {
+		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, bufferIn.getBuffer(NostrumRenderTypes.GetIconType(TEX)), 0, 0, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH,
+				red, green, blue, alpha);
 	}
 	
 	// Make it easy to pool these

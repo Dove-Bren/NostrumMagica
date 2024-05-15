@@ -128,7 +128,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 /**
- * Common (client and server) handler for MOD bus events.
+ * Client handler for MOD bus events.
  * MOD bus is not game event bus.
  * @author Skyler
  *

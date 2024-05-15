@@ -355,11 +355,6 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		}
 		else
 		{
-			if (isSneak)
-			{
-				matrixStackIn.translate(0.0F, 0.2F, 0.0F);
-			}
-			
 			if (head.showModel) {
 				copyOffsetAndRots(head, bipedHead);
 				this.head.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);

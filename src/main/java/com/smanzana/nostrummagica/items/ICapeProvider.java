@@ -5,10 +5,10 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,7 +18,7 @@ public interface ICapeProvider {
 	public boolean shouldRenderCape(LivingEntity entity, ItemStack stack);
 	
 	@OnlyIn(Dist.CLIENT)
-	public ModelResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack);
+	public ResourceLocation[] getCapeModels(LivingEntity entity, ItemStack stack);
 	
 	@OnlyIn(Dist.CLIENT)
 	public @Nullable RenderType[] getCapeRenderTypes(LivingEntity entity, ItemStack stack);
