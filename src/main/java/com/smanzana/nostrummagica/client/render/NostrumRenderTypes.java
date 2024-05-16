@@ -3,8 +3,9 @@ package com.smanzana.nostrummagica.client.render;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.smanzana.nostrummagica.client.render.entity.ModelSwitchTrigger;
+import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
+import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;

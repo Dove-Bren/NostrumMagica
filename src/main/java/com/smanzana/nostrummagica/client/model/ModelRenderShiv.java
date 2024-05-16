@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.render.entity;
+package com.smanzana.nostrummagica.client.model;
 
 import java.util.function.Function;
 
@@ -18,8 +18,6 @@ import net.minecraft.util.ResourceLocation;
  */
 public class ModelRenderShiv<T extends Entity> extends EntityModel<T> {
 
-	private int unused; // Uhhh could I have just used LivingRenderer#preRenderCallback?
-	
 	public static interface RenderRunnable {
 		public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 				float red, float green, float blue, float alpha);

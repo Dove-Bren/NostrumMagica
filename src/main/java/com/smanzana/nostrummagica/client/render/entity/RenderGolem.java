@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.model.ModelGolem;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;

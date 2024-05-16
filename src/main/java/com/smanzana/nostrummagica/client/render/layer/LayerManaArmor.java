@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.render;
+package com.smanzana.nostrummagica.client.render.layer;
 
 import javax.annotation.Nullable;
 
@@ -6,6 +6,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -18,7 +19,7 @@ import net.minecraft.util.math.MathHelper;
 
 public class LayerManaArmor extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
 
-	protected static final ResourceLocation TEXTURE_ARMOR = new ResourceLocation(NostrumMagica.MODID, "textures/entity/manaarmor.png");
+	public static final ResourceLocation TEXTURE_ARMOR = new ResourceLocation(NostrumMagica.MODID, "textures/entity/manaarmor.png");
 	protected final PlayerRenderer renderPlayer;
 	
 	public LayerManaArmor(PlayerRenderer renderPlayerIn) {

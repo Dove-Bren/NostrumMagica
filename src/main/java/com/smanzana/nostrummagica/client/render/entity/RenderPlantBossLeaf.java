@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.model.ModelPlantBossLeaf;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;

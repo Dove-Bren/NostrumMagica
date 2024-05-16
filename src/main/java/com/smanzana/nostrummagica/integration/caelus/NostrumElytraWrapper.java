@@ -5,7 +5,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Multimap;
-import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
+import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.IElytraRenderer;
 

@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.model.ModelDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;

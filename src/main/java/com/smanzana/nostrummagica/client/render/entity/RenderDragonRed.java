@@ -3,8 +3,9 @@ package com.smanzana.nostrummagica.client.render.entity;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed.EDragonArmorPart;
-import com.smanzana.nostrummagica.client.render.entity.ModelDragonRed.EDragonOverlayMaterial;
+import com.smanzana.nostrummagica.client.model.ModelDragonRed;
+import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonArmorPart;
+import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonOverlayMaterial;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
 import com.smanzana.nostrummagica.items.DragonArmor;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.render.entity;
+package com.smanzana.nostrummagica.client.model;
 
 import java.util.function.Function;
 

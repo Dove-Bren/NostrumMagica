@@ -26,10 +26,9 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierG
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.client.render.LayerAetherCloak;
-import com.smanzana.nostrummagica.client.render.LayerCustomElytra;
-import com.smanzana.nostrummagica.client.render.LayerDragonFlightWings;
-import com.smanzana.nostrummagica.client.render.LayerManaArmor;
+import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
+import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
+import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.HookshotItem;
@@ -1025,7 +1024,6 @@ public class OverlayRenderer extends AbstractGui {
 			
 			// EnderIO injects custom cape layer so that capes don't render if an elytra-like item is present. We won't bother.
 			// Instead, we just inject a layer for our custom elytras, and another for dragon-flight wings
-			event.getRenderer().addLayer(new LayerCustomElytra<>(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerManaArmor(event.getRenderer()));

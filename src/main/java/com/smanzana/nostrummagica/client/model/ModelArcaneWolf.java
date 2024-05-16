@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.render.entity;
+package com.smanzana.nostrummagica.client.model;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;

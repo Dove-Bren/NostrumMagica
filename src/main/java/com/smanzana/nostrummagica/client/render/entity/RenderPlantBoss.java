@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.model.ModelPlantBoss;
+import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
 import com.smanzana.nostrummagica.spells.EMagicElement;

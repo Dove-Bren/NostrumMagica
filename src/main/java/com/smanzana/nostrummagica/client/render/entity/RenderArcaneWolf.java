@@ -2,7 +2,8 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.render.LayerArcaneWolfRunes;
+import com.smanzana.nostrummagica.client.model.ModelArcaneWolf;
+import com.smanzana.nostrummagica.client.render.layer.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;

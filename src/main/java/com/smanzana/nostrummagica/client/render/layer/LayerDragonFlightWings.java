@@ -1,11 +1,11 @@
-package com.smanzana.nostrummagica.client.render;
+package com.smanzana.nostrummagica.client.render.layer;
 
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.render.entity.ModelDragonFlightWings;
+import com.smanzana.nostrummagica.client.model.ModelDragonFlightWings;
 import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 

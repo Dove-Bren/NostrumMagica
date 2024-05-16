@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.smanzana.nostrummagica.client.model.ModelShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;

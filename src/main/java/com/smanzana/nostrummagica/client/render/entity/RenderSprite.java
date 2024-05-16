@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.smanzana.nostrummagica.client.model.ModelSpriteCore;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;

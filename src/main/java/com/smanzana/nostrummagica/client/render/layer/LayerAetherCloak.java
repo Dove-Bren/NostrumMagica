@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.render;
+package com.smanzana.nostrummagica.client.render.layer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

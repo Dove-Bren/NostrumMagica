@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.render.entity;
+package com.smanzana.nostrummagica.client.model;
 
 public class ModelRepeatSwitchTrigger extends ModelSwitchTrigger {
 	
