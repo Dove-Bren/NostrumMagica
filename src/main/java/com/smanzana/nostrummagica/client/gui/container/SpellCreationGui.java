@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.NostrumItems;
@@ -22,7 +21,7 @@ import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellCrafting;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -394,85 +393,50 @@ public class SpellCreationGui {
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean isValid, boolean deductReagents) {
 			boolean fail = false;
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
-			boolean locked = attr == null || !attr.isUnlocked() || !attr.getCompletedResearches().contains("spellcraft");
+			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
+			boolean locked = SpellCrafting.CanCraftSpells(crafter);
 			spellErrorStrings.clear();
 			reagentStrings.clear();
 			
-			String prefix = "";
-			
 			if (locked) {
-				//prefix = TextFormatting.OBFUSCATED + "";
-				spellErrorStrings.add(new StringTextComponent(prefix + "The runes on the board don't respond to your hands"));
-				fail = true;
+				spellErrorStrings.add(new StringTextComponent("The runes on the board don't respond to your hands"));
+				return null;
 			}
 			
-			if (!isValid) {
-				spellErrorStrings.add(new StringTextComponent(prefix + "Missing blank scroll"));
-				return null; // fatal
-			}
+			int unused;
+//			if (!isValid) {
+//				spellErrorStrings.add(new StringTextComponent("Missing blank scroll"));
+//				return null; // fatal
+//			}
 			
 			if (name.trim().isEmpty()) {
-				spellErrorStrings.add(new StringTextComponent(prefix + "Must have a name"));
+				spellErrorStrings.add(new StringTextComponent("Must have a name"));
 				fail = true;
 			}
 			
 			if (iconIdx < 0) {
-				spellErrorStrings.add(new StringTextComponent(prefix + "Must have a spell icon selected"));
+				spellErrorStrings.add(new StringTextComponent("Must have a spell icon selected"));
 				fail = true;
 			}
 			
-			@Nonnull ItemStack stack = inventory.getStackInSlot(1);
-			if (stack.isEmpty() || !SpellRune.isTrigger(stack)) {
-				spellErrorStrings.add(new StringTextComponent(prefix + "Spell must begin with a trigger"));
+			List<String> rawSpellErrors = new ArrayList<>();
+			if (!SpellCrafting.CheckForValidRunes(inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors)) {
+				// Dump raw errors into output strings and return
+				for (String error : rawSpellErrors) {
+					spellErrorStrings.add(new StringTextComponent(error));
+				}
 				return null;
 			}
 			
-			boolean flag = false;
-			for (int i = 2; i < inventory.getReagentSlotIndex(); i++) {
-				stack = inventory.getStackInSlot(i);
-				if (stack.isEmpty()) {
-					break;
-				}
-				if (!SpellRune.isSpellWorthy(stack)) {
-					spellErrorStrings.add(new StringTextComponent(prefix + "Rune in slot " + (i) + " is not allowed."));
-					
-					// This builds on the assumption that the two spellworthy types are triggers and packed shapes
-					spellErrorStrings.add(new StringTextComponent(prefix + "  -> Shapes, Elements, and Alterations must be combined into a Packed Shape first."));
-					return null;
-				}
-				if (SpellRune.isPackedShape(stack)) {
-					flag = true;
-					break;
-				}
-			}
-			
-			if (!flag) {
-				spellErrorStrings.add(new StringTextComponent(prefix + "Must have at least one packed spell shape"));
+			// Stop here if already failing and avoid creating the spell
+			if (fail) {
 				return null;
 			}
 			
-			Spell spell = new Spell(name, true);
-			SpellPart part;
-			for (int i = 1; i < inventory.getReagentSlotIndex(); i++) {
-				stack = inventory.getStackInSlot(i);
-				if (stack.isEmpty()) {
-					break;
-				}
-				
-				part = SpellRune.getPart(stack);
-				if (part == null) {
-					spellErrorStrings.add(new StringTextComponent(prefix + "Unfinished spell part in slot " + (i + 1)));
-					if (SpellRune.isShape(stack))
-						spellErrorStrings.add(new StringTextComponent(prefix + " -> Spell parts must have an element"));
-					else
-						spellErrorStrings.add(new StringTextComponent(prefix + " -> This trigger has been corrupted"));
-					return null;
-				} else {
-					spell.addPart(part);
-				}
-			}
+			// Actually make spell
+			Spell spell = SpellCrafting.CreateSpellFromRunes(name, inventory, 1, inventory.getReagentSlotIndex()-1);
 			
+			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
 			for (ReagentType type : reagents.keySet()) {
 				if (type == null)
@@ -483,10 +447,10 @@ public class SpellCreationGui {
 				
 				int left = takeReagent(inventory, type, count, false);
 				if (left != 0) {
-					spellErrorStrings.add(new StringTextComponent(prefix + "Need " + left + " more " + type.prettyName()));
+					spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
 					fail = true;
 				} else {
-					reagentStrings.add(new StringTextComponent(prefix + count + " " + type.prettyName()));
+					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()));
 				}
 				
 			}
@@ -507,7 +471,7 @@ public class SpellCreationGui {
 					int left = takeReagent(inventory, type, count, true);
 					if (left != 0) {
 						System.out.println("Couldn't take all " + type.name());
-						spellErrorStrings.add(new StringTextComponent(prefix + "Need " + left + " more " + type.prettyName()));
+						spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
 						return null;
 					}
 					
