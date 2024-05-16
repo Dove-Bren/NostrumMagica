@@ -136,10 +136,6 @@ public class SpellCreationGui {
 				public void putStack(@Nonnull ItemStack stack) {
 					super.putStack(stack);
 					
-					if (!stack.isEmpty() && stack.getItem() instanceof BlankScroll) {
-						iconIndex = NostrumMagica.rand.nextInt(SpellIcon.numIcons);
-					}
-					
 					validate();
 				}
 				
