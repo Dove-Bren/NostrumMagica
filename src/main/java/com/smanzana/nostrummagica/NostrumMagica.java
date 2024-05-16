@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -15,7 +13,6 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
@@ -25,12 +22,7 @@ import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
-import com.smanzana.nostrummagica.entity.tasks.FollowOwnerAdvancedGoal;
-import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
-import com.smanzana.nostrummagica.entity.tasks.PetTargetGoal;
 import com.smanzana.nostrummagica.init.ModInit;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
@@ -48,7 +40,6 @@ import com.smanzana.nostrummagica.listeners.ManaArmorListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.pet.PetCommandManager;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
@@ -64,23 +55,16 @@ import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
+import com.smanzana.petcommand.api.PetFuncs;
 
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.FollowOwnerGoal;
-import net.minecraft.entity.ai.goal.GoalSelector;
-import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.entity.boss.dragon.EnderDragonPartEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -88,20 +72,17 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(NostrumMagica.MODID)
 public class NostrumMagica {
 	public static final String MODID = "nostrummagica";
-	public static final String VERSION = "1.14.4-1.10.0";
 	public static final Random rand = new Random();
 
 	public static NostrumMagica instance;
@@ -123,7 +104,6 @@ public class NostrumMagica {
 	private static SpellRegistry spellRegistry;
 	private static NostrumDimensionMapper serverDimensionMapper;
 	private static PetSoulRegistry petSoulRegistry;
-	private static PetCommandManager petCommandManager;
 	private static NostrumKeyRegistry worldKeys;
 
 	public static boolean initFinished = false;
@@ -663,82 +643,43 @@ public class NostrumMagica {
 
 	public static List<ITameDragon> getNearbyTamedDragons(LivingEntity entity, double blockRadius,
 			boolean onlyOwned) {
-		List<ITameDragon> list = new LinkedList<>();
-
-		AxisAlignedBB box = new AxisAlignedBB(entity.getPosX() - blockRadius, entity.getPosY() - blockRadius,
-				entity.getPosZ() - blockRadius, entity.getPosX() + blockRadius, entity.getPosY() + blockRadius,
-				entity.getPosZ() + blockRadius);
-
-		List<EntityTameDragonRed> dragonList = entity.world.getEntitiesWithinAABB(EntityTameDragonRed.class, box,
-				(dragon) -> {
-					return dragon instanceof ITameDragon;
-				});
-
-		if (dragonList != null && !dragonList.isEmpty()) {
-			for (EntityTameDragonRed dragon : dragonList) {
-				ITameDragon tame = (ITameDragon) dragon;
-
-				if (onlyOwned && (!tame.isEntityTamed() || tame.getLivingOwner() != entity)) {
-					continue;
-				}
-
-				list.add((ITameDragon) dragon);
+//		List<ITameDragon> list = new LinkedList<>();
+//
+//		AxisAlignedBB box = new AxisAlignedBB(entity.getPosX() - blockRadius, entity.getPosY() - blockRadius,
+//				entity.getPosZ() - blockRadius, entity.getPosX() + blockRadius, entity.getPosY() + blockRadius,
+//				entity.getPosZ() + blockRadius);
+//
+//		List<EntityTameDragonRed> dragonList = entity.world.getEntitiesWithinAABB(EntityTameDragonRed.class, box,
+//				(dragon) -> {
+//					return dragon instanceof ITameDragon;
+//				});
+//
+//		if (dragonList != null && !dragonList.isEmpty()) {
+//			for (EntityTameDragonRed dragon : dragonList) {
+//				ITameDragon tame = (ITameDragon) dragon;
+//
+//				if (onlyOwned && (!tame.isEntityTamed() || tame.getLivingOwner() != entity)) {
+//					continue;
+//				}
+//
+//				list.add((ITameDragon) dragon);
+//			}
+//		}
+//
+//		return list;
+		
+		double blockRadiusSq = blockRadius * blockRadius;
+		return PetFuncs.GetTamedEntities(entity, (ent) -> {
+			if (!(ent instanceof ITameDragon)) {
+				return false;
 			}
-		}
-
-		return list;
-	}
-
-	public static List<LivingEntity> getTamedEntities(LivingEntity owner) {
-		List<LivingEntity> ents = new ArrayList<>();
-		
-		Iterable<Entity> entities;
-		
-		if (owner.world instanceof ServerWorld) {
-			entities = ((ServerWorld) owner.world).getEntities().collect(Collectors.toList());
-		} else {
-			entities = ((ClientWorld) owner.world).getAllEntities();
-		}
-		
-		for (Entity e : entities) {
-			if (!(e instanceof LivingEntity)) {
-				continue;
+			
+			if (ent.getDistanceSq(entity) > blockRadiusSq) {
+				return false;
 			}
-
-			LivingEntity ent = (LivingEntity) e;
-			if (ent instanceof ITameableEntity) {
-				ITameableEntity tame = (ITameableEntity) ent;
-				if (tame.isEntityTamed() && tame.getLivingOwner() != null && tame.getLivingOwner().equals(owner)) {
-					ents.add(ent);
-				}
-			} else if (ent instanceof TameableEntity) {
-				TameableEntity tame = (TameableEntity) ent;
-				if (tame.isTamed() && tame.isOwner(owner)) {
-					ents.add(ent);
-				}
-			}
-		}
-		return ents;
-	}
-
-	public static @Nullable LivingEntity getOwner(MobEntity entity) {
-		LivingEntity ent = (LivingEntity) entity;
-		if (ent instanceof ITameableEntity) {
-			ITameableEntity tame = (ITameableEntity) ent;
-			return tame.getLivingOwner();
-		} else if (ent instanceof TameableEntity) {
-			TameableEntity tame = (TameableEntity) ent;
-			return tame.getOwner();
-		}
-		return null;
-	}
-	
-	public static @Nullable LivingEntity getOwner(Entity entity) {
-		if (entity instanceof MobEntity) {
-			return getOwner((MobEntity) entity);
-		}
-		
-		return null;
+			
+			return true;
+		}).stream().map(ent -> (ITameDragon) ent).collect(Collectors.toList());
 	}
 
 	public static @Nullable Entity getEntityByUUID(World world, UUID id) {
@@ -768,17 +709,6 @@ public class NostrumMagica {
 		return petSoulRegistry;
 	}
 
-	public PetCommandManager getPetCommandManager() {
-		if (petCommandManager == null) {
-			if (proxy.isServer()) {
-				throw new RuntimeException("Accessing PetCommandManager before a world has been loaded!");
-			} else {
-				petCommandManager = new PetCommandManager();
-			}
-		}
-		return petCommandManager;
-	}
-	
 	public NostrumKeyRegistry getWorldKeys() {
 		if (worldKeys == null) {
 			if (proxy.isServer()) {
@@ -844,17 +774,6 @@ public class NostrumMagica {
 //		}
 	}
 
-	private void initPetCommandManager(World world) {
-		petCommandManager = (PetCommandManager) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PetCommandManager::new,
-				PetCommandManager.DATA_NAME);
-
-		// TODO I think this is automatic now?
-//		if (petCommandManager == null) {
-//			petCommandManager = new PetCommandManager();
-//			world.getMapStorage().setData(PetCommandManager.DATA_NAME, petCommandManager);
-//		}
-	}
-	
 	private void initWorldKeys(World world) {
 		worldKeys = (NostrumKeyRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(NostrumKeyRegistry::new,
 				NostrumKeyRegistry.DATA_NAME);
@@ -885,7 +804,6 @@ public class NostrumMagica {
 			initSpellRegistry(world);
 			getDimensionMapper(world);
 			initPetSoulRegistry(world);
-			initPetCommandManager(world);
 			initWorldKeys(world);
 		}
 	}
@@ -914,41 +832,7 @@ public class NostrumMagica {
 	}
 
 	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
-		if (ent1 == ent2) {
-			return true;
-		}
-
-		if (ent1 == null || ent2 == null) {
-			return false;
-		}
-
-		if (ent1.getTeam() != null || ent2.getTeam() != null) { // If teams are at play, just use those.
-			return ent1.isOnSameTeam(ent2);
-		}
-		
-		LivingEntity ent1Owner = getOwner(ent1);
-		if (ent1Owner != null) {
-			// Are they on the same team as our owner?
-			return IsSameTeam((LivingEntity) ent1Owner, ent2);
-		}
-		
-		LivingEntity ent2Owner = getOwner(ent2);
-		if (ent2Owner != null) {
-			// Are we on the same team as their owner?
-			return IsSameTeam(ent1, ent2Owner);
-		}
-
-		// Non-owned entities with no teams involved.
-		// Assume mobs are on a different team than anything else
-		// return (ent1 instanceof IMob == ent2 instanceof IMob);
-
-		// If both are players and teams aren't involved, assume they can work together
-		if (ent1 instanceof PlayerEntity && ent2 instanceof PlayerEntity) {
-			return true;
-		}
-
-		// More hostile; assume anything here is not on same team
-		return false;
+		return PetFuncs.IsSameTeam(ent1, ent2);
 	}
 
 	public static @Nullable LivingEntity resolveLivingEntity(@Nullable Entity entityOrSubEntity) {
@@ -975,99 +859,6 @@ public class NostrumMagica {
 		}
 
 		return null;
-	}
-
-	@SubscribeEvent
-	public void onEntitySpawn(EntityJoinWorldEvent e) {
-		if (e.isCanceled()) {
-			return;
-		}
-
-		if (!(e.getEntity() instanceof MobEntity)) {
-			return;
-		}
-		
-		if (!(e.getEntity() instanceof TameableEntity) && !(e.getEntity() instanceof ITameableEntity)) {
-			return;
-		}
-
-		final MobEntity living = (MobEntity) e.getEntity();
-
-		// Follow task for pets
-		{
-			PrioritizedGoal existingTask = null;
-			PrioritizedGoal followTask = null;
-			
-			// Get private goal list
-			LinkedHashSet<PrioritizedGoal> goals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.goalSelector, "field_220892_d"); 
-
-			// Scan for existing task
-			for (PrioritizedGoal entry : goals) {
-				if (entry.getGoal() instanceof FollowOwnerAdvancedGoal) {
-					if (existingTask == null) {
-						existingTask = entry;
-					} else if (existingTask.getPriority() > entry.getPriority()) {
-						existingTask = entry; // cause > priority means less priority lol
-					}
-				} else if (entry.getGoal() instanceof FollowOwnerGoal
-						|| entry.getGoal() instanceof FollowOwnerGenericGoal) {
-					if (followTask == null) {
-						followTask = entry;
-					} else if (followTask.getPriority() > entry.getPriority()) {
-						followTask = entry;
-					}
-				}
-			}
-
-			if (existingTask == null) {
-				// Gotta inject task. May have to make space for it.
-				FollowOwnerAdvancedGoal<MobEntity> task = new FollowOwnerAdvancedGoal<MobEntity>(living,
-						1.5f, 0f, .5f);
-				if (followTask == null) {
-					// Can just add at end
-					living.goalSelector.addGoal(100, task);
-				} else {
-					List<PrioritizedGoal> removes = Lists.newArrayList(goals);
-					final int priority = followTask.getPriority();
-					removes.removeIf((entry) -> {
-						return entry.getPriority() < priority;
-					});
-
-					living.goalSelector.addGoal(priority, task);
-					for (PrioritizedGoal entry : removes) {
-						living.goalSelector.removeGoal(entry.getGoal());
-						living.goalSelector.addGoal(entry.getPriority() + 1, entry.getGoal());
-					}
-				}
-			}
-		}
-
-		// Target task for pets
-		if (living instanceof CreatureEntity) {
-			CreatureEntity creature = (CreatureEntity) living;
-			boolean hasTaskAlready = false;
-			
-			// Get private goal list
-			LinkedHashSet<PrioritizedGoal> targetGoals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, living.targetSelector, "field_220892_d"); 
-
-			// Scan for existing task
-			for (PrioritizedGoal entry : targetGoals) {
-				if (entry.getGoal() instanceof PetTargetGoal) {
-					hasTaskAlready = true;
-					break;
-				}
-			}
-
-			if (!hasTaskAlready) {
-				List<PrioritizedGoal> removes = Lists.newArrayList(targetGoals);
-
-				living.targetSelector.addGoal(1, new PetTargetGoal<CreatureEntity>(creature));
-				for (PrioritizedGoal entry : removes) {
-					living.targetSelector.removeGoal(entry.getGoal());
-					living.targetSelector.addGoal(entry.getPriority() + 1, entry.getGoal());
-				}
-			}
-		}
 	}
 
 	public static boolean attemptTeleport(World world, BlockPos target, PlayerEntity player, boolean allowPortal,

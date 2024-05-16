@@ -3,7 +3,8 @@ package com.smanzana.nostrummagica.entity.tasks;
 import java.util.EnumSet;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
+import com.smanzana.petcommand.api.ai.IFollowOwnerGoal;
+import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
@@ -17,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal {
+public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal implements IFollowOwnerGoal {
 	
 	private final T thePet;
 	private LivingEntity theOwner;

@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
 
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
@@ -22,7 +21,6 @@ public class NostrumContainers {
 	@ObjectHolder(ReagentBagGui.BagContainer.ID) public static ContainerType<ReagentBagGui.BagContainer> ReagentBag;
 	@ObjectHolder(RuneBagGui.BagContainer.ID) public static ContainerType<RuneBagGui.BagContainer> RuneBag;
 	@ObjectHolder(SpellCreationGui.SpellCreationContainer.ID) public static ContainerType<SpellCreationGui.SpellCreationContainer> SpellCreation;
-	@ObjectHolder(PetGUI.PetContainer.ID) public static ContainerType<PetGUI.PetContainer<?>> PetGui;
 	@ObjectHolder(RuneShaperGui.RuneShaperContainer.ID) public static ContainerType<RuneShaperGui.RuneShaperContainer> RuneShaper;
 	
 	@SubscribeEvent
@@ -36,7 +34,6 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(ReagentBagGui.BagContainer::FromNetwork).setRegistryName(ReagentBagGui.BagContainer.ID));
 		registry.register(IForgeContainerType.create(RuneBagGui.BagContainer::FromNetwork).setRegistryName(RuneBagGui.BagContainer.ID));
 		registry.register(IForgeContainerType.create(SpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(SpellCreationGui.SpellCreationContainer.ID));
-		registry.register(IForgeContainerType.create(PetGUI.PetContainer::FromNetwork).setRegistryName(PetGUI.PetContainer.ID));
 		registry.register(IForgeContainerType.create(RuneShaperGui.RuneShaperContainer::FromNetwork).setRegistryName(RuneShaperGui.RuneShaperContainer.ID));
 	}
 }

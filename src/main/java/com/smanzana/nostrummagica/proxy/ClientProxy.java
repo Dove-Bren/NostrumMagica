@@ -38,7 +38,6 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -53,11 +52,8 @@ import com.smanzana.nostrummagica.network.messages.BladeCastMessage;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
-import com.smanzana.nostrummagica.network.messages.PetCommandMessage;
 import com.smanzana.nostrummagica.network.messages.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.messages.StatRequestMessage;
-import com.smanzana.nostrummagica.pet.PetPlacementMode;
-import com.smanzana.nostrummagica.pet.PetTargetMode;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -75,7 +71,6 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -91,7 +86,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
@@ -111,16 +105,9 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingScroll;
 	private KeyBinding bindingInfo;
 	private KeyBinding bindingBladeCast;
-	private KeyBinding bindingPetPlacementModeCycle;
-	private KeyBinding bindingPetTargetModeCycle;
-	private KeyBinding bindingPetAttackAll;
-	private KeyBinding bindingPetAttack;
-	private KeyBinding bindingPetAllStop;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 	
-	private @Nullable LivingEntity selectedPet; // Used for directing pets to do actions on key releases
-
 	public ClientProxy() {
 		super();
 		
@@ -139,16 +126,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingInfo);
 		bindingBladeCast = new KeyBinding("key.bladecast.desc", GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
-		bindingPetPlacementModeCycle = new KeyBinding("key.pet.placementmode.desc", GLFW.GLFW_KEY_G, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingPetPlacementModeCycle);
-		bindingPetTargetModeCycle = new KeyBinding("key.pet.targetmode.desc", GLFW.GLFW_KEY_H, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingPetTargetModeCycle);
-		bindingPetAttackAll = new KeyBinding("key.pet.attackall.desc", GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingPetAttackAll);
-		bindingPetAttack = new KeyBinding("key.pet.attack.desc", GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingPetAttack);
-		bindingPetAllStop = new KeyBinding("key.pet.stopall.desc", GLFW.GLFW_KEY_L, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingPetAllStop);
 	}
 	
 	@SubscribeEvent
@@ -202,94 +179,7 @@ public class ClientProxy extends CommonProxy {
 				doBladeCast();
 			}
 			
-		} else if (bindingPetPlacementModeCycle.isPressed()) {
-			// Cycle placement mode
-			final PetPlacementMode current = NostrumMagica.instance.getPetCommandManager().getPlacementMode(this.getPlayer());
-			final PetPlacementMode next = PetPlacementMode.values()[(current.ordinal() + 1) % PetPlacementMode.values().length];
-			
-			// Set up client to have this locally
-			NostrumMagica.instance.getPetCommandManager().setPlacementMode(getPlayer(), next);
-			
-			// Update client icon
-			this.overlayRenderer.changePetPlacementIcon();
-			
-			// Send change to server
-			NetworkHandler.sendToServer(PetCommandMessage.AllPlacementMode(next));
-		} else if (bindingPetTargetModeCycle.isPressed()) {
-			// Cycle target mode
-			final PetTargetMode current = NostrumMagica.instance.getPetCommandManager().getTargetMode(this.getPlayer());
-			final PetTargetMode next = PetTargetMode.values()[(current.ordinal() + 1) % PetTargetMode.values().length];
-			
-			// Update client icon
-			this.overlayRenderer.changePetTargetIcon();
-			
-			// Set up client to have this locally
-			NostrumMagica.instance.getPetCommandManager().setTargetMode(getPlayer(), next);
-			
-			// Send change to server
-			NetworkHandler.sendToServer(PetCommandMessage.AllTargetMode(next));
-		} else if (bindingPetAttackAll.isPressed()) {
-			// Raytrace, find tar get, and set all to attack
-			final PlayerEntity player = getPlayer();
-			if (player != null && player.world != null) {
-				final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
-				final List<LivingEntity> tames = NostrumMagica.getTamedEntities(player);
-				RayTraceResult result = RayTrace.raytraceApprox(
-						player.world, player,
-						player.getEyePosition(partialTicks),
-						player.getLook(partialTicks),
-						100, (e) -> { return e != player && e instanceof LivingEntity && !player.isOnSameTeam(e) && !tames.contains(e);},
-						1);
-				if (result != null && result.getType() == RayTraceResult.Type.ENTITY) {
-					NetworkHandler.sendToServer(PetCommandMessage.AllAttack(RayTrace.livingFromRaytrace(result)));
-				}
-			}
-		} else if (bindingPetAttack.isPressed()) {
-			// Raytrace, find target, and then make single one attack
-			// Probably could be same button but if raytrace is our pet,
-			// have them hold it down and release on an enemy? Or 'select' them
-			// and have them press again to select enemy?
-			final PlayerEntity player = getPlayer();
-			if (player != null && player.world != null) {
-				final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
-				final List<LivingEntity> tames = NostrumMagica.getTamedEntities(player);
-				if (selectedPet == null) {
-					// Try and select a pet
-					RayTraceResult result = RayTrace.raytraceApprox(
-							player.world, player,
-							player.getEyePosition(partialTicks),
-							player.getLook(partialTicks),
-							100, (e) -> { return e != player && tames.contains(e);},
-							.1);
-					if (result != null && result.getType() == RayTraceResult.Type.ENTITY) {
-						selectedPet = RayTrace.livingFromRaytrace(result);
-						if (selectedPet.world.isRemote) {
-							selectedPet.setGlowing(true);
-						}
-					}
-				} else {
-					// Find target
-					RayTraceResult result = RayTrace.raytraceApprox(
-							player.world, player,
-							player.getEyePosition(partialTicks),
-							player.getLook(partialTicks),
-							100, (e) -> { return e != player && e instanceof LivingEntity && !player.isOnSameTeam(e) && !tames.contains(e);},
-							1);
-					if (result != null && result.getType() == RayTraceResult.Type.ENTITY) {
-						NetworkHandler.sendToServer(PetCommandMessage.PetAttack(selectedPet, RayTrace.livingFromRaytrace(result)));
-					}
-					
-					// Clear out pet
-					if (selectedPet.world.isRemote) {
-						selectedPet.setGlowing(false);
-					}
-					selectedPet = null;
-				}
-			}
-		} else if (bindingPetAllStop.isPressed()) {
-			NetworkHandler.sendToServer(PetCommandMessage.AllStop());
 		}
-		
 	}
 	
 	private void doBladeCast() {
@@ -550,17 +440,6 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openBook(PlayerEntity player, GuiBook book, Object userdata) {
 		Minecraft.getInstance().displayGuiScreen(book.getScreen(userdata));
-	}
-	
-	@Override
-	public void openPetGUI(PlayerEntity player, IEntityPet pet) {
-		// Integrated clients still need to open the gui...
-		//if (!player.world.isRemote) {
-//			DragonContainer container = dragon.getGUIContainer();
-//			DragonGUI gui = new DragonGUI(container);
-//			FMLCommonHandler.instance().showGuiScreen(gui);
-			super.openPetGUI(player, pet);
-		//}
 	}
 	
 	@Override
@@ -1172,9 +1051,5 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		super.playRitualEffect(world, pos, element, center, extras, types, output);
-	}
-	
-	public @Nullable LivingEntity getCurrentPet() {
-		return this.selectedPet;
 	}
 }

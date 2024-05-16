@@ -3,12 +3,12 @@ package com.smanzana.nostrummagica.entity.tasks.arcanewolf;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -43,7 +43,7 @@ public class ArcaneWolfAIMysticTask extends Goal {
 	
 	protected List<LivingEntity> getTargets(EntityArcaneWolf wolf) {
 		LivingEntity owner = wolf.getOwner();
-		List<LivingEntity> tames = NostrumMagica.getTamedEntities(owner);
+		List<LivingEntity> tames = PetFuncs.GetTamedEntities(owner);
 		tames.add(owner);
 		tames.removeIf((e) -> { return e.getDistance(wolf) > 15;});
 		return tames;

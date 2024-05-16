@@ -13,8 +13,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIStatAdapter;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInventorySheet;
@@ -23,9 +21,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
-import com.smanzana.nostrummagica.entity.tasks.FollowOwnerAdvancedGoal;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
-import com.smanzana.nostrummagica.entity.tasks.PetTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIBarrierTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIEldrichTask;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfAIHellTask;
@@ -36,9 +32,6 @@ import com.smanzana.nostrummagica.items.ArcaneWolfSoulItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
-import com.smanzana.nostrummagica.pet.PetInfo;
-import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
-import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.serializers.ArcaneWolfElementalTypeSerializer;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
@@ -57,6 +50,15 @@ import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Inventories;
+import com.smanzana.petcommand.api.PetCommandAPI;
+import com.smanzana.petcommand.api.PetFuncs;
+import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
+import com.smanzana.petcommand.api.client.petgui.PetGUIStatAdapter;
+import com.smanzana.petcommand.api.entity.IEntityPet;
+import com.smanzana.petcommand.api.entity.ITameableEntity;
+import com.smanzana.petcommand.api.pet.PetInfo;
+import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
+import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -403,7 +405,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityArcaneWolf.class, DataSerializers.FLOAT);
     protected static final DataParameter<Integer> MANA  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
     protected static final DataParameter<Integer> MAX_MANA  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
-    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityArcaneWolf.class, PetJobSerializer.instance);
+    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityArcaneWolf.class, PetJobSerializer.GetInstance());
     protected static final DataParameter<Integer> RUNE_COLOR = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
     
     protected static final DataParameter<ArcaneWolfElementalType> ELEMENTAL_TYPE = EntityDataManager.<ArcaneWolfElementalType>createKey(EntityArcaneWolf.class, ArcaneWolfElementalTypeSerializer.instance);
@@ -571,7 +573,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				// return the same answer
 				LivingEntity owner = entity.getOwner();
 				if (owner != null) {
-					List<LivingEntity> tames = NostrumMagica.getTamedEntities(owner);
+					List<LivingEntity> tames = PetFuncs.GetTamedEntities(owner);
 					tames.add(owner);
 					tames.removeIf((e) -> { return e.getDistance(entity) > 15;});
 					Collections.shuffle(tames, new Random(entity.ticksExisted));
@@ -614,7 +616,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				wolf.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, .8f);
 			}
 		});
-		this.goalSelector.addGoal(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
+		//this.goalSelector.addGoal(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
 		this.goalSelector.addGoal(priority++, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
 		//this.goalSelector.addGoal(7, new EntityAIMate(this, 1.0D));
 		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
@@ -623,7 +625,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		this.goalSelector.addGoal(priority++, new LookRandomlyGoal(this));
 		
 		priority = 1;
-		this.targetSelector.addGoal(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
+		//this.targetSelector.addGoal(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
 		this.targetSelector.addGoal(priority++, new OwnerHurtByTargetGoal(this));
 		this.targetSelector.addGoal(priority++, new OwnerHurtTargetGoal(this));
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(EntityArcaneWolf.class, WolfEntity.class));
@@ -830,7 +832,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			} else if (this.isSitting() && stack.isEmpty()) {
 				if (!this.world.isRemote) {
 					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
-					NostrumMagica.instance.proxy.openPetGUI(player, this);
+					PetCommandAPI.OpenPetGUI(player, this);
 				}
 				return ActionResultType.SUCCESS;
 			} else if (stack.isEmpty()) {
@@ -1386,7 +1388,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 			
 			if (myOwner != null) {
-				LivingEntity otherOwner = NostrumMagica.getOwner(entityIn);
+				LivingEntity otherOwner = PetFuncs.GetOwner(entityIn);
 				if (otherOwner != null && otherOwner.equals(myOwner)) {
 					return true;
 				}
@@ -1959,5 +1961,10 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	@Override
 	public UUID getPetID() {
 		return this.getUniqueID();
+	}
+
+	@Override
+	public boolean isBigPet() {
+		return false;
 	}
 }

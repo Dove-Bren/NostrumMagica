@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.petcommand.api.client.container.IPetContainer;
+import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -23,12 +23,12 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, PetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf wolf, PlayerEntity player, PetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
 		
 	}
 
@@ -231,7 +231,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 		return "Stats";
 	}
 	
-	public boolean shouldShow(EntityArcaneWolf wolf, PetContainer<EntityArcaneWolf> container) {
+	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
 		return true;
 	}
 

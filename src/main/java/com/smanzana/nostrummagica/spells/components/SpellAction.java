@@ -44,6 +44,7 @@ import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.HarvestUtil;
 import com.smanzana.nostrummagica.utils.HarvestUtil.ITreeWalker;
 import com.smanzana.nostrummagica.utils.ItemStacks;
+import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -144,11 +145,11 @@ public class SpellAction {
 		
 		public final boolean apply(LivingEntity caster, LivingEntity entity, float eff) {
 			if (entity != null && isHarmful() && caster != entity) {
-				if (NostrumMagica.getOwner(entity) != null && caster.equals(NostrumMagica.getOwner(entity))) {
+				if (PetFuncs.GetOwner(entity) != null && caster.equals(PetFuncs.GetOwner(entity))) {
 					return false; // we own the target entity
 				}
 				
-				if (NostrumMagica.getOwner(caster) != null && entity.equals(NostrumMagica.getOwner(caster))) {
+				if (PetFuncs.GetOwner(caster) != null && entity.equals(PetFuncs.GetOwner(caster))) {
 					return false; // they own us
 				}
 			}

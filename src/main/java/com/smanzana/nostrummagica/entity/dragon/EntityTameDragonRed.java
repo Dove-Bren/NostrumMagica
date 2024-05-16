@@ -14,15 +14,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIStatAdapter;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventorySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonSpellSheet;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
-import com.smanzana.nostrummagica.entity.ITameableEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
@@ -42,14 +38,20 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
-import com.smanzana.nostrummagica.pet.PetInfo;
-import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
-import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.petcommand.api.PetCommandAPI;
+import com.smanzana.petcommand.api.PetFuncs;
+import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
+import com.smanzana.petcommand.api.client.petgui.PetGUIStatAdapter;
+import com.smanzana.petcommand.api.entity.IEntityPet;
+import com.smanzana.petcommand.api.entity.ITameableEntity;
+import com.smanzana.petcommand.api.pet.PetInfo;
+import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
+import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -127,7 +129,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
     protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
     
     protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityTameDragonRed.class, DataSerializers.FLOAT);
-    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetJobSerializer.instance);
+    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityTameDragonRed.class, PetJobSerializer.GetInstance());
     
     protected static final DataParameter<ItemStack> DATA_ARMOR_BODY = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEMSTACK);
     protected static final DataParameter<ItemStack> DATA_ARMOR_HELM = EntityDataManager.<ItemStack>createKey(EntityTameDragonRed.class, DataSerializers.ITEMSTACK);
@@ -534,7 +536,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				} else if (this.isEntitySitting() && stack.isEmpty()) {
 					if (!this.world.isRemote) {
 						//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
-						NostrumMagica.instance.proxy.openPetGUI(player, this);
+						PetCommandAPI.OpenPetGUI(player, this);
 					}
 					return ActionResultType.SUCCESS;
 				} else if (isBreedingItem(stack) && this.getBond() > BOND_LEVEL_BREED && this.getEgg() == null) {
@@ -1269,7 +1271,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 			}
 
 			if (myOwner != null) {
-				LivingEntity theirOwner = NostrumMagica.getOwner(entityIn);
+				LivingEntity theirOwner = PetFuncs.GetOwner(entityIn);
 				if (theirOwner == myOwner) {
 					return true;
 				}
@@ -2552,6 +2554,11 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 	@Override
 	public UUID getPetID() {
 		return this.getUniqueID();
+	}
+
+	@Override
+	public boolean isBigPet() {
+		return true;
 	}
 	
 }

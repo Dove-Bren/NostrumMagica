@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.EnumSet;
 
-import com.smanzana.nostrummagica.entity.ITameableEntity;
+import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.EntityPredicate;

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.serializers;
 
-import com.smanzana.nostrummagica.pet.PetInfo;
+import com.smanzana.petcommand.api.pet.PetInfo;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
@@ -8,7 +8,10 @@ import net.minecraft.network.datasync.IDataSerializer;
 
 public final class PetJobSerializer implements IDataSerializer<PetInfo.PetAction> {
 	
-	public static PetJobSerializer instance = new PetJobSerializer();
+	private static PetJobSerializer instance = new PetJobSerializer();
+	public static PetJobSerializer GetInstance() {
+		return instance;
+	}
 	
 	private PetJobSerializer() {
 		;

@@ -147,6 +147,9 @@ dependencies {
 	runtimeOnly files("libs/NostrumAetheriaAPI-${aetheria_version}.jar")
 	compileOnly files("libs/musica-${musica_version}.jar")
 	runtimeOnly files("libs/musica-${musica_version}.jar")
+	
+	runtimeOnly files("libs/petcommand-${petcommand_version}-deobf.jar")
+	compileOnly files("libs/petcommand-${petcommand_version}-api.jar")
 }
 
 task sourcesJar(type: Jar) {

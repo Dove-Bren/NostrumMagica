@@ -3,11 +3,9 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.RedDragonSpellInventory;
@@ -16,6 +14,9 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.petcommand.api.client.container.IPetContainer;
+import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
+import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,12 +27,21 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
+	
+	private static final ResourceLocation DRAGON_ICON_TEXT = NostrumMagica.Loc("textures/gui/container/dragon_gui.png");
+	
+	public static int GUI_TEX_TOGGLE_HOFFSET = 0;
+	public static int GUI_TEX_TOGGLE_VOFFSET = 18;
+	public static int GUI_TEX_TOGGLE_LENGTH = 10;
+	private static int GUI_TEX_WIDTH = 64;
+	private static int GUI_TEX_HEIGHT = 64;
 	
 	// Position stuff.
 	private static final int cellWidth = 18;
@@ -41,14 +51,14 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	private static final int dragonTopOffset = 10;
 	private static final int playerInvSize = 27 + 9;
 	private static final int rowMargin = 2;
-	private static final int rowHMargin = 8 + PetGUI.GUI_TEX_TOGGLE_LENGTH;
-	private static final int toggleSize = PetGUI.GUI_TEX_TOGGLE_LENGTH;
+	private static final int rowHMargin = 8 + GUI_TEX_TOGGLE_LENGTH;
+	private static final int toggleSize = GUI_TEX_TOGGLE_LENGTH;
 	private static final int rowIncr = cellWidth + toggleSize + rowMargin;
 	
 	private EntityTameDragonRed dragon;
 	private RedDragonSpellInventory dragonInv;
 	private IInventory playerInv;
-	private PetContainer<EntityTameDragonRed> container;
+	private IPetContainer<EntityTameDragonRed> container;
 	private int width;
 	private int height;
 	private int offsetX;
@@ -115,7 +125,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
 		this.container = container;
 		this.dragonInv = this.dragon.getSpellInventory();
 		this.playerInv = player.inventory;
@@ -133,16 +143,16 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void hideSheet(EntityTameDragonRed dragon, PlayerEntity player, PetContainer<EntityTameDragonRed> container) {
+	public void hideSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container) {
 		container.clearSlots();
 	}
 	
 	private void drawCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
-				y, PetGUI.GUI_TEX_CELL_HOFFSET,
-				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-				cellWidth, 256, 256);
+		matrixStackIn.push();
+		matrixStackIn.translate(x, y, 0);
+		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
+		matrixStackIn.pop();
 	}
 	
 	private static @Nonnull ItemStack scrollShadow = ItemStack.EMPTY;
@@ -154,30 +164,43 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			scrollShadow = new ItemStack(NostrumItems.spellScroll);
 		}
 		
-		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
-				y, PetGUI.GUI_TEX_CELL_HOFFSET + cellWidth,
-				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-				cellWidth, 256, 256);
+		matrixStackIn.push();
+		matrixStackIn.translate(x, y, 0);
+		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
 		
-		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.color4f(.8f, .8f, .8f, .6f);
+		RenderFuncs.ItemRenderer(scrollShadow, matrixStackIn);
+		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.disableBlend();
+		matrixStackIn.pop();
 	}
 	
 	private void drawShadowCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
-				y, PetGUI.GUI_TEX_CELL_HOFFSET,
-				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-				cellWidth, 256, 256,
-				.7f, .71f, .7f, .4f);
+		matrixStackIn.push();
+		matrixStackIn.translate(x, y, 0);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.color4f(.7f, .71f, .7f, .4f);
+		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
+		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.disableBlend();
+		matrixStackIn.pop();
 	}
 	
 	private void drawFadedCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
-				y, PetGUI.GUI_TEX_CELL_HOFFSET,
-				PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-				cellWidth, 256, 256,
-				.2f, .2f, .2f, .4f);
+		matrixStackIn.push();
+		matrixStackIn.translate(x, y, 0);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.color4f(.2f, .2f, .2f, .4f);
+		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
+		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.disableBlend();
+		matrixStackIn.pop();
 	}
 	
 	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, EntityDragonGambit gambit) {
@@ -185,12 +208,12 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		if (gambit != null) {
 			texOffset = gambit.getTexOffsetX();
 		}
-		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
+		mc.getTextureManager().bindTexture(DRAGON_ICON_TEXT);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y,
-				PetGUI.GUI_TEX_TOGGLE_HOFFSET + texOffset,
-				PetGUI.GUI_TEX_TOGGLE_VOFFSET, toggleSize,
-				toggleSize, 256, 256);
+				GUI_TEX_TOGGLE_HOFFSET + texOffset,
+				GUI_TEX_TOGGLE_VOFFSET, toggleSize,
+				toggleSize, GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
 	}
 	
 	private void drawRow(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
@@ -201,7 +224,6 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		int ghostCount;
 		
 		mc.fontRenderer.drawString(matrixStackIn, title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
-		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
 		
 		count = 0;
 		ghostCount = 0;
@@ -254,15 +276,19 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			drawRow(matrixStackIn, mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr + rowIncr, "Ally", dragonInv.getAllySpells(), dragonInv.getAllyGambits());
 			
 			final int playerTopOffset = dragonTopOffset + (rowIncr * 3) + 10;
-			for (int i = 0; i < playerInvSize; i++) {
-				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
-						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
-						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-						cellWidth, 256, 256);
-			}
+			matrixStackIn.push();
+			matrixStackIn.translate(leftOffset - 1, playerTopOffset - 1, 0);
+			// ... First 27
+			PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.min(27, playerInvSize), invRow);
+			
+			// Remaining (toolbar)
+			final int yOffset = ((Math.min(27, playerInvSize) / invRow)) * cellWidth;
+			matrixStackIn.translate(0, 10 + yOffset, 0);
+			PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.max(0, playerInvSize-27), invRow);
 			
 			matrixStackIn.pop();
 		}
+		matrixStackIn.pop();
 	}
 	
 	@Override
@@ -620,7 +646,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public boolean shouldShow(EntityTameDragonRed dragon, PetContainer<EntityTameDragonRed> container) {
+	public boolean shouldShow(EntityTameDragonRed dragon, IPetContainer<EntityTameDragonRed> container) {
 		return this.dragon.canManageSpells();
 	}
 	

@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityLux;
 import com.smanzana.nostrummagica.entity.EntitySprite;
 import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.entity.IEntityPet.SoulBoundLore;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

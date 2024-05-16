@@ -11,8 +11,6 @@ import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
@@ -94,12 +92,6 @@ public class CommonProxy {
 	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
 		if (!player.world.isRemote() && player instanceof ServerPlayerEntity) {
 			NetworkHooks.openGui((ServerPlayerEntity) player, provider, provider.getData());
-		}
-	}
-	
-	public <T extends IEntityPet> void openPetGUI(PlayerEntity player, T pet) {
-		if (!player.world.isRemote()) {
-			this.openContainer(player, PetGUI.PetContainer.Make(pet, player));
 		}
 	}
 	

@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.client.overlay;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -33,7 +31,6 @@ import com.smanzana.nostrummagica.client.render.LayerCustomElytra;
 import com.smanzana.nostrummagica.client.render.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
@@ -43,11 +40,6 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.pet.PetInfo;
-import com.smanzana.nostrummagica.pet.PetInfo.PetAction;
-import com.smanzana.nostrummagica.pet.PetInfo.SecondaryFlavor;
-import com.smanzana.nostrummagica.pet.PetPlacementMode;
-import com.smanzana.nostrummagica.pet.PetTargetMode;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.Transmutation;
@@ -61,7 +53,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
@@ -117,78 +108,16 @@ public class OverlayRenderer extends AbstractGui {
 	private static final int GUI_CONTINGENCY_ICON_OFFSETY = 37;
 	private static final int GUI_CONTINGENCY_ICON_LENGTH = 18;
 
-	private static final ResourceLocation GUI_HEALTHBARS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/healthbars.png");
-	private static final int GUI_HEALTHBAR_ORB_BACK_WIDTH = 205;
-	private static final int GUI_HEALTHBAR_ORB_BACK_HEIGHT = 56;
-	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_HOFFSET = 2;
-	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_VOFFSET = 112;
-	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_HOFFSET = 2;
-	private static final int GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_VOFFSET = 29;
-	private static final int GUI_HEALTHBAR_ORB_HEALTH_WIDTH = 152;
-	private static final int GUI_HEALTHBAR_ORB_HEALTH_HEIGHT = 18;
-	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_HOFFSET = 61;
-	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_VOFFSET = 129;
-	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_HOFFSET = 61;
-	private static final int GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_VOFFSET = 45;
-	private static final int GUI_HEALTHBAR_ORB_SECONDARY_WIDTH = 105;
-	private static final int GUI_HEALTHBAR_ORB_SECONDARY_HEIGHT = 8;
-	private static final int GUI_HEALTHBAR_ORB_ENTITY_HOFFSET = 177;
-	private static final int GUI_HEALTHBAR_ORB_ENTITY_VOFFSET = 40;
-	private static final int GUI_HEALTHBAR_ORB_ENTITY_WIDTH = 12;
-	private static final int GUI_HEALTHBAR_ORB_NAME_WIDTH = 160;
-	private static final int GUI_HEALTHBAR_ORB_NAME_HEIGHT = 30;
-	private static final int GUI_HEALTHBAR_ORB_NAME_HOFFSET = 20;
-	private static final int GUI_HEALTHBAR_ORB_NAME_VOFFSET = 12;
-	
-	private static final int GUI_HEALTHBAR_BOX_BACK_WIDTH = 191;
-	private static final int GUI_HEALTHBAR_BOX_BACK_HEIGHT = 25;
-	private static final int GUI_HEALTHBAR_BOX_BACK_VOFFSET = 140;
-	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_HOFFSET = 2;
-	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_VOFFSET = 191;
-	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_HOFFSET = 2;
-	private static final int GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_VOFFSET = 1;
-	private static final int GUI_HEALTHBAR_BOX_HEALTH_WIDTH = 165;
-	private static final int GUI_HEALTHBAR_BOX_HEALTH_HEIGHT = 18;
-	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_HOFFSET = 61;
-	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_VOFFSET = 211;
-	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_HOFFSET = 62;
-	private static final int GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_VOFFSET = 17;
-	private static final int GUI_HEALTHBAR_BOX_SECONDARY_WIDTH = 104;
-	private static final int GUI_HEALTHBAR_BOX_SECONDARY_HEIGHT = 8;
-	
-	private static final int GUI_HEALTHBAR_ICON_LENGTH = 32;
-	private static final int GUI_HEALTHBAR_ICON_HOFFSET = 207;
-	private static final int GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET = 300;
-	private static final int GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET = 50;
-	private static final int GUI_HEALTHBAR_ICON_STAY_VOFFSET = 0;
-	private static final int GUI_HEALTHBAR_ICON_ATTACK_VOFFSET = GUI_HEALTHBAR_ICON_STAY_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
-	private static final int GUI_HEALTHBAR_ICON_WORK_VOFFSET = GUI_HEALTHBAR_ICON_ATTACK_VOFFSET + GUI_HEALTHBAR_ICON_LENGTH;
-	
-	private static final ResourceLocation GUI_PET_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/pet_icons.png");
-	//private static final int GUI_PET_ICONS_DIMS = 256;
-	private static final int GUI_PET_ICON_DIMS = 32;
-	private static final int GUI_PET_ICON_TARGET_HOFFSET = 0;
-	private static final int GUI_PET_ICON_TARGET_VOFFSET = 0;
-	private static final int GUI_PET_ICON_PLACEMENT_HOFFSET = 0;
-	private static final int GUI_PET_ICON_PLACEMENT_VOFFSET = GUI_PET_ICON_DIMS;
-	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
 	
 	private int wingIndex; // Controls mana wing animation. Set to -wingAnimDur to play backwards.
 	private static final int wingAnimDur = 20;
 	
-	private int petTargetIndex; // Controls displaying pet target icon (fade in/out 50%)
-	private int petTargetAnimDur = 80;
-	private int petPlacementIndex; // Controls displaying pet placement icon (fade in/out at 50%)
-	private int petPlacementAnimDur = 80;
-	
 	public OverlayRenderer() {
 		MinecraftForge.EVENT_BUS.register(this);
 		wiggleIndex = 0;
 		wingIndex = 0;
-		petTargetIndex = -1;
-		petPlacementIndex = -1;
 	}
 	
 	@SubscribeEvent
@@ -274,45 +203,6 @@ public class OverlayRenderer extends AbstractGui {
 			if (ModConfig.config.displayManaBar()) {
 				renderManaBar(matrixStackIn, player, window, attr);
 			}
-			
-			final float scale = 0.5f;
-			int y = 75;
-			int healthbarWidth;
-			int healthbarHeight;
-			int xOffset;
-			
-			// Dragon info
-			if (ModConfig.config.displayDragonHealthbars()) {
-				healthbarWidth = (int) (GUI_HEALTHBAR_ORB_BACK_WIDTH * scale);
-				healthbarHeight = (int) (GUI_HEALTHBAR_ORB_BACK_HEIGHT * scale);
-				xOffset = window.getScaledWidth() - (2 + healthbarWidth);
-				
-				List<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
-				Collections.sort(dragons, (left, right) -> {
-					return ((LivingEntity) (left)).getUniqueID().compareTo(((LivingEntity) right).getUniqueID());
-				});
-				for (ITameDragon dragon : dragons) {
-					if (dragon instanceof LivingEntity) {
-						renderHealthbarOrb(matrixStackIn, player, window, (LivingEntity) dragon, xOffset, y, scale);
-						y += healthbarHeight + 2;
-					}
-				}
-			}
-			
-			// Pet info
-			if (ModConfig.config.displayPetHealthbars()) {
-				healthbarWidth = (int) (GUI_HEALTHBAR_BOX_BACK_WIDTH * scale);
-				healthbarHeight = (int) (GUI_HEALTHBAR_BOX_BACK_HEIGHT * scale);
-				xOffset = window.getScaledWidth() - (2 + healthbarWidth);
-				final boolean hideDragons = ModConfig.config.displayDragonHealthbars();
-				for (LivingEntity tamed : NostrumMagica.getTamedEntities(player)) {
-					if (hideDragons && tamed instanceof ITameDragon) {
-						continue;
-					}
-					renderHealthbarBox(matrixStackIn, player, window, tamed, xOffset, y, scale);
-					y += healthbarHeight;
-				}
-			}
 		} else if (event.getType() == ElementType.ARMOR) {
 			if (ModConfig.config.displayArmorOverlay()) {
 				renderArmorOverlay(matrixStackIn, player, window);
@@ -346,25 +236,6 @@ public class OverlayRenderer extends AbstractGui {
 					if (result != null && RayTrace.entFromRaytrace(result) != null) {
 						renderCrosshairTargetOverlay(matrixStackIn, player, window);
 					}
-				}
-			}
-			
-			final float ticks = player.ticksExisted + event.getPartialTicks();
-			if (petTargetIndex >= 0) {
-				PetTargetMode mode = NostrumMagica.instance.getPetCommandManager().getTargetMode(player);
-				renderPetActionTargetMode(matrixStackIn, player, window, mode, (ticks - petTargetIndex) / (float) petTargetAnimDur);
-				
-				if (ticks >= petTargetIndex + petTargetAnimDur) {
-					petTargetIndex = -1;
-				}
-			}
-			
-			if (petPlacementIndex >= 0) {
-				PetPlacementMode mode = NostrumMagica.instance.getPetCommandManager().getPlacementMode(player);
-				renderPetActionPlacementMode(matrixStackIn, player, window, mode, (ticks - petPlacementIndex) / (float) petPlacementAnimDur);
-				
-				if (ticks >= petPlacementIndex + petPlacementAnimDur) {
-					petPlacementIndex = -1;
 				}
 			}
 		} else if (event.getType() == ElementType.POTION_ICONS) {
@@ -851,63 +722,6 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.pop();
 	}
 	
-	private void renderPetActionTargetMode(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution, PetTargetMode mode, float prog) {
-		Minecraft mc = Minecraft.getInstance();
-		final float alpha;
-		if (prog < .2f) {
-			alpha = prog / .2f;
-		} else if (prog >= .8f) {
-			alpha = (1f-prog) / .2f;
-		} else {
-			alpha = 1f;
-		}
-		
-		final int u = GUI_PET_ICON_TARGET_HOFFSET + (mode.ordinal() * GUI_PET_ICON_DIMS);
-		final int v = GUI_PET_ICON_TARGET_VOFFSET; // + (mode.ordinal() * GUI_PET_ICON_DIMS);
-		
-		matrixStackIn.push();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		mc.getTextureManager().bindTexture(GUI_PET_ICONS);
-		
-		matrixStackIn.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
-		matrixStackIn.scale(.5f, .5f, .5f);
-		matrixStackIn.translate(1, 1, 0);
-		
-		RenderFuncs.blit(matrixStackIn, 0, 0, u, v, GUI_PET_ICON_DIMS, GUI_PET_ICON_DIMS, 1f, 1f, 1f, alpha * .6f);
-		
-		RenderSystem.disableBlend();
-		matrixStackIn.pop();
-	}
-	
-	private void renderPetActionPlacementMode(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution, PetPlacementMode mode, float prog) {
-		Minecraft mc = Minecraft.getInstance();
-		final float alpha;
-		if (prog < .2f) {
-			alpha = prog / .2f;
-		} else if (prog >= .8f) {
-			alpha = (1f-prog) / .2f;
-		} else {
-			alpha = 1f;
-		}
-		final int u = GUI_PET_ICON_PLACEMENT_HOFFSET + (mode.ordinal() * GUI_PET_ICON_DIMS);
-		final int v = GUI_PET_ICON_PLACEMENT_VOFFSET; // + (mode.ordinal() * GUI_PET_ICON_DIMS);
-		
-		matrixStackIn.push();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		mc.getTextureManager().bindTexture(GUI_PET_ICONS);
-		
-		matrixStackIn.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
-		matrixStackIn.scale(.5f, .5f, .5f);
-		matrixStackIn.translate(-(GUI_PET_ICON_DIMS + 1), 1, 0);
-		
-		RenderFuncs.blit(matrixStackIn, 0, 0, u, v, GUI_PET_ICON_DIMS, GUI_PET_ICON_DIMS, 1f, 1f, 1f, alpha * .6f);
-		
-		RenderSystem.disableBlend();
-		matrixStackIn.pop();
-	}
-	
 	private void renderContingencyShield(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution, int typeOffset, int xoffset, float timer) {
 		Minecraft mc = Minecraft.getInstance();
 		final int left = (scaledResolution.getScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
@@ -989,271 +803,6 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.pop();
 	}
 	
-	private void renderHealthbarOrb(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, LivingEntity pet, int xoffset, int yoffset, float scale) {
-		Minecraft mc = Minecraft.getInstance();
-		
-		// Render back, scaled bar + middle 'goods', and then foreground. Easy.
-		// For center, render:
-		// 1) healthbar
-		// 2) pet head/icon
-		// 3) pet status icon
-		FontRenderer fonter = mc.fontRenderer;
-//		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
-//				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
-//				: false);
-//		final boolean attacking = (pet instanceof MobEntity ? ((MobEntity) pet).getAttackTarget() != null : false);
-//		final float health = (float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
-//		boolean hasSecondaryBar = false;
-//		float secondaryMeter = 0f;
-//		
-//		if (pet instanceof ITameDragon) {
-//			ITameDragon dragon = (ITameDragon) pet;
-//			hasSecondaryBar = true;
-//			secondaryMeter = (float) dragon.getXP() / (float) dragon.getMaxXP();
-//		}
-		
-		PetInfo info;
-		if (pet instanceof IEntityPet) {
-			IEntityPet iPet = (IEntityPet) pet;
-			info = iPet.getPetSummary();
-		} else {
-			info = PetInfo.Wrap(pet);
-		}
-		
-		final float health = (float) info.getHpPercent();//(float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
-		final boolean hasSecondaryBar = info.getMaxSecondary() > 0;
-		float secondaryMeter = (float) info.getSecondaryPercent();
-		final SecondaryFlavor flavor = info.getSecondaryFlavor();
-		final PetAction action = info.getPetAction();
-		
-		info.release();
-		info = null;
-		
-		mc.getTextureManager().bindTexture(GUI_HEALTHBARS);
-		
-		matrixStackIn.push();
-		
-		matrixStackIn.translate(xoffset, yoffset, 0);
-		matrixStackIn.scale(scale, scale, 1);
-		
-		RenderSystem.enableBlend();
-		
-		// Draw background
-		matrixStackIn.push();
-		matrixStackIn.translate(0, 0, -100);
-		this.fillGradient(matrixStackIn, GUI_HEALTHBAR_ORB_NAME_HOFFSET, GUI_HEALTHBAR_ORB_NAME_VOFFSET,
-				GUI_HEALTHBAR_ORB_NAME_WIDTH, GUI_HEALTHBAR_ORB_NAME_HEIGHT,
-				0x50000000, 0xA0000000); //nameplate background
-		blit(matrixStackIn, 0, 0,
-				0, GUI_HEALTHBAR_ORB_BACK_HEIGHT, GUI_HEALTHBAR_ORB_BACK_WIDTH, GUI_HEALTHBAR_ORB_BACK_HEIGHT);
-		matrixStackIn.pop();
-		
-		// Draw middle
-		matrixStackIn.push();
-		// 	-> Health bar
-		blit(matrixStackIn,
-				GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_HEALTH_WIDTH * (1f-health)),
-				GUI_HEALTHBAR_ORB_HEALTH_BAR_INNER_VOFFSET,
-				GUI_HEALTHBAR_ORB_HEALTH_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_HEALTH_WIDTH * (1f-health)),
-				GUI_HEALTHBAR_ORB_HEALTH_BAR_VOFFSET,
-				GUI_HEALTHBAR_ORB_HEALTH_WIDTH - Math.round(GUI_HEALTHBAR_ORB_HEALTH_WIDTH * (1f-health)),
-				GUI_HEALTHBAR_ORB_HEALTH_HEIGHT);
-		//	-> Secondary bar
-		{
-			final float[] color;
-			if (!hasSecondaryBar) {
-				color = new float[] {.7f, .9f, .7f, 1f};
-				secondaryMeter = 1f;
-			} else {
-				color = new float[] {flavor.colorR(secondaryMeter),
-						flavor.colorG(secondaryMeter),
-						flavor.colorB(secondaryMeter),
-						flavor.colorA(secondaryMeter)};
-			}
-			RenderFuncs.blit(matrixStackIn, 
-					GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
-					GUI_HEALTHBAR_ORB_SECONDARY_BAR_INNER_VOFFSET,
-					GUI_HEALTHBAR_ORB_SECONDARY_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
-					GUI_HEALTHBAR_ORB_SECONDARY_BAR_VOFFSET,
-					GUI_HEALTHBAR_ORB_SECONDARY_WIDTH - Math.round(GUI_HEALTHBAR_ORB_SECONDARY_WIDTH * (1f-secondaryMeter)),
-					GUI_HEALTHBAR_ORB_SECONDARY_HEIGHT,
-					color[0], color[1], color[2], color[3]);
-		}
-	
-		//	-> Icon
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
-		InventoryScreen.drawEntityOnScreen(GUI_HEALTHBAR_ORB_ENTITY_HOFFSET, GUI_HEALTHBAR_ORB_ENTITY_VOFFSET, GUI_HEALTHBAR_ORB_ENTITY_WIDTH, 0, 0, pet);
-		RenderSystem.popMatrix();
-		mc.getTextureManager().bindTexture(GUI_HEALTHBARS);
-		
-		//	-> Status
-		matrixStackIn.translate(0, 0, 100);
-		matrixStackIn.push();
-		matrixStackIn.scale(.6f, .6f, .6f);
-		matrixStackIn.translate(0, 0, 0);
-		if (action == PetAction.ATTACKING) {
-			blit(matrixStackIn, GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
-					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_ATTACK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		} else if (action == PetAction.SITTING) {
-			blit(matrixStackIn, GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
-					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_STAY_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		} else if (action == PetAction.WORKING) {
-			blit(matrixStackIn, GUI_HEALTHBAR_ICON_INTERNAL_HOFFSET, GUI_HEALTHBAR_ICON_INTERNAL_VOFFSET,
-					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_WORK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		}
-		matrixStackIn.pop();
-		
-		//	-> Name
-		final String name = pet.hasCustomName() ? pet.getCustomName().getString() : pet.getName().getString();
-		final int nameLen = fonter.getStringWidth(name);
-		//final float fontScale = (1f/scale) * .6f;
-		final float fontScale = scale * 2.4f;
-		matrixStackIn.push();
-		matrixStackIn.scale(fontScale, fontScale, fontScale);
-		fonter.drawString(matrixStackIn, name, 123 - (nameLen), 25 - (fonter.FONT_HEIGHT + 2), 0xFFFFFFFF);
-		mc.getTextureManager().bindTexture(GUI_HEALTHBARS);
-		matrixStackIn.pop();
-		
-		matrixStackIn.pop();
-		
-		// Draw foreground
-		RenderSystem.enableBlend();
-		matrixStackIn.push();
-		matrixStackIn.translate(0, 0, 100);
-		blit(matrixStackIn, 0, 0,
-				0, 0, GUI_HEALTHBAR_ORB_BACK_WIDTH, GUI_HEALTHBAR_ORB_BACK_HEIGHT);
-		matrixStackIn.pop();
-		
-		RenderSystem.disableBlend();
-		matrixStackIn.pop();
-	}
-	
-	private void renderHealthbarBox(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, LivingEntity pet, int xoffset, int yoffset, float scale) {
-		Minecraft mc = Minecraft.getInstance();
-		
-		// Render back, scaled bar + middle 'goods', and then foreground. Easy.
-		// For center, render:
-		// 1) healthbar
-		// 2) pet head/icon
-		// 3) pet status icon
-		FontRenderer fonter = mc.fontRenderer;
-		
-		PetInfo info;
-		if (pet instanceof IEntityPet) {
-			IEntityPet iPet = (IEntityPet) pet;
-			info = iPet.getPetSummary();
-		} else {
-			info = PetInfo.Wrap(pet);
-		}
-		
-		final float health = (float) info.getHpPercent();//(float) (Math.max(0, Math.ceil(pet.getHealth())) / Math.max(0.01, Math.ceil(pet.getMaxHealth())));
-		final boolean hasSecondaryBar = info.getMaxSecondary() > 0;
-		float secondaryMeter = (float) info.getSecondaryPercent();
-		final SecondaryFlavor flavor = info.getSecondaryFlavor();
-//		final boolean sitting = (pet instanceof EntityTameable ? ((EntityTameable) pet).isSitting()
-//				: pet instanceof IEntityTameable ? ((IEntityTameable) pet).isSitting()
-//				: false);
-//		final boolean attacking = (pet instanceof MobEntity ? ((MobEntity) pet).getAttackTarget() != null : false);
-		final PetAction action = info.getPetAction();
-		
-		info.release();
-		info = null;
-		
-		mc.getTextureManager().bindTexture(GUI_HEALTHBARS);
-		
-		matrixStackIn.push();
-		
-		matrixStackIn.translate(xoffset, yoffset, 0);
-		matrixStackIn.scale(scale, scale, 1);
-		
-		RenderSystem.enableBlend();
-		
-		// Draw background
-		matrixStackIn.push();
-		matrixStackIn.translate(0, 0, -100);
-//		this.drawGradientRect(GUI_HEALTHBAR_ORB_NAME_HOFFSET, GUI_HEALTHBAR_ORB_NAME_VOFFSET,
-//				GUI_HEALTHBAR_ORB_NAME_WIDTH, GUI_HEALTHBAR_ORB_NAME_HEIGHT,
-//				0x50000000, 0xA0000000); //nameplate background
-		blit(matrixStackIn, 0, 0,
-				0, GUI_HEALTHBAR_BOX_BACK_VOFFSET + GUI_HEALTHBAR_BOX_BACK_HEIGHT, GUI_HEALTHBAR_BOX_BACK_WIDTH, GUI_HEALTHBAR_BOX_BACK_HEIGHT);
-		matrixStackIn.pop();
-		
-		// Draw middle
-		matrixStackIn.push();
-		// 	-> Health bar
-		blit(matrixStackIn, 
-				GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_HEALTH_WIDTH * (1f-health)),
-				GUI_HEALTHBAR_BOX_HEALTH_BAR_INNER_VOFFSET,
-				GUI_HEALTHBAR_BOX_HEALTH_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_HEALTH_WIDTH * (1f-health)),
-				GUI_HEALTHBAR_BOX_HEALTH_BAR_VOFFSET,
-				GUI_HEALTHBAR_BOX_HEALTH_WIDTH - Math.round(GUI_HEALTHBAR_BOX_HEALTH_WIDTH * (1f-health)),
-				GUI_HEALTHBAR_BOX_HEALTH_HEIGHT);
-		//	-> Secondary bar
-		{
-			final float[] color;
-			if (!hasSecondaryBar) {
-				color = new float[] {.7f, .9f, .7f, 1f};
-				secondaryMeter = 1f;
-			} else {
-				color = new float[] {flavor.colorR(secondaryMeter),
-						flavor.colorG(secondaryMeter),
-						flavor.colorB(secondaryMeter),
-						flavor.colorA(secondaryMeter)};
-			}
-			RenderFuncs.blit(matrixStackIn, 
-					GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
-					GUI_HEALTHBAR_BOX_SECONDARY_BAR_INNER_VOFFSET,
-					GUI_HEALTHBAR_BOX_SECONDARY_BAR_HOFFSET + Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
-					GUI_HEALTHBAR_BOX_SECONDARY_BAR_VOFFSET,
-					GUI_HEALTHBAR_BOX_SECONDARY_WIDTH - Math.round(GUI_HEALTHBAR_BOX_SECONDARY_WIDTH * (1f-secondaryMeter)),
-					GUI_HEALTHBAR_BOX_SECONDARY_HEIGHT,
-					color[0], color[1], color[2], color[3]);
-		}
-	
-		
-		//		-> Status
-		matrixStackIn.translate(0, 0, 100);
-		matrixStackIn.push();
-		matrixStackIn.scale(.6f, .6f, .6f);
-		matrixStackIn.translate(0, 0, 0);
-		if (action == PetAction.ATTACKING) {
-			blit(matrixStackIn, 282, 6,
-					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_ATTACK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		} else if (action == PetAction.SITTING) {
-			blit(matrixStackIn, 282, 6,
-					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_STAY_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		} else if (action == PetAction.WORKING) {
-			blit(matrixStackIn, 282, 6,
-					GUI_HEALTHBAR_ICON_HOFFSET, GUI_HEALTHBAR_ICON_WORK_VOFFSET, GUI_HEALTHBAR_ICON_LENGTH, GUI_HEALTHBAR_ICON_LENGTH);
-		}
-		matrixStackIn.pop();
-
-		//	-> Name
-		final String name = pet.hasCustomName() ? pet.getCustomName().getString() : pet.getName().getString();
-		final int nameLen = fonter.getStringWidth(name);
-		//final float fontScale = (1f/scale) * .6f;
-		final float fontScale = scale * 2.4f;
-		matrixStackIn.push();
-		matrixStackIn.scale(fontScale, fontScale, fontScale);
-		fonter.drawStringWithShadow(matrixStackIn, name, 135 - (nameLen), 14 - (fonter.FONT_HEIGHT + 2), 0xFFFFFFFF);
-		mc.getTextureManager().bindTexture(GUI_HEALTHBARS);
-		matrixStackIn.pop();
-		
-		matrixStackIn.pop();
-		
-		// Draw foreground
-		RenderSystem.enableBlend();
-		matrixStackIn.push();
-		matrixStackIn.translate(0, 0, 100);
-		blit(matrixStackIn, 0, 0,
-				0, GUI_HEALTHBAR_BOX_BACK_VOFFSET, GUI_HEALTHBAR_BOX_BACK_WIDTH, GUI_HEALTHBAR_BOX_BACK_HEIGHT);
-		matrixStackIn.pop();
-		
-		RenderSystem.disableBlend();
-		matrixStackIn.pop();
-	}
-	
 	public void startManaWiggle(int wiggleCount) {
 		this.wiggleIndex = 12 * wiggleCount;
 	}
@@ -1263,34 +812,6 @@ public class OverlayRenderer extends AbstractGui {
 			this.wingIndex = 1;
 		} else {
 			this.wingIndex = -wingAnimDur;
-		}
-	}
-	
-	public void changePetTargetIcon() {
-		Minecraft mc = Minecraft.getInstance();
-		final ClientPlayerEntity player = mc.player;
-		if (petTargetIndex < 0) {
-			// Brand new animation
-			petTargetIndex = player.ticksExisted;
-		} else if (player.ticksExisted - petTargetIndex > petTargetAnimDur/2) {
-			// Reset to halfway point
-			petTargetIndex = player.ticksExisted - petTargetAnimDur/2;
-		} else {
-			; // Fading in, leave alone and just swap out the icon
-		}
-	}
-	
-	public void changePetPlacementIcon() {
-		Minecraft mc = Minecraft.getInstance();
-		final ClientPlayerEntity player = mc.player;
-		if (petPlacementIndex < 0) {
-			// Brand new animation
-			petPlacementIndex = player.ticksExisted;
-		} else if (player.ticksExisted - petPlacementIndex > petPlacementAnimDur/2) {
-			// Reset to halfway point
-			petPlacementIndex = player.ticksExisted - petPlacementAnimDur/2;
-		} else {
-			; // Fading in, leave alone and just swap out the icon
 		}
 	}
 	

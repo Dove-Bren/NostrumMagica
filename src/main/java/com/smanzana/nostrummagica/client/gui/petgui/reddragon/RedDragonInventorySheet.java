@@ -3,13 +3,12 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
-import com.smanzana.nostrummagica.client.gui.petgui.PetInventorySheet;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.petcommand.api.client.container.IPetContainer;
+import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
+import com.smanzana.petcommand.api.client.petgui.sheet.PetInventorySheet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +22,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, PetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
 		super.showSheet(dragon, player, container, width, height, offsetX, offsetY);
 		
 		final int cellWidth = 18;
@@ -56,8 +55,6 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		super.draw(matrixStackIn, mc, partialTicks, width, height, mouseX, mouseY);
 		
-		mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-		
 		// Draw sheet
 		matrixStackIn.push();
 		{
@@ -77,11 +74,10 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 				// NOT IMPLEMENTED TODO
 				
 				final int i = slot.ordinal();
-				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 - (cellWidth + 4),
-						dragonTopOffset - 1 + (cellWidth * (i * 2)), PetGUI.GUI_TEX_CELL_HOFFSET,
-						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-						cellWidth, 256, 256,
-						1f, 1f, 1f, 1f);
+				matrixStackIn.push();
+				matrixStackIn.translate(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)), 0);
+				PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
+				matrixStackIn.pop();
 			}
 			
 			matrixStackIn.pop();
@@ -89,7 +85,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	}
 
 	@Override
-	public boolean shouldShow(EntityTameDragonRed dragon, PetContainer<EntityTameDragonRed> container) {
+	public boolean shouldShow(EntityTameDragonRed dragon, IPetContainer<EntityTameDragonRed> container) {
 		return this.pet.canUseInventory();
 	}
 

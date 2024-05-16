@@ -38,6 +38,7 @@ import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

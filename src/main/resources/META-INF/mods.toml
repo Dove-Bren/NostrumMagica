@@ -37,6 +37,13 @@ Immersive & Complex Spellcrafting
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
+	modId="petcommand"
+	mandatory=true
+	versionRange="[1.16.5-1.0.0,)"
+	ordering="AFTER"
+	side="BOTH"
+
+[[dependencies.nostrummagica]]
 	modId="caelus"
 	mandatory=true
 	versionRange="[1.16.4-2.1.0.2,)"

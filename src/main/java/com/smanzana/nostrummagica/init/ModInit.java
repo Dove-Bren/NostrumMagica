@@ -39,7 +39,6 @@ import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolem;
@@ -58,6 +57,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.NostrumQuest.QuestType;
 import com.smanzana.nostrummagica.quests.objectives.ObjectiveKill;
@@ -2090,7 +2090,7 @@ public class ModInit {
 						NostrumResearchTab.ADVANCED_MAGICA, Size.LARGE, -3, 0, true,
 						new ItemStack(NostrumItems.skillEnderPin));
 
-		NostrumResearch.startBuilding().hiddenParent("kani").lore(IEntityPet.SoulBoundLore.instance())
+		NostrumResearch.startBuilding().hiddenParent("kani").lore(IPetWithSoul.SoulBoundLore.instance())
 				.reference("ritual::revive_soulbound_pet_dragon", "ritual.revive_soulbound_pet_dragon.name")
 				.reference("ritual::revive_soulbound_pet_wolf", "ritual.revive_soulbound_pet_wolf.name")
 				.build("soulbound_pets", NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 0, 1, true,
@@ -2166,7 +2166,6 @@ public class ModInit {
     	registry.register(new DataSerializerEntry(OptionalDragonArmorMaterialSerializer.instance).setRegistryName("nostrum.serial.dragon_armor_opt"));
     	registry.register(new DataSerializerEntry(MagicElementDataSerializer.instance).setRegistryName("nostrum.serial.element"));
     	registry.register(new DataSerializerEntry(HookshotTypeDataSerializer.instance).setRegistryName("nostrum.serial.hookshot_type"));
-    	registry.register(new DataSerializerEntry(PetJobSerializer.instance).setRegistryName("nostrum.serial.pet_job"));
     	registry.register(new DataSerializerEntry(WilloStatusSerializer.instance).setRegistryName("nostrum.serial.willo_status"));
     	registry.register(new DataSerializerEntry(ArcaneWolfElementalTypeSerializer.instance).setRegistryName("nostrum.serial.arcane_wolf_type"));
     	registry.register(new DataSerializerEntry(FloatArraySerializer.instance).setRegistryName("nostrum.serial.float_array"));
@@ -2174,6 +2173,7 @@ public class ModInit {
     	registry.register(new DataSerializerEntry(PlantBossTreeTypeSerializer.instance).setRegistryName("nostrum.serial.plantboss_tree_type"));
     	registry.register(new DataSerializerEntry(OptionalParticleDataSerializer.instance).setRegistryName("nostrum.serial.particle_opt"));
     	registry.register(new DataSerializerEntry(RedDragonBodyPartTypeSerializer.instance).setRegistryName("nostrum.serial.red_dragon.body_part_type"));
+    	registry.register(new DataSerializerEntry(PetJobSerializer.GetInstance()).setRegistryName("nostrum.serial.pet_job"));
     }
 	
 	public static final void registerCommands(RegisterCommandsEvent event) {

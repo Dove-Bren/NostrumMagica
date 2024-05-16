@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.Projectiles;
+import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -88,10 +89,10 @@ public class ProjectileTrigger extends SpellTrigger {
 						}
 						
 						if (!hitAllies) {
-							if (NostrumMagica.getOwner(ent) != null && NostrumMagica.getOwner(ent).equals(getState().getSelf())) {
+							if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
 								return false; // We own the target
 							}
-							if (NostrumMagica.getOwner(getState().getSelf()) != null && NostrumMagica.getOwner(getState().getSelf()).equals(ent)) {
+							if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
 								return false; // ent owns us
 							}
 							

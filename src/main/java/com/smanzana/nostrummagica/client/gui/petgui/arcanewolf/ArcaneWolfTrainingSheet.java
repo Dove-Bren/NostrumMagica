@@ -5,9 +5,6 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.petgui.IPetGUISheet;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
@@ -15,6 +12,9 @@ import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.petcommand.api.client.container.IPetContainer;
+import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
+import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -265,7 +265,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 		}
 	}
 	
-	protected void onSlotChange(EntityArcaneWolf wolf, PlayerEntity player, PetContainer<EntityArcaneWolf> container) {
+	protected void onSlotChange(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
 		
 		// See if all slots are filled and if we should start training
 		final SlotMode mode = getSlotMode(wolf);
@@ -308,7 +308,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf pet, PlayerEntity player, PetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(EntityArcaneWolf pet, PlayerEntity player, IPetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
 		final int cellWidth = 18;
 		final int invRow = 9;
 		final int invWidth = cellWidth * invRow;
@@ -361,7 +361,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf pet, PlayerEntity player, PetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(EntityArcaneWolf pet, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
 		container.dropContainerInventory(localInv);
 		container.clearSlots();
 	}
@@ -529,11 +529,10 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				
 				if (i == 0) {
 					// Draw center slot
-					mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x - 1,
-							upperOffset + y - 1, PetGUI.GUI_TEX_CELL_HOFFSET,
-							PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-							cellWidth, 256, 256);
+					matrixStackIn.push();
+					matrixStackIn.translate(x-1, upperOffset + y - 1, 0);
+					PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
+					matrixStackIn.pop();
 				} else {
 					// Draw bowl
 					mc.getTextureManager().bindTexture(TEX_LOC);
@@ -570,15 +569,20 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 				}
 			}
 			
-
-			mc.getTextureManager().bindTexture(PetGUI.PetGUIContainer.TEXT);
-			for (int i = 0; i < playerInvSize; i++) {
-				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, leftOffset - 1 + (cellWidth * (i % invRow)),
-						(i < 27 ? 0 : 10) + playerTopOffset - 1 + (cellWidth * (i / invRow)), PetGUI.GUI_TEX_CELL_HOFFSET,
-						PetGUI.GUI_TEX_CELL_VOFFSET, cellWidth,
-						cellWidth, 256, 256);
+			// Player inventory
+			{
+				matrixStackIn.push();
+				matrixStackIn.translate(leftOffset - 1, playerTopOffset - 1, 0);
+				// ... First 27
+				PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.min(27, playerInvSize), invRow);
+				
+				// Remaining (toolbar)
+				final int yOffset = ((Math.min(27, playerInvSize) / invRow)) * cellWidth;
+				matrixStackIn.translate(0, 10 + yOffset, 0);
+				PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.max(0, playerInvSize-27), invRow);
+				
+				matrixStackIn.pop();
 			}
-			mc.getTextureManager().bindTexture(TEX_LOC);
 			
 			matrixStackIn.pop();
 		}
@@ -600,7 +604,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public boolean shouldShow(EntityArcaneWolf wolf, PetContainer<EntityArcaneWolf> container) {
+	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
 		return wolf.hasWolfCapability(WolfBondCapability.TRAINABLE);
 	}
 

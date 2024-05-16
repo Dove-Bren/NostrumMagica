@@ -781,7 +781,7 @@ public class RoomBlueprint {
 		if (dimensions != null) {
 			BlockPos offset = (entry == null ? BlockPos.ZERO : entry.getPos());
 			for (int xOff = -(width/2); xOff <= (width-1)/2; xOff++)
-			for (int yOff = 0; yOff <= height; yOff++)
+			for (int yOff = 0; yOff < height; yOff++)
 			for (int zOff = -(depth/2); zOff <= (depth-1)/2; zOff++) {
 				final int x = xOff + offset.getX();
 				final int y = yOff + offset.getY();

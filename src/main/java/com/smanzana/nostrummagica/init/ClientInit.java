@@ -16,9 +16,6 @@ import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetContainer;
-import com.smanzana.nostrummagica.client.gui.petgui.PetGUI.PetGUIContainer;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -60,7 +57,6 @@ import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
-import com.smanzana.nostrummagica.entity.IEntityPet;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
 import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
@@ -106,12 +102,10 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.CommandSource;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -136,7 +130,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientInit {
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
@@ -159,7 +152,6 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.ReagentBag, ReagentBagGui.BagGui::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneBag, RuneBagGui.BagGui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreation, SpellCreationGui.SpellGui::new);
-		ScreenManager.registerFactory(NostrumContainers.PetGui, new PetGUIFactory());
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
 		
 		// Register client command registering command.
@@ -176,16 +168,6 @@ public class ClientInit {
     	ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
 		proxy.initKeybinds();
     	proxy.initDefaultEffects();
-	}
-	
-	// To get around bounds matching. D:
-	protected static class PetGUIFactory<T extends IEntityPet> implements ScreenManager.IScreenFactory<PetGUI.PetContainer<T>, PetGUI.PetGUIContainer<T>> {
-
-			@Override
-			public PetGUIContainer<T> create(PetContainer<T> c, PlayerInventory p,
-					ITextComponent n) {
-				return new PetGUI.PetGUIContainer<T>(c, p, n);
-			}
 	}
 	
 	// Subscribed to game bus in #clientSetup

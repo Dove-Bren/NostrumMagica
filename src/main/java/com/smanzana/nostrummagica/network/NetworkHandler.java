@@ -18,10 +18,6 @@ import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.messages.ObeliskTeleportationRequestMessage;
-import com.smanzana.nostrummagica.network.messages.PetCommandMessage;
-import com.smanzana.nostrummagica.network.messages.PetCommandSettingsSyncMessage;
-import com.smanzana.nostrummagica.network.messages.PetGUIControlMessage;
-import com.smanzana.nostrummagica.network.messages.PetGUISyncMessage;
 import com.smanzana.nostrummagica.network.messages.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
@@ -96,8 +92,6 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, ModifyMessage.class, ModifyMessage::encode, ModifyMessage::decode, ModifyMessage::handle);
 		syncChannel.registerMessage(discriminator++, LoreMessage.class, LoreMessage::encode, LoreMessage::decode, LoreMessage::handle);
 		syncChannel.registerMessage(discriminator++, RuneBagToggleMessage.class, RuneBagToggleMessage::encode, RuneBagToggleMessage::decode, RuneBagToggleMessage::handle);
-		syncChannel.registerMessage(discriminator++, PetGUIControlMessage.class, PetGUIControlMessage::encode, PetGUIControlMessage::decode, PetGUIControlMessage::handle);
-		syncChannel.registerMessage(discriminator++, PetGUISyncMessage.class, PetGUISyncMessage::encode, PetGUISyncMessage::decode, PetGUISyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, MagicEffectUpdate.class, MagicEffectUpdate::encode, MagicEffectUpdate::decode, MagicEffectUpdate::handle);
 		syncChannel.registerMessage(discriminator++, ClientPurchaseResearchMessage.class, ClientPurchaseResearchMessage::encode, ClientPurchaseResearchMessage::decode, ClientPurchaseResearchMessage::handle);
 		syncChannel.registerMessage(discriminator++, CandleIgniteMessage.class, CandleIgniteMessage::encode, CandleIgniteMessage::decode, CandleIgniteMessage::handle);
@@ -108,8 +102,6 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, BladeCastMessage.class, BladeCastMessage::encode, BladeCastMessage::decode, BladeCastMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpawnNostrumRitualEffectMessage.class, SpawnNostrumRitualEffectMessage::encode, SpawnNostrumRitualEffectMessage::decode, SpawnNostrumRitualEffectMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpawnPredefinedEffectMessage.class, SpawnPredefinedEffectMessage::encode, SpawnPredefinedEffectMessage::decode, SpawnPredefinedEffectMessage::handle);
-		syncChannel.registerMessage(discriminator++, PetCommandMessage.class, PetCommandMessage::encode, PetCommandMessage::decode, PetCommandMessage::handle);
-		syncChannel.registerMessage(discriminator++, PetCommandSettingsSyncMessage.class, PetCommandSettingsSyncMessage::encode, PetCommandSettingsSyncMessage::decode, PetCommandSettingsSyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, ManaArmorSyncMessage.class, ManaArmorSyncMessage::encode, ManaArmorSyncMessage::decode, ManaArmorSyncMessage::handle);
 	}
 	
