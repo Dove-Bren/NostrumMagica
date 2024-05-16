@@ -14,28 +14,30 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 // Tamed dragons may use these to allow players to set up when they cast stuff!
 public enum EntityDragonGambit {
 
-	ALWAYS("always", 10),
+	ALWAYS("always", 10, 0),
 	
-	HEALTH_CRITICAL("health_critical", 20),
+	HEALTH_CRITICAL("health_critical", 20, 0),
 	
-	HEALTH_LOW("health_low", 30),
+	HEALTH_LOW("health_low", 30, 0),
 	
-	MANA_LOW("mana_low", 40),
+	MANA_LOW("mana_low", 0, 10),
 	
-	OCCASIONAL("occasional", 50),
+	OCCASIONAL("occasional", 10, 10),
 	
-	FREQUENT("frequent", 60);
+	FREQUENT("frequent", 20, 10);
 	
-	private String unlocName;
-	private int texOffsetX;
+	private final String unlocName;
+	private final int texOffsetX;
+	private final int texOffsetY;
 	
 	// Only the client uses these
 	private List<ITextComponent> desc;
 	private String transName;
 	
-	private EntityDragonGambit(String unlocName, int texOffsetX) {
+	private EntityDragonGambit(String unlocName, int texOffsetX, int texOffsetY) {
 		this.unlocName = unlocName;
 		this.texOffsetX = texOffsetX;
+		this.texOffsetY = texOffsetY;
 		this.desc = null;
 		this.transName = null;
 	}
@@ -46,6 +48,10 @@ public enum EntityDragonGambit {
 	
 	public int getTexOffsetX() {
 		return texOffsetX;
+	}
+	
+	public int getTexOffsetY() {
+		return texOffsetY;
 	}
 	
 	@OnlyIn(Dist.CLIENT)

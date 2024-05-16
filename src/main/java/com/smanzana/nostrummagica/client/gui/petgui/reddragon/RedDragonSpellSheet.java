@@ -167,13 +167,27 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		matrixStackIn.push();
 		matrixStackIn.translate(x, y, 0);
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
+
+		matrixStackIn.translate(1, 1, 0);
+		{
+			RenderSystem.pushMatrix();
+			RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
+			RenderSystem.translated(0, 0, -100);
+			mc.getItemRenderer().renderItemIntoGUI(scrollShadow,
+					0,
+					0);
+			RenderSystem.popMatrix();
+		}
 		
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(.8f, .8f, .8f, .6f);
-		RenderFuncs.ItemRenderer(scrollShadow, matrixStackIn);
-		RenderSystem.color4f(1f, 1f, 1f, 1f);
-		RenderSystem.disableBlend();
+			
+		int color = 0x55FFFFFF;
+		matrixStackIn.push();
+		matrixStackIn.translate(0, 0, 1);
+		RenderFuncs.drawRect(matrixStackIn, 
+				0, 0,
+				16, 16,
+				color);
+		matrixStackIn.pop();
 		matrixStackIn.pop();
 	}
 	
@@ -204,16 +218,18 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, EntityDragonGambit gambit) {
-		int texOffset = 0;
+		int texOffsetX = 0;
+		int texOffsetY = 0;
 		if (gambit != null) {
-			texOffset = gambit.getTexOffsetX();
+			texOffsetX = gambit.getTexOffsetX();
+			texOffsetY = gambit.getTexOffsetY();
 		}
 		mc.getTextureManager().bindTexture(DRAGON_ICON_TEXT);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y,
-				GUI_TEX_TOGGLE_HOFFSET + texOffset,
-				GUI_TEX_TOGGLE_VOFFSET, toggleSize,
-				toggleSize, GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
+				GUI_TEX_TOGGLE_HOFFSET + texOffsetX,
+				GUI_TEX_TOGGLE_VOFFSET + texOffsetY,
+				toggleSize,	toggleSize, GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
 	}
 	
 	private void drawRow(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
