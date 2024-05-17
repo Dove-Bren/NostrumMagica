@@ -32,14 +32,14 @@ public class EntityGolemLightning extends EntityGolem {
 	
 	private static void init() {
 		if (spellRanged1 == null) {
-			spellRanged1 = new Spell("Lightning Strike", true);
+			spellRanged1 = Spell.CreateAISpell("Lightning Strike");
 			spellRanged1.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellRanged1.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.CONJURE));
 			
-			spellRanged2 = new Spell("Spark", true);
+			spellRanged2 = Spell.CreateAISpell("Spark");
 			spellRanged2.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged2.addPart(new SpellPart(AoEShape.instance(),
 					EMagicElement.LIGHTNING,
@@ -47,7 +47,7 @@ public class EntityGolemLightning extends EntityGolem {
 					null,
 					new SpellPartParam(1, false)));
 			
-			spellBuff = new Spell("Magic Ward", true);
+			spellBuff = Spell.CreateAISpell("Magic Ward");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.LIGHTNING,

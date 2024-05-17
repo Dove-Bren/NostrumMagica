@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -17,6 +18,7 @@ import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellCrafting;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
@@ -253,17 +255,16 @@ public class RoomLectern extends StaticRoom {
 		}
 		
 		// Build the spell
-		Spell spell = new Spell(genSpellName(rand, element, harmful, status), false);
-		
+		List<SpellPart> parts = new ArrayList<>(8);
 		if (harmful) {
 			
 			if (rand.nextBoolean() && rand.nextBoolean()) {
-				spell.addPart(new SpellPart(BeamTrigger.instance()));
+				parts.add(new SpellPart(BeamTrigger.instance()));
 			} else {
-				spell.addPart(new SpellPart(ProjectileTrigger.instance()));
+				parts.add(new SpellPart(ProjectileTrigger.instance()));
 				
 				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) {
-					spell.addPart(new SpellPart(ProximityTrigger.instance()));
+					parts.add(new SpellPart(ProximityTrigger.instance()));
 				}
 			}
 			
@@ -292,14 +293,14 @@ public class RoomLectern extends StaticRoom {
 					alt = EAlteration.INFLICT;
 				}
 				
-				spell.addPart(new SpellPart(shape, element, potency, alt));
+				parts.add(new SpellPart(shape, element, potency, alt));
 			}
 		} else {
 			boolean self = rand.nextBoolean();
 			if (self) {
-				spell.addPart(new SpellPart(SelfTrigger.instance()));
+				parts.add(new SpellPart(SelfTrigger.instance()));
 			} else {
-				spell.addPart(new SpellPart(ProjectileTrigger.instance()));
+				parts.add(new SpellPart(ProjectileTrigger.instance()));
 			}
 			
 			int effects = 1;
@@ -333,11 +334,11 @@ public class RoomLectern extends StaticRoom {
 					shape = SingleShape.instance();
 				}
 				
-				spell.addPart(new SpellPart(shape, element, potency, alts.get(rand.nextInt(alts.size()))));
+				parts.add(new SpellPart(shape, element, potency, alts.get(rand.nextInt(alts.size()))));
 			}
 		}
 		
-		return spell;
+		return SpellCrafting.CreateSpellFromParts(genSpellName(rand, element, harmful, status), parts, false);
 	}
 	
 	@Override

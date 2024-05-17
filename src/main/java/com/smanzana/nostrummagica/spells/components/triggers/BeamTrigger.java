@@ -138,4 +138,9 @@ public class BeamTrigger extends InstantTrigger {
 		return null	;
 	}
 	
+	@Override
+	public int getWeight() {
+		return 3;
+	}
+	
 }

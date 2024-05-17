@@ -156,5 +156,11 @@ public abstract class SpellShape {
 	 */
 	public abstract String supportedFloatName();
 	
+	/**
+	 * Return the weight cost of this shape. Should be 0+.
+	 * @return
+	 */
+	public abstract int getWeight();
+	
 	
 }

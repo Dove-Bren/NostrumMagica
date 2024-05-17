@@ -176,4 +176,9 @@ public class MagicCyclerTrigger extends SpellTrigger {
 		return I18n.format("modification.vortex_blade.float.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+	
 }

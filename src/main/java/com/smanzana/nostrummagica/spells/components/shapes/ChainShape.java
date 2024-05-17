@@ -178,5 +178,10 @@ public class ChainShape extends SpellShape {
 	public String supportedFloatName() {
 		return I18n.format("modification.chain.name", (Object[]) null);
 	}
+	
+	@Override
+	public int getWeight() {
+		return 0;
+	}
 
 }

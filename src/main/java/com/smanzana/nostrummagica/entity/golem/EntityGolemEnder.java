@@ -27,7 +27,7 @@ public class EntityGolemEnder extends EntityGolem {
 	
 	private static void init() {
 		if (spellRange == null) {
-			spellRange = new Spell("Overwhelm", true);
+			spellRange = Spell.CreateAISpell("Overwhelm");
 			spellRange.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellRange.addPart(new SpellPart(AoEShape.instance(),
 					EMagicElement.ENDER,
@@ -35,14 +35,14 @@ public class EntityGolemEnder extends EntityGolem {
 					null,
 					new SpellPartParam(2, false)));
 			
-			spellDebuff = new Spell("Blind", true);
+			spellDebuff = Spell.CreateAISpell("Blind");
 			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellDebuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.ENDER,
 					1,
 					EAlteration.INFLICT));
 			
-			spellBuff = new Spell("Cloak", true);
+			spellBuff = Spell.CreateAISpell("Cloak");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.ENDER,

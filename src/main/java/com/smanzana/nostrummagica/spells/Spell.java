@@ -449,11 +449,13 @@ public class Spell {
 	private int iconIndex; // Basically useless on server, selects which icon to show on the client
 	private int registryID;
 	private List<SpellPart> parts;
-	private int manaCost;
+	private final int manaCost;
+	private final int weight;
 	
-	private Spell() {
+	private Spell(int manaCost, int weight) {
 		this.parts = new LinkedList<>();
-		manaCost = -1; // un-calculated value
+		this.manaCost = manaCost;
+		this.weight = weight;
 		name = "";
 		iconIndex = 0;
 	}
@@ -462,12 +464,12 @@ public class Spell {
 	 * Creates a new spell and registers it in the registry.
 	 * @param name
 	 */
-	public Spell(String name) {
-		this(name, false);
+	public Spell(String name, int manaCost, int weight) {
+		this(name, false, manaCost, weight);
 	}
 	
-	public Spell(String name, boolean trans) {
-		this();
+	public Spell(String name, boolean trans, int manaCost, int weight) {
+		this(manaCost, weight);
 		this.name = name;
 		
 		if (trans)
@@ -476,13 +478,17 @@ public class Spell {
 			registryID = NostrumMagica.instance.getSpellRegistry().register(this);
 	}
 	
-	public static Spell CreateInternal(String name, int id) {
-		Spell s = new Spell();
+	public static Spell CreateFake(String name, int id) {
+		Spell s = new Spell(0, 0);
 		s.name = name;
 		s.registryID = id;
 		
 		NostrumMagica.instance.getSpellRegistry().override(id, s);
 		return s;
+	}
+	
+	public static Spell CreateAISpell(String name) {
+		return new Spell(name, true, 50, 10);
 	}
 	
 	/**
@@ -498,7 +504,6 @@ public class Spell {
 	
 	public Spell addPart(SpellPart part) {
 		this.parts.add(part);
-		manaCost = -1;
 		return this;
 	}
 	
@@ -535,33 +540,11 @@ public class Spell {
 	}
 	
 	public int getManaCost() {
-		if (manaCost != -1)
-			return manaCost;
-		
-		// Triggers can report their  cost
-		// Alterations are in enum
-		// Shapes cost 10
-		// First elem is free. Extra costs 20 ea
-		// Rolling multiplier makes it more expensive for one long spell vs many small
-		// (rate of 1.1x)
-		float cost = 0f;
-		float multiplier = 1f;
-		
-		for (SpellPart part : parts) {
-			if (part.isTrigger())
-				cost += multiplier * (float) part.getTrigger().getManaCost();
-			else {
-				cost += multiplier * 10f;
-				if (part.getElementCount() > 1)
-					cost += multiplier * (float) (20 * (part.getElementCount() - 1));
-				if (part.getAlteration() != null)
-					cost += multiplier * (float) part.getAlteration().getCost();
-			}
-			multiplier *= 1.1;
-		}
-		
-		manaCost = (int) Math.ceil(cost);
 		return manaCost;
+	}
+	
+	public int getWeight() {
+		return weight;
 	}
 	
 	public Map<ReagentType, Integer> getRequiredReagents() {
@@ -846,6 +829,8 @@ public class Spell {
 	}
 	
 	private static final String NBT_SPELL_NAME = "name";
+	private static final String NBT_MANA_COST = "mana_cost";
+	private static final String NBT_WEIGHT = "spell_weight";
 	private static final String NBT_LIST = "parts";
 	private static final String NBT_ICON_INDEX = "ico_index";
 	
@@ -882,6 +867,8 @@ public class Spell {
 		compound = new CompoundNBT();
 		compound.putString(NBT_SPELL_NAME, name);
 		compound.putInt(NBT_ICON_INDEX, iconIndex);
+		compound.putInt(NBT_MANA_COST, manaCost);
+		compound.putInt(NBT_WEIGHT, weight);
 		compound.put(NBT_LIST, list);
 		return compound;
 	}
@@ -899,7 +886,17 @@ public class Spell {
 		
 		String name = nbt.getString(NBT_SPELL_NAME); 
 		int index = nbt.getInt(NBT_ICON_INDEX);
-		Spell spell = new Spell();
+		int manaCost = nbt.getInt(NBT_MANA_COST);
+		int weight = nbt.getInt(NBT_WEIGHT);
+		
+		{
+			if (!nbt.contains(NBT_MANA_COST)) {
+				NostrumMagica.logger.warn("Found spell with no recorded mana cost! Making absurd. " + name + "[" + id + "]");
+				manaCost = 10000;
+			}
+		}
+		
+		Spell spell = new Spell(manaCost, weight);
 		spell.name = name;
 		spell.registryID = id;
 		spell.iconIndex = index;

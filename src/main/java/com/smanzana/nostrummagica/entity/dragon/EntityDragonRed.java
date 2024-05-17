@@ -134,7 +134,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	private static Spell makeSpell(
 			String name,
 			Object ... objects) {
-		Spell spell = new Spell(name, true);
+		Spell spell = Spell.CreateAISpell(name);
 		
 		for (int i = 0; i < objects.length; i++) {
 			Object o = objects[i];

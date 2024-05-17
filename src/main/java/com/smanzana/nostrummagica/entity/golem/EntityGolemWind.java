@@ -25,14 +25,14 @@ public class EntityGolemWind extends EntityGolem {
 	
 	private static void init() {
 		if (spellPush == null) {
-			spellPush = new Spell("Gust", true);
+			spellPush = Spell.CreateAISpell("Gust");
 			spellPush.addPart(new SpellPart(SelfTrigger.instance()));
 			spellPush.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.WIND,
 					1,
 					EAlteration.RESIST));
 			
-			spellBuff = new Spell("Speed", true);
+			spellBuff = Spell.CreateAISpell("Speed");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.WIND,

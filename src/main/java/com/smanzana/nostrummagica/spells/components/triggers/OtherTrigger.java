@@ -85,4 +85,9 @@ public class OtherTrigger extends InstantTrigger {
 		return null;
 	}
 	
+	@Override
+	public int getWeight() {
+		return 0;
+	}
+	
 }

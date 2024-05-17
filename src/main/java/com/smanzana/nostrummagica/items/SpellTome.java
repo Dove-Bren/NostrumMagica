@@ -642,7 +642,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	private static Spell getTemp(int id) {
-		return Spell.CreateInternal("Loading...", id);
+		return Spell.CreateFake("Loading...", id);
 	}
 
 	@Override

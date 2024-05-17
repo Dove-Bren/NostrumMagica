@@ -156,4 +156,10 @@ public abstract class SpellTrigger {
 	 * Display name for the float option. Should be translated already
 	 */
 	public abstract String supportedFloatName();
+	
+	/**
+	 * Return the weight cost of this trigger. Should be 0+.
+	 * @return
+	 */
+	public abstract int getWeight();
 }

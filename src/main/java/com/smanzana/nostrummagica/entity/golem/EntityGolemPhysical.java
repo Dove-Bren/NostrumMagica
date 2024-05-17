@@ -24,7 +24,7 @@ public class EntityGolemPhysical extends EntityGolem {
 	
 	private static void init() {
 		if (spellRanged == null) {
-			spellRanged = new Spell("Massive Blow", true);
+			spellRanged = Spell.CreateAISpell("Massive Blow");
 			//spellRanged.addPart(new SpellPart()); should be projectile
 			spellRanged.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged.addPart(new SpellPart(SingleShape.instance(),
@@ -32,7 +32,7 @@ public class EntityGolemPhysical extends EntityGolem {
 					1,
 					null));
 			
-			spellDebuff = new Spell("Corrupt Offense", true);
+			spellDebuff = Spell.CreateAISpell("Corrupt Offense");
 			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellDebuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.PHYSICAL,

@@ -187,4 +187,9 @@ public class ManaTrigger extends SpellTrigger {
 		return I18n.format("modification.mana.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+	
 }

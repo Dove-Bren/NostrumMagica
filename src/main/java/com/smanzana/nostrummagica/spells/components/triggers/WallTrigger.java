@@ -223,4 +223,9 @@ public class WallTrigger extends TriggerAreaTrigger {
 		return I18n.format("modification.wall.float.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 2;
+	}
+	
 }

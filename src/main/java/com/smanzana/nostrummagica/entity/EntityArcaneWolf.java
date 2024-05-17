@@ -275,7 +275,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	protected static enum WolfSpell {
 		GROUP_SPEED(WolfSpellTargetGroup.SELF, 50,
-				(new Spell("WolfSpeed", true)).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfSpeed")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.WIND, 1)
 							&& wolf.getAttackTarget() == null // Not in battle
@@ -283,31 +283,31 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							;
 				}),
 		WIND_CUTTER(WolfSpellTargetGroup.ENEMY, 20,
-				(new Spell("WolfWindCutter", true)).addPart(new SpellPart(MagicCutterTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.WIND, 2, EAlteration.RUIN)),
+				(Spell.CreateAISpell("WolfWindCutter")).addPart(new SpellPart(MagicCutterTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.WIND, 2, EAlteration.RUIN)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.WIND, 3);
 				}),
 		ROOTS(WolfSpellTargetGroup.ENEMY, 25,
-				(new Spell("WolfRoots", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfRoots")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.EARTH, 1)
 							&& target.getActivePotionEffect(NostrumEffects.rooted) == null;
 				}),
 		REGEN(WolfSpellTargetGroup.ALLY, 50,
-				(new Spell("WolfRegen", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.GROWTH)),
+				(Spell.CreateAISpell("WolfRegen")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.GROWTH)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.EARTH, 3)
 							&& target.getHealth() < target.getMaxHealth()
 							&& target.getActivePotionEffect(Effects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD(WolfSpellTargetGroup.SELF, 30,
-				(new Spell("WolfMagicShield", true)).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ICE, 1)
 							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
 		WOLF_HEAL(null, 20,
-				(new Spell("WolfHeal", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE, 2, EAlteration.GROWTH)),
+				(Spell.CreateAISpell("WolfHeal")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE, 2, EAlteration.GROWTH)),
 				(wolf, target) -> {
 					if (!wolf.hasElementLevel(EMagicElement.ICE, 2)) {
 						return false;
@@ -321,19 +321,19 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 					}
 				}),
 		ICE_FANGS(WolfSpellTargetGroup.SELF, 100,
-				(new Spell("WolfIceFangs", true)).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 2, EAlteration.ENCHANT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfIceFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 2, EAlteration.ENCHANT, new SpellPartParam(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ICE, 3)
 							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
 		FIRE_TOUCH(WolfSpellTargetGroup.ENEMY, 10,
-				(new Spell("WolfFireBite", true)).addPart(new SpellPart(TouchTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 2, EAlteration.RUIN)),
+				(Spell.CreateAISpell("WolfFireBite")).addPart(new SpellPart(TouchTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 2, EAlteration.RUIN)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.FIRE, 1)
 							&& wolf.getDistance(target) <= TouchTrigger.TOUCH_RANGE;
 				}),
 		MAGIC_BOOST(WolfSpellTargetGroup.ALLY, 20,
-				(new Spell("WolfMagicBoost", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
+				(Spell.CreateAISpell("WolfMagicBoost")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.FIRE, 3)
 							&& target.getActivePotionEffect(NostrumEffects.magicBoost) == null
@@ -341,24 +341,24 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							;
 				}),
 		ENDER_SHROUD(WolfSpellTargetGroup.ENEMY, 20,
-				(new Spell("WolfEnderShroud", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartParam(3, true))).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartParam(3, true))).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ENDER, 1);
 				}),
 		ENDER_FANGS(WolfSpellTargetGroup.SELF, 75,
-				(new Spell("WolfEnderFangs", true)).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ENDER, 1, EAlteration.ENCHANT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfEnderFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ENDER, 1, EAlteration.ENCHANT, new SpellPartParam(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ENDER, 3)
 							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
 		SLOW(WolfSpellTargetGroup.ENEMY, 10,
-				(new Spell("WolfSlow", true)).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfSlow")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.LIGHTNING, 1)
 							&& target.getActivePotionEffect(Effects.SLOWNESS) == null;
 				}),
 		CHAIN_LIGHTNING(WolfSpellTargetGroup.ENEMY, 40,
-				(new Spell("WolfChainLightning", true)).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartParam(6, true))),
+				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartParam(6, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.LIGHTNING, 3);
 				}),

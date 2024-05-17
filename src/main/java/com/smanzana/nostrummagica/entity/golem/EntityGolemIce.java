@@ -23,14 +23,14 @@ public class EntityGolemIce extends EntityGolem {
 	
 	private static void init() {
 		if (spellRange == null) {
-			spellRange = new Spell("Chill", true);
+			spellRange = Spell.CreateAISpell("Chill");
 			spellRange.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellRange.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.ICE,
 					1,
 					EAlteration.INFLICT));
 			
-			spellBuff = new Spell("Aegis", true);
+			spellBuff = Spell.CreateAISpell("Aegis");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.ICE,

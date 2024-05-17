@@ -374,7 +374,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor,
 		if (MissleSpells == null) {
 			MissleSpells = new Spell[EMagicElement.values().length];
 			for (EMagicElement elem : EMagicElement.values()) {
-				Spell spell = new Spell("WarlockMissle_" + elem.name(), true);
+				Spell spell = Spell.CreateAISpell("WarlockMissle_" + elem.name());
 				spell.addPart(new SpellPart(SeekingBulletTrigger.instance()));
 				spell.addPart(new SpellPart(SingleShape.instance(), elem, 1, null));
 				MissleSpells[elem.ordinal()] = spell;

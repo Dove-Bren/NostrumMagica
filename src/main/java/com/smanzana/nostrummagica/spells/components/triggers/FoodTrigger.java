@@ -191,4 +191,9 @@ public class FoodTrigger extends SpellTrigger {
 		return I18n.format("modification.food.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+	
 }

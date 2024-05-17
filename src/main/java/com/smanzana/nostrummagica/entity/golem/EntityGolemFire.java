@@ -30,14 +30,14 @@ public class EntityGolemFire extends EntityGolem {
 	
 	private static void init() {
 		if (spellRanged1 == null) {
-			spellRanged1 = new Spell("Fireball", true);
+			spellRanged1 = Spell.CreateAISpell("Fireball");
 			spellRanged1.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged1.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.FIRE,
 					1,
 					null));
 			
-			spellRanged2 = new Spell("Blaze", true);
+			spellRanged2 = Spell.CreateAISpell("Blaze");
 			spellRanged2.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged2.addPart(new SpellPart(AoEShape.instance(),
 					EMagicElement.FIRE,
@@ -45,7 +45,7 @@ public class EntityGolemFire extends EntityGolem {
 					EAlteration.CONJURE,
 					new SpellPartParam(2, false)));
 			
-			spellRanged3 = new Spell("Melt Armor", true);
+			spellRanged3 = Spell.CreateAISpell("Melt Armor");
 			spellRanged3.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spellRanged3.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.FIRE,
@@ -53,7 +53,7 @@ public class EntityGolemFire extends EntityGolem {
 					EAlteration.GROWTH,
 					new SpellPartParam(1, false)));
 			
-			spellBuff = new Spell("Fire Shield", true);
+			spellBuff = Spell.CreateAISpell("Fire Shield");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.FIRE,

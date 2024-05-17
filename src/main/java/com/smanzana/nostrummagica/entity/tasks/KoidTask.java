@@ -51,7 +51,7 @@ public class KoidTask extends Goal {
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		Spell spell = new Spell(name, true);
+		Spell spell = Spell.CreateAISpell(name);
 		spell.addPart(new SpellPart(trigger));
 		spell.addPart(new SpellPart(shape, element, power, alteration));
 		
@@ -151,7 +151,7 @@ public class KoidTask extends Goal {
 					EMagicElement.FIRE,
 					1,
 					null);
-			spell = new Spell("Fireball", true);
+			spell = Spell.CreateAISpell("Fireball");
 			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.FIRE,
 					1, null, new SpellPartParam(3, false)));
@@ -176,7 +176,7 @@ public class KoidTask extends Goal {
 					EMagicElement.ICE,
 					1,
 					null);
-			spell = new Spell("Group Frostbite", true);
+			spell = Spell.CreateAISpell("Group Frostbite");
 			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.ICE,
 					1, EAlteration.INFLICT, new SpellPartParam(5, false)));
@@ -266,7 +266,7 @@ public class KoidTask extends Goal {
 					EMagicElement.ENDER,
 					2,
 					EAlteration.RESIST);
-			spell = new Spell("Blinker", true);
+			spell = Spell.CreateAISpell("Blinker");
 			spell.addPart(new SpellPart(SelfTrigger.instance()));
 			spell.addPart(new SpellPart(DamagedTrigger.instance()));
 			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER,

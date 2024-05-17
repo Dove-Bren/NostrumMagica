@@ -85,5 +85,10 @@ public class SingleShape extends SpellShape {
 	public String supportedFloatName() {
 		return null;
 	}
+	
+	@Override
+	public int getWeight() {
+		return 0;
+	}
 
 }

@@ -271,4 +271,9 @@ public class MortarTrigger extends SpellTrigger {
 		return null;
 	}
 	
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+	
 }

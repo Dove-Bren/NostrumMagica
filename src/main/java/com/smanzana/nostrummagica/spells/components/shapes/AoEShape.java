@@ -140,4 +140,9 @@ public class AoEShape extends SpellShape {
 		return I18n.format("modification.aoe.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 0;
+	}
+	
 }

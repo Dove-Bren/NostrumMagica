@@ -209,4 +209,9 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		return I18n.format("modification.field.float.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 2;
+	}
+	
 }

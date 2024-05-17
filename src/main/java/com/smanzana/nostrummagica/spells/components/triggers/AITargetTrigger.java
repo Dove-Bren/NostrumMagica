@@ -87,4 +87,9 @@ public class AITargetTrigger extends InstantTrigger {
 		return null;
 	}
 	
+	@Override
+	public int getWeight() {
+		return 99;
+	}
+	
 }

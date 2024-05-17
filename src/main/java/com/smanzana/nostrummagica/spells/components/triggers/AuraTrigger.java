@@ -242,4 +242,9 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		return I18n.format("modification.aura.float.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 3;
+	}
+	
 }

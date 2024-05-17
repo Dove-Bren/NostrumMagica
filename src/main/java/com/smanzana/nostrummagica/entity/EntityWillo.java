@@ -735,7 +735,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		Spell spell = new Spell(name, true);
+		Spell spell = Spell.CreateAISpell(name);
 		spell.addPart(new SpellPart(trigger1));
 		if (trigger2 != null) {
 			spell.addPart(new SpellPart(trigger2));
@@ -1005,7 +1005,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 					EMagicElement.ENDER,
 					1,
 					EAlteration.INFLICT);
-			spell = new Spell("Blinker", true);
+			spell = Spell.CreateAISpell("Blinker");
 			spell.addPart(new SpellPart(SelfTrigger.instance()));
 			spell.addPart(new SpellPart(DamagedTrigger.instance()));
 			spell.addPart(new SpellPart(OtherTrigger.instance()));

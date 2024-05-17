@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
 import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellCrafting;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -56,43 +57,6 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return PackedTypeMap.get(shape);
 	}
 	
-//	@OnlyIn(Dist.CLIENT)
-//	public static class ModelMesher implements ItemMeshDefinition {
-//
-//		@Override
-//		public ModelResourceLocation getModelLocation(ItemStack stack) {
-//			// Must be kept in sync with ClientProxy variant registration
-//			/*
-//			 * for (EMagicElement type : EMagicElement.values()) {
-//    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name()));
-//	    	}
-//	    	for (EAlteration type : EAlteration.values()) {
-//	    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.name()));
-//	    	}
-//	    	for (SpellShape type : SpellShape.getAllShapes()) {
-//	    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.getShapeKey()));
-//	    	}
-//	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
-//	    		list.add(new ResourceLocation(NostrumMagica.MODID, "rune_" + type.getTriggerKey()));
-//	    	}
-//			 */
-//			String suffix = "blank";
-//			
-//			if (!stack.isEmpty()) {
-//				suffix = getPieceName(stack);
-//				if (suffix == null || suffix.trim().isEmpty())
-//					suffix = "blank";
-//				else
-//					suffix = suffix.toLowerCase();
-//			}
-//			
-//			return new ModelResourceLocation(
-//					new ResourceLocation(NostrumMagica.MODID, "rune_" + suffix),
-//					"inventory");
-//		}
-//
-//	}
-	
 	protected static final String ID_PREFIX = "rune_";
 	private static final String NBT_PARAM_VAL = "param_value"; // shapes/triggers
 	private static final String NBT_PARAM_FLIP = "param_flip"; // shapes/triggers
@@ -104,35 +68,6 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	public abstract SpellComponentWrapper getComponent();
 	
 	public abstract String makeRegistryName();
-	
-//	// TODO decide about this
-//	@Override
-//	public String getTranslationKey(ItemStack stack) {
-//		return this.getDefaultTranslationKey() + "." + getPieceName(stack).toLowerCase();
-//	}
-	
-//	/**
-//     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-//     */
-//    @OnlyIn(Dist.CLIENT)
-//    @Override
-//	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-//    	if (this.isInCreativeTab(tab)) {
-//	    	// Should be synced to client proxy registering variants
-//	    	for (EMagicElement type : EMagicElement.values()) {
-//	    		subItems.add(getRune(type, 1));
-//	    	}
-//	    	for (EAlteration type : EAlteration.values()) {
-//	    		subItems.add(getRune(type));
-//	    	}
-//	    	for (SpellShape type : SpellShape.getAllShapes()) {
-//	    		subItems.add(getRune(type));
-//	    	}
-//	    	for (SpellTrigger type : SpellTrigger.getAllTriggers()) {
-//	    		subItems.add(getRune(type));
-//	    	}
-//    	}
-//	}
 	
 	public static ItemStack getRune(SpellComponentWrapper wrapper) {
 		Item rune = GetRuneForType(wrapper);
@@ -220,76 +155,6 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		return output;
 	}
-	
-//	private static EMagicElement getPieceShapeElement(ItemStack piece) {
-//		if (!piece.hasTag())
-//			return null;
-//		
-//		if (!piece.getTag().contains(NBT_SHAPE_ELEMENT, NBT.TAG_STRING))
-//			return null;
-//		
-//		try {
-//			return EMagicElement.valueOf(piece.getTag().getString(NBT_SHAPE_ELEMENT));
-//		} catch (IllegalArgumentException e) {
-//			NostrumMagica.logger.error("Failed to get element from rune");
-//			return EMagicElement.PHYSICAL;
-//		}
-//	}
-//	
-//	private static void setPieceShapeElement(ItemStack piece, @Nullable EMagicElement element) {
-//		if (!piece.hasTag())
-//			return;
-//		
-//		if (element != null) {
-//			piece.getTag().putString(NBT_SHAPE_ELEMENT, element.name());
-//		} else {
-//			piece.getTag().remove(NBT_SHAPE_ELEMENT);
-//		}
-//	}
-//	
-//	private static EAlteration getPieceShapeAlteration(ItemStack piece) {
-//		if (!piece.hasTag())
-//			return null;
-//		
-//		if (!piece.getTag().contains(NBT_SHAPE_ALTERATION, NBT.TAG_STRING))
-//			return null;
-//		
-//		try {
-//			return EAlteration.valueOf(piece.getTag().getString(NBT_SHAPE_ALTERATION));
-//		} catch (IllegalArgumentException e) {
-//			NostrumMagica.logger.error("Failed to get alteration from rune");
-//			return null;
-//		}
-//	}
-//	
-//	private static void setPieceShapeAlteration(ItemStack piece, @Nullable EAlteration alteration) {
-//		if (!piece.hasTag())
-//			return;
-//		
-//		if (alteration != null) {
-//			piece.getTag().putString(NBT_SHAPE_ALTERATION, alteration.name());
-//		} else {
-//			piece.getTag().remove(NBT_SHAPE_ALTERATION);
-//		}
-//	}
-//	
-//	private static int getPieceElementCount(ItemStack piece) {
-//		if (!piece.hasTag())
-//			return 0;
-//		
-//		return piece.getTag().getInt(NBT_ELEMENT_COUNT);
-//	}
-//	
-//	private static void setPieceElementCount(ItemStack piece, int count) {
-//		if (!piece.hasTag())
-//			return;
-//		
-//		if (count > 0) {
-//			piece.getTag().putInt(NBT_ELEMENT_COUNT, count);
-//		} else {
-//			piece.getTag().remove(NBT_ELEMENT_COUNT);
-//		}
-//	}
 	
 	public static SpellPartParam getPieceParam(ItemStack piece) {
 		if (!piece.hasTag())
@@ -426,6 +291,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			tooltip.add(new StringTextComponent("Trigger").mergeStyle(TextFormatting.DARK_BLUE));
+			tooltip.add(new StringTextComponent("Weight " + trigger.getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
 			
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
@@ -536,6 +402,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			tooltip.add(new StringTextComponent("Alteration").mergeStyle(TextFormatting.AQUA));
+			tooltip.add(new StringTextComponent("Weight " + alteration.getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
 		}
 		
 		@Override
@@ -584,6 +451,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			tooltip.add(new StringTextComponent("Shape Piece").mergeStyle(TextFormatting.DARK_RED));
+			tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getShape().supportsBoolean() && params.flip) {
@@ -648,6 +516,9 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			if (alteration != null) {
 				tooltip.add(new StringTextComponent(alteration.getName()).mergeStyle(TextFormatting.AQUA));
 			}
+			
+			int weight = SpellCrafting.CalculateWeight(getShape(), getNestedElement(stack), getNestedElementCount(stack), getNestedAlteration(stack));
+			tooltip.add(new StringTextComponent("Weight " + weight).mergeStyle(TextFormatting.DARK_PURPLE));
 			
 			SpellPartParam params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);

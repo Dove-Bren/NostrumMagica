@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -32,32 +33,39 @@ public class CommandRandomSpell {
 				Commands.literal("randomspell")
 					.requires(s -> s.hasPermissionLevel(2))
 					.then(Commands.argument("name", StringArgumentType.greedyString())
-						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name")))
+						.then(Commands.argument("cost", IntegerArgumentType.integer(0)).then(Commands.argument("weight", IntegerArgumentType.integer(0)))
+								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"), IntegerArgumentType.getInteger(ctx, "cost"), IntegerArgumentType.getInteger(ctx, "weight")))
+							))
+						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"))
 						)
 					.executes(ctx -> execute(ctx, ""))
 				);
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
+		return execute(context, name, 50, 1);
+	}
+	
+	private static final int execute(CommandContext<CommandSource> context, String name, int cost, int weight) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
 		if (name == null || name.isEmpty()) {
 			name = "Random Spell";
 		}
 		
-		final Spell spell = CreateRandomSpell(name, null);
+		final Spell spell = CreateRandomSpell(name, null, cost, weight);
 		ItemStack stack = SpellScroll.create(spell);
 		player.inventory.addItemStackToInventory(stack);
 		
 		return 0;
 	}
 
-	public static Spell CreateRandomSpell(String name, @Nullable Random rand) {
+	public static Spell CreateRandomSpell(String name, @Nullable Random rand, int cost, int weight) {
 		if (rand == null) {
 			rand = NostrumMagica.rand;
 		}
 		
-		Spell spell = new Spell(name, false);
+		Spell spell = new Spell(name, false, cost, weight);
 		
 		// Go ahead and do 1 trigger and 1 shape
 		final List<SpellTrigger> triggers = Lists.newArrayList(SpellTrigger.getAllTriggers().stream().filter((t) -> {return !(t instanceof AITargetTrigger);}).iterator());

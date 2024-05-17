@@ -666,7 +666,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		Spell spell = new Spell(name, true);
+		Spell spell = Spell.CreateAISpell(name);
 		spell.addPart(new SpellPart(trigger));
 		spell.addPart(new SpellPart(shape, element, power, alteration));
 		
@@ -775,7 +775,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 //					null);
 
 			// Ice
-			spell = new Spell("Frostbite", true);
+			spell = Spell.CreateAISpell("Frostbite");
 			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE,
 					1, EAlteration.INFLICT));

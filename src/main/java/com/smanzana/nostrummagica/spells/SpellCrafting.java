@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.spells;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -9,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
@@ -61,23 +63,84 @@ public class SpellCrafting {
 	}
 	
 	public static @Nullable Spell CreateSpellFromRunes(String spellName, IInventory inventory, int startIdx, int slotCount) {
-		Spell spell = new Spell(spellName, true);
-		SpellPart part;
+		
+		List<SpellPart> parts = new ArrayList<>(slotCount);
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
 			if (stack.isEmpty()) {
 				break;
 			}
 			
-			part = SpellRune.getPart(stack);
+			SpellPart part = SpellRune.getPart(stack);
 			if (part == null) {
 				NostrumMagica.logger.error("Got null SpellPart from rune: " + stack + " :: " + (stack.hasTag() ? stack.getTag().toString() : "NO NBT"));
 				return null;
 			} else {
-				spell.addPart(part);
+				parts.add(part);
 			}
 		}
 		
+		return CreateSpellFromParts(spellName, parts, true);
+	}
+	
+	public static Spell CreateSpellFromParts(String spellName, List<SpellPart> parts, boolean trans) {
+		final int manaCost = CalculateManaCost(parts);
+		final int weight = CalculateWeight(parts);
+		Spell spell = new Spell(spellName, trans, manaCost, weight);
+		for (SpellPart part : parts) {
+			spell.addPart(part);
+		}
 		return spell;
+	}
+	
+	protected static int CalculateManaCost(List<SpellPart> parts) {
+		// Triggers can report their  cost
+		// Alterations are in enum
+		// Shapes cost 10
+		// First elem is free. Extra costs 20 ea
+		// Rolling multiplier makes it more expensive for one long spell vs many small
+		// (rate of 1.1x)
+		float cost = 0f;
+		float multiplier = 1f;
+		
+		for (SpellPart part : parts) {
+			if (part.isTrigger())
+				cost += multiplier * (float) part.getTrigger().getManaCost();
+			else {
+				cost += multiplier * 10f;
+				if (part.getElementCount() > 1)
+					cost += multiplier * (float) (20 * (part.getElementCount() - 1));
+				if (part.getAlteration() != null)
+					cost += multiplier * (float) part.getAlteration().getCost();
+			}
+			multiplier *= 1.1;
+		}
+		
+		return (int) Math.ceil(cost);
+	}
+	
+	public static final int CalculateWeight(SpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+		// In shapes, the shape itself and alteration report their own cost.
+		// Elements are free.
+		int weight = shape.getWeight();
+		if (alteration != null) {
+			weight += alteration.getWeight();
+		}
+		return weight;
+	}
+	
+	protected static int CalculateWeight(List<SpellPart> parts) {
+		// Triggers report their own cost.
+		// In shapes, the shape itself and alteration report their own cost.
+		// Elements are free.
+		int weight = 0;
+		for (SpellPart part : parts) {
+			if (part.isTrigger()) {
+				weight += part.getTrigger().getWeight();
+			} else {
+				weight += CalculateWeight(part.getShape(), part.getElement(), part.getElementCount(), part.getAlteration());
+			}
+		}
+		return weight;
 	}
 }

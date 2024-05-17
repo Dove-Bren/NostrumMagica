@@ -25,14 +25,14 @@ public class EntityGolemEarth extends EntityGolem {
 	
 	private static void init() {
 		if (spellBuff1 == null) {
-			spellBuff1 = new Spell("Earthern Shield", true);
+			spellBuff1 = Spell.CreateAISpell("Earthern Shield");
 			spellBuff1.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff1.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.EARTH,
 					1,
 					EAlteration.SUPPORT));
 			
-			spellBuff2 = new Spell("Impact Enchantment", true);
+			spellBuff2 = Spell.CreateAISpell("Impact Enchantment");
 			spellBuff2.addPart(new SpellPart(AITargetTrigger.instance()));
 			spellBuff2.addPart(new SpellPart(SingleShape.instance(),
 					EMagicElement.EARTH,

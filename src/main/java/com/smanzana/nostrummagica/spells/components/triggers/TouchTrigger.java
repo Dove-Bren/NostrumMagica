@@ -113,4 +113,9 @@ public class TouchTrigger extends InstantTrigger {
 		return null;
 	}
 	
+	@Override
+	public int getWeight() {
+		return 0;
+	}
+	
 }

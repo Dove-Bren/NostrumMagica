@@ -224,4 +224,9 @@ public class ProjectileTrigger extends SpellTrigger {
 		return null;
 	}
 	
+	@Override
+	public int getWeight() {
+		return 0;
+	}
+	
 }

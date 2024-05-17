@@ -73,7 +73,7 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 	
 	private static void initStaticSpells() {
 		if (EARTH_ZAP == null) {
-			EARTH_ZAP = new Spell("Sprite_EARTHZAP", true);
+			EARTH_ZAP = Spell.CreateAISpell("Sprite_EARTHZAP");
 			EARTH_ZAP.addPart(new SpellPart(TouchTrigger.instance()));
 			EARTH_ZAP.addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 3, null));
 		}

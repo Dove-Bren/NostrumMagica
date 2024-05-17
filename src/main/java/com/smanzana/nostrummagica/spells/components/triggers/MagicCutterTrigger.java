@@ -201,4 +201,9 @@ public class MagicCutterTrigger extends SpellTrigger {
 		return I18n.format("modification.cutter.trips", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+	
 }

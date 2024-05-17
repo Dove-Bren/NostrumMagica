@@ -174,4 +174,9 @@ public class DamagedTrigger extends SpellTrigger {
 		return I18n.format("modification.damaged_duration.name", (Object[]) null);
 	}
 	
+	@Override
+	public int getWeight() {
+		return 1;
+	}
+	
 }
