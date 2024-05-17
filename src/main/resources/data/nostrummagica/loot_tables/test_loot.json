@@ -1,0 +1,30 @@
+{
+  "pools": [
+	{
+		"name": "test",
+		"rolls": 3,
+		"entries": [
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_novice",
+			 "entryName": "novice",
+			 "weight": 2,
+			 "functions":
+			 [
+				{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 5,
+					"capacity_max": 10,
+					"slot_min": 2,
+					"slot_max": 5
+				}
+			]
+			},
+			{
+				"type": "empty",
+				"weight": 5
+			}
+		]
+	}
+	]
+}

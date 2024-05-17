@@ -53,6 +53,7 @@ import com.smanzana.nostrummagica.items.MagicArmorBase;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.loot.NostrumLoot;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.WarlockSword;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -223,6 +224,7 @@ public class ModInit {
 		registerDefaultTrials();
 		registerDefaultResearch();
 
+		NostrumLoot.RegisterLootFunctions();
 		new NostrumLootHandler();
 		//DungeonRoomRegistry.instance().loadRegistryFromDisk(); Done in feature loading since it's required by that system and this is too late :(
 		//NostrumDimensionMapper.registerDimensions();
