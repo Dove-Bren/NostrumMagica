@@ -135,6 +135,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	private static final String NBT_XP = "tome_xp";
 	private static final String NBT_MODIFICATIONS = "tome_mods";
 	private static final String NBT_CAPACITY = "tome_capacity";
+	private static final String NBT_SLOTS = "tome_slots";
 	private static final String NBT_ID = "tome_id";
 	
 	public static final String ID_PREFIX = "spelltome_";
@@ -172,16 +173,17 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	public static ItemStack Create(TomeStyle style,
-			int level, int capacity,
+			int level, int capacity, int slots,
 			SpellTomeEnhancementWrapper ... enhancements) {
-		return Create(style, level, capacity, Lists.newArrayList(enhancements));
+		return Create(style, level, capacity, slots, Lists.newArrayList(enhancements));
 	}
 	
 	public static ItemStack Create(TomeStyle style,
-			int level, int capacity,
+			int level, int capacity, int slots,
 			List<SpellTomeEnhancementWrapper> enhancements) {
 		ItemStack item = new ItemStack(GetTomeForStyle(style), 1);
 		setCapacity(item, capacity);
+		setSlots(item, slots);
 		setLevel(item, level);
 		if (enhancements != null && !enhancements.isEmpty()) {
 			CompoundNBT tag = item.getTag();
@@ -205,6 +207,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			enhancements = new LinkedList<>();
 		
 		int capacity = SpellPlate.getCapacity(plate);
+		int slots = SpellPlate.getSlots(plate);
 		
 		if (pages != null) {
 			for (ItemStack page : pages) {
@@ -216,7 +219,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			}
 		}
 		
-		ItemStack stack = Create(style, 1, capacity, enhancements);
+		ItemStack stack = Create(style, 1, capacity, slots, enhancements);
 		
 //		if (!enhancements.isEmpty()) {
 //			CompoundNBT tag = stack.getTag();
@@ -416,7 +419,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			return 0;
 		
-			return nbt.getInt(NBT_CAPACITY);
+		return nbt.getInt(NBT_CAPACITY);
 	}
 	
 	public static void setCapacity(ItemStack itemStack, int capacity) {
@@ -427,6 +430,28 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			nbt = new CompoundNBT();
 		nbt.putInt(NBT_CAPACITY, capacity);
+		itemStack.setTag(nbt);
+	}
+	
+	public static int getSlots(ItemStack itemStack) {
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		CompoundNBT nbt = itemStack.getTag();
+		if (nbt == null)
+			return 2;
+		
+		return nbt.getInt(NBT_SLOTS);
+	}
+	
+	public static void setSlots(ItemStack itemStack, int slots) {
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		CompoundNBT nbt = itemStack.getTag();
+		if (nbt == null)
+			nbt = new CompoundNBT();
+		nbt.putInt(NBT_SLOTS, slots);
 		itemStack.setTag(nbt);
 	}
 	

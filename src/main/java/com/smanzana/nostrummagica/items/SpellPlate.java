@@ -33,6 +33,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	 */
 	
 	private static final String NBT_CAPACITY = "capacity";
+	private static final String NBT_SLOTS = "slots";
 	private static final String NBT_ENHANCEMENTS = "enhancements";
 	private static final String NBT_ENHANCEMENT_LEVEL = "";
 	private static final String NBT_ENHANCEMENT_TYPE = "";
@@ -101,7 +102,9 @@ public class SpellPlate extends Item implements ILoreTagged {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		int capacity = getCapacity(stack);
+		final int capacity = getCapacity(stack);
+		final int slots = getSlots(stack);
+		tooltip.add(new TranslationTextComponent("info.tome.slots", slots));
 		tooltip.add(new TranslationTextComponent("info.tome.capacity", capacity));
 		
 		List<SpellTomeEnhancementWrapper> enhancements = getEnhancements(stack);
@@ -196,6 +199,16 @@ public class SpellPlate extends Item implements ILoreTagged {
 		return stack.getTag().getInt(NBT_CAPACITY);
 	}
 	
+	public static int getSlots(ItemStack stack) {
+		if (stack .isEmpty() || !(stack.getItem() instanceof SpellPlate))
+			return 0;
+		
+		if (!stack.hasTag())
+			return 2; // Default for ones made before slots were introduced
+		
+		return stack.getTag().getInt(NBT_SLOTS);
+	}
+	
 	public static List<SpellTomeEnhancementWrapper> getEnhancements(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof SpellPlate))
 			return null;
@@ -234,6 +247,17 @@ public class SpellPlate extends Item implements ILoreTagged {
 		stack.setTag(tag);
 	}
 	
+	public static void setSlots(ItemStack stack, int slots) {
+		CompoundNBT tag = stack.getTag();
+		if (tag == null) {
+			tag = new CompoundNBT();
+		}
+		
+		tag.putInt(NBT_SLOTS, slots);
+		
+		stack.setTag(tag);
+	}
+	
 	public static void setEnhancements(ItemStack stack, List<SpellTomeEnhancementWrapper> enhancements) {
 		CompoundNBT tag = stack.getTag();
 		if (tag == null) {
@@ -267,10 +291,12 @@ public class SpellPlate extends Item implements ILoreTagged {
 		if (this.isInGroup(group)) {
 			ItemStack stack = new ItemStack(this);
 			setCapacity(stack, 5);
+			setSlots(stack, 2);
 			items.add(stack);
 			
 			stack = new ItemStack(this);
 			setCapacity(stack, 10);
+			setSlots(stack, 5);
 			items.add(stack);
 		}
 	}
