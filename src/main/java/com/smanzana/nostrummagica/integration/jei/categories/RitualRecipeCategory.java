@@ -245,7 +245,6 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		IGuiIngredientGroup<RitualOutcomeWrapper> guiOutcomes =
 				recipeLayout.getIngredientsGroup(RitualOutcomeIngredientType.instance);
 		
-		int unused; // why don't I have to change this after changing its type?
 		List<List<ItemStack>> itemOuts = ingredients.getOutputs(VanillaTypes.ITEM);
 		if (itemOuts != null && itemOuts.size() > 0) {
 			guiItemStacks.init(10, false, 132, 66);

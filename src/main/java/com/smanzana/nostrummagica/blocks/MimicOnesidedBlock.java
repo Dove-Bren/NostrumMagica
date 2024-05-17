@@ -261,6 +261,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		return samplePos.equals(fromPos);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos) {
 		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north

@@ -461,6 +461,6 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 			tolerance = .5f;
 		}
 		
-		return tolerance - worldIn.getBrightness(pos);
+		return tolerance - worldIn.getLight(pos);
 	}
 }

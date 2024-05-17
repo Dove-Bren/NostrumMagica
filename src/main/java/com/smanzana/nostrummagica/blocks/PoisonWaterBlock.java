@@ -65,6 +65,7 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 		return !unbreakable;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
 		if (!world.isRemote
