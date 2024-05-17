@@ -305,46 +305,13 @@
 			 "name": "nostrummagica:spelltomeplate_novice",
 			 "entryName": "novice",
 			 "weight": 2,
-			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+			 "functions": 
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 5,
+					"slot_min": 2,
+					"slot_max": 3
 				}]
 			},
 			{
@@ -353,45 +320,12 @@
 			 "entryName": "advanced",
 			 "weight": 2,
 			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 10,
+					"slot_min": 2,
+					"slot_max": 4
 				}]
 			},
 			{
@@ -400,45 +334,12 @@
 			 "entryName": "combat",
 			 "weight": 2,
 			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 5,
+					"slot_min": 2,
+					"slot_max": 5
 				}]
 			},
 			{
@@ -447,45 +348,12 @@
 			 "entryName": "death",
 			 "weight": 2,
 			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 15,
+					"slot_min": 2,
+					"slot_max": 3
 				}]
 			},
 			{
@@ -494,45 +362,12 @@
 			 "entryName": "muted",
 			 "weight": 2,
 			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 10,
+					"slot_min": 1,
+					"slot_max": 5
 				}]
 			},
 			{
@@ -541,45 +376,12 @@
 			 "entryName": "spooky",
 			 "weight": 2,
 			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 0,
+					"slot_min": 3,
+					"slot_max": 5
 				}]
 			},
 			{
@@ -588,45 +390,12 @@
 			 "entryName": "living",
 			 "weight": 2,
 			 "functions":
-			 [
-				{
-					"function": "set_nbt",
-					"tag": "{capacity: 5}"
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 6}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.5
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 7}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 8}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 9}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.2
-						}]
-				}, {
-					"function": "set_nbt",
-					"tag": "{capacity: 10}",
-					"conditions": [{
-						"condition": "random_chance", 
-						"chance": 0.1
-						}]
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 5,
+					"capacity_max": 5,
+					"slot_min": 2,
+					"slot_max": 5
 				}]
 			},
 			{

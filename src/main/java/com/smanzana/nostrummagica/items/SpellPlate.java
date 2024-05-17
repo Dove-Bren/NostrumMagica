@@ -105,7 +105,9 @@ public class SpellPlate extends Item implements ILoreTagged {
 		final int capacity = getCapacity(stack);
 		final int slots = getSlots(stack);
 		tooltip.add(new TranslationTextComponent("info.tome.slots", slots));
-		tooltip.add(new TranslationTextComponent("info.tome.capacity", capacity));
+		if (capacity > 0) {
+			tooltip.add(new TranslationTextComponent("info.tome.capacity", capacity));
+		}
 		
 		List<SpellTomeEnhancementWrapper> enhancements = getEnhancements(stack);
 		if (enhancements != null && !enhancements.isEmpty()) {

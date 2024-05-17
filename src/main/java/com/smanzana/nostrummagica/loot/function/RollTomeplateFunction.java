@@ -41,10 +41,12 @@ public class RollTomeplateFunction extends LootFunction {
 	public ItemStack doApply(ItemStack stack, LootContext context) {
 		ItemStack newStack = stack.copy();
 		
-		final int capacityRange = Math.max(1, capacityMax - capacityMin);
+		// +1 to max when calculating range so that (0, 3) becomes {0, 1, 2, 3} instead of {0, 1, 2}.
+		// Since we know min <= max, we know range will be 1+ too and avoid an exception in Random#nextInt()
+		final int capacityRange = (capacityMax + 1) - capacityMin;
 		final int capacity = context.getRandom().nextInt(capacityRange) + capacityMin;
 		
-		final int slotRange = Math.max(1, slotMax - slotMin);
+		final int slotRange = (slotMax + 1) - slotMin;
 		final int slots = context.getRandom().nextInt(slotRange) + slotMin;
 		
 		SpellPlate.setCapacity(newStack, capacity);
