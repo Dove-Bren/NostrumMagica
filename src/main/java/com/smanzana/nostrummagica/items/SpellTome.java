@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.items;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -88,8 +89,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		public static int getMaxMana(int level) {
 			switch (level) {
+			case 0:
 			case 1:
-			default:
 				return 100;
 			case 2:
 				return 200;
@@ -100,6 +101,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			case 5:
 				return 5000;
 			case 6:
+			default:
 				return 10000;
 			}
 		}
@@ -121,6 +123,36 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 				return 99999999;
 			}
 		}
+		
+		public static int getBaseCapacity(int level) {
+			// level 1 has 0 capacity
+			// First two levels are worth +5
+			// Next two are worth +10
+			// Last is with +20
+			switch (level) {
+			case 1:
+				return 0;
+			case 2:
+				return 5;
+			case 3:
+				return 10;
+			case 4:
+				return 20;
+			case 5:
+				return 30;
+			case 6:
+			default:
+				return 50;
+			}
+		}
+		
+		public static int getBasePageCount(int level) {
+			level = Math.max(1, Math.min(6, level));
+			
+			// 1 page for lvl 1 and 2, 2 pages at 3 and 4, and 3 at 5 and 6
+			// aka a new page every two levels
+			return 1 + ((level-1) / 2);
+		}
 	}
 
 	private static final String NBT_SPELLS = "nostrum_spells";
@@ -134,8 +166,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	private static final String NBT_LEVEL = "tome_level";
 	private static final String NBT_XP = "tome_xp";
 	private static final String NBT_MODIFICATIONS = "tome_mods";
-	private static final String NBT_CAPACITY = "tome_capacity";
+	private static final String NBT_CAPACITY_BONUS = "tome_capacity_bonus";
 	private static final String NBT_SLOTS = "tome_slots";
+	private static final String NBT_PAGE_BONUS = "tome_page_bonus";
 	private static final String NBT_ID = "tome_id";
 	
 	public static final String ID_PREFIX = "spelltome_";
@@ -173,16 +206,17 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	public static ItemStack Create(TomeStyle style,
-			int level, int capacity, int slots,
+			int level, int bonusCapacity, int slots, int bonusPages,
 			SpellTomeEnhancementWrapper ... enhancements) {
-		return Create(style, level, capacity, slots, Lists.newArrayList(enhancements));
+		return Create(style, level, bonusCapacity, slots, bonusPages, Lists.newArrayList(enhancements));
 	}
 	
 	public static ItemStack Create(TomeStyle style,
-			int level, int capacity, int slots,
+			int level, int bonusCapacity, int slots, int bonusPages,
 			List<SpellTomeEnhancementWrapper> enhancements) {
 		ItemStack item = new ItemStack(GetTomeForStyle(style), 1);
-		setCapacity(item, capacity);
+		setCapacityBonus(item, bonusCapacity);
+		setPageBonus(item, bonusPages);
 		setSlots(item, slots);
 		setLevel(item, level);
 		if (enhancements != null && !enhancements.isEmpty()) {
@@ -208,18 +242,22 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		int capacity = SpellPlate.getCapacity(plate);
 		int slots = SpellPlate.getSlots(plate);
+		int pageCount = 0;
 		
 		if (pages != null) {
 			for (ItemStack page : pages) {
 				if (pages.isEmpty() || !(page.getItem() instanceof SpellTomePage))
 					continue;
 				
+				pageCount++;
 				enhancements.add(new SpellTomeEnhancementWrapper(SpellTomePage.getEnhancement(page),
 						SpellTomePage.getLevel(page)));
 			}
 		}
 		
-		ItemStack stack = Create(style, 1, capacity, slots, enhancements);
+		// Get a bonus page if all 4 pages were used when creating
+		final int bonusPages = pageCount >= 4 ? 1 : 0; 
+		ItemStack stack = Create(style, 1, capacity, slots, bonusPages, enhancements);
 		
 //		if (!enhancements.isEmpty()) {
 //			CompoundNBT tag = stack.getTag();
@@ -411,7 +449,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		itemStack.setTag(nbt);
 	}
 	
-	public static int getCapacity(ItemStack itemStack) {
+	public static int getCapacityBonus(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
@@ -419,17 +457,17 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			return 0;
 		
-		return nbt.getInt(NBT_CAPACITY);
+		return nbt.getInt(NBT_CAPACITY_BONUS);
 	}
 	
-	public static void setCapacity(ItemStack itemStack, int capacity) {
+	public static void setCapacityBonus(ItemStack itemStack, int capacity) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
 		CompoundNBT nbt = itemStack.getTag();
 		if (nbt == null)
 			nbt = new CompoundNBT();
-		nbt.putInt(NBT_CAPACITY, capacity);
+		nbt.putInt(NBT_CAPACITY_BONUS, capacity);
 		itemStack.setTag(nbt);
 	}
 	
@@ -452,6 +490,28 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			nbt = new CompoundNBT();
 		nbt.putInt(NBT_SLOTS, slots);
+		itemStack.setTag(nbt);
+	}
+	
+	public static int getPageBonus(ItemStack itemStack) {
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
+			return 0;
+
+		CompoundNBT nbt = itemStack.getTag();
+		if (nbt == null)
+			return 0;
+		
+		return nbt.getInt(NBT_PAGE_BONUS);
+	}
+	
+	public static void setPageBonus(ItemStack itemStack, int pageBonus) {
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
+			return;
+
+		CompoundNBT nbt = itemStack.getTag();
+		if (nbt == null)
+			nbt = new CompoundNBT();
+		nbt.putInt(NBT_PAGE_BONUS, pageBonus);
 		itemStack.setTag(nbt);
 	}
 	
@@ -699,29 +759,35 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			int maxMana = getMaxMana(stack);
 			List<Spell> spells = getSpells(stack);
 			int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
-			int capacity = getCapacity(stack);
+			int weightCapacity = getCapacity(stack);
+			int weightSum = getUsedCapacity(stack);
+			int spellPages = getPageCount(stack);
 			int xp = getXP(stack);
 			int maxxp = LevelCurve.getMaxXP(level);
 			int modifications = getModifications(stack);
-			int id = getTomeID(stack);
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
-			SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
-			String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
-			String compname = (comp == null) ? null :
-				(comp.isAlteration() ? comp.getAlteration().getName() :
-				(comp.isElement() ? comp.getElement().getName() :
-				(comp.isShape() ? comp.getShape().getDisplayName() :
-				(comp.getTrigger().getDisplayName()))));
+			//int id = getTomeID(stack);
+			//INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
+			//SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
+			//String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
+			//String compname = (comp == null) ? null :
+//				(comp.isAlteration() ? comp.getAlteration().getName() :
+//				(comp.isElement() ? comp.getElement().getName() :
+//				(comp.isShape() ? comp.getShape().getDisplayName() :
+//				(comp.getTrigger().getDisplayName()))));
 			pages.add(new TitlePage(title, false));
 			pages.add(new LinedTextPage("", "",
 					"Level: " + level, "XP: " + xp + "/" + maxxp, "",
 					"Max Mana: " + maxMana,
+					"Spell Pages: " + spellPages,
 					"Modifications: " + modifications,
 					"",
-					spellCount + "/" + capacity + " Spells",
-					"",
-					(comp != null ? "Binding spell " + bindingName : ""),
-					(comp != null ? "Seek a shrine of " + compname : "")));
+					spellCount + " Spells",
+					weightSum + "/" + weightCapacity + " Weight Capacity"
+					//"",
+					//(comp != null ? "Binding spell " + bindingName : ""),
+					//(comp != null ? "Seek a shrine of " + compname : ""))
+					)
+				);
 			
 			if (spells != null && spellCount > 0) {
 				boolean top = true;
@@ -1021,6 +1087,19 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return LevelCurve.getMaxMana(getLevel(tome));
 	}
 	
+	public static int getCapacity(ItemStack tome) {
+		return LevelCurve.getBaseCapacity(getLevel(tome)) + getCapacityBonus(tome);
+	}
+	
+	public static int getUsedCapacity(ItemStack tome) {
+		List<Spell> spells = getSpells(tome);
+		return (spells != null && !spells.isEmpty() ? spells.stream().map(s -> s.getWeight()).collect(Collectors.summingInt(i -> i)) : 0);
+	}
+	
+	public static int getPageCount(ItemStack tome) {
+		return LevelCurve.getBasePageCount(getLevel(tome)) + getPageBonus(tome);
+	}
+	
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_TOMES;
@@ -1030,25 +1109,25 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
 		if (this.isInGroup(group)) {
 			ItemStack stack = new ItemStack(this);
-			setCapacity(stack, 5);
+			setCapacityBonus(stack, 5);
 			items.add(stack);
 			
 			stack = new ItemStack(this);
-			setCapacity(stack, 10);
+			setCapacityBonus(stack, 10);
 			items.add(stack);
 		}
 	}
 	
 	/**
-	 * Check whether the tome has room for more spell scrolls to be bound
+	 * Check whether the tome has room for the provided spell to be bound
 	 * @param tome
 	 * @return
 	 */
-	public static boolean hasRoom(ItemStack tome) {
-		int capacity = SpellTome.getCapacity(tome);
-		List<Spell> spells = SpellTome.getSpells(tome);
-		int taken = spells == null ? 0 : spells.size();
-		return taken < capacity;
+	public static boolean hasRoom(ItemStack tome, Spell spell) {
+		final int capacity = SpellTome.getCapacity(tome);
+		final int used = SpellTome.getUsedCapacity(tome);
+		
+		return (capacity >= used + spell.getWeight());
 	}
 	
 	public static boolean startBinding(PlayerEntity player, ItemStack tome, ItemStack scroll, boolean quick) {
@@ -1067,7 +1146,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			return false;
 		}
 		
-		if (!hasRoom(tome)) {
+		if (!hasRoom(tome, spell)) {
 			if (!player.world.isRemote) {
 				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.DUMMY_UUID);
 			}

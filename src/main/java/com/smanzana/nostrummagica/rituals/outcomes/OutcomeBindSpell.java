@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRecipe.RitualMatchInfo;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.utils.TextUtils;
 
@@ -15,6 +16,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -40,7 +42,15 @@ public class OutcomeBindSpell implements IRitualOutcome {
 				|| scroll.isEmpty())
 			return false;
 		
-		if (!SpellTome.hasRoom(tome)) {
+		Spell spell = SpellScroll.getSpell(scroll);
+		if (spell == null) {
+			if (!player.world.isRemote) {
+				player.sendMessage(new StringTextComponent("The scroll is missing it's spell..."), Util.DUMMY_UUID);
+			}
+			return false;
+		}
+		
+		if (!SpellTome.hasRoom(tome, spell)) {
 			if (!player.world.isRemote) {
 				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.DUMMY_UUID);
 			}
