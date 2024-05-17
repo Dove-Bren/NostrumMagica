@@ -40,7 +40,7 @@ public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntit
 		matrixStackIn.translate(.5, 1.25, .5);
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
 		matrixStackIn.scale(scale, scale, scale);
-		RenderFuncs.renderItemStandard(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+		RenderFuncs.RenderWorldItem(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 		matrixStackIn.pop();
 		
 	}

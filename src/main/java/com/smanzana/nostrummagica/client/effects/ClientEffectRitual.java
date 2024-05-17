@@ -134,7 +134,7 @@ public class ClientEffectRitual extends ClientEffect {
 
 		RenderHelper.enableStandardItemLighting();
 		
-		RenderFuncs.ItemRenderer(stack, matrixStackIn);
+		RenderFuncs.RenderWorldItem(stack, matrixStackIn);
 		
 		matrixStackIn.pop();
 		
@@ -169,7 +169,7 @@ public class ClientEffectRitual extends ClientEffect {
 //			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderHelper.enableStandardItemLighting();
 			
-			RenderFuncs.ItemRenderer(getReagentItem(type), matrixStackIn);
+			RenderFuncs.RenderWorldItem(getReagentItem(type), matrixStackIn);
 			
 			matrixStackIn.pop();
 		}

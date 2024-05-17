@@ -223,7 +223,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		matrixStackIn.translate(.5, 2.5, .5);
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(20 * angle));
 		RenderSystem.enableBlend();
-		RenderFuncs.ItemRenderer(InfusedGemItem.getGem(ritual.getElement(), 1), matrixStackIn);
+		RenderFuncs.RenderWorldItem(InfusedGemItem.getGem(ritual.getElement(), 1), matrixStackIn);
 		matrixStackIn.pop();
 
 //	    GL11.glViewport(0, 0, mc.displayWidth, mc.displayHeight);
@@ -301,7 +301,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			matrixStackIn.push();
 			RenderSystem.enableBlend();
 			matrixStackIn.translate(x + .5, y + 1, z + .5);
-			RenderFuncs.ItemRenderer(
+			RenderFuncs.RenderWorldItem(
 					ReagentItem.CreateStack(reagent, 1), matrixStackIn);
 			matrixStackIn.pop();
 			RenderSystem.disableBlend();
@@ -317,7 +317,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			matrixStackIn.push();
 			RenderSystem.enableBlend();
 			matrixStackIn.translate(x + .5, y + 1.5, z + .5);
-			RenderFuncs.ItemRenderer(
+			RenderFuncs.RenderWorldItem(
 					matches[ingIndex], matrixStackIn);
 			matrixStackIn.pop();
 			RenderSystem.disableBlend();

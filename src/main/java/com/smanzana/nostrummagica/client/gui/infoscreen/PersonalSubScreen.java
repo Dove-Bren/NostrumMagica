@@ -380,7 +380,6 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			float alpha;
 			RenderSystem.enableBlend();
-			RenderSystem.enableAlphaTest();
 			Map<EMagicElement, Boolean> elementKnow = attr.getKnownElements();
 			for (EMagicElement elem : EMagicElement.values()) {
 				ElementalMastery mastery = attr.getElementalMastery(elem);

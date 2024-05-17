@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.client.gui.container;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.items.NostrumItems;
@@ -551,12 +550,10 @@ public class ModificationTableGui {
 					shadow = pageShadow;
 				}
 				if (!shadow.isEmpty()) {
-					RenderSystem.pushMatrix();
-					RenderSystem.translated(0, 0, -100);
-					mc.getItemRenderer().renderItemIntoGUI(shadow,
+					RenderFuncs.RenderGUIItem(shadow, matrixStackIn, 
 						horizontalMargin + container.inputSlot.xPos,
-						verticalMargin + container.inputSlot.yPos);
-					RenderSystem.popMatrix();
+						verticalMargin + container.inputSlot.yPos,
+						-150);
 				}
 			}
 			
@@ -570,12 +567,10 @@ public class ModificationTableGui {
 				final int idx = Math.abs(((int) System.currentTimeMillis() / 1000) % shadows.size());
 				display = shadows.get(idx);
 				
-				RenderSystem.pushMatrix();
-				RenderSystem.translated(0, 0, -100);
-				mc.getItemRenderer().renderItemIntoGUI(display,
+				RenderFuncs.RenderGUIItem(display, matrixStackIn, 
 						horizontalMargin + SLOT_MAIN_HOFFSET,
-						verticalMargin + SLOT_MAIN_VOFFSET);
-				RenderSystem.popMatrix();
+						verticalMargin + SLOT_MAIN_VOFFSET,
+						-200);
 				
 				int color = 0x55FFFFFF;
 				matrixStackIn.push();
@@ -788,11 +783,10 @@ public class ModificationTableGui {
 					if (val != gui.container.boolIndex)
 						x += BUTTON_WIDTH;
 					
-					RenderSystem.color4f(tint, tint, tint, 1f);
-					this.blit(matrixStackIn, this.x, this.y,
+					RenderFuncs.blit(matrixStackIn, this.x, this.y,
 							BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET,
-							this.width, this.height);
-					RenderSystem.color4f(1f, 1f, 1f, 1f);
+							this.width, this.height,
+							tint, tint, tint, 1f);
 				}
 			}
 		}
@@ -836,11 +830,10 @@ public class ModificationTableGui {
 						String text = String.format("%.1f", actualVal);
 						len = mc.fontRenderer.getStringWidth(text);
 						
-						RenderSystem.color3f(tint, tint, tint);
-						this.blit(matrixStackIn, this.x, this.y,
+						RenderFuncs.blit(matrixStackIn, this.x, this.y,
 								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
-								this.width, this.height);
-						RenderSystem.color4f(1f, 1f, 1f, 1f);
+								this.width, this.height,
+								tint, tint, tint, 1f);
 						
 						mc.fontRenderer.drawString(matrixStackIn, text,
 								this.x + (LARGE_BUTTON_WIDTH / 2) - (len / 2),
@@ -860,13 +853,9 @@ public class ModificationTableGui {
 						if (gui.container.floatIndex != this.val)
 							x += LARGE_BUTTON_WIDTH;
 						
-						RenderSystem.color3f(tint, tint, tint);
-						blit(matrixStackIn, this.x, this.y, this.width, this.height, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
-								LARGE_BUTTON_WIDTH, LARGE_BUTTON_HEIGHT, 256, 256);
-//						this.drawTexturedModalRect(this.x, this.y,
-//								BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
-//								this.width, this.height);
-						RenderSystem.color4f(1f, 1f, 1f, 1f);
+						RenderFuncs.blit(matrixStackIn, this.x, this.y, this.width, this.height, BUTTON_TEXT_HOFFSET + x, BUTTON_TEXT_VOFFSET + BUTTON_HEIGHT,
+								LARGE_BUTTON_WIDTH, LARGE_BUTTON_HEIGHT, 256, 256,
+								tint, tint, tint, 1f);
 						
 						SpellIcon.get(this.val).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4, tint, tint, tint, 1f);
 						
@@ -900,14 +889,13 @@ public class ModificationTableGui {
 					}
 					
 					Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
-					RenderSystem.color3f(tint, tint, tint);
 					int y = 0;
 					if (gui.container.isValid)
 						y += SUBMIT_HEIGHT;
-					this.blit(matrixStackIn, this.x, this.y,
+					RenderFuncs.blit(matrixStackIn, this.x, this.y,
 							SUBMIT_TEXT_HOFFSET, SUBMIT_TEXT_VOFFSET + y,
-							this.width, this.height);
-					RenderSystem.color4f(1f, 1f, 1f, 1f);
+							this.width, this.height,
+							tint, tint, tint, 1f);
 				}
 			}
 			

@@ -593,9 +593,6 @@ public class MirrorGui extends Screen {
 	}
 	
 	private void drawResearchPages(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-		RenderSystem.enableAlphaTest();
-		RenderSystem.enableBlend();
-		RenderSystem.disableLighting();
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width, this.height, 0x60000000);
 		currentInfoScreen.render(matrixStackIn, mouseX, mouseY, partialTicks);
 	}
@@ -989,20 +986,12 @@ public class MirrorGui extends Screen {
             		textureY += TEXT_ICON_MAJORBUTTON_HEIGHT;
             		mouseOver = true;
             	}
-            	RenderHelper.disableStandardItemLighting();
-            	RenderSystem.disableLighting();
-            	RenderSystem.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
         				textureY, TEXT_ICON_MAJORBUTTON_WIDTH, TEXT_ICON_MAJORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
-                matrixStackIn.push();
-                RenderHelper.disableStandardItemLighting();
-                //matrixStackIn.translate(0, 0, -50); int unused; // not using matrixStack
-                mc.getItemRenderer().renderItemIntoGUI(icon, x + (width - 16) / 2, y + (height - 16) / 2);
-                RenderHelper.disableStandardItemLighting();
-                matrixStackIn.pop();
+                RenderFuncs.RenderGUIItem(icon, matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
             }
         }
 		
@@ -1171,7 +1160,7 @@ public class MirrorGui extends Screen {
 					color = new float[] {.2f, 2f/3f, .2f, 1f};
 					break;
 				case INACTIVE:
-					color = new float[] {2f/3f, 0f, 2f/3f, .8f};
+					color = new float[] {2f/3f, 0f, 2f/3f, 1f};
 					break;
 				case TAKEN: {
 					float amt = 0f;
@@ -1183,12 +1172,10 @@ public class MirrorGui extends Screen {
 					break;
 				}
 				case UNAVAILABLE:
-					color = new float[] {.8f, .0f, .0f, .6f};
+					color = new float[] {.8f, .0f, .0f, 1f};
 					break;
             	}
                 
-            	RenderSystem.disableLighting();
-            	RenderSystem.disableBlend();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
                 		textureY, TEXT_ICON_QUEST_LENGTH, TEXT_ICON_QUEST_LENGTH, this.width, this.height, 256, 256,
@@ -1197,7 +1184,6 @@ public class MirrorGui extends Screen {
                 if (icon != null) {
                 	icon.draw(this, matrixStackIn, font, x + 2, y + 3, 12, 12); // Blend with color?
                 } else {
-                	RenderSystem.enableBlend();
                 	RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x + 4, y + 5, iconOffset,
                 		TEXT_ICON_BUTTON_VOFFSET, TEXT_ICON_REWARD_WIDTH, TEXT_ICON_REWARD_WIDTH, 8, 8, 256, 256,
                 		1f, 1f, 1f, .8f);
@@ -1369,24 +1355,15 @@ public class MirrorGui extends Screen {
             		mouseOver = true;
             	}
                 
-            	//GlStateManager.color4f(1f, 1f, 1f, 1f);
-            	RenderHelper.disableStandardItemLighting();
-            	RenderSystem.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
                 		textureY, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
                 
                 // Now draw icon
-                matrixStackIn.push();
-                RenderHelper.disableStandardItemLighting();
-                //matrixStackIn.translate(0, 0, -50); int unused; // not using matrix
-                mc.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x + (width - 16) / 2, y + (height - 16) / 2);
-                RenderHelper.disableStandardItemLighting();
-                matrixStackIn.pop();
+                RenderFuncs.RenderGUIItem(tab.getIcon(), matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
                 
                 // Draw new tab if there's something new
                 if (tab.hasNew()) {
-                	RenderHelper.disableStandardItemLighting();
                     mc.getTextureManager().bindTexture(RES_ICONS);
                     RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, TEXT_ICON_MINORBUTTON_HOFFSET + TEXT_ICON_MINORBUTTON_WIDTH,
                     		TEXT_ICON_MINORBUTTON_VOFFSET, TEXT_ICON_MINORBUTTON_WIDTH, TEXT_ICON_MINORBUTTON_HEIGHT, this.width, this.height, 256, 256);
@@ -1462,12 +1439,9 @@ public class MirrorGui extends Screen {
 			matrixStackIn.push();
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 	        RenderSystem.enableBlend();
-	        RenderSystem.enableAlphaTest();
-	        RenderSystem.disableColorMaterial();
 	        RenderSystem.disableColorLogicOp();
 	        RenderSystem.disableTexture();
 	        RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-	        RenderSystem.disableLighting();
 	        //GlStateManager.disableDepth();
 	        RenderSystem.lineWidth(3.5f);
 	        
@@ -1582,7 +1556,6 @@ public class MirrorGui extends Screen {
 	        	// from bottom
 	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
 	        }
-	        RenderSystem.disableLighting();
 	        RenderSystem.enableTexture();
             RenderSystem.enableBlend();
             mc.getTextureManager().bindTexture(RES_ICONS);
@@ -1659,10 +1632,8 @@ public class MirrorGui extends Screen {
 					break;
             	}
                 
-            	RenderSystem.disableLighting();
             	RenderSystem.enableTexture();
             	RenderSystem.enableBlend();
-            	RenderSystem.enableAlphaTest();
                 mc.getTextureManager().bindTexture(RES_ICONS);
                 RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
                 		textureY, textureW, textureH, this.width, this.height, 256, 256,
@@ -1670,22 +1641,9 @@ public class MirrorGui extends Screen {
                 
                 // Now draw icon
                 RenderHelper.enableStandardItemLighting();
-                matrixStackIn.translate(0, 0, -140.5);
-                {
-                	RenderSystem.pushMatrix();
-                	RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
-                	mc.getItemRenderer().renderItemAndEffectIntoGUI(research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2);
-                	mc.getItemRenderer().renderItemOverlayIntoGUI(font, research.getIconItem(), x + (width - 16) / 2, y + (height - 16) / 2, null);
-                	RenderSystem.popMatrix();
-                }
-                RenderHelper.disableStandardItemLighting();
+                matrixStackIn.translate(0, 0, -50.5);
+               	RenderFuncs.RenderGUIItem(research.getIconItem(), matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
                 RenderSystem.enableDepthTest();
-                RenderSystem.enableBlend(); // this isn't standard...
-                
-//                RenderHelper.enableGUIStandardItemLighting();
-//                mc.getItemRenderer().renderItemIntoGUI(research.getIconItem(), x + (width -16) / 2, y + (height -16) / 2);
-//                RenderHelper.disableStandardItemLighting();
-//            	GlStateManager.enableBlend();
                 
                 matrixStackIn.pop();
             }
@@ -1694,7 +1652,6 @@ public class MirrorGui extends Screen {
 		public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int parX, int parY) {
 			if (mouseOver) {
 		        RenderSystem.enableBlend();
-		        RenderSystem.enableAlphaTest();
 		        matrixStackIn.push();
 		        matrixStackIn.scale(fontScale, fontScale, 1f);
 		        matrixStackIn.translate((int) (parX / fontScale) - parX, (int) (parY / fontScale) - parY, 0);

@@ -607,7 +607,6 @@ public class OverlayRenderer extends AbstractGui {
         	Minecraft mc = Minecraft.getInstance();
 	        matrixStackIn.push();
 			RenderSystem.enableBlend();
-			RenderSystem.color4f(1f, 1f, 1f, 1f); // ?
 			mc.getTextureManager().bindTexture(GUI_ICONS);
 			
 	        for (int i = 0; i < whole; i++)
@@ -815,16 +814,10 @@ public class OverlayRenderer extends AbstractGui {
 	}
 	
 	private void renderLoreIcon(MatrixStack matrixStackIn, Boolean loreIsDeep) {
-		Minecraft mc = Minecraft.getInstance();
-		RenderSystem.enableBlend();
-		RenderSystem.color4f(.6f, .6f, .6f, .6f);
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
-		mc.getItemRenderer().renderItemIntoGUI(new ItemStack(NostrumItems.spellScroll), 0, 0); // not using transform!
-		RenderSystem.popMatrix();
-		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderFuncs.RenderGUIItem(new ItemStack(NostrumItems.spellScroll), matrixStackIn);
 		
 		if (loreIsDeep != null) {
+			final Minecraft mc = Minecraft.getInstance();
 			final int u = (160 + (loreIsDeep ? 0 : 32));
 			mc.getTextureManager().bindTexture(GUI_ICONS);
 			

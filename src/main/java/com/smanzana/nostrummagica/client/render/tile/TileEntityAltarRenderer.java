@@ -33,7 +33,7 @@ public class TileEntityAltarRenderer extends TileEntityRenderer<AltarTileEntity>
 		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
 		matrixStackIn.scale(scale, scale, scale);
 		
-		RenderFuncs.renderItemStandard(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+		RenderFuncs.RenderWorldItem(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 		
 		matrixStackIn.pop();
 	}

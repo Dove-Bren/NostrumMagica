@@ -198,7 +198,7 @@ public class MagicCutterTrigger extends SpellTrigger {
 
 	@Override
 	public String supportedFloatName() {
-		return I18n.format("modificaton.cutter.trips", (Object[]) null);
+		return I18n.format("modification.cutter.trips", (Object[]) null);
 	}
 	
 }

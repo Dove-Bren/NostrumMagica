@@ -373,7 +373,7 @@ public class SpellCreationGui {
 		
 		public Spell makeSpell(String name, int iconIdx, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, isValid, clear);
+			Spell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;
@@ -387,7 +387,7 @@ public class SpellCreationGui {
 		
 		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
-				boolean isValid, boolean deductReagents) {
+				boolean deductReagents) {
 			boolean fail = false;
 			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
 			boolean locked = SpellCrafting.CanCraftSpells(crafter);
@@ -398,12 +398,6 @@ public class SpellCreationGui {
 				spellErrorStrings.add(new StringTextComponent("The runes on the board don't respond to your hands"));
 				return null;
 			}
-			
-			int unused;
-//			if (!isValid) {
-//				spellErrorStrings.add(new StringTextComponent("Missing blank scroll"));
-//				return null; // fatal
-//			}
 			
 			if (name.trim().isEmpty()) {
 				spellErrorStrings.add(new StringTextComponent("Must have a name"));
@@ -698,7 +692,6 @@ public class SpellCreationGui {
 				matrixStackIn.push();
 				matrixStackIn.translate(0, 0, 500);
 				mc.getTextureManager().bindTexture(TEXT);
-				RenderSystem.enableAlphaTest();
 				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
 						(GUI_WIDTH - MESSAGE_WIDTH) / 2,

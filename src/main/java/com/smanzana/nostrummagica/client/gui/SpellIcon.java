@@ -46,7 +46,6 @@ public class SpellIcon {
 		Minecraft.getInstance().getTextureManager().bindTexture(TEX);
 		
 		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH,
 				red, green, blue, alpha);
 		

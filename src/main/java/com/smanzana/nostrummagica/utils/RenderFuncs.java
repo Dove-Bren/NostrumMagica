@@ -39,6 +39,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
+@SuppressWarnings("deprecation")
 public final class RenderFuncs {
 	
 	public static final Random RenderRandom(Random existing) {
@@ -87,20 +88,12 @@ public final class RenderFuncs {
 		WorldVertexBufferUploader.draw(buffer);
 	}
 	
-//	private static final Vector3f Vec3fZero = new Vector3f();
-	
 	public static void RenderModelWithColor(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int color, int combinedLight, int combinedOverlay) {
-//		RenderModelWithColor(stack, buffer, model, color, combinedLight, Vec3fZero);
 		final float colors[] = ColorUtil.ARGBToColor(color);
 		RenderModel(stack, buffer, model, combinedLight, combinedOverlay, colors[0], colors[1], colors[2], colors[3]);
 	}
 	
 	private static final Random RenderModelRandom = new Random();
-	
-//	public static void RenderModelWithColor(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int color, int combinedLight, Vector3f offset) {
-//		final float colors[] = ColorUtil.ARGBToColor(color);
-//		RenderModel(stack, buffer, model, combinedLight, colors[0], colors[1], colors[2], colors[3], offset);
-//	}
 	
 	public static void RenderModel(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int combinedLight, int combinedOverlay, float red, float green, float blue, float alpha) {
 		RenderModel(stack.getLast(), buffer, model, combinedLight, combinedOverlay, red, green, blue, alpha);
@@ -191,13 +184,13 @@ public final class RenderFuncs {
 //		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 	}
 	
-	public static void ItemRenderer(ItemStack stack, MatrixStack matrix) {
+	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix) {
 		// light and overlay constants taken from ItemRenderer and GameRenderer
 		final int combinedLight = 15728880;
 		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 		
 		IRenderTypeBuffer.Impl typebuffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-		ItemRenderer(stack, matrix, typebuffer, combinedLight, combinedOverlay);
+		RenderWorldItem(stack, matrix, typebuffer, combinedLight, combinedOverlay);
 		typebuffer.finish();
 	}
 	
@@ -207,45 +200,37 @@ public final class RenderFuncs {
 	 * @param world
 	 * @param stack
 	 */
-	public static void ItemRenderer(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight) {
-		ItemRenderer(stack, matrix, typeBuffer, combinedLight, OverlayTexture.NO_OVERLAY);
+	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight) {
+		RenderWorldItem(stack, matrix, typeBuffer, combinedLight, OverlayTexture.NO_OVERLAY);
 	}
 	
-	public static void ItemRenderer(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight, int combinedOverlay) {
+	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight, int combinedOverlay) {
 		Minecraft.getInstance().getItemRenderer()
 			.renderItem(stack, TransformType.GROUND, combinedLight, combinedOverlay, matrix, typeBuffer);
 	}
 	
-	/**
-	 * Render an item with default blending and lighting.
-	 * @param world
-	 * @param stack
-	 */
-	public static void renderItemStandard(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight, int combinedOverlay) {
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-//		GlStateManager.disableLighting();
-//		GlStateManager.enableAlphaTest();
-//		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-//
-//		RenderHelper.enableStandardItemLighting();
-		
-		ItemRenderer(stack, matrix, typeBuffer, combinedLight, combinedOverlay);
+	public static void RenderGUIItem(ItemStack stack, MatrixStack matrixStackIn) {
+		final Minecraft mc = Minecraft.getInstance();
+		RenderSystem.pushMatrix();
+		RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
+		mc.getItemRenderer().renderItemIntoGUI(stack, 0, 0);
+		RenderSystem.popMatrix();
+	}
+	
+	public static void RenderGUIItem(ItemStack stack, MatrixStack matrixStackIn, int x, int y, int z) {
+		matrixStackIn.push();
+		matrixStackIn.translate(x, y, z);
+		RenderGUIItem(stack, matrixStackIn);
+		matrixStackIn.pop();
+	}
+	
+	public static void RenderGUIItem(ItemStack stack, MatrixStack matrixStackIn, int x, int y) {
+		RenderGUIItem(stack, matrixStackIn, x, y, 0);
 	}
 	
 	// can use blit here: blit(x, y, 0, u, v, width, height, texWidth, texHeight)
 	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
 		Screen.blit(matrixStackIn, x, y, u, v, width, height, textureWidth, textureHeight);
-//		float f = 1.0F / textureWidth;
-//		float f1 = 1.0F / textureHeight;
-//		Tessellator tessellator = Tessellator.getInstance();
-//		BufferBuilder bufferbuilder = tessellator.getBuffer();
-//		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-//		bufferbuilder.pos((double)x, (double)(y + height), 0.0D).tex((double)(u * f), (double)((v + (float)height) * f1)).endVertex();
-//		bufferbuilder.pos((double)(x + width), (double)(y + height), 0.0D).tex((double)((u + (float)width) * f), (double)((v + (float)height) * f1)).endVertex();
-//		bufferbuilder.pos((double)(x + width), (double)y, 0.0D).tex((double)((u + (float)width) * f), (double)(v * f1)).endVertex();
-//		bufferbuilder.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
-//		tessellator.draw();
 	}
 	
 	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
@@ -295,57 +280,6 @@ public final class RenderFuncs {
 		AbstractGui.fill(stack, minX, minY, maxX, maxY, colorARGB);
 	}
 
-	// Called fillGradient
-//	public static void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor) {
-//		float f = (float)(startColor >> 24 & 255) / 255.0F;
-//		float f1 = (float)(startColor >> 16 & 255) / 255.0F;
-//		float f2 = (float)(startColor >> 8 & 255) / 255.0F;
-//		float f3 = (float)(startColor & 255) / 255.0F;
-//		float f4 = (float)(endColor >> 24 & 255) / 255.0F;
-//		float f5 = (float)(endColor >> 16 & 255) / 255.0F;
-//		float f6 = (float)(endColor >> 8 & 255) / 255.0F;
-//		float f7 = (float)(endColor & 255) / 255.0F;
-//		GlStateManager.disableTexture2D();
-//		GlStateManager.enableBlend();
-//		GlStateManager.disableAlpha();
-//		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-//		GlStateManager.shadeModel(7425);
-//		Tessellator tessellator = Tessellator.getInstance();
-//		BufferBuilder bufferbuilder = tessellator.getBuffer();
-//		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-//		bufferbuilder.pos((double)right, (double)top, (double)this.zLevel).color(f1, f2, f3, f).endVertex();
-//		bufferbuilder.pos((double)left, (double)top, (double)this.zLevel).color(f1, f2, f3, f).endVertex();
-//		bufferbuilder.pos((double)left, (double)bottom, (double)this.zLevel).color(f5, f6, f7, f4).endVertex();
-//		bufferbuilder.pos((double)right, (double)bottom, (double)this.zLevel).color(f5, f6, f7, f4).endVertex();
-//		tessellator.draw();
-//		GlStateManager.shadeModel(7424);
-//		GlStateManager.disableBlend();
-//		GlStateManager.enableAlpha();
-//		GlStateManager.enableTexture2D();
-//    }
-	
-//	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer, double relX, double relY, double relZ,
-//			double radius,
-//			float red, float green, float blue, float alpha) {
-//		// Billboard no rot
-//		buffer.pos(relX - radius, relY - radius, relZ)
-//			.tex(0, 0)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(relX - radius, relY + radius, relZ)
-//			.tex(0, 1)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(relX + radius, relY + radius, relZ)
-//			.tex(1, 1)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(relX + radius, relY - radius, relZ)
-//			.tex(1, 0)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//	}
-	
 	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer,
 			float radius,
 			int combinedLightmapIn, int combinedOverlayIn, float red, float green, float blue, float alpha
@@ -373,54 +307,12 @@ public final class RenderFuncs {
 		buffer.pos(transform, avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ()).color(red, green, blue, alpha).tex(uMax, vMin).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
 		buffer.pos(transform, avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ()).color(red, green, blue, alpha).tex(uMin, vMin).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
 		buffer.pos(transform, avector3f[3].getX(), avector3f[3].getY(), avector3f[3].getZ()).color(red, green, blue, alpha).tex(uMin, vMax).overlay(combinedOverlayIn).lightmap(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
-		
-//		buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
-//			.tex(0, 0)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
-//			.tex(0, 1)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
-//			.tex(1, 1)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
-//			.tex(1, 0)
-//			.color(red, green, blue, alpha)
-//			.normal(0, 0, 1).endVertex();
-//		
-//		{
-//			buffer.pos(relX - (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ - (rYZ * radius) - (rXZ * radius))
-//				.tex(0, 0)
-//				.color(red, green, blue, alpha)
-//				.normal(0, 0, -1).endVertex();
-//			buffer.pos(relX - (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ - (rYZ * radius) + (rXZ * radius))
-//				.tex(0, 1)
-//				.color(red, green, blue, alpha)
-//				.normal(0, 0, -1).endVertex();
-//			buffer.pos(relX + (rX * radius) + (rXY * radius), relY + (rZ * radius), relZ + (rYZ * radius) + (rXZ * radius))
-//				.tex(1, 1)
-//				.color(red, green, blue, alpha)
-//				.normal(0, 0, -1).endVertex();
-//			buffer.pos(relX + (rX * radius) - (rXY * radius), relY - (rZ * radius), relZ + (rYZ * radius) - (rXZ * radius))
-//				.tex(1, 0)
-//				.color(red, green, blue, alpha)
-//				.normal(0, 0, -1).endVertex();
-//		}
 	}
 	
 	public static final void renderSpaceQuadFacingCamera(MatrixStack stack, IVertexBuilder buffer, ActiveRenderInfo renderInfo,
 			float radius,
 			int lightmap, int overlay,
 			float red, float green, float blue, float alpha) {
-//		float rotationX = MathHelper.cos(renderInfo.getYaw() * ((float)Math.PI / 180F));
-//		float rotationYZ = MathHelper.sin(renderInfo.getYaw() * ((float)Math.PI / 180F));
-//		float rotationXY = -rotationYZ * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
-//		float rotationXZ = rotationX * MathHelper.sin(renderInfo.getPitch() * ((float)Math.PI / 180F));
-//		float rotationZ = MathHelper.cos(renderInfo.getPitch() * ((float)Math.PI / 180F));
-		
 		Quaternion rotation = renderInfo.getRotation();
 		
 		stack.push();
@@ -765,10 +657,6 @@ public final class RenderFuncs {
 		RenderSystem.enableAlphaTest();
 		WorldVertexBufferUploader.draw(bufferbuilder);
 	}
-	
-//	public static final float interpolateRotation(float prevYawOffset, float yawOffset, float partialTicks) {
-//		return MathHelper.func_219805_h(partialTicks, prevYawOffset, yawOffset);
-//	}
 	
 	// Should be somewhere else?
 	@OnlyIn(Dist.CLIENT)

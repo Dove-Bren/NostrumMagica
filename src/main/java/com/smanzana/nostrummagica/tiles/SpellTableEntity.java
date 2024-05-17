@@ -220,7 +220,7 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 		}
 		
 		Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-				name, iconIndex, this, crafter, new LinkedList<ITextComponent>(), new LinkedList<ITextComponent>(), true, true);
+				name, iconIndex, this, crafter, new LinkedList<ITextComponent>(), new LinkedList<ITextComponent>(), true);
 		
 		if (spell != null) {
 			spell.promoteFromTrans();

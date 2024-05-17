@@ -169,16 +169,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
 
 		matrixStackIn.translate(1, 1, 0);
-		{
-			RenderSystem.pushMatrix();
-			RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
-			RenderSystem.translated(0, 0, -100);
-			mc.getItemRenderer().renderItemIntoGUI(scrollShadow,
-					0,
-					0);
-			RenderSystem.popMatrix();
-		}
-		
+		RenderFuncs.RenderGUIItem(scrollShadow, matrixStackIn, 0, 0, -100);
 			
 		int color = 0x55FFFFFF;
 		matrixStackIn.push();
@@ -191,6 +182,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		matrixStackIn.pop();
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void drawShadowCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.push();
@@ -204,6 +196,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		matrixStackIn.pop();
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void drawFadedCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.push();

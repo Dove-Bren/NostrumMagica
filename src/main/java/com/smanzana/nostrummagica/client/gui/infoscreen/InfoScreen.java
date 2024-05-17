@@ -373,10 +373,7 @@ public class InfoScreen extends StackableScreen {
                 //RenderHelper.enableStandardItemLighting();
                 int x = this.x + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
                 int y = this.y + (TEXT_BUTTON_TAB_WIDTH - itemLength) / 2;
-                RenderSystem.pushMatrix();
-                RenderSystem.multMatrix(matrixStackIn.getLast().getMatrix());
-                minecraft.getItemRenderer().renderItemIntoGUI(tab.getIcon(), x, y);
-                RenderSystem.popMatrix();
+                RenderFuncs.RenderGUIItem(tab.getIcon(), matrixStackIn, x, y);
                 
                 //drawButtonForegroundLayer(parX, parY);
             }
