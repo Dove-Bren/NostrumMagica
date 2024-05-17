@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
 import com.smanzana.nostrummagica.integration.jei.categories.TransmutationItemCategory;
 import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeIngredientType;
@@ -26,7 +27,9 @@ import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationS
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.recipe.IRecipeManager;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
@@ -36,6 +39,7 @@ import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
@@ -167,6 +171,16 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
 		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.UID);
+	}
+	
+	@Override
+	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+		registration.addGuiContainerHandler(SpellCreationGui.SpellGui.class, new IGuiContainerHandler<SpellCreationGui.SpellGui>() {
+			@Override
+			public List<Rectangle2d> getGuiExtraAreas(SpellCreationGui.SpellGui containerScreen) {
+				return containerScreen.getGuiExtraAreas();
+			}
+		});
 	}
 
 	@Override

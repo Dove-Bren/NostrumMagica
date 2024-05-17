@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -31,6 +32,7 @@ import com.smanzana.nostrummagica.utils.RenderFuncs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -555,6 +557,7 @@ public class SpellCreationGui {
 		private SpellCreationContainer container;
 		private List<SpellIconButton> buttons;
 		private TextFieldWidget nameField;
+		private Rectangle2d iconArea;
 		
 		public SpellGui(SpellCreationContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
@@ -591,6 +594,7 @@ public class SpellCreationGui {
 			final int perRow = spaceWidth / ICON_BUTTON_LENGTH;
 			extraMargin += (spaceWidth % ICON_BUTTON_LENGTH) / 2; // Center by adding remainder / 2
 			
+			iconArea = new Rectangle2d(extraMargin, verticalMargin, horizontalMargin - extraMargin, ((SpellIcon.numIcons / perRow) + 1) * ICON_BUTTON_LENGTH);
 			for (int i = 0; i < SpellIcon.numIcons; i++) {
 				SpellIconButton button = new SpellIconButton(
 						extraMargin + (i % perRow) * ICON_BUTTON_LENGTH,
@@ -731,6 +735,7 @@ public class SpellCreationGui {
 											container.iconIndex
 											));
 									container.name = "";
+									this.nameField.setText("");
 									container.iconIndex = -1;
 								}
 							} else {
@@ -751,6 +756,10 @@ public class SpellCreationGui {
 
 			// Copied from AnvilScreen
 			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canWrite() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
+		}
+		
+		public List<Rectangle2d> getGuiExtraAreas() {
+			return Lists.newArrayList(iconArea);
 		}
 	}
 	
