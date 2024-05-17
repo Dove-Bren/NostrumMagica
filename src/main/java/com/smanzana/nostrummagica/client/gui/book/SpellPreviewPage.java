@@ -66,7 +66,6 @@ public class SpellPreviewPage implements IClickableBookPage {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
 		
 		matrixStackIn.push();
-		RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderFuncs.drawRect(matrixStackIn, xoffset, yoffset, xoffset + width, yoffset + height, 0x40000000);
 		
 		// Draw element icon
@@ -83,6 +82,8 @@ public class SpellPreviewPage implements IClickableBookPage {
 		fonter.drawString(matrixStackIn, spell.getName(), 0, 0, spell.getPrimaryElement().getColor());
 		yoffset = fonter.FONT_HEIGHT + 3;
 		fonter.drawString(matrixStackIn, "Mana: " + spell.getManaCost(), 0, yoffset, 0xFF354AA8);
+		yoffset += fonter.FONT_HEIGHT + 3;
+		fonter.drawString(matrixStackIn, "Weight: " + spell.getWeight(), 0, yoffset, 0xFF354AA8);
 		yoffset += fonter.FONT_HEIGHT + 3;
 		if (attr != null) {
 			float xp = spell.getXP(true);

@@ -114,6 +114,7 @@ public class SpellCreationGui {
 		protected String name;
 		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
+		protected int lastWeight;
 		
 		public SpellCreationContainer(int windowId, PlayerEntity crafter, PlayerInventory playerInv, SpellTableEntity tableInventory) {
 			super(NostrumContainers.SpellCreation, windowId);
@@ -382,6 +383,7 @@ public class SpellCreationGui {
 				this.inventory.clearBoard();
 			
 			this.lastManaCost = spell.getManaCost();
+			this.lastWeight = spell.getWeight();
 			return spell;
 		}
 		
@@ -630,30 +632,14 @@ public class SpellCreationGui {
 						v, STATUS_WIDTH,
 						STATUS_HEIGHT, 256, 256);
 				
-//				mc.fontRenderer.drawString(container.name.toString(), 
-//						horizontalMargin + NAME_HOFFSET + 2,
-//						verticalMargin + NAME_VOFFSET + 2, 
-//						0xFF000000);
-//				if (nameSelectedPos != -1 && ++counter > 30) {
-//					
-//					x = horizontalMargin + NAME_HOFFSET + 2;
-//					for (int i = 0; i < nameSelectedPos; i++) {
-//						x += mc.fontRenderer.getCharWidth(container.name.charAt(i));
-//					}
-//					
-//					RenderFuncs.drawRect(x, verticalMargin + NAME_VOFFSET + 1,
-//							x + 1, verticalMargin + NAME_VOFFSET + 3 + mc.fontRenderer.FONT_HEIGHT,
-//							0xFF000000);
-//					
-//					if (counter > 60)
-//						counter = 0;
-//				}
-				
 				if (container.spellValid) {
-					String str = "Spell Cost: " + container.lastManaCost;
-					x = this.width / 2;
-					x -= mc.fontRenderer.getStringWidth(str) / 2;
-					mc.fontRenderer.drawString(matrixStackIn, str, x, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					String costStr = "Mana Cost: " + container.lastManaCost;
+					String weightStr = "Weight: " + container.lastWeight;
+					final int weightStrLen = mc.fontRenderer.getStringWidth(weightStr);
+					final int margin = 10;
+					
+					mc.fontRenderer.drawString(matrixStackIn, costStr, horizontalMargin + margin, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					mc.fontRenderer.drawString(matrixStackIn, weightStr, horizontalMargin + xSize - (margin + weightStrLen), verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
 				}
 			}
 			
@@ -720,26 +706,6 @@ public class SpellCreationGui {
 				int left = guiLeft + NAME_HOFFSET;
 				int top = guiTop + NAME_VOFFSET;
 			
-//				if (mouseX >= left && mouseX <= left + NAME_WIDTH && 
-//					mouseY >= top && mouseY <= top + NAME_HEIGHT) {
-//						// clicked in name field
-//						if (nameSelectedPos == -1) {
-//							nameSelectedPos = container.name.length();
-//						} else {
-//							int offset = (int) (mouseX - left);
-//							offset -= 5; // offset of drawn text
-//							int index = 0;
-//							while (index < container.name.length() && offset >= mc.fontRenderer.getCharWidth(container.name.charAt(index))) {
-//								offset -= mc.fontRenderer.getCharWidth(container.name.charAt(index));
-//								index++;
-//							}
-//							nameSelectedPos = Math.min(container.name.length(), index + 1);
-//						}
-//						counter = 0;
-//						return true;
-//				}
-//				// implicit else
-//				nameSelectedPos = -1;
 				left = guiLeft + SUBMIT_HOFFSET;
 				top = guiTop + SUBMIT_VOFFSET;
 				
@@ -774,7 +740,6 @@ public class SpellCreationGui {
 					}
 			}
 			
-			//nameSelectedPos = -1;
 			return super.mouseClicked(mouseX, mouseY, mouseButton);
 		}
 		
@@ -791,19 +756,6 @@ public class SpellCreationGui {
 	
 	private static boolean isValidChar(int codepoint) {
 		return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint) || Character.isSpaceChar(codepoint);
-		
-//		// utility function for me <3
-//		return keyCode == 14 // backspace
-//				|| (keyCode >= 2 && keyCode <= 11) // numbers
-//				|| (keyCode >= 16 && keyCode <= 27) // qwerty row
-//				|| (keyCode >= 30 && keyCode <= 39) // asdf row (+ colon)
-//				|| (keyCode >= 44 && keyCode <= 53) // zxcv row
-//				|| keyCode == 57 // space
-//				|| keyCode == 203 // left arrow
-//				|| keyCode == 205 // right arrow
-//				|| keyCode == 199 // home
-//				|| keyCode == 207; // end
-			
 	}
 	
 	private static class RuneSlot extends Slot {

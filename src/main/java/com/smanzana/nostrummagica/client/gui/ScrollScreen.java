@@ -79,7 +79,10 @@ public class ScrollScreen extends Screen {
 		
 		final int titleYOffset = 30;
 		final int iconYOffset = 45;
-		final int listYOffset = 80;
+		final int statXOffset = 15;
+		final int statYOffset = 82;
+		final int statXWidth = TEXT_BACK_WIDTH - (statXOffset);
+		final int listYOffset = 95;
 		final int listXOffset = 25;
 		
 		//RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -100,9 +103,17 @@ public class ScrollScreen extends Screen {
 			icon.render(Minecraft.getInstance(), matrixStackIn, left, topOffset + iconYOffset, iconLen, iconLen);
 		}
 		
+		final String weightStr = "Weight: " + spell.getWeight();
+		final int weightWidth = this.font.getStringWidth(weightStr);
+		this.font.drawString(matrixStackIn, "Cost: " + spell.getManaCost(), leftOffset + statXOffset, topOffset + statYOffset, 0xFF000000);
+		this.font.drawString(matrixStackIn, weightStr, leftOffset + statXWidth - (weightWidth), topOffset + statYOffset, 0xFF000000);
+		
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + statXOffset - 2, topOffset + statYOffset + font.FONT_HEIGHT,
+				leftOffset + statXWidth + 2, topOffset + statYOffset + font.FONT_HEIGHT + 2, 0xFF000000);
+		
 		int i = 0;
 		for (String line : this.components) {
-			this.font.drawString(matrixStackIn, line, leftOffset + listXOffset, 10 + topOffset + listYOffset + (i * this.font.FONT_HEIGHT + 2), 0xFF000000);
+			this.font.drawString(matrixStackIn, line, leftOffset + listXOffset, topOffset + listYOffset + (i * this.font.FONT_HEIGHT + 2), 0xFF000000);
 			i++;
 		}
 		
