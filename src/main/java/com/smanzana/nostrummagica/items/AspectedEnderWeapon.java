@@ -51,7 +51,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpellArmor {
+public class AspectedEnderWeapon extends SwordItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "sword_ender";
 	private static final int USE_DURATION = 20; // In ticks

@@ -41,7 +41,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
-public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpellArmor {
+public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "sword_earth";
 	

@@ -9,6 +9,7 @@ public class SpellCastSummary {
 	private float xpRate;
 	private float costRate;
 	private float efficiencyRate;
+	private int weightDiscount;
 	
 	public SpellCastSummary(int cost, float xp) {
 		this.baseCost = cost;
@@ -18,6 +19,7 @@ public class SpellCastSummary {
 			= this.costRate
 			= this.efficiencyRate
 			= 1.0f;
+		this.weightDiscount = 0;
 	}
 	
 	public void addXPRate(float diff) {
@@ -34,6 +36,10 @@ public class SpellCastSummary {
 	
 	public void addEfficiency(float diff) {
 		this.efficiencyRate += diff;
+	}
+	
+	public void addWeightDiscount(int diff) {
+		this.weightDiscount += diff;
 	}
 
 	public float getBaseXP() {
@@ -58,6 +64,10 @@ public class SpellCastSummary {
 	
 	public float getEfficiency() {
 		return this.efficiencyRate;
+	}
+	
+	public int getWeightDiscount() {
+		return this.weightDiscount;
 	}
 	
 	public float getFinalXP() {

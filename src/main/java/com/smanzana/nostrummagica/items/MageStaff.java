@@ -30,7 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MageStaff extends SwordItem implements ILoreTagged, ISpellArmor {
+public class MageStaff extends SwordItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "mage_staff";
 	

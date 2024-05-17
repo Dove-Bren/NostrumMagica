@@ -9,9 +9,6 @@ import net.minecraft.item.ItemStack;
 
 public interface IReactiveEquipment {
 
-	public static final String NBT_ITEM = "nested_item";
-	public static final String NBT_USES = "enchanted_uses";
-	
 	/**
 	 * Return a spell action to apply appropriately when this enchantment
 	 * is triggered.

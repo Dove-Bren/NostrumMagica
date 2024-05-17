@@ -45,7 +45,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, ISpellArmor {
+public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "sword_physical";
 	

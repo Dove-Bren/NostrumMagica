@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.spells;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,7 +13,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
-import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -21,7 +22,6 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
@@ -70,9 +70,7 @@ public class SpellCasting {
 		
 		// Cast it!
 		boolean seen = att.wasSpellDone(spell);
-		float xp = spell.getXP(seen);
-		int cost = spell.getManaCost();
-		SpellCastSummary summary = new SpellCastSummary(cost, xp);
+		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen));
 		
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);
@@ -80,9 +78,12 @@ public class SpellCasting {
 		// Add the player's personal bonuses
 		summary.addCostRate(att.getManaCostModifier());
 		if (!freeCast && !tome.isEmpty() && tome.getItem() instanceof SpellTome) {
+			int unused; // !! Remove this! Should be moved till later (after all bonuses are totalled)
+			// but it's going to go away later, right?
+			
 			// Check if base mana cost exceeds what we can do
 			int cap = SpellTome.getMaxMana(tome);
-			if (cap < cost) {
+			if (cap < summary.getFinalCost()) {
 				playerCast.sendMessage(new TranslationTextComponent("info.spell.tome_weak"), Util.DUMMY_UUID);
 				return false;
 			}
@@ -102,39 +103,10 @@ public class SpellCasting {
 		}
 		
 		// Visit an equipped spell armor
-		for (ItemStack equip : entity.getEquipmentAndArmor()) {
-			if (equip.isEmpty())
-				continue;
-			if (equip.getItem() instanceof ISpellArmor) {
-				ISpellArmor armor = (ISpellArmor) equip.getItem();
-				armor.apply(entity, summary, equip);
-			}
-		}
+		ISpellEquipment.ApplyAll(entity, summary);
 		
-		// Possibly use baubles (for players)
-		if (playerCast != null) {
-			IInventory curios = NostrumMagica.instance.curios.getCurios(playerCast);
-			if (curios != null) {
-				for (int i = 0; i < curios.getSizeInventory(); i++) {
-					ItemStack equip = curios.getStackInSlot(i);
-					if (equip.isEmpty()) {
-						continue;
-					}
-					
-					if (equip.getItem() instanceof ISpellArmor) {
-						ISpellArmor armor = (ISpellArmor) equip.getItem();
-						armor.apply(entity, summary, equip);
-					}
-				}
-			}
-		}
-		
-		cost = summary.getFinalCost();
-		xp = summary.getFinalXP();
-		float reagentCost = summary.getReagentCost();
-		
-		cost = Math.max(cost, 0);
-		reagentCost = Math.max(reagentCost, 0);
+		int cost = Math.max(0, summary.getFinalCost());
+		float xp = summary.getFinalXP();
 		
 		Map<ReagentType, Integer> reagents = null;
 		Collection<ITameDragon> dragons = null; // more generally: mana HELPERS
@@ -160,10 +132,9 @@ public class SpellCasting {
 				return false;
 			}
 			
-			reagents = spell.getRequiredReagents();
+			reagents = CalculateRequiredReagents(spell, entity, summary);
 			
-			// Total and deduct reagents
-			ApplyReagentRate(reagents, reagentCost);
+			// Count and deduct reagents
 			if (playerCast != null) {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(playerCast, row.getKey());
@@ -258,6 +229,33 @@ public class SpellCasting {
 		}
 		
 		return true;
+	}
+	
+	public static final int CalculateEffectiveSpellWeight(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
+		final int base = spell.getWeight();
+		final int bonus = summary.getWeightDiscount();
+		return Math.max(0, base - bonus);
+	}
+	
+	private static final Map<ReagentType, Integer> NoReagentCost;
+	static { NoReagentCost = new EnumMap<>(ReagentType.class); for (ReagentType t : ReagentType.values()) NoReagentCost.put(t, 0); }
+	
+	/**
+	 * Calculate the required reagents adjusted for any weight calculations and per the provided summary.
+	 * @param spell
+	 * @param caster
+	 * @param tome
+	 */
+	private static final Map<ReagentType, Integer> CalculateRequiredReagents(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
+		// If weight is reduced to 0, no reagents needed. Otherwise, all reagents needed.
+		int spellWeight = CalculateEffectiveSpellWeight(spell, caster, summary);
+		if (spellWeight <= 0) {
+			return NoReagentCost;
+		} else {
+			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
+			ApplyReagentRate(reagents, summary.getReagentCost());
+			return reagents;
+		}
 	}
 	
 	private static final void ApplyReagentRate(Map<ReagentType, Integer> reagents, float reagentCost) {

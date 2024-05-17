@@ -13,7 +13,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.ISpellArmor;
+import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -38,7 +38,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, ISpellArmor {
+public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, ISpellEquipment {
 	
 	public static final String ID_RIBBON_SMALL = "ribbon_small";
 	public static final String ID_RIBBON_MEDIUM = "ribbon_medium";

@@ -61,7 +61,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class WarlockSword extends SwordItem implements ILoreTagged, ISpellArmor, IRaytraceOverlay {
+public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipment, IRaytraceOverlay {
 
 	public static final String ID = "warlock_sword";
 	private static final String NBT_LEVELS = "levels";

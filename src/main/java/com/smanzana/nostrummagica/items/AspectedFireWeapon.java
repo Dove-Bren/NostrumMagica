@@ -42,7 +42,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpellArmor, IRaytraceOverlay {
+public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpellEquipment, IRaytraceOverlay {
 
 	public static final String ID = "sword_fire";
 	private static final int USE_DURATION = 20; // In ticks

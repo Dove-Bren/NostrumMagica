@@ -553,17 +553,9 @@ public class Spell {
 		for (ReagentType type : ReagentType.values())
 			costs.put(type, 0);
 		
-		// First trigger and first non-altered shape is free
-		boolean freeTrigger = false;
-		boolean freeShape = false;
 		ReagentType type;
 		for (SpellPart part : parts) {
 			if (part.isTrigger()) {
-				if (!freeTrigger) {
-					freeTrigger = true;
-					continue;
-				}
-				
 				for (ItemStack req : part.getTrigger().getReagents()) {
 					type = ReagentItem.FindType(req);
 					int count = costs.get(type);
@@ -571,11 +563,6 @@ public class Spell {
 					costs.put(type, count);
 				}
 			} else {
-				if (part.getAlteration() == null && !freeShape) {
-					freeShape = true;
-					continue;
-				}
-				
 				for (ItemStack req : part.getShape().getReagents()) {
 					type = ReagentItem.FindType(req);
 					int count = costs.get(type);

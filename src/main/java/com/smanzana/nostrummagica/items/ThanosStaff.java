@@ -34,7 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellArmor {
+public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "thanos_staff";
 	private static final String NBT_XP = "absorbed_xp";

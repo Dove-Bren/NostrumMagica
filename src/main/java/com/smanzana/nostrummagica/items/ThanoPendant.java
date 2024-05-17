@@ -26,7 +26,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class ThanoPendant extends Item implements ILoreTagged, ISpellArmor {
+public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "pendant_whole";
 	private static final String NBT_THANOS_XP = "thanos_xp";

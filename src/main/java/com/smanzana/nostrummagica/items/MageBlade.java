@@ -38,7 +38,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MageBlade extends SwordItem implements ILoreTagged, ISpellArmor, IEnchantableItem {
+public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment, IEnchantableItem {
 
 	public static final String ID = "mage_blade";
 	

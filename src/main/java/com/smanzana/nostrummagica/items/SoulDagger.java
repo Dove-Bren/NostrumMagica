@@ -57,7 +57,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SoulDagger extends SwordItem implements ILoreTagged, ISpellArmor {
+public class SoulDagger extends SwordItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "soul_dagger";
 	private static final int USE_DURATION = 30; // In ticks
