@@ -574,7 +574,7 @@
     "info.spell.low_tech": "You lack the technique required for such a complex spell",
     "info.spell.low_finesse": "You lack the finesse required by such an intricate spell",
     "info.spell.low_control": "You lack the control to handle such a powerful spell",
-    "info.spell.low_mastery": "This spell requires a %1$s %2$s caster, but you are only %3$s",
+    "info.spell.low_mastery": "This spell requires a %1$s rank %2$s caster, but you are only %3$s rank",
     "info.spell.no_mastery": "This spell requires knowledge of the %s element",
     "info.spell.bad_reagent": "You do not have enough %s",
     "info.spell.tome_weak": "Your tome cannot cast such a powerful spell",

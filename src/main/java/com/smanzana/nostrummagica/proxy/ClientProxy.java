@@ -1,10 +1,5 @@
 package com.smanzana.nostrummagica.proxy;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -13,7 +8,6 @@ import org.lwjgl.glfw.GLFW;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
 import com.smanzana.nostrummagica.client.effects.ClientEffectEchoed;
@@ -40,9 +34,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
-import com.smanzana.nostrummagica.items.ISpellArmor;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
@@ -58,7 +50,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellCasting;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
@@ -67,8 +59,6 @@ import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
-import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
-import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 
@@ -80,7 +70,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
@@ -187,97 +176,19 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private void doCast() {
-		final Minecraft mc = Minecraft.getInstance();
-		Spell spell = NostrumMagica.getCurrentSpell(mc.player);
+		final PlayerEntity player = getPlayer();
+		Spell spell = NostrumMagica.getCurrentSpell(player);
 		if (spell == null) {
-			System.out.println("LOUD NULL SPELL"); // TODO remove
 			return;
 		}
 		
-		// Do mana check here (it's also done on server)
-		// to stop redundant checks and get mana looking good
-		// on client side immediately
-		PlayerEntity player = mc.player;
-		INostrumMagic att = NostrumMagica.getMagicWrapper(player);
-		int mana = att.getMana();
-		int cost = spell.getManaCost();
-		SpellCastSummary summary = new SpellCastSummary(cost, 0);
-		
-		// Add the player's personal bonuses
-		summary.addCostRate(-att.getManaCostModifier());
-		
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
-		if (!tome.isEmpty() && tome.getItem() instanceof SpellTome) {
-			// Casting from a tome.
-			
-			// Make sure it isn't too hard for the tome
-			int cap = SpellTome.getMaxMana(tome);
-			if (cap < cost) {
-				player.sendMessage(new TranslationTextComponent(
-						"info.spell.tome_weak", new Object[0]), Util.DUMMY_UUID);
-				NostrumMagicaSounds.CAST_FAIL.play(player);
-				System.out.println("LOUD tome weak"); // TODO remove
-				return;
-			}
-			
-			List<SpellTomeEnhancementWrapper> enhancements = SpellTome.getEnhancements(tome);
-			if (enhancements != null && !enhancements.isEmpty())
-			for (SpellTomeEnhancementWrapper enhance : enhancements) {
-				enhance.getEnhancement().onCast(
-						enhance.getLevel(), summary, player, att);
-			}
-		}
-		
-		// Cap enhancements at 80% LRC
-		{
-			float lrc = summary.getReagentCost();
-			if (lrc < .2f)
-				summary.addCostRate(.2f - lrc); // Add however much we need to get to 1
-		}
-		
-		// Visit an equipped spell armor
-		for (ItemStack equip : player.getEquipmentAndArmor()) {
-			if (equip.isEmpty())
-				continue;
-			if (equip.getItem() instanceof ISpellArmor) {
-				ISpellArmor armor = (ISpellArmor) equip.getItem();
-				armor.apply(player, summary, equip);
-			}
-		}
-		
-		// Possible use baubles
-		IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
-		if (baubles != null) {
-			for (int i = 0; i < baubles.getSizeInventory(); i++) {
-				ItemStack equip = baubles.getStackInSlot(i);
-				if (equip.isEmpty()) {
-					continue;
-				}
-				
-				if (equip.getItem() instanceof ISpellArmor) {
-					ISpellArmor armor = (ISpellArmor) equip.getItem();
-					armor.apply(player, summary, equip);
-				}
-			}
-		}
-		
-		cost = summary.getFinalCost();
-		
-		// Add dragon mana pool
-		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
-		if (dragons != null && !dragons.isEmpty()) {
-			for (ITameDragon dragon : dragons) {
-				if (dragon.sharesMana(mc.player)) {
-					mana += dragon.getMana();
-				}
-			}
-		}
-		
-		if (!mc.player.isCreative()) {
-			// Check mana
-			if (mana < cost) {
-				
+		if (!tome.isEmpty()) {
+			if (SpellCasting.CheckTomeCast(spell, player, tome)) {
+				NetworkHandler.sendToServer(
+		    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
+			} else {
 				for (int i = 0; i < 15; i++) {
 					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
@@ -288,88 +199,10 @@ public class ClientProxy extends CommonProxy {
 					
 				}
 				
-				System.out.println("LOUD LOW MANA"); // TODO remove
-				
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				overlayRenderer.startManaWiggle(2);
-				return;
 			}
-			
-			// Check attributes
-			int maxComps = 2 * (att.getTech() + 1);
-			int maxTriggers = 1 + (att.getFinesse());
-			int maxElems = 1 + (3 * att.getControl());
-			if (spell.getComponentCount() > maxComps) {
-				player.sendMessage(new TranslationTextComponent(
-						"info.spell.low_tech", new Object[0]), Util.DUMMY_UUID);
-				NostrumMagicaSounds.CAST_FAIL.play(player);
-				return;
-			} else if (spell.getElementCount() > maxElems) {
-				player.sendMessage(new TranslationTextComponent(
-						"info.spell.low_control", new Object[0]), Util.DUMMY_UUID);
-				NostrumMagicaSounds.CAST_FAIL.play(player);
-				return;
-			} else if (spell.getTriggerCount() > maxTriggers) {
-				player.sendMessage(new TranslationTextComponent(
-						"info.spell.low_finesse", new Object[0]), Util.DUMMY_UUID);
-				NostrumMagicaSounds.CAST_FAIL.play(player);
-				return;
-			}
-			
-			// Check elemental mastery
-			for (SpellPart part : spell.getSpellParts()) {
-	    		if (part.isTrigger())
-	    			continue;
-	    		EMagicElement elem = part.getElement();
-	    		if (elem == null)
-	    			elem = EMagicElement.PHYSICAL;
-	    		int level = part.getElementCount();
-	    		
-	    		final ElementalMastery neededMastery;
-				switch (level) {
-				case 0:
-				case 1:
-					neededMastery = ElementalMastery.NOVICE;
-					break;
-				case 2:
-					neededMastery = ElementalMastery.ADEPT;
-					break;
-				case 3:
-				default:
-					neededMastery = ElementalMastery.MASTER;
-					break;
-				}
-				
-				final ElementalMastery currentMastery = att.getElementalMastery(elem);
-				if (!currentMastery.isGreaterOrEqual(neededMastery)) {
-					player.sendMessage(new TranslationTextComponent(
-							"info.spell.low_mastery", neededMastery.name().toLowerCase(), elem.getName(), currentMastery.name().toLowerCase()), Util.DUMMY_UUID);
-						NostrumMagicaSounds.CAST_FAIL.play(player);
-				}
-	    	}
-			
-			// Check reagents
-			// Skip check if there's a server-side chance of it still working anyways
-			if (summary.getReagentCost() >= 1f) {
-				Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
-				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
-					int count = NostrumMagica.getReagentCount(player, row.getKey());
-					if (count < row.getValue()) {
-						player.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.DUMMY_UUID);
-						return;
-					}
-				}
-				
-				// Don't actually deduct on client.
-				// Response from server will result in deduct if it goes through
-			}
-			
-			NostrumMagica.getMagicWrapper(mc.player)
-				.addMana(-cost);
 		}
-		
-		NetworkHandler.sendToServer(
-    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
 	}
 	
 	@Override

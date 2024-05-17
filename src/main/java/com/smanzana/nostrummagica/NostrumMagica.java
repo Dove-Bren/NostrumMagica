@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica;
 
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
@@ -67,6 +69,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -598,17 +602,27 @@ public class NostrumMagica {
 		return 0;
 	}
 
-	public static boolean canCast(Spell spell, INostrumMagic attr) {
+	public static boolean canCast(Spell spell, INostrumMagic attr, @Nonnull List<ITextComponent> problemsOut) {
 		int comps = getMaxComponents(attr);
 		int triggers = getMaxTriggers(attr);
 		int elements = getMaxElements(attr);
+		
+		boolean success = true;
 
-		if (spell.getComponentCount() > comps)
-			return false;
-		if (spell.getTriggerCount() > triggers)
-			return false;
-		if (spell.getElementCount() > elements)
-			return false;
+		if (spell.getComponentCount() > comps) {
+			success = false;
+			problemsOut.add(new TranslationTextComponent("info.spell.low_tech"));
+		}
+		if (spell.getTriggerCount() > triggers) {
+			success = false;
+			problemsOut.add(new TranslationTextComponent("info.spell.low_finesse"));
+		}
+		if (spell.getElementCount() > elements) {
+			success = false;
+			problemsOut.add(new TranslationTextComponent("info.spell.low_control"));
+		}
+		
+		Map<EMagicElement, ElementalMastery> neededMasteries = new EnumMap<>(EMagicElement.class);
 
 		for (SpellPart part : spell.getSpellParts()) {
 			if (part.isTrigger())
@@ -632,13 +646,26 @@ public class NostrumMagica {
 				neededMastery = ElementalMastery.MASTER;
 				break;
 			}
-
-			if (!attr.getElementalMastery(elem).isGreaterOrEqual(neededMastery)) {
-				return false;
+			
+			if (!neededMasteries.containsKey(elem) || !neededMasteries.get(elem).isGreaterOrEqual(neededMastery)) {
+				neededMasteries.put(elem, neededMastery);
+			}
+		}
+		
+		for (EMagicElement elem : neededMasteries.keySet()) {
+			final @Nullable ElementalMastery neededMastery = neededMasteries.get(elem);
+			if (neededMastery == null) {
+				continue;
+			}
+			
+			final ElementalMastery currentMastery = attr.getElementalMastery(elem);
+			if (!currentMastery.isGreaterOrEqual(neededMastery)) {
+				success = false;
+				problemsOut.add(new TranslationTextComponent("info.spell.low_mastery", neededMastery.name().toLowerCase(), elem.getName(), currentMastery.name().toLowerCase()));
 			}
 		}
 
-		return true;
+		return success;
 	}
 
 	public static List<ITameDragon> getNearbyTamedDragons(LivingEntity entity, double blockRadius,
