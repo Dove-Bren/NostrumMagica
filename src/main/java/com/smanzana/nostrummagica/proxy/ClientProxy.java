@@ -67,6 +67,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -83,6 +84,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.event.InputEvent.MouseScrollEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -91,7 +94,11 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy extends CommonProxy {
 	
-	private KeyBinding bindingCast;
+	private KeyBinding bindingCast1;
+	private KeyBinding bindingCast2;
+	private KeyBinding bindingCast3;
+	private KeyBinding bindingCast4;
+	private KeyBinding bindingCast5;
 	private KeyBinding bindingScroll;
 	private KeyBinding bindingInfo;
 	private KeyBinding bindingBladeCast;
@@ -108,8 +115,16 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	public void initKeybinds() {
-		bindingCast = new KeyBinding("key.cast.desc", GLFW.GLFW_KEY_LEFT_CONTROL, "key.nostrummagica.desc");
-		ClientRegistry.registerKeyBinding(bindingCast);
+		bindingCast1 = new KeyBinding("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingCast1);
+		bindingCast2 = new KeyBinding("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingCast2);
+		bindingCast3 = new KeyBinding("key.cast3.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingCast3);
+		bindingCast4 = new KeyBinding("key.cast4.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingCast4);
+		bindingCast5 = new KeyBinding("key.cast5.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingCast5);
 		bindingScroll = new KeyBinding("key.spellscroll.desc", GLFW.GLFW_KEY_LEFT_SHIFT, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingScroll);
 		bindingInfo = new KeyBinding("key.infoscreen.desc", GLFW.GLFW_KEY_HOME, "key.nostrummagica.desc");
@@ -118,6 +133,26 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
 	}
 	
+	public KeyBinding getBindingCast1() {
+		return bindingCast1;
+	}
+
+	public KeyBinding getBindingCast2() {
+		return bindingCast2;
+	}
+
+	public KeyBinding getBindingCast3() {
+		return bindingCast3;
+	}
+
+	public KeyBinding getBindingCast4() {
+		return bindingCast4;
+	}
+
+	public KeyBinding getBindingCast5() {
+		return bindingCast5;
+	}
+
 	@SubscribeEvent
 	public void onMouse(MouseScrollEvent event) {
 		int wheel = event.getScrollDelta() < 0 ? -1 : event.getScrollDelta() > 0 ? 1 : 0;
@@ -144,9 +179,17 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
 		final Minecraft mc = Minecraft.getInstance();
-		if (bindingCast.isPressed())
-			doCast();
-		else if (bindingInfo.isPressed()) {
+		if (bindingCast1.isPressed()) {
+			doCast(0);
+		} else if (bindingCast2.isPressed()) {
+			doCast(1);
+		} else if (bindingCast3.isPressed()) {
+			doCast(2);
+		} else if (bindingCast4.isPressed()) {
+			doCast(3);
+		} else if (bindingCast5.isPressed()) {
+			doCast(4);
+		} else if (bindingInfo.isPressed()) {
 			PlayerEntity player = mc.player;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
@@ -176,15 +219,18 @@ public class ClientProxy extends CommonProxy {
 		NetworkHandler.sendToServer(new BladeCastMessage());
 	}
 	
-	private void doCast() {
+	private void doCast(int castSlot) {
 		final PlayerEntity player = getPlayer();
-		int castSlot = 0; int unused; // Multiple keybinds!
 		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
-		if (spells.length == 0 || spells.length <= castSlot) {
+		if (castSlot < 0 || spells.length == 0 || spells.length <= castSlot) {
 			return;
 		}
 		
 		final Spell spell = spells[castSlot];
+		if (spell == null) {
+			// No spell in slot
+			return;
+		}
 		
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 

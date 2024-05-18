@@ -40,6 +40,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.Transmutation;
@@ -59,6 +60,7 @@ import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -507,7 +509,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private void renderSpellLoadoutSlot(MatrixStack matrixStackIn, @Nullable Spell spell, int width, int height) {
+	private void renderSpellLoadoutSlot(MatrixStack matrixStackIn, @Nullable Spell spell, String binding, int width, int height) {
 		// Probably going to draw icon, and spell name real small on top of it?
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, height-1, 0x80404040);
@@ -515,18 +517,61 @@ public class OverlayRenderer extends AbstractGui {
 			final Minecraft mc = Minecraft.getInstance();
 			SpellIcon.get(spell.getIconIndex()).render(mc, matrixStackIn, 1, 1, width-2, height-2);
 			
-			// Name?
+			// Name
 			RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, (mc.fontRenderer.FONT_HEIGHT / 4) + 2, 0x80000000);
 			String name = spell.getName();
 			if (name.length() > 11) {
 				name = name.substring(0, 9) + "...";
 			}
+			matrixStackIn.push();
 			matrixStackIn.translate(width/2, 1, 0);
 			matrixStackIn.scale(.25f, .25f, 1f);
 			mc.fontRenderer.drawString(matrixStackIn, name, -mc.fontRenderer.getStringWidth(name)/2, 0, 0xFFFFFFFF);
+			matrixStackIn.pop();
+			
+			// Keybind
+			if (binding != null && binding.length() > 0) {
+				RenderFuncs.drawRect(matrixStackIn, 1, height-1, width-1, height - (mc.fontRenderer.FONT_HEIGHT / 4) -2, 0x80000000);
+				if (binding.length() > 11) {
+					binding = binding.substring(0, 9) + "...";
+				}
+				matrixStackIn.push();
+				matrixStackIn.translate(width/2, (height - mc.fontRenderer.FONT_HEIGHT/4) - 1, 0);
+				matrixStackIn.scale(.25f, .25f, 1f);
+				mc.fontRenderer.drawString(matrixStackIn, binding, -mc.fontRenderer.getStringWidth(binding)/2, 0, 0xFFFFFFFF);
+				matrixStackIn.pop();
+			}
 			
 			// Fade if can't cast it?
 		}
+	}
+	
+	private String getBindingForSlot(int slot) {
+		String binding = null;
+		ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
+		@Nullable KeyBinding key = null;
+		switch (slot) {
+		case 0:
+			key = proxy.getBindingCast1();
+			break;
+		case 1:
+			key = proxy.getBindingCast2();
+			break;
+		case 2:
+			key = proxy.getBindingCast3();
+			break;
+		case 3:
+			key = proxy.getBindingCast4();
+			break;
+		case 4:
+			key = proxy.getBindingCast5();
+			break;
+		}
+		
+		if (key != null) {
+			binding = key.func_238171_j_().getString();
+		}
+		return binding;
 	}
 	
 	private void renderSpellSlide(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
@@ -560,7 +605,7 @@ public class OverlayRenderer extends AbstractGui {
 			for (int i = 0; i < current.length; i++) {
 				matrixStackIn.push();
 				matrixStackIn.translate(xOffset + (i * slotSize), yOffset, 0);
-				renderSpellLoadoutSlot(matrixStackIn, current[i], slotSize, slotSize);
+				renderSpellLoadoutSlot(matrixStackIn, current[i], getBindingForSlot(i), slotSize, slotSize);
 				matrixStackIn.pop();
 			}
 		}

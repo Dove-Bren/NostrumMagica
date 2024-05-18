@@ -440,7 +440,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		CompoundNBT nbt = itemStack.getOrCreateTag();
-		ListNBT pages = (nbt.contains(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY)) ? nbt.getList(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY) : new ListNBT();
+		ListNBT pages = (nbt.contains(NBT_PAGE_LIST, NBT.TAG_LIST)) ? nbt.getList(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY) : new ListNBT();
 		
 		// Possibly catch up on any pages that aren't in the list yet. Could just go up to pageIdx, but might as well take the time to fill them out all.
 		final int pageCount = getPageCount(itemStack);

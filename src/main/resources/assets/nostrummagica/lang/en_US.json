@@ -486,7 +486,11 @@
 	"container.nostrummagica.putter.name": "Putter",
 	"container.nostrummagica.active_hopper.name": "Active Hopper",
 
-    "key.cast.desc": "Cast Spell",
+    "key.cast1.desc": "Cast Spell Slot 1",
+	"key.cast2.desc": "Cast Spell Slot 2",
+	"key.cast3.desc": "Cast Spell Slot 3",
+	"key.cast4.desc": "Cast Spell Slot 4",
+	"key.cast5.desc": "Cast Spell Slot 5",
     "key.spellscroll.desc": "Scroll Spells (+ MouseWheel)",
     "key.infoscreen.desc": "Info Screen",
     "key.dash.left.desc": "Ender Dash Left",
