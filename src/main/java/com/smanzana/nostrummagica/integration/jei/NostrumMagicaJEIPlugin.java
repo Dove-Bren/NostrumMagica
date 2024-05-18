@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
 import com.smanzana.nostrummagica.integration.jei.categories.TransmutationItemCategory;
@@ -175,9 +176,15 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-		registration.addGuiContainerHandler(SpellCreationGui.SpellGui.class, new IGuiContainerHandler<SpellCreationGui.SpellGui>() {
+		registration.addGuiContainerHandler(MasterSpellCreationGui.SpellGui.class, new IGuiContainerHandler<MasterSpellCreationGui.SpellGui>() {
 			@Override
-			public List<Rectangle2d> getGuiExtraAreas(SpellCreationGui.SpellGui containerScreen) {
+			public List<Rectangle2d> getGuiExtraAreas(MasterSpellCreationGui.SpellGui containerScreen) {
+				return containerScreen.getGuiExtraAreas();
+			}
+		});
+		registration.addGenericGuiContainerHandler(SpellCreationGui.SpellGui.class, new IGuiContainerHandler<SpellCreationGui.SpellGui<?>>() {
+			@Override
+			public List<Rectangle2d> getGuiExtraAreas(SpellCreationGui.SpellGui<?> containerScreen) {
 				return containerScreen.getGuiExtraAreas();
 			}
 		});

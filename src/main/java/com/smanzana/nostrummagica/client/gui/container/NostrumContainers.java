@@ -20,7 +20,8 @@ public class NostrumContainers {
 	@ObjectHolder(PutterBlockGui.PutterBlockContainer.ID) public static ContainerType<PutterBlockGui.PutterBlockContainer> Putter;
 	@ObjectHolder(ReagentBagGui.BagContainer.ID) public static ContainerType<ReagentBagGui.BagContainer> ReagentBag;
 	@ObjectHolder(RuneBagGui.BagContainer.ID) public static ContainerType<RuneBagGui.BagContainer> RuneBag;
-	@ObjectHolder(SpellCreationGui.SpellCreationContainer.ID) public static ContainerType<SpellCreationGui.SpellCreationContainer> SpellCreation;
+	@ObjectHolder(MasterSpellCreationGui.SpellCreationContainer.ID) public static ContainerType<MasterSpellCreationGui.SpellCreationContainer> SpellCreationMaster;
+	@ObjectHolder(BasicSpellCraftGui.BasicSpellCraftContainer.ID) public static ContainerType<BasicSpellCraftGui.BasicSpellCraftContainer> SpellCreationBasic;
 	@ObjectHolder(RuneShaperGui.RuneShaperContainer.ID) public static ContainerType<RuneShaperGui.RuneShaperContainer> RuneShaper;
 	
 	@SubscribeEvent
@@ -33,7 +34,8 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(PutterBlockGui.PutterBlockContainer::FromNetwork).setRegistryName(PutterBlockGui.PutterBlockContainer.ID));
 		registry.register(IForgeContainerType.create(ReagentBagGui.BagContainer::FromNetwork).setRegistryName(ReagentBagGui.BagContainer.ID));
 		registry.register(IForgeContainerType.create(RuneBagGui.BagContainer::FromNetwork).setRegistryName(RuneBagGui.BagContainer.ID));
-		registry.register(IForgeContainerType.create(SpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(SpellCreationGui.SpellCreationContainer.ID));
+		registry.register(IForgeContainerType.create(MasterSpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(MasterSpellCreationGui.SpellCreationContainer.ID));
+		registry.register(IForgeContainerType.create(BasicSpellCraftGui.BasicSpellCraftContainer::FromNetwork).setRegistryName(BasicSpellCraftGui.BasicSpellCraftContainer.ID));
 		registry.register(IForgeContainerType.create(RuneShaperGui.RuneShaperContainer::FromNetwork).setRegistryName(RuneShaperGui.RuneShaperContainer.ID));
 	}
 }

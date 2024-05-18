@@ -143,4 +143,24 @@ public class SpellCrafting {
 		}
 		return weight;
 	}
+	
+	public static int CalculateWeightFromRunes(IInventory inventory, int startIdx, int slotCount) {
+		
+		List<SpellPart> parts = new ArrayList<>(slotCount);
+		for (int i = startIdx; i < startIdx + slotCount; i++) {
+			ItemStack stack = inventory.getStackInSlot(i);
+			if (stack.isEmpty()) {
+				break;
+			}
+			
+			SpellPart part = SpellRune.getPart(stack);
+			if (part == null) {
+				NostrumMagica.logger.error("Got null SpellPart from rune: " + stack + " :: " + (stack.hasTag() ? stack.getTag().toString() : "NO NBT"));
+			} else {
+				parts.add(part);
+			}
+		}
+		
+		return CalculateWeight(parts);
+	}
 }

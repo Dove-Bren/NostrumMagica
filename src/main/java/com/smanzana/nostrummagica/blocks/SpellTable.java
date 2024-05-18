@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
+import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
 import net.minecraft.block.Block;
@@ -76,17 +76,6 @@ public class SpellTable extends HorizontalBlock {
 			state.updateNeighbours(worldIn, pos, 3);
 		}
 	}
-	
-	// public BlockRenderLayer getRenderLayer() ?
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -176,7 +165,11 @@ public class SpellTable extends HorizontalBlock {
 		}
 		
 		SpellTableEntity te = (SpellTableEntity) worldIn.getTileEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(playerIn, SpellCreationGui.SpellCreationContainer.Make(te));
+		//NostrumMagica.instance.proxy.openContainer(playerIn, MasterSpellCreationGui.SpellCreationContainer.Make(te));
+		//if (handIn == null) {
+			int unused; // remove
+			NostrumMagica.instance.proxy.openContainer(playerIn, BasicSpellCraftGui.BasicSpellCraftContainer.Make(te));
+		//}
 		
 		return ActionResultType.SUCCESS;
 	}

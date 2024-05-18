@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
+import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -16,14 +17,13 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SpellTableEntity extends TileEntity implements IInventory {
+public class SpellTableEntity extends TileEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
 
 	private static final String NBT_INV = "inventory";
 	
@@ -242,5 +242,20 @@ public class SpellTableEntity extends TileEntity implements IInventory {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public ISpellCraftingInventory getSpellCraftingInventory() {
+		return this;
+	}
+
+	@Override
+	public int getRuneSlotStartingIndex() {
+		return this.getRuneSlotIndex();
+	}
+
+	@Override
+	public int getMaxWeight(PlayerEntity crafter) {
+		return 5;
 	}
 }

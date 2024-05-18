@@ -8,14 +8,15 @@ import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
 import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
+import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
+import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
 import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
 import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
-import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
@@ -151,7 +152,8 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.Putter, PutterBlockGui.PutterBlockGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.ReagentBag, ReagentBagGui.BagGui::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneBag, RuneBagGui.BagGui::new);
-		ScreenManager.registerFactory(NostrumContainers.SpellCreation, SpellCreationGui.SpellGui::new);
+		ScreenManager.registerFactory(NostrumContainers.SpellCreationMaster, MasterSpellCreationGui.SpellGui::new);
+		ScreenManager.registerFactory(NostrumContainers.SpellCreationBasic, BasicSpellCraftGui.BasicSpellCraftGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
 		
 		// Register client command registering command.

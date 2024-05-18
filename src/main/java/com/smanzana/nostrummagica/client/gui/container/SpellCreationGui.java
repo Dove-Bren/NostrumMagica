@@ -7,30 +7,25 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.BlankScroll;
-import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellCrafting;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.tiles.SpellTableEntity;
-import com.smanzana.nostrummagica.utils.ContainerUtil;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,184 +33,178 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SpellCreationGui {
 	
-	private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/spell_create.png");
+	public static final int MaxNameLength = 20;
 	
-	private static final int GUI_WIDTH = 202;
-	private static final int GUI_HEIGHT = 218;
-	private static final int PLAYER_INV_HOFFSET = 23;
-	private static final int PLAYER_INV_VOFFSET = 138;
-	private static final int SLOT_MAIN_HOFFSET = 23;
-	private static final int SLOT_MAIN_VOFFSET = 14;
-	
-	//23, 136
-	
-	private static final int GRAMMAR_SLOT_HOFFSET = 16;
-	private static final int GRAMMAR_SLOT_VOFFSET = 42;
-	private static final int GRAMMAR_SLOT_HDIST = 22;
-	private static final int GRAMMAR_SLOT_VDIST = 39;
-	private static final int GRAMMAR_SLOT_MAXX = 8;
-	
-	private static final int NAME_HOFFSET  = 47;
-	private static final int NAME_VOFFSET = 18;
-	private static final int NAME_WIDTH = 116;
-	private static final int NAME_HEIGHT = 12;
-	private static final int SUBMIT_HOFFSET = 172;
-	private static final int SUBMIT_VOFFSET = 16;
-	private static final int SUBMIT_WIDTH = 18;
-	private static final int SUBMIT_HEIGHT = 10;
-	
-	private static final int MESSAGE_WIDTH = 144;
-	private static final int MESSAGE_HEIGHT = 37;
-	private static final int MESSAGE_VALID_HOFFSET = 30;
-	private static final int MESSAGE_VALID_VOFFSET = 219;
-	private static final int MESSAGE_DISPLAY_VOFFSET = 38;
-	
-	private static final int STATUS_WIDTH = 10;
-	private static final int STATUS_HEIGHT = 10;
-	private static final int STATUS_HOFFSET = 10;
-	private static final int STATUS_VOFFSET = 219;
-	private static final int STATUS_DISP_HOFFSET = 4;
-	private static final int STATUS_DISP_VOFFSET = 4;
-	
-	private static final int REAGENT_BAG_HOFFSET = 23;
-	private static final int REAGENT_BAG_VOFFSET = 112;
-	
-	private static final int ICON_LBUTTON_HOFFSET = 174;
-	private static final int ICON_LBUTTON_VOFFSET = 219; 
-	private static final int ICON_BUTTON_LENGTH = 16;
-	
-	private static final int MANA_VOFFSET = 99;
-	
-	public static class SpellCreationContainer extends Container {
+	public static abstract class SpellCreationContainer extends Container {
 		
-		public static final String ID = "spell_creation";
+		protected static class ScrollSlot extends Slot {
+			
+			private final SpellCreationContainer container;
+			
+			public ScrollSlot(SpellCreationContainer container, IInventory inventory, int idx, int x, int y) {
+				super(inventory, idx, x, y);
+				this.container = container;
+			}
+			
+			@Override
+			public boolean isItemValid(@Nonnull ItemStack stack) {
+				return (stack.isEmpty()
+						|| stack.getItem() instanceof BlankScroll);
+			}
+			
+			@Override
+			public void putStack(@Nonnull ItemStack stack) {
+				super.putStack(stack);
+				
+				container.validate();
+			}
+			
+			@Override
+			public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+				container.validate();
+				return super.onTake(playerIn, stack);
+			}
+			
+			@Override
+			public int getSlotStackLimit() {
+				return 1;
+			}
+		}
+		
+		protected static class RuneSlot extends Slot {
+
+			private final RuneSlot prev;
+			private RuneSlot next;
+			private final SpellCreationContainer container;
+			
+			public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int x, int y) {
+				super(inventoryIn, index, x, y);
+				this.prev = prev;
+				this.container = container;
+			}
+			
+			public void setNext(RuneSlot next) {
+				this.next = next;
+			}
+			
+			@Override
+			public boolean isItemValid(@Nonnull ItemStack stack) {
+				// Can put the item in if:
+				// it's empty
+				// OR previous slot is not null (not the first trigger-only slot)
+				// OR it's a trigger rune
+				// all ANDed with does the previous slot have a rune?
+				if (!container.hasScroll)
+					return false;
+				
+				if (prev != null &&
+						!prev.getHasStack())
+					return false;
+				
+				if (stack.isEmpty())
+					return true;
+				
+				if (!(stack.getItem() instanceof SpellRune))
+					return false;
+				
+				boolean trigger = SpellRune.isTrigger(stack);
+				if (!trigger && !SpellRune.isPackedShape(stack))
+					return false;
+				
+				return (prev != null || trigger);
+			}
+			
+			@Override
+			@OnlyIn(Dist.CLIENT)
+			public boolean isEnabled() {
+				return (prev == null ||
+						prev.getHasStack());
+			}
+			
+			@Override
+			public void putStack(@Nonnull ItemStack stack) {
+				super.putStack(stack);
+				
+				container.validate();
+			}
+			
+			@Override
+			public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+				// This is called AFTER things have been changed or swapped
+				// Which means we just look to see if we have an item.
+				// If not, take item from next
+				if (!this.getHasStack() && next != null && next.getHasStack()) {
+					this.putStack(next.getStack().copy());
+					next.putStack(ItemStack.EMPTY);
+					next.onTake(playerIn, this.getStack());
+				}
+
+				container.validate();
+				
+				return super.onTake(playerIn, stack);
+			}
+			
+			@Override
+			public int getSlotStackLimit() {
+				return 1;
+			}
+		}
 		
 		// Kept just to report to server which TE is doing crafting
 		protected final BlockPos pos;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected final SpellTableEntity inventory;
+		protected final ISpellCraftingInventory inventory;
 		protected final PlayerEntity player;
-		protected boolean isValid; // has an acceptable scroll
-		protected boolean spellValid; // grammer checks out
+		
+		
+		protected boolean hasScroll; // has an acceptable scroll
+		protected boolean spellValid; // grammar checks out
 		protected List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
 		protected List<ITextComponent> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
-		protected String name;
-		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
 		protected int lastWeight;
 		
-		public SpellCreationContainer(int windowId, PlayerEntity crafter, PlayerInventory playerInv, SpellTableEntity tableInventory) {
-			super(NostrumContainers.SpellCreation, windowId);
+		public SpellCreationContainer(ContainerType<? extends SpellCreationContainer> type, int windowId, PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory, BlockPos tablePos) {
+			super(type, windowId);
 			this.inventory = tableInventory;
 			this.player = crafter;
-			this.pos = tableInventory.getPos();
+			this.pos = tablePos;
 			
 			spellErrorStrings = new LinkedList<>();
-			this.name = "";
-			this.iconIndex = -1;
 			
-			this.addSlot(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
-				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
-					return (stack.isEmpty()
-							|| stack.getItem() instanceof BlankScroll);
-				}
-				
-				@Override
-				public void putStack(@Nonnull ItemStack stack) {
-					super.putStack(stack);
-					
-					validate();
-				}
-				
-				@Override
-				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
-					validate();
-					
-					return super.onTake(playerIn, stack);
-				}
-				
-				@Override
-				public int getSlotStackLimit() {
-					return 1;
-				}
-			});
-			
-			RuneSlot prev = null, cur;
-			for (int i = 0; i < Math.min(GRAMMAR_SLOT_MAXX * 2, inventory.getRuneSlotCount()); i++) {
-				int x = ( (i % GRAMMAR_SLOT_MAXX) * GRAMMAR_SLOT_HDIST + GRAMMAR_SLOT_HOFFSET);
-				int y = ( (i / GRAMMAR_SLOT_MAXX) * GRAMMAR_SLOT_VDIST + GRAMMAR_SLOT_VOFFSET);
-				cur = new RuneSlot(this, prev, inventory, i + 1, x, y);
-				if (prev != null)
-					prev.setNext(cur);
-				prev = cur;
-				this.addSlot(prev);
-			}
-			
-			// Create reagent bag slots
-			for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
-				int x = (i * 18) + REAGENT_BAG_HOFFSET;
-				int y = REAGENT_BAG_VOFFSET;
-				this.addSlot(new Slot(inventory, i + inventory.getReagentSlotIndex(), x, y) {
-					@Override
-					public int getSlotStackLimit() {
-						return 64;
-					}
-					
-					@Override
-					public void putStack(@Nonnull ItemStack stack) {
-						super.putStack(stack);
-						
-						validate();
-					}
-					
-					@Override
-					public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
-						validate();
-						
-						return super.onTake(playerIn, stack);
-					}
-				});
-			}
-			
-			// Construct player inventory
-			for (int y = 0; y < 3; y++) {
-				for (int x = 0; x < 9; x++) {
-					this.addSlot(new Slot(playerInv, x + y * 9 + 9, PLAYER_INV_HOFFSET + (x * 18), PLAYER_INV_VOFFSET + (y * 18)));
-				}
-			}
-			// Construct player hotbar
-			for (int x = 0; x < 9; x++) {
-				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
-			}
-			
-			// isValid means there's something that can accept a spell
-			// in the tome slot. Is there?
-			isValid = false;
-			@Nonnull ItemStack stack = this.inventory.getStackInSlot(0);
-			if (!stack.isEmpty() && stack.getItem() instanceof BlankScroll)
-				isValid = true;
-			
-			validate();
-			
+			// Dont auto call this; let children, so that they can set up things they need to first.
+			//validate();
 		}
 		
-		public static final SpellCreationContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
-			return new SpellCreationContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buffer));
+		public abstract String getName();
+		
+		public abstract int getSpellIcon();
+		
+		protected boolean isValidScroll(ItemStack stack) {
+			return !stack.isEmpty() && stack.getItem() instanceof BlankScroll;
+		}
+		
+		protected void checkScroll() {
+			this.hasScroll = isValidScroll(this.inventory.getScrollSlotContents());
+		}
+		
+		public boolean hasScroll() {
+			return this.hasScroll;
 		}
 		
 		@Override
@@ -228,22 +217,12 @@ public class SpellCreationGui {
 			return true;
 		}
 		
-		public static IPackedContainerProvider Make(SpellTableEntity table) {
-			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new SpellCreationContainer(windowId, player, playerInv, table);
-			}, (buffer) -> {
-				ContainerUtil.PackTE(buffer, table);
-			});
-		}
-		
 		@Override
 		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
 			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
 			
-			isValid = false;
-			ItemStack stack = this.inventory.getStackInSlot(0);
-			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
-				isValid = true;
+			int unused; // is this useful?
+			checkScroll();
 			
 			return ret;
 		}
@@ -264,62 +243,17 @@ public class SpellCreationGui {
 					}
 				} else {
 					// Trying to add an item
-					if (cur.getItem() instanceof ReagentItem) {
-						// Adding a reagent. Try to add to reagent spots
-						
-						// Try to add to existing
-						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
-							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
-							if (stack.isEmpty() || stack.getItem() != cur.getItem())
-								continue;
-							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
-							
-							int maxsize = Math.min(stack.getMaxStackSize(), reagentSlot.getSlotStackLimit());
-							int room = maxsize - stack.getCount();
-							if (room >= cur.getCount()) {
-								stack.grow(cur.getCount());
-								cur.setCount(0);
-							} else {
-								cur.shrink(room);
-								stack.setCount(maxsize);
-							}
-							
-							if (cur.getCount() <= 0)
-								break;
-						}
-						
-						// If still ahve items, add to empty slots
-						if (!cur.isEmpty())
-						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
-							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
-							if (!stack.isEmpty())
-								continue;
-							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
-							
-							int maxsize = reagentSlot.getSlotStackLimit();
-							if (maxsize >= cur.getCount()) {
-								reagentSlot.putStack(cur.copy());
-								cur.setCount(0);
-							} else {
-								reagentSlot.putStack(cur.split(maxsize));
-							}
-							
-							if (cur.isEmpty())
-								break;
-						}
-					} else if (cur.getItem() instanceof BlankScroll) {
-						ItemStack existing = inventory.getStackInSlot(inventory.getScrollSlotIndex());
+					if (cur.getItem() instanceof BlankScroll) {
+						ItemStack existing = inventory.getScrollSlotContents();
 						if (existing.isEmpty()) {
-							inventory.setInventorySlotContents(inventory.getScrollSlotIndex(),
-									cur.split(1));
+							inventory.setScrollSlotContents(cur.split(1));
 							this.validate();
 						}
 					} else if (cur.getItem() instanceof SpellRune) {
 						// Only allow adding if blank scroll is in place
-						ItemStack scroll = inventory.getStackInSlot(inventory.getScrollSlotIndex());
-						if (scroll.isEmpty() || !(scroll.getItem() instanceof BlankScroll)) {
+						if (!this.hasScroll()) {
 							// Do nothing
-						} else if (!inventory.getStackInSlot(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1).isEmpty()) {
+						} else if (!inventory.getRuneSlotContents(inventory.getRuneSlotCount() - 1).isEmpty()) {
 							// If something's in last slot, we're full
 							// Table will naturally shift things down
 						} else {
@@ -331,16 +265,16 @@ public class SpellCreationGui {
 								add = true;
 							} else if (SpellRune.isPackedShape(cur)) {
 								// Must have a trigger in first slot already
-								if (!inventory.getStackInSlot(inventory.getRuneSlotIndex()).isEmpty())
+								if (!inventory.getRuneSlotContents(0).isEmpty())
 									add = true;
 							}
 							
 							if (add) {
-								int index = inventory.getRuneSlotIndex();
-								while (!inventory.getStackInSlot(index).isEmpty())
+								int index = 0;
+								while (!inventory.getRuneSlotContents(index).isEmpty())
 									index++;
 								
-								inventory.setInventorySlotContents(index, cur.split(1));
+								inventory.setRuneSlotContents(index, cur.split(1));
 								//cur = ItemStack.EMPTY;
 								this.validate();
 							}
@@ -356,18 +290,56 @@ public class SpellCreationGui {
 			return ItemStack.EMPTY;
 		}
 		
-		public void validate() {
-			validate(name.toString(), this.iconIndex);
+		public boolean hasProblems() {
+			return !this.spellValid;
 		}
 		
-		public void validate(String name, int iconIdx) {
+		public List<ITextComponent> getProblems() {
+			return this.spellErrorStrings;
+		}
+		
+		public List<ITextComponent> getReagentStrings() {
+			return this.reagentStrings;
+		}
+		
+		public int getCurrentWeight() {
+			if (!this.hasProblems()) {
+				return this.lastWeight;
+			}
+			
+			// Could cache
+			return SpellCrafting.CalculateWeightFromRunes(inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
+		}
+		
+		public int getMaxWeight() {
+			return this.inventory.getMaxWeight(player);
+		}
+		
+		public int getManaCost() {
+			if (!this.hasProblems()) {
+				return this.lastManaCost;
+			}
+			
+			return 0;
+		}
+		
+		protected void validate() {
+			validate(getName(), getSpellIcon());
+		}
+		
+		protected void validate(String name, int iconIdx) {
 			if (spellErrorStrings == null)
 				spellErrorStrings = new LinkedList<>();
 			if (reagentStrings == null)
 				reagentStrings = new LinkedList<>();
 			
-			Spell spell = makeSpell(name, iconIdx);
-			spellValid = (spell != null);
+			checkScroll();
+			if (this.hasScroll) {
+				Spell spell = makeSpell(name, iconIdx);
+				spellValid = (spell != null);
+			} else {
+				spellValid = false;
+			}
 		}
 		
 		public Spell makeSpell(String name, int iconIdx) {
@@ -381,15 +353,21 @@ public class SpellCreationGui {
 			if (spell == null)
 				return null;
 			
-			if (clear)
-				this.inventory.clearBoard();
-			
 			this.lastManaCost = spell.getManaCost();
 			this.lastWeight = spell.getWeight();
+			
+			if (this.lastWeight > this.getMaxWeight()) {
+				this.spellErrorStrings.add(new StringTextComponent("Too much weight"));
+				return null;
+			}
+			
+			if (clear)
+				this.inventory.clearSpellBoard();
+			
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
+		public static Spell craftSpell(String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -414,7 +392,7 @@ public class SpellCreationGui {
 			}
 			
 			List<String> rawSpellErrors = new ArrayList<>();
-			if (!SpellCrafting.CheckForValidRunes(inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors)) {
+			if (!SpellCrafting.CheckForValidRunes(inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors)) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {
 					spellErrorStrings.add(new StringTextComponent(error));
@@ -428,7 +406,7 @@ public class SpellCreationGui {
 			}
 			
 			// Actually make spell
-			Spell spell = SpellCrafting.CreateSpellFromRunes(name, inventory, 1, inventory.getReagentSlotIndex()-1);
+			Spell spell = SpellCrafting.CreateSpellFromRunes(name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
@@ -439,7 +417,7 @@ public class SpellCreationGui {
 				if (count == null)
 					continue;
 				
-				int left = takeReagent(inventory, type, count, false);
+				int left = takeReagent(crafter, inventory, type, count, false);
 				if (left != 0) {
 					spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
 					fail = true;
@@ -462,7 +440,7 @@ public class SpellCreationGui {
 					if (count == null)
 						continue;
 					
-					int left = takeReagent(inventory, type, count, true);
+					int left = takeReagent(crafter, inventory, type, count, true);
 					if (left != 0) {
 						System.out.println("Couldn't take all " + type.name());
 						spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
@@ -475,57 +453,98 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public void setScroll(@Nonnull ItemStack item) {
-			this.inventory.setInventorySlotContents(0, item);
-			isValid = false;
-		}
-
-	}
-	
-	// if take, actually removes. Otherwise, just checks
-	// returns amount needed still. 0 means all that were needed are there
-	private static int takeReagent(SpellTableEntity inventory, ReagentType type, int count, boolean take) {
-		for (int i = inventory.getReagentSlotIndex(); i < inventory.getReagentSlotIndex() + inventory.getReagentSlotCount(); i++) {
-			@Nonnull ItemStack stack = inventory.getStackInSlot(i);
-			if (stack.isEmpty())
-				continue;
-			
-			if (ReagentItem.FindType(stack) == type) {
-				if (stack.getCount() > count) {
-					if (take)
-						inventory.decrStackSize(i, count);
-					count = 0;
-				} else {
-					count -= stack.getCount();
-					if (take)
-						inventory.setInventorySlotContents(i, ItemStack.EMPTY);
-				}
+		// if take, actually removes. Otherwise, just checks
+		// returns amount needed still. 0 means all that were needed are there
+		private static int takeReagent(PlayerEntity player, ISpellCraftingInventory craftingInventory, ReagentType type, int count, boolean take) {
+			final IInventory inventory = player.inventory;
+			for (int i = 0; i < inventory.getSizeInventory(); i++) {
+				@Nonnull ItemStack stack = inventory.getStackInSlot(i);
+				if (stack.isEmpty())
+					continue;
 				
-				if (count == 0)
-					break;
+				if (ReagentItem.FindType(stack) == type) {
+					if (stack.getCount() > count) {
+						if (take)
+							inventory.decrStackSize(i, count);
+						count = 0;
+					} else {
+						count -= stack.getCount();
+						if (take)
+							inventory.setInventorySlotContents(i, ItemStack.EMPTY);
+					}
+					
+					if (count == 0)
+						break;
+				}
 			}
+			
+			return count;
 		}
-		
-		return count;
 	}
-	
-	private static final int NAME_MAX = 20;
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class SpellGui extends AutoGuiContainer<SpellCreationContainer> {
+	public static abstract class SpellGui<T extends SpellCreationContainer> extends AutoGuiContainer<T> {
 		
-		private static class SpellIconButton extends Button {
+		private static final ResourceLocation TEXT_UTILS = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/spell_create.png");
+		
+		private static final int TEXT_UTILS_WIDTH = 64;
+		private static final int TEXT_UTILS_HEIGHT = 64;
+		
+		private static final int TEXT_STATUS_GOOD_HOFFSET = 0;
+		private static final int TEXT_STATUS_GOOD_VOFFSET = 0;
+		private static final int TEXT_STATUS_GOOD_WIDTH = 10;
+		private static final int TEXT_STATUS_GOOD_HEIGHT = 10;
+		
+		private static final int TEXT_STATUS_BAD_HOFFSET = TEXT_STATUS_GOOD_HOFFSET + TEXT_STATUS_GOOD_WIDTH;
+		private static final int TEXT_STATUS_BAD_VOFFSET = 0;
+		private static final int TEXT_STATUS_BAD_WIDTH = TEXT_STATUS_GOOD_WIDTH;
+		private static final int TEXT_STATUS_BAD_HEIGHT = TEXT_STATUS_GOOD_HEIGHT;
+		
+		private static final int TEXT_ICONBACK_PRESSED_HOFFSET = 0;
+		private static final int TEXT_ICONBACK_PRESSED_VOFFSET = 10;
+		private static final int TEXT_ICONBACK_PRESSED_WIDTH = 20;
+		private static final int TEXT_ICONBACK_PRESSED_HEIGHT = 20;
+		
+		private static final int TEXT_ICONBACK_HOFFSET = 0;
+		private static final int TEXT_ICONBACK_VOFFSET = TEXT_ICONBACK_PRESSED_VOFFSET + TEXT_ICONBACK_PRESSED_HEIGHT;
+		private static final int TEXT_ICONBACK_WIDTH = TEXT_ICONBACK_PRESSED_WIDTH;
+		private static final int TEXT_ICONBACK_HEIGHT = TEXT_ICONBACK_PRESSED_HEIGHT;
+		
+		private static final int TEXT_SUBMIT_DISABLED_HOFFSET = 20;
+		private static final int TEXT_SUBMIT_DISABLED_VOFFSET = 0;
+		private static final int TEXT_SUBMIT_DISABLED_WIDTH = 18;
+		private static final int TEXT_SUBMIT_DISABLED_HEIGHT = 10;
+		
+		private static final int TEXT_SUBMIT_HOFFSET = TEXT_SUBMIT_DISABLED_HOFFSET;
+		private static final int TEXT_SUBMIT_VOFFSET = TEXT_SUBMIT_DISABLED_VOFFSET + TEXT_SUBMIT_DISABLED_HEIGHT;
+		private static final int TEXT_SUBMIT_WIDTH = TEXT_SUBMIT_DISABLED_WIDTH;
+		private static final int TEXT_SUBMIT_HEIGHT = TEXT_SUBMIT_DISABLED_HEIGHT;
+		
+		private static final int TEXT_SCALE_HOFFSET = 20;
+		private static final int TEXT_SCALE_VOFFSET = 20;
+		private static final int TEXT_SCALE_WIDTH = 32;
+		private static final int TEXT_SCALE_HEIGHT = 32;
+		
+		private static final int TEXT_GUAGE_HOFFSET = 0;
+		private static final int TEXT_GUAGE_VOFFSET = 56;
+		private static final int TEXT_GUAGE_WIDTH = 64;
+		private static final int TEXT_GUAGE_HEIGHT = 8;
+		
+//		private static final int TEXT_GUAGE_INNER_HMARGIN = 3;
+//		private static final int TEXT_GUAGE_INNER_VMARGIN = 2;
+//		private static final int TEXT_GUAGE_INNER_WIDTH = 58;
+//		private static final int TEXT_GUAGE_INNER_HEIGHT = 4;
+		
+		protected static class SpellIconButton extends Button {
 			
-			private int value;
-			private SpellGui gui;
+			private final int value;
+			private final SpellGui<?> gui;
 			
-			public SpellIconButton(int x, int y, int val, SpellGui gui) {
-				super(x, y, ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, StringTextComponent.EMPTY, (b) -> {
-					gui.iconButtonClicked(b);
+			public SpellIconButton(int x, int y, int width, int height, int val, SpellGui<?> gui) {
+				super(x, y, width, height, StringTextComponent.EMPTY, (b) -> {
+					gui.iconButtonClicked((SpellIconButton) b);
 				});
 				this.value = val;
-				this.width = ICON_BUTTON_LENGTH;
-				this.height = ICON_BUTTON_LENGTH;
 				this.gui = gui;
 			}
 			
@@ -533,19 +552,29 @@ public class SpellCreationGui {
 			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
-				mc.getTextureManager().bindTexture(TEXT);
+				mc.getTextureManager().bindTexture(TEXT_UTILS);
 				if (mouseX >= this.x && mouseY >= this.y
 						&& mouseX <= this.x + this.width
 						&& mouseY <= this.y + this.height) {
 					tint = .8f;
 				}
 				
-				int x = 0;
-				if (gui.container.iconIndex != this.value)
-					x += 20;
+				final int u, v, wu, hv;
+				if (gui.container.getSpellIcon() != this.value) {
+					u = TEXT_ICONBACK_HOFFSET;
+					v = TEXT_ICONBACK_VOFFSET;
+					wu = TEXT_ICONBACK_WIDTH;
+					hv = TEXT_ICONBACK_HEIGHT;
+				} else {
+					u = TEXT_ICONBACK_PRESSED_HOFFSET;
+					v = TEXT_ICONBACK_PRESSED_VOFFSET;
+					wu = TEXT_ICONBACK_PRESSED_WIDTH;
+					hv = TEXT_ICONBACK_PRESSED_HEIGHT;
+				}
 				
-				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y, ICON_LBUTTON_HOFFSET + x,
-						ICON_LBUTTON_VOFFSET, 20, 20, this.width, this.height, 256, 256,
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
+						u, v, wu, hv,
+						this.width, this.height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT,
 						tint, tint, tint, 1f);
 				
 				SpellIcon.get(this.value).render(mc, matrixStackIn, this.x + 2, this.y + 2, this.width - 4, this.height - 4,
@@ -553,298 +582,244 @@ public class SpellCreationGui {
 			}
 			
 		}
-
-		private SpellCreationContainer container;
-		private List<SpellIconButton> buttons;
-		private TextFieldWidget nameField;
-		private Rectangle2d iconArea;
 		
-		public SpellGui(SpellCreationContainer container, PlayerInventory playerInv, ITextComponent name) {
+		protected static class SubmitButton extends AbstractButton {
+			private final SpellGui<?> gui;
+			
+			public SubmitButton(SpellGui<?> gui, int x, int y, int width, int height) {
+				super(x, y, width, height, StringTextComponent.EMPTY);
+				this.gui = gui;
+			}
+
+			@Override
+			public void onPress() {
+				gui.submitButtonClicked(this);
+			}
+			
+			@Override
+			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+				if (!gui.getContainer().hasProblems()) {
+					gui.func_243308_b(matrixStackIn, gui.getContainer().getReagentStrings(), mouseX, mouseY);
+				}
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				final Minecraft mc = Minecraft.getInstance();
+				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				final int u, v, wu, hv;
+				final float tint;
+				if (!gui.getContainer().hasProblems()) {
+					u = TEXT_SUBMIT_HOFFSET;
+					v = TEXT_SUBMIT_VOFFSET;
+					wu = TEXT_SUBMIT_WIDTH;
+					hv = TEXT_SUBMIT_HEIGHT;
+					tint = this.isHovered() ? .8f : 1f;
+				} else {
+					u = TEXT_SUBMIT_DISABLED_HOFFSET;
+					v = TEXT_SUBMIT_DISABLED_VOFFSET;
+					wu = TEXT_SUBMIT_DISABLED_WIDTH;
+					hv = TEXT_SUBMIT_DISABLED_HEIGHT;
+					tint = 1f;
+				}
+				
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
+						u, v, wu, hv,
+						this.width, this.height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT,
+						tint, tint, tint, 1f
+						);
+				
+				if (this.isHovered()) {
+					matrixStackIn.push();
+					matrixStackIn.translate(0, 0, 100);
+					this.renderToolTip(matrixStackIn, mouseX, mouseY);
+					matrixStackIn.pop();
+				}
+			}
+		}
+		
+		protected static class SpellStatusIcon extends Widget {
+			
+			private final SpellGui<?> gui;
+			
+			public SpellStatusIcon(SpellGui<?> gui, int x, int y, int width, int height) {
+				super(x, y, width, height, StringTextComponent.EMPTY);
+				this.gui = gui;
+			}
+			
+			@Override
+			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+				if (gui.getContainer().hasProblems()) {
+					List<ITextComponent> problems = gui.getContainer().getProblems();
+					gui.func_243308_b(matrixStackIn, problems, mouseX, mouseY);
+				}
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				final Minecraft mc = Minecraft.getInstance();
+				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				final int u, v, wu, hv;
+				if (this.gui.getContainer().hasProblems()) {
+					u = TEXT_STATUS_BAD_HOFFSET;
+					v = TEXT_STATUS_BAD_VOFFSET;
+					wu = TEXT_STATUS_BAD_WIDTH;
+					hv = TEXT_STATUS_BAD_HEIGHT;
+				} else {
+					u = TEXT_STATUS_GOOD_HOFFSET;
+					v = TEXT_STATUS_GOOD_VOFFSET;
+					wu = TEXT_STATUS_GOOD_WIDTH;
+					hv = TEXT_STATUS_GOOD_HEIGHT;
+				}
+				
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
+						u, v, wu, hv,
+						this.width, this.height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
+						);
+				
+				if (this.isHovered()) {
+					matrixStackIn.push();
+					matrixStackIn.translate(0, 0, 100);
+					this.renderToolTip(matrixStackIn, mouseX, mouseY);
+					matrixStackIn.pop();
+				}
+			}
+		}
+		
+		protected static class WeightStatus extends Widget {
+			
+			private final SpellGui<?> gui;
+			
+			public WeightStatus(SpellGui<?> gui, int x, int y, int width, int height) {
+				super(x, y, width, height, StringTextComponent.EMPTY);
+				this.gui = gui;
+			}
+			
+			@Override
+			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+				final int weight = gui.getContainer().getCurrentWeight();
+				final int maxWeight = gui.getContainer().getMaxWeight();
+				gui.renderTooltip(matrixStackIn, new TranslationTextComponent("info.spellcraft.weight_tooltip", weight, maxWeight), mouseX, mouseY);
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				final Minecraft mc = Minecraft.getInstance();
+				final int weight = gui.getContainer().getCurrentWeight();
+				final int maxWeight = gui.getContainer().getMaxWeight();
+				
+				// Need to break up space better. Greedily taking up full height for icon
+				final int iconHeight = height;
+				final int iconWidth = iconHeight;
+				
+				final int meterWidth = width - (iconWidth + 1);
+				final int meterHeight = 8;
+				final int meterBarWidth = meterWidth - 2;
+				final int meterBarHeight = 6;
+				
+				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				
+				// Scale icon
+				final float[] scaleColor = ColorUtil.ARGBToColor(this.getScaleIconColor(weight, maxWeight));
+				RenderSystem.enableBlend();
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
+						TEXT_SCALE_HOFFSET, TEXT_SCALE_VOFFSET, TEXT_SCALE_WIDTH, TEXT_SCALE_HEIGHT,
+						iconWidth, iconWidth, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT,
+						scaleColor[0], scaleColor[1], scaleColor[2], scaleColor[3]
+						);
+				RenderSystem.disableBlend();
+				
+				// Meter
+				final int meterXOffset = x + iconWidth + 1;
+				final int meterYOffset = y + (height - meterHeight) / 2;
+				final int meterPixels = Math.min(meterBarWidth, (int) (((float) weight / (float) maxWeight) * meterBarWidth));
+				RenderFuncs.drawRect(matrixStackIn,
+						meterXOffset + (meterWidth-meterBarWidth)/2, y + (height - meterBarHeight)/2,
+						meterXOffset + meterWidth - (meterWidth-meterBarWidth)/2, y + (height + meterBarHeight)/2,
+						0xFF808080);
+				RenderFuncs.drawRect(matrixStackIn,
+						meterXOffset + (meterWidth-meterBarWidth)/2, y + (height - meterBarHeight)/2,
+						meterXOffset + (meterWidth-meterBarWidth)/2 + meterPixels, y + (height + meterBarHeight)/2,
+						this.getMeterColor(weight, maxWeight));
+				
+				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, meterXOffset, meterYOffset,
+						TEXT_GUAGE_HOFFSET, TEXT_GUAGE_VOFFSET, TEXT_GUAGE_WIDTH, TEXT_GUAGE_HEIGHT,
+						meterWidth, meterHeight, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
+						);
+				
+				if (this.isHovered()) {
+					matrixStackIn.push();
+					matrixStackIn.translate(0, 0, 100);
+					this.renderToolTip(matrixStackIn, mouseX, mouseY);
+					matrixStackIn.pop();
+				}
+			}
+			
+			protected int getScaleIconColor(int weight, int maxWeight) {
+				return weight > maxWeight ? 0xFFFF0000 : 0xFF202020;
+			}
+			
+			protected int getMeterColor(int weight, int maxWeight) {
+				if (weight == maxWeight) {
+					return 0xFFCCCC40;
+				}
+				
+				if (weight < maxWeight) {
+					return 0xFF3366FF;
+				} else {
+					return 0xFFFF0000;
+				}
+			}
+		}
+		
+		protected static final void drawScrollMessage(MatrixStack matrixStackIn, int width, int height, FontRenderer fonter) {
+			final String message = "Insert Blank Scroll";
+			final int msgWidth = fonter.getStringWidth(message);
+			
+			RenderFuncs.drawRect(matrixStackIn, -width/2, -height/2, width/2, height/2, 0xDD000000);
+			fonter.drawString(matrixStackIn, message, -msgWidth / 2, -fonter.FONT_HEIGHT/2, 0xFFFFFFFF);
+		}
+
+		private T container;
+		
+		public SpellGui(T container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
 			this.container = container;
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
-			final Minecraft mc = Minecraft.getInstance();
-			this.nameField = new TextFieldWidget(mc.fontRenderer, 0, 0, NAME_WIDTH, NAME_HEIGHT, new StringTextComponent(container.name));
-			this.nameField.setMaxStringLength(NAME_MAX);
-			this.nameField.setResponder((s) -> {
-				container.name = s;
-				container.validate();
-			});
-			this.nameField.setValidator((s) -> {
-				// do this better? If it ends up sucking. Otherwise this is probably fine
-				return s.codePoints().allMatch(SpellCreationGui::isValidChar);
-			});
-			this.buttons = new ArrayList<>(SpellIcon.numIcons);
-			
-			this.addButton(nameField);
 		}
 		
 		@Override
 		public void init() {
-			buttons.clear();
-			
 			super.init();
-			
-			int extraMargin = 3;
-			final int horizontalMargin = ((width - xSize) / 2);
-			final int verticalMargin = (height - ySize) / 2;
-			final int spaceWidth = horizontalMargin - (2 * extraMargin); // amount of space to draw in
-			
-			final int perRow = spaceWidth / ICON_BUTTON_LENGTH;
-			extraMargin += (spaceWidth % ICON_BUTTON_LENGTH) / 2; // Center by adding remainder / 2
-			
-			iconArea = new Rectangle2d(extraMargin, verticalMargin, horizontalMargin - extraMargin, ((SpellIcon.numIcons / perRow) + 1) * ICON_BUTTON_LENGTH);
-			for (int i = 0; i < SpellIcon.numIcons; i++) {
-				SpellIconButton button = new SpellIconButton(
-						extraMargin + (i % perRow) * ICON_BUTTON_LENGTH,
-						verticalMargin + (i / perRow) * ICON_BUTTON_LENGTH,
-						i,
-						this);
-						//int buttonId, int x, int y, int val, float actual, SpellCreationContainer container
-				
-				this.buttons.add(button);
-				this.addButton(button);
-			}
-			
-			this.addButton(nameField);
-			this.nameField.x = horizontalMargin + NAME_HOFFSET;
-			this.nameField.y = verticalMargin + NAME_VOFFSET;
 		}
 		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
-			
-			mc.getTextureManager().bindTexture(TEXT);
-			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
-			
-			int x = (width - MESSAGE_WIDTH) / 2;
-			int y = verticalMargin + MESSAGE_DISPLAY_VOFFSET;
-			if (container.isValid) {
-				
-				x = horizontalMargin + STATUS_DISP_HOFFSET;
-				y = verticalMargin + STATUS_DISP_VOFFSET;
-				int u = STATUS_HOFFSET;
-				int v = STATUS_VOFFSET;
-				if (!container.spellValid) {
-					u += STATUS_WIDTH;
-				}
-				
-				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, u,
-						v, STATUS_WIDTH,
-						STATUS_HEIGHT, 256, 256);
-				
-				if (container.spellValid) {
-					String costStr = "Mana Cost: " + container.lastManaCost;
-					String weightStr = "Weight: " + container.lastWeight;
-					final int weightStrLen = mc.fontRenderer.getStringWidth(weightStr);
-					final int margin = 10;
-					
-					mc.fontRenderer.drawString(matrixStackIn, costStr, horizontalMargin + margin, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
-					mc.fontRenderer.drawString(matrixStackIn, weightStr, horizontalMargin + xSize - (margin + weightStrLen), verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
-				}
-			}
-			
+			super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
 		}
 		
 		@Override
 		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-			
-			if (container.isValid) {
-				int horizontalMargin = (width - xSize) / 2;
-				int verticalMargin = (height - ySize) / 2;
-				
-				if (!container.spellValid) {
-					
-					if (mouseX > horizontalMargin + STATUS_DISP_HOFFSET && mouseX <= horizontalMargin + STATUS_DISP_HOFFSET + STATUS_WIDTH
-						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
-						this.func_243308_b(matrixStackIn, container.spellErrorStrings,
-								mouseX - horizontalMargin, mouseY - verticalMargin);
-					}
-				}
-				
-				if (mouseX > horizontalMargin + NAME_HOFFSET && mouseX <= horizontalMargin + NAME_HOFFSET + NAME_WIDTH
-						 && mouseY > verticalMargin + NAME_VOFFSET && mouseY <= verticalMargin + NAME_VOFFSET + NAME_HEIGHT) {
-					RenderFuncs.drawRect(matrixStackIn, NAME_HOFFSET, NAME_VOFFSET, NAME_HOFFSET + NAME_WIDTH, NAME_VOFFSET + NAME_HEIGHT, 0x40000000);
-				}
-				
-				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
-						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
-					RenderFuncs.drawRect(matrixStackIn, SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
-					this.func_243308_b(matrixStackIn, container.reagentStrings,
-							mouseX - horizontalMargin, mouseY - verticalMargin);
-				}
-			}
-			
-			if (!container.isValid) {
-				matrixStackIn.push();
-				matrixStackIn.translate(0, 0, 500);
-				mc.getTextureManager().bindTexture(TEXT);
-				RenderSystem.enableBlend();
-				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
-						(GUI_WIDTH - MESSAGE_WIDTH) / 2,
-						MESSAGE_DISPLAY_VOFFSET, MESSAGE_VALID_HOFFSET,
-						MESSAGE_VALID_VOFFSET, MESSAGE_WIDTH,
-						MESSAGE_HEIGHT, 256, 256);
-				matrixStackIn.pop();
-			}
-			
+			;			
 		}
 		
-		protected void iconButtonClicked(Button buttonIn) {
-			// Only type of button we have are icon buttons
-			SpellIconButton button = (SpellIconButton) buttonIn;
-			
-			container.iconIndex = button.value;
-			container.validate();
-		}
-			
-		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-			int guiLeft = (width - xSize) / 2;
-			int guiTop = (height - ySize) / 2;
-			
-			if (container.isValid) {
-				int left = guiLeft + NAME_HOFFSET;
-				int top = guiTop + NAME_VOFFSET;
-			
-				left = guiLeft + SUBMIT_HOFFSET;
-				top = guiTop + SUBMIT_VOFFSET;
-				
-				if (mouseX >= left && mouseX <= left + SUBMIT_WIDTH && 
-						mouseY >= top && mouseY <= top + SUBMIT_HEIGHT) {
-							// clicked on submit button
-							container.validate();
-							if (container.spellValid) {
-								// whoo make spell
-								Spell spell = container.makeSpell(container.name.toString(), container.iconIndex, true);
-								if (spell != null) {
-									// All of this happens again and is synced back to client
-									// But in the mean, might as well do it here for the
-									// smoothest feel
-									ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
-									SpellScroll.setSpell(scroll, spell);
-									container.setScroll(scroll);
-									//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
-									
-									NetworkHandler.sendToServer(new SpellCraftMessage(
-											container.name.toString(),
-											container.pos,
-											container.iconIndex
-											));
-									container.name = "";
-									this.nameField.setText("");
-									container.iconIndex = -1;
-								}
-							} else {
-								// Don't
-							}
-							return true;
-					}
-			}
-			
-			return super.mouseClicked(mouseX, mouseY, mouseButton);
-		}
-		
-		@Override
-		public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-			if (p_keyPressed_1_ == 256) {
-				this.mc.player.closeScreen();
-			}
-
-			// Copied from AnvilScreen
-			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canWrite() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
-		}
-		
-		public List<Rectangle2d> getGuiExtraAreas() {
-			return Lists.newArrayList(iconArea);
-		}
-	}
-	
-	private static boolean isValidChar(int codepoint) {
-		return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint) || Character.isSpaceChar(codepoint);
-	}
-	
-	private static class RuneSlot extends Slot {
-
-		private RuneSlot prev;
-		private RuneSlot next;
-		private SpellCreationContainer container;
-		
-		public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int x, int y) {
-			super(inventoryIn, index, x, y);
-			this.prev = prev;
-			this.container = container;
-		}
-		
-		public void setNext(RuneSlot next) {
-			this.next = next;
-		}
-		
-		@Override
-		public boolean isItemValid(@Nonnull ItemStack stack) {
-			// Can put the item in if:
-			// it's empty
-			// OR previous slot is not null (not the first trigger-only slot)
-			// OR it's a trigger rune
-			// all ANDed with does the previous slot have a rune?
-			if (!container.isValid)
-				return false;
-			
-			if (prev != null &&
-					!prev.getHasStack())
-				return false;
-			
-			if (stack.isEmpty())
-				return true;
-			
-			if (!(stack.getItem() instanceof SpellRune))
-				return false;
-			
-			boolean trigger = SpellRune.isTrigger(stack);
-			if (!trigger && !SpellRune.isPackedShape(stack))
-				return false;
-			
-			return (prev != null || trigger);
-		}
-		
-		@Override
-		@OnlyIn(Dist.CLIENT)
-		public boolean isEnabled() {
-			return (prev == null ||
-					prev.getHasStack());
-		}
-		
-		@Override
-		public void putStack(@Nonnull ItemStack stack) {
-			super.putStack(stack);
-			
+		protected void iconButtonClicked(SpellIconButton button) {
+			this.onIconSelected(button.value);
 			container.validate();
 		}
 		
-		@Override
-		public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
-			// This is called AFTER things have been changed or swapped
-			// Which means we just look to see if we have an item.
-			// If not, take item from next
-			if (!this.getHasStack() && next != null && next.getHasStack()) {
-				System.out.println("grabbing stack");
-				this.putStack(next.getStack().copy());
-				next.putStack(ItemStack.EMPTY);
-				next.onTake(playerIn, this.getStack());
-			}
-
-			container.validate();
-			
-			return super.onTake(playerIn, stack);
+		protected abstract void onIconSelected(int icon);
+		
+		protected void submitButtonClicked(SubmitButton button) {
+			this.onSubmit();
 		}
 		
-		@Override
-		public int getSlotStackLimit() {
-			return 1;
+		protected abstract void onSubmit();
+		
+		protected static boolean isValidChar(int codepoint) {
+			return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint) || Character.isSpaceChar(codepoint);
 		}
+
+		public abstract List<Rectangle2d> getGuiExtraAreas();
 	}
-	
 }
