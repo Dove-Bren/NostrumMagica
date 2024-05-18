@@ -293,7 +293,7 @@ public class TomeWorkshopScreen extends Screen {
 	}
 	
 	protected void addLibrary() {
-		List<Spell> librarySpells = SpellTome.getSpells(playerStackSelected);
+		List<Spell> librarySpells = SpellTome.getSpellLibrary(playerStackSelected);
 		final int x = getGuiLeft() + POS_LIBRARY_HOFFSET;
 		final int yAnchor = getGuiTop() + POS_LIBRARY_VOFFSET;
 		final int buttonWidth = 79;
@@ -306,10 +306,6 @@ public class TomeWorkshopScreen extends Screen {
 			this.addButton(pane);
 			spellLibraryWidgets.add(pane);
 		}
-	}
-	
-	protected void addPageTurnButtons() {
-		
 	}
 	
 	protected void refreshTomeScreen() {
@@ -327,7 +323,7 @@ public class TomeWorkshopScreen extends Screen {
 		if (isValidSelection(playerStackSelected)) {
 			addSpellSlots();
 			addLibrary();
-			addPageTurnButtons();
+			//addPageTurnButtons();
 		} else {
 			// Reset page for next tome
 			pageIdx = 0;

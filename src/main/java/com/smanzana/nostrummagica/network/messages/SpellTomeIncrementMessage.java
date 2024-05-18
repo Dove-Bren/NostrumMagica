@@ -13,7 +13,6 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
- * Client has toggled vacuum setting on their reagent bag
  * @author Skyler
  *
  */
@@ -25,7 +24,7 @@ public class SpellTomeIncrementMessage {
 		final ServerPlayerEntity sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
-			SpellTome.setIndex(NostrumMagica.getCurrentTome(sp),
+			SpellTome.setPageIndex(NostrumMagica.getCurrentTome(sp),
 					message.index);
 		});
 	}

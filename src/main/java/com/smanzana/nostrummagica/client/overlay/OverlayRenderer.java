@@ -510,9 +510,9 @@ public class OverlayRenderer extends AbstractGui {
 		// Bottom left spell slide
 		// Spell name
 		Minecraft mc = Minecraft.getInstance();
-		Spell current = NostrumMagica.getCurrentSpell(mc.player);
+		Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
 		boolean xp = ModConfig.config.displayXPText();
-		if (current != null || xp) {
+		if (current.length != 0 || xp) {
 			FontRenderer fonter = mc.fontRenderer;
 			final int iconSize = 16;
 			final int iconMargin = 2;
@@ -524,17 +524,17 @@ public class OverlayRenderer extends AbstractGui {
 				slideHeight = Math.max(slideHeight, fonter.FONT_HEIGHT * 2 + 9);
 			}
 			
-			String text = (current == null ? "" : current.getName());
+			String text = (current[0] == null ? "" : current[0].getName());
 			
 			RenderFuncs.drawRect(matrixStackIn, textOffset, window.getScaledHeight() - slideHeight, 120, window.getScaledHeight(), 0x50606060);
 			
 			// Draw icon
-			if (current != null) {
+			if (current[0] != null) {
 				RenderFuncs.drawRect(matrixStackIn, 0, window.getScaledHeight() - slideHeight, textOffset, window.getScaledHeight(), 0xFF202020);
 				
 //				GlStateManager.color4f(1f, 1f, 1f, 1f);
 				final int drawY = (window.getScaledHeight() - (slideHeight + iconSize) / 2);
-				SpellIcon.get(current.getIconIndex()).render(Minecraft.getInstance(), matrixStackIn, iconMargin, drawY, iconSize, iconSize);
+				SpellIcon.get(current[0].getIconIndex()).render(Minecraft.getInstance(), matrixStackIn, iconMargin, drawY, iconSize, iconSize);
 			}
 			
 			// Draw name (and maybe xp)

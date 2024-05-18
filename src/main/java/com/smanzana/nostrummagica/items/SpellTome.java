@@ -159,7 +159,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 
 	private static final String NBT_SPELLS = "nostrum_spells";
-	private static final String NBT_INDEX = "spell_index";
+	private static final String NBT_PAGE_INDEX = "spell_page_index";
 	private static final String NBT_ENHANCEMENTS = "tome_enhancements";
 	private static final String NBT_ENHANCEMENT_KEY = "enhancement_key";
 	private static final String NBT_ENHANCEMENT_LEVEL = "enhancement_level";
@@ -328,9 +328,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			if (tags.getInt(i) == spellID) {
 				tags.remove(i);
 				found = true;
-				if (i >= getIndex(itemStack)) {
-					incrementIndex(itemStack, -1);
-				}
 				break;
 			}
 		}
@@ -338,6 +335,22 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (found) {
 			nbt.put(NBT_SPELLS, tags);
 			itemStack.setTag(nbt);
+			
+			// Clean spell out from any spell pages, too
+			for (int i = 0; i < getPageCount(itemStack); i++) {
+				found = false;
+				int[] slottedSpells = getPageSpellIDs(itemStack, i);
+				for (int j = 0; j < slottedSpells.length; j++) {
+					if (slottedSpells[j] == spellID) {
+						found = true;
+						slottedSpells[j] = -1;
+					}
+				}
+				
+				if (found) {
+					setPageSpellIDs(itemStack, i, slottedSpells);
+				}
+			}
 		}
 		
 		return found;
@@ -456,32 +469,32 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		setPageSpellIDs(itemStack, pageIdx, ids);
 	}
 	
-	private static int getIndex(ItemStack itemStack) {
+	private static int getPageIndex(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return 0;
 
 		CompoundNBT nbt = itemStack.getTag();
 		
-		return nbt.getInt(NBT_INDEX);
+		return nbt.getInt(NBT_PAGE_INDEX);
 	}
 	
 	// Returns resultant index, or -1 on no change
-	public static int incrementIndex(ItemStack itemStack, int amount) {
+	public static int incrementPageIndex(ItemStack itemStack, int amount) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return -1;
 		
 		CompoundNBT nbt = itemStack.getTag();
 		
-		int index = nbt.getInt(NBT_INDEX);
+		int index = nbt.getInt(NBT_PAGE_INDEX);
 		int initial = index;
 		
-		int indices[] = getSpellIDs(itemStack);
-		if (indices == null || indices.length == 0)
+		final int pageCount = getPageCount(itemStack);
+		if (pageCount == 0)
 			return -1;
 		
-		index = Math.max(0, Math.min(index + amount, indices.length - 1));
+		index = Math.max(0, Math.min(index + amount, pageCount - 1));
 		
-		nbt.putInt(NBT_INDEX, index);
+		nbt.putInt(NBT_PAGE_INDEX, index);
 		
 		if (initial != index && !NostrumMagica.instance.proxy.isServer()) {
 			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
@@ -491,19 +504,19 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 	}
 	
-	public static void setIndex(ItemStack itemStack, int index) {
+	public static void setPageIndex(ItemStack itemStack, int index) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 
-		int indices[] = getSpellIDs(itemStack);
-		if (indices == null || indices.length == 0)
+		final int pageCount = getPageCount(itemStack);
+		if (pageCount == 0)
 			return;
 		
-		index = Math.max(0, Math.min(index, indices.length - 1));
+		index = Math.max(0, Math.min(index, pageCount - 1));
 		
 		CompoundNBT nbt = itemStack.getTag();
 		
-		nbt.putInt(NBT_INDEX, index);
+		nbt.putInt(NBT_PAGE_INDEX, index);
 	}
 	
 	public static int getXP(ItemStack itemStack) {
@@ -734,11 +747,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	
 	/**
 	 * Retrieves a list of spells stored in the spell tome.
-	 * The active 'currently selected' spell is always first in the list.
 	 * @param itemStack
 	 * @return
 	 */
-	public static List<Spell> getSpells(ItemStack itemStack) {
+	public static List<Spell> getSpellLibrary(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
@@ -751,30 +763,27 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			sniffIDs(ids);
 		}
 		
-		int index = getIndex(itemStack);
-		if (index < 0) {
-			index = 0;
-		} else if (index >= ids.length) {
-			index = ids.length - 1;
-		}
-		
-		int id = ids[index];
-		Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
-		
-		if (spell != null)
-			list.add(spell);
-		
 		for (int i = 0; i < ids.length; i++) {
-			if (i == index)
-				continue;
-			
-			id = ids[i];
-			spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
+			int id = ids[i];
+			Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
 			if (spell != null)
 				list.add(spell);
 		}
 		
 		return list;
+	}
+	
+	public static @Nonnull Spell[] getSpellsInCurrentPage(ItemStack itemStack) {
+		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
+			return new Spell[0];
+		
+		final int slots = getSlots(itemStack);
+		final int pageIdx = getPageIndex(itemStack);
+		Spell[] spells = new Spell[slots];
+		for (int i = 0; i < slots; i++) {
+			spells[i] = getSpellInSlot(itemStack, pageIdx, i);
+		}
+		return spells;
 	}
 	
 	public static @Nullable Spell getSpellInSlot(ItemStack itemStack, int pageIdx, int slot) {
@@ -851,7 +860,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			String title = stack.getDisplayName().getString();
 			int level = getLevel(stack);
 			int maxMana = getMaxMana(stack);
-			List<Spell> spells = getSpells(stack);
+			List<Spell> spells = getSpellLibrary(stack);
 			int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
 			int weightCapacity = getCapacity(stack);
 			int weightSum = getUsedCapacity(stack);
@@ -1186,7 +1195,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	public static int getUsedCapacity(ItemStack tome) {
-		List<Spell> spells = getSpells(tome);
+		List<Spell> spells = getSpellLibrary(tome);
 		return (spells != null && !spells.isEmpty() ? spells.stream().map(s -> s.getWeight()).collect(Collectors.summingInt(i -> i)) : 0);
 	}
 	
@@ -1283,12 +1292,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 
 	@Override
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
-		Spell spell = NostrumMagica.getCurrentSpell(player);
-		if (spell != null && spell.getSpellParts() != null && spell.getSpellParts().get(0).isTrigger()) {
-			SpellTrigger trigger = spell.getSpellParts().get(0).getTrigger();
-			return trigger instanceof SeekingBulletTrigger;
+		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		for (Spell spell : spells) {
+			if (spell != null && spell.getSpellParts() != null && spell.getSpellParts().get(0).isTrigger()) {
+				SpellTrigger trigger = spell.getSpellParts().get(0).getTrigger();
+				return trigger instanceof SeekingBulletTrigger;
+			}
 		}
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 }

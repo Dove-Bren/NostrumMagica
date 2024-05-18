@@ -130,7 +130,7 @@ public class ClientProxy extends CommonProxy {
 			if (!tome.isEmpty()) {
 				if (bindingScroll.isKeyDown()) {
 					wheel = (wheel > 0 ? -1 : 1);
-					int index = SpellTome.incrementIndex(tome, wheel);
+					int index = SpellTome.incrementPageIndex(tome, wheel);
 					if (index != -1) {
 						NetworkHandler.getSyncChannel()
 							.sendToServer(new SpellTomeIncrementMessage(index));
@@ -178,10 +178,13 @@ public class ClientProxy extends CommonProxy {
 	
 	private void doCast() {
 		final PlayerEntity player = getPlayer();
-		Spell spell = NostrumMagica.getCurrentSpell(player);
-		if (spell == null) {
+		int castSlot = 0; int unused; // Multiple keybinds!
+		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		if (spells.length == 0 || spells.length <= castSlot) {
 			return;
 		}
+		
+		final Spell spell = spells[castSlot];
 		
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 

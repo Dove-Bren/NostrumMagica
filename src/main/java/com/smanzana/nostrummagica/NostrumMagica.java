@@ -227,12 +227,19 @@ public class NostrumMagica {
 		return tome;
 	}
 
-	public static Spell getCurrentSpell(PlayerEntity player) {
-		List<Spell> spells = getSpells(player);
-		if (spells == null || spells.isEmpty())
-			return null;
+	public static @Nonnull Spell[] getCurrentSpellLoadout(PlayerEntity player) {
+		if (player == null) {
+			return new Spell[0];
+		}
+		
+		// We just return the spells from the curernt tome.
+		ItemStack tome = getCurrentTome(player);
 
-		return spells.get(0);
+		if (tome.isEmpty())
+			return null;
+		
+		Spell[] spells = SpellTome.getSpellsInCurrentPage(tome);
+		return spells;
 	}
 
 	public static int getReagentCount(PlayerEntity player, ReagentType type) {
@@ -290,20 +297,6 @@ public class NostrumMagica {
 		}
 
 		return count == 0;
-	}
-
-	public static List<Spell> getSpells(PlayerEntity entity) {
-		if (entity == null)
-			return null;
-
-		// We just return the spells from the curernt tome.
-		ItemStack tome = getCurrentTome(entity);
-
-		if (tome.isEmpty())
-			return null;
-
-		return SpellTome.getSpells(tome);
-
 	}
 
 	public static List<NostrumQuest> getActiveQuests(PlayerEntity player) {
