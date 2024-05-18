@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
@@ -506,6 +507,28 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
+	private void renderSpellLoadoutSlot(MatrixStack matrixStackIn, @Nullable Spell spell, int width, int height) {
+		// Probably going to draw icon, and spell name real small on top of it?
+		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
+		RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, height-1, 0x80404040);
+		if (spell != null) {
+			final Minecraft mc = Minecraft.getInstance();
+			SpellIcon.get(spell.getIconIndex()).render(mc, matrixStackIn, 1, 1, width-2, height-2);
+			
+			// Name?
+			RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, (mc.fontRenderer.FONT_HEIGHT / 4) + 2, 0x80000000);
+			String name = spell.getName();
+			if (name.length() > 11) {
+				name = name.substring(0, 9) + "...";
+			}
+			matrixStackIn.translate(width/2, 1, 0);
+			matrixStackIn.scale(.25f, .25f, 1f);
+			mc.fontRenderer.drawString(matrixStackIn, name, -mc.fontRenderer.getStringWidth(name)/2, 0, 0xFFFFFFFF);
+			
+			// Fade if can't cast it?
+		}
+	}
+	
 	private void renderSpellSlide(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
 		// Bottom left spell slide
 		// Spell name
@@ -513,41 +536,32 @@ public class OverlayRenderer extends AbstractGui {
 		Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
 		boolean xp = ModConfig.config.displayXPText();
 		if (current.length != 0 || xp) {
-			FontRenderer fonter = mc.fontRenderer;
-			final int iconSize = 16;
-			final int iconMargin = 2;
-			final int textOffset = iconSize + (2 * iconMargin);
-			final int textMargin = 5;
-			int slideHeight = iconSize + (2 * iconMargin);
+			final int slotSize = 16;
+			int slideHeight = slotSize + (4);
 			
-			if (xp) {
-				slideHeight = Math.max(slideHeight, fonter.FONT_HEIGHT * 2 + 9);
+			final int slideWidthInSlots = Math.max(3, current.length);
+			final int slideWidth = slotSize * slideWidthInSlots;
+			
+			// XP bar
+			RenderFuncs.drawRect(matrixStackIn, 0, window.getScaledHeight() - 4, slideWidth, window.getScaledHeight(), 0xFF000000);
+			RenderFuncs.drawRect(matrixStackIn, 1, window.getScaledHeight() - 3, slideWidth - 1, window.getScaledHeight() - 1, 0xFF808080);
+			final int xpXOffset = Math.round((attr.getXP() / attr.getMaxXP()) * (slideWidth-2));
+			if (xpXOffset > 0) {
+				RenderFuncs.drawRect(matrixStackIn, 1, window.getScaledHeight() - 3, 1 + xpXOffset, window.getScaledHeight() - 1, 0xFFFFFF22);
 			}
 			
-			String text = (current[0] == null ? "" : current[0].getName());
-			
-			RenderFuncs.drawRect(matrixStackIn, textOffset, window.getScaledHeight() - slideHeight, 120, window.getScaledHeight(), 0x50606060);
-			
-			// Draw icon
-			if (current[0] != null) {
-				RenderFuncs.drawRect(matrixStackIn, 0, window.getScaledHeight() - slideHeight, textOffset, window.getScaledHeight(), 0xFF202020);
-				
-//				GlStateManager.color4f(1f, 1f, 1f, 1f);
-				final int drawY = (window.getScaledHeight() - (slideHeight + iconSize) / 2);
-				SpellIcon.get(current[0].getIconIndex()).render(Minecraft.getInstance(), matrixStackIn, iconMargin, drawY, iconSize, iconSize);
+			// Spells
+			final int xOffset = (slideWidthInSlots > current.length) ? ((slideWidthInSlots - current.length) * slotSize) / 2 : 0;
+			final int yOffset = window.getScaledHeight() - slideHeight;
+			if (slideWidthInSlots > current.length) {
+				RenderFuncs.drawGradientRect(matrixStackIn, 0, yOffset + (slideHeight/4), slideWidth, window.getScaledHeight() - 4,
+						0x00000000, 0x00000000, 0x80000000, 0x80000000);
 			}
-			
-			// Draw name (and maybe xp)
-			
-			if (xp) {
-				// Height is based on this height. Just draw.
-				fonter.drawString(matrixStackIn, text, textOffset + textMargin, window.getScaledHeight() - (fonter.FONT_HEIGHT + iconMargin), 0xFF000000);
-				fonter.drawString(matrixStackIn, String.format("%.02f%%", 100f * attr.getXP() / attr.getMaxXP()),
-						textOffset + textMargin, window.getScaledHeight() - (fonter.FONT_HEIGHT * 2 + 6), 0xFF000000);
-			} else {
-				// Draw in center
-				final int drawY = (window.getScaledHeight() - (slideHeight + fonter.FONT_HEIGHT) / 2);
-				fonter.drawString(matrixStackIn, text, textOffset + textMargin, drawY, 0xFF000000);
+			for (int i = 0; i < current.length; i++) {
+				matrixStackIn.push();
+				matrixStackIn.translate(xOffset + (i * slotSize), yOffset, 0);
+				renderSpellLoadoutSlot(matrixStackIn, current[i], slotSize, slotSize);
+				matrixStackIn.pop();
 			}
 		}
 	}

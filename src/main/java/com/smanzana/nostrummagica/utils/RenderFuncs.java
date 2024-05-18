@@ -279,6 +279,37 @@ public final class RenderFuncs {
 	public static void drawRect(MatrixStack stack, int minX, int minY, int maxX, int maxY, int colorARGB) {
 		AbstractGui.fill(stack, minX, minY, maxX, maxY, colorARGB);
 	}
+	
+	public static void drawGradientRect(MatrixStack stack, int minX, int minY, int maxX, int maxY, int colorTopLeft, int colorTopRight, int colorBottomLeft, int colorBottomRight) {
+		final Matrix4f transform = stack.getLast().getMatrix();
+		final float[] colorTR = ColorUtil.ARGBToColor(colorTopRight);
+		final float[] colorTL = ColorUtil.ARGBToColor(colorTopLeft);
+		final float[] colorBL = ColorUtil.ARGBToColor(colorBottomLeft);
+		final float[] colorBR = ColorUtil.ARGBToColor(colorBottomRight);
+		
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+		RenderSystem.disableTexture();
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.disableAlphaTest();
+		RenderSystem.shadeModel(GL11.GL_SMOOTH);
+		{
+			bufferbuilder.pos(transform, minX, minY, 0).color(colorTL[0], colorTL[1], colorTL[2], colorTL[3]).endVertex();
+			bufferbuilder.pos(transform, minX, maxY, 0).color(colorBL[0], colorBL[1], colorBL[2], colorBL[3]).endVertex();
+			bufferbuilder.pos(transform, maxX, maxY, 0).color(colorBR[0], colorBR[1], colorBR[2], colorBR[3]).endVertex();
+			bufferbuilder.pos(transform, maxX, minY, 0).color(colorTR[0], colorTR[1], colorTR[2], colorTR[3]).endVertex();
+		}
+
+		bufferbuilder.finishDrawing();
+		WorldVertexBufferUploader.draw(bufferbuilder);
+		RenderSystem.disableBlend();
+		RenderSystem.enableAlphaTest();
+		RenderSystem.enableTexture();
+		RenderSystem.shadeModel(GL11.GL_FLAT);
+	}
 
 	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer,
 			float radius,
