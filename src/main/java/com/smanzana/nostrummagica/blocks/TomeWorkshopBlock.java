@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
-import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -31,10 +29,7 @@ public class TomeWorkshopBlock extends Block {
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (worldIn.isRemote()) {
-			// Open screen on client
-		}
-		
+		NostrumMagica.instance.proxy.openTomeWorkshopScreen();
 		return ActionResultType.SUCCESS;
 	}
 	

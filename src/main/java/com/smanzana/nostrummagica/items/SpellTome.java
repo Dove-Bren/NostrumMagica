@@ -1,11 +1,13 @@
 package com.smanzana.nostrummagica.items;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -42,6 +44,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.IntArrayNBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.EffectInstance;
@@ -170,6 +173,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	private static final String NBT_SLOTS = "tome_slots";
 	private static final String NBT_PAGE_BONUS = "tome_page_bonus";
 	private static final String NBT_ID = "tome_id";
+	private static final String NBT_PAGE_LIST = "tome_page_list";
 	
 	public static final String ID_PREFIX = "spelltome_";
 	
@@ -375,6 +379,81 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 
 		return ids;
+	}
+	
+	private static final int[] makeDefaultPage(ItemStack itemStack) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome)) {
+			return new int[0];
+		}
+		
+		final int slots = getSlots(itemStack);
+		final int[] array = new int[slots];
+		Arrays.fill(array, -1);
+		return array;
+	}
+	
+	/**
+	 * Returns the RAW id array, including an empty one if the tome supports it but hasn't used it yet.
+	 * @param itemStack
+	 * @param pageIdx
+	 * @return
+	 */
+	private static int[] getPageSpellIDs(ItemStack itemStack, int pageIdx) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome) || !itemStack.hasTag())
+			return makeDefaultPage(itemStack);
+		
+		CompoundNBT nbt = itemStack.getTag();
+		ListNBT pages = nbt.getList(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY);
+		
+		if (pages == null || pages.size() == 0 || pages.size() <= pageIdx) {
+			return makeDefaultPage(itemStack);
+		}
+		
+		return pages.getIntArray(pageIdx);
+	}
+	
+	private static int getPageSpellID(ItemStack itemStack, int pageIdx, int slot) {
+		int[] ids = getPageSpellIDs(itemStack, pageIdx);
+		if (ids.length <= slot) {
+			return -1;
+		}
+		
+		return ids[slot];
+	}
+	
+	private static void setPageSpellIDs(ItemStack itemStack, int pageIdx, int[] ids) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome)) {
+			return;
+		}
+		
+		CompoundNBT nbt = itemStack.getOrCreateTag();
+		ListNBT pages = (nbt.contains(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY)) ? nbt.getList(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY) : new ListNBT();
+		
+		// Possibly catch up on any pages that aren't in the list yet. Could just go up to pageIdx, but might as well take the time to fill them out all.
+		final int pageCount = getPageCount(itemStack);
+		while (pages.size() < pageCount) {
+			pages.add(new IntArrayNBT(makeDefaultPage(itemStack)));
+		}
+		
+		if (pageIdx > pageCount) {
+			// Trying to assign to a page we don't have
+			return;
+		}
+		pages.set(pageIdx, new IntArrayNBT(ids));
+		nbt.put(NBT_PAGE_LIST, pages);
+		itemStack.setTag(nbt);
+	}
+	
+	private static void setPageSpellID(ItemStack itemStack, int pageIdx, int slot, int spellID) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome) || slot > getSlots(itemStack)) {
+			return;
+		}
+		
+		int[] ids = getPageSpellIDs(itemStack, pageIdx);
+		//assert(ids.length == getSlots(itemStack) OR upgrade, but we don't expect they'll change
+		ids[slot] = spellID;
+		
+		setPageSpellIDs(itemStack, pageIdx, ids);
 	}
 	
 	private static int getIndex(ItemStack itemStack) {
@@ -696,6 +775,21 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		return list;
+	}
+	
+	public static @Nullable Spell getSpellInSlot(ItemStack itemStack, int pageIdx, int slot) {
+		final int spellID = getPageSpellID(itemStack, pageIdx, slot);
+		final @Nullable Spell spell;
+		if (spellID == -1) {
+			spell = null;
+		} else {
+			spell = NostrumMagica.instance.getSpellRegistry().lookup(spellID);
+		}
+		return spell;
+	}
+	
+	public static void setSpellInSlot(ItemStack itemStack, int pageIdx, int slot, @Nullable Spell spell) {
+		setPageSpellID(itemStack, pageIdx, slot, (spell == null) ? -1 : spell.getRegistryID());
 	}
 	
 	/**
@@ -1110,10 +1204,12 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (this.isInGroup(group)) {
 			ItemStack stack = new ItemStack(this);
 			setCapacityBonus(stack, 5);
+			setSlots(stack, 1);
 			items.add(stack);
 			
 			stack = new ItemStack(this);
 			setCapacityBonus(stack, 10);
+			setSlots(stack, 5);
 			items.add(stack);
 		}
 	}

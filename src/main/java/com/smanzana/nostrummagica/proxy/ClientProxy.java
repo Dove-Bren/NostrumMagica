@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.gui.ObeliskScreen;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
+import com.smanzana.nostrummagica.client.gui.TomeWorkshopScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -301,6 +302,14 @@ public class ClientProxy extends CommonProxy {
 		if (world.isRemote()) {
 			NostrumObeliskEntity te = (NostrumObeliskEntity) world.getTileEntity(pos);
 			Minecraft.getInstance().displayGuiScreen(new ObeliskScreen(te));
+		}
+	}
+	
+	@Override
+	public void openTomeWorkshopScreen() {
+		final PlayerEntity player = getPlayer();
+		if (player.world.isRemote()) {
+			Minecraft.getInstance().displayGuiScreen(new TomeWorkshopScreen(player));
 		}
 	}
 	

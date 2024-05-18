@@ -106,6 +106,10 @@ public class CommonProxy {
 	public void openObeliskScreen(World world, BlockPos pos) {
 		; // Nothing on server side
 	}
+	
+	public void openTomeWorkshopScreen() {
+		; // Nothing on server side
+	}
 
 	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
 		NetworkHandler.sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);
