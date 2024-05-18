@@ -263,6 +263,9 @@ public class TomeWorkshopScreen extends Screen {
 			playerSlotSelected = -1;
 			playerStackSelected = ItemStack.EMPTY;
 		} else {
+			if (slotIdx != playerSlotSelected) {
+				this.pageIdx = 0; // Reset page
+			}
 			playerSlotSelected = slotIdx;
 			playerStackSelected = playerInv.getStackInSlot(slotIdx);
 		}
@@ -992,38 +995,50 @@ public class TomeWorkshopScreen extends Screen {
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			
+			// Figure out if disasbled. Should be doing somewhere else...
+			final boolean disabled;
+			{
+				final int numPages = SpellTome.getPageCount(screen.playerStackSelected);
+				final int previewIdx = screen.pageIdx + (this.isLeft ? -1 : 1);
+				disabled = previewIdx < 0 || previewIdx >= numPages;
+			}
+			
 			matrixStackIn.push();
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
 			mc.textureManager.bindTexture(TEXT);
-			if (this.isHovered()) {
-				if (this.isLeft) {
-					RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
-						TEXT_LARROW_HIGH_HOFFSET, TEXT_LARROW_HIGH_VOFFSET,
-						TEXT_LARROW_HIGH_WIDTH, TEXT_LARROW_HIGH_HEIGHT,
-						width, height,
-						TEXT_WIDTH, TEXT_HEIGHT);
-				} else {
-					RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
-							TEXT_RARROW_HIGH_HOFFSET, TEXT_RARROW_HIGH_VOFFSET,
-							TEXT_RARROW_HIGH_WIDTH, TEXT_RARROW_HIGH_HEIGHT,
-							width, height,
-							TEXT_WIDTH, TEXT_HEIGHT);
-				}
+			if (disabled) {
+				
 			} else {
-				if (this.isLeft) {
-					RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
-							TEXT_LARROW_HOFFSET, TEXT_LARROW_VOFFSET,
-							TEXT_LARROW_WIDTH, TEXT_LARROW_HEIGHT,
+				if (this.isHovered()) {
+					if (this.isLeft) {
+						RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
+							TEXT_LARROW_HIGH_HOFFSET, TEXT_LARROW_HIGH_VOFFSET,
+							TEXT_LARROW_HIGH_WIDTH, TEXT_LARROW_HIGH_HEIGHT,
 							width, height,
 							TEXT_WIDTH, TEXT_HEIGHT);
+					} else {
+						RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
+								TEXT_RARROW_HIGH_HOFFSET, TEXT_RARROW_HIGH_VOFFSET,
+								TEXT_RARROW_HIGH_WIDTH, TEXT_RARROW_HIGH_HEIGHT,
+								width, height,
+								TEXT_WIDTH, TEXT_HEIGHT);
+					}
 				} else {
-					RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
-							TEXT_RARROW_HOFFSET, TEXT_RARROW_VOFFSET,
-							TEXT_RARROW_WIDTH, TEXT_RARROW_HEIGHT,
-							width, height,
-							TEXT_WIDTH, TEXT_HEIGHT);
+					if (this.isLeft) {
+						RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
+								TEXT_LARROW_HOFFSET, TEXT_LARROW_VOFFSET,
+								TEXT_LARROW_WIDTH, TEXT_LARROW_HEIGHT,
+								width, height,
+								TEXT_WIDTH, TEXT_HEIGHT);
+					} else {
+						RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
+								TEXT_RARROW_HOFFSET, TEXT_RARROW_VOFFSET,
+								TEXT_RARROW_WIDTH, TEXT_RARROW_HEIGHT,
+								width, height,
+								TEXT_WIDTH, TEXT_HEIGHT);
+					}
 				}
 			}
 			
