@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.spellcraft.modifier;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
@@ -10,7 +12,15 @@ import com.smanzana.nostrummagica.spells.SpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+
 public class FlatSpellCraftModifier implements ISpellCraftModifier {
+	
+	protected static final TextFormatting STYLE_GOOD = TextFormatting.DARK_GREEN;
+	protected static final TextFormatting STYLE_BAD = TextFormatting.RED;
+	protected static final TextFormatting STYLE_OVERRIDE = TextFormatting.DARK_PURPLE;
 	
 	protected final int weightModifier;
 	protected final float manaRateModifier;
@@ -60,6 +70,41 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		if (triggerOverride != null) {
 			builder.setTriggerOverride(triggerOverride);
 		}
+	}
+
+	@Override
+	public List<ITextComponent> getDetails(List<ITextComponent> lines) {
+		if (weightModifier != 0) {
+			lines.add(new TranslationTextComponent("spellcraftmod.weight", (weightModifier < 0 ? "" : "+"), weightModifier)
+					.mergeStyle(weightModifier < 0 ? STYLE_GOOD : STYLE_BAD));
+		}
+		if (manaRateModifier != 0) {
+			final int manaPerc = (int) (manaRateModifier * 100);
+			lines.add(new TranslationTextComponent("spellcraftmod.mana", (manaRateModifier < 0 ? "" : "+"), manaPerc)
+					.mergeStyle(manaRateModifier < 0 ? STYLE_GOOD : STYLE_BAD));
+		}
+		if (elementCountModifier != 0) {
+			lines.add(new TranslationTextComponent("spellcraftmod.elementcount", (elementCountModifier < 0 ? "" : "+"), elementCountModifier)
+					.mergeStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
+		}
+		if (elementOverride != null) {
+			lines.add(new TranslationTextComponent("spellcraftmod.override.element", elementOverride.getName())
+					.mergeStyle(STYLE_OVERRIDE));
+		}
+		if (alterationOverride != null) {
+			lines.add(new TranslationTextComponent("spellcraftmod.override.alteration", alterationOverride.getName())
+					.mergeStyle(STYLE_OVERRIDE));
+		}
+		if (shapeOverride != null) {
+			lines.add(new TranslationTextComponent("spellcraftmod.override.shape", shapeOverride.getDisplayName())
+					.mergeStyle(STYLE_OVERRIDE));
+		}
+		if (triggerOverride != null) {
+			lines.add(new TranslationTextComponent("spellcraftmod.override.trigger", triggerOverride.getDisplayName())
+					.mergeStyle(STYLE_OVERRIDE));
+		}
+		
+		return lines;
 	}
 	
 	public static final class Builder {

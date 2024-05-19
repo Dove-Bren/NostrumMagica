@@ -490,7 +490,7 @@
 	"container.nostrummagica.active_hopper.name": "Active Hopper",
 	
 	"pattern.nostrummagica.lightweight": "Lightweight",
-	"pattern.nostrummagica.lightweight.description": "Makes the rune in the second slot weigh one unit less, but cost twice as much mana",
+	"pattern.nostrummagica.lightweight.description": "Makes the rune in the second slot weigh one unit less, but cost three times as much mana",
 
     "key.cast1.desc": "Cast Spell Slot 1",
 	"key.cast2.desc": "Cast Spell Slot 2",
@@ -555,6 +555,15 @@
 
     "fluid.nostrummagica.poison_water": "Poison Water",
     "fluid.nostrummagica.poison_water_unbreakable": "Poison Water (Dungeon)",
+	
+	"spellcraftmod.weight": "%1$s%2$d Weight",
+	"spellcraftmod.mana": "%1$s%2$d%% Mana Cost",
+	"spellcraftmod.elementcount": "%1$s%2$d Elemental Power",
+	
+	"spellcraftmod.override.element": "Forced %1$s",
+	"spellcraftmod.override.alteration": "Forced %1$s",
+	"spellcraftmod.override.shape": "Forced %1$s",
+	"spellcraftmod.override.trigger": "Forced %1$s",
 
     "info.recall.fail": "A mark location must be set first",
     "info.recall.baddimension": "Your mark location is in a different dimension",

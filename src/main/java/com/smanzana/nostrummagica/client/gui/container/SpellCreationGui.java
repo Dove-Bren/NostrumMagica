@@ -44,6 +44,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -426,17 +427,17 @@ public class SpellCreationGui {
 				if (type == null)
 					continue;
 				Integer count = reagents.get(type);
-				if (count == null)
+				if (count == null || count == 0)
 					continue;
 				
 				int left = takeReagent(crafter, inventory, type, count, false);
 				if (left != 0) {
 					spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
+					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()).mergeStyle(TextFormatting.DARK_RED));
 					fail = true;
 				} else {
 					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()));
 				}
-				
 			}
 			
 			if (fail)
@@ -805,7 +806,7 @@ public class SpellCreationGui {
 				if (pattern != null) {
 					List<ITextComponent> tooltip = new ArrayList<>(4);
 					tooltip.add(pattern.getName());
-					pattern.addDescription(tooltip);
+					tooltip = pattern.addDescription(tooltip);
 					gui.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
 				}
 			}

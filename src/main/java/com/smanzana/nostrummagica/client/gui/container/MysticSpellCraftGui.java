@@ -9,12 +9,15 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer.RuneSlot;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
+import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
@@ -24,6 +27,7 @@ import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.Rectangle2d;
@@ -235,7 +239,7 @@ public class MysticSpellCraftGui {
 		private static final int POS_INFOPANEL_HEIGHT = 79;
 		
 		private static final int POS_WEIGHTBAR_HOFFSET = POS_INFOPANEL_HOFFSET + 6;
-		private static final int POS_WEIGHTBAR_VOFFSET = POS_INFOPANEL_VOFFSET + 5;
+		private static final int POS_WEIGHTBAR_VOFFSET = POS_INFOPANEL_VOFFSET + 2;
 		private static final int POS_WEIGHTBAR_WIDTH = 50;
 		private static final int POS_WEIGHTBAR_HEIGHT = 16;
 		
@@ -332,7 +336,7 @@ public class MysticSpellCraftGui {
 			this.runeSlots = new Vector3i[runeSlotCount];
 			this.spacerSpots = new Vector3i[Math.max(0, runeSlotCount-1)];
 			for (int i = 0; i < runeSlotCount; i++) {
-				runeSlots[i] = new Vector3i(-1 + runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + (i * POS_SLOT_RUNES_SPACER_WIDTH), -1 + POS_SLOT_RUNES_VOFFSET, 0);
+				runeSlots[i] = new Vector3i(-1 + runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + (i * POS_SLOT_RUNES_SPACER_WIDTH), -1 + POS_SLOT_RUNES_VOFFSET, i);
 				if (i > 0) {
 					spacerSpots[i-1] = new Vector3i(runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + ((i-1) * POS_SLOT_RUNES_SPACER_WIDTH), POS_SLOT_RUNES_VOFFSET, i-1);
 				}
@@ -473,6 +477,9 @@ public class MysticSpellCraftGui {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
+			final @Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
+			final SpellCraftContext context = getContainer().getCraftContext();
+			
 			mc.getTextureManager().bindTexture(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0, 0, POS_CONTAINER_WIDTH, POS_CONTAINER_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 			
@@ -485,9 +492,23 @@ public class MysticSpellCraftGui {
 				matrixStackIn.pop();
 			}
 			for (Vector3i slotPos : runeSlots) {
+				final int runeSlotIdx = slotPos.getZ();
+				final boolean isModified;
+				if (pattern != null) {
+					final @Nullable ISpellCraftModifier modifier;
+					if (pattern.hasModifier(context, runeSlotIdx)) {
+						modifier = pattern.getModifier(context, runeSlotIdx);
+					} else {
+						modifier = null;
+					}
+					isModified = modifier != null;
+				} else {
+					isModified = false;
+				}
+				
 				matrixStackIn.push();
 				matrixStackIn.translate(horizontalMargin + slotPos.getX(), verticalMargin + slotPos.getY(), 0);
-				drawRuneCellBackground(matrixStackIn, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH);
+				drawRuneCellBackground(matrixStackIn, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH, isModified);
 				matrixStackIn.pop();
 			}
 			
@@ -509,21 +530,129 @@ public class MysticSpellCraftGui {
 				SpellGui.drawScrollMessage(matrixStackIn, width, height, mc.fontRenderer);
 				matrixStackIn.pop();
 			}
+			
+			final @Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
+			final SpellCraftContext context = getContainer().getCraftContext();
+			
+			for (Vector3i slotPos : runeSlots) {
+				final int runeSlotIdx = slotPos.getZ();
+				final boolean isModified;
+				if (pattern != null) {
+					final @Nullable ISpellCraftModifier modifier;
+					if (pattern.hasModifier(context, runeSlotIdx)) {
+						modifier = pattern.getModifier(context, runeSlotIdx);
+					} else {
+						modifier = null;
+					}
+					isModified = modifier != null;
+				} else {
+					isModified = false;
+				}
+				
+				matrixStackIn.push();
+				matrixStackIn.translate(slotPos.getX(), slotPos.getY(), 0);
+				{
+					if (isModified) {
+						matrixStackIn.push();
+						matrixStackIn.translate(0, 0, 300);
+						RenderFuncs.drawGradientRect(matrixStackIn, 0, POS_SLOT_RUNES_WIDTH/4, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH,
+								0x00FFFFFF, 0x00FFFFFF, // top colors
+								0x60FFFF00, 0x60FFFF00 // bottom colors
+							);
+						matrixStackIn.pop();
+					}
+				}
+				matrixStackIn.pop();
+			}
 		}
 		
 		protected void drawInfoPanelBackground(MatrixStack matrixStackIn) {
+			final Minecraft mc = Minecraft.getInstance();
+			final FontRenderer fontRenderer = mc.fontRenderer;
+			final int width = POS_INFOPANEL_WIDTH;
+			final int height = POS_INFOPANEL_HEIGHT;
+			
 			// Background
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bindTexture(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_INFOPANEL_HOFFSET, TEX_INFOPANEL_VOFFSET, TEX_INFOPANEL_WIDTH, TEX_INFOPANEL_HEIGHT,
-					POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT,
+					width, height,
 					TEX_WIDTH, TEX_HEIGHT
 					);
 			
-			// info?
+			// info
+			final int xOffset = 4;
+			final int yOffset = (POS_WEIGHTBAR_VOFFSET - POS_INFOPANEL_VOFFSET) + POS_WEIGHTBAR_HEIGHT;
+			matrixStackIn.push();
+			matrixStackIn.translate(xOffset, yOffset, 0);
+			
+			// Decide whether to show summary or modifier info
+			int highlightedRuneIdx = -1;
+			if (this.hoveredSlot != null && this.hoveredSlot instanceof RuneSlot) {
+				highlightedRuneIdx = ((RuneSlot) this.hoveredSlot).getSlotIndex() - getContainer().inventory.getRuneSlotStartingIndex();
+			}
+			
+			if (highlightedRuneIdx == -1) {
+				// Summary info
+				final MysticContainer container = getContainer();
+				final String summaryText = "Summary";
+				final int summaryTextWidth = fontRenderer.getStringWidth(summaryText);
+				fontRenderer.drawString(matrixStackIn, summaryText, ((width-8) - summaryTextWidth)/2, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				matrixStackIn.scale(.5f, .5f, 1f);
+				
+				// Mana cost
+				fontRenderer.drawString(matrixStackIn, "Mana Cost: " + container.getManaCost(), 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				// Weight
+				fontRenderer.drawString(matrixStackIn, "Weight: " + container.getCurrentWeight(), 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				// Reagents
+				if (!container.getReagentStrings().isEmpty()) {
+					fontRenderer.drawString(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					for (ITextComponent string : container.getReagentStrings()) {
+						fontRenderer.func_243248_b(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
+						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					}
+				}
+			} else {
+				// Modifier info
+				final @Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
+				final SpellCraftContext context = getContainer().getCraftContext();
+				final @Nullable ISpellCraftModifier modifier;
+				if (pattern != null && pattern.hasModifier(context, highlightedRuneIdx)) {
+					modifier = pattern.getModifier(context, highlightedRuneIdx);
+				} else {
+					modifier = null;
+				}
+				
+				final String modifierText = "Modifier";
+				final int modifierTextWidth = fontRenderer.getStringWidth(modifierText);
+				fontRenderer.drawString(matrixStackIn, modifierText, ((width-8) - modifierTextWidth)/2, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				matrixStackIn.scale(.5f, .5f, 1f);
+				
+				if (modifier != null) {
+					List<ITextComponent> lines = new ArrayList<>(4);
+					lines = modifier.getDetails(lines);
+					for (ITextComponent line : lines) {
+						fontRenderer.func_243248_b(matrixStackIn, line, 0, 0, 0xFF000000);
+						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT + 1, 0);
+					}
+				} else {
+					fontRenderer.drawString(matrixStackIn, "No Slot Modifier", 0, 0, 0xFF000000);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				}
+			}
+			matrixStackIn.pop();
 		}
 		
-		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height) {
+		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height, boolean isModified) {
 			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_RUNESLOT_HOFFSET, TEX_RUNESLOT_VOFFSET, TEX_RUNESLOT_WIDTH, TEX_RUNESLOT_HEIGHT,
