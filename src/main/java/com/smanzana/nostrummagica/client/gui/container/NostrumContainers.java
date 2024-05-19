@@ -23,6 +23,7 @@ public class NostrumContainers {
 	@ObjectHolder(MasterSpellCreationGui.SpellCreationContainer.ID) public static ContainerType<MasterSpellCreationGui.SpellCreationContainer> SpellCreationMaster;
 	@ObjectHolder(BasicSpellCraftGui.BasicSpellCraftContainer.ID) public static ContainerType<BasicSpellCraftGui.BasicSpellCraftContainer> SpellCreationBasic;
 	@ObjectHolder(RuneShaperGui.RuneShaperContainer.ID) public static ContainerType<RuneShaperGui.RuneShaperContainer> RuneShaper;
+	@ObjectHolder(MysticSpellCraftGui.MysticContainer.ID) public static ContainerType<MysticSpellCraftGui.MysticContainer> SpellCreationMystic;
 	
 	@SubscribeEvent
 	public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
@@ -37,5 +38,6 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(MasterSpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(MasterSpellCreationGui.SpellCreationContainer.ID));
 		registry.register(IForgeContainerType.create(BasicSpellCraftGui.BasicSpellCraftContainer::FromNetwork).setRegistryName(BasicSpellCraftGui.BasicSpellCraftContainer.ID));
 		registry.register(IForgeContainerType.create(RuneShaperGui.RuneShaperContainer::FromNetwork).setRegistryName(RuneShaperGui.RuneShaperContainer.ID));
+		registry.register(IForgeContainerType.create(MysticSpellCraftGui.MysticContainer::FromNetwork).setRegistryName(MysticSpellCraftGui.MysticContainer.ID));
 	}
 }

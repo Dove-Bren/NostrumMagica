@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
+import com.smanzana.nostrummagica.client.gui.container.MysticSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
 import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
@@ -155,6 +156,7 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMaster, MasterSpellCreationGui.SpellGui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationBasic, BasicSpellCraftGui.BasicSpellCraftGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
+		ScreenManager.registerFactory(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
 		
 		// Register client command registering command.
 		// Note that it's on the game event bus, so it has to be registered special

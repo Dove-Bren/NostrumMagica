@@ -14,7 +14,7 @@ public class MysticSpellTableEntity extends BasicSpellTableEntity {
 	/**
 	 * Inventory:
 	 *   0 - Spell scroll slot
-	 *   1-6 - Rune Slots
+	 *   1-8 - Rune Slots
 	 */
 	
 	private @Nonnull ItemStack slots[];

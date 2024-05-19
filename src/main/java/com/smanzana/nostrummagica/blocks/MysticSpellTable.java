@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
+import com.smanzana.nostrummagica.client.gui.container.MysticSpellCraftGui;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.tiles.MysticSpellTableEntity;
 
@@ -41,8 +41,7 @@ public class MysticSpellTable extends BasicSpellTable {
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
 		
 		MysticSpellTableEntity te = (MysticSpellTableEntity) worldIn.getTileEntity(pos);
-		int unused; // Update to use a fancier container that can make things mystic!
-		NostrumMagica.instance.proxy.openContainer(playerIn, BasicSpellCraftGui.BasicSpellCraftContainer.Make(te));
+		NostrumMagica.instance.proxy.openContainer(playerIn, MysticSpellCraftGui.MysticContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;
 	}
