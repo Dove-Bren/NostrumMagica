@@ -597,7 +597,6 @@
     "info.spell.low_mastery": "This spell requires a %1$s rank %2$s caster, but you are only %3$s rank",
     "info.spell.no_mastery": "This spell requires knowledge of the %s element",
     "info.spell.bad_reagent": "You do not have enough %s",
-    "info.spell.tome_weak": "Your tome cannot cast such a powerful spell",
     "info.skillitem.living_flute": "You've been awarded an additional point in Finesse!",
     "info.skillitem.essential_ooze": "You've been awarded an additional point in Control!",
     "info.skillitem.eldrich_pendant": "You've been awarded an additional point in Technique!",

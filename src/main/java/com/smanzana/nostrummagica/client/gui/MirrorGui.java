@@ -614,7 +614,7 @@ public class MirrorGui extends Screen {
 		}
 		
 		matrixStackIn.push();
-		matrixStackIn.translate(0, 0, 50);
+		matrixStackIn.translate(0, 0, 150);
 		
 		// Black out surrounding screen
 		int color = 0xFF000000;

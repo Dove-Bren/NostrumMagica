@@ -88,27 +88,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	private static class LevelCurve {
-		
-		
-		public static int getMaxMana(int level) {
-			switch (level) {
-			case 0:
-			case 1:
-				return 100;
-			case 2:
-				return 200;
-			case 3:
-				return 500;
-			case 4:
-				return 1000;
-			case 5:
-				return 5000;
-			case 6:
-			default:
-				return 10000;
-			}
-		}
-		
 		public static int getMaxXP(int level) {
 			switch (level) {
 			case 1:
@@ -859,7 +838,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		} else {
 			String title = stack.getDisplayName().getString();
 			int level = getLevel(stack);
-			int maxMana = getMaxMana(stack);
 			List<Spell> spells = getSpellLibrary(stack);
 			int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
 			int weightCapacity = getCapacity(stack);
@@ -880,7 +858,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			pages.add(new TitlePage(title, false));
 			pages.add(new LinedTextPage("", "",
 					"Level: " + level, "XP: " + xp + "/" + maxxp, "",
-					"Max Mana: " + maxMana,
 					"Spell Pages: " + spellPages,
 					"Modifications: " + modifications,
 					"",
@@ -1184,10 +1161,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		setModifications(tome, ++mods);
 		int level = getLevel(tome);
 		setLevel(tome, ++level);
-	}
-	
-	public static int getMaxMana(ItemStack tome) {
-		return LevelCurve.getMaxMana(getLevel(tome));
 	}
 	
 	public static int getCapacity(ItemStack tome) {

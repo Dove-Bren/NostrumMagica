@@ -77,17 +77,9 @@ public class SpellCasting {
 		
 		// Add the player's personal bonuses
 		summary.addCostRate(att.getManaCostModifier());
-		if (!freeCast && !tome.isEmpty() && tome.getItem() instanceof SpellTome) {
-			int unused; // !! Remove this! Should be moved till later (after all bonuses are totalled)
-			// but it's going to go away later, right?
-			
-			// Check if base mana cost exceeds what we can do
-			int cap = SpellTome.getMaxMana(tome);
-			if (cap < summary.getFinalCost()) {
-				playerCast.sendMessage(new TranslationTextComponent("info.spell.tome_weak"), Util.DUMMY_UUID);
-				return false;
-			}
-			
+		
+		// Add tome enchancements
+		if (!tome.isEmpty() && tome.getItem() instanceof SpellTome) {
 			SpellTome.applyEnhancements(tome, summary, entity);
 			
 		}
