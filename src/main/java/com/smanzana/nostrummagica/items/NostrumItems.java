@@ -223,7 +223,6 @@ public class NostrumItems {
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_WIND) public static MagicCharm magicCharmWind;
 	@ObjectHolder(MagicSwordBase.ID) public static MagicSwordBase magicSwordBase;
 	@ObjectHolder(MasteryOrb.ID) public static MasteryOrb masteryOrb;
-	@ObjectHolder(MirrorItem.ID) public static MirrorItem mirrorItem; // TODO could clean up; is just a BlockItem
 	@ObjectHolder(MirrorShield.ID) public static MirrorShield mirrorShield;
 	@ObjectHolder(MirrorShieldImproved.ID) public static MirrorShieldImproved mirrorShieldImproved;
 	@ObjectHolder(NostrumGuide.ID) public static NostrumGuide nostrumGuide;
@@ -278,7 +277,6 @@ public class NostrumItems {
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_MUTED) public static SpellPlate spellPlateMuted;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING) public static SpellPlate spellPlateLiving;
 	@ObjectHolder(SpellScroll.ID) public static SpellScroll spellScroll;
-	@ObjectHolder(SpellTableItem.ID) public static SpellTableItem spellTableItem;
 	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE) public static SpellTome spellTomeNovice;
 	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED) public static SpellTome spellTomeAdvanced;
 	@ObjectHolder(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT) public static SpellTome spellTomeCombat;
@@ -526,7 +524,6 @@ public class NostrumItems {
     	register(registry, new MagicCharm(EMagicElement.WIND).setRegistryName(MagicCharm.ID_PREFIX + ID_WIND));
     	register(registry, new MagicSwordBase().setRegistryName(MagicSwordBase.ID));
     	register(registry, new MasteryOrb().setRegistryName(MasteryOrb.ID));
-    	register(registry, new MirrorItem().setRegistryName(MirrorItem.ID));
     	register(registry, new MirrorShield().setRegistryName(MirrorShield.ID));
     	register(registry, new MirrorShieldImproved().setRegistryName(MirrorShieldImproved.ID));
     	register(registry, new NostrumGuide().setRegistryName(NostrumGuide.ID));
@@ -582,7 +579,6 @@ public class NostrumItems {
     	register(registry, new SpellPlate(SpellTome.TomeStyle.LIVING).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_LIVING));
     	//register(registry, new SpellRune().setRegistryName(SpellRune.ID));
     	register(registry, new SpellScroll().setRegistryName(SpellScroll.ID));
-    	register(registry, new SpellTableItem().setRegistryName(SpellTableItem.ID));
     	register(registry, new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE));
     	register(registry, new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED));
     	register(registry, new SpellTome().setRegistryName(SpellTome.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT));

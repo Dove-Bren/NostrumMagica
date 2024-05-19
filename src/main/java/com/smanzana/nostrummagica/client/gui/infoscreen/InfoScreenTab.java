@@ -327,7 +327,7 @@ public abstract class InfoScreenTab {
 				
 				button = new SubscreenInfoButton(screen, "shrines",
 						new PaginatedInfoSubScreen(screen, "shrines"),
-						new ItemStack(NostrumItems.mirrorItem));
+						new ItemStack(NostrumBlocks.mirrorBlock));
 				buttons.add(button);
 				index("builtin::guides::shrines", button);
 				

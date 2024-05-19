@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "nostrummagica:mirror_item"
+          "name": "nostrummagica:mirror_block"
         }
       ],
       "conditions": [

@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrummagica:spell_table_item"
+    "item": "nostrummagica:spelltable_basic"
   },
   "pattern": [
     "CBD",

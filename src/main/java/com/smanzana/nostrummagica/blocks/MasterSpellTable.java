@@ -32,14 +32,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
 @SuppressWarnings("deprecation")
-public class SpellTable extends HorizontalBlock {
+public class MasterSpellTable extends HorizontalBlock {
 	
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
-	public static final String ID = "spell_table";
+	public static final String ID = "spelltable_master";
 	
-	public SpellTable() {
+	public MasterSpellTable() {
 		super(Block.Properties.create(Material.WOOD)
 				.hardnessAndResistance(3.0f, 15.0f)
 				.sound(SoundType.WOOD)

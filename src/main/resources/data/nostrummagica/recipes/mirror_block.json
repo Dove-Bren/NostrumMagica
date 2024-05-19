@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrummagica:mirror_item"
+    "item": "nostrummagica:mirror_block"
   },
   "pattern": [
     "RQR",

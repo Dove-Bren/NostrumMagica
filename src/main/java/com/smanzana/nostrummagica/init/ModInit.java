@@ -520,7 +520,7 @@ public class ModInit {
 
 		// Obelisk -- tier 3. Vani crystal. Balanced slab, 2 eyes of ender, compass.
 		registry.register(RitualRecipe.createTier3("create_obelisk",
-				new ItemStack(NostrumItems.mirrorItem), EMagicElement.ENDER,
+				new ItemStack(NostrumBlocks.mirrorBlock), EMagicElement.ENDER,
 				new ReagentType[] {
 						ReagentType.BLACK_PEARL, ReagentType.SKY_ASH, ReagentType.MANDRAKE_ROOT, ReagentType.GINSENG },
 				Ingredient.fromTag(NostrumTags.Items.CrystalLarge),

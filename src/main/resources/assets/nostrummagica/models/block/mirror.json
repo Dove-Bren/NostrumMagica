@@ -1,4 +1,26 @@
 {
 	"loader": "forge:obj",
-	"model": "nostrummagica:models/block/mirror.obj"
+	"model": "nostrummagica:models/block/mirror.obj",
+    "textures": {
+        "particle": "nostrummagica:block/ceramic_generic"
+    },
+    "display": {
+        "thirdperson": {
+            "rotation": [ 10, -45, 170 ],
+            "translation": [ 0, 1.5, -2.75 ],
+            "scale": [ 0.375, 0.375, 0.375 ]
+        },
+		"gui": {
+			"rotation": [ 120, 0, -45 ],
+			"scale": [ 0.625, 0.625, 0.625 ]
+		},
+		"fixed": {
+			"rotation": [90, 0, -180]
+		},
+		"ground": {
+			"rotation": [90, 0, 0],
+            "translation": [ 0, 3, 0],
+            "scale":[ 0.25, 0.25, 0.25 ]
+		}
+    }
 }

@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "nostrummagica:spell_table_item"
+          "name": "nostrummagica:spelltable_master"
         }
       ],
       "conditions": [

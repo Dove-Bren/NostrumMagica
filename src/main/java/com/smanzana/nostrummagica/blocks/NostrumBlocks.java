@@ -64,7 +64,7 @@ public class NostrumBlocks {
 	@ObjectHolder(ShrineBlock.ID) public static ShrineBlock shrineBlock;
 	@ObjectHolder(SorceryPortal.ID) public static SorceryPortal sorceryPortal;
 	@ObjectHolder(SorceryPortalSpawner.ID) public static SorceryPortalSpawner sorceryPortalSpawner;
-	@ObjectHolder(SpellTable.ID) public static SpellTable spellTable;
+	@ObjectHolder(MasterSpellTable.ID) public static MasterSpellTable spellTable;
 	@ObjectHolder(SwitchBlock.ID) public static SwitchBlock switchBlock;
 	@ObjectHolder(TeleportationPortal.ID) public static TeleportationPortal teleportationPortal;
 	@ObjectHolder(SymbolBlock.ID) public static SymbolBlock symbolBlock;
@@ -127,7 +127,7 @@ public class NostrumBlocks {
     	registerBlockItem(modificationTable, modificationTable.getRegistryName(), registry);
     	//registerBlockItem(midnightIris, midnightIris.getRegistryName(), registry);
     	//registerBlockItem(crystabloom, crystabloom.getRegistryName(), registry);
-    	//registerBlockItem(mirrorBlock, mirrorBlock.getRegistryName(), registry);
+    	registerBlockItem(mirrorBlock, mirrorBlock.getRegistryName(), registry);
     	//registerBlockItem(obelisk, obelisk.getRegistryName(), registry);
     	registerBlockItem(singleSpawner, singleSpawner.getRegistryName(), registry);
     	registerBlockItem(matchSpawner, matchSpawner.getRegistryName(), registry);
@@ -141,7 +141,7 @@ public class NostrumBlocks {
     	//registerBlockItem(shrineBlock, shrineBlock.getRegistryName(), registry);
     	//registerBlockItem(sorceryPortal, sorceryPortal.getRegistryName(), registry);
     	//registerBlockItem(sorceryPortalSpawner, sorceryPortalSpawner.getRegistryName(), registry);
-    	//registerBlockItem(spellTable, spellTable.getRegistryName(), registry);
+    	registerBlockItem(spellTable, spellTable.getRegistryName(), registry);
     	registerBlockItem(switchBlock, switchBlock.getRegistryName(), registry);
     	//registerBlockItem(teleportationPortal, teleportationPortal.getRegistryName(), registry);
     	registerBlockItem(symbolBlock, symbolBlock.getRegistryName(), registry);
@@ -240,7 +240,7 @@ public class NostrumBlocks {
     	registerBlock(new ShrineBlock(), ShrineBlock.ID, registry);
     	registerBlock(new SorceryPortal(), SorceryPortal.ID, registry);
     	registerBlock(new SorceryPortalSpawner(), SorceryPortalSpawner.ID, registry);
-    	registerBlock(new SpellTable(), SpellTable.ID, registry);
+    	registerBlock(new MasterSpellTable(), MasterSpellTable.ID, registry);
     	registerBlock(new SwitchBlock(), SwitchBlock.ID, registry);
     	registerBlock(new TeleportationPortal(), TeleportationPortal.ID, registry);
     	registerBlock(new SymbolBlock(), SymbolBlock.ID, registry);
