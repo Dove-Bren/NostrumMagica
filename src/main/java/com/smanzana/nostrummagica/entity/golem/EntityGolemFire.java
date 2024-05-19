@@ -4,8 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
@@ -43,7 +43,7 @@ public class EntityGolemFire extends EntityGolem {
 					EMagicElement.FIRE,
 					1,
 					EAlteration.CONJURE,
-					new SpellPartParam(2, false)));
+					new SpellPartProperties(2, false)));
 			
 			spellRanged3 = Spell.CreateAISpell("Melt Armor");
 			spellRanged3.addPart(new SpellPart(ProjectileTrigger.instance()));
@@ -51,7 +51,7 @@ public class EntityGolemFire extends EntityGolem {
 					EMagicElement.FIRE,
 					1,
 					EAlteration.GROWTH,
-					new SpellPartParam(1, false)));
+					new SpellPartProperties(1, false)));
 			
 			spellBuff = Spell.CreateAISpell("Fire Shield");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));

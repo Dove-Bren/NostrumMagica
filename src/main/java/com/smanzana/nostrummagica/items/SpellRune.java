@@ -11,11 +11,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
-import com.smanzana.nostrummagica.spells.SpellCrafting;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -156,16 +156,16 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return output;
 	}
 	
-	public static SpellPartParam getPieceParam(ItemStack piece) {
+	public static SpellPartProperties getPieceParam(ItemStack piece) {
 		if (!piece.hasTag())
-			return new SpellPartParam(0f, false);
+			return new SpellPartProperties(0f, false);
 		
 		float level = piece.getTag().getFloat(NBT_PARAM_VAL);
 		boolean flip = piece.getTag().getBoolean(NBT_PARAM_FLIP);
-		return new SpellPartParam(level, flip);
+		return new SpellPartProperties(level, flip);
 	}
 	
-	public static void setPieceParam(ItemStack piece, SpellPartParam params) {
+	public static void setPieceParam(ItemStack piece, SpellPartProperties params) {
 		if (!piece.hasTag())
 			piece.setTag(new CompoundNBT());
 		
@@ -293,7 +293,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			tooltip.add(new StringTextComponent("Trigger").mergeStyle(TextFormatting.DARK_BLUE));
 			tooltip.add(new StringTextComponent("Weight " + trigger.getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
 			
-			SpellPartParam params = getPieceParam(stack);
+			SpellPartProperties params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			
 			if (comp.getTrigger().supportsBoolean() && params.flip) {
@@ -316,8 +316,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
 			SpellPart part = null;
 			
-			part = new SpellPart(trigger);
-			part.setParam(getPieceParam(stack));
+			part = new SpellPart(trigger, getPieceParam(stack));
 			
 			return part;
 		}
@@ -452,7 +451,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			tooltip.add(new StringTextComponent("Shape Piece").mergeStyle(TextFormatting.DARK_RED));
 			tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
-			SpellPartParam params = getPieceParam(stack);
+			SpellPartProperties params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getShape().supportsBoolean() && params.flip) {
 				tooltip.add(new StringTextComponent(comp.getShape().supportedBooleanName() + ": On"));
@@ -520,7 +519,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			int weight = SpellCrafting.CalculateWeight(getShape(), getNestedElement(stack), getNestedElementCount(stack), getNestedAlteration(stack));
 			tooltip.add(new StringTextComponent("Weight " + weight).mergeStyle(TextFormatting.DARK_PURPLE));
 			
-			SpellPartParam params = getPieceParam(stack);
+			SpellPartProperties params = getPieceParam(stack);
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getShape().supportsBoolean() && params.flip) {
 				tooltip.add(new StringTextComponent(comp.getShape().supportedBooleanName() + ": On"));
@@ -565,9 +564,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			
 			EAlteration alteration = getNestedAlteration(stack);
 			
-			part = new SpellPart(shape, element, count, alteration);
-			
-			part.setParam(getPieceParam(stack));
+			part = new SpellPart(shape, element, count, alteration, getPieceParam(stack));
 			
 			return part;
 		}

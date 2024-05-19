@@ -38,8 +38,8 @@ import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -275,7 +275,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	protected static enum WolfSpell {
 		GROUP_SPEED(WolfSpellTargetGroup.SELF, 50,
-				(Spell.CreateAISpell("WolfSpeed")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfSpeed")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartProperties(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.WIND, 1)
 							&& wolf.getAttackTarget() == null // Not in battle
@@ -301,7 +301,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							&& target.getActivePotionEffect(Effects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD(WolfSpellTargetGroup.SELF, 30,
-				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartProperties(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ICE, 1)
 							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
@@ -321,7 +321,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 					}
 				}),
 		ICE_FANGS(WolfSpellTargetGroup.SELF, 100,
-				(Spell.CreateAISpell("WolfIceFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 2, EAlteration.ENCHANT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfIceFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 2, EAlteration.ENCHANT, new SpellPartProperties(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ICE, 3)
 							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
@@ -341,12 +341,12 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							;
 				}),
 		ENDER_SHROUD(WolfSpellTargetGroup.ENEMY, 20,
-				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartParam(3, true))).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartProperties(3, true))).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ENDER, 1);
 				}),
 		ENDER_FANGS(WolfSpellTargetGroup.SELF, 75,
-				(Spell.CreateAISpell("WolfEnderFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ENDER, 1, EAlteration.ENCHANT, new SpellPartParam(8, true))),
+				(Spell.CreateAISpell("WolfEnderFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ENDER, 1, EAlteration.ENCHANT, new SpellPartProperties(8, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.ENDER, 3)
 							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
@@ -358,7 +358,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							&& target.getActivePotionEffect(Effects.SLOWNESS) == null;
 				}),
 		CHAIN_LIGHTNING(WolfSpellTargetGroup.ENEMY, 40,
-				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartParam(6, true))),
+				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartProperties(6, true))),
 				(wolf, target) -> {
 					return wolf.hasElementLevel(EMagicElement.LIGHTNING, 3);
 				}),

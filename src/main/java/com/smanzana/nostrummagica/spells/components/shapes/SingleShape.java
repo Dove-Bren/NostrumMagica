@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
@@ -31,7 +31,7 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	protected List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos) {
+	protected List<LivingEntity> getTargets(SpellPartProperties param, LivingEntity target, World world, BlockPos pos) {
 		if (target != null)
 			return Lists.newArrayList(target);
 		
@@ -39,7 +39,7 @@ public class SingleShape extends SpellShape {
 	}
 
 	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world,
+	protected List<BlockPos> getTargetLocations(SpellPartProperties param, LivingEntity target, World world,
 			BlockPos pos) {
 		if (target != null)
 			return null;

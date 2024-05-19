@@ -21,7 +21,7 @@ import com.smanzana.nostrummagica.items.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
@@ -363,7 +363,7 @@ public class RuneShaperGui {
 		protected @Nonnull ItemStack getOutput() {
 			// Shape and some elems are required
 			@Nullable SpellShape shape = null;
-			@Nullable SpellPartParam params = null;
+			@Nullable SpellPartProperties params = null;
 			@Nullable EAlteration alteration = null;
 			@Nullable EMagicElement element = null;
 			int elementCount = 0;

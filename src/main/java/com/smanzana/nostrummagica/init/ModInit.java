@@ -107,6 +107,7 @@ import com.smanzana.nostrummagica.serializers.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.serializers.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -2147,6 +2148,13 @@ public class ModInit {
     	SpellTrigger.register(AuraTrigger.instance());
     	SpellTrigger.register(CasterTrigger.instance());
     }
+	
+	@SubscribeEvent
+	public static void registerSpellcraftPatterns(RegistryEvent.Register<SpellCraftPattern> event) {
+		final IForgeRegistry<SpellCraftPattern> registry = event.getRegistry();
+		
+		//registry.register()
+	}
     
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {

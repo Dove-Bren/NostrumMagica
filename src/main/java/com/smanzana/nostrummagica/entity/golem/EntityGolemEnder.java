@@ -4,8 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
@@ -33,7 +33,7 @@ public class EntityGolemEnder extends EntityGolem {
 					EMagicElement.ENDER,
 					1,
 					null,
-					new SpellPartParam(2, false)));
+					new SpellPartProperties(2, false)));
 			
 			spellDebuff = Spell.CreateAISpell("Blind");
 			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));

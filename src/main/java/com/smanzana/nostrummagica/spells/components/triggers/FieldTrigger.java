@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -151,7 +151,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartParam params) {
+			SpellPartProperties params) {
 		
 		// Blindly guess if trigger put us in a wall but above us isn't that t he player
 		// wants us up one

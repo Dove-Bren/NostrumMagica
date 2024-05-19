@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
@@ -45,7 +45,7 @@ public class EntityGolemLightning extends EntityGolem {
 					EMagicElement.LIGHTNING,
 					1,
 					null,
-					new SpellPartParam(1, false)));
+					new SpellPartProperties(1, false)));
 			
 			spellBuff = Spell.CreateAISpell("Magic Ward");
 			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));

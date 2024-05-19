@@ -13,8 +13,8 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.block.Blocks;
@@ -125,7 +125,7 @@ public class DamagedTrigger extends SpellTrigger {
 
 	@Override
 	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartParam params) {
+			SpellPartProperties params) {
 		return new DamagedTriggerInstance(state, state.getSelf(), (int) params.level);
 	}
 

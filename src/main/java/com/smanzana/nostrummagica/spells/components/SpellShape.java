@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -59,7 +59,7 @@ public abstract class SpellShape {
 	 * @param pos
 	 */
 	public void perform(SpellAction action,
-						SpellPartParam param,
+						SpellPartProperties param,
 						LivingEntity target,
 						World world,
 						BlockPos pos,
@@ -103,7 +103,7 @@ public abstract class SpellShape {
 	 * @param pos
 	 * @return
 	 */
-	protected abstract List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos);
+	protected abstract List<LivingEntity> getTargets(SpellPartProperties param, LivingEntity target, World world, BlockPos pos);
 	
 	/**
 	 * Returns all blockPOS that are affected when using this shape.
@@ -115,7 +115,7 @@ public abstract class SpellShape {
 	 * @param pos
 	 * @return
 	 */
-	protected abstract List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world, BlockPos pos);
+	protected abstract List<BlockPos> getTargetLocations(SpellPartProperties param, LivingEntity target, World world, BlockPos pos);
 	
 	/**
 	 * Return a list of reagents required.

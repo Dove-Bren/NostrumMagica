@@ -46,16 +46,6 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class Spell {
 	
-	public static class SpellPartParam {
-		 public float level;
-		 public boolean flip;
-		 
-		 public SpellPartParam(float level, boolean flip) {
-			 this.level = level;
-			 this.flip = flip;
-		 }
-	}
-	
 	public class SpellState {
 		private int index;
 		private float efficiency;
@@ -109,14 +99,14 @@ public class Spell {
 					else {
 						SpellPart part = parts.get(index);
 						sib.appendString("[" + part.getTrigger().getDisplayName() + "] " );
-						if (part.param.flip || Math.abs(part.param.level) > .001) {
+						if (part.getParam().flip || Math.abs(part.getParam().level) > .001) {
 							Style style = Style.EMPTY;
 							String buf = "";
-							if (part.param.flip) {
+							if (part.getParam().flip) {
 								buf = "Inverted ";
 							}
-							if (Math.abs(part.param.level) > .001) {
-								buf += String.format("Level %02.1f", part.param.level);
+							if (Math.abs(part.getParam().level) > .001) {
+								buf += String.format("Level %02.1f", part.getParam().level);
 							}
 							style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT,
 									new StringTextComponent(buf)));
@@ -181,7 +171,7 @@ public class Spell {
 					SpellShape shape = next.getShape();
 					SpellAction action = solveAction(caster, next.getAlteration(),
 							next.getElement(), next.getElementCount());
-					SpellPartParam param = next.getParam();
+					SpellPartProperties param = next.getParam();
 					
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 					if (attr != null && attr.isUnlocked()) {
@@ -314,7 +304,7 @@ public class Spell {
 			}
 		}
 		
-		private void spawnTrigger(SpellTrigger trigger, LivingEntity targ, World world, BlockPos targpos, SpellPartParam param) {
+		private void spawnTrigger(SpellTrigger trigger, LivingEntity targ, World world, BlockPos targpos, SpellPartProperties param) {
 			// instantiate trigger in world
 			Vector3d pos;
 			if (world == null)
@@ -381,70 +371,6 @@ public class Spell {
 		}
 	}
 	
-	public static class SpellPart {
-		private SpellTrigger trigger;
-		private SpellShape shape;
-		private EAlteration alteration;
-		private EMagicElement element;
-		private int elementCount;
-		private SpellPartParam param;
-		
-		public SpellPart(SpellTrigger trigger, SpellPartParam param) {
-			this.trigger = trigger;
-			this.param = param;
-		}
-		
-		public SpellPart(SpellTrigger trigger) {
-			this(trigger, new SpellPartParam(0, false));
-		}
-		
-		public SpellPart(SpellShape shape, EMagicElement element, int count, EAlteration alt,
-				SpellPartParam param) {
-			this.shape = shape;
-			this.element = element;
-			this.elementCount = count;
-			this.alteration = alt;
-			this.param = param;
-		}
-		
-		public SpellPart(SpellShape shape, EMagicElement element, int count,
-				EAlteration alteration) {
-			this(shape, element, count, alteration, new SpellPartParam(0, false));
-		}
-		
-		public boolean isTrigger() {
-			return trigger != null;
-		}
-
-		public SpellTrigger getTrigger() {
-			return trigger;
-		}
-
-		public SpellShape getShape() {
-			return shape;
-		}
-
-		public EAlteration getAlteration() {
-			return alteration;
-		}
-
-		public EMagicElement getElement() {
-			return element;
-		}
-
-		public int getElementCount() {
-			return elementCount;
-		}
-
-		public SpellPartParam getParam() {
-			return param;
-		}
-		
-		public void setParam(SpellPartParam param) {
-			this.param = param;
-		}
-	}
-
 	private String name;
 	private int iconIndex; // Basically useless on server, selects which icon to show on the client
 	private int registryID;
@@ -894,7 +820,7 @@ public class Spell {
 		EMagicElement element;
 		EAlteration alteration;
 		int count;
-		SpellPartParam param;
+		SpellPartProperties param;
 		
 		for (int i = 0; i < list.size(); i++) {
 			tag = list.getCompound(i);
@@ -902,7 +828,7 @@ public class Spell {
 			if (key == null || key.isEmpty())
 				continue;
 			
-			param = new SpellPartParam(
+			param = new SpellPartProperties(
 					tag.getFloat(NBT_PARAM_LEVEL),
 					tag.getBoolean(NBT_PARAM_FLIP)
 					);
@@ -951,7 +877,7 @@ public class Spell {
 			
 			for (SpellPart part : parts) {
 				if (!part.isTrigger()) {
-					primaryCache = part.element;
+					primaryCache = part.getElement();
 					break;
 				}
 			}
@@ -986,23 +912,23 @@ public class Spell {
 					shapes++;
 					if (part.getElementCount() > 2)
 						highPotency = true;
-					if (part.alteration == null)
+					if (part.getAlteration() == null)
 						damage = true;
-					if (part.alteration == EAlteration.INFLICT
-							|| part.alteration == EAlteration.RESIST
-							|| part.alteration == EAlteration.SUPPORT
-							|| part.alteration == EAlteration.CORRUPT)
+					if (part.getAlteration() == EAlteration.INFLICT
+							|| part.getAlteration() == EAlteration.RESIST
+							|| part.getAlteration() == EAlteration.SUPPORT
+							|| part.getAlteration() == EAlteration.CORRUPT)
 						status = true;
-					if (part.alteration == EAlteration.RESIST
-							|| part.alteration == EAlteration.SUPPORT
-							|| part.alteration == EAlteration.GROWTH
-							|| part.alteration == EAlteration.ENCHANT)
+					if (part.getAlteration() == EAlteration.RESIST
+							|| part.getAlteration() == EAlteration.SUPPORT
+							|| part.getAlteration() == EAlteration.GROWTH
+							|| part.getAlteration() == EAlteration.ENCHANT)
 						beneficial = true;
-					if (part.alteration == EAlteration.SUMMON)
+					if (part.getAlteration() == EAlteration.SUMMON)
 						summon = true;
-					if (part.alteration == EAlteration.ENCHANT)
+					if (part.getAlteration() == EAlteration.ENCHANT)
 						enchant = true;
-					if (part.alteration == EAlteration.GROWTH)
+					if (part.getAlteration() == EAlteration.GROWTH)
 						restorative = true;
 				}
 			}
@@ -1097,7 +1023,7 @@ public class Spell {
 		if (!parts.isEmpty())
 		for (SpellPart part : parts) {
 			if (!part.isTrigger())
-				count += part.elementCount;
+				count += part.getElementCount();
 		}
 		return count;
 	}
@@ -1116,12 +1042,12 @@ public class Spell {
 		Map<EMagicElement, Integer> list = new EnumMap<>(EMagicElement.class);
 		if (!parts.isEmpty())
 		for (SpellPart part : parts) {
-			if (!part.isTrigger() && part.element != null) {
+			if (!part.isTrigger() && part.getElement() != null) {
 				int count = 0;
-				if (list.get(part.element) != null)
-					count = list.get(part.element);
-				count += part.elementCount;
-				list.put(part.element, count);
+				if (list.get(part.getElement()) != null)
+					count = list.get(part.getElement());
+				count += part.getElementCount();
+				list.put(part.getElement(), count);
 			} 
 		}
 		return list;
@@ -1131,12 +1057,12 @@ public class Spell {
 		Map<EAlteration, Integer> list = new EnumMap<>(EAlteration.class);
 		if (!parts.isEmpty())
 		for (SpellPart part : parts) {
-			if (!part.isTrigger() && part.alteration != null) {
+			if (!part.isTrigger() && part.getAlteration() != null) {
 				int count = 0;
-				if (list.get(part.alteration) != null)
-					count = list.get(part.alteration);
+				if (list.get(part.getAlteration()) != null)
+					count = list.get(part.getAlteration());
 				count++;
-				list.put(part.alteration, count);
+				list.put(part.getAlteration(), count);
 			}
 		}
 		return list;
@@ -1178,15 +1104,15 @@ public class Spell {
 		int index = NostrumMagica.rand.nextInt(this.parts.size());
 		SpellPart part = parts.get(index);
 		if (part.isTrigger())
-			return new SpellComponentWrapper(part.trigger);
+			return new SpellComponentWrapper(part.getTrigger());
 		else {
-			if (part.alteration != null && NostrumMagica.rand.nextInt(3) == 0) {
-				return new SpellComponentWrapper(part.alteration);
+			if (part.getAlteration() != null && NostrumMagica.rand.nextInt(3) == 0) {
+				return new SpellComponentWrapper(part.getAlteration());
 			}
-			if (part.element != null && NostrumMagica.rand.nextBoolean()) {
-				return new SpellComponentWrapper(part.element);
+			if (part.getElement() != null && NostrumMagica.rand.nextBoolean()) {
+				return new SpellComponentWrapper(part.getElement());
 			}
-			return new SpellComponentWrapper(part.shape);
+			return new SpellComponentWrapper(part.getShape());
 		}
 	}
 	

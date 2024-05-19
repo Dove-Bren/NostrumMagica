@@ -10,7 +10,7 @@ import java.util.Set;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 
 import net.minecraft.client.resources.I18n;
@@ -40,7 +40,7 @@ public class ChainShape extends SpellShape {
 	}
 	
 	@Override
-	protected List<LivingEntity> getTargets(SpellPartParam param, LivingEntity target, World world, BlockPos pos) {
+	protected List<LivingEntity> getTargets(SpellPartProperties param, LivingEntity target, World world, BlockPos pos) {
 		List<LivingEntity> ret = new LinkedList<>();
 		
 		if (target == null) {
@@ -121,7 +121,7 @@ public class ChainShape extends SpellShape {
 	}
 
 	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartParam param, LivingEntity target, World world,
+	protected List<BlockPos> getTargetLocations(SpellPartProperties param, LivingEntity target, World world,
 			BlockPos pos) {
 		List<BlockPos> list = new LinkedList<>();
 		

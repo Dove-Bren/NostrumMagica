@@ -27,8 +27,8 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
@@ -146,10 +146,10 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 				EMagicElement element = (EMagicElement) objects[++i];
 				Integer level = (Integer) objects[++i];
 				EAlteration alt = (EAlteration) objects[++i];
-				SpellPartParam param = (SpellPartParam) objects[++i];
+				SpellPartProperties param = (SpellPartProperties) objects[++i];
 				
 				if (param == null) {
-					param = new SpellPartParam(0, false);
+					param = new SpellPartProperties(0, false);
 				}
 				
 				spell.addPart(new SpellPart(shape, element, level, alt, param));
@@ -168,14 +168,14 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 					EMagicElement.FIRE,
 					2,
 					null,
-					new SpellPartParam(3, false));
+					new SpellPartProperties(3, false));
 			DSPELL_Fireball2 = makeSpell("Fireball2",
 					ProjectileTrigger.instance(),
 					AoEShape.instance(),
 					EMagicElement.FIRE,
 					3,
 					null,
-					new SpellPartParam(3, false));
+					new SpellPartProperties(3, false));
 			DSPELL_Speed = makeSpell("Speed",
 					SelfTrigger.instance(),
 					SingleShape.instance(),

@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -122,7 +122,7 @@ public class ModificationTableGui {
 					floatIndex = 0;
 					
 					if (!stack.isEmpty() && stack.getItem() instanceof SpellRune) {
-						SpellPartParam params = SpellRune.getPieceParam(stack);
+						SpellPartProperties params = SpellRune.getPieceParam(stack);
 						SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 						
 						if (comp.isTrigger()) {

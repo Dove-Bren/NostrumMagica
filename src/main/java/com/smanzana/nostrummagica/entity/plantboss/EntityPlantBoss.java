@@ -30,8 +30,8 @@ import com.smanzana.nostrummagica.serializers.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
@@ -146,7 +146,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			
 			spells.add(makeSpell("Leaf Blade",
 					MagicCutterTrigger.instance(),
-					new SpellPartParam(1, true),
+					new SpellPartProperties(1, true),
 					SingleShape.instance(),
 					EMagicElement.WIND,
 					2,
@@ -155,7 +155,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 					));
 			spells.add(makeSpell("Spore",
 					SeekingBulletTrigger.instance(),
-					new SpellPartParam(0, true),
+					new SpellPartProperties(0, true),
 					SingleShape.instance(),
 					EMagicElement.LIGHTNING,
 					1,
@@ -175,9 +175,9 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		if (SeedBombSpell == null) {
 			SeedBombSpell = makeSpell("Seed Bomb",
 					MortarTrigger.instance(),
-					new SpellPartParam(0, true),
+					new SpellPartProperties(0, true),
 					FieldTrigger.instance(),
-					new SpellPartParam(2, false),
+					new SpellPartProperties(2, false),
 					SingleShape.instance(),
 					EMagicElement.EARTH,
 					1,
@@ -230,14 +230,14 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			Object o = objects[i];
 			if (o instanceof SpellTrigger) {
 				SpellTrigger trigger = (SpellTrigger) o;
-				final SpellPartParam param;
+				final SpellPartProperties param;
 				
 				// Peek at next
 				if (objects.length > i + 1
-						&& objects[i+1] instanceof SpellPartParam) {
-					param = (SpellPartParam) objects[++i];
+						&& objects[i+1] instanceof SpellPartProperties) {
+					param = (SpellPartProperties) objects[++i];
 				} else {
-					param = new SpellPartParam(0, false); // matches SpellPart constructor with no second param
+					param = new SpellPartProperties(0, false); // matches SpellPart constructor with no second param
 				}
 				
 				spell.addPart(new SpellPart(trigger, param));
@@ -246,10 +246,10 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 				EMagicElement element = (EMagicElement) objects[++i];
 				Integer level = (Integer) objects[++i];
 				EAlteration alt = (EAlteration) objects[++i];
-				SpellPartParam param = (SpellPartParam) objects[++i];
+				SpellPartProperties param = (SpellPartProperties) objects[++i];
 				
 				if (param == null) {
-					param = new SpellPartParam(0, false);
+					param = new SpellPartProperties(0, false);
 				}
 				
 				spell.addPart(new SpellPart(shape, element, level, alt, param));

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.LivingEntity;
@@ -44,7 +44,7 @@ public abstract class InstantTrigger extends SpellTrigger {
 	}
 	
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartParam params) {
+	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartProperties params) {
 		return new InstantTriggerInstance(state, world, pos, pitch, yaw);
 	}
 	

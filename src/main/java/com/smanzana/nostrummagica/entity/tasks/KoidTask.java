@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.SpellPart;
-import com.smanzana.nostrummagica.spells.Spell.SpellPartParam;
+import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
@@ -154,7 +154,7 @@ public class KoidTask extends Goal {
 			spell = Spell.CreateAISpell("Fireball");
 			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.FIRE,
-					1, null, new SpellPartParam(3, false)));
+					1, null, new SpellPartProperties(3, false)));
 			rangedSpells.get(EMagicElement.FIRE).add(spell);
 			putSpell(rangedSpells, "Flare",
 					ProjectileTrigger.instance(),
@@ -179,7 +179,7 @@ public class KoidTask extends Goal {
 			spell = Spell.CreateAISpell("Group Frostbite");
 			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
 			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.ICE,
-					1, EAlteration.INFLICT, new SpellPartParam(5, false)));
+					1, EAlteration.INFLICT, new SpellPartProperties(5, false)));
 			rangedSpells.get(EMagicElement.ICE).add(spell);
 			
 			putSpell(meleeSpells, "Hand Of Cold",
