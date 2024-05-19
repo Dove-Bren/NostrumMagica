@@ -338,7 +338,7 @@ public class RoomLectern extends StaticRoom {
 			}
 		}
 		
-		return SpellCrafting.CreateSpellFromParts(genSpellName(rand, element, harmful, status), parts, false);
+		return SpellCrafting.CreateSpellFromPartsNoContext(genSpellName(rand, element, harmful, status), parts, false);
 	}
 	
 	@Override

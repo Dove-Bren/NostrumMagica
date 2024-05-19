@@ -141,7 +141,8 @@ public class MysticSpellCraftGui {
 			return this.spellIcon;
 		}
 		
-		public @Nullable SpellCraftPattern getPattern() {
+		@Override
+		public @Nullable SpellCraftPattern getCraftPattern() {
 			return (this.patternChoices.length == 0 || this.patternIdx >= this.patternChoices.length)
 					? null
 					: patternChoices[this.patternIdx];
@@ -415,7 +416,7 @@ public class MysticSpellCraftGui {
 			getContainer().validate();
 			if (getContainer().spellValid) {
 				// whoo make spell
-				Spell spell = getContainer().makeSpell(getContainer().name.toString(), getContainer().spellIcon, true);
+				Spell spell = getContainer().makeSpell(true);
 				if (spell != null) {
 					// All of this happens again and is synced back to client
 					// But in the mean, might as well do it here for the
@@ -430,11 +431,12 @@ public class MysticSpellCraftGui {
 							getContainer().name.toString(),
 							getContainer().pos,
 							getContainer().spellIcon,
-							getContainer().getPattern()
+							getContainer().getCraftPattern()
 							));
 					getContainer().name = "";
 					this.nameField.setText("");
 					getContainer().spellIcon = -1;
+					// getContainer().patternIdx = 0; leave pattern selected?
 				}
 			} else {
 				// Don't
@@ -569,7 +571,7 @@ public class MysticSpellCraftGui {
 					);
 			
 			// Draw pattern icon
-			@Nullable SpellCraftPattern pattern = getContainer().getPattern();
+			@Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
 			if (pattern != null) {
 				matrixStackIn.push();
 				matrixStackIn.translate(1, 1, 0);

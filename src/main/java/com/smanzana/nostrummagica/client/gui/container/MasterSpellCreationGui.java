@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -428,7 +429,8 @@ public class MasterSpellCreationGui {
 			}
 			
 			// Actually make spell
-			Spell spell = SpellCrafting.CreateSpellFromRunes(name, inventory, 1, inventory.getReagentSlotIndex()-1);
+			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
+			Spell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1);
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

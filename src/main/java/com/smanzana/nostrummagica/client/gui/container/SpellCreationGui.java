@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,6 +18,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
@@ -198,6 +200,8 @@ public class SpellCreationGui {
 		
 		public abstract int getSpellIcon();
 		
+		public abstract @Nullable SpellCraftPattern getCraftPattern();
+		
 		protected boolean isValidScroll(ItemStack stack) {
 			return !stack.isEmpty() && stack.getItem() instanceof BlankScroll;
 		}
@@ -311,7 +315,7 @@ public class SpellCreationGui {
 			}
 			
 			// Could cache
-			return SpellCrafting.CalculateWeightFromRunes(inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
+			return SpellCrafting.CalculateWeightFromRunes(getCraftContext(), getCraftPattern(), inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
 		}
 		
 		public int getMaxWeight() {
@@ -327,10 +331,6 @@ public class SpellCreationGui {
 		}
 		
 		protected void validate() {
-			validate(getName(), getSpellIcon());
-		}
-		
-		protected void validate(String name, int iconIdx) {
 			if (spellErrorStrings == null)
 				spellErrorStrings = new LinkedList<>();
 			if (reagentStrings == null)
@@ -338,7 +338,7 @@ public class SpellCreationGui {
 			
 			checkScroll();
 			if (this.hasScroll) {
-				Spell spell = makeSpell(name, iconIdx);
+				Spell spell = makeSpell();
 				spellValid = (spell != null);
 			} else {
 				spellValid = false;
@@ -349,13 +349,17 @@ public class SpellCreationGui {
 			return this.context;
 		}
 		
-		public Spell makeSpell(String name, int iconIdx) {
-			return makeSpell(name, iconIdx, false);
+		public Spell makeSpell() {
+			return makeSpell(false);
 		}
 		
-		public Spell makeSpell(String name, int iconIdx, boolean clear) {
+		public Spell makeSpell(boolean clear) {
+			return makeSpell(this.getName(), this.getSpellIcon(), this.getCraftPattern(), clear);
+		}
+		
+		public Spell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			Spell spell = craftSpell(getCraftContext(), null, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;
@@ -374,7 +378,7 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
+		public static Spell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -413,7 +417,7 @@ public class SpellCreationGui {
 			}
 			
 			// Actually make spell
-			Spell spell = SpellCrafting.CreateSpellFromRunes(name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
+			Spell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

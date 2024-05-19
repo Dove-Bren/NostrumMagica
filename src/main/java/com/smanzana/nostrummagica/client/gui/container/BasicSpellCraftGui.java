@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.BasicSpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -129,6 +130,11 @@ public class BasicSpellCraftGui {
 		@Override
 		public int getSpellIcon() {
 			return this.spellIcon;
+		}
+		
+		@Override
+		public @Nullable SpellCraftPattern getCraftPattern() {
+			return null; // Table doesn't support patterns.
 		}
 	}
 	
@@ -275,7 +281,7 @@ public class BasicSpellCraftGui {
 			getContainer().validate();
 			if (getContainer().spellValid) {
 				// whoo make spell
-				Spell spell = getContainer().makeSpell(getContainer().name.toString(), getContainer().spellIcon, true);
+				Spell spell = getContainer().makeSpell(true);
 				if (spell != null) {
 					// All of this happens again and is synced back to client
 					// But in the mean, might as well do it here for the

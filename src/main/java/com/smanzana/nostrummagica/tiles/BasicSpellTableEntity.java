@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 
@@ -206,8 +207,9 @@ public class BasicSpellTableEntity extends TileEntity implements ISpellCraftingI
 			return null;
 		}
 		
+		SpellCraftContext context = new SpellCraftContext(crafter, this.world, this.pos);
 		Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-				name, iconIndex, this, crafter, new LinkedList<ITextComponent>(), new LinkedList<ITextComponent>(), true);
+				context, pattern, name, iconIndex, this, crafter, new LinkedList<ITextComponent>(), new LinkedList<ITextComponent>(), true);
 		
 		if (spell != null) {
 			spell.promoteFromTrans();

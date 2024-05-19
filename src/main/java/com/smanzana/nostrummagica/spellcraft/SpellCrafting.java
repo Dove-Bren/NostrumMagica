@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -65,8 +66,26 @@ public class SpellCrafting {
 		return valid;
 	}
 	
-	public static @Nullable Spell CreateSpellFromRunes(String spellName, IInventory inventory, int startIdx, int slotCount) {
+	protected static List<SpellPartBuilder> MakeIngredients(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, List<SpellPart> parts) {
+		List<SpellPartBuilder> ingredients = new ArrayList<>(parts.size());
 		
+		for (int i = 0; i < parts.size(); i++) {
+			final SpellPart part = parts.get(i);
+			final SpellPartBuilder builder = new SpellPartBuilder(part);
+			
+			if (context != null && pattern != null) {
+				@Nullable ISpellCraftModifier modifier = pattern.getModifier(context, i);
+				if (modifier != null) {
+					modifier.modify(context, part, builder);
+				}
+			}
+
+			ingredients.add(builder);
+		}
+		return ingredients;
+	}
+	
+	public static @Nullable Spell CreateSpellFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, IInventory inventory, int startIdx, int slotCount) {
 		List<SpellPart> parts = new ArrayList<>(slotCount);
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
@@ -83,20 +102,40 @@ public class SpellCrafting {
 			}
 		}
 		
-		return CreateSpellFromParts(spellName, parts, true);
+		return CreateSpellFromParts(context, pattern, spellName, parts, true);
 	}
 	
-	public static Spell CreateSpellFromParts(String spellName, List<SpellPart> parts, boolean trans) {
-		final int manaCost = CalculateManaCost(parts);
-		final int weight = CalculateWeight(parts);
+	public static Spell CreateSpellFromParts(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<SpellPart> parts, boolean trans) {
+		return CreateSpellFromPartsInternal(context, pattern, spellName, parts, trans);
+	}
+	
+	/**
+	 * Specialized spell creation when there isn't a player context available.
+	 * Examples include randomly-generated spells in dungeons.
+	 * @param spellName
+	 * @param parts
+	 * @param trans
+	 * @return
+	 */
+	public static Spell CreateSpellFromPartsNoContext(String spellName, List<SpellPart> parts, boolean trans) {
+		return CreateSpellFromPartsInternal(null, null, spellName, parts, trans);
+	}
+	
+	protected static Spell CreateSpellFromPartsInternal(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<SpellPart> parts, boolean trans) {
+		
+		List<SpellPartBuilder> ingredients = MakeIngredients(context, pattern, parts);
+		
+		final int manaCost = CalculateManaCost(ingredients);
+		final int weight = CalculateWeight(ingredients);
 		Spell spell = new Spell(spellName, trans, manaCost, weight);
-		for (SpellPart part : parts) {
-			spell.addPart(part);
+		for (SpellPartBuilder ingredient : ingredients) {
+			spell.addPart(ingredient.build());
 		}
+		
 		return spell;
 	}
 	
-	protected static int CalculateManaCost(List<SpellPart> parts) {
+	protected static int CalculateManaCost(List<SpellPartBuilder> parts) {
 		// Triggers can report their  cost
 		// Alterations are in enum
 		// Shapes cost 10
@@ -106,8 +145,8 @@ public class SpellCrafting {
 		int cost = 0;
 		float multiplier = 1f;
 		
-		for (SpellPart part : parts) {
-			cost += CalculateManaCost(part, multiplier);
+		for (SpellPartBuilder part : parts) {
+			cost += CalculateManaCost(part.build(), multiplier * part.getManaRate());
 			multiplier *= 1.1;
 		}
 		
@@ -152,18 +191,19 @@ public class SpellCrafting {
 		return weight;
 	}
 	
-	protected static int CalculateWeight(List<SpellPart> parts) {
+	protected static int CalculateWeight(List<SpellPartBuilder> parts) {
 		// Triggers report their own cost.
 		// In shapes, the shape itself and alteration report their own cost.
 		// Elements are free.
 		int weight = 0;
-		for (SpellPart part : parts) {
-			weight += CalculateWeight(part);
+		for (SpellPartBuilder part : parts) {
+			final int partWeight = Math.max(0, CalculateWeight(part.build()) + part.getWeightModifier());
+			weight += partWeight;
 		}
 		return weight;
 	}
 	
-	public static int CalculateWeightFromRunes(IInventory inventory, int startIdx, int slotCount) {
+	public static int CalculateWeightFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, IInventory inventory, int startIdx, int slotCount) {
 		
 		List<SpellPart> parts = new ArrayList<>(slotCount);
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
@@ -180,6 +220,6 @@ public class SpellCrafting {
 			}
 		}
 		
-		return CalculateWeight(parts);
+		return CalculateWeight(MakeIngredients(context, pattern, parts));
 	}
 }
