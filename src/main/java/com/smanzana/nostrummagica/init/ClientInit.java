@@ -7,6 +7,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.MimicBlock;
 import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
+import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
+import com.smanzana.nostrummagica.client.gui.SpellCraftPatternAutoRenderer;
 import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
 import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
@@ -82,6 +84,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SoulDagger;
 import com.smanzana.nostrummagica.items.ThanosStaff;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.nostrummagica.spellcraft.pattern.NostrumSpellCraftPatterns;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
 
@@ -157,6 +160,9 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationBasic, BasicSpellCraftGui.BasicSpellCraftGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
+		
+		// Could probably make this be the default!
+		ISpellCraftPatternRenderer.RegisterRenderer(NostrumSpellCraftPatterns.lightweight, SpellCraftPatternAutoRenderer.INSTANCE);
 		
 		// Register client command registering command.
 		// Note that it's on the game event bus, so it has to be registered special

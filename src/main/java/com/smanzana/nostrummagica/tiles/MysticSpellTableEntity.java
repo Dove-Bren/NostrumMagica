@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
-import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
+import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockState;
@@ -71,7 +71,6 @@ public class MysticSpellTableEntity extends BasicSpellTableEntity {
 	
 	@Override
 	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
-		int unused; // use pattern!
 		return super.craft(crafter, inventory, name, iconIndex, pattern);
 	}
 

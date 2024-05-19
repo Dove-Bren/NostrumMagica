@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
-import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
+import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockState;

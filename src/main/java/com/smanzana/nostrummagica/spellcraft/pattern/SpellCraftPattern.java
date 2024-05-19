@@ -1,16 +1,14 @@
-package com.smanzana.nostrummagica.spellcraft;
+package com.smanzana.nostrummagica.spellcraft.pattern;
 
 import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,9 +36,6 @@ public abstract class SpellCraftPattern extends ForgeRegistryEntry<SpellCraftPat
 	public abstract boolean hasModifier(SpellCraftContext context, int slot);
 	
 	public abstract @Nullable ISpellCraftModifier getModifier(SpellCraftContext context, int slot);
-	
-	@OnlyIn(Dist.CLIENT)
-	public abstract void drawPatternIcon(MatrixStack matrixStackIn, SpellCraftContext context, int width, int height, float red, float green, float blue, float alpha);
 	
 	public static final @Nullable SpellCraftPattern Get(ResourceLocation id) {
 		return REGISTRY.getValue(id);

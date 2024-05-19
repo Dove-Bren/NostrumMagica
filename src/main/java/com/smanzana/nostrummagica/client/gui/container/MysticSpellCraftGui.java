@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
@@ -15,7 +16,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
-import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
+import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
 import com.smanzana.nostrummagica.tiles.MysticSpellTableEntity;
@@ -573,10 +574,13 @@ public class MysticSpellCraftGui {
 			// Draw pattern icon
 			@Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
 			if (pattern != null) {
-				matrixStackIn.push();
-				matrixStackIn.translate(1, 1, 0);
-				pattern.drawPatternIcon(matrixStackIn, getContainer().getCraftContext(), width-2, height-2, 1f, 1f, 1f, 1f);
-				matrixStackIn.pop();
+				@Nullable ISpellCraftPatternRenderer renderer = ISpellCraftPatternRenderer.GetRenderer(pattern);
+				if (renderer != null) {
+					matrixStackIn.push();
+					matrixStackIn.translate(1, 1, 0);
+					renderer.drawPatternIcon(matrixStackIn, pattern, getContainer().getCraftContext(), width-2, height-2, 1f, 1f, 1f, 1f);
+					matrixStackIn.pop();
+				}
 			}
 		}
 	}
