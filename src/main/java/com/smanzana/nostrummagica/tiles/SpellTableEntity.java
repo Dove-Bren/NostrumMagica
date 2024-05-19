@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
@@ -13,6 +14,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockState;
@@ -213,7 +215,8 @@ public class SpellTableEntity extends TileEntity implements ISpellCraftingInvent
 		}
 	}
 	
-	public Spell craft(PlayerEntity crafter, String name, int iconIndex) {
+	@Override
+	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		ItemStack stack = this.getStackInSlot(0);
 		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
 			return null;

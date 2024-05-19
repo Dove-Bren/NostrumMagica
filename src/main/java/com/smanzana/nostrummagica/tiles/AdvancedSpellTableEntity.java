@@ -1,7 +1,10 @@
 package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockState;
@@ -63,7 +66,8 @@ public class AdvancedSpellTableEntity extends BasicSpellTableEntity {
 		super.read(state, nbt);
 	}
 	
-	public Spell craft(PlayerEntity crafter, String name, int iconIndex) {
-		return super.craft(crafter, name, iconIndex);
+	@Override
+	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
+		return super.craft(crafter, inventory, name, iconIndex, pattern);
 	}
 }

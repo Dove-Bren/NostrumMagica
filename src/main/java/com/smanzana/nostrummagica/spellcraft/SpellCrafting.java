@@ -132,7 +132,7 @@ public class SpellCrafting {
 		return (int) Math.ceil(cost);
 	}
 	
-	protected static final int CalculateWeight(SpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+	public static final int CalculateWeight(SpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
 		// In shapes, the shape itself and alteration report their own cost.
 		// Elements are free.
 		int weight = shape.getWeight();

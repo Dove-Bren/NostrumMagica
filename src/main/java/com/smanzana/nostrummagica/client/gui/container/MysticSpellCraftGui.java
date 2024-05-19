@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
 import com.smanzana.nostrummagica.tiles.MysticSpellTableEntity;
@@ -62,8 +63,11 @@ public class MysticSpellCraftGui {
 		
 		public static final String ID = "mysticspellcrafter";
 		
+		private final SpellCraftPattern[] patternChoices; // Cached
+		
 		protected String name;
 		protected int spellIcon;
+		protected int patternIdx;
 		
 		public MysticContainer(int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
@@ -78,6 +82,9 @@ public class MysticSpellCraftGui {
 			
 			this.name = "";
 			this.spellIcon = -1;
+			this.patternIdx = 0;
+			
+			patternChoices = MysticSpellTableEntity.CalculatePatternChoices(crafter, tableInventory, tablePos);
 			
 			// Scroll slot
 			this.addSlot(new ScrollSlot(this, tableInventory, tableInventory.getScrollSlotIndex(), POS_SLOT_SCROLL_HOFFSET, POS_SLOT_SCROLL_VOFFSET));
@@ -132,6 +139,16 @@ public class MysticSpellCraftGui {
 		@Override
 		public int getSpellIcon() {
 			return this.spellIcon;
+		}
+		
+		public @Nullable SpellCraftPattern getPattern() {
+			return (this.patternChoices.length == 0 || this.patternIdx >= this.patternChoices.length)
+					? null
+					: patternChoices[this.patternIdx];
+		}
+		
+		protected SpellCraftPattern[] getPatternChoices() {
+			return this.patternChoices;
 		}
 
 		public int getFilledRuneSlots() {
@@ -409,11 +426,11 @@ public class MysticSpellCraftGui {
 					getContainer().inventory.setScrollSlotContents(scroll);
 					//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
 					
-					int unused; // Need to expand network message to allow pattern selection
 					NetworkHandler.sendToServer(new SpellCraftMessage(
 							getContainer().name.toString(),
 							getContainer().pos,
-							getContainer().spellIcon
+							getContainer().spellIcon,
+							getContainer().getPattern()
 							));
 					getContainer().name = "";
 					this.nameField.setText("");
@@ -425,8 +442,15 @@ public class MysticSpellCraftGui {
 		}
 		
 		protected void patternChangeButtonClicked(PatternChangeButton button, boolean isLeft) {
-			System.out.println("Pattern change " + (isLeft ? "left" : "right"));
-			int unused;
+			SpellCraftPattern[] choices = getContainer().getPatternChoices();
+			
+			// Safety check
+			if (choices == null || choices.length == 0) {
+				return;
+			}
+			
+			MysticContainer container = getContainer();
+			container.patternIdx = (container.patternIdx + (isLeft ? -1 : 1)) % choices.length;
 		}
 		
 		@Override
@@ -544,8 +568,14 @@ public class MysticSpellCraftGui {
 					TEX_WIDTH, TEX_HEIGHT
 					);
 			
-			int unused;
 			// Draw pattern icon
+			@Nullable SpellCraftPattern pattern = getContainer().getPattern();
+			if (pattern != null) {
+				matrixStackIn.push();
+				matrixStackIn.translate(1, 1, 0);
+				pattern.drawPatternIcon(matrixStackIn, getContainer().getCraftContext(), width-2, height-2, 1f, 1f, 1f, 1f);
+				matrixStackIn.pop();
+			}
 		}
 	}
 	

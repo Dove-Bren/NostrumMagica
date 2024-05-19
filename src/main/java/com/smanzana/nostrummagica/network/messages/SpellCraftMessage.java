@@ -2,13 +2,16 @@ package com.smanzana.nostrummagica.network.messages;
 
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.tiles.SpellTableEntity;
+import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -48,11 +51,11 @@ public class SpellCraftMessage {
 				return;
 			}
 			
-			SpellTableEntity entity = (SpellTableEntity) TE;
+			ISpellCraftingTileEntity entity = (ISpellCraftingTileEntity) TE;
 			
-			Spell spell = entity.craft(sp, message.name, message.iconIndex);
+			Spell spell = entity.craft(sp, entity.getSpellCraftingInventory(), message.name, message.iconIndex, message.craftPattern);
 			if (spell != null) {
-				NostrumMagicaSounds.UI_RESEARCH.play(entity.getWorld(), 
+				NostrumMagicaSounds.UI_RESEARCH.play(TE.getWorld(), 
 						message.pos.getX(), message.pos.getY(), message.pos.getZ());
 				}
 			
@@ -67,21 +70,35 @@ public class SpellCraftMessage {
 	private final String name;
 	private final BlockPos pos;
 	private final int iconIndex;
+	private final @Nullable SpellCraftPattern craftPattern;
 	
 	public SpellCraftMessage(String name, BlockPos pos, int iconIndex) {
+		this(name, pos, iconIndex, null);
+	}
+	
+	public SpellCraftMessage(String name, BlockPos pos, int iconIndex, @Nullable SpellCraftPattern craftPattern) {
 		this.name = name;
 		this.pos = pos;
 		this.iconIndex = iconIndex;
+		this.craftPattern = craftPattern;
 	}
 
 	public static SpellCraftMessage decode(PacketBuffer buf) {
-		return new SpellCraftMessage(buf.readString(32767), buf.readBlockPos(), buf.readVarInt());
+		return new SpellCraftMessage(buf.readString(32767), buf.readBlockPos(), buf.readVarInt(),
+				(buf.readBoolean() ? SpellCraftPattern.Get(buf.readResourceLocation()) : null)
+			);
 	}
 
 	public static void encode(SpellCraftMessage msg, PacketBuffer buf) {
 		buf.writeString(msg.name);
 		buf.writeBlockPos(msg.pos);
 		buf.writeVarInt(msg.iconIndex);
+		if (msg.craftPattern == null) {
+			buf.writeBoolean(false);
+		} else {
+			buf.writeBoolean(true);
+			buf.writeResourceLocation(msg.craftPattern.getRegistryName());
+		}
 	}
 
 }

@@ -15,8 +15,9 @@ import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
+import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.ColorUtil;
@@ -170,6 +171,7 @@ public class SpellCreationGui {
 		// of crafting state
 		protected final ISpellCraftingInventory inventory;
 		protected final PlayerEntity player;
+		protected final SpellCraftContext context; // Made once for efficiency
 		
 		
 		protected boolean hasScroll; // has an acceptable scroll
@@ -184,6 +186,7 @@ public class SpellCreationGui {
 			this.inventory = tableInventory;
 			this.player = crafter;
 			this.pos = tablePos;
+			this.context = new SpellCraftContext(crafter, crafter.world, pos);
 			
 			spellErrorStrings = new LinkedList<>();
 			
@@ -340,6 +343,10 @@ public class SpellCreationGui {
 			} else {
 				spellValid = false;
 			}
+		}
+		
+		public SpellCraftContext getCraftContext() {
+			return this.context;
 		}
 		
 		public Spell makeSpell(String name, int iconIdx) {
