@@ -45,6 +45,7 @@ public class NostrumTileEntities {
 	private static final String ID_DelayedMimicBlockTileEntity = "delayed_mimic_block_te";
 	private static final String ID_BasicSpellTableTileEntity = "spelltable_basic_te";
 	private static final String ID_AdvancedSpellTableTileEntity = "spelltable_advanced_te";
+	private static final String ID_MysticSpellTableTileEntity = "spelltable_mystic_te";
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableEntity> SpellTableEntityType;
 	@ObjectHolder(ID_SingleSpawnerTileEntity) public static TileEntityType<SingleSpawnerTileEntity> SingleSpawnerTileEntityType;
@@ -77,6 +78,7 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_DelayedMimicBlockTileEntity) public static TileEntityType<DelayLoadedMimicBlockTileEntity> DelayedMimicBlockTileEntityType;
 	@ObjectHolder(ID_BasicSpellTableTileEntity) public static TileEntityType<BasicSpellTableEntity> BasicSpellTableType;
 	@ObjectHolder(ID_AdvancedSpellTableTileEntity) public static TileEntityType<AdvancedSpellTableEntity> AdvancedSpellTableType;
+	@ObjectHolder(ID_MysticSpellTableTileEntity) public static TileEntityType<MysticSpellTableEntity> MysticSpellTableType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -117,6 +119,7 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(DelayLoadedMimicBlockTileEntity::new, NostrumBlocks.mimicDoor, NostrumBlocks.mimicFacade, NostrumBlocks.mimicDoorUnbreakable, NostrumBlocks.mimicFacadeUnbreakable).build(null), ID_DelayedMimicBlockTileEntity);
 		register(registry, TileEntityType.Builder.create(BasicSpellTableEntity::new, NostrumBlocks.basicSpellTable).build(null), ID_BasicSpellTableTileEntity);
 		register(registry, TileEntityType.Builder.create(AdvancedSpellTableEntity::new, NostrumBlocks.advancedSpellTable).build(null), ID_AdvancedSpellTableTileEntity);
+		register(registry, TileEntityType.Builder.create(MysticSpellTableEntity::new, NostrumBlocks.mysticSpellTable).build(null), ID_MysticSpellTableTileEntity);
 		
     }
 }

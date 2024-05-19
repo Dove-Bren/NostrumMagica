@@ -443,7 +443,8 @@
 	"block.nostrummagica.mine_block": "Mine",
 	"block.nostrummagica.tome_workshop": "Tome Workshop",
 	"block.nostrummagica.spelltable_basic": "Spell Table",
-	"block.nostrummagica.spelltable_advanced": "Mystic Spell Table",
+	"block.nostrummagica.spelltable_advanced": "Blackstone Spell Table",
+	"block.nostrummagica.spelltable_mystic": "Mystic Spell Table",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

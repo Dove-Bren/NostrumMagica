@@ -341,6 +341,7 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.dungeonBars, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.basicSpellTable, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.advancedSpellTable, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticSpellTable, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

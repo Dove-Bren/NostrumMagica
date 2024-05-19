@@ -81,6 +81,7 @@ public class NostrumBlocks {
 	@ObjectHolder(TomeWorkshopBlock.ID) public static TomeWorkshopBlock tomeWorkshop;
 	@ObjectHolder(BasicSpellTable.ID) public static BasicSpellTable basicSpellTable;
 	@ObjectHolder(AdvancedSpellTable.ID) public static AdvancedSpellTable advancedSpellTable;
+	@ObjectHolder(MysticSpellTable.ID) public static MysticSpellTable mysticSpellTable;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -154,6 +155,7 @@ public class NostrumBlocks {
     	registerBlockItem(tomeWorkshop, tomeWorkshop.getRegistryName(), registry);
     	registerBlockItem(basicSpellTable, basicSpellTable.getRegistryName(), registry);
     	registerBlockItem(advancedSpellTable, advancedSpellTable.getRegistryName(), registry);
+    	registerBlockItem(mysticSpellTable, mysticSpellTable.getRegistryName(), registry);
     	
 
 //    	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -255,6 +257,7 @@ public class NostrumBlocks {
     	registerBlock(new TomeWorkshopBlock(), TomeWorkshopBlock.ID, registry);
     	registerBlock(new BasicSpellTable(), BasicSpellTable.ID, registry);
     	registerBlock(new AdvancedSpellTable(), AdvancedSpellTable.ID, registry);
+    	registerBlock(new MysticSpellTable(), MysticSpellTable.ID, registry);
     }
     
 }
