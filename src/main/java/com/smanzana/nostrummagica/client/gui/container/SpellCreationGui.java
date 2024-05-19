@@ -329,7 +329,7 @@ public class SpellCreationGui {
 				return this.lastManaCost;
 			}
 			
-			return 0;
+			return SpellCrafting.CalculateManaCostFromRunes(getCraftContext(), getCraftPattern(), inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
 		}
 		
 		protected void validate() {

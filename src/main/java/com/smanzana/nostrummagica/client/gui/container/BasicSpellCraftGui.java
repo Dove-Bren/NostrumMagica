@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
@@ -364,15 +365,49 @@ public class BasicSpellCraftGui {
 		}
 		
 		protected void drawInfoPanelBackground(MatrixStack matrixStackIn) {
+			final Minecraft mc = Minecraft.getInstance();
+			FontRenderer fontRenderer = mc.fontRenderer;
+			
 			// Background
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bindTexture(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_INFOPANEL_HOFFSET, TEX_INFOPANEL_VOFFSET, TEX_INFOPANEL_WIDTH, TEX_INFOPANEL_HEIGHT,
 					POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT,
 					TEX_WIDTH, TEX_HEIGHT
 					);
 			
-			// info?
+			// info
+			final int xOffset = 4;
+			final int yOffset = (POS_WEIGHTBAR_VOFFSET - POS_INFOPANEL_VOFFSET) + POS_WEIGHTBAR_HEIGHT;
+			matrixStackIn.push();
+			matrixStackIn.translate(xOffset, yOffset, 0);
+			
+			final BasicSpellCraftContainer container = getContainer();
+			final String summaryText = "Summary";
+			final int summaryTextWidth = fontRenderer.getStringWidth(summaryText);
+			fontRenderer.drawString(matrixStackIn, summaryText, ((width-8) - summaryTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			matrixStackIn.scale(.5f, .5f, 1f);
+			
+			// Mana cost
+			fontRenderer.drawString(matrixStackIn, "Mana Cost: " + container.getManaCost(), 0, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			// Weight
+			fontRenderer.drawString(matrixStackIn, "Weight: " + container.getCurrentWeight(), 0, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			// Reagents
+			if (!container.getReagentStrings().isEmpty()) {
+				fontRenderer.drawString(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				for (ITextComponent string : container.getReagentStrings()) {
+					fontRenderer.func_243248_b(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				}
+			}
+			matrixStackIn.pop();
 		}
 		
 		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height) {
