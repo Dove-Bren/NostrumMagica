@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
+import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 
 import net.minecraft.block.Block;
@@ -165,11 +165,7 @@ public class SpellTable extends HorizontalBlock {
 		}
 		
 		SpellTableEntity te = (SpellTableEntity) worldIn.getTileEntity(pos);
-		//NostrumMagica.instance.proxy.openContainer(playerIn, MasterSpellCreationGui.SpellCreationContainer.Make(te));
-		//if (handIn == null) {
-			int unused; // remove
-			NostrumMagica.instance.proxy.openContainer(playerIn, BasicSpellCraftGui.BasicSpellCraftContainer.Make(te));
-		//}
+		NostrumMagica.instance.proxy.openContainer(playerIn, MasterSpellCreationGui.SpellCreationContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;
 	}

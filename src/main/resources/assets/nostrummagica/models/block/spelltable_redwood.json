@@ -1,0 +1,83 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "nostrummagica:block/spelltable_redwood_side",
+		"1": "nostrummagica:block/red_wood_planks",
+		"2": "nostrummagica:block/spelltable_redwood_bottom",
+		"3": "nostrummagica:block/spelltable_redwood_top",
+		"particle": "nostrummagica:block/spelltable_redwood_top"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [1, 0, 1],
+			"to": [15, 2, 15],
+			"faces": {
+				"north": {"uv": [1, 14, 15, 16], "texture": "#0"},
+				"east": {"uv": [1, 14, 15, 16], "texture": "#0"},
+				"south": {"uv": [1, 14, 15, 16], "texture": "#0"},
+				"west": {"uv": [1, 14, 15, 16], "texture": "#0"},
+				"up": {"uv": [1, 1, 15, 15], "texture": "#2"},
+				"down": {"uv": [0, 0, 14, 14], "texture": "#1", "cullface": "down"}
+			}
+		},
+		{
+			"name": "support",
+			"from": [3, 2, 3],
+			"to": [6, 13, 6],
+			"faces": {
+				"north": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"east": {"uv": [13, 2, 16, 13], "texture": "#0"},
+				"south": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"west": {"uv": [13, 2, 16, 13], "texture": "#0"}
+			}
+		},
+		{
+			"name": "support",
+			"from": [3, 2, 10],
+			"to": [6, 13, 13],
+			"faces": {
+				"north": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"east": {"uv": [13, 2, 16, 13], "texture": "#0"},
+				"south": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"west": {"uv": [13, 2, 16, 13], "texture": "#0"}
+			}
+		},
+		{
+			"name": "support",
+			"from": [10, 2, 3],
+			"to": [13, 13, 6],
+			"faces": {
+				"north": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"east": {"uv": [13, 2, 16, 13], "texture": "#0"},
+				"south": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"west": {"uv": [13, 2, 16, 13], "texture": "#0"}
+			}
+		},
+		{
+			"name": "support",
+			"from": [10, 2, 10],
+			"to": [13, 13, 13],
+			"faces": {
+				"north": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"east": {"uv": [13, 2, 16, 13], "texture": "#0"},
+				"south": {"uv": [0, 2, 3, 13], "texture": "#0"},
+				"west": {"uv": [13, 2, 16, 13], "texture": "#0"}
+			}
+		},
+		{
+			"name": "top",
+			"from": [0, 12, 0],
+			"to": [16, 15, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"east": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"west": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#3", "cullface": "up"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		}
+	]
+}

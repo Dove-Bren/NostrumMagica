@@ -79,6 +79,8 @@ public class NostrumBlocks {
 	@ObjectHolder(TriggerRepeater.ID) public static TriggerRepeater triggerRepeater;
 	@ObjectHolder(MineBlock.ID) public static MineBlock mineBlock;
 	@ObjectHolder(TomeWorkshopBlock.ID) public static TomeWorkshopBlock tomeWorkshop;
+	@ObjectHolder(BasicSpellTable.ID) public static BasicSpellTable basicSpellTable;
+	@ObjectHolder(AdvancedSpellTable.ID) public static AdvancedSpellTable advancedSpellTable;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -150,6 +152,8 @@ public class NostrumBlocks {
     	registerBlockItem(toggleDoor, toggleDoor.getRegistryName(), registry);
     	registerBlockItem(triggerRepeater, triggerRepeater.getRegistryName(), registry);
     	registerBlockItem(tomeWorkshop, tomeWorkshop.getRegistryName(), registry);
+    	registerBlockItem(basicSpellTable, basicSpellTable.getRegistryName(), registry);
+    	registerBlockItem(advancedSpellTable, advancedSpellTable.getRegistryName(), registry);
     	
 
 //    	String[] variants = new String[DungeonBlock.Type.values().length];
@@ -249,6 +253,8 @@ public class NostrumBlocks {
     	registerBlock(new TriggerRepeater(), TriggerRepeater.ID, registry);
     	registerBlock(new MineBlock(), MineBlock.ID, registry);
     	registerBlock(new TomeWorkshopBlock(), TomeWorkshopBlock.ID, registry);
+    	registerBlock(new BasicSpellTable(), BasicSpellTable.ID, registry);
+    	registerBlock(new AdvancedSpellTable(), AdvancedSpellTable.ID, registry);
     }
     
 }
