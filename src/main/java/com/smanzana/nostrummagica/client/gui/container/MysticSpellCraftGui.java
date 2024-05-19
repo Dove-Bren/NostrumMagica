@@ -155,16 +155,6 @@ public class MysticSpellCraftGui {
 		protected SpellCraftPattern[] getPatternChoices() {
 			return this.patternChoices;
 		}
-
-		public int getFilledRuneSlots() {
-			final int runeSlots = this.inventory.getRuneSlotCount();
-			for (int i = 0; i < runeSlots; i++) {
-				if (this.inventory.getRuneSlotContents(i).isEmpty()) {
-					return i;
-				}
-			}
-			return runeSlots;
-		}
 	}
 	
 	public static class Gui extends SpellGui<MysticContainer> {

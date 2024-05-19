@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.client.gui.container.MysticSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.NostrumContainers;
 import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
+import com.smanzana.nostrummagica.client.gui.container.RedwoodSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
@@ -159,6 +160,7 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMaster, MasterSpellCreationGui.SpellGui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationBasic, BasicSpellCraftGui.BasicSpellCraftGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
+		ScreenManager.registerFactory(NostrumContainers.SpellCreationRedwood, RedwoodSpellCraftGui.Gui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
 		
 		// Could probably make this be the default!

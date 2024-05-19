@@ -109,7 +109,7 @@ public class BasicSpellCraftGui {
 			
 		}
 		
-		public static final BasicSpellCraftContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static BasicSpellCraftContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			final BasicSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
 			return new BasicSpellCraftContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos());
@@ -151,10 +151,16 @@ public class BasicSpellCraftGui {
 		private static final int TEX_RUNESLOT_WIDTH = 18;
 		private static final int TEX_RUNESLOT_HEIGHT = 18;
 		
-		private static final int TEX_RUNESPACER_HOFFSET = 18;
-		private static final int TEX_RUNESPACER_VOFFSET = 166;
-		private static final int TEX_RUNESPACER_WIDTH = 18;
-		private static final int TEX_RUNESPACER_HEIGHT = 18;
+		private static final int TEX_RUNESPACER_DISABLED_HOFFSET = 18;
+		private static final int TEX_RUNESPACER_DISABLED_VOFFSET = 166;
+		private static final int TEX_RUNESPACER_DISABLED_WIDTH = 18;
+		private static final int TEX_RUNESPACER_DISABLED_HEIGHT = 18;
+		
+		private static final int TEX_RUNESPACER_HOFFSET = TEX_RUNESPACER_DISABLED_HOFFSET;
+		private static final int TEX_RUNESPACER_VOFFSET = TEX_RUNESPACER_DISABLED_VOFFSET + TEX_RUNESPACER_DISABLED_HEIGHT;
+		private static final int TEX_RUNESPACER_WIDTH = TEX_RUNESPACER_DISABLED_WIDTH;
+		private static final int TEX_RUNESPACER_HEIGHT = TEX_RUNESPACER_DISABLED_HEIGHT;
+		private static final int TEX_RUNESPACER_ANIM_COUNT = 4;
 		
 		private static final int TEX_INFOPANEL_HOFFSET = 36;
 		private static final int TEX_INFOPANEL_VOFFSET = 166;
@@ -207,9 +213,9 @@ public class BasicSpellCraftGui {
 			this.runeSlots = new Vector3i[runeSlotCount];
 			this.spacerSpots = new Vector3i[Math.max(0, runeSlotCount-1)];
 			for (int i = 0; i < runeSlotCount; i++) {
-				runeSlots[i] = new Vector3i(-1 + runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + (i * POS_SLOT_RUNES_SPACER_WIDTH), -1 + POS_SLOT_RUNES_VOFFSET, 0);
+				runeSlots[i] = new Vector3i(-1 + runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + (i * POS_SLOT_RUNES_SPACER_WIDTH), -1 + POS_SLOT_RUNES_VOFFSET, i);
 				if (i > 0) {
-					spacerSpots[i-1] = new Vector3i(runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + ((i-1) * POS_SLOT_RUNES_SPACER_WIDTH), POS_SLOT_RUNES_VOFFSET, 0);
+					spacerSpots[i-1] = new Vector3i(runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + ((i-1) * POS_SLOT_RUNES_SPACER_WIDTH), POS_SLOT_RUNES_VOFFSET, i-1);
 				}
 			}
 		}
@@ -322,19 +328,24 @@ public class BasicSpellCraftGui {
 			return extraAreas;
 		}
 		
+		protected ResourceLocation getBackgroundTexture() {
+			return TEXT; 
+		}
+		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - xSize) / 2;
 			int verticalMargin = (height - ySize) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bindTexture(getBackgroundTexture());
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0, 0, POS_CONTAINER_WIDTH, POS_CONTAINER_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 			
 			// Manually draw rune slots, since they're not baked onto the sheet
+			final int filledRuneSlots = getContainer().getFilledRuneSlots();
 			for (Vector3i spacerPos : spacerSpots) {
 				matrixStackIn.push();
 				matrixStackIn.translate(horizontalMargin + spacerPos.getX(), verticalMargin + spacerPos.getY(), 0);
-				drawRuneSpacerBackground(matrixStackIn, POS_SLOT_RUNES_SPACER_WIDTH, POS_SLOT_RUNES_SPACER_WIDTH);
+				drawRuneSpacerBackground(matrixStackIn, POS_SLOT_RUNES_SPACER_WIDTH, POS_SLOT_RUNES_SPACER_WIDTH, spacerPos.getZ() < filledRuneSlots-1);
 				matrixStackIn.pop();
 			}
 			for (Vector3i slotPos : runeSlots) {
@@ -369,7 +380,7 @@ public class BasicSpellCraftGui {
 			FontRenderer fontRenderer = mc.fontRenderer;
 			
 			// Background
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bindTexture(getBackgroundTexture());
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_INFOPANEL_HOFFSET, TEX_INFOPANEL_VOFFSET, TEX_INFOPANEL_WIDTH, TEX_INFOPANEL_HEIGHT,
 					POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT,
@@ -385,7 +396,7 @@ public class BasicSpellCraftGui {
 			final BasicSpellCraftContainer container = getContainer();
 			final String summaryText = "Summary";
 			final int summaryTextWidth = fontRenderer.getStringWidth(summaryText);
-			fontRenderer.drawString(matrixStackIn, summaryText, ((width-8) - summaryTextWidth)/2, 0, 0xFF000000);
+			fontRenderer.drawString(matrixStackIn, summaryText, ((POS_INFOPANEL_WIDTH-8) - summaryTextWidth)/2, 0, 0xFF000000);
 			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
 			
 			matrixStackIn.scale(.5f, .5f, 1f);
@@ -411,7 +422,7 @@ public class BasicSpellCraftGui {
 		}
 		
 		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bindTexture(getBackgroundTexture());
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_RUNESLOT_HOFFSET, TEX_RUNESLOT_VOFFSET, TEX_RUNESLOT_WIDTH, TEX_RUNESLOT_HEIGHT,
 					width, height,
@@ -419,13 +430,32 @@ public class BasicSpellCraftGui {
 					);
 		}
 		
-		protected void drawRuneSpacerBackground(MatrixStack matrixStackIn, int width, int height) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
-					TEX_RUNESPACER_HOFFSET, TEX_RUNESPACER_VOFFSET, TEX_RUNESPACER_WIDTH, TEX_RUNESPACER_HEIGHT,
-					width, height,
-					TEX_WIDTH, TEX_HEIGHT
-					);
+		protected void drawRuneSpacerBackground(MatrixStack matrixStackIn, int width, int height, boolean animate) {
+			Minecraft.getInstance().getTextureManager().bindTexture(getBackgroundTexture());
+//			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
+//					TEX_RUNESPACER_HOFFSET, TEX_RUNESPACER_VOFFSET, TEX_RUNESPACER_WIDTH, TEX_RUNESPACER_HEIGHT,
+//					width, height,
+//					TEX_WIDTH, TEX_HEIGHT
+//					);
+			
+			if (animate) {
+				final int frameTimeMS = 500;
+				final int animFrame = (int) (System.currentTimeMillis() % (frameTimeMS * TEX_RUNESPACER_ANIM_COUNT)) / frameTimeMS;
+				
+				final int v = TEX_RUNESPACER_VOFFSET + (animFrame * TEX_RUNESPACER_HEIGHT);
+			
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
+						TEX_RUNESPACER_HOFFSET, v, TEX_RUNESPACER_WIDTH, TEX_RUNESPACER_HEIGHT,
+						width, height,
+						TEX_WIDTH, TEX_HEIGHT
+						);
+			} else {
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
+						TEX_RUNESPACER_DISABLED_HOFFSET, TEX_RUNESPACER_DISABLED_VOFFSET, TEX_RUNESPACER_DISABLED_WIDTH, TEX_RUNESPACER_DISABLED_HEIGHT,
+						width, height,
+						TEX_WIDTH, TEX_HEIGHT
+						);
+			}
 		}
 	}
 	

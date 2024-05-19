@@ -331,6 +331,16 @@ public class SpellCreationGui {
 			
 			return SpellCrafting.CalculateManaCostFromRunes(getCraftContext(), getCraftPattern(), inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
 		}
+
+		public int getFilledRuneSlots() {
+			final int runeSlots = this.inventory.getRuneSlotCount();
+			for (int i = 0; i < runeSlots; i++) {
+				if (this.inventory.getRuneSlotContents(i).isEmpty()) {
+					return i;
+				}
+			}
+			return runeSlots;
+		}
 		
 		protected void validate() {
 			if (spellErrorStrings == null)

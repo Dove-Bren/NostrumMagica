@@ -1,14 +1,23 @@
 package com.smanzana.nostrummagica.blocks;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.container.RedwoodSpellCraftGui;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.tiles.AdvancedSpellTableEntity;
+import com.smanzana.nostrummagica.tiles.BasicSpellTableEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
 public class AdvancedSpellTable extends BasicSpellTable {
@@ -27,6 +36,14 @@ public class AdvancedSpellTable extends BasicSpellTable {
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		return new AdvancedSpellTableEntity();
+	}
+	
+	@Override
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
+		BasicSpellTableEntity te = (BasicSpellTableEntity) worldIn.getTileEntity(pos);
+		NostrumMagica.instance.proxy.openContainer(playerIn, RedwoodSpellCraftGui.RedwoodContainer.Make(te));
+		
+		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
