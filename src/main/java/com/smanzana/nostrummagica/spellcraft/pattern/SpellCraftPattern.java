@@ -1,14 +1,19 @@
 package com.smanzana.nostrummagica.spellcraft.pattern;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
+import com.smanzana.nostrummagica.utils.TextUtils;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -36,6 +41,26 @@ public abstract class SpellCraftPattern extends ForgeRegistryEntry<SpellCraftPat
 	public abstract boolean hasModifier(SpellCraftContext context, int slot);
 	
 	public abstract @Nullable ISpellCraftModifier getModifier(SpellCraftContext context, int slot);
+	
+	public String getUnlocalizedName() {
+		return "pattern." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath();
+	}
+	
+	public ITextComponent getName() {
+		return new TranslationTextComponent(getUnlocalizedName()).mergeStyle(TextFormatting.DARK_GREEN);
+	}
+	
+	public String getUnlocalizedDescription() {
+		return getUnlocalizedName() + ".description";
+	}
+	
+	public List<ITextComponent> addDescription(List<ITextComponent> description) {
+		description.addAll(TextUtils.GetTranslatedList(getUnlocalizedDescription()));
+		return description;
+	}
+	
+	
+	
 	
 	public static final @Nullable SpellCraftPattern Get(ResourceLocation id) {
 		return REGISTRY.getValue(id);

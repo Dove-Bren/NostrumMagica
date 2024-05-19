@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
@@ -191,11 +190,6 @@ public class MysticSpellCraftGui {
 		private static final int TEX_INFOPANEL_VOFFSET = 177;
 		private static final int TEX_INFOPANEL_WIDTH = 62;
 		private static final int TEX_INFOPANEL_HEIGHT = 79;
-		
-		private static final int TEX_PATTERN_HOFFSET = 0;
-		private static final int TEX_PATTERN_VOFFSET = 195;
-		private static final int TEX_PATTERN_WIDTH = 20;
-		private static final int TEX_PATTERN_HEIGHT = 20;
 		
 		private static final int TEX_RARROW_HOFFSET = 38;
 		private static final int TEX_RARROW_VOFFSET = 177;
@@ -404,6 +398,9 @@ public class MysticSpellCraftGui {
 			// Pattern arrows
 			this.addButton(new PatternChangeButton(this, true, horizontalMargin + POS_LARROW_HOFFSET, verticalMargin + POS_LARROW_VOFFSET, POS_LARROW_WIDTH, POS_LARROW_HEIGHT));
 			this.addButton(new PatternChangeButton(this, false, horizontalMargin + POS_RARROW_HOFFSET, verticalMargin + POS_RARROW_VOFFSET, POS_RARROW_WIDTH, POS_RARROW_HEIGHT));
+			
+			// Pattern icon
+			this.addButton(new PatternIcon(this, horizontalMargin + POS_PATTERN_HOFFSET, verticalMargin + POS_PATTERN_VOFFSET, POS_PATTERN_WIDTH, POS_PATTERN_HEIGHT));
 		}
 
 		@Override
@@ -453,7 +450,7 @@ public class MysticSpellCraftGui {
 			}
 			
 			MysticContainer container = getContainer();
-			container.patternIdx = (container.patternIdx + (isLeft ? -1 : 1)) % choices.length;
+			container.patternIdx = ((choices.length + container.patternIdx) + (isLeft ? -1 : 1)) % choices.length;
 		}
 		
 		@Override
@@ -493,12 +490,6 @@ public class MysticSpellCraftGui {
 				drawRuneCellBackground(matrixStackIn, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH);
 				matrixStackIn.pop();
 			}
-			
-			// Draw pattern slot
-			matrixStackIn.push();
-			matrixStackIn.translate(horizontalMargin + POS_PATTERN_HOFFSET, verticalMargin + POS_PATTERN_VOFFSET, 0);
-			drawPattern(matrixStackIn, POS_PATTERN_WIDTH, POS_PATTERN_HEIGHT);
-			matrixStackIn.pop();
 			
 			// Draw info panel since it's not a widget
 			matrixStackIn.push();
@@ -560,27 +551,6 @@ public class MysticSpellCraftGui {
 						width, height,
 						TEX_WIDTH, TEX_HEIGHT
 						);
-			}
-		}
-		
-		protected void drawPattern(MatrixStack matrixStackIn, int width, int height) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
-					TEX_PATTERN_HOFFSET, TEX_PATTERN_VOFFSET, TEX_PATTERN_WIDTH, TEX_PATTERN_HEIGHT,
-					width, height,
-					TEX_WIDTH, TEX_HEIGHT
-					);
-			
-			// Draw pattern icon
-			@Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
-			if (pattern != null) {
-				@Nullable ISpellCraftPatternRenderer renderer = ISpellCraftPatternRenderer.GetRenderer(pattern);
-				if (renderer != null) {
-					matrixStackIn.push();
-					matrixStackIn.translate(1, 1, 0);
-					renderer.drawPatternIcon(matrixStackIn, pattern, getContainer().getCraftContext(), width-2, height-2, 1f, 1f, 1f, 1f);
-					matrixStackIn.pop();
-				}
 			}
 		}
 	}

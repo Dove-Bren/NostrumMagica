@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.BlankScroll;
@@ -546,6 +547,11 @@ public class SpellCreationGui {
 //		private static final int TEXT_GUAGE_INNER_WIDTH = 58;
 //		private static final int TEXT_GUAGE_INNER_HEIGHT = 4;
 		
+		private static final int TEX_PATTERN_HOFFSET = 38;
+		private static final int TEX_PATTERN_VOFFSET = 0;
+		private static final int TEX_PATTERN_WIDTH = 20;
+		private static final int TEX_PATTERN_HEIGHT = 20;
+		
 		protected static class SpellIconButton extends Button {
 			
 			private final int value;
@@ -780,6 +786,58 @@ public class SpellCreationGui {
 					return 0xFF3366FF;
 				} else {
 					return 0xFFFF0000;
+				}
+			}
+		}
+		
+		protected static class PatternIcon extends Widget {
+
+			private final SpellGui<?> gui;
+			
+			public PatternIcon(SpellGui<?> gui, int x, int y, int width, int height) {
+				super(x, y, width, height, StringTextComponent.EMPTY);
+				this.gui = gui;
+			}
+			
+			@Override
+			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+				final SpellCraftPattern pattern = gui.getContainer().getCraftPattern();
+				if (pattern != null) {
+					List<ITextComponent> tooltip = new ArrayList<>(4);
+					tooltip.add(pattern.getName());
+					pattern.addDescription(tooltip);
+					gui.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
+				}
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				final Minecraft mc = Minecraft.getInstance();
+				
+				// Background
+				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, 
+						TEX_PATTERN_HOFFSET, TEX_PATTERN_VOFFSET, TEX_PATTERN_WIDTH, TEX_PATTERN_HEIGHT,
+						width, height,
+						TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
+						);
+				
+				final SpellCraftPattern pattern = gui.getContainer().getCraftPattern();
+				if (pattern != null) {
+					@Nullable ISpellCraftPatternRenderer renderer = ISpellCraftPatternRenderer.GetRenderer(pattern);
+					if (renderer != null) {
+						matrixStackIn.push();
+						matrixStackIn.translate(x + 1, y + 1, 0);
+						renderer.drawPatternIcon(matrixStackIn, pattern, gui.getContainer().getCraftContext(), this.width-2, this.height-2, 1f, 1f, 1f, 1f);
+						matrixStackIn.pop();
+					}
+					
+					if (this.isHovered()) {
+						matrixStackIn.push();
+						matrixStackIn.translate(0, 0, 100);
+						this.renderToolTip(matrixStackIn, mouseX, mouseY);
+						matrixStackIn.pop();
+					}
 				}
 			}
 		}

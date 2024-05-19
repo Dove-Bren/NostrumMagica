@@ -488,6 +488,9 @@
 	
 	"container.nostrummagica.putter.name": "Putter",
 	"container.nostrummagica.active_hopper.name": "Active Hopper",
+	
+	"pattern.nostrummagica.lightweight": "Lightweight",
+	"pattern.nostrummagica.lightweight.description": "Makes the rune in the second slot weigh one unit less, but cost twice as much mana",
 
     "key.cast1.desc": "Cast Spell Slot 1",
 	"key.cast2.desc": "Cast Spell Slot 2",
