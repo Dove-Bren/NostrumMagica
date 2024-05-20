@@ -229,10 +229,7 @@ public class SpellCreationGui {
 		@Override
 		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
 			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
-			
-			int unused; // is this useful?
 			checkScroll();
-			
 			return ret;
 		}
 		

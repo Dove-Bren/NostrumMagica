@@ -60,6 +60,7 @@ import com.smanzana.petcommand.api.pet.PetInfo;
 import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
 import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
 
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -84,6 +85,7 @@ import net.minecraft.entity.monster.AbstractSkeletonEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -95,6 +97,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.Effects;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
@@ -102,6 +105,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -660,6 +664,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	public void tick() {
 		super.tick();
 		this.stepHeight = 1.1f;
+		checkAndHandleLava();
 	}
 	
 	@Override
@@ -771,6 +776,28 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return super.isPushedByWater();
 	}
 	
+	protected void checkAndHandleLava() {
+		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK) && super.isInLava()) {
+			// Copied from Strider
+			ISelectionContext iselectioncontext = ISelectionContext.forEntity(this);
+			if (iselectioncontext.func_216378_a(FlowingFluidBlock.LAVA_COLLISION_SHAPE, this.getPosition(), true) && !this.world.getFluidState(this.getPosition().up()).isTagged(FluidTags.LAVA)) {
+				this.onGround = true;
+			} else {
+				this.setMotion(this.getMotion().scale(0.5D).add(0.0D, 0.05D, 0.0D));
+			}
+		}
+	}
+	
+	@Override
+	public boolean func_230285_a_(Fluid fluid) {
+		// Copied from Strider
+		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+			return fluid.isIn(FluidTags.LAVA);
+		}
+		
+		return super.func_230285_a_(fluid);
+	}
+	
 	@Override
 	public boolean isBreedingItem(@Nonnull ItemStack stack) {
 		return false;
@@ -816,6 +843,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 					this.setSitting(!this.isSitting());
 					if (player.isCreative()) {
 						this.setBond(1f);
+						this.addTrainingXP(500);
 					}
 				}
 				return ActionResultType.SUCCESS;
