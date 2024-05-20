@@ -579,8 +579,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Spell name
 		Minecraft mc = Minecraft.getInstance();
 		Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
-		boolean xp = ModConfig.config.displayXPText();
-		if (current.length != 0 || xp) {
+		if (current != null && current.length != 0) {
 			final int slotSize = 16;
 			int slideHeight = slotSize + (4);
 			

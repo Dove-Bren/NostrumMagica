@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Multimap;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.IElytraRenderer;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 import top.theillusivec4.caelus.api.CaelusApi;
 import top.theillusivec4.caelus.api.RenderElytraEvent;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, value = Dist.CLIENT)
 public class NostrumElytraWrapper {
 	
 	// Make a modifier with a random UUID that turns the elytra ON
@@ -75,7 +76,7 @@ public class NostrumElytraWrapper {
 	}
 	
 	@SubscribeEvent(priority=EventPriority.LOWEST)
-	public void onRenderElytra(RenderElytraEvent event) {
+	public static void onRenderElytra(RenderElytraEvent event) {
 		
 		// Cancel if a cape is specifically suppressing it
 		final LivingEntity entity = event.getEntityLiving();
@@ -97,7 +98,7 @@ public class NostrumElytraWrapper {
 			if (!stack.isEmpty() && stack.getItem() instanceof IElytraRenderer) {
 				if (((IElytraRenderer) stack.getItem()).shouldRenderElyta(entity, stack)) {
 					event.setRender(true);
-					event.setEnchanted(true);
+					event.setEnchanted(stack.isEnchanted());
 					return;
 				}
 			}

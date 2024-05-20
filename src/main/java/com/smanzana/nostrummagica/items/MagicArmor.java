@@ -1678,7 +1678,9 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
-		return hasElytra(entity)
+		return stack != entity.getHeldItemMainhand()
+				&& stack != entity.getHeldItemOffhand()
+				&& hasElytra(entity)
 				&& (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND)
 				&& (!(entity instanceof PlayerEntity) || !(shouldRenderDragonWings(stack, (PlayerEntity) entity)));
 	}
