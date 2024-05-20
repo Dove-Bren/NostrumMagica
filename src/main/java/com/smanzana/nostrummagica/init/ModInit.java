@@ -9,10 +9,12 @@ import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.capabilities.ManaArmor;
 import com.smanzana.nostrummagica.capabilities.ManaArmorStorage;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
+import com.smanzana.nostrummagica.capabilities.SpellCraftingCapability;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
 import com.smanzana.nostrummagica.command.CommandAllResearch;
 import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
@@ -260,6 +262,7 @@ public class ModInit {
     	
     	CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
+		CapabilityManager.INSTANCE.register(ISpellCrafting.class, SpellCraftingCapability.Serializer.INSTANCE, SpellCraftingCapability::new);
 		new CapabilityHandler();
 	}
 	

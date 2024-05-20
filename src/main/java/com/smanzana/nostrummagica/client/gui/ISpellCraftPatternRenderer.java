@@ -3,8 +3,6 @@ package com.smanzana.nostrummagica.client.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
@@ -27,7 +25,7 @@ public interface ISpellCraftPatternRenderer {
 		Renderers.put(pattern.getRegistryName(), renderer);
 	}
 	
-	public static @Nullable ISpellCraftPatternRenderer GetRenderer(SpellCraftPattern pattern) {
-		return Renderers.get(pattern.getRegistryName());
+	public static ISpellCraftPatternRenderer GetRenderer(SpellCraftPattern pattern) {
+		return Renderers.getOrDefault(pattern.getRegistryName(), SpellCraftPatternAutoRenderer.INSTANCE);
 	}
 }

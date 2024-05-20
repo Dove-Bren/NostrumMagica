@@ -31,6 +31,7 @@ public class StatRequestMessage {
 			
 			NetworkHandler.sendTo(new StatSyncMessage(att), sp);
 			NetworkHandler.sendTo(new ManaArmorSyncMessage(sp, NostrumMagica.getManaArmor(sp)), sp);
+			NetworkHandler.sendTo(new SpellCraftingCapabilitySyncMessage(sp, NostrumMagica.getSpellCrafting(sp)), sp);
 		});
 	}
 

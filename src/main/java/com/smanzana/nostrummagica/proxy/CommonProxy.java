@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
@@ -21,6 +22,7 @@ import com.smanzana.nostrummagica.network.messages.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
+import com.smanzana.nostrummagica.network.messages.SpellCraftingCapabilitySyncMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
@@ -60,6 +62,9 @@ public class CommonProxy {
     			player);
     	NetworkHandler.sendTo(
     			new ManaArmorSyncMessage(player, NostrumMagica.getManaArmor(player)),
+    			player);
+    	NetworkHandler.sendTo(
+    			new SpellCraftingCapabilitySyncMessage(player, NostrumMagica.getSpellCrafting(player)),
     			player);
     }
     
@@ -219,7 +224,16 @@ public class CommonProxy {
 		NetworkHandler.sendToAllTracking(new ManaArmorSyncMessage(player, stats), player);
 	}
 	
+	public void sendSpellCraftingCapability(PlayerEntity player) {
+		ISpellCrafting stats = NostrumMagica.getSpellCrafting(player);
+		NetworkHandler.sendToAllTracking(new SpellCraftingCapabilitySyncMessage(player, stats), player);
+	}
+	
 	public void receiveManaArmorOverride(@Nonnull Entity ent, IManaArmor override) {
+		; // Nothing to do on server
+	}
+
+	public void receiveSpellCraftingOverride(Entity ent, ISpellCrafting stats) {
 		; // Nothing to do on server
 	}
 	

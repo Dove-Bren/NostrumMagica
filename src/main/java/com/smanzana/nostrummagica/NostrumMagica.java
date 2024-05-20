@@ -20,8 +20,10 @@ import com.smanzana.nostrummagica.blocks.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
+import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
+import com.smanzana.nostrummagica.capabilities.SpellCraftingCapabilityProvider;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -179,6 +181,14 @@ public class NostrumMagica {
 			return null;
 
 		return e.getCapability(ManaArmorAttributeProvider.CAPABILITY).orElse(null);
+	}
+	
+	public static ISpellCrafting getSpellCrafting(Entity e) {
+		if (e == null) {
+			return null;
+		}
+		
+		return e.getCapability(SpellCraftingCapabilityProvider.CAPABILITY).orElse(null);
 	}
 
 	public static ItemStack findTome(PlayerEntity entity, int tomeID) {

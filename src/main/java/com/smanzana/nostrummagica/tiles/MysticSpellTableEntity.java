@@ -1,10 +1,13 @@
 package com.smanzana.nostrummagica.tiles;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -76,8 +79,8 @@ public class MysticSpellTableEntity extends BasicSpellTableEntity {
 
 	public static SpellCraftPattern[] CalculatePatternChoices(PlayerEntity crafter,
 			ISpellCraftingInventory tableInventory, BlockPos tablePos) {
-		int unused; // Make based on player... and maybe world and position?
-		Collection<SpellCraftPattern> values = SpellCraftPattern.GetAll();
+		@Nullable ISpellCrafting crafting = NostrumMagica.getSpellCrafting(crafter);
+		Collection<SpellCraftPattern> values = crafting == null ? new ArrayList<>(0) : crafting.getKnownPatterns();
 		
 		SpellCraftPattern[] choices = new SpellCraftPattern[values.size() + 1];
 		

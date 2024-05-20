@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
+import com.smanzana.nostrummagica.network.messages.SpellCraftingCapabilitySyncMessage;
 import com.smanzana.nostrummagica.network.messages.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestReplyMessage;
@@ -103,6 +104,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpawnPredefinedEffectMessage.class, SpawnPredefinedEffectMessage::encode, SpawnPredefinedEffectMessage::decode, SpawnPredefinedEffectMessage::handle);
 		syncChannel.registerMessage(discriminator++, ManaArmorSyncMessage.class, ManaArmorSyncMessage::encode, ManaArmorSyncMessage::decode, ManaArmorSyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellTomeSlotModifyMessage.class, SpellTomeSlotModifyMessage::encode, SpellTomeSlotModifyMessage::decode, SpellTomeSlotModifyMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellCraftingCapabilitySyncMessage.class, SpellCraftingCapabilitySyncMessage::encode, SpellCraftingCapabilitySyncMessage::decode, SpellCraftingCapabilitySyncMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),

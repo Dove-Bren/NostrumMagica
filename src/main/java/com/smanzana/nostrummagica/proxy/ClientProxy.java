@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
 import com.smanzana.nostrummagica.client.effects.ClientEffectEchoed;
@@ -927,8 +928,25 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
+	public void sendSpellCraftingCapability(PlayerEntity player) {
+		if (player.world.isRemote()) {
+			return;
+		}
+		
+		super.sendSpellCraftingCapability(player);
+	}
+	
+	@Override
 	public void receiveManaArmorOverride(@Nonnull Entity ent, IManaArmor override) {
 		@Nullable IManaArmor existing = NostrumMagica.getManaArmor(ent);
+		if (existing != null) {
+			existing.copy(override);
+		}
+	}
+	
+	@Override
+	public void receiveSpellCraftingOverride(Entity ent, ISpellCrafting override) {
+		@Nullable ISpellCrafting existing = NostrumMagica.getSpellCrafting(ent);
 		if (existing != null) {
 			existing.copy(override);
 		}

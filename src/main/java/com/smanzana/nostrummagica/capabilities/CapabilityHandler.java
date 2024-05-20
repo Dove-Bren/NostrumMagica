@@ -14,6 +14,7 @@ public class CapabilityHandler {
 
 	public static final ResourceLocation CAPABILITY_MAGIC_LOC = new ResourceLocation(NostrumMagica.MODID, "magicattrib");
 	public static final ResourceLocation CAPABILITY_MANARMOR_LOC = new ResourceLocation(NostrumMagica.MODID, "manaarmorattrib");
+	public static final ResourceLocation CAPABILITY_SPELLCRAFTING_LOC = NostrumMagica.Loc("spellcrafting");
 	
 	public CapabilityHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -25,14 +26,9 @@ public class CapabilityHandler {
 		//if player. Or not. Should get config going. For now, if it's a player make it?
 		//also need to catch death, etc
 		if (event.getObject() instanceof PlayerEntity) {
-			//attach that shizz
 			event.addCapability(CAPABILITY_MAGIC_LOC, new NostrumMagicAttributeProvider(event.getObject()));
 			event.addCapability(CAPABILITY_MANARMOR_LOC, new ManaArmorAttributeProvider(event.getObject()));
-			
-			// Too early; may not have connection
-//			if (event.getObject().world != null && event.getObject().world.isRemote) {
-//				NostrumMagica.instance.proxy.requestStats((PlayerEntity) event.getObject());
-//			}
+			event.addCapability(CAPABILITY_SPELLCRAFTING_LOC, new SpellCraftingCapabilityProvider());
 		}
 	}
 	
@@ -46,6 +42,10 @@ public class CapabilityHandler {
 			IManaArmor armor = NostrumMagica.getManaArmor(event.getOriginal());
 			event.getPlayer().getCapability(ManaArmorAttributeProvider.CAPABILITY, null).orElse(null)
 				.copy(armor);
+			
+			ISpellCrafting crafting = NostrumMagica.getSpellCrafting(event.getOriginal());
+			event.getPlayer().getCapability(SpellCraftingCapabilityProvider.CAPABILITY, null).orElse(null)
+				.copy(crafting);
 		//}
 		//if (!event.getEntityPlayer().world.isRemote)
 		//	NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.getEntityPlayer());
