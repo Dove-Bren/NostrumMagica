@@ -7,7 +7,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.MasteryOrb;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -605,7 +604,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 
 	@Override
 	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
-		return wolf.hasWolfCapability(WolfBondCapability.TRAINABLE);
+		return wolf.canWolfTrain();
 	}
 
 	@Override

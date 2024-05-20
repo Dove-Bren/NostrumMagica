@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfAbilitySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInventorySheet;
@@ -107,6 +108,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -271,52 +273,55 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		}
 	}
 	
-	protected static enum WolfSpellTargetGroup {
+	public static interface IWolfAbility {
+		public ITextComponent getName();
+		public ITextComponent getDescription();
+		public @Nullable WolfSpellTargetGroup getTargetGroup();
+		public int getCost();
+	}
+	
+	public static enum WolfSpellTargetGroup {
 		SELF,
 		ALLY,
 		ENEMY,
 	}
 	
-	protected static enum WolfSpell {
-		GROUP_SPEED(WolfSpellTargetGroup.SELF, 50,
+	protected static enum WolfSpell implements IWolfAbility {
+		GROUP_SPEED("packspeed", WolfSpellTargetGroup.SELF, 50,
 				(Spell.CreateAISpell("WolfSpeed")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartProperties(8, true))),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.WIND, 1),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.WIND, 1)
-							&& wolf.getAttackTarget() == null // Not in battle
+					return wolf.getAttackTarget() == null // Not in battle
 							&& wolf.getMana() >= wolf.getMaxMana() * .30 // >= 30% mana
 							;
 				}),
-		WIND_CUTTER(WolfSpellTargetGroup.ENEMY, 20,
+		WIND_CUTTER("windcutter", WolfSpellTargetGroup.ENEMY, 20,
 				(Spell.CreateAISpell("WolfWindCutter")).addPart(new SpellPart(MagicCutterTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.WIND, 2, EAlteration.RUIN)),
-				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.WIND, 3);
-				}),
-		ROOTS(WolfSpellTargetGroup.ENEMY, 25,
+				(wolf) -> wolf.hasElementLevel(EMagicElement.WIND, 3),
+				(wolf, target) -> true),
+		ROOTS("roots", WolfSpellTargetGroup.ENEMY, 25,
 				(Spell.CreateAISpell("WolfRoots")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.INFLICT)),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 1),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.EARTH, 1)
-							&& target.getActivePotionEffect(NostrumEffects.rooted) == null;
+					return target.getActivePotionEffect(NostrumEffects.rooted) == null;
 				}),
-		REGEN(WolfSpellTargetGroup.ALLY, 50,
+		REGEN("wolfregen", WolfSpellTargetGroup.ALLY, 50,
 				(Spell.CreateAISpell("WolfRegen")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.GROWTH)),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 3),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.EARTH, 3)
-							&& target.getHealth() < target.getMaxHealth()
+					return target.getHealth() < target.getMaxHealth()
 							&& target.getActivePotionEffect(Effects.REGENERATION) == null;
 				}),
-		MAGIC_SHIELD(WolfSpellTargetGroup.SELF, 30,
+		MAGIC_SHIELD("magicshield", WolfSpellTargetGroup.SELF, 30,
 				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartProperties(8, true))),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 1),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.ICE, 1)
-							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
+					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
-		WOLF_HEAL(null, 20,
+		WOLF_HEAL("heal", null, 20,
 				(Spell.CreateAISpell("WolfHeal")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE, 2, EAlteration.GROWTH)),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 2),
 				(wolf, target) -> {
-					if (!wolf.hasElementLevel(EMagicElement.ICE, 2)) {
-						return false;
-					}
-					
 					if (target.isEntityUndead()) {
 						// An attack against undead!
 						return !NostrumMagica.IsSameTeam(wolf, target);
@@ -324,64 +329,76 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 						return target.getHealth() < target.getMaxHealth() && NostrumMagica.IsSameTeam(wolf, target);
 					}
 				}),
-		ICE_FANGS(WolfSpellTargetGroup.SELF, 100,
+		ICE_FANGS("icefang", WolfSpellTargetGroup.SELF, 100,
 				(Spell.CreateAISpell("WolfIceFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ICE, 2, EAlteration.ENCHANT, new SpellPartProperties(8, true))),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 3),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.ICE, 3)
-							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
+					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
-		FIRE_TOUCH(WolfSpellTargetGroup.ENEMY, 10,
+		FIRE_TOUCH("firefang", WolfSpellTargetGroup.ENEMY, 10,
 				(Spell.CreateAISpell("WolfFireBite")).addPart(new SpellPart(TouchTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 2, EAlteration.RUIN)),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 1),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.FIRE, 1)
-							&& wolf.getDistance(target) <= TouchTrigger.TOUCH_RANGE;
+					return wolf.getDistance(target) <= TouchTrigger.TOUCH_RANGE;
 				}),
-		MAGIC_BOOST(WolfSpellTargetGroup.ALLY, 20,
+		MAGIC_BOOST("magicboost", WolfSpellTargetGroup.ALLY, 20,
 				(Spell.CreateAISpell("WolfMagicBoost")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 3),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.FIRE, 3)
-							&& target.getActivePotionEffect(NostrumEffects.magicBoost) == null
+					return target.getActivePotionEffect(NostrumEffects.magicBoost) == null
 							&& (wolf.getAttackTarget() != null || wolf.getMana() >= wolf.getMaxMana() * .75) // in battle or >= 75% mana
 							;
 				}),
-		ENDER_SHROUD(WolfSpellTargetGroup.ENEMY, 20,
+		ENDER_SHROUD("endershroud", WolfSpellTargetGroup.ENEMY, 20,
 				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartProperties(3, true))).addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
-				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.ENDER, 1);
-				}),
-		ENDER_FANGS(WolfSpellTargetGroup.SELF, 75,
+				(wolf) -> wolf.hasElementLevel(EMagicElement.ENDER, 1),
+				(wolf, target) -> true),
+		ENDER_FANGS("enderfang", WolfSpellTargetGroup.SELF, 75,
 				(Spell.CreateAISpell("WolfEnderFangs")).addPart(new SpellPart(SelfTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.ENDER, 1, EAlteration.ENCHANT, new SpellPartProperties(8, true))),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.ENDER, 3),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.ENDER, 3)
-							&& wolf.getAttackTarget() != null; // Don't want to cast out of battle
+					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
-		SLOW(WolfSpellTargetGroup.ENEMY, 10,
+		SLOW("slow", WolfSpellTargetGroup.ENEMY, 10,
 				(Spell.CreateAISpell("WolfSlow")).addPart(new SpellPart(AITargetTrigger.instance())).addPart(new SpellPart(SingleShape.instance(), EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.LIGHTNING, 1),
 				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.LIGHTNING, 1)
-							&& target.getActivePotionEffect(Effects.SLOWNESS) == null;
+					return target.getActivePotionEffect(Effects.SLOWNESS) == null;
 				}),
-		CHAIN_LIGHTNING(WolfSpellTargetGroup.ENEMY, 40,
+		CHAIN_LIGHTNING("chainlighting", WolfSpellTargetGroup.ENEMY, 40,
 				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellPart(SeekingBulletTrigger.instance())).addPart(new SpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartProperties(6, true))),
-				(wolf, target) -> {
-					return wolf.hasElementLevel(EMagicElement.LIGHTNING, 3);
-				}),
+				(wolf) -> wolf.hasElementLevel(EMagicElement.LIGHTNING, 3),
+				(wolf, target) -> true),
 		;
 		
 		private static interface ISpellPredicate {
 			public boolean apply(EntityArcaneWolf wolf, LivingEntity target);
 		}
 		
+		private static interface IWolfPredicate {
+			public boolean apply(EntityArcaneWolf wolf);
+		}
+		
+		protected final String key;
 		private final @Nullable WolfSpellTargetGroup group;
 		private final Spell spell;
 		private final ISpellPredicate predicate;
+		private final IWolfPredicate wolfChecker;
 		private final int cost;
 		
-		private WolfSpell(@Nullable WolfSpellTargetGroup group, int cost, Spell spell, ISpellPredicate predicate) {
+		private final ITextComponent name;
+		private final ITextComponent description;
+		
+		private WolfSpell(String key, @Nullable WolfSpellTargetGroup group, int cost, Spell spell, IWolfPredicate wolfChecker, ISpellPredicate predicate) {
+			this.key = key;
 			this.group = group;
 			this.spell = spell;
 			this.predicate = predicate;
+			this.wolfChecker = wolfChecker;
 			this.cost = cost;
+			
+			this.name = new TranslationTextComponent("info.wolf_ability." + key + ".name");
+			this.description = new TranslationTextComponent("info.wolf_ability." + key + ".desc");
 		}
 		
 		public Spell getSpell() {
@@ -389,13 +406,76 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		}
 		
 		public boolean matches(WolfSpellTargetGroup group, EntityArcaneWolf wolf, LivingEntity target) {
-			return (this.group == null || this.group == group) && predicate.apply(wolf, target);
+			return (this.group == null || this.group == group) && canCast(wolf) && predicate.apply(wolf, target);
 		}
 		
+		public boolean canCast(EntityArcaneWolf wolf) {
+			return wolfChecker.apply(wolf);
+		}
+		
+		@Override
 		public int getCost() {
 			return this.cost;
 		}
+		
+		@Override
+		public WolfSpellTargetGroup getTargetGroup() {
+			return this.group;
+		}
+		
+		@Override
+		public ITextComponent getName() {
+			return name;
+		}
+		
+		@Override
+		public ITextComponent getDescription() {
+			return description;
+		}
 	}
+	
+	private static final class StubbedWolfAbility implements IWolfAbility {
+		private final ITextComponent name;
+		private final ITextComponent desc;
+		private final int manaCost;
+		private final WolfSpellTargetGroup group;
+		
+		public StubbedWolfAbility(String key, int manaCost, WolfSpellTargetGroup group) {
+			super();
+			this.manaCost = manaCost;
+			this.group = group;
+			this.name = new TranslationTextComponent("info.wolf_ability." + key + ".name");
+			this.desc = new TranslationTextComponent("info.wolf_ability." + key + ".desc");
+		}
+		
+		@Override
+		public ITextComponent getName() {
+			return name;
+		}
+		
+		@Override
+		public ITextComponent getDescription() {
+			return desc;
+		}
+		
+		@Override
+		public WolfSpellTargetGroup getTargetGroup() {
+			return group;
+		}
+		
+		@Override
+		public int getCost() {
+			return manaCost;
+		}
+		
+	}
+	
+	private static final IWolfAbility ABILITY_INFO_BARRIER = new StubbedWolfAbility("class_barrier", 5, WolfSpellTargetGroup.ALLY);
+	private static final IWolfAbility ABILITY_INFO_STORM = new StubbedWolfAbility("class_storm", 30, WolfSpellTargetGroup.ENEMY);
+	private static final IWolfAbility ABILITY_INFO_ELDRICH = new StubbedWolfAbility("class_elrich", 40, WolfSpellTargetGroup.ENEMY);
+	private static final IWolfAbility ABILITY_INFO_MYSTIC = new StubbedWolfAbility("class_mystic", 10, WolfSpellTargetGroup.ALLY);
+	private static final IWolfAbility ABILITY_INFO_NATURE = new StubbedWolfAbility("class_nature", 25, WolfSpellTargetGroup.ALLY);
+	private static final IWolfAbility ABILITY_INFO_HELL = new StubbedWolfAbility("class_hell", 40, WolfSpellTargetGroup.ENEMY);
 	
 	public static final String ID = "entity_arcane_wolf";
 	
@@ -1794,13 +1874,50 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return hasElementLevel(element, 3);
 	}
 	
+	public List<IWolfAbility> getAbilityList() {
+		List<IWolfAbility> abilities = new ArrayList<>(8);
+		for (WolfSpell spell : WolfSpell.values()) {
+			if (spell.canCast(this)) {
+				abilities.add(spell);
+			}
+		}
+		
+		// Add class abilities which are not WolfSpells
+		if (this.getElementalType() == ArcaneWolfElementalType.BARRIER) {
+			abilities.add(ABILITY_INFO_BARRIER);
+		}
+		if (this.getElementalType() == ArcaneWolfElementalType.ELDRICH) {
+			abilities.add(ABILITY_INFO_ELDRICH);
+		}
+		if (this.getElementalType() == ArcaneWolfElementalType.HELL) {
+			abilities.add(ABILITY_INFO_HELL);
+		}
+		if (this.getElementalType() == ArcaneWolfElementalType.MYSTIC) {
+			abilities.add(ABILITY_INFO_MYSTIC);
+		}
+		if (this.getElementalType() == ArcaneWolfElementalType.NATURE) {
+			abilities.add(ABILITY_INFO_NATURE);
+		}
+		if (this.getElementalType() == ArcaneWolfElementalType.STORM) {
+			abilities.add(ABILITY_INFO_STORM);
+		}
+		
+		return abilities;
+	}
+	
+	public boolean canWolfTrain() {
+		return hasWolfCapability(WolfBondCapability.TRAINABLE)
+				&& getElementalType().getSecondary() == null; // A bit hacky
+	}
+	
 	@Override
 	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player) {
 		return ArrayUtil.MakeArray(
 				new ArcaneWolfInfoSheet(this),
 				new ArcaneWolfBondInfoSheet(this),
 				new ArcaneWolfInventorySheet(this),
-				new ArcaneWolfTrainingSheet(this)
+				new ArcaneWolfTrainingSheet(this),
+				new ArcaneWolfAbilitySheet(this)
 		);
 	}
 
@@ -1877,10 +1994,12 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	protected List<Spell> getTargetSpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
-		for (WolfSpell spell : WolfSpell.values()) {
-			if (this.getMana() >= spell.getCost()
-					&& spell.matches(WolfSpellTargetGroup.ENEMY, this, target)) {
-				listToAddTo.add(spell.getSpell());
+		if (target != null) {
+			for (WolfSpell spell : WolfSpell.values()) {
+				if (this.getMana() >= spell.getCost()
+						&& spell.matches(WolfSpellTargetGroup.ENEMY, this, target)) {
+					listToAddTo.add(spell.getSpell());
+				}
 			}
 		}
 		return listToAddTo;
@@ -1899,10 +2018,12 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	protected List<Spell> getAllySpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
-		for (WolfSpell spell : WolfSpell.values()) {
-			if (this.getMana() >= spell.getCost()
-					&& spell.matches(WolfSpellTargetGroup.ALLY, this, target)) {
-				listToAddTo.add(spell.getSpell());
+		if (target != null) {
+			for (WolfSpell spell : WolfSpell.values()) {
+				if (this.getMana() >= spell.getCost()
+						&& spell.matches(WolfSpellTargetGroup.ALLY, this, target)) {
+					listToAddTo.add(spell.getSpell());
+				}
 			}
 		}
 		return listToAddTo;

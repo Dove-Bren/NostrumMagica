@@ -1,5 +1,11 @@
 package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
@@ -9,17 +15,25 @@ import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.vector.Vector4f;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 
 	private EntityArcaneWolf wolf;
+	private List<CapabilityTooltip> widgets;
 	
 	public ArcaneWolfInfoSheet(EntityArcaneWolf wolf) {
 		this.wolf = wolf;
+		widgets = new ArrayList<>();
 	}
 	
 	@Override
@@ -194,11 +208,23 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
+		// Hackily create widgets first time we're rendered so that this logic only exists in one place
+		final @Nullable List<CapabilityTooltip> widgetCollection = (this.widgets.isEmpty() ? this.widgets : null); 
 		x = 10;
 		{
 			str = "Rideable";
-			
 			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+			
+			if (widgetCollection != null) {
+				Vector4f dims = new Vector4f(fonter.getStringWidth(str), fonter.FONT_HEIGHT, 0, 0);
+				dims.transform(matrixStackIn.getLast().getMatrix());
+				
+				final int widgetWidth = (int) dims.getX();
+				final int widgetHeight = (int) dims.getY();
+				final String key = "Can be ridden upon, and is even strong enough to jump!";
+				widgetCollection.add(new CapabilityTooltip(new StringTextComponent(key), x, y, widgetWidth, widgetHeight));
+			}
+			
 			y += h + smallMargin;
 		}
 		
@@ -207,11 +233,25 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 				x = 10;
 				{
 					str = I18n.format("info.tamed_arcane_wolf.capability." + cap.getKey());
-					
 					fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+					
+					if (widgetCollection != null) {
+						Vector4f dims = new Vector4f(fonter.getStringWidth(str), fonter.FONT_HEIGHT, 0, 0);
+						dims.transform(matrixStackIn.getLast().getMatrix());
+						
+						final int widgetWidth = (int) dims.getX();
+						final int widgetHeight = (int) dims.getY();
+						final String key = "info.tamed_arcane_wolf.capability." + cap.getKey() + ".desc";
+						widgetCollection.add(new CapabilityTooltip(new TranslationTextComponent(key), x, y, widgetWidth, widgetHeight));
+					}
+					
 					y += h + smallMargin;
 				}
 			}
+		}
+		
+		for (Widget widget : this.widgets) {
+			widget.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 	}
@@ -237,7 +277,30 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 
 	@Override
 	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		for (CapabilityTooltip widget : widgets) {
+			widget.drawOverlay(mc, matrixStackIn, width, height, mouseX, mouseY);
+		}
+	}
+	
+	private static class CapabilityTooltip extends Widget {
 		
+		private final ITextComponent tooltip;
+		
+		public CapabilityTooltip(ITextComponent tooltip, int x, int y, int width, int height) {
+			super(x, y, width, height, StringTextComponent.EMPTY);
+			this.tooltip = tooltip;
+		}
+		
+		@Override
+		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialsTicks) {
+			;
+		}
+		
+		public void drawOverlay(Minecraft mc, MatrixStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
+			if (this.isHovered()) {
+				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(this.tooltip), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.fontRenderer);
+			}
+		}
 	}
 
 }

@@ -41,7 +41,7 @@ public class ModelArcaneWolf extends WolfModel<EntityArcaneWolf> {
 //		headSnootBridge.offsetX = 0;
 //		headSnootBridge.offsetY = .016F;
 //		headSnootBridge.offsetZ = -.075F;
-		headSnootBridge.setRotationPoint(0.5F, -0.5F + .016F, -.075F);
+		headSnootBridge.setRotationPoint(0.5F, -0.5F + (16 *.016F), 16 * -.075F);
 		headSnootBridge.addBox(0, 0, 0, 1, 1, 2, 0.0F); // SnootBridge
 		headSnootBridge.rotateAngleX = 10f;
 		head.addChild(headSnootBridge);
