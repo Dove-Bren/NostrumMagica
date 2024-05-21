@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui;
+package com.smanzana.nostrummagica.client.gui.widget;
 
 import javax.annotation.Nullable;
 
@@ -33,19 +33,25 @@ public abstract class ObscurableWidget extends Widget {
 		this.y = y;
 	}
 	
-	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-		// Check bounds
+	protected boolean inBounds() {
 		if (this.bounds != null) {
 			final int maxX = this.x + this.width;
 			final int maxY = this.y + this.height;
 			final int boundsMaxX = bounds.getX() + bounds.getWidth();
 			final int boundsMaxY = bounds.getY() + bounds.getHeight();
-			this.visible = x < boundsMaxX
+			return x < boundsMaxX
 					&& maxX > bounds.getX()
 					&& y < boundsMaxY
 					&& maxY > bounds.getY();
 		}
+		
+		return true;
+	}
+	
+	@Override
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+		// Check bounds
+		this.visible = inBounds();
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
