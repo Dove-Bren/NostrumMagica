@@ -13,6 +13,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
+import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.ElementSpellRune;
@@ -47,6 +48,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -97,8 +99,9 @@ public class RuneShaperGui {
 		protected RuneShaperEntity shaper;
 		protected final CraftResultInventory resultInv;
 		protected Slot outputSlot;
+		protected SimpleInventoryContainerlet extraInv;
 		
-		public RuneShaperContainer(int windowId, PlayerEntity player, IInventory playerInv, RuneShaperEntity tableInventory, BlockPos pos) {
+		public RuneShaperContainer(int windowId, PlayerEntity player, IInventory playerInv, RuneShaperEntity tableInventory, BlockPos pos, @Nullable IInventory extraInventory) {
 			super(NostrumContainers.RuneShaper, windowId);
 			this.shaper = tableInventory;
 			this.resultInv = new CraftResultInventory();
@@ -138,16 +141,22 @@ public class RuneShaperGui {
 				this.addSlot(new Slot(playerInv, x, PLAYER_INV_HOFFSET + x * 18, 58 + (PLAYER_INV_VOFFSET)));
 			}
 			
+			if (extraInventory != null) {
+				final int height = 88;
+				this.extraInv = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new, GUI_WIDTH, GUI_HEIGHT	- height, 100, height, new StringTextComponent("Chest"));
+			}
+			
 			refreshOutput();
 		}
 		
 		public static final RuneShaperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
-			return new RuneShaperContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf), buf.readBlockPos());
+			RuneShaperEntity te = ContainerUtil.GetPackedTE(buf);
+			return new RuneShaperContainer(windowId, playerInv.player, playerInv, te, buf.readBlockPos(), te.getExtraInventory());
 		}
 		
 		public static final IPackedContainerProvider Make(RuneShaperEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new RuneShaperContainer(windowId, player, playerInv, table, table.getPos());
+				return new RuneShaperContainer(windowId, player, playerInv, table, table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
 				buffer.writeBlockPos(table.getPos());
@@ -473,6 +482,8 @@ public class RuneShaperGui {
 
 		private final RuneShaperContainer container;
 		
+		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
+		
 		private @Nullable SpellAction lastAction = null;
 		private @Nullable SpellActionProperties lastProps = null;
 		
@@ -486,6 +497,12 @@ public class RuneShaperGui {
 		@Override
 		public void init() {
 			super.init();
+			
+			if (container.extraInv != null) {
+				this.extraInventoryWidget = new SimpleInventoryWidget(this, container.extraInv);
+				this.extraInventoryWidget.setColor(0xFF221F23);
+				this.addButton(extraInventoryWidget);
+			}
 		}
 		
 		protected void drawAffectEntity(MatrixStack matrixStackIn, float[] color) {

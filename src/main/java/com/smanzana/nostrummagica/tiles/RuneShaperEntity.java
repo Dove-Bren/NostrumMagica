@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.tiles;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellRune;
@@ -10,7 +11,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class RuneShaperEntity extends TileEntity implements IInventory {
@@ -191,34 +194,6 @@ public class RuneShaperEntity extends TileEntity implements IInventory {
 		}
 	}
 	
-//	// Submit current staged modifications
-//	public void modify(boolean valB, float valF) {
-//		ItemStack stack = this.getMainSlot();
-//		if (stack.getItem() instanceof SpellTome) {
-//			if (this.getInputSlot() != null && this.getInputSlot().getItem() instanceof SpellTomePage) {
-//				SpellTome.addEnhancement(stack, new SpellTomeEnhancementWrapper( 
-//						SpellTomePage.getEnhancement(this.getInputSlot()),
-//						SpellTomePage.getLevel(this.getInputSlot())));
-//				int mods = Math.max(0, SpellTome.getModifications(stack) - 1);
-//				SpellTome.setModifications(stack, mods);
-//				this.setInventorySlotContents(1, ItemStack.EMPTY);
-//			}
-//		} else if (stack.getItem() instanceof SpellRune) {
-//			this.setInventorySlotContents(1, ItemStack.EMPTY);
-//			SpellRune.setPieceParam(stack, new SpellPartParam(valF, valB));
-//		} else if (stack.getItem() instanceof SpellScroll) {
-//			Spell spell = SpellScroll.getSpell(stack);
-//			if (spell != null) {
-//				spell.setIcon((int) valF);
-//				this.setInventorySlotContents(1, ItemStack.EMPTY);
-//			}
-//		} else if (stack.getItem() instanceof WarlockSword) {
-//			this.setInventorySlotContents(1, ItemStack.EMPTY);
-//			WarlockSword.addCapacity(stack, 2);
-//		}
-//		
-//	}
-
 	@Override
 	public boolean isEmpty() {
 		for (@Nonnull ItemStack stack : slots) {
@@ -227,5 +202,16 @@ public class RuneShaperEntity extends TileEntity implements IInventory {
 			}
 		}
 		return true;
+	}
+
+	public IInventory getExtraInventory() {
+		for (BlockPos checkPos : new BlockPos[] {pos.north(), pos.east(), pos.south(), pos.west()}) {
+			@Nullable TileEntity te = world.getTileEntity(checkPos);
+			if (te != null && te instanceof ChestTileEntity) {
+				return ((ChestTileEntity) te);
+			}
+		}
+		
+		return null;
 	}
 }
