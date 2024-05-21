@@ -21,7 +21,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
@@ -242,10 +241,10 @@ public class BasicSpellTableEntity extends TileEntity implements ISpellCraftingI
 	}
 	
 	public @Nullable IInventory getExtraInventory() {
-		for (BlockPos checkPos : new BlockPos[] {pos.north(), pos.east(), pos.south(), pos.west()}) {
+		for (BlockPos checkPos : new BlockPos[] {pos.up(), pos.north(), pos.east(), pos.south(), pos.west(), pos.down(), pos.up().north(), pos.up().south(), pos.up().east(), pos.up().west(), pos.north().east(), pos.north().west(), pos.south().east(), pos.south().west()}) {
 			@Nullable TileEntity te = world.getTileEntity(checkPos);
-			if (te != null && te instanceof ChestTileEntity) {
-				return ((ChestTileEntity) te);
+			if (te != null && te instanceof RuneLibraryTileEntity) {
+				return ((RuneLibraryTileEntity) te).getInventory();
 			}
 		}
 		

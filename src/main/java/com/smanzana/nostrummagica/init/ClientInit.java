@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.client.gui.container.PutterBlockGui;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RedwoodSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
+import com.smanzana.nostrummagica.client.gui.container.RuneLibraryGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
@@ -162,6 +163,7 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationRedwood, RedwoodSpellCraftGui.Gui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
+		ScreenManager.registerFactory(NostrumContainers.RuneLibrary, RuneLibraryGui.Gui::new);
 		
 		// Could probably make this be the default!
 		ISpellCraftPatternRenderer.RegisterRenderer(NostrumSpellCraftPatterns.lightweight, SpellCraftPatternAutoRenderer.INSTANCE);
@@ -352,6 +354,7 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.basicSpellTable, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.advancedSpellTable, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticSpellTable, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.runeLibrary, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

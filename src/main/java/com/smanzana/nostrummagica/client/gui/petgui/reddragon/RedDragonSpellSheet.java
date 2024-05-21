@@ -182,7 +182,6 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		matrixStackIn.pop();
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void drawShadowCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.push();
@@ -196,7 +195,6 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		matrixStackIn.pop();
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void drawFadedCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.push();

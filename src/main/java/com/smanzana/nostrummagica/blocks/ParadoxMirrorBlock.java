@@ -129,11 +129,6 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 		builder.add(FACING);
 	}
 	
-//	@Override
-//	public boolean isSolid(BlockState state) {
-//		return false;
-//	}
-	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		switch (state.get(FACING)) {
@@ -150,24 +145,6 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 			return AABB_W;
 		}
 	}
-	
-//	@Override
-//	public VoxelShape getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-//		switch (blockState.get(FACING)) {
-//		case NORTH:
-//		case UP:
-//		case DOWN:
-//		default:
-//			return AABB_N;
-//		case EAST:
-//			return AABB_E;
-//		case SOUTH:
-//			return AABB_S;
-//		case WEST:
-//			return AABB_W;
-//		
-//		}
-//	}
 	
 	@Override
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {

@@ -82,6 +82,7 @@ public class NostrumBlocks {
 	@ObjectHolder(BasicSpellTable.ID) public static BasicSpellTable basicSpellTable;
 	@ObjectHolder(AdvancedSpellTable.ID) public static AdvancedSpellTable advancedSpellTable;
 	@ObjectHolder(MysticSpellTable.ID) public static MysticSpellTable mysticSpellTable;
+	@ObjectHolder(RuneLibraryBlock.ID) public static RuneLibraryBlock runeLibrary;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -156,31 +157,7 @@ public class NostrumBlocks {
     	registerBlockItem(basicSpellTable, basicSpellTable.getRegistryName(), registry);
     	registerBlockItem(advancedSpellTable, advancedSpellTable.getRegistryName(), registry);
     	registerBlockItem(mysticSpellTable, mysticSpellTable.getRegistryName(), registry);
-    	
-
-//    	String[] variants = new String[DungeonBlock.Type.values().length];
-//    	for (DungeonBlock.Type type : DungeonBlock.Type.values()) {
-//    		variants[type.ordinal()] = type.getName().toLowerCase();
-//    	}
-//    	registry.register(
-//    			(new ItemMultiTexture(DungeonBlock.instance(), DungeonBlock.instance(), variants))
-//    			.setRegistryName(DungeonBlock.ID)
-//    		.setCreativeTab(NostrumMagica.creativeTab).setUnlocalizedName(DungeonBlock.ID));
-//    	
-//    	registry.register((new ItemMultiTexture(MimicBlock.door(), MimicBlock.door(), new String[] {
-//    			"breakable", // 0 meta
-//    			"unbreakable", // 1 meta
-//    		})).setRegistryName(MimicBlock.ID_DOOR).setCreativeTab(NostrumMagica.creativeTab));
-//    	registry.register((new ItemMultiTexture(MimicBlock.facade(), MimicBlock.facade(), new String[] {
-//    			"breakable", // 0 meta
-//    			"unbreakable", // 1 meta
-//    		})).setRegistryName(MimicBlock.ID_FACADE).setCreativeTab(NostrumMagica.creativeTab));
-//    	
-//    	registry.register((new ItemMultiTexture(DungeonAir.instance(), DungeonAir.instance(), new String[] {
-//    			"single", // 0 meta
-//    			"flood", // 1 meta
-//    		})).setRegistryName(DungeonAir.ID).setCreativeTab(NostrumMagica.creativeTab));
-    	
+    	registerBlockItem(runeLibrary, runeLibrary.getRegistryName(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -258,6 +235,7 @@ public class NostrumBlocks {
     	registerBlock(new BasicSpellTable(), BasicSpellTable.ID, registry);
     	registerBlock(new AdvancedSpellTable(), AdvancedSpellTable.ID, registry);
     	registerBlock(new MysticSpellTable(), MysticSpellTable.ID, registry);
+    	registerBlock(new RuneLibraryBlock(), RuneLibraryBlock.ID, registry);
     }
     
 }

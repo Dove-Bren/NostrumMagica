@@ -1,0 +1,184 @@
+{
+	"parent": "block/block",
+	"texture_size": [32, 32],
+	"textures": {
+		"particle": "nostrummagica:block/red_wood_planks",
+		"wood": "nostrummagica:block/red_wood_planks",
+		"rune_1": "nostrummagica:item/rune_single",
+		"rune_2": "nostrummagica:item/rune_self",
+		"rune_3": "nostrummagica:item/rune_fire",
+		"rune_4": "nostrummagica:item/rune_touch",
+		"rune_5": "nostrummagica:item/rune_ender",
+		"rune_6": "nostrummagica:item/rune_mortar",
+		"rune_7": "nostrummagica:item/rune_projectile"
+	},
+	"elements": [
+		{
+			"name": "bottom",
+			"from": [0, 0, 10],
+			"to": [16, 1, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 1], "texture": "#wood"},
+				"east": {"uv": [0, 0, 6, 1], "texture": "#wood"},
+				"south": {"uv": [0, 0, 16, 1], "texture": "#wood", "cullface": "south"},
+				"west": {"uv": [0, 0, 6, 1], "texture": "#wood"},
+				"up": {"uv": [0, 0, 16, 6], "texture": "#wood"},
+				"down": {"uv": [0, 0, 16, 6], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "top",
+			"from": [0, 15, 10],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 1], "texture": "#wood"},
+				"east": {"uv": [0, 0, 6, 1], "texture": "#wood"},
+				"south": {"uv": [0, 0, 16, 1], "texture": "#wood", "cullface": "south"},
+				"west": {"uv": [0, 0, 6, 1], "texture": "#wood"},
+				"up": {"uv": [0, 0, 16, 6], "texture": "#wood"},
+				"down": {"uv": [0, 0, 16, 6], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "left",
+			"from": [0, 1, 10],
+			"to": [1, 15, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 14], "texture": "#wood"},
+				"east": {"uv": [0, 0, 6, 14], "texture": "#wood"},
+				"south": {"uv": [0, 0, 1, 14], "texture": "#wood", "cullface": "south"},
+				"west": {"uv": [0, 0, 6, 14], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "right",
+			"from": [15, 1, 10],
+			"to": [16, 15, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 14], "texture": "#wood"},
+				"east": {"uv": [0, 0, 6, 14], "texture": "#wood"},
+				"south": {"uv": [0, 0, 1, 14], "texture": "#wood", "cullface": "south"},
+				"west": {"uv": [0, 0, 6, 14], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "back",
+			"from": [1, 1, 15],
+			"to": [15, 15, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 14, 14], "texture": "#wood"},
+				"south": {"uv": [0, 0, 14, 14], "texture": "#wood", "cullface": "south"}
+			}
+		},
+		{
+			"name": "rack",
+			"from": [1, 5, 11],
+			"to": [15, 6, 15],
+			"faces": {
+				"north": {"uv": [0, 0, 14, 1], "texture": "#wood"},
+				"up": {"uv": [0, 0, 14, 4], "texture": "#wood"},
+				"down": {"uv": [0, 0, 14, 4], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "rack",
+			"from": [1, 10, 11],
+			"to": [15, 11, 15],
+			"faces": {
+				"north": {"uv": [0, 0, 14, 1], "texture": "#wood"},
+				"up": {"uv": [0, 0, 14, 4], "texture": "#wood"},
+				"down": {"uv": [0, 0, 14, 4], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "rackv",
+			"from": [5, 1, 12],
+			"to": [6, 15, 15],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 14], "texture": "#wood"},
+				"east": {"uv": [0, 0, 3, 14], "texture": "#wood"},
+				"west": {"uv": [0, 0, 3, 14], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "rackv",
+			"from": [10, 1, 12],
+			"to": [11, 15, 15],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 14], "texture": "#wood"},
+				"east": {"uv": [0, 0, 3, 14], "texture": "#wood"},
+				"west": {"uv": [0, 0, 3, 14], "texture": "#wood"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [1.5, 1.5, 13],
+			"to": [4.5, 4.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_3"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [1.5, 11.5, 13],
+			"to": [4.5, 14.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_4"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [6.5, 1.5, 13],
+			"to": [9.5, 4.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_1"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [6.5, 6.5, 13],
+			"to": [9.5, 9.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_2"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [6.5, 11.5, 13],
+			"to": [9.5, 14.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_7"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [11.5, 1.5, 13],
+			"to": [14.5, 4.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_6"}
+			}
+		},
+		{
+			"name": "item",
+			"from": [11.5, 6.5, 13],
+			"to": [14.5, 9.5, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rune_5"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "shelves",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+		},
+		{
+			"name": "displays",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"children": [9, 10, 11, 12, 13, 14, 15]
+		}
+	]
+}

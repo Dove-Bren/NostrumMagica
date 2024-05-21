@@ -443,6 +443,7 @@
 	"block.nostrummagica.spelltable_basic": "Spell Table",
 	"block.nostrummagica.spelltable_advanced": "Blackstone Spell Table",
 	"block.nostrummagica.spelltable_mystic": "Mystic Spell Table",
+	"block.nostrummagica.rune_library": "Rune Library",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",
@@ -486,6 +487,7 @@
 	
 	"container.nostrummagica.putter.name": "Putter",
 	"container.nostrummagica.active_hopper.name": "Active Hopper",
+	"container.nostrummagica.rune_library.name": "Rune Library",
 	
 	"pattern.nostrummagica.lightweight": "Lightweight",
 	"pattern.nostrummagica.lightweight.description": "Makes the rune in the second slot weigh one unit less, but cost three times as much mana",

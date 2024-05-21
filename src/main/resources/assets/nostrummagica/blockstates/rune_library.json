@@ -1,0 +1,20 @@
+{
+    "variants": {
+        "facing=north,fill=empty": { "model": "nostrummagica:block/rune_library_empty" },
+        "facing=north,fill=some": { "model": "nostrummagica:block/rune_library_some" },
+        "facing=north,fill=most": { "model": "nostrummagica:block/rune_library_most" },
+        "facing=north,fill=full": { "model": "nostrummagica:block/rune_library_full" },
+        "facing=south,fill=empty": { "model": "nostrummagica:block/rune_library_empty", "y": 180 },
+        "facing=south,fill=some": { "model": "nostrummagica:block/rune_library_some", "y": 180 },
+        "facing=south,fill=most": { "model": "nostrummagica:block/rune_library_most", "y": 180 },
+        "facing=south,fill=full": { "model": "nostrummagica:block/rune_library_full", "y": 180 },
+        "facing=west,fill=empty":  { "model": "nostrummagica:block/rune_library_empty", "y": 270 },
+        "facing=west,fill=some":  { "model": "nostrummagica:block/rune_library_some", "y": 270 },
+        "facing=west,fill=most":  { "model": "nostrummagica:block/rune_library_most", "y": 270 },
+        "facing=west,fill=full":  { "model": "nostrummagica:block/rune_library_full", "y": 270 },
+        "facing=east,fill=empty":  { "model": "nostrummagica:block/rune_library_empty", "y": 90 },
+        "facing=east,fill=some":  { "model": "nostrummagica:block/rune_library_some", "y": 90 },
+        "facing=east,fill=most":  { "model": "nostrummagica:block/rune_library_most", "y": 90 },
+        "facing=east,fill=full":  { "model": "nostrummagica:block/rune_library_full", "y": 90 }
+    }
+}
