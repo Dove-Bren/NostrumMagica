@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -478,10 +479,11 @@ public class RuneShaperGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class RuneShaperGuiContainer extends AutoGuiContainer<RuneShaperContainer> {
+	public static class RuneShaperGuiContainer extends AutoGuiContainer<RuneShaperContainer> implements IJEIAwareGuiContainer {
 
 		private final RuneShaperContainer container;
 		
+		protected List<Rectangle2d> extraAreas;
 		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
 		
 		private @Nullable SpellAction lastAction = null;
@@ -492,6 +494,7 @@ public class RuneShaperGui {
 			this.container = container;
 			this.xSize = GUI_WIDTH;
 			this.ySize = GUI_HEIGHT;
+			extraAreas = new ArrayList<>(1);
 		}
 		
 		@Override
@@ -502,6 +505,7 @@ public class RuneShaperGui {
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, container.extraInv);
 				this.extraInventoryWidget.setColor(0xFF221F23);
 				this.addButton(extraInventoryWidget);
+				extraAreas.add(new Rectangle2d(this.getGuiLeft() + container.extraInv.x, this.getGuiTop() + this.container.extraInv.y, this.container.extraInv.width, this.container.extraInv.height));
 			}
 		}
 		
@@ -668,6 +672,11 @@ public class RuneShaperGui {
 			}
 			
 			return action;
+		}
+
+		@Override
+		public List<Rectangle2d> getGuiExtraAreas() {
+			return extraAreas;
 		}
 	}
 }

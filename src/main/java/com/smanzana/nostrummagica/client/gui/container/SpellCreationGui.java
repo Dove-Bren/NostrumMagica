@@ -503,7 +503,7 @@ public class SpellCreationGui {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static abstract class SpellGui<T extends SpellCreationContainer> extends AutoGuiContainer<T> {
+	public static abstract class SpellGui<T extends SpellCreationContainer> extends AutoGuiContainer<T> implements IJEIAwareGuiContainer {
 		
 		private static final ResourceLocation TEXT_UTILS = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/spell_create.png");
 		
@@ -897,6 +897,7 @@ public class SpellCreationGui {
 			return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint) || Character.isSpaceChar(codepoint);
 		}
 
+		@Override
 		public abstract List<Rectangle2d> getGuiExtraAreas();
 	}
 }

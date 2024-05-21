@@ -514,7 +514,7 @@ public class MasterSpellCreationGui {
 	private static final int NAME_MAX = 20;
 	
 	@OnlyIn(Dist.CLIENT)
-	public static class SpellGui extends AutoGuiContainer<SpellCreationContainer> {
+	public static class SpellGui extends AutoGuiContainer<SpellCreationContainer> implements IJEIAwareGuiContainer {
 		
 		private static class SpellIconButton extends Button {
 			
@@ -760,6 +760,7 @@ public class MasterSpellCreationGui {
 			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canWrite() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 		}
 		
+		@Override
 		public List<Rectangle2d> getGuiExtraAreas() {
 			return Lists.newArrayList(iconArea);
 		}

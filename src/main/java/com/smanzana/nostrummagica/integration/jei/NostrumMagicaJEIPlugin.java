@@ -9,8 +9,11 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.container.IJEIAwareGuiContainer;
 import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
+import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.integration.jei.categories.RitualRecipeCategory;
 import com.smanzana.nostrummagica.integration.jei.categories.TransmutationItemCategory;
@@ -39,6 +42,7 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
@@ -174,20 +178,23 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.UID);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-		registration.addGuiContainerHandler(MasterSpellCreationGui.SpellGui.class, new IGuiContainerHandler<MasterSpellCreationGui.SpellGui>() {
-			@Override
-			public List<Rectangle2d> getGuiExtraAreas(MasterSpellCreationGui.SpellGui containerScreen) {
-				return containerScreen.getGuiExtraAreas();
-			}
-		});
-		registration.addGenericGuiContainerHandler(SpellCreationGui.SpellGui.class, new IGuiContainerHandler<SpellCreationGui.SpellGui<?>>() {
-			@Override
-			public List<Rectangle2d> getGuiExtraAreas(SpellCreationGui.SpellGui<?> containerScreen) {
-				return containerScreen.getGuiExtraAreas();
-			}
-		});
+		List<Class<? extends IJEIAwareGuiContainer>> list = Lists.newArrayList(
+				SpellCreationGui.SpellGui.class,
+				MasterSpellCreationGui.SpellGui.class,
+				RuneShaperGui.RuneShaperGuiContainer.class
+		);
+		
+		for (Class<? extends ContainerScreen<?>> clazz : list.toArray(new Class[0])) {
+			registration.addGenericGuiContainerHandler(clazz, new IGuiContainerHandler<ContainerScreen<?>>() {
+				@Override
+				public List<Rectangle2d> getGuiExtraAreas(ContainerScreen<?> containerScreen) {
+					return ((IJEIAwareGuiContainer) containerScreen).getGuiExtraAreas();
+				}
+			});
+		}
 	}
 
 	@Override
