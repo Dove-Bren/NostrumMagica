@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui.BasicSpellCraftContainer;
 import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui.BasicSpellCraftGuiContainer;
@@ -11,6 +13,7 @@ import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -25,25 +28,26 @@ public class RedwoodSpellCraftGui {
 		
 		public RedwoodContainer(int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos) {
-			this(NostrumContainers.SpellCreationRedwood, windowId, crafter, playerInv, tableInventory, tablePos);
+				BlockPos tablePos, @Nullable IInventory extraInventory) {
+			this(NostrumContainers.SpellCreationRedwood, windowId, crafter, playerInv, tableInventory, tablePos, extraInventory);
 		}
 
 		protected RedwoodContainer(ContainerType<? extends SpellCreationContainer> type, int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos) {
-			super(type, windowId, crafter, playerInv, tableInventory, tablePos);
+				BlockPos tablePos, @Nullable IInventory extraInventory) {
+			super(type, windowId, crafter, playerInv, tableInventory, tablePos, extraInventory);
 		}
 		
 		public static RedwoodContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			final BasicSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
-			return new RedwoodContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos());
+			@Nullable IInventory extraInventory = te.getExtraInventory();
+			return new RedwoodContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInventory);
 		}
 		
 		public static IPackedContainerProvider Make(BasicSpellTableEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new RedwoodContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos());
+				return new RedwoodContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
 			});
@@ -58,8 +62,18 @@ public class RedwoodSpellCraftGui {
 			super(container, playerInv, name);
 		}
 		
+		@Override
 		protected ResourceLocation getBackgroundTexture() {
 			return TEXT; 
+		}
+		
+		@Override
+		public void init() {
+			super.init();
+			
+			if (this.extraInventoryWidget != null) {
+				this.extraInventoryWidget.setColor(0xFF501516);
+			}
 		}
 	}
 	

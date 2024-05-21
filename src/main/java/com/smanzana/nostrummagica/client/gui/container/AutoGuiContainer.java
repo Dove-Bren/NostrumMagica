@@ -35,7 +35,7 @@ public abstract class AutoGuiContainer<T extends Container> extends ContainerScr
 		// Try passing to widgets first
 		for (Widget child : this.buttons) { // should be children?
 			if (child.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
-				return true;
+				//return true;
 			}
 		}
 		

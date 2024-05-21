@@ -18,10 +18,13 @@ import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -236,5 +239,16 @@ public class BasicSpellTableEntity extends TileEntity implements ISpellCraftingI
 	@Override
 	public ISpellCraftingInventory getSpellCraftingInventory() {
 		return this;
+	}
+	
+	public @Nullable IInventory getExtraInventory() {
+		for (BlockPos checkPos : new BlockPos[] {pos.north(), pos.east(), pos.south(), pos.west()}) {
+			@Nullable TileEntity te = world.getTileEntity(checkPos);
+			if (te != null && te instanceof ChestTileEntity) {
+				return ((ChestTileEntity) te);
+			}
+		}
+		
+		return null;
 	}
 }

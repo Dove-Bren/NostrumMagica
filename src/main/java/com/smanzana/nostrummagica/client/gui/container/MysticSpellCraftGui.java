@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer.RuneSlot;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
@@ -33,11 +34,11 @@ import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
@@ -62,6 +63,11 @@ public class MysticSpellCraftGui {
 	
 	protected static final int POS_SLOT_HOTBAR_HOFFSET = 21;
 	protected static final int POS_SLOT_HOTBAR_VOFFSET = 154;
+	
+	protected static final int POS_INFOPANEL_HOFFSET = POS_CONTAINER_WIDTH;
+	protected static final int POS_INFOPANEL_VOFFSET = 0;
+	protected static final int POS_INFOPANEL_WIDTH = 62;
+	protected static final int POS_INFOPANEL_HEIGHT = 79;
 
 	public static class MysticContainer extends SpellCreationContainer {
 		
@@ -72,16 +78,17 @@ public class MysticSpellCraftGui {
 		protected String name;
 		protected int spellIcon;
 		protected int patternIdx;
+		protected @Nullable SimpleInventoryContainerlet extraInventory;
 		
 		public MysticContainer(int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos) {
-			this(NostrumContainers.SpellCreationMystic, windowId, crafter, playerInv, tableInventory, tablePos);
+				BlockPos tablePos, @Nullable IInventory extraInventory) {
+			this(NostrumContainers.SpellCreationMystic, windowId, crafter, playerInv, tableInventory, tablePos, extraInventory);
 		}
 
 		protected MysticContainer(ContainerType<? extends SpellCreationContainer> type, int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos) {
+				BlockPos tablePos, @Nullable IInventory extraInventory) {
 			super(type, windowId, crafter, playerInv, tableInventory, tablePos);
 			
 			this.name = "";
@@ -119,17 +126,25 @@ public class MysticSpellCraftGui {
 				prev = slot;
 			}
 			
+			// Extra inventory, if tile entity has one
+			if (extraInventory != null) {
+				this.extraInventory = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new,
+						POS_CONTAINER_WIDTH, POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT, POS_INFOPANEL_WIDTH, POS_CONTAINER_HEIGHT - (POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT),
+						new StringTextComponent("Extra"));
+			}
+			
 		}
 		
 		public static final MysticContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			final MysticSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
-			return new MysticContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos());
+			final @Nullable IInventory extraInv = te.getExtraInventory();
+			return new MysticContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInv);
 		}
 		
-		public static IPackedContainerProvider Make(TileEntity table) {
+		public static IPackedContainerProvider Make(MysticSpellTableEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new MysticContainer(windowId, player, playerInv, ((ISpellCraftingTileEntity) table).getSpellCraftingInventory(), table.getPos());
+				return new MysticContainer(windowId, player, playerInv, ((ISpellCraftingTileEntity) table).getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
 			});
@@ -223,11 +238,6 @@ public class MysticSpellCraftGui {
 		private static final int POS_SUBMIT_WIDTH = 18;
 		private static final int POS_SUBMIT_HEIGHT = 10;
 		
-		private static final int POS_INFOPANEL_HOFFSET = POS_CONTAINER_WIDTH;
-		private static final int POS_INFOPANEL_VOFFSET = 0;
-		private static final int POS_INFOPANEL_WIDTH = 62;
-		private static final int POS_INFOPANEL_HEIGHT = 79;
-		
 		private static final int POS_WEIGHTBAR_HOFFSET = POS_INFOPANEL_HOFFSET + 6;
 		private static final int POS_WEIGHTBAR_VOFFSET = POS_INFOPANEL_VOFFSET + 2;
 		private static final int POS_WEIGHTBAR_WIDTH = 50;
@@ -309,6 +319,7 @@ public class MysticSpellCraftGui {
 		}
 		
 		private TextFieldWidget nameField;
+		private @Nullable SimpleInventoryWidget extraInventoryWidget;
 		private List<Rectangle2d> extraAreas;
 		
 		private Vector3i[] runeSlots;
@@ -395,6 +406,15 @@ public class MysticSpellCraftGui {
 			
 			// Pattern icon
 			this.addButton(new PatternIcon(this, horizontalMargin + POS_PATTERN_HOFFSET, verticalMargin + POS_PATTERN_VOFFSET, POS_PATTERN_WIDTH, POS_PATTERN_HEIGHT));
+
+			// Extra inventory
+			if (this.getContainer().extraInventory != null) {
+				final SimpleInventoryContainerlet extraContainer = this.getContainer().extraInventory;
+				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
+				this.extraInventoryWidget.setColor(0xFF263D5A);
+				this.addButton(this.extraInventoryWidget);
+				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getContainer().extraInventory.y, this.getContainer().extraInventory.width, this.getContainer().extraInventory.height));
+			}
 		}
 
 		@Override

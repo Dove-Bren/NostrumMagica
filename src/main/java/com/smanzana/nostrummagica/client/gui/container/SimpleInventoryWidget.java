@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget.IScrollbarListener;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -32,15 +33,21 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		protected final int y;
 		protected final int width;
 		protected final int height;
+		protected final ITextComponent title;
 		protected final Rectangle2d invBounds;
 		protected final List<HideableSlot> slots;
 		protected final int spilloverRows;
 		
 		public SimpleInventoryContainerlet(Consumer<Slot> container, IInventory inventory, IHiddenSlotFactory factory, int x, int y, int width, int height) {
+			this(container, inventory, factory, x, y, width, height, StringTextComponent.EMPTY);
+		}
+		
+		public SimpleInventoryContainerlet(Consumer<Slot> container, IInventory inventory, IHiddenSlotFactory factory, int x, int y, int width, int height, ITextComponent title) {
 			this.x = x;
 			this.y = y;
 			this.width = width;
 			this.height = height;
+			this.title = title;
 			invBounds = MakeBounds(inventory.getSizeInventory(), x, y, width, height);
 			slots = new ArrayList<>(inventory.getSizeInventory());
 			
@@ -195,9 +202,10 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	protected final SimpleInventoryContainerlet containerlet;
 	protected List<SlotWidget> slotWidgets;
 	protected Rectangle2d guiBounds;
+	protected float[] color = {1f, 1f, 1f, 1f};
 	
-	public SimpleInventoryWidget(ContainerScreen<? extends Container> gui, SimpleInventoryContainerlet containerlet, ITextComponent name) {
-		super(containerlet.x + gui.getGuiLeft(), containerlet.y + gui.getGuiTop(), containerlet.width, containerlet.height, name);
+	public SimpleInventoryWidget(ContainerScreen<? extends Container> gui, SimpleInventoryContainerlet containerlet) {
+		super(containerlet.x + gui.getGuiLeft(), containerlet.y + gui.getGuiTop(), containerlet.width, containerlet.height, containerlet.title);
 		this.containerlet = containerlet;
 		this.slotWidgets = new ArrayList<>(containerlet.slots.size());
 		
@@ -256,6 +264,15 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		}
 	}
 	
+	public void setColor(int color) {
+		float[] colors = ColorUtil.ARGBToColor(color);
+		setColor(colors[0], colors[1], colors[2], colors[3]);
+	}
+	
+	public void setColor(float red, float green, float blue, float alpha) {
+		this.color = new float[] {red, green, blue, alpha};
+	}
+	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		return super.mouseClicked(mouseX, mouseY, button);
@@ -270,7 +287,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		matrixStackIn.push();
 		matrixStackIn.translate(this.x, this.y, 0);
-		renderInventoryBackground(matrixStackIn, this.width, this.height, 1f, 1f, 1f, 1f);
+		renderInventoryBackground(matrixStackIn, this.width, this.height, color[0], color[1], color[2], color[3]);
 		matrixStackIn.pop();
 	}
 	
@@ -281,7 +298,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		
 		matrixStackIn.push();
 		matrixStackIn.translate(this.x, this.y, 0);
-		renderInventoryOverlay(matrixStackIn, this.width, this.height, guiBounds, 1f, 1f, 1f, 1f);
+		renderInventoryOverlay(matrixStackIn, this.width, this.height, guiBounds, color[0], color[1], color[2], color[3]);
 		fontRenderer.func_243248_b(matrixStackIn, getMessage(), 8, 6, 4210752); // pos and color copied from ContainerScreen
 		matrixStackIn.pop();
 	}
@@ -306,25 +323,25 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	protected void renderInventoryOverlay(MatrixStack matrixStackIn, int width, int height, Rectangle2d hollow, float red, float green, float blue, float alpha) {
 		Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
 		
-		final int innerOffset = 4;
-		final int topY = hollow.getY() - 1;
-		final int bottomY = hollow.getY() + hollow.getHeight();
-		
-		// Two rectangles.
-		// Top one from 0,0 to width,topY
-		// Bottom one from 0,bottomY to width,height
-		// Except where there are 0's are the inner offsets and where width/height are are that - innerOffset...
-		matrixStackIn.push();
-		matrixStackIn.translate(innerOffset, innerOffset, 0);
-		width -= 2 * innerOffset;
-		height -= 2 * innerOffset;
-		
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_CENTER_HOFFSET, TEX_CENTER_VOFFSET, TEX_CENTER_WIDTH, TEX_CENTER_HEIGHT,
-				width, topY, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, bottomY, TEX_CENTER_HOFFSET, TEX_CENTER_VOFFSET, TEX_CENTER_WIDTH, TEX_CENTER_HEIGHT,
-				width - 0, height - bottomY, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
-		
-		matrixStackIn.pop();
+//		final int innerOffset = 4;
+//		final int topY = hollow.getY() - 1;
+//		final int bottomY = hollow.getY() + hollow.getHeight();
+//		
+//		// Two rectangles.
+//		// Top one from 0,0 to width,topY
+//		// Bottom one from 0,bottomY to width,height
+//		// Except where there are 0's are the inner offsets and where width/height are are that - innerOffset...
+//		matrixStackIn.push();
+//		matrixStackIn.translate(innerOffset, innerOffset, 0);
+//		width -= 2 * innerOffset;
+//		height -= 2 * innerOffset;
+//		
+////		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_CENTER_HOFFSET, TEX_CENTER_VOFFSET, TEX_CENTER_WIDTH, TEX_CENTER_HEIGHT,
+////				width, topY, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
+////		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, bottomY, TEX_CENTER_HOFFSET, TEX_CENTER_VOFFSET, TEX_CENTER_WIDTH, TEX_CENTER_HEIGHT,
+////				width - 0, height - bottomY, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
+//		
+//		matrixStackIn.pop();
 	}
 
 	@Override

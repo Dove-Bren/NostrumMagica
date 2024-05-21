@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
@@ -28,6 +29,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -57,22 +59,28 @@ public class BasicSpellCraftGui {
 	protected static final int POS_SLOT_HOTBAR_HOFFSET = 21;
 	protected static final int POS_SLOT_HOTBAR_VOFFSET = 143;
 
+	protected static final int POS_INFOPANEL_HOFFSET = POS_CONTAINER_WIDTH;
+	protected static final int POS_INFOPANEL_VOFFSET = 0;
+	protected static final int POS_INFOPANEL_WIDTH = 62;
+	protected static final int POS_INFOPANEL_HEIGHT = 79;
+
 	public static class BasicSpellCraftContainer extends SpellCreationContainer {
 		
 		public static final String ID = "basicspellcrafter";
 		
 		protected String name;
 		protected int spellIcon;
+		protected @Nullable SimpleInventoryContainerlet extraInventory;
 		
 		public BasicSpellCraftContainer(int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos) {
-			this(NostrumContainers.SpellCreationBasic, windowId, crafter, playerInv, tableInventory, tablePos);
+				BlockPos tablePos, @Nullable IInventory extraInventory) {
+			this(NostrumContainers.SpellCreationBasic, windowId, crafter, playerInv, tableInventory, tablePos, extraInventory);
 		}
 
 		protected BasicSpellCraftContainer(ContainerType<? extends SpellCreationContainer> type, int windowId,
 				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos) {
+				BlockPos tablePos, @Nullable IInventory extraInventory) {
 			super(type, windowId, crafter, playerInv, tableInventory, tablePos);
 			
 			this.name = "";
@@ -107,17 +115,25 @@ public class BasicSpellCraftGui {
 				prev = slot;
 			}
 			
+			// Extra inventory, if tile entity has one
+			if (extraInventory != null) {
+				this.extraInventory = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new,
+						POS_CONTAINER_WIDTH, POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT, POS_INFOPANEL_WIDTH, POS_CONTAINER_HEIGHT - (POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT),
+						new StringTextComponent("Extra"));
+			}
+			
 		}
 		
 		public static BasicSpellCraftContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			final BasicSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
-			return new BasicSpellCraftContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos());
+			final @Nullable IInventory extraInv = te.getExtraInventory();
+			return new BasicSpellCraftContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInv);
 		}
 		
 		public static IPackedContainerProvider Make(BasicSpellTableEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new BasicSpellCraftContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos());
+				return new BasicSpellCraftContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
 			});
@@ -185,18 +201,14 @@ public class BasicSpellCraftGui {
 		private static final int POS_SUBMIT_WIDTH = 18;
 		private static final int POS_SUBMIT_HEIGHT = 10;
 		
-		private static final int POS_INFOPANEL_HOFFSET = POS_CONTAINER_WIDTH;
-		private static final int POS_INFOPANEL_VOFFSET = 0;
-		private static final int POS_INFOPANEL_WIDTH = 62;
-		private static final int POS_INFOPANEL_HEIGHT = 79;
-		
 		private static final int POS_WEIGHTBAR_HOFFSET = POS_INFOPANEL_HOFFSET + 6;
 		private static final int POS_WEIGHTBAR_VOFFSET = POS_INFOPANEL_VOFFSET + 5;
 		private static final int POS_WEIGHTBAR_WIDTH = 50;
 		private static final int POS_WEIGHTBAR_HEIGHT = 16;
 		
-		private TextFieldWidget nameField;
-		private List<Rectangle2d> extraAreas;
+		protected TextFieldWidget nameField;
+		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
+		protected List<Rectangle2d> extraAreas;
 		
 		private Vector3i[] runeSlots;
 		private Vector3i[] spacerSpots;
@@ -275,6 +287,14 @@ public class BasicSpellCraftGui {
 			
 			// Weight status
 			this.addButton(new WeightStatus(this, horizontalMargin + POS_WEIGHTBAR_HOFFSET, verticalMargin + POS_WEIGHTBAR_VOFFSET, POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+			
+			// Extra inventory
+			if (this.getContainer().extraInventory != null) {
+				final SimpleInventoryContainerlet extraContainer = this.getContainer().extraInventory;
+				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
+				this.addButton(this.extraInventoryWidget);
+				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getContainer().extraInventory.y, this.getContainer().extraInventory.width, this.getContainer().extraInventory.height));
+			}
 		}
 
 		@Override
