@@ -1748,7 +1748,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		LivingEntity owner = this.getOwner();
 		if (owner != null) {
 			this.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, 1f);
-			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"), Util.DUMMY_UUID);
+			owner.sendMessage(new StringTextComponent(this.getName().getString() + " leveled up!"), Util.DUMMY_UUID);
 		}
 	}
 	

@@ -894,6 +894,29 @@ public class PlayerListener {
 				}
 			}
 			
+			IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+			if (curios != null) {
+				for (int i = 0; i < curios.getSizeInventory(); i++) {
+					ItemStack equip = curios.getStackInSlot(i);
+					if (equip.isEmpty()) {
+						continue;
+					}
+					
+					if (equip.getItem() instanceof ReagentBag) {
+						addedItem = ReagentBag.addItem(equip, addedItem);
+						if (addedItem.isEmpty() || addedItem.getCount() < originalSize) {
+							NostrumMagicaSounds.UI_TICK.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+						}
+						if (addedItem.isEmpty()) {
+							e.setCanceled(true);
+							e.getItem().remove();
+							return;
+						}
+						originalSize = addedItem.getCount();
+					}
+				}
+			}
+			
 			if (addedItem.getCount() < e.getItem().getItem().getCount()) {
 				e.setCanceled(true);
 				e.getItem().setItem(addedItem);

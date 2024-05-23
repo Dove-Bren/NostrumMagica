@@ -671,7 +671,7 @@ public class OverlayRenderer extends AbstractGui {
 					this.fadeInReagents();
 				}
 				lastReagentCounts.put(type, current);
-				if (current < last) {
+				if (last != null && current < last) {
 					lastReagentsUsed.add(type);
 				}
 			}

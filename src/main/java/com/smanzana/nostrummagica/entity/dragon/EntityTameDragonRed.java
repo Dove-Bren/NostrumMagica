@@ -1241,7 +1241,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 		LivingEntity owner = this.getOwner();
 		if (owner != null) {
 			NostrumMagicaSounds.DRAGON_DEATH.play(owner);
-			owner.sendMessage(new StringTextComponent(this.getName() + " leveled up!"), Util.DUMMY_UUID);
+			owner.sendMessage(new StringTextComponent(this.getName().getString() + " leveled up!"), Util.DUMMY_UUID);
 		}
 	}
 	

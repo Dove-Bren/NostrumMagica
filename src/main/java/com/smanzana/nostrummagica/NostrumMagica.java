@@ -66,6 +66,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonPartEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -274,6 +275,20 @@ public class NostrumMagica {
 				count += item.getCount();
 			}
 		}
+		
+		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+		if (curios != null) {
+			for (int i = 0; i < curios.getSizeInventory(); i++) {
+				ItemStack equip = curios.getStackInSlot(i);
+				if (equip.isEmpty()) {
+					continue;
+				}
+				
+				if (equip.getItem() instanceof ReagentBag) {
+					count += ReagentBag.getReagentCount(equip, type);
+				}
+			}
+		}
 
 		return count;
 	}
@@ -281,7 +296,26 @@ public class NostrumMagica {
 	public static boolean removeReagents(PlayerEntity player, ReagentType type, int count) {
 		if (getReagentCount(player, type) < count)
 			return false;
+		
+		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+		if (curios != null) {
+			for (int i = 0; i < curios.getSizeInventory(); i++) {
+				ItemStack equip = curios.getStackInSlot(i);
+				if (equip.isEmpty()) {
+					continue;
+				}
+				
+				if (equip.getItem() instanceof ReagentBag) {
+					count = ReagentBag.removeCount(equip, type, count);
+				}
+				
+				if (count == 0) {
+					break;
+				}
+			}
+		}
 
+		if (count != 0)
 		for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
 			ItemStack item = player.inventory.getStackInSlot(i);
 			if (item.isEmpty())
