@@ -103,6 +103,7 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingScroll;
 	private KeyBinding bindingInfo;
 	private KeyBinding bindingBladeCast;
+	private KeyBinding bindingHUD;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 	
@@ -132,6 +133,8 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingInfo);
 		bindingBladeCast = new KeyBinding("key.bladecast.desc", GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
+		bindingHUD = new KeyBinding("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingHUD);
 	}
 	
 	public KeyBinding getBindingCast1() {
@@ -152,6 +155,10 @@ public class ClientProxy extends CommonProxy {
 
 	public KeyBinding getBindingCast5() {
 		return bindingCast5;
+	}
+	
+	public KeyBinding getHUDKey() {
+		return bindingHUD;
 	}
 
 	@SubscribeEvent
@@ -213,6 +220,8 @@ public class ClientProxy extends CommonProxy {
 				doBladeCast();
 			}
 			
+		} else if (bindingHUD.isPressed()) {
+			this.overlayRenderer.toggleHUD();
 		}
 	}
 	

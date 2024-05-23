@@ -4,21 +4,19 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.research.NostrumResearch;
+import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
+import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 
-public class CommandAllResearch  {
-	
+public class CommandAllPatterns  {
+
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
-				Commands.literal("nostrumresearch")
+				Commands.literal("nostrumpatterns")
 					.requires(s -> s.hasPermissionLevel(2))
 					.executes(ctx -> execute(ctx))
 				);
@@ -27,18 +25,17 @@ public class CommandAllResearch  {
 	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		ISpellCrafting attr = NostrumMagica.getSpellCrafting(player);
 		if (attr == null) {
 			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		
-		for (NostrumResearch research : NostrumResearch.AllResearch()) {
-			attr.completeResearch(research.getKey());
+		for (SpellCraftPattern pattern : SpellCraftPattern.GetAll()) {
+			attr.addPattern(pattern);
 		}
-		NetworkHandler.sendTo(
-				new StatSyncMessage(attr)
-				, (ServerPlayerEntity) player);
+		
+		NostrumMagica.instance.proxy.syncPlayer(player);
 		
 		return 0;
 	}

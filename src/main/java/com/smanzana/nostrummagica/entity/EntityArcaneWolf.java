@@ -612,6 +612,10 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							if (EntityArcaneWolf.this.getTrainingElement() == EMagicElement.ENDER) {
 								EntityArcaneWolf.this.addTrainingXP(1);
 							}
+							
+							if (EntityArcaneWolf.this.rand.nextBoolean()) {
+								EntityArcaneWolf.this.addXP(1);
+							}
 						}
 					}
 				}
@@ -637,6 +641,10 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
 				wolf.playSound(SoundEvents.ENTITY_WOLF_GROWL, 1f, .8f);
+				
+				if (EntityArcaneWolf.this.rand.nextBoolean()) {
+					EntityArcaneWolf.this.addXP(1);
+				}
 			}
 		});
 		// Ally spells
@@ -673,6 +681,10 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
 				wolf.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, .8f);
+				
+				if (EntityArcaneWolf.this.rand.nextBoolean()) {
+					EntityArcaneWolf.this.addXP(1);
+				}
 			}
 		});
 		// Self spells (longer recast)
@@ -698,6 +710,10 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
 				wolf.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, .8f);
+				
+				if (EntityArcaneWolf.this.rand.nextBoolean()) {
+					EntityArcaneWolf.this.addXP(1);
+				}
 			}
 		});
 		//this.goalSelector.addGoal(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
@@ -1287,6 +1303,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	@Override
 	public PetInfo getPetSummary() {
 		return PetInfo.claim(getHealth(), getMaxHealth(), getXP(), getMaxXP(), SecondaryFlavor.PROGRESS, getPetAction());
+		//return PetInfo.claim(getHealth(), getMaxHealth(), getMana(), getMaxMana(), SecondaryFlavor.GOOD, getPetAction());
 	}
 	
 	public int getBonusJumps() {

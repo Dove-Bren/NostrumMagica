@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.config;
 
+import com.electronwill.nightconfig.core.EnumGetMethod;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.overlay.ReagentHUDMode;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -21,6 +23,10 @@ public class ModConfigClient {
 		DISPLAY_DRAGON_HEALTHBARS(ModConfig.Category.DISPLAY, "dragon_healthbar", true, "Display special healthbars for dragons"),
 		DISPLAY_PET_HEALTHBARS(ModConfig.Category.DISPLAY, "pet_healthbar", true, "Display healthbars for tamed pets"),
 		DISPLAY_MANA_HEIGHT(ModConfig.Category.DISPLAY, "mana_spheres_height", 0, "Extra space (in full rows) to move mana display up. Useful when other mods add info above the armor bar."),
+		DISPLAY_REAGENTS_MODE(ModConfig.Category.DISPLAY, "reagenthud_mode", ReagentHUDMode.ONCHANGE, "When to display the reagent count overlay. ALWAYS displays it all the time, TOGGLE turns it on and off when you press the Nostrum HUD button, and ONCHANGE shows it automatically when reagent counts change"),
+		DISPLAY_REAGENTS_XPOS(ModConfig.Category.DISPLAY, "reagenthud_xpos", 0, "X position to dipslay the reagent HUD element"),
+		DISPLAY_REAGENTS_YPOS(ModConfig.Category.DISPLAY, "reagenthud_ypos", 0, "Y position to dipslay the reagent HUD element"),
+		DISPLAY_REAGENTS_TALL(ModConfig.Category.DISPLAY, "reagenthud_tallmode", false, "Whether to show the reagent HUD element in tall mode"),
 		
 		LOGIN_TEXT(ModConfig.Category.DISPLAY, "display_login_text", true, "On login, show Nostrum Magica welcome text"),
 		
@@ -60,8 +66,10 @@ public class ModConfigClient {
 	ForgeConfigSpec.BooleanValue configArmorDisplay;
 	ForgeConfigSpec.BooleanValue configDisplayShields;
 	ForgeConfigSpec.BooleanValue configDisplayHookshotCrosshair;
-	ForgeConfigSpec.BooleanValue configDisplayDragonHealthbars;
-	ForgeConfigSpec.BooleanValue configDisplayPetHealthbars;
+	ForgeConfigSpec.EnumValue<ReagentHUDMode> configDisplayReagentMode;
+	ForgeConfigSpec.IntValue configDisplayReagentX;
+	ForgeConfigSpec.IntValue configDisplayReagentY;
+	ForgeConfigSpec.BooleanValue configDisplayReagentTall;
 	ForgeConfigSpec.IntValue configManaHeight;
 	ForgeConfigSpec.BooleanValue configLoginText;
 	ForgeConfigSpec.BooleanValue configDashDoublePress;
@@ -93,7 +101,7 @@ public class ModConfigClient {
 //			builder.pop();
 //		}
 		
-		ModConfig.Category.SPELL.start(builder);
+		ModConfig.Category.DISPLAY.start(builder);
 		{
 			configMPDisplaySpheres = builder
 					.comment(Key.MP_DISPLAY_SPHERES.desc)
@@ -139,18 +147,25 @@ public class ModConfigClient {
 					.comment(Key.DISPLAY_HOOKSHOT_CROSSHAIR.desc)
 					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
 					.define(Key.DISPLAY_HOOKSHOT_CROSSHAIR.key, true); // Default pulled out
-			configDisplayDragonHealthbars = builder
-					.comment(Key.DISPLAY_DRAGON_HEALTHBARS.desc)
-					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
-					.define(Key.DISPLAY_DRAGON_HEALTHBARS.key, true); // Default pulled out
-			configDisplayPetHealthbars = builder
-					.comment(Key.DISPLAY_PET_HEALTHBARS.desc)
-					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
-					.define(Key.DISPLAY_PET_HEALTHBARS.key, true); // Default pulled out
 			configManaHeight = builder
 					.comment(Key.DISPLAY_MANA_HEIGHT.desc)
 					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
 					.defineInRange(Key.DISPLAY_MANA_HEIGHT.key, 0, 0, Integer.MAX_VALUE); // Default pulled out
+			
+
+			configDisplayReagentMode = builder
+					.comment(Key.DISPLAY_REAGENTS_MODE.desc)
+					.defineEnum(Key.DISPLAY_REAGENTS_MODE.key, ReagentHUDMode.ONCHANGE, EnumGetMethod.NAME_IGNORECASE);
+			configDisplayReagentX = builder
+					.comment(Key.DISPLAY_REAGENTS_XPOS.desc)
+					.defineInRange(Key.DISPLAY_REAGENTS_XPOS.key, -1, Integer.MIN_VALUE, Integer.MAX_VALUE); // Default pulled out
+			configDisplayReagentY = builder
+					.comment(Key.DISPLAY_REAGENTS_YPOS.desc)
+					.defineInRange(Key.DISPLAY_REAGENTS_YPOS.key, -1, Integer.MIN_VALUE, Integer.MAX_VALUE); // Default pulled out
+			configDisplayReagentTall = builder
+					.comment(Key.DISPLAY_REAGENTS_TALL.desc)
+					.define(Key.DISPLAY_REAGENTS_TALL.key, false);
+			
 			configLoginText = builder
 					.comment(Key.LOGIN_TEXT.desc)
 					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
@@ -167,9 +182,4 @@ public class ModConfigClient {
 		}
 		builder.pop();
 	}
-	
-	public Object getValue(Key key) {
-		return key.configField.get();
-	}
-	
 }

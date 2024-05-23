@@ -1,6 +1,9 @@
 package com.smanzana.nostrummagica.client.overlay;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -37,6 +40,8 @@ import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.items.IRaytraceOverlay;
 import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.ReagentItem;
+import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -70,6 +75,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -90,7 +96,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class OverlayRenderer extends AbstractGui {
-
+	
 	private static final ResourceLocation GUI_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/icons.png");
 	private static final int GUI_ORB_WIDTH = 9;
 	private static final int GUI_ORB_HEIGHT = 9;
@@ -116,10 +122,17 @@ public class OverlayRenderer extends AbstractGui {
 	private int wingIndex; // Controls mana wing animation. Set to -wingAnimDur to play backwards.
 	private static final int wingAnimDur = 20;
 	
+	private int reagentIndex; // Contols reagent HUD element fade in and out
+	private static final int reagentFadeDur = 60;
+	private static final int reagentFadeDelay = 3 * 60;
+	
+	private boolean HUDToggle;
+	
 	public OverlayRenderer() {
 		MinecraftForge.EVENT_BUS.register(this);
 		wiggleIndex = 0;
 		wingIndex = 0;
+		HUDToggle = false;
 	}
 	
 	@SubscribeEvent
@@ -190,6 +203,7 @@ public class OverlayRenderer extends AbstractGui {
 			}
 			
 			renderSpellSlide(matrixStackIn, player, window, attr);
+			renderReagentTracker(matrixStackIn, player, window, attr, mc.fontRenderer);
 			
 			if (mc.player.isCreative()
 					|| mc.player.isSpectator()) {
@@ -610,6 +624,228 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
+	protected void fadeInReagents() {
+		// Either start a fade in, don't touch one that's happening, or reset fade out duration
+		if (reagentIndex >= reagentFadeDelay + reagentFadeDur) {
+			// Fully faded out. Start new
+			reagentIndex = -reagentFadeDur;
+		} else if (reagentIndex < 0) {
+			; // Fading in already
+		} else {
+			// Reset to fully opaque and in delay time
+			reagentIndex = 0;
+		}
+	}
+	
+	protected boolean reagentsFadeIsVisible() {
+		// Are we visible at all?
+		return reagentIndex < reagentFadeDelay + reagentFadeDur;
+	}
+	
+	protected float reagentsFadeCurrentAlpha() {
+		// if -, fading in
+		// if 0-reagentFadeDelay, opaque
+		// else fading out
+		if (reagentIndex < 0) {
+			return (float) (reagentFadeDur + reagentIndex) / (float) reagentFadeDur;
+		} else if (reagentIndex > reagentFadeDelay) {
+			return 1f - ((float) (reagentIndex - reagentFadeDelay) / (float) reagentFadeDur);
+		} else {
+			return 1f;
+		}
+	}
+	
+	private final Map<ReagentType, Integer> lastReagentCounts = new EnumMap<>(ReagentType.class);
+	private final Map<ReagentType, ItemStack> reagentStacks = new EnumMap<>(ReagentType.class);
+	private final List<ReagentType> lastReagentsUsed = new ArrayList<>(ReagentType.values().length);
+	
+	protected void tickReagentCounts(PlayerEntity player) {
+		boolean changedThisTick = false;
+		for (ReagentType type : ReagentType.values()) {
+			Integer last = lastReagentCounts.get(type);
+			int current = NostrumMagica.getReagentCount(player, type);
+			if (last == null || last != current) {
+				if (!changedThisTick) {
+					changedThisTick = true;
+					lastReagentsUsed.clear();
+					this.fadeInReagents();
+				}
+				lastReagentCounts.put(type, current);
+				if (current < last) {
+					lastReagentsUsed.add(type);
+				}
+			}
+		}
+		
+		// Also tick fade anim
+		if (this.reagentIndex < reagentFadeDelay + reagentFadeDur) {
+			this.reagentIndex++;
+		}
+	}
+	
+	protected ItemStack getReagentStack(ReagentType type) {
+		// fill out reagent itemstacks
+		if (reagentStacks.get(type) == null || reagentStacks.get(type).isEmpty()) {
+			for (ReagentType typez : ReagentType.values()) { 
+				reagentStacks.put(typez, ReagentItem.CreateStack(typez, 1));
+			}
+		}
+		return reagentStacks.get(type);
+	}
+	
+	private void renderReagentTracker(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr, FontRenderer fonter) {
+		tickReagentCounts(player);
+		
+		final ReagentHUDMode mode = ModConfig.config.displayReagentMode();
+		switch (mode) {
+		case ALWAYS:
+			; // fall through
+			break;
+		case HOLD: {
+				ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
+				if (!proxy.getHUDKey().isKeyDown()) {
+					return;
+				}
+			}
+			break;
+		case TOGGLE:
+			if (this.HUDToggle) {
+				return;
+			}
+			break;
+		case ONCHANGE:
+			if (!reagentsFadeIsVisible()) {
+				return;
+			}
+			break;
+		}
+		
+		// We are visible and should render
+		
+		final int configX = ModConfig.config.displayReagentXPos();
+		final int configY = ModConfig.config.displayReagentYPos();
+		final boolean tall = ModConfig.config.displayReagentTall();
+		
+		final int rows = (ReagentType.values().length+1) / (tall ? 1 : 2);
+		final int margin = 3;
+		
+		final int width = (tall ? 24 : 48) + 2*margin;
+		final int height = (rows * 8) + 2*margin;
+		
+		final int xOffset;
+		final int yOffset;
+		final Direction hang; // N being up
+		final boolean offsetAuto = (configX == -1 && configY == -1);
+		if (offsetAuto) {
+			final int estimatedSpellSlideWidth = 16 * 5;
+			final int estimatedLeftTaken = estimatedSpellSlideWidth + 80 + width;
+			if (window.getScaledWidth()/2 < estimatedLeftTaken) {
+				xOffset = 0;
+				yOffset = window.getScaledHeight() - (height + 28);
+				hang = Direction.WEST;
+			} else {
+				xOffset = estimatedSpellSlideWidth + 10;
+				yOffset = window.getScaledHeight() - height;
+				hang = Direction.SOUTH;
+			}
+		} else {
+			if (configX == -1) {
+				xOffset = window.getScaledWidth() - width;
+			} else {
+				xOffset = configX > 0 ? configX : (window.getScaledWidth() - configX);
+			}
+			if (configY == -1) {
+				yOffset = window.getScaledHeight() - height;
+			} else {
+				yOffset = configY > 0 ? configY : (window.getScaledHeight() - configY);
+			}
+			
+			hang = configX == -1 ? Direction.EAST
+					: configX == 0 ? Direction.WEST
+					: configY == -1 ? Direction.SOUTH
+					: Direction.NORTH;
+		}
+		
+		final float fadeProg;
+		if (mode == ReagentHUDMode.ONCHANGE) {
+			fadeProg = reagentsFadeCurrentAlpha();
+		} else {
+			fadeProg = 1f;
+		}
+		
+//		Function<Integer, Integer> makeColor = (color) -> {
+//			float existingAlpha = (float) (color >> 24) / (255f);
+//			return (int) (existingAlpha * alpha * 255) << 24;
+//		};
+		
+		matrixStackIn.push();
+		if (fadeProg != 1f) {
+			switch (hang) {
+			case UP:
+			case DOWN:
+			case SOUTH:
+			default:
+				matrixStackIn.translate(0, height * (1f - fadeProg), 0);
+				break;
+			case EAST:
+				matrixStackIn.translate(width * (1f - fadeProg), 0, 0);
+				break;
+			case NORTH:
+				matrixStackIn.translate(0, -height * (1f - fadeProg), 0);
+				break;
+			case WEST:
+				matrixStackIn.translate(-width * (1f - fadeProg), 0, 0);
+				break;
+			}
+		}
+		
+		final int colorTL, colorTR, colorBL, colorBR;
+		final int dark = 0xAA000000;
+		final int light = 0x10000000;
+		switch (hang) {
+		case UP:
+		case DOWN:
+		case SOUTH:
+		default:
+			colorTL = colorTR = light;
+			colorBL = colorBR = dark;
+			break;
+		case EAST:
+			colorTL = colorBL = light;
+			colorTR = colorBR = dark;
+			break;
+		case NORTH:
+			colorTL = colorTR = dark;
+			colorBL = colorBR = light;
+			break;
+		case WEST:
+			colorTL = colorBL = dark;
+			colorTR = colorBR = light;
+			break;
+		}
+		
+		RenderFuncs.drawGradientRect(matrixStackIn, xOffset, yOffset, xOffset + width, yOffset + height,
+				colorTL, colorTR,
+				colorBL, colorBR);
+		
+		matrixStackIn.push();
+		matrixStackIn.translate(xOffset + margin, yOffset + margin, 0);
+		matrixStackIn.scale(.5f, .5f, 1f);
+		
+		final ReagentType[] types = ReagentType.values();
+		for (int i = 0; i < types.length; i++) {
+			final ReagentType type = types[i];
+			final int x = (i / rows) * 48;
+			final int y = (i % rows) * 16;
+			final int color = (lastReagentsUsed.contains(type) ? 0xFFFFFF40 : 0xFFFFFFFF);
+			
+			RenderFuncs.RenderGUIItem(getReagentStack(type), matrixStackIn, x, y, -30);
+			fonter.drawString(matrixStackIn, lastReagentCounts.get(type) + "", x + 18, y + 5, color);
+		}
+		matrixStackIn.pop();
+		matrixStackIn.pop();
+	}
+	
 	private void renderArmorOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {
 		// Clone calc of left y offset, since it's not passed through
 		int left_height = 39;
@@ -869,6 +1105,11 @@ public class OverlayRenderer extends AbstractGui {
 		} else {
 			this.wingIndex = -wingAnimDur;
 		}
+	}
+	
+	public void toggleHUD() {
+		this.HUDToggle = !this.HUDToggle;
+		this.fadeInReagents();
 	}
 	
 	private void renderLoreIcon(MatrixStack matrixStackIn, Boolean loreIsDeep) {

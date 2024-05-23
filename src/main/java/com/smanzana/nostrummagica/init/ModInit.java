@@ -2206,6 +2206,7 @@ public class ModInit {
 		CommandRandomSpell.register(dispatcher);
 		CommandDebugEffect.register(dispatcher);
 		CommandSetManaArmor.register(dispatcher);
+		CommandAllResearch.register(dispatcher);
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

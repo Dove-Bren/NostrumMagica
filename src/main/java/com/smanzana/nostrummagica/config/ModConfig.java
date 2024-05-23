@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.overlay.ReagentHUDMode;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -497,12 +498,20 @@ public class ModConfig {
 		return client.configDisplayHookshotCrosshair.get();
 	}
 	
-	public boolean displayDragonHealthbars() {
-		return client.configDisplayDragonHealthbars.get();
+	public int displayReagentXPos() {
+		return client.configDisplayReagentX.get();
 	}
 	
-	public boolean displayPetHealthbars() {
-		return client.configDisplayPetHealthbars.get();
+	public int displayReagentYPos() {
+		return client.configDisplayReagentY.get();
+	}
+	
+	public boolean displayReagentTall() {
+		return client.configDisplayReagentTall.get();
+	}
+	
+	public ReagentHUDMode displayReagentMode() {
+		return client.configDisplayReagentMode.get();
 	}
 	
 	public boolean overrideElytraCode() {
