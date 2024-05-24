@@ -126,6 +126,10 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	
 	@Override
 	protected void fireChargedWeapon(World worldIn, LivingEntity entityLiving, Hand hand, ItemStack stack) {
+		if (worldIn.isRemote()) {
+			return;
+		}
+		
 		// Do forward attack
 		//vfx
 		{

@@ -192,7 +192,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 
 	@Override
 	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
-		if (castRod(worldIn, playerIn)) {
+		if (!worldIn.isRemote() && castRod(worldIn, playerIn)) {
 			ItemStacks.damageItem(stack, playerIn, hand, 1);
 		}
 	}

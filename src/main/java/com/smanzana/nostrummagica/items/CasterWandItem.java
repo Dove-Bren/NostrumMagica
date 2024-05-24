@@ -15,6 +15,8 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.proxy.ClientProxy;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -32,6 +34,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -225,8 +228,30 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
 		@Nullable Spell spell = this.getSpell(stack);
 		if (spell != null) {
-			if (SpellCasting.AttemptToolCast(spell, playerIn, stack)) {
-				ItemStacks.damageItem(stack, playerIn, hand, 1);
+			if (worldIn.isRemote()) {
+				if (SpellCasting.CheckToolCast(spell, playerIn, stack)) {
+					ItemStacks.damageItem(stack, playerIn, hand, 1);
+				} else {
+					for (int i = 0; i < 15; i++) {
+						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
+						double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
+						playerIn.world
+							.addParticle(ParticleTypes.LARGE_SMOKE,
+									playerIn.getPosX() + offsetx, playerIn.getPosY(), playerIn.getPosZ() + offsetz,
+									0, -.5, 0);
+						
+					}
+					
+					NostrumMagicaSounds.CAST_FAIL.playClient(playerIn);
+					((ClientProxy) NostrumMagica.instance.proxy).doManaWiggle(2);
+				}
+			} else {
+				if (SpellCasting.AttemptToolCast(spell, playerIn, stack)) {
+					ItemStacks.damageItem(stack, playerIn, hand, 1);
+					if (playerIn instanceof PlayerEntity) {
+						NostrumMagica.instance.proxy.sendMana((PlayerEntity) playerIn);
+					}
+				}
 			}
 		}
 	}

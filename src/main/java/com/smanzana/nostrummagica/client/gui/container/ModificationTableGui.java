@@ -1,10 +1,13 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.items.CasterWandItem;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
@@ -23,6 +26,7 @@ import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.utils.TextUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
@@ -95,8 +99,12 @@ public class ModificationTableGui {
 		protected boolean boolIndex = false;
 		protected int modIndex = 0;
 		
+		// Was going to pull these into an enum, but would rather abstract out all of this into IModifiableItem or such interfaces
 		protected boolean runeMode;
 		protected boolean scrollMode;
+		protected boolean tomeMode;
+		protected boolean wandMode;
+		
 		protected boolean hasBool;
 		protected boolean hasFloat;
 		protected SpellComponentWrapper component;
@@ -264,12 +272,13 @@ public class ModificationTableGui {
 			if (inventory.getMainSlot().getItem() instanceof SpellTome) {
 				this.runeMode = false;
 				this.scrollMode = false;
+				this.wandMode = false;
+				this.tomeMode = true;
 				ItemStack inputItem = inputSlot.getStack();
 				isValid = (SpellTome.getModifications(inventory.getMainSlot()) > 0);
 				if (!isValid || inputItem.isEmpty() || !(inputItem.getItem() instanceof SpellTomePage)) {
 					this.isValid = false;
 				}
-				
 				
 				inputSlot.setRequired(ItemStack.EMPTY);
 				return;
@@ -278,6 +287,8 @@ public class ModificationTableGui {
 			if (inventory.getMainSlot().getItem() instanceof SpellRune) {
 				this.runeMode = true;
 				this.scrollMode = false;
+				this.wandMode = false;
+				this.tomeMode = false;
 				SpellComponentWrapper component = SpellRune.toComponentWrapper(inventory.getMainSlot());
 				this.component = component;
 				hasBool = false;
@@ -372,6 +383,39 @@ public class ModificationTableGui {
 				
 				runeMode = false;
 				scrollMode = true;
+				this.wandMode = false;
+				this.tomeMode = false;
+				
+				return;
+			}
+			
+			if (inventory.getMainSlot().getItem() instanceof CasterWandItem) {
+				final ItemStack stack = inventory.getMainSlot();
+				final ItemStack inputItem = inputSlot.getStack();
+				
+				runeMode = false;
+				scrollMode = false;
+				wandMode = true;
+				tomeMode = false;
+				
+				hasBool = false;
+				hasFloat = false;
+				
+				isValid = false;
+				if (inputItem.isEmpty()) {
+					// Allow removal if we actually have a spell
+					isValid = CasterWandItem.GetSpell(stack) != null;
+				} else if (inputItem.getItem() instanceof SpellScroll
+						&& SpellScroll.getSpell(inputItem) != null) {
+					isValid = CasterWandItem.CanStoreSpell(stack, SpellScroll.getSpell(inputItem));
+				}
+				
+				// Show scroll if nothing's in the wand
+				if (CasterWandItem.GetSpell(stack) == null) {
+					inputSlot.setRequired(new ItemStack(NostrumItems.spellScroll));
+				} else {
+					inputSlot.setRequired(ItemStack.EMPTY);
+				}
 				
 				return;
 			}
@@ -422,6 +466,7 @@ public class ModificationTableGui {
 					shadows.add(SpellRune.getRune(trigger));
 				}
 			}
+			shadows.add(new ItemStack(NostrumItems.casterWand));
 		}
 		
 		@Override
@@ -484,7 +529,7 @@ public class ModificationTableGui {
 				}
 			} else if (container.scrollMode) {
 				
-			} else {
+			} else if (container.tomeMode) {
 				// Draw tome info
 				int x, y;
 				y = verticalMargin + PANEL_VOFFSET + 10;
@@ -542,18 +587,48 @@ public class ModificationTableGui {
 					mc.fontRenderer.drawString(matrixStackIn, "" + SpellTome.getModifications(tome), valX, y, 0xFFFFFFFF);
 							
 				}
+			} else if (container.wandMode) {
+				int x, y;
+				y = verticalMargin + PANEL_VOFFSET + 10;
+				final ItemStack wand = container.inventory.getMainSlot();
+				final ItemStack input = container.inventory.getInputSlot();
+				if (!wand.isEmpty()) {
+					final List<ITextComponent> info;
+					if (input.isEmpty()) {
+						if (CasterWandItem.GetSpell(wand) == null) {
+							info = TextUtils.GetTranslatedList("modification.caster_wand.intro");
+						} else {
+							info = TextUtils.GetTranslatedList("modification.caster_wand.remove");
+						}
+					} else if (input.getItem() instanceof SpellScroll && SpellScroll.getSpell(input) != null) {
+						final Spell scrollSpell = SpellScroll.getSpell(input);
+						if (CasterWandItem.GetSpell(wand) == null) {
+							info = TextUtils.GetTranslatedList("modification.caster_wand.addspell", scrollSpell.getName());
+						} else {
+							info = TextUtils.GetTranslatedList("modification.caster_wand.replacespell", scrollSpell.getName());
+						}
+					} else {
+						info = TextUtils.GetTranslatedList("modification.caster_wand.nospell");
+					}
+					
+					x = horizontalMargin + PANEL_HOFFSET + 5;
+					for (ITextComponent line : info) {
+						mc.fontRenderer.func_243248_b(matrixStackIn, line, x, y, 0xFFFFFFFF);
+						y += mc.fontRenderer.FONT_HEIGHT + 1;
+					}
+				}
 			}
 			
 			if (!container.inputSlot.getHasStack()) {
 				ItemStack shadow = container.inputSlot.required;
-				if (shadow.isEmpty() && !container.runeMode) {
-					shadow = pageShadow;
-				}
+//				if (shadow.isEmpty() && !container.runeMode) {
+//					shadow = pageShadow;
+//				}
 				if (!shadow.isEmpty()) {
 					RenderFuncs.RenderGUIItem(shadow, matrixStackIn, 
 						horizontalMargin + container.inputSlot.xPos,
 						verticalMargin + container.inputSlot.yPos,
-						-150);
+						-100);
 				}
 			}
 			
@@ -570,7 +645,7 @@ public class ModificationTableGui {
 				RenderFuncs.RenderGUIItem(display, matrixStackIn, 
 						horizontalMargin + SLOT_MAIN_HOFFSET,
 						verticalMargin + SLOT_MAIN_VOFFSET,
-						-200);
+						-100);
 				
 				int color = 0x55FFFFFF;
 				matrixStackIn.push();

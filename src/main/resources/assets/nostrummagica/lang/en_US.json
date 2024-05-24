@@ -1518,6 +1518,12 @@
     "modification.aura.float.name":"Radius",
 
     "modification.level.flip": "Trigger When Above",
+	
+	"modification.caster_wand.intro": "Bind a spell to the wand by supplying|a spell scroll",
+	"modification.caster_wand.remove": "Release the spell bound to the|wand back into a spell scroll",
+	"modification.caster_wand.addspell": "Bind \"%1$s\" to the wand",
+	"modification.caster_wand.replacespell": "Bind \"%1$s\" to the wand,|replacing the spell in it",
+	"modification.caster_wand.nospell": "There is no spell that can be|bound from this item",
 
     "info.nostrumwelcome.text": "Welcome to Nostrum Magica! Press [%s] to get started!",
 

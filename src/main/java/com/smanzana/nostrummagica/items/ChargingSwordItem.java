@@ -94,12 +94,19 @@ public abstract class ChargingSwordItem extends SwordItem {
 		
 		// Only do something if enough time has passed
 		final int duration = stack.getUseDuration() - timeLeft;
-		if (worldIn.isRemote || duration < this.getTotalChargeTime(stack)) {
+		if (duration < this.getTotalChargeTime(stack)) {
 			return;
 		}
 		
 		final Hand hand = entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
 		fireChargedWeapon(worldIn, entityLiving, hand, stack);
+	}
+	
+	@Override
+	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+		final Hand hand = entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
+		fireChargedWeapon(worldIn, entityLiving, hand, stack);
+		return stack;
 	}
 	
 	@OnlyIn(Dist.CLIENT)

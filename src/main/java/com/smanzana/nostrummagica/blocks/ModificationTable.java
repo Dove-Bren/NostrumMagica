@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
+import com.smanzana.nostrummagica.items.CasterWandItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -109,6 +110,7 @@ public class ModificationTable extends Block {
 		return item instanceof SpellTome
 				//|| item instanceof SpellRune
 				|| (item instanceof SpellScroll && SpellScroll.getSpell(stack) != null)
-				|| item instanceof WarlockSword;
+				|| item instanceof WarlockSword
+				|| item instanceof CasterWandItem;
 	}
 }

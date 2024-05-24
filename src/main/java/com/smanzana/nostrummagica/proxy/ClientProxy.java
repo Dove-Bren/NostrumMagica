@@ -260,7 +260,7 @@ public class ClientProxy extends CommonProxy {
 				}
 				
 				NostrumMagicaSounds.CAST_FAIL.play(player);
-				overlayRenderer.startManaWiggle(2);
+				doManaWiggle(2);
 			}
 		}
 	}
@@ -969,5 +969,9 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		super.playRitualEffect(world, pos, element, center, extras, types, output);
+	}
+
+	public void doManaWiggle(int wiggleCount) {
+		this.overlayRenderer.startManaWiggle(wiggleCount);
 	}
 }

@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.blocks.ModificationTable;
+import com.smanzana.nostrummagica.items.CasterWandItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
@@ -210,6 +211,35 @@ public class ModificationTableEntity extends TileEntity implements IInventory {
 		} else if (stack.getItem() instanceof WarlockSword) {
 			this.setInventorySlotContents(1, ItemStack.EMPTY);
 			WarlockSword.addCapacity(stack, 2);
+		} else if (stack.getItem() instanceof CasterWandItem) {
+			final Spell currentSpell = CasterWandItem.GetSpell(stack);
+			
+			// Make sure if we're going to try and put a spell in that it's not empty
+			if (!this.getInputSlot().isEmpty()) {
+				if (SpellScroll.getSpell(getInputSlot()) == null) {
+					return;
+				}
+			}
+			
+			final Spell scrollSpell;
+			if (this.getInputSlot().isEmpty()) {
+				scrollSpell = null;
+			} else {
+				scrollSpell = SpellScroll.getSpell(this.getInputSlot());
+			}
+			if (scrollSpell == null || CasterWandItem.CanStoreSpell(stack, scrollSpell)) {
+				CasterWandItem.SetSpell(stack, scrollSpell);
+				this.setInventorySlotContents(1, stack); // Put wand in input slot so there's a visible change
+				
+				// Create a scroll for the old spell, if there was one
+				if (currentSpell != null) {
+					ItemStack scroll = SpellScroll.create(currentSpell);
+					scroll.setDamage(SpellScroll.getMaxDurability(scroll) - 1);
+					this.setInventorySlotContents(0, scroll);
+				} else {
+					this.setInventorySlotContents(0, ItemStack.EMPTY);
+				}
+			}
 		}
 		
 	}
