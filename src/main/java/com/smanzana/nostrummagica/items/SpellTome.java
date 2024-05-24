@@ -61,7 +61,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay {
+public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay, ISpellCastingTool {
 	
 	public static enum TomeStyle {
 		NOVICE, // Blue and simple
@@ -1258,5 +1258,17 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		return largest;
+	}
+
+	@Override
+	public void onStartCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+		SpellTome.applyEnhancements(stack, summary, caster);
+	}
+
+	@Override
+	public void onFinishCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+		if (caster instanceof PlayerEntity) {
+			SpellTome.doSpecialCastEffects(stack, (PlayerEntity) caster);
+		}
 	}
 }

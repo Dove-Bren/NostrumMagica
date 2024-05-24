@@ -13,9 +13,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.items.ISpellCastingTool;
 import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -33,21 +33,21 @@ public class SpellCasting {
 		return AttemptCast(spell, entity, ItemStack.EMPTY, true, false);
 	}
 	
-	public static final boolean AttemptTomeCast(Spell spell, LivingEntity entity, ItemStack tome) {
+	public static final boolean AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
 		final boolean freeCast = entity instanceof PlayerEntity
 				? ((PlayerEntity) entity).isCreative()
 				: false;
-		return AttemptCast(spell, entity, tome, freeCast, false);
+		return AttemptCast(spell, entity, tool, freeCast, false);
 	}
 	
-	public static final boolean CheckTomeCast(Spell spell, LivingEntity entity, ItemStack tome) {
+	public static final boolean CheckToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
 		final boolean freeCast = entity instanceof PlayerEntity
 				? ((PlayerEntity) entity).isCreative()
 				: false;
-		return AttemptCast(spell, entity, tome, freeCast, true);
+		return AttemptCast(spell, entity, tool, freeCast, true);
 	}
 
-	protected static final boolean AttemptCast(Spell spell, LivingEntity entity, ItemStack tome, boolean freeCast, boolean checking) {
+	protected static final boolean AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, boolean freeCast, boolean checking) {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(entity);
 		@Nullable PlayerEntity playerCast = (entity instanceof PlayerEntity) ? (PlayerEntity) entity : null;
 		
@@ -79,9 +79,8 @@ public class SpellCasting {
 		summary.addCostRate(att.getManaCostModifier());
 		
 		// Add tome enchancements
-		if (!tome.isEmpty() && tome.getItem() instanceof SpellTome) {
-			SpellTome.applyEnhancements(tome, summary, entity);
-			
+		if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
+			((ISpellCastingTool) tool.getItem()).onStartCastFromTool(entity, summary, tool);
 		}
 		
 		if (freeCast) {
@@ -204,11 +203,6 @@ public class SpellCasting {
 			}
 		}
 		
-		if (!tome.isEmpty() && playerCast != null && !checking) {
-			// little hook here for extra effects
-			SpellTome.doSpecialCastEffects(tome, playerCast);
-		}
-		
 		if (!checking) {
 			spell.cast(entity, summary.getEfficiency());
 			
@@ -218,6 +212,10 @@ public class SpellCasting {
 			}
 			
 			att.addXP(xp);
+		
+			if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
+				((ISpellCastingTool) tool.getItem()).onFinishCastFromTool(entity, summary, tool);
+			}
 		}
 		
 		return true;

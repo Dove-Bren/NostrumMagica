@@ -245,7 +245,7 @@ public class ClientProxy extends CommonProxy {
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
 		if (!tome.isEmpty()) {
-			if (SpellCasting.CheckTomeCast(spell, player, tome)) {
+			if (SpellCasting.CheckToolCast(spell, player, tome)) {
 				NetworkHandler.sendToServer(
 		    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
 			} else {

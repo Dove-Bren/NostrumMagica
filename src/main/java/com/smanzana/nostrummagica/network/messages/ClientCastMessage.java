@@ -54,7 +54,7 @@ public class ClientCastMessage {
 				if (!tome.isEmpty() && tome.getItem() instanceof SpellTome
 						&& SpellTome.getTomeID(tome) == tomeID) {
 					// Casting from a tome.
-					success = SpellCasting.AttemptTomeCast(spell, sp, tome);
+					success = SpellCasting.AttemptToolCast(spell, sp, tome);
 				} else {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					success = false;

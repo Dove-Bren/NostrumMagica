@@ -16,6 +16,9 @@ import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellCasting;
+import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.util.ITooltipFlag;
@@ -37,7 +40,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, ISpellContainerItem, IRaytraceOverlay {
+public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, ISpellContainerItem, IRaytraceOverlay, ISpellCastingTool {
 
 	public static final String ID = "caster_wand";
 	
@@ -220,6 +223,22 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
+		@Nullable Spell spell = this.getSpell(stack);
+		if (spell != null) {
+			if (SpellCasting.AttemptToolCast(spell, playerIn, stack)) {
+				ItemStacks.damageItem(stack, playerIn, hand, 1);
+			}
+		}
+	}
+
+	@Override
+	public void onStartCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+		// Reduce weight by 2!
+		summary.addWeightDiscount(2);
+	}
+
+	@Override
+	public void onFinishCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		;
 	}
 
