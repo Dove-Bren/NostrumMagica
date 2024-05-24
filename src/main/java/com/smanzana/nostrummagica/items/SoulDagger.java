@@ -51,10 +51,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpellEquipment {
+public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpellEquipment, IRaytraceOverlay {
 
 	public static final String ID = "soul_dagger";
 	private static final int USE_DURATION = 30; // In ticks
+	private static final float STAB_RANGE = 3f;
 	
 	public SoulDagger() {
 		super(ItemTier.IRON, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
@@ -145,8 +146,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	}
 	
 	protected List<LivingEntity> findStabTargets(World worldIn, LivingEntity wielder, ItemStack dagger) {
-		float extent = 3f;
-		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder, wielder.getEyePosition(.5f), wielder.getLook(.5f), extent, new RayTrace.OtherLiving(wielder));
+		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder, wielder.getEyePosition(.5f), wielder.getLook(.5f), STAB_RANGE, new RayTrace.OtherLiving(wielder));
 		if (mop == null || mop.getType() != RayTraceResult.Type.ENTITY) {
 			return new ArrayList<>();
 		} else {
@@ -290,5 +290,15 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	@Override
 	protected int getTotalChargeTime(ItemStack stack) {
 		return USE_DURATION;
+	}
+	
+	@Override
+	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
+		return true;
+	}
+
+	@Override
+	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+		return STAB_RANGE;
 	}
 }

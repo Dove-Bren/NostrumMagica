@@ -49,7 +49,6 @@ import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.Transmutation;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -239,8 +238,9 @@ public class OverlayRenderer extends AbstractGui {
 				}
 				
 				if (!held.isEmpty()) {
+					final double range = ((IRaytraceOverlay) held.getItem()).getTraceRange(player.world, player, held);
 					RayTraceResult result = RayTrace.raytraceApprox(player.world, player, player.getEyePosition(event.getPartialTicks()),
-							player.rotationPitch, player.rotationYaw, SeekingBulletTrigger.MAX_DIST,
+							player.rotationPitch, player.rotationYaw, (float) range,
 							new Predicate<Entity>() {
 	
 								@Override

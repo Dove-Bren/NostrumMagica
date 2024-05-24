@@ -213,5 +213,9 @@ public class FieldTrigger extends TriggerAreaTrigger {
 	public int getWeight() {
 		return 2;
 	}
-	
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return false;
+	}
 }

@@ -25,7 +25,7 @@ public class SpellCrafting {
 	
 	public static boolean CanCraftSpells(PlayerEntity player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		return attr == null || !attr.isUnlocked() || !attr.getCompletedResearches().contains("spellcraft");
+		return attr != null && attr.isUnlocked() && attr.getCompletedResearches().contains("spellcraft");
 	}
 	
 	public static boolean CheckForValidRunes(IInventory inventory, int startIdx, int slotCount, @Nonnull List<String> errorsOut) {

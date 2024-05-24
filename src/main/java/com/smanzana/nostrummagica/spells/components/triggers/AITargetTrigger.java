@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.block.Blocks;
@@ -91,5 +92,9 @@ public class AITargetTrigger extends InstantTrigger {
 	public int getWeight() {
 		return 99;
 	}
-	
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return false;
+	}
 }

@@ -493,4 +493,9 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		return false;
 	}
 
+	@Override
+	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+		return SeekingBulletTrigger.MAX_DIST;
+	}
+
 }

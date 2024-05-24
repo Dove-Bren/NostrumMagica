@@ -43,6 +43,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 
 	public static final String ID = "sword_fire";
 	private static final int USE_DURATION = 20; // In ticks
+	private static final float CAST_RANGE = SeekingBulletTrigger.MAX_DIST;
 	
 	public AspectedFireWeapon() {
 		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().maxDamage(1240));
@@ -194,6 +195,11 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		if (castRod(worldIn, playerIn)) {
 			ItemStacks.damageItem(stack, playerIn, hand, 1);
 		}
+	}
+
+	@Override
+	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+		return CAST_RANGE;
 	}
 
 }

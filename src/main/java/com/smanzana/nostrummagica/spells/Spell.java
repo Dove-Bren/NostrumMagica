@@ -1119,4 +1119,27 @@ public class Spell {
 	public List<SpellPart> getSpellParts() {
 		return this.parts;
 	}
+	
+	/**
+	 * Whether (the first part of this spell) wants tracing, to show indicators when an enemy is being looked at.
+	 * For example, seeking bullet needs the player to be looking at an enemy to select who to go after.
+	 * @return
+	 */
+	public boolean shouldTrace() {
+		if (!getSpellParts().isEmpty()) {
+			SpellPart firstTrigger = getSpellParts().get(0);
+			return firstTrigger.getTrigger().shouldTrace(firstTrigger.getParam());
+		}
+		
+		return false;
+	}
+	
+	public double getTraceRange() {
+		if (!getSpellParts().isEmpty()) {
+			SpellPart firstTrigger = getSpellParts().get(0);
+			return firstTrigger.getTrigger().getTraceRange(firstTrigger.getParam());
+		}
+		
+		return 0;
+	}
 }

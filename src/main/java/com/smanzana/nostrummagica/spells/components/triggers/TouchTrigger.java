@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
@@ -116,6 +117,16 @@ public class TouchTrigger extends InstantTrigger {
 	@Override
 	public int getWeight() {
 		return 0;
+	}
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public double getTraceRange(SpellPartProperties params) {
+		return TOUCH_RANGE;
 	}
 	
 }

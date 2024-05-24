@@ -8,4 +8,6 @@ public interface IRaytraceOverlay {
 
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack);
 	
+	public double getTraceRange(World world, PlayerEntity player, ItemStack stack);
+	
 }

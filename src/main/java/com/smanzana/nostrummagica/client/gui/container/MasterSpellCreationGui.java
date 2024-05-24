@@ -395,7 +395,7 @@ public class MasterSpellCreationGui {
 				boolean deductReagents) {
 			boolean fail = false;
 			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
-			boolean locked = SpellCrafting.CanCraftSpells(crafter);
+			boolean locked = !SpellCrafting.CanCraftSpells(crafter);
 			spellErrorStrings.clear();
 			reagentStrings.clear();
 			

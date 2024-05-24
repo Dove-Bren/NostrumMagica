@@ -228,5 +228,15 @@ public class ProjectileTrigger extends SpellTrigger {
 	public int getWeight() {
 		return 0;
 	}
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public double getTraceRange(SpellPartProperties params) {
+		return PROJECTILE_RANGE;
+	}
 	
 }

@@ -33,6 +33,10 @@ public abstract class ChargingSwordItem extends SwordItem {
 		super(tier, attackDamageIn, attackSpeedIn, builder);
 	}
 	
+	protected boolean canCharge(World worldIn, PlayerEntity playerIn, Hand hand, ItemStack stack) {
+		return true;
+	}
+	
 	/**
 	 * Whether this charging item should 'fire' when the charge time is up.
 	 * If false, players can keep holding the charge button as long as they want past
@@ -56,10 +60,12 @@ public abstract class ChargingSwordItem extends SwordItem {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final ItemStack held = playerIn.getHeldItem(hand);
 		
-		// Don't do when sneaking so players can still use a shield
-		if (!playerIn.isSneaking()) {
-			playerIn.setActiveHand(hand);
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
+		if (canCharge(worldIn, playerIn, hand, held)) {
+			// Don't do when sneaking so players can still use a shield
+			if (!playerIn.isSneaking()) {
+				playerIn.setActiveHand(hand);
+				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
+			}
 		}
 		
 		return new ActionResult<ItemStack>(ActionResultType.PASS, held);

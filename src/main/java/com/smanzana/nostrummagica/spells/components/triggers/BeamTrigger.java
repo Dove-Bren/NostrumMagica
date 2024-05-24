@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -141,6 +142,16 @@ public class BeamTrigger extends InstantTrigger {
 	@Override
 	public int getWeight() {
 		return 3;
+	}
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public double getTraceRange(SpellPartProperties params) {
+		return BEAM_RANGE;
 	}
 	
 }

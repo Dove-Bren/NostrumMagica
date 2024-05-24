@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
@@ -89,5 +90,9 @@ public class OtherTrigger extends InstantTrigger {
 	public int getWeight() {
 		return 0;
 	}
-	
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return false;
+	}
 }

@@ -246,5 +246,9 @@ public class AuraTrigger extends TriggerAreaTrigger {
 	public int getWeight() {
 		return 3;
 	}
-	
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return false;
+	}
 }

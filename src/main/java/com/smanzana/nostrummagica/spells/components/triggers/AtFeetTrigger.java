@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.spells.components.triggers;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.block.Blocks;
@@ -82,5 +83,9 @@ public class AtFeetTrigger extends InstantTrigger {
 	public int getWeight() {
 		return 0;
 	}
-	
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return false;
+	}
 }

@@ -29,8 +29,6 @@ import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
@@ -242,20 +240,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		final int bonusPages = pageCount >= 4 ? 1 : 0; 
 		ItemStack stack = Create(style, 1, capacity, slots, bonusPages, enhancements);
 		
-//		if (!enhancements.isEmpty()) {
-//			CompoundNBT tag = stack.getTag();
-//			if (tag == null)
-//				tag = new CompoundNBT();
-//			
-//			writeEnhancements(enhancements, tag);
-//				
-//			stack.setTag(tag);
-//			
-//		}
-//		
-//		setCapacity(stack, capacity);
-//		setLevel(stack, 1);
-			
 		return stack;
 	}
 	
@@ -846,15 +830,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			int xp = getXP(stack);
 			int maxxp = LevelCurve.getMaxXP(level);
 			int modifications = getModifications(stack);
-			//int id = getTomeID(stack);
-			//INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
-			//SpellComponentWrapper comp = (attr.isBinding() && id == attr.getBindingID()) ? attr.getBindingComponent() : null;
-			//String bindingName = (comp == null) ? null : attr.getBindingSpell().getName();
-			//String compname = (comp == null) ? null :
-//				(comp.isAlteration() ? comp.getAlteration().getName() :
-//				(comp.isElement() ? comp.getElement().getName() :
-//				(comp.isShape() ? comp.getShape().getDisplayName() :
-//				(comp.getTrigger().getDisplayName()))));
 			pages.add(new TitlePage(title, false));
 			pages.add(new LinedTextPage("", "",
 					"Level: " + level, "XP: " + xp + "/" + maxxp, "",
@@ -863,9 +838,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 					"",
 					spellCount + " Spells",
 					weightSum + "/" + weightCapacity + " Weight Capacity"
-					//"",
-					//(comp != null ? "Binding spell " + bindingName : ""),
-					//(comp != null ? "Seek a shrine of " + compname : ""))
 					)
 				);
 			
@@ -1267,12 +1239,24 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		for (Spell spell : spells) {
-			if (spell != null && spell.getSpellParts() != null && spell.getSpellParts().get(0).isTrigger()) {
-				SpellTrigger trigger = spell.getSpellParts().get(0).getTrigger();
-				return trigger instanceof SeekingBulletTrigger;
+			if (spell != null && spell.shouldTrace()) {
+				return true;
 			}
 		}
 		
 		return false;
+	}
+
+	@Override
+	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+		double largest = 0;
+		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		for (Spell spell : spells) {
+			if (spell != null && spell.shouldTrace()) {
+				largest = Math.max(largest, spell.getTraceRange());
+			}
+		}
+		
+		return largest;
 	}
 }

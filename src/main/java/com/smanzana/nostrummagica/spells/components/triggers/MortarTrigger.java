@@ -275,5 +275,15 @@ public class MortarTrigger extends SpellTrigger {
 	public int getWeight() {
 		return 1;
 	}
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public double getTraceRange(SpellPartProperties params) {
+		return MaxHDist;
+	}
 	
 }

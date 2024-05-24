@@ -191,5 +191,9 @@ public class ManaTrigger extends SpellTrigger {
 	public int getWeight() {
 		return 1;
 	}
-	
+
+	@Override
+	public boolean shouldTrace(SpellPartProperties params) {
+		return false;
+	}
 }

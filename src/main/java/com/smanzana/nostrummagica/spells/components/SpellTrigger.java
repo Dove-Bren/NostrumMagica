@@ -162,4 +162,20 @@ public abstract class SpellTrigger {
 	 * @return
 	 */
 	public abstract int getWeight();
+
+	/**
+	 * Whether spells that start with this trigger should request tracing when players have
+	 * the spell selected.
+	 * @return
+	 */
+	public abstract boolean shouldTrace(SpellPartProperties params);
+	
+	/**
+	 * if {@link #shouldTrace(SpellPartProperties)} is true, how far to trace
+	 * @param params
+	 * @return
+	 */
+	public double getTraceRange(SpellPartProperties params) {
+		return 0;
+	}
 }

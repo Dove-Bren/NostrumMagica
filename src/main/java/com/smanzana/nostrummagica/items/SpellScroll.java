@@ -12,8 +12,6 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientCastMessage;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -37,9 +35,6 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 
 	private static final String NBT_SPELL = "nostrum_spell";
 	private static final String NBT_DURABILITY = "max_uses";
-	//private static final String NBT_WAKE_START = "nostrum_timer";
-	//private static final String NBT_TYPE = "nostrum_type";
-	//private static final int WAKE_TIME = 20 * 60 * 5;
 	public static final String ID = "spell_scroll";
 	
 	public SpellScroll() {
@@ -151,28 +146,6 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		return Math.max(1, nbt.getInt(NBT_DURABILITY));
 	}
 	
-//	public static int getNestedScrollMeta(ItemStack scroll) {
-//		byte ret = 0;
-//		
-//		if (!scroll.isEmpty() && scroll.hasTag()) {
-//			CompoundNBT nbt = scroll.getTag();
-//			ret = nbt.getByte(NBT_TYPE);
-//		}
-//		
-//		return ret;
-//	}
-//	
-//	public static void setNestedScrollMeta(ItemStack scroll, byte meta) {
-//		if (scroll.isEmpty())
-//			return;
-//		
-//		CompoundNBT nbt = scroll.getTag();
-//		if (nbt == null)
-//			nbt = new CompoundNBT();
-//		
-//		nbt.setByte(NBT_TYPE, meta);
-//	}
-	
 	public static ItemStack create(Spell spell) {
 		ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 		setSpell(scroll, spell);
@@ -227,49 +200,20 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		;
 	}
 	
-//	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-//		super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
-//		
-////		if (!worldIn.isRemote) {
-////			if (stack.isRemote() || getNestedScrollMeta(stack) != 1)
-////				return;
-////			
-////			CompoundNBT nbt;
-////			if (!stack.hasTag())
-////				nbt = new CompoundNBT();
-////			else
-////				nbt = stack.getTag();
-////			
-////			long start = nbt.getLong(NBT_WAKE_START);
-////			long worldtime = worldIn.getMinecraftServer().getTickCounter();
-////			if (start == 0) {
-////				nbt.putLong(NBT_WAKE_START, worldtime);
-////				stack.setTag(nbt);
-////				return;
-////			}
-////			
-////			if (worldtime > start + WAKE_TIME) {
-////				setNestedScrollMeta(stack, (byte) 2);
-////				if (!worldIn.isRemote) {
-////					NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ());
-////				}
-////			}
-////		}
-//	}
-
 	@Override
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Spell spell = getSpell(stack);
-		SpellTrigger firstTrigger = null;
-		if (spell != null && !spell.getSpellParts().isEmpty()) {
-			firstTrigger = spell.getSpellParts().get(0).getTrigger();
-		}
-		
-		return firstTrigger != null && firstTrigger instanceof SeekingBulletTrigger;
+		return spell == null ? false : spell.shouldTrace();
 	}
 	
 	@Override
 	public int getMaxDamage(ItemStack stack) {
 		return getMaxDurability(stack);
+	}
+
+	@Override
+	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+		Spell spell = getSpell(stack);
+		return spell == null ? 0 : spell.getTraceRange();
 	}
 }
