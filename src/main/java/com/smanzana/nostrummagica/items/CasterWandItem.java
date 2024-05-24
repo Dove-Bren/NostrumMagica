@@ -38,6 +38,8 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -62,7 +64,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		builder.putAll(multimap);
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 1, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
             builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
 		}
 		
@@ -112,14 +114,16 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("weight -1 lol"));
-		
 		final @Nullable Spell spell = getSpell(stack);
 		if (spell != null) {
-			tooltip.add(new StringTextComponent("Spell"));
+			tooltip.add(new TranslationTextComponent("info.caster_wand.spell", spell.getName()).mergeStyle(TextFormatting.GOLD));
 		} else {
-			tooltip.add(new StringTextComponent("No Bound Spell"));
+			tooltip.add(new TranslationTextComponent("info.caster_wand.nospell"));
 		}
+		
+		tooltip.add(StringTextComponent.EMPTY);
+		tooltip.add(new TranslationTextComponent("info.caster_wand.desc").mergeStyle(TextFormatting.GRAY));
+		tooltip.add(new StringTextComponent(" -2 Spell Weight").mergeStyle(TextFormatting.DARK_GREEN));
 	}
 	
 	protected void setSpell(ItemStack wand, @Nullable Spell spell) {
@@ -216,7 +220,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	protected boolean shouldAutoFire(ItemStack stack) {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -250,6 +254,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 					ItemStacks.damageItem(stack, playerIn, hand, 1);
 					if (playerIn instanceof PlayerEntity) {
 						NostrumMagica.instance.proxy.sendMana((PlayerEntity) playerIn);
+						((PlayerEntity) playerIn).getCooldownTracker().setCooldown(stack.getItem(), 20);
 					}
 				}
 			}
