@@ -28,10 +28,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RayTraceResult;
@@ -42,7 +39,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpellEquipment, IRaytraceOverlay {
+public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged, ISpellEquipment, IRaytraceOverlay {
 
 	public static final String ID = "sword_fire";
 	private static final int USE_DURATION = 20; // In ticks
@@ -103,29 +100,6 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
-	}
-	
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final ItemStack held = playerIn.getHeldItem(hand);
-		
-		// Don't do when sneaking so players can still use a shield
-		if (!playerIn.isSneaking()) {
-			playerIn.setActiveHand(hand);
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
-		}
-		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, held);
-	}
-	
-	@Override
-	public UseAction getUseAction(ItemStack stack) {
-		return UseAction.BOW;
-	}
-	
-	@Override
-	public int getUseDuration(ItemStack stack) {
-		return 270000;
 	}
 	
 	protected void doCastEffect(LivingEntity caster, LivingEntity target) {
@@ -190,20 +164,6 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 	}
 	
 	@Override
-	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
-		
-		// Only do something if enough time has passed
-		final int duration = stack.getUseDuration() - timeLeft;
-		if (worldIn.isRemote || duration < USE_DURATION) {
-			return;
-		}
-		
-		if (castRod(worldIn, entityLiving)) {
-			ItemStacks.damageItem(stack, entityLiving, entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
-		}
-	}
-	
-	@Override
 	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (!playerIn.world.isRemote()) {
 			if (castOn(playerIn, target)) {
@@ -219,18 +179,21 @@ public class AspectedFireWeapon extends SwordItem implements ILoreTagged, ISpell
 		return true;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharge(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-		if (entityIn == null) {
-			return 0.0F;
-		} else {
-			return !(entityIn.getActiveItemStack().getItem() instanceof AspectedFireWeapon) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getItemInUseCount()) / USE_DURATION;
-		}
+	@Override
+	protected boolean shouldAutoFire(ItemStack stack) {
+		return false;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharging(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+	@Override
+	protected int getTotalChargeTime(ItemStack stack) {
+		return USE_DURATION;
+	}
+
+	@Override
+	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
+		if (castRod(worldIn, playerIn)) {
+			ItemStacks.damageItem(stack, playerIn, hand, 1);
+		}
 	}
 
 }

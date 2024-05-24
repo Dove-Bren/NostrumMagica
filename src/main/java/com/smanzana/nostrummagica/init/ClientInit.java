@@ -76,6 +76,7 @@ import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.items.AspectedFireWeapon;
 import com.smanzana.nostrummagica.items.AspectedPhysicalWeapon;
+import com.smanzana.nostrummagica.items.ChargingSwordItem;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.HookshotItem;
 import com.smanzana.nostrummagica.items.MageBlade;
@@ -358,10 +359,10 @@ public class ClientInit {
 	}
 	
 	private static final void registerItemModelProperties() {
-		ItemModelsProperties.registerProperty(NostrumItems.enderRod, NostrumMagica.Loc("charge"), AspectedEnderWeapon::ModelCharge);
-		ItemModelsProperties.registerProperty(NostrumItems.enderRod, NostrumMagica.Loc("charging"), AspectedEnderWeapon::ModelCharging);
-		ItemModelsProperties.registerProperty(NostrumItems.flameRod, NostrumMagica.Loc("charge"), AspectedFireWeapon::ModelCharge);
-		ItemModelsProperties.registerProperty(NostrumItems.flameRod, NostrumMagica.Loc("charging"), AspectedFireWeapon::ModelCharging);
+		ItemModelsProperties.registerProperty(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedEnderWeapon::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedEnderWeapon::ModelCharging);
+		ItemModelsProperties.registerProperty(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedFireWeapon::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedFireWeapon::ModelCharging);
 		ItemModelsProperties.registerProperty(NostrumItems.deepMetalAxe, NostrumMagica.Loc("blocking"), AspectedPhysicalWeapon::ModelBlocking);
 		ItemModelsProperties.registerProperty(NostrumItems.hookshotWeak, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
 		ItemModelsProperties.registerProperty(NostrumItems.hookshotMedium, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
@@ -371,8 +372,8 @@ public class ClientInit {
 		ItemModelsProperties.registerProperty(NostrumItems.mirrorShield, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
 		ItemModelsProperties.registerProperty(NostrumItems.mirrorShieldImproved, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
 		ItemModelsProperties.registerProperty(NostrumItems.mirrorShieldImproved, NostrumMagica.Loc("charged"), MirrorShieldImproved::ModelCharged);
-		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, NostrumMagica.Loc("charge"), SoulDagger::ModelCharge);
-		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, NostrumMagica.Loc("charging"), SoulDagger::ModelCharging);
+		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGE, SoulDagger::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGING, SoulDagger::ModelCharging);
 		ItemModelsProperties.registerProperty(NostrumItems.thanosStaff, NostrumMagica.Loc("activated"), ThanosStaff::ModelActivated);
 	}
 	

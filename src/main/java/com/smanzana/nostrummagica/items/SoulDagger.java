@@ -3,8 +3,6 @@ package com.smanzana.nostrummagica.items;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
@@ -38,12 +36,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
@@ -57,7 +51,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SoulDagger extends SwordItem implements ILoreTagged, ISpellEquipment {
+public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "soul_dagger";
 	private static final int USE_DURATION = 30; // In ticks
@@ -130,35 +124,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellEquipmen
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final ItemStack held = playerIn.getHeldItem(hand);
-		if (playerIn.isSneaking()) {
-			playerIn.setActiveHand(hand);
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
-		}
-			
-		return new ActionResult<ItemStack>(ActionResultType.PASS, held);
-	}
-	
-	@Override
-	public UseAction getUseAction(ItemStack stack) {
-		return UseAction.BOW;
-	}
-	
-	@Override
-	public int getUseDuration(ItemStack stack) {
-		return 270000;
-	}
-	
-	@Override
-	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
-		
-		// Only do something if enough time has passed
-		final int duration = stack.getUseDuration() - timeLeft;
-		if (worldIn.isRemote || duration < USE_DURATION) {
-			return;
-		}
-		
+	protected void fireChargedWeapon(World worldIn, LivingEntity entityLiving, Hand hand, ItemStack stack) {
 		// Do forward attack
 		//vfx
 		{
@@ -171,7 +137,7 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellEquipmen
 				// Just find and stab first
 				if (target != null) {
 					stabTarget(entityLiving, target, stack);
-					ItemStacks.damageItem(stack, entityLiving, entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+					ItemStacks.damageItem(stack, entityLiving, hand, 1);
 					return;
 				}
 			}
@@ -316,18 +282,13 @@ public class SoulDagger extends SwordItem implements ILoreTagged, ISpellEquipmen
 		return true;
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharge(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-		if (entityIn == null) {
-			return 0.0F;
-		} else {
-			return !(entityIn.getActiveItemStack().getItem() instanceof SoulDagger) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getItemInUseCount()) / USE_DURATION;
-		}
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharging(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+	@Override
+	protected boolean shouldAutoFire(ItemStack stack) {
+		return false;
 	}
 
+	@Override
+	protected int getTotalChargeTime(ItemStack stack) {
+		return USE_DURATION;
+	}
 }
