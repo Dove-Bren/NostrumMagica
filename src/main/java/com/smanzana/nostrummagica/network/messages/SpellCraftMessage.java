@@ -57,10 +57,10 @@ public class SpellCraftMessage {
 			if (spell != null) {
 				NostrumMagicaSounds.UI_RESEARCH.play(TE.getWorld(), 
 						message.pos.getX(), message.pos.getY(), message.pos.getZ());
-				}
 			
 				NetworkHandler.sendToAll(
 						new SpellRequestReplyMessage(Lists.newArrayList(spell)));
+			}
 		});
 	}
 

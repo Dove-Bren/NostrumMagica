@@ -368,7 +368,7 @@ public class SpellCreationGui {
 		
 		public Spell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(getCraftContext(), null, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			Spell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;

@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.capabilities.ManaArmorStorage;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
 import com.smanzana.nostrummagica.capabilities.SpellCraftingCapability;
+import com.smanzana.nostrummagica.command.CommandAllPatterns;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
 import com.smanzana.nostrummagica.command.CommandAllResearch;
 import com.smanzana.nostrummagica.command.CommandCreateGeotoken;
@@ -2206,7 +2207,7 @@ public class ModInit {
 		CommandRandomSpell.register(dispatcher);
 		CommandDebugEffect.register(dispatcher);
 		CommandSetManaArmor.register(dispatcher);
-		CommandAllResearch.register(dispatcher);
+		CommandAllPatterns.register(dispatcher);
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

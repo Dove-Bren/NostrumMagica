@@ -46,7 +46,18 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 
 	@Override
 	public boolean canModify(SpellCraftContext context, SpellPart originalPart) {
-		return true;
+		// If mana or weight is involved, it's definitely applicable
+		if (this.weightModifier != 0 || this.manaRateModifier != 0) {
+			return true;
+		}
+		if (originalPart.isTrigger()) {
+			return this.triggerOverride != null;
+		} else {
+			return this.elementCountModifier != 0
+					|| this.shapeOverride != null
+					|| this.alterationOverride != null
+					|| this.elementOverride != null;
+		}
 	}
 
 	@Override

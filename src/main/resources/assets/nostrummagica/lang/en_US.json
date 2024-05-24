@@ -491,6 +491,16 @@
 	
 	"pattern.nostrummagica.lightweight": "Lightweight",
 	"pattern.nostrummagica.lightweight.description": "Makes the rune in the second slot weigh one unit less, but cost three times as much mana",
+	"pattern.nostrummagica.wobbly": "Jagged",
+	"pattern.nostrummagica.wobbly.description": "Alternates doubling and halving the mana cost of each slot",
+	"pattern.nostrummagica.shortheavy": "Bottom Heavy",
+	"pattern.nostrummagica.shortheavy.description": "Makes the second slot rune two units heavier, but removes the mana cost of the third",
+	"pattern.nostrummagica.barbed": "Barbed",
+	"pattern.nostrummagica.barbed.description": "Lightens the second slot by one and halves the mana costs of the third slot, but makes any shape in slot two use the inflict alteration",
+	"pattern.nostrummagica.ticktock": "Tick Tock",
+	"pattern.nostrummagica.ticktock.description": "Cheapens the first three runes, but forces a shape in the second slot to be good while a shape in the third slot is negative",
+	"pattern.nostrummagica.tocktick": "Tock Tick",
+	"pattern.nostrummagica.tocktick.description": "Cheapens the first three runes, but forces a shape in the second slot to be negative while a shape in the third slot is good",
 
     "key.cast1.desc": "Cast Spell Slot 1",
 	"key.cast2.desc": "Cast Spell Slot 2",

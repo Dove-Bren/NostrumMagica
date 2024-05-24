@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCre
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
@@ -465,6 +466,7 @@ public class MysticSpellCraftGui {
 			
 			MysticContainer container = getContainer();
 			container.patternIdx = ((choices.length + container.patternIdx) + (isLeft ? -1 : 1)) % choices.length;
+			container.validate();
 		}
 		
 		@Override
@@ -547,32 +549,44 @@ public class MysticSpellCraftGui {
 			for (Vector3i slotPos : runeSlots) {
 				final int runeSlotIdx = slotPos.getZ();
 				final boolean isModified;
+				final boolean hasModifier;
+				
 				if (pattern != null) {
-					final @Nullable ISpellCraftModifier modifier;
 					if (pattern.hasModifier(context, runeSlotIdx)) {
-						modifier = pattern.getModifier(context, runeSlotIdx);
+						@Nullable ISpellCraftModifier modifier = pattern.getModifier(context, runeSlotIdx);
+						if (modifier != null) {
+							hasModifier = true;
+							final ItemStack rune = getContainer().inventory.getRuneSlotContents(runeSlotIdx);
+							if (!rune.isEmpty()) {
+								isModified = modifier.canModify(context, SpellRune.getPart(rune));
+							} else {
+								isModified = false;
+							}
+						} else {
+							hasModifier = isModified = false;
+						}
 					} else {
-						modifier = null;
+						hasModifier = isModified = false;
 					}
-					isModified = modifier != null;
 				} else {
-					isModified = false;
+					hasModifier = isModified = false;
 				}
 				
-				matrixStackIn.push();
-				matrixStackIn.translate(slotPos.getX(), slotPos.getY(), 0);
-				{
+				if (hasModifier) {
+					final int color;
 					if (isModified) {
-						matrixStackIn.push();
-						matrixStackIn.translate(0, 0, 300);
-						RenderFuncs.drawGradientRect(matrixStackIn, 0, POS_SLOT_RUNES_WIDTH/4, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH,
-								0x00FFFFFF, 0x00FFFFFF, // top colors
-								0x60FFFF00, 0x60FFFF00 // bottom colors
-							);
-						matrixStackIn.pop();
+						color = 0x60FFFF00;
+					} else {
+						color = 0x60FFFFFF;
 					}
+					matrixStackIn.push();
+					matrixStackIn.translate(slotPos.getX(), slotPos.getY(), 300);
+					RenderFuncs.drawGradientRect(matrixStackIn, 0, POS_SLOT_RUNES_WIDTH/4, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH,
+							0x00FFFFFF, 0x00FFFFFF, // top colors
+							color, color // bottom colors
+						);
+					matrixStackIn.pop();
 				}
-				matrixStackIn.pop();
 			}
 		}
 		
