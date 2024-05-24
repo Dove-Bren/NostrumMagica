@@ -76,6 +76,7 @@ import com.smanzana.nostrummagica.fluids.NostrumFluids;
 import com.smanzana.nostrummagica.items.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.items.AspectedFireWeapon;
 import com.smanzana.nostrummagica.items.AspectedPhysicalWeapon;
+import com.smanzana.nostrummagica.items.CasterWandItem;
 import com.smanzana.nostrummagica.items.ChargingSwordItem;
 import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.HookshotItem;
@@ -239,6 +240,8 @@ public class ClientInit {
 		ev.getItemColors().register(tinter, NostrumItems.essenceEarth, NostrumItems.essenceEnder, NostrumItems.essenceFire,
 				NostrumItems.essenceIce, NostrumItems.essenceLightning, NostrumItems.essencePhysical, NostrumItems.essenceWind
 				);
+		
+		ev.getItemColors().register(new CasterWandItem.CasterWandColor(), NostrumItems.casterWand);
 	}
 	
 	@SubscribeEvent
@@ -375,6 +378,8 @@ public class ClientInit {
 		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGE, SoulDagger::ModelCharge);
 		ItemModelsProperties.registerProperty(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGING, SoulDagger::ModelCharging);
 		ItemModelsProperties.registerProperty(NostrumItems.thanosStaff, NostrumMagica.Loc("activated"), ThanosStaff::ModelActivated);
+		ItemModelsProperties.registerProperty(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGE, CasterWandItem::ModelCharge);
+		ItemModelsProperties.registerProperty(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGING, CasterWandItem::ModelCharging);
 	}
 	
 	@SuppressWarnings("deprecation")
