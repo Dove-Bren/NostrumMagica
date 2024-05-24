@@ -22,7 +22,7 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 	protected float waveProg;
 	
 	public ModelWillo() {
-		super(RenderType::getEntityTranslucent);
+		super(RenderType::getEntityCutoutNoCull);
 		this.textureHeight = 64;
 		this.textureWidth = 64;
 		

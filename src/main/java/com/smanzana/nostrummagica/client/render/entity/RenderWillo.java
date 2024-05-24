@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
 import com.smanzana.nostrummagica.client.model.ModelWillo;
 import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -24,7 +25,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 	private ModelWillo mainModel;
 	
 	public RenderWillo(EntityRendererManager renderManagerIn, float scale) {
-		super(renderManagerIn, new ModelRenderShiv<EntityWillo>(RenderType::getEntityTranslucent), .33f);
+		super(renderManagerIn, new ModelRenderShiv<EntityWillo>(RenderType::getEntityCutoutNoCull), .33f);
 		mainModel = new ModelWillo();
 	}
 	
@@ -125,14 +126,10 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 			int packedOverlayIn, float red, float green, float blue, float alpha) {
 		
 		// GlStateManager.color4f(.65f, 1f, .7f, 1f);
-		red *= .65f;
-		green *= 1f;
-		blue *= .7f;
-		alpha *= 1f;
-		
 		final float rotPeriod = 6f * 20f;
 		final float time = partialTicks + entityIn.ticksExisted;
 		final float rotX = 360f * (time % rotPeriod) / rotPeriod;
+		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
 		this.mainModel.setLivingAnimations(entityIn, 0, 0, partialTicks);
 		
@@ -149,14 +146,14 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 		// Render face inside main body
 		matrixStackIn.push();
 		matrixStackIn.scale(.4f, .4f, .4f);
-		renderFace(entityIn, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderFace(entityIn, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red * .65f, green * 1f, blue * .7f, alpha);
 		matrixStackIn.pop();
 		
 		// Render face inside main body
 		matrixStackIn.push();
 		matrixStackIn.scale(.5f, .5f, .5f);
 		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		renderCube(entityIn, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderCube(entityIn, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red * color[0], green * color[1], blue * color[2], alpha);
 		matrixStackIn.pop();
 		
 		matrixStackIn.pop();

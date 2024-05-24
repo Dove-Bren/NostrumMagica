@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
@@ -46,18 +47,22 @@ public class NostrumRenderTypes {
 
 	private static final RenderState.TargetState ITEM_ENTITY_TARGET = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_241712_U_");
 	
-	private static final boolean ENABLE_DEPTH_WRITING = true;
-	private static final boolean ENABLE_COLOUR_COMPONENTS_WRITING = true;
-	private static final RenderState.WriteMaskState WRITE_TO_DEPTH_AND_COLOR
-            = new RenderState.WriteMaskState(ENABLE_DEPTH_WRITING, ENABLE_COLOUR_COMPONENTS_WRITING);
+	private static final RenderState.WriteMaskState WRITE_TO_DEPTH_AND_COLOR = new RenderState.WriteMaskState(true, true);
+	private static final RenderState.WriteMaskState WRITE_NO_DEPTH_BUT_COLOR = new RenderState.WriteMaskState(true, false);
     
 	private static final RenderState.CullState NO_CULL = new RenderState.CullState(false);
     
-	private static final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
+	//private static final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
     //final RenderState.DepthTestState NO_DEPTH_TEST = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
     
 	private static final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
 	private static final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
+	private static final RenderState.OverlayState OVERLAY_ENABLED = new RenderState.OverlayState(true);
+	
+	private static final RenderState.DiffuseLightingState DIFFUSE_LIGHTING_ENABLED = new RenderState.DiffuseLightingState(true);
+	
+	private static final RenderState.AlphaState DEFAULT_ALPHA = new RenderState.AlphaState(0.003921569F);
+	private static final RenderState.AlphaState CUTOUT_ALPHA = new RenderState.AlphaState(.5f);
     
     @SuppressWarnings("deprecation")
     private static final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
@@ -90,10 +95,9 @@ public class NostrumRenderTypes {
 				.texture(new RenderState.TextureState(RenderHookShot.CHAIN_TEXTURE, false, true))
 				.cull(NO_CULL)
 				.lightmap(NO_LIGHTING)
-				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.layer(VIEW_OFFSET_Z_LAYERING)
 				.target(ITEM_ENTITY_TARGET)
-				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+				.alpha(CUTOUT_ALPHA)
 			.build(false);
 		HOOKSHOT_CHAIN = RenderType.makeType(Name("hookshot_chain"), DefaultVertexFormats.POSITION_TEX, GL11.GL_QUADS, 128, glState);
 		
@@ -102,7 +106,7 @@ public class NostrumRenderTypes {
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(NO_LIGHTING)
 				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
 				.texturing(MANAARMOR_GLINT)
 				// depth test?
 			.build(false);
@@ -113,7 +117,7 @@ public class NostrumRenderTypes {
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(NO_LIGHTING)
 				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
 			.build(false);
 		SWITCH_TRIGGER_BASE = RenderType.makeType(Name("switch_trigger_base"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
 		
@@ -122,8 +126,8 @@ public class NostrumRenderTypes {
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(NO_LIGHTING)
 				.layer(VIEW_OFFSET_Z_LAYERING)
-				.depthTest(DEPTH_EQUAL)
-				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+				//.depthTest(DEPTH_EQUAL)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
 			.build(false);
 		SWITCH_TRIGGER_CAGE = RenderType.makeType(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
 		
@@ -175,6 +179,43 @@ public class NostrumRenderTypes {
 				//.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.build(false);
 		return RenderType.makeType(Name("flaticon"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
+	}
+	
+	public static final RenderType GetBlendedEntity(ResourceLocation texture, boolean affectsOutline) {
+		// This based on RenderType.getEntityTranslucent(locationIn) but with no depth buffer writing
+		RenderType.State glState;
+		
+//		RenderType.State rendertype$state = RenderType.State.getBuilder()
+//				.texture(new RenderState.TextureState(LocationIn, false, false))
+//				.transparency(TRANSLUCENT_TRANSPARENCY)
+//				.diffuseLighting(DIFFUSE_LIGHTING_ENABLED)
+//				.alpha(DEFAULT_ALPHA).cull(CULL_DISABLED)
+//				.lightmap(LIGHTMAP_ENABLED)
+//				.overlay(OVERLAY_ENABLED)
+//			.build(outlineIn);
+		
+		RenderSystem.defaultBlendFunc();
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(texture, false, false))
+				.transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
+				      RenderSystem.enableBlend();
+				      RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+				   }, () -> {
+				      RenderSystem.disableBlend();
+				      RenderSystem.defaultBlendFunc();
+				   }))
+				.diffuseLighting(DIFFUSE_LIGHTING_ENABLED)
+				.alpha(DEFAULT_ALPHA).cull(NO_CULL)
+				.lightmap(LIGHTMAP_ENABLED)
+				.overlay(OVERLAY_ENABLED)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
+			.build(affectsOutline);
+		return RenderType.makeType(Name("nostrum_blendedentity"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 256, glState);
+	}
+	
+	public static final RenderType GetBlendedEntity(ResourceLocation texture) {
+		return GetBlendedEntity(texture, true);
 	}
 	
 }

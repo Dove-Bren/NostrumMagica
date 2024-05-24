@@ -211,7 +211,7 @@ public class NostrumMagicaFlower extends BushBlock {
 			
 			NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 					1,
-					pos.getX(), pos.getY(), pos.getZ(), 1, 40, 0,
+					pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .5, 40, 0,
 					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -23,7 +24,7 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 
 	public RenderEnderRodBall(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
-		this.ballOrb = new ModelBaked<>(RenderType::getEntityTranslucent, BALL_MODEL);
+		this.ballOrb = new ModelBaked<>(NostrumRenderTypes::GetBlendedEntity, BALL_MODEL);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -40,7 +41,7 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 		final float red = .525f;
 		final float green = .314f;
 		final float blue = .725f;
-		final IVertexBuilder buffer = bufferIn.getBuffer(this.ballOrb.getRenderType(getEntityTexture(entityIn)));
+		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutout(getEntityTexture(entityIn)));
 		
 		matrixStackIn.push();
 		
@@ -62,6 +63,8 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
 		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, 1f);
 		matrixStackIn.pop();
+		
+		buffer = bufferIn.getBuffer(this.ballOrb.getRenderType(getEntityTexture(entityIn)));
 		
 		// Inner glow orb is slightly larger but pulses at same rate and is transparent
 		scale += .2f;
