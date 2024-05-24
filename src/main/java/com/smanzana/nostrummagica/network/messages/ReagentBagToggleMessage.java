@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.items.ReagentBag;
+import com.smanzana.nostrummagica.items.equipment.ReagentBag;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;

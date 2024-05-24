@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.equipment;
 
 import java.util.List;
 
@@ -11,6 +11,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.items.IRaytraceOverlay;
+import com.smanzana.nostrummagica.items.ISpellEquipment;
+import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
+import com.smanzana.nostrummagica.items.armor.MagicArmor.Type;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EMagicElement;

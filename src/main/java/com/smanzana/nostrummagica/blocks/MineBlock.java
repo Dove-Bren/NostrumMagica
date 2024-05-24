@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.blocks;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.effects.NostrumEffects;
-import com.smanzana.nostrummagica.items.AspectedEarthWeapon;
+import com.smanzana.nostrummagica.items.equipment.AspectedEarthWeapon;
 import com.smanzana.nostrummagica.utils.HarvestUtil;
 
 import net.minecraft.block.Block;

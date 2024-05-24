@@ -4,8 +4,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.items.MageBlade;
 import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.equipment.MageBlade;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.item.ItemStack;

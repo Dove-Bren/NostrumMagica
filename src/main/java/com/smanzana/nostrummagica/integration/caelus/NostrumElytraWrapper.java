@@ -7,8 +7,8 @@ import javax.annotation.Nonnull;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
-import com.smanzana.nostrummagica.items.ICapeProvider;
 import com.smanzana.nostrummagica.items.IElytraRenderer;
+import com.smanzana.nostrummagica.items.armor.ICapeProvider;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;

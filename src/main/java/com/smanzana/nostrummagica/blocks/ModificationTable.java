@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.blocks;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
-import com.smanzana.nostrummagica.items.CasterWandItem;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
-import com.smanzana.nostrummagica.items.WarlockSword;
+import com.smanzana.nostrummagica.items.equipment.CasterWandItem;
+import com.smanzana.nostrummagica.items.equipment.WarlockSword;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
 

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.armor;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,6 +34,12 @@ import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
+import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
+import com.smanzana.nostrummagica.items.IElytraRenderer;
+import com.smanzana.nostrummagica.items.IReactiveEquipment;
+import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.equipment.AspectedEnderWeapon;
+import com.smanzana.nostrummagica.items.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.messages.EnchantedArmorStateUpdate.ArmorState;

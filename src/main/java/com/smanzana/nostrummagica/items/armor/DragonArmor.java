@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.armor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
+import com.smanzana.nostrummagica.items.NostrumItems;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;

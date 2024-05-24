@@ -1,13 +1,13 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.armor;
 
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 
-public class MagicFireArmor extends MagicArmor {
+public class MagicEarthArmor extends MagicArmor {
 
-	public static final String ID_PREFIX = "armor_fire_";
+	public static final String ID_PREFIX = "armor_earth_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
 	public static final String ID_HELM_ADEPT = ID_PREFIX + "helm_adept";
 	public static final String ID_HELM_MASTER = ID_PREFIX + "helm_master";
@@ -28,8 +28,8 @@ public class MagicFireArmor extends MagicArmor {
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 	public static final String ID_FEET_TRUE = ID_PREFIX + "feet_true";
 	
-	public MagicFireArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
-		super(EMagicElement.FIRE, slot, type, properties);
+	public MagicEarthArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+		super(EMagicElement.EARTH, slot, type, properties);
 	}
 	
 }

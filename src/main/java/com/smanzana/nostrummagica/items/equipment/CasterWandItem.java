@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.equipment;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +13,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.items.IRaytraceOverlay;
+import com.smanzana.nostrummagica.items.ISpellCastingTool;
+import com.smanzana.nostrummagica.items.ISpellContainerItem;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.proxy.ClientProxy;

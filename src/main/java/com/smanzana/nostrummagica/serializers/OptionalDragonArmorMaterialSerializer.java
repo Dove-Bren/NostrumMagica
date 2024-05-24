@@ -1,8 +1,9 @@
 package com.smanzana.nostrummagica.serializers;
 
 import java.util.Optional;
-import com.smanzana.nostrummagica.items.DragonArmor;
-import com.smanzana.nostrummagica.items.DragonArmor.DragonArmorMaterial;
+
+import com.smanzana.nostrummagica.items.armor.DragonArmor;
+import com.smanzana.nostrummagica.items.armor.DragonArmor.DragonArmorMaterial;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;

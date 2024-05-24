@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.equipment;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.ISpellActionListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener.SpellActionListenerData;

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.equipment;
 
 import javax.annotation.Nullable;
 
@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.SpellActionListenerData;
 import com.smanzana.nostrummagica.loretag.Lore;

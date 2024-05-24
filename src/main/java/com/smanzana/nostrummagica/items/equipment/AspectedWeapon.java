@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.equipment;
 
 import java.util.Random;
 import java.util.UUID;
@@ -19,6 +19,10 @@ import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
+import com.smanzana.nostrummagica.items.IReactiveEquipment;
+import com.smanzana.nostrummagica.items.NostrumItems;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
+import com.smanzana.nostrummagica.items.armor.MagicArmor.Type;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;

@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.block.BlockState;

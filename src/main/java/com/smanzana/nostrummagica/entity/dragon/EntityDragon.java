@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.DragonArmor;
-import com.smanzana.nostrummagica.items.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.items.armor.DragonArmor;
+import com.smanzana.nostrummagica.items.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.NonNullEnumMap;

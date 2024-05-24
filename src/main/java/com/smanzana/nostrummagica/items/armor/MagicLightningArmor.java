@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.armor;
 
 import com.smanzana.nostrummagica.spells.EMagicElement;
 

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.network.messages;
 
 import java.util.function.Supplier;
 
-import com.smanzana.nostrummagica.items.WarlockSword;
+import com.smanzana.nostrummagica.items.equipment.WarlockSword;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;

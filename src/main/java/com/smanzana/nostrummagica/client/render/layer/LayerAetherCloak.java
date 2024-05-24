@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.ICapeProvider;
+import com.smanzana.nostrummagica.items.armor.ICapeProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;

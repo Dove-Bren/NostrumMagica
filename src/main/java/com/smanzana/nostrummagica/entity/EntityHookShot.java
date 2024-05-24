@@ -7,8 +7,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.HookshotItem;
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.items.equipment.HookshotItem;
+import com.smanzana.nostrummagica.items.equipment.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.utils.Entities;

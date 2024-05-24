@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.serializers;
 
-import com.smanzana.nostrummagica.items.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.items.equipment.HookshotItem.HookshotType;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;

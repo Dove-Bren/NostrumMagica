@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.effects;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 

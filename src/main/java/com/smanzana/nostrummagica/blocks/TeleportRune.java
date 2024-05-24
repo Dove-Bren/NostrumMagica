@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.items.MagicArmor;
 import com.smanzana.nostrummagica.items.PositionCrystal;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.tiles.TeleportRuneTileEntity;
 

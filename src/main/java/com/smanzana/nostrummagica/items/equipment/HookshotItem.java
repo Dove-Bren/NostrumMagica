@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.items;
+package com.smanzana.nostrummagica.items.equipment;
 
 import java.util.UUID;
 
@@ -9,6 +9,8 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
+import com.smanzana.nostrummagica.items.IElytraRenderer;
+import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;

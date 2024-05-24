@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.network.messages;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.MagicArmor;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import net.minecraft.entity.LivingEntity;
