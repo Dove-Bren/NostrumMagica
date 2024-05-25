@@ -16,7 +16,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.blocks.NostrumPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.MirrorGui;
+import com.smanzana.nostrummagica.client.gui.mirror.MirrorResearchSubscreen;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.enchantments.EnchantmentManaRecovery;
@@ -269,7 +269,7 @@ public class PlayerListener {
 		foodInfos.clear();
 		manaInfos.clear();
 		magicEffectInfos.clear();
-		MirrorGui.resetSeenCache();
+		MirrorResearchSubscreen.ResetSeenCache();
 	}
 	
 	/**

@@ -4,11 +4,10 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.text.ITextComponent;
 
-public abstract class ObscurableWidget extends Widget {
+public abstract class ObscurableWidget extends FixedWidget {
 
 	protected @Nullable Rectangle2d bounds;
 	

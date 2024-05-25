@@ -521,15 +521,25 @@
     "key.nostrummagica.desc": "Nostrum Magica",
 
     "attribute.nostrummagica.magic_resist.name": "Magic Resistance",
+	"attribute.nostrummagica.magic_resist.name.desc": "Damage reduction to any form of magical damage or negative effects",
     "attribute.nostrummagica.magic_reduct_fire.name": "Fire Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_fire.name.desc": "Flat reduction of fire-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_ice.name": "Ice Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_ice.name.desc": "Flat reduction of ice-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_earth.name": "Earth Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_earth.name.desc": "Flat reduction of earth-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_wind.name": "Wind Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_wind.name.desc": "Flat reduction of wind-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_ender.name": "Ender Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_ender.name.desc": "Flat reduction of ender-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_lightning.name": "Lightning Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_lightning.name.desc": "Flat reduction of lightning-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_physical.name": "Physical Magic Reduction",
+    "attribute.nostrummagica.magic_reduct_physical.name.desc": "Flat reduction of physically-aspected magical damage",
     "attribute.nostrummagica.magic_potency.name": "Magic Potency",
+    "attribute.nostrummagica.magic_potency.name.desc": "Bonus to potency of spells including outoging spell damage, healing, and effects",
     "attribute.nostrummagica.mana_regen.name": "Mana Regen",
+    "attribute.nostrummagica.mana_regen.name.desc": "Bonus to mana regen",
 
     "config.nostrummagica.display": "Display Options",
     "config.nostrummagica.display.display_bar": "Mana Bar",
@@ -669,6 +679,8 @@
     "info.stats.name": "Stats",
     "info.growth.name": "Growth",
     "info.exploration.name": "Exploration",
+	
+	"info.reserved_mana.desc": "Mana taken out of your normal pool to fuel powerful active effects",
 
     "info.shrines.name": "Shrines",
     "info.shrines.desc": "Shrines are an important part of Nostrum Magica. Scattered throughout throughout the world are shrines that contain a host of challenging mosters, loot, and (most importantly) aspected altars that help you unlock different spell components. Gaining mastery over more spell components is crucial to advanced in Nostrum Magica. In order to construct different spells, you'll need different shapes, triggers, and elements. Unlocking these involves visiting shrines. Finding shrines can be difficult. There are two items in Nostrum Magica that make this a little bit easier, but those are for you to find out. Element and Trigger shrines are much more common than shape shrines. There's guaranteed to be a Shrine of the Single shape near the worlds spawn location.",
@@ -1546,7 +1558,8 @@
     "modification.damaged_duration.food": "Your On Hit effect expired",
     "modification.damaged_duration.name": "Duration",
 
-    "mirror.tab.character.name": "Attribute Glyph",
+    "mirror.tab.character.name": "Characteristics",
+	"mirror.tab.quest.name": "Attribute Glyph",
     "mirror.tab.research.name": "Research Table",
 
     "research.tab.magica.name": "Magica",

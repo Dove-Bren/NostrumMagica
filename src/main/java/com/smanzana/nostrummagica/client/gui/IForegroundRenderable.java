@@ -4,6 +4,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 public interface IForegroundRenderable {
 
-	public void renderForeground(MatrixStack matrixStackIn, int parX, int parY, float partialTicks);
+	public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks);
 	
 }

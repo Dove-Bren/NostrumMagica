@@ -26,11 +26,11 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierR
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
-import com.smanzana.nostrummagica.client.gui.MirrorGui;
 import com.smanzana.nostrummagica.client.gui.ObeliskScreen;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.TomeWorkshopScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
+import com.smanzana.nostrummagica.client.gui.mirror.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
@@ -293,7 +293,7 @@ public class ClientProxy extends CommonProxy {
 			
 			// If we're on a screen that cares, refresh it
 			if (mc.currentScreen instanceof MirrorGui) {
-				((MirrorGui) mc.currentScreen).refresh();
+				//((MirrorGui) mc.currentScreen).refresh();
 			}
 			
 			if (ModList.get().isLoaded("jei")) {

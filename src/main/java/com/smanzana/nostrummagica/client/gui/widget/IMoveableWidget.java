@@ -6,6 +6,10 @@ public interface IMoveableWidget {
 	
 	public void offset(int x, int y);
 	
+	public default void offsetFromStart(int x, int y) {
+		setPosition(getStartingX() + x, getStartingY() + y);
+	}
+	
 	public void resetPosition();
 	
 	public int getStartingX();

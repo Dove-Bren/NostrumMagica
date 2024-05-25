@@ -121,27 +121,7 @@ public class SpellComponentIcon {
 	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height,
 			float red, float green, float blue, float alpha) {
 		matrixStackIn.push();
-		
-		
 
-//		if (useIconSheet)
-//		{
-//		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-//			float scaleU = (float) width / (float) this.width;
-//			float scaleV = (float) height / (float) this.height;
-//			
-//			xOffset *= 1f / scaleU;
-//			yOffset *= 1f / scaleV;
-//			
-//			GL11.glScalef(scaleU, scaleV, 0f); // Idk which it is!
-//			//GlStateManager.color4f(1f, 1f, 1f, 1f);
-//		
-//			Minecraft.getInstance().getTextureManager().bindTexture(iconSheet);
-//		
-//			parent.blit(xOffset, yOffset, offsetU, offsetV,
-//					this.width, this.height);
-//		}
-//		else
 		{
 			Minecraft.getInstance().getTextureManager().bindTexture(this.getModelLocation());
 			RenderSystem.enableBlend();
