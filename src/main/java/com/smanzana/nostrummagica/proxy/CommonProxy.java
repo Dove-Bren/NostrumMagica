@@ -171,40 +171,6 @@ public class CommonProxy {
 		} else {
 			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimensionKey()));
 		}
-		
-//		if (caster != null) {
-//			//caster.addTrackingPlayer(player);
-//			players.addAll(((ServerWorld) world).getEntityTracker()
-//				.getTrackingPlayers(caster));
-//		}
-//		
-//		if (target != null) {
-//			//caster.addTrackingPlayer(player);
-//			players.addAll(((ServerWorld) world).getEntityTracker()
-//				.getTrackingPlayers(target));
-//		}
-//		
-//		if (caster != null && caster == target && caster instanceof PlayerEntity) {
-//			// Very specific case here
-//			players.add((PlayerEntity) caster);
-//		}
-//		
-//		if (players.isEmpty()) {
-//			// Fall back to distance check against locations
-//			if (casterPos != null) {
-//				for (PlayerEntity player : world.playerEntities) {
-//					if (player.getDistanceSq(casterPos.x, casterPos.y, casterPos.z) <= MAX_RANGE_SQR)
-//						players.add(player);
-//				}
-//			}
-//			
-//			if (targetPos != null) {
-//				for (PlayerEntity player : world.playerEntities) {
-//					if (player.getDistanceSq(targetPos.x, targetPos.y, targetPos.z) <= MAX_RANGE_SQR)
-//						players.add(player);
-//				}
-//			}
-//		}
 	}
 	
 	public void sendMana(PlayerEntity player) {

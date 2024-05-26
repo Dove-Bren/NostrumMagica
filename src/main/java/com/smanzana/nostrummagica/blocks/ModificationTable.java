@@ -100,9 +100,7 @@ public class ModificationTable extends Block {
 		if (item instanceof SpellRune) {
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			
-			if (comp.isTrigger()) {
-				return comp.getTrigger().supportedFloats() != null || comp.getTrigger().supportsBoolean();
-			} else if (comp.isShape()) {
+			if (comp.isShape()) {
 				return comp.getShape().supportedFloats() != null || comp.getShape().supportsBoolean();
 			}
 		}

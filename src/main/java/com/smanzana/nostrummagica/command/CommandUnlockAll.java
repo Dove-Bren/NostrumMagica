@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.command.CommandSource;
@@ -39,7 +39,7 @@ public class CommandUnlockAll {
 		
 		attr.unlock();
 		
-		for (SpellShape shape : SpellShape.getAllShapes()) {
+		for (LegacySpellShape shape : LegacySpellShape.getAllShapes()) {
 			attr.addShape(shape);
 		}
 		for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {

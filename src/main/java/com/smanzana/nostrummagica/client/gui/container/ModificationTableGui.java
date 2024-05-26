@@ -15,10 +15,10 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ModifyMessage;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.tiles.ModificationTableEntity;
@@ -170,7 +170,7 @@ public class ModificationTableGui {
 						}
 					} else if (!stack.isEmpty() && stack.getItem() instanceof SpellScroll) {
 						// Shouldn't be null since we disallow null in the slot... but let's just be safe. This is UI code.
-						Spell spell = SpellScroll.getSpell(stack);
+						LegacySpell spell = SpellScroll.getSpell(stack);
 						if (spell != null) {
 							floatIndex = spell.getIconIndex();							
 						}
@@ -456,7 +456,7 @@ public class ModificationTableGui {
 			shadows = NonNullList.create();
 			shadows.add(new ItemStack(NostrumItems.spellTomeNovice)); // hasto be index 0
 			shadows.add(new ItemStack(NostrumItems.spellScroll)); // has to be index 1
-			for (SpellShape shape : SpellShape.getAllShapes()) {
+			for (LegacySpellShape shape : LegacySpellShape.getAllShapes()) {
 				if (shape.supportsBoolean() || shape.supportedFloats() != null) {
 					shadows.add(SpellRune.getRune(shape));
 				}
@@ -601,7 +601,7 @@ public class ModificationTableGui {
 							info = TextUtils.GetTranslatedList("modification.caster_wand.remove");
 						}
 					} else if (input.getItem() instanceof SpellScroll && SpellScroll.getSpell(input) != null) {
-						final Spell scrollSpell = SpellScroll.getSpell(input);
+						final LegacySpell scrollSpell = SpellScroll.getSpell(input);
 						if (CasterWandItem.GetSpell(wand) == null) {
 							info = TextUtils.GetTranslatedList("modification.caster_wand.addspell", scrollSpell.getName());
 						} else {

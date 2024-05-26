@@ -14,8 +14,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
 
@@ -67,15 +67,15 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 
 	private static final DataParameter<Boolean> SPRITE_ANGRY = EntityDataManager.<Boolean>createKey(EntitySprite.class, DataSerializers.BOOLEAN);
 	
-	private static Spell EARTH_ZAP = null;
+	private static LegacySpell EARTH_ZAP = null;
 	
 	private static final double EFFECT_DISTANCE_SQ = 256.0;
 	
 	private static void initStaticSpells() {
 		if (EARTH_ZAP == null) {
-			EARTH_ZAP = Spell.CreateAISpell("Sprite_EARTHZAP");
-			EARTH_ZAP.addPart(new SpellPart(TouchTrigger.instance()));
-			EARTH_ZAP.addPart(new SpellPart(SingleShape.instance(), EMagicElement.EARTH, 3, null));
+			EARTH_ZAP = LegacySpell.CreateAISpell("Sprite_EARTHZAP");
+			EARTH_ZAP.addPart(new LegacySpellPart(TouchTrigger.instance()));
+			EARTH_ZAP.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.EARTH, 3, null));
 		}
 	}
 	

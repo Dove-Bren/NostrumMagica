@@ -46,7 +46,7 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.Transmutation;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -523,7 +523,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private void renderSpellLoadoutSlot(MatrixStack matrixStackIn, @Nullable Spell spell, String binding, int width, int height) {
+	private void renderSpellLoadoutSlot(MatrixStack matrixStackIn, @Nullable LegacySpell spell, String binding, int width, int height) {
 		// Probably going to draw icon, and spell name real small on top of it?
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, height-1, 0x80404040);
@@ -592,7 +592,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Bottom left spell slide
 		// Spell name
 		Minecraft mc = Minecraft.getInstance();
-		Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
+		LegacySpell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
 		if (current != null && current.length != 0) {
 			final int slotSize = 16;
 			int slideHeight = slotSize + (4);

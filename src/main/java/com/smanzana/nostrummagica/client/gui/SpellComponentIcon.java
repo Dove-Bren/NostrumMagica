@@ -9,7 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -49,7 +49,7 @@ public class SpellComponentIcon {
 		return icon;
 	}
 	
-	public static SpellComponentIcon get(SpellShape shape) {
+	public static SpellComponentIcon get(LegacySpellShape shape) {
 		String name = shape.getShapeKey();
 		SpellComponentIcon icon = shapeCache.get(name);
 		
@@ -106,7 +106,7 @@ public class SpellComponentIcon {
 				"textures/models/symbol/trigger_" + trigger.getTriggerKey().toLowerCase() + ".png");
 	}
 	
-	public SpellComponentIcon(SpellShape shape) {
+	public SpellComponentIcon(LegacySpellShape shape) {
 		width = uWidthShape;
 		height = uWidthShape;
 		

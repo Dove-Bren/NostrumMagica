@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.entity.LivingEntity;

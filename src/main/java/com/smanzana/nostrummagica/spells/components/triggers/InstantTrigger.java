@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.spells.components.triggers;
 
-import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 

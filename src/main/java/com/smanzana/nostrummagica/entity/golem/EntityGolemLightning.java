@@ -4,8 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -26,30 +26,30 @@ public class EntityGolemLightning extends EntityGolem {
 	private static final AttributeModifier MOVEMENT_STORM_MODIFIER
 		= new AttributeModifier("lightning_storm_boost", .2, AttributeModifier.Operation.MULTIPLY_BASE);
 	
-	private static Spell spellRanged1;
-	private static Spell spellRanged2;
-	private static Spell spellBuff;
+	private static LegacySpell spellRanged1;
+	private static LegacySpell spellRanged2;
+	private static LegacySpell spellBuff;
 	
 	private static void init() {
 		if (spellRanged1 == null) {
-			spellRanged1 = Spell.CreateAISpell("Lightning Strike");
-			spellRanged1.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellRanged1.addPart(new SpellPart(SingleShape.instance(),
+			spellRanged1 = LegacySpell.CreateAISpell("Lightning Strike");
+			spellRanged1.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellRanged1.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.CONJURE));
 			
-			spellRanged2 = Spell.CreateAISpell("Spark");
-			spellRanged2.addPart(new SpellPart(ProjectileTrigger.instance()));
-			spellRanged2.addPart(new SpellPart(AoEShape.instance(),
+			spellRanged2 = LegacySpell.CreateAISpell("Spark");
+			spellRanged2.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
+			spellRanged2.addPart(new LegacySpellPart(AoEShape.instance(),
 					EMagicElement.LIGHTNING,
 					1,
 					null,
 					new SpellPartProperties(1, false)));
 			
-			spellBuff = Spell.CreateAISpell("Magic Ward");
-			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new SpellPart(SingleShape.instance(),
+			spellBuff = LegacySpell.CreateAISpell("Magic Ward");
+			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.RESIST));

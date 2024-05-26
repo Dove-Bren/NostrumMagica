@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
@@ -153,29 +153,6 @@ public class ShrineBlock extends SymbolBlock {
 			return ActionResultType.SUCCESS;
 		}
 		
-		if (component.isTrigger()) {
-			if (attr.getTriggers().contains(component.getTrigger()))
-				return ActionResultType.FAIL;
-			
-			if (isExhausted(state)) {
-				if (playerIn.world.isRemote) {
-					playerIn.sendMessage(new TranslationTextComponent("info.shrine.exhausted", new Object[0]), Util.DUMMY_UUID);
-				}
-				return ActionResultType.SUCCESS;
-			}
-			
-			attr.addTrigger(component.getTrigger());
-			
-			DoEffect(pos, playerIn, 0x8080A0C0);
-			worldIn.setBlockState(pos, getExhaustedState(true));
-			SymbolTileEntity ent = (SymbolTileEntity) worldIn.getTileEntity(pos);
-			ent.setComponent(component);
-			
-			if (playerIn.world.isRemote) {
-				playerIn.sendMessage(new TranslationTextComponent("info.shrine.trigger", new Object[] {component.getTrigger().getDisplayName()}), Util.DUMMY_UUID);
-			}
-		}
-		
 		if (component.isShape()) {
 			boolean pass = false;
 			if (component.getShape() instanceof SingleShape) {
@@ -189,7 +166,7 @@ public class ShrineBlock extends SymbolBlock {
 					if (component.getShape() instanceof AoEShape) {
 						boolean speed, leap;
 						speed = leap = false;
-						for (SpellPart part : spell.getSpellParts()) {
+						for (LegacySpellPart part : spell.getSpellParts()) {
 							if (part.isTrigger())
 								continue;
 							if (!(part.getShape() instanceof SingleShape))
@@ -218,7 +195,7 @@ public class ShrineBlock extends SymbolBlock {
 					} else if (component.getShape() instanceof ChainShape) {
 						boolean ice, weak;
 						ice = weak = false;
-						for (SpellPart part : spell.getSpellParts()) {
+						for (LegacySpellPart part : spell.getSpellParts()) {
 							if (part.isTrigger())
 								continue;
 							if (!(part.getShape() instanceof SingleShape))

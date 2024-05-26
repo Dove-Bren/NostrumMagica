@@ -14,13 +14,10 @@ import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.StringNBT;
@@ -157,14 +154,6 @@ public interface INostrumMagic {
 	public void addFamiliar(LivingEntity familiar);
 	public void clearFamiliars();
 	
-	// Binding
-	public boolean isBinding();
-	public SpellComponentWrapper getBindingComponent(); // Get current needed component
-	public Spell getBindingSpell();
-	public int getBindingID();
-	public void startBinding(Spell spell, SpellComponentWrapper component, int tomeID);
-	public void completeBinding(ItemStack tome); // if tome == null, will require it be in player inventory
-	
 	// Lore
 	public boolean hasLore(ILoreTagged tagged);
 	public boolean hasFullLore(ILoreTagged tagged);
@@ -179,8 +168,6 @@ public interface INostrumMagic {
 	// Spell components
 	public List<SpellShape> getShapes();
 	public void addShape(SpellShape shape);
-	public List<SpellTrigger> getTriggers();
-	public void addTrigger(SpellTrigger trigger);
 	public Map<EAlteration, Boolean> getAlterations();
 	public void unlockAlteration(EAlteration alteration);
 	

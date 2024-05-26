@@ -51,7 +51,7 @@ public class SpellPreviewPage implements IClickableBookPage {
 		tooltip.add(new StringTextComponent("Click for details").mergeStyle(TextFormatting.GRAY));
 		tooltip.add(new StringTextComponent("Shift+Right Click to remove and destroy").mergeStyle(TextFormatting.DARK_RED));
 		
-		description = spell.getDescription();
+		description = "";
 		this.tome = tome;
 	}
 	

@@ -4,15 +4,15 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellPartBuilder;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 
 import net.minecraft.util.text.ITextComponent;
 
 public interface ISpellCraftModifier {
 
-	public boolean canModify(SpellCraftContext context, SpellPart originalPart);
+	public boolean canModify(SpellCraftContext context, LegacySpellPart originalPart);
 	
-	public void modify(SpellCraftContext context, SpellPart originalPart, SpellPartBuilder builder);
+	public void modify(SpellCraftContext context, LegacySpellPart originalPart, SpellPartBuilder builder);
 
 	public List<ITextComponent> getDetails(List<ITextComponent> lines);
 	

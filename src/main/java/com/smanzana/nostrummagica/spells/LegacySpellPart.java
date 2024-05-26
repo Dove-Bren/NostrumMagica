@@ -1,17 +1,17 @@
 package com.smanzana.nostrummagica.spells;
 
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
-public class SpellPart {
+public class LegacySpellPart {
 	private final SpellTrigger trigger;
-	private final SpellShape shape;
+	private final LegacySpellShape shape;
 	private final EAlteration alteration;
 	private final EMagicElement element;
 	private final int elementCount;
 	private final SpellPartProperties param;
 	
-	public SpellPart(SpellTrigger trigger, SpellPartProperties param) {
+	public LegacySpellPart(SpellTrigger trigger, SpellPartProperties param) {
 		this.trigger = trigger;
 		this.param = param;
 		
@@ -21,11 +21,11 @@ public class SpellPart {
 		this.elementCount = 0;
 	}
 	
-	public SpellPart(SpellTrigger trigger) {
+	public LegacySpellPart(SpellTrigger trigger) {
 		this(trigger, new SpellPartProperties(0, false));
 	}
 	
-	public SpellPart(SpellShape shape, EMagicElement element, int count, EAlteration alt, SpellPartProperties param) {
+	public LegacySpellPart(LegacySpellShape shape, EMagicElement element, int count, EAlteration alt, SpellPartProperties param) {
 		this.shape = shape;
 		this.element = element;
 		this.elementCount = count;
@@ -35,7 +35,7 @@ public class SpellPart {
 		this.trigger = null;
 	}
 	
-	public SpellPart(SpellShape shape, EMagicElement element, int count, EAlteration alteration) {
+	public LegacySpellPart(LegacySpellShape shape, EMagicElement element, int count, EAlteration alteration) {
 		this(shape, element, count, alteration, new SpellPartProperties(0, false));
 	}
 	
@@ -47,7 +47,7 @@ public class SpellPart {
 		return trigger;
 	}
 
-	public SpellShape getShape() {
+	public LegacySpellShape getShape() {
 		return shape;
 	}
 

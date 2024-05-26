@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SingleShape extends SpellShape {
+public class SingleShape extends LegacySpellShape {
 
 	private static final String SHAPE_KEY = "single";
 	private static SingleShape instance = null;

@@ -17,9 +17,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -53,7 +53,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				desc = I18n.format("info.discovery.spells", new Object[0]);
 			} else {
 				SpellTrigger trigger = null;
-				SpellShape shape = null;
+				LegacySpellShape shape = null;
 				EMagicElement element = null;
 				if (!attr.getTriggers().isEmpty())
 					trigger = attr.getTriggers().get(0);
@@ -124,8 +124,8 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					color = new float[] {1f, 1f, 1f, 1f};
 				else {
 					color = new float[] {.8f, .5f, .5f, .5f};
-					Collection<SpellShape> shapes = SpellShape.getAllShapes();
-					SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
+					Collection<LegacySpellShape> shapes = LegacySpellShape.getAllShapes();
+					LegacySpellShape[] shapeArray = shapes.toArray(new LegacySpellShape[0]);
 					shape = shapeArray[
 		                  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 					      ];
@@ -438,8 +438,8 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					drawX, drawY, 0xFFFFFFFF);
 			drawY += 10;
 			
-			List<SpellShape> knownShapes = attr.getShapes();
-			for (SpellShape shape : SpellShape.getAllShapes()) {
+			List<LegacySpellShape> knownShapes = attr.getShapes();
+			for (LegacySpellShape shape : LegacySpellShape.getAllShapes()) {
 				if (knownShapes.contains(shape))
 					alpha = known;
 				else
@@ -679,7 +679,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			SpellAction action = map.get(element);
 			if (action == null) {
-				action = Spell.solveAction(null, alteration, element, 1);
+				action = LegacySpell.solveAction(null, alteration, element, 1);
 				map.put(element, action);
 			}
 			

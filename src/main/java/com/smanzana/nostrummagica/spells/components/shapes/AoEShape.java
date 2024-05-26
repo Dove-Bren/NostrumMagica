@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -21,7 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class AoEShape extends SpellShape {
+public class AoEShape extends LegacySpellShape {
 
 	private static final String SHAPE_KEY = "aoe";
 	private static AoEShape instance = null;

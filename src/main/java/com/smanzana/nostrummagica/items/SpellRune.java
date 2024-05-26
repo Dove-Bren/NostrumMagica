@@ -14,10 +14,10 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -47,13 +47,13 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return TypeMap.get(type);
 	}
 	
-	protected static final Map<SpellShape, PackedShapeSpellRune> PackedTypeMap = new HashMap<>();
+	protected static final Map<LegacySpellShape, PackedShapeSpellRune> PackedTypeMap = new HashMap<>();
 	
-	public static final void SetPackedRuneForShape(SpellShape shape, PackedShapeSpellRune rune) {
+	public static final void SetPackedRuneForShape(LegacySpellShape shape, PackedShapeSpellRune rune) {
 		PackedTypeMap.put(shape, rune);
 	}
 	
-	public static final @Nullable PackedShapeSpellRune GetPackedRuneForType(SpellShape shape) {
+	public static final @Nullable PackedShapeSpellRune GetPackedRuneForType(LegacySpellShape shape) {
 		return PackedTypeMap.get(shape);
 	}
 	
@@ -82,7 +82,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return getRune(new SpellComponentWrapper(alteration));
 	}
 	
-	public static ItemStack getRune(SpellShape shape) {
+	public static ItemStack getRune(LegacySpellShape shape) {
 		return getRune(new SpellComponentWrapper(shape));
 	}
 	
@@ -90,7 +90,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return getRune(new SpellComponentWrapper(trigger));
 	}
 	
-	public static ItemStack getRune(SpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+	public static ItemStack getRune(LegacySpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
 		PackedShapeSpellRune rune = GetPackedRuneForType(shape);
 		ItemStack stack = new ItemStack(rune);
 		
@@ -111,7 +111,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	 * @param count
 	 * @return
 	 */
-	public static ItemStack getRune(SpellPart part) {
+	public static ItemStack getRune(LegacySpellPart part) {
 		ItemStack stack;
 		if (part.isTrigger()) {
 			stack = getRune(part.getTrigger());
@@ -211,7 +211,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return isReady;
 	}
 	
-	protected abstract @Nullable SpellPart getSpellPart(ItemStack stack);
+	protected abstract @Nullable LegacySpellPart getSpellPart(ItemStack stack);
 	
 	/**
 	 * Works with trigger or shape runes.
@@ -220,8 +220,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	 * @param stack
 	 * @return null on error
 	 */
-	public static SpellPart getPart(ItemStack stack) {
-		SpellPart part = null;
+	public static LegacySpellPart getPart(ItemStack stack) {
+		LegacySpellPart part = null;
 		
 		if (!stack.isEmpty() && stack.getItem() instanceof SpellRune) {
 			part = ((SpellRune) stack.getItem()).getSpellPart(stack);
@@ -313,10 +313,10 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		@Override
-		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
-			SpellPart part = null;
+		protected @Nullable LegacySpellPart getSpellPart(ItemStack stack) {
+			LegacySpellPart part = null;
 			
-			part = new SpellPart(trigger, getPieceParam(stack));
+			part = new LegacySpellPart(trigger, getPieceParam(stack));
 			
 			return part;
 		}
@@ -364,7 +364,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		@Override
-		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
+		protected @Nullable LegacySpellPart getSpellPart(ItemStack stack) {
 			return null;
 		}
 		
@@ -411,7 +411,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		@Override
-		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
+		protected @Nullable LegacySpellPart getSpellPart(ItemStack stack) {
 			return null;
 		}
 		
@@ -425,14 +425,14 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		protected static final String ID_FIX = "shape_";
 		
-		protected final SpellShape shape;
+		protected final LegacySpellShape shape;
 
-		public ShapeSpellRune(SpellShape shape) {
+		public ShapeSpellRune(LegacySpellShape shape) {
 			super();
 			this.shape = shape;
 		}
 		
-		public SpellShape getShape() {
+		public LegacySpellShape getShape() {
 			return this.shape;
 		}
 		
@@ -470,7 +470,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		@Override
-		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
+		protected @Nullable LegacySpellPart getSpellPart(ItemStack stack) {
 			return null;
 		}
 		
@@ -487,9 +487,9 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		private static final String NBT_SHAPE_ELEMENT = "shape_element"; // shapes
 		private static final String NBT_ELEMENT_COUNT = "e_count"; // shapes
 		
-		protected final SpellShape shape;
+		protected final LegacySpellShape shape;
 
-		public PackedShapeSpellRune(SpellShape shape) {
+		public PackedShapeSpellRune(LegacySpellShape shape) {
 			super(shape);
 			this.shape = shape;
 		}
@@ -552,8 +552,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		@Override
-		protected @Nullable SpellPart getSpellPart(ItemStack stack) {
-			SpellPart part = null;
+		protected @Nullable LegacySpellPart getSpellPart(ItemStack stack) {
+			LegacySpellPart part = null;
 			EMagicElement element = getNestedElement(stack);
 			//if (element == null)
 			//	return null;
@@ -564,7 +564,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			
 			EAlteration alteration = getNestedAlteration(stack);
 			
-			part = new SpellPart(shape, element, count, alteration, getPieceParam(stack));
+			part = new LegacySpellPart(shape, element, count, alteration, getPieceParam(stack));
 			
 			return part;
 		}
@@ -574,7 +574,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			return true;
 		}
 		
-		public SpellShape getShape(ItemStack stack) {
+		public LegacySpellShape getShape(ItemStack stack) {
 			return this.shape;
 		}
 		

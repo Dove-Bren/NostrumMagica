@@ -44,7 +44,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.block.Blocks;
@@ -638,7 +638,7 @@ public class NostrumItems {
 	    	for (EAlteration type : EAlteration.values()) {
 	    		registerRune(registry, new AlterationSpellRune(type));
 	    	}
-	    	for (SpellShape type : SpellShape.getAllShapes()) {
+	    	for (LegacySpellShape type : LegacySpellShape.getAllShapes()) {
 	    		registerRune(registry, new ShapeSpellRune(type));
 	    		registerPackedRune(registry, new PackedShapeSpellRune(type));
 	    	}

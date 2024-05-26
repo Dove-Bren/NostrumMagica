@@ -18,8 +18,8 @@ import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -255,16 +255,16 @@ public class RoomLectern extends StaticRoom {
 		}
 		
 		// Build the spell
-		List<SpellPart> parts = new ArrayList<>(8);
+		List<LegacySpellPart> parts = new ArrayList<>(8);
 		if (harmful) {
 			
 			if (rand.nextBoolean() && rand.nextBoolean()) {
-				parts.add(new SpellPart(BeamTrigger.instance()));
+				parts.add(new LegacySpellPart(BeamTrigger.instance()));
 			} else {
-				parts.add(new SpellPart(ProjectileTrigger.instance()));
+				parts.add(new LegacySpellPart(ProjectileTrigger.instance()));
 				
 				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) {
-					parts.add(new SpellPart(ProximityTrigger.instance()));
+					parts.add(new LegacySpellPart(ProximityTrigger.instance()));
 				}
 			}
 			
@@ -273,7 +273,7 @@ public class RoomLectern extends StaticRoom {
 				effects++;
 			
 			for (int i = 0; i < effects; i++) {
-				SpellShape shape;
+				LegacySpellShape shape;
 				if (rand.nextBoolean() && rand.nextBoolean()) {
 					shape = AoEShape.instance();
 				}
@@ -293,14 +293,14 @@ public class RoomLectern extends StaticRoom {
 					alt = EAlteration.INFLICT;
 				}
 				
-				parts.add(new SpellPart(shape, element, potency, alt));
+				parts.add(new LegacySpellPart(shape, element, potency, alt));
 			}
 		} else {
 			boolean self = rand.nextBoolean();
 			if (self) {
-				parts.add(new SpellPart(SelfTrigger.instance()));
+				parts.add(new LegacySpellPart(SelfTrigger.instance()));
 			} else {
-				parts.add(new SpellPart(ProjectileTrigger.instance()));
+				parts.add(new LegacySpellPart(ProjectileTrigger.instance()));
 			}
 			
 			int effects = 1;
@@ -323,7 +323,7 @@ public class RoomLectern extends StaticRoom {
 				int potency = 1;
 				if (rand.nextInt(6) == 0)
 					potency = 2;
-				SpellShape shape;
+				LegacySpellShape shape;
 				if (rand.nextBoolean() && rand.nextBoolean()) {
 					shape = AoEShape.instance();
 				}
@@ -334,7 +334,7 @@ public class RoomLectern extends StaticRoom {
 					shape = SingleShape.instance();
 				}
 				
-				parts.add(new SpellPart(shape, element, potency, alts.get(rand.nextInt(alts.size()))));
+				parts.add(new LegacySpellPart(shape, element, potency, alts.get(rand.nextInt(alts.size()))));
 			}
 		}
 		

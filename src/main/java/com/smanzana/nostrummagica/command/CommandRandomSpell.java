@@ -15,9 +15,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
@@ -53,28 +53,28 @@ public class CommandRandomSpell {
 			name = "Random Spell";
 		}
 		
-		final Spell spell = CreateRandomSpell(name, null, cost, weight);
+		final LegacySpell spell = CreateRandomSpell(name, null, cost, weight);
 		ItemStack stack = SpellScroll.create(spell);
 		player.inventory.addItemStackToInventory(stack);
 		
 		return 0;
 	}
 
-	public static Spell CreateRandomSpell(String name, @Nullable Random rand, int cost, int weight) {
+	public static LegacySpell CreateRandomSpell(String name, @Nullable Random rand, int cost, int weight) {
 		if (rand == null) {
 			rand = NostrumMagica.rand;
 		}
 		
-		Spell spell = new Spell(name, false, cost, weight);
+		LegacySpell spell = new LegacySpell(name, false, cost, weight);
 		
 		// Go ahead and do 1 trigger and 1 shape
 		final List<SpellTrigger> triggers = Lists.newArrayList(SpellTrigger.getAllTriggers().stream().filter((t) -> {return !(t instanceof AITargetTrigger);}).iterator());
-		spell.addPart(new SpellPart(
+		spell.addPart(new LegacySpellPart(
 				triggers.get(rand.nextInt(triggers.size()))
 				));
 		
-		final List<SpellShape> shapes = Lists.newArrayList(SpellShape.getAllShapes());
-		final SpellShape shape = shapes.get(rand.nextInt(shapes.size()));
+		final List<LegacySpellShape> shapes = Lists.newArrayList(LegacySpellShape.getAllShapes());
+		final LegacySpellShape shape = shapes.get(rand.nextInt(shapes.size()));
 		final EMagicElement elem = EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
 		final int power = rand.nextInt(3) + 1;
 		final EAlteration alt;
@@ -83,7 +83,7 @@ public class CommandRandomSpell {
 		} else {
 			alt = null;
 		}
-		spell.addPart(new SpellPart(
+		spell.addPart(new LegacySpellPart(
 				shape,
 				elem,
 				power,

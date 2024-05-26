@@ -10,7 +10,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -53,15 +54,14 @@ public class ScrollScreen extends Screen {
 			this.color = spell.getPrimaryElement().getColor();
 			this.icon = SpellIcon.get(spell.getIconIndex());
 			
-			for (SpellPart part : spell.getSpellParts()) {
-				if (part.isTrigger()) {
-					this.components.add(part.getTrigger().getDisplayName());
-				} else {
-					final String intensity = SpellPlate.toRoman(part.getElementCount());	
-					this.components.add(" - " + part.getShape().getDisplayName());
-					this.components.add("   " + part.getElement().getName() + " " + intensity
-							+ (part.getAlteration() == null ? "" : (" [" + part.getAlteration().getName() + "]")));
-				}
+			for (SpellShapePart part : spell.getSpellShapeParts()) {
+				this.components.add(" - " + part.getShape().getDisplayName());
+			}
+			
+			for (SpellEffectPart part : spell.getSpellEffectParts()) {
+				final String intensity = SpellPlate.toRoman(part.getElementCount());	
+				this.components.add("   " + part.getElement().getName() + " " + intensity
+						+ (part.getAlteration() == null ? "" : (" [" + part.getAlteration().getName() + "]")));
 			}
 		}
 	}

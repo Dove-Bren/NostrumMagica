@@ -21,11 +21,11 @@ import com.smanzana.nostrummagica.items.SpellRune.PackedShapeSpellRune;
 import com.smanzana.nostrummagica.items.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
 import com.smanzana.nostrummagica.tiles.RuneShaperEntity;
@@ -372,7 +372,7 @@ public class RuneShaperGui {
 		
 		protected @Nonnull ItemStack getOutput() {
 			// Shape and some elems are required
-			@Nullable SpellShape shape = null;
+			@Nullable LegacySpellShape shape = null;
 			@Nullable SpellPartProperties params = null;
 			@Nullable EAlteration alteration = null;
 			@Nullable EMagicElement element = null;
@@ -667,7 +667,7 @@ public class RuneShaperGui {
 			
 			SpellAction action = map.get(element);
 			if (action == null) {
-				action = Spell.solveAction(null, alteration, element, 1);
+				action = LegacySpell.solveAction(null, alteration, element, 1);
 				map.put(element, action);
 			}
 			

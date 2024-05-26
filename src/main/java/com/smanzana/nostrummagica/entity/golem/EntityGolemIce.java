@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
@@ -18,21 +18,21 @@ public class EntityGolemIce extends EntityGolem {
 	
 	public static final String ID = "ice_golem";
 	
-	private static Spell spellRange;
-	private static Spell spellBuff;
+	private static LegacySpell spellRange;
+	private static LegacySpell spellBuff;
 	
 	private static void init() {
 		if (spellRange == null) {
-			spellRange = Spell.CreateAISpell("Chill");
-			spellRange.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellRange.addPart(new SpellPart(SingleShape.instance(),
+			spellRange = LegacySpell.CreateAISpell("Chill");
+			spellRange.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellRange.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.ICE,
 					1,
 					EAlteration.INFLICT));
 			
-			spellBuff = Spell.CreateAISpell("Aegis");
-			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new SpellPart(SingleShape.instance(),
+			spellBuff = LegacySpell.CreateAISpell("Aegis");
+			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.ICE,
 					1,
 					EAlteration.SUPPORT));

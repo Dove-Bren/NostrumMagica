@@ -21,7 +21,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
@@ -347,7 +347,7 @@ public class SpellCreationGui {
 			
 			checkScroll();
 			if (this.hasScroll) {
-				Spell spell = makeSpell();
+				LegacySpell spell = makeSpell();
 				spellValid = (spell != null);
 			} else {
 				spellValid = false;
@@ -358,17 +358,17 @@ public class SpellCreationGui {
 			return this.context;
 		}
 		
-		public Spell makeSpell() {
+		public LegacySpell makeSpell() {
 			return makeSpell(false);
 		}
 		
-		public Spell makeSpell(boolean clear) {
+		public LegacySpell makeSpell(boolean clear) {
 			return makeSpell(this.getName(), this.getSpellIcon(), this.getCraftPattern(), clear);
 		}
 		
-		public Spell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
+		public LegacySpell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			LegacySpell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;
@@ -387,7 +387,7 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
+		public static LegacySpell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -426,7 +426,7 @@ public class SpellCreationGui {
 			}
 			
 			// Actually make spell
-			Spell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
+			LegacySpell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

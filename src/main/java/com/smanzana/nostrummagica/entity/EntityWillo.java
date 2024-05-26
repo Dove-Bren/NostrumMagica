@@ -27,10 +27,10 @@ import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -124,9 +124,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		int priority = 1;
 		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityWillo>(this, 20, 4, true, (willo) -> {
 			return willo.getAttackTarget() != null && willo.getStatus() != WilloStatus.PANIC;
-		}, new Spell[0]){
+		}, new LegacySpell[0]){
 			@Override
-			public Spell pickSpell(Spell[] spells, EntityWillo wisp) {
+			public LegacySpell pickSpell(LegacySpell[] spells, EntityWillo wisp) {
 				// Ignore empty array and use spell from the wisp
 				return getSpellToUse();
 			}
@@ -464,9 +464,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		return this.dataManager.get(ELEMENT);
 	}
 	
-	protected Spell getSpellToUse() {
+	protected LegacySpell getSpellToUse() {
 		init();
-		List<Spell> spells = defaultSpells.get(this.getElement());
+		List<LegacySpell> spells = defaultSpells.get(this.getElement());
 		int idx = (this.getStatus() == WilloStatus.NEUTRAL
 				? this.rand.nextInt(2)
 				: this.rand.nextInt(spells.size()));
@@ -717,11 +717,11 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		}
 	}
 	
-	private static Map<EMagicElement, List<Spell>> defaultSpells;
+	private static Map<EMagicElement, List<LegacySpell>> defaultSpells;
 	
 	private static void putSpell(String name,
 			SpellTrigger trigger,
-			SpellShape shape,
+			LegacySpellShape shape,
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
@@ -731,16 +731,16 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 	private static void putSpell(String name,
 			SpellTrigger trigger1,
 			SpellTrigger trigger2,
-			SpellShape shape,
+			LegacySpellShape shape,
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		Spell spell = Spell.CreateAISpell(name);
-		spell.addPart(new SpellPart(trigger1));
+		LegacySpell spell = LegacySpell.CreateAISpell(name);
+		spell.addPart(new LegacySpellPart(trigger1));
 		if (trigger2 != null) {
-			spell.addPart(new SpellPart(trigger2));
+			spell.addPart(new LegacySpellPart(trigger2));
 		}
-		spell.addPart(new SpellPart(shape, element, power, alteration));
+		spell.addPart(new LegacySpellPart(shape, element, power, alteration));
 		
 		if (!defaultSpells.containsKey(element) || defaultSpells.get(element) == null) {
 			defaultSpells.put(element, new ArrayList<>());
@@ -752,7 +752,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		if (defaultSpells == null) {
 			defaultSpells = new EnumMap<>(EMagicElement.class);
 			
-			Spell spell;
+			LegacySpell spell;
 			
 			// Note: spell spot 1 and 2 are 'neutral' spells and can be cast on passing-by players.
 			// The others are only cast when aggro or panicking
@@ -1005,11 +1005,11 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 					EMagicElement.ENDER,
 					1,
 					EAlteration.INFLICT);
-			spell = Spell.CreateAISpell("Blinker");
-			spell.addPart(new SpellPart(SelfTrigger.instance()));
-			spell.addPart(new SpellPart(DamagedTrigger.instance()));
-			spell.addPart(new SpellPart(OtherTrigger.instance()));
-			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER,
+			spell = LegacySpell.CreateAISpell("Blinker");
+			spell.addPart(new LegacySpellPart(SelfTrigger.instance()));
+			spell.addPart(new LegacySpellPart(DamagedTrigger.instance()));
+			spell.addPart(new LegacySpellPart(OtherTrigger.instance()));
+			spell.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ENDER,
 					2, EAlteration.GROWTH));
 			defaultSpells.get(EMagicElement.ENDER).add(spell);
 			putSpell("Random Teleport",

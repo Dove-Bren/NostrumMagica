@@ -53,8 +53,8 @@ import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
@@ -625,12 +625,12 @@ public class NostrumMagica {
 		return 0;
 	}
 
-	public static int getMaxTriggers(INostrumMagic attr) {
-		if (attr.isUnlocked())
-			return 1 + (attr.getFinesse());
-
-		return 0;
-	}
+//	public static int getMaxTriggers(INostrumMagic attr) {
+//		if (attr.isUnlocked())
+//			return 1 + (attr.getFinesse());
+//
+//		return 0;
+//	}
 
 	public static int getMaxElements(INostrumMagic attr) {
 		if (attr.isUnlocked())
@@ -641,19 +641,19 @@ public class NostrumMagica {
 
 	public static boolean canCast(Spell spell, INostrumMagic attr, @Nonnull List<ITextComponent> problemsOut) {
 		int comps = getMaxComponents(attr);
-		int triggers = getMaxTriggers(attr);
 		int elements = getMaxElements(attr);
 		
 		boolean success = true;
 
+		int unused; // REVISIT
 		if (spell.getComponentCount() > comps) {
 			success = false;
 			problemsOut.add(new TranslationTextComponent("info.spell.low_tech"));
 		}
-		if (spell.getTriggerCount() > triggers) {
-			success = false;
-			problemsOut.add(new TranslationTextComponent("info.spell.low_finesse"));
-		}
+//		if (spell.getTriggerCount() > triggers) {
+//			success = false;
+//			problemsOut.add(new TranslationTextComponent("info.spell.low_finesse"));
+//		}
 		if (spell.getElementCount() > elements) {
 			success = false;
 			problemsOut.add(new TranslationTextComponent("info.spell.low_control"));
@@ -661,9 +661,7 @@ public class NostrumMagica {
 		
 		Map<EMagicElement, ElementalMastery> neededMasteries = new EnumMap<>(EMagicElement.class);
 
-		for (SpellPart part : spell.getSpellParts()) {
-			if (part.isTrigger())
-				continue;
+		for (SpellEffectPart part : spell.getSpellEffectParts()) {
 			EMagicElement elem = part.getElement();
 			if (elem == null)
 				elem = EMagicElement.PHYSICAL;

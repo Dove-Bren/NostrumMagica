@@ -4,13 +4,13 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 public class SpellPartBuilder {
 
-	public final SpellPart base;
+	public final LegacySpellPart base;
 	
 	protected int weightModifier;
 	protected float manaRate;
@@ -18,10 +18,10 @@ public class SpellPartBuilder {
 	protected int elementCountModifier;
 	protected @Nullable EMagicElement elementOverride;
 	protected @Nullable EAlteration alterationOverride;
-	protected @Nullable SpellShape shapeOverride;
+	protected @Nullable LegacySpellShape shapeOverride;
 	protected @Nullable SpellTrigger triggerOverride;
 	
-	public SpellPartBuilder(SpellPart base) {
+	public SpellPartBuilder(LegacySpellPart base) {
 		this.base = base;
 		
 		weightModifier = 0;
@@ -60,7 +60,7 @@ public class SpellPartBuilder {
 		this.alterationOverride = alterationOverride;
 	}
 
-	public void setShapeOverride(SpellShape shapeOverride) {
+	public void setShapeOverride(LegacySpellShape shapeOverride) {
 		this.shapeOverride = shapeOverride;
 	}
 
@@ -68,7 +68,7 @@ public class SpellPartBuilder {
 		this.triggerOverride = triggerOverride;
 	}
 
-	public SpellPart getBase() {
+	public LegacySpellPart getBase() {
 		return base;
 	}
 
@@ -92,7 +92,7 @@ public class SpellPartBuilder {
 		return alterationOverride;
 	}
 
-	public SpellShape getShapeOverride() {
+	public LegacySpellShape getShapeOverride() {
 		return shapeOverride;
 	}
 
@@ -132,7 +132,7 @@ public class SpellPartBuilder {
 		return getAlterationOverride() == null ? base.getAlteration() : getAlterationOverride();
 	}
 
-	public @Nullable SpellShape getCurrentShape() {
+	public @Nullable LegacySpellShape getCurrentShape() {
 		if (base.isTrigger()) {
 			return null;
 		}
@@ -148,11 +148,11 @@ public class SpellPartBuilder {
 		return getTriggerOverride() == null ? base.getTrigger() : getTriggerOverride();
 	}
 	
-	public final SpellPart build() {
+	public final LegacySpellPart build() {
 		if (base.isTrigger()) {
-			return new SpellPart(this.getCurrentTrigger(), base.getParam());
+			return new LegacySpellPart(this.getCurrentTrigger(), base.getParam());
 		} else {
-			return new SpellPart(this.getCurrentShape(), this.getCurrentElement(), this.getCurrentElementCount(), this.getCurrentAlteration(), base.getParam());
+			return new LegacySpellPart(this.getCurrentShape(), this.getCurrentElement(), this.getCurrentElementCount(), this.getCurrentAlteration(), base.getParam());
 		}
 	}
 }

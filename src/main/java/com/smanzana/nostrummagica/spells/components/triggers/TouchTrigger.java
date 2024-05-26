@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.LivingEntity;

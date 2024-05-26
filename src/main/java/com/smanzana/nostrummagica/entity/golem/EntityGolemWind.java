@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
@@ -20,21 +20,21 @@ public class EntityGolemWind extends EntityGolem {
 	
 	public static final String ID = "wind_golem";
 	
-	private static Spell spellPush;
-	private static Spell spellBuff;
+	private static LegacySpell spellPush;
+	private static LegacySpell spellBuff;
 	
 	private static void init() {
 		if (spellPush == null) {
-			spellPush = Spell.CreateAISpell("Gust");
-			spellPush.addPart(new SpellPart(SelfTrigger.instance()));
-			spellPush.addPart(new SpellPart(SingleShape.instance(),
+			spellPush = LegacySpell.CreateAISpell("Gust");
+			spellPush.addPart(new LegacySpellPart(SelfTrigger.instance()));
+			spellPush.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.WIND,
 					1,
 					EAlteration.RESIST));
 			
-			spellBuff = Spell.CreateAISpell("Speed");
-			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new SpellPart(SingleShape.instance(),
+			spellBuff = LegacySpell.CreateAISpell("Speed");
+			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.WIND,
 					1,
 					EAlteration.SUPPORT));

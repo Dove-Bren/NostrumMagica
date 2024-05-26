@@ -89,12 +89,6 @@ public class ProgressionDoorTileEntity extends TileEntity {
 								missingDepStrings.add(new TranslationTextComponent("info.door.missing.shape", comp.getShape().getDisplayName()));
 							meets = false;
 						}
-					} else if (comp.isTrigger()) {
-						if (!attr.getTriggers().contains(comp.getTrigger())) {
-							if (missingDepStrings != null)
-								missingDepStrings.add(new TranslationTextComponent("info.door.missing.trigger", comp.getTrigger().getDisplayName()));
-							meets = false;
-						}
 					} else if (comp.isElement()) {
 						Boolean known = attr.getKnownElements().get(comp.getElement());
 						if (known == null || !known) {

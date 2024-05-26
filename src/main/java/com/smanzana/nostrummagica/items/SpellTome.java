@@ -28,7 +28,6 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
@@ -1180,7 +1179,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return (capacity >= used + spell.getWeight());
 	}
 	
-	public static boolean startBinding(PlayerEntity player, ItemStack tome, ItemStack scroll, boolean quick) {
+	public static boolean startBinding(PlayerEntity player, ItemStack tome, ItemStack scroll) {
 		if (tome.isEmpty() || scroll.isEmpty())
 			return false;
 		
@@ -1207,30 +1206,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (attr == null)
 			return false;
 		
-		SpellComponentWrapper comp = spell.getRandomComponent();
-		if (comp == null)
-			return false;
-		
-		while (comp.isAlteration()) {
-			comp = spell.getRandomComponent();
-		}
-		
-		String compName;
-		if (comp.isElement())
-			compName = comp.getElement().getName();
-		else if (comp.isTrigger())
-			compName = comp.getTrigger().getDisplayName();
-		else if (comp.isShape())
-			compName = comp.getShape().getDisplayName();
-		else
-			compName = "Physic";
-		
-		attr.startBinding(spell, comp, SpellTome.getTomeID(tome));
-		if (quick) {
-			attr.completeBinding(tome);
-		} else if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.bind_start", new Object[] {spell.getName(), compName}), Util.DUMMY_UUID);
-		}
+		SpellTome.addSpell(tome, spell);
 		
 		return true;
 	}

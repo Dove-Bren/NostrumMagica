@@ -11,9 +11,9 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.Spell.ICastListener;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpell.ICastListener;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.client.resources.I18n;
@@ -53,10 +53,10 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 	private Map<EMagicElement, Integer> elements;
 	private Map<EAlteration, Integer> alterations;
 	private Map<SpellTrigger, Integer> triggers;
-	private Map<SpellShape, Integer> shapes;
+	private Map<LegacySpellShape, Integer> shapes;
 
 	public ObjectiveSpellCast() {
-		Spell.registerCastListener(this);
+		LegacySpell.registerCastListener(this);
 		this.elements = new EnumMap<>(EMagicElement.class);
 		this.alterations = new EnumMap<>(EAlteration.class);
 		this.triggers = new HashMap<>();
@@ -94,7 +94,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		return this;
 	}
 	
-	public ObjectiveSpellCast requiredShape(SpellShape shape) {
+	public ObjectiveSpellCast requiredShape(LegacySpellShape shape) {
 		int count = 0;
 		if (this.shapes.get(shape) != null)
 			count = shapes.get(shape);
@@ -135,7 +135,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 	}
 
 	@Override
-	public void onCast(LivingEntity entity, Spell spell) {
+	public void onCast(LivingEntity entity, LegacySpell spell) {
 		
 		if (entity instanceof PlayerEntity) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -172,7 +172,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		return;
 	}
 	
-	private boolean spellMatches(Spell spell) {
+	private boolean spellMatches(LegacySpell spell) {
 		if (numElems > 0)
 			if (numElems > spell.getElementCount())
 				return false;
@@ -212,8 +212,8 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		}
 		
 		if (!shapes.isEmpty()) {
-			Map<SpellShape, Integer> spellMap = spell.getShapes();
-			for (SpellShape shape: shapes.keySet()) {
+			Map<LegacySpellShape, Integer> spellMap = spell.getShapes();
+			for (LegacySpellShape shape: shapes.keySet()) {
 				Integer count = shapes.get(shape);
 				if (count == null || count == 0)
 					continue;

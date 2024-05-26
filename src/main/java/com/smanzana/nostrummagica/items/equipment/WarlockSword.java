@@ -26,8 +26,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -371,21 +371,21 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
 	}
 
-	private static Spell[] MissleSpells = null;
+	private static LegacySpell[] MissleSpells = null;
 	
 	private static void InitMissleSpells() {
 		if (MissleSpells == null) {
-			MissleSpells = new Spell[EMagicElement.values().length];
+			MissleSpells = new LegacySpell[EMagicElement.values().length];
 			for (EMagicElement elem : EMagicElement.values()) {
-				Spell spell = Spell.CreateAISpell("WarlockMissle_" + elem.name());
-				spell.addPart(new SpellPart(SeekingBulletTrigger.instance()));
-				spell.addPart(new SpellPart(SingleShape.instance(), elem, 1, null));
+				LegacySpell spell = LegacySpell.CreateAISpell("WarlockMissle_" + elem.name());
+				spell.addPart(new LegacySpellPart(SeekingBulletTrigger.instance()));
+				spell.addPart(new LegacySpellPart(SingleShape.instance(), elem, 1, null));
 				MissleSpells[elem.ordinal()] = spell;
 			}
 		}
 	}
 	
-	private static Spell GetMissleSpell(EMagicElement elem) {
+	private static LegacySpell GetMissleSpell(EMagicElement elem) {
 		InitMissleSpells();
 		return MissleSpells[elem.ordinal()];
 	}
@@ -454,7 +454,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 					for (EMagicElement elem : EMagicElement.values()) {
 						Float val = power.get(elem);
 						if (val != null && val >= 1f) {
-							Spell missle = GetMissleSpell(elem);
+							LegacySpell missle = GetMissleSpell(elem);
 							missle.cast(playerIn, .5f * (int) (float) val);
 							any = true;
 						}

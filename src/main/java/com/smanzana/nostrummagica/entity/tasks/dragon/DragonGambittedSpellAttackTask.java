@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -44,7 +44,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	 * Return an array of spells to use.
 	 * @return
 	 */
-	public abstract Spell[] getSpells();
+	public abstract LegacySpell[] getSpells();
 	
 	public abstract LivingEntity getTarget(T dragon);
 	
@@ -82,8 +82,8 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 	}
 	
 	// Actually has the logic of using gambits!
-	private Spell getSpellToCast(Spell[] spells, EntityDragonGambit[] gambits) {
-		Spell spell = null;
+	private LegacySpell getSpellToCast(LegacySpell[] spells, EntityDragonGambit[] gambits) {
+		LegacySpell spell = null;
 		
 		// Fix up tickStorage in case things are returning weirdly
 		if (this.tickStorage == null) {
@@ -93,7 +93,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 		}
 		
 		for (int i = 0; spell == null && i < spells.length; i++) {
-			Spell cur = spells[i];
+			LegacySpell cur = spells[i];
 			EntityDragonGambit gambit = gambits[i];
 			if (cur == null) {
 				break;
@@ -160,7 +160,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 
 	@Override
 	public void startExecuting() {
-		Spell[] spells = getSpells();
+		LegacySpell[] spells = getSpells();
 		EntityDragonGambit[] gambits = getGambits();
 		
 		if (spells == null || spells.length == 0) {
@@ -176,7 +176,7 @@ public abstract class DragonGambittedSpellAttackTask<T extends EntityDragon & IT
 			return;
 		}
 		
-		Spell spell = getSpellToCast(spells, gambits);
+		LegacySpell spell = getSpellToCast(spells, gambits);
 		
 		if (spell == null) {
 			return;

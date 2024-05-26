@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -23,7 +23,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ChainShape extends SpellShape {
+public class ChainShape extends LegacySpellShape {
 
 	private static final String SHAPE_KEY = "chain";
 	private static ChainShape instance = null;

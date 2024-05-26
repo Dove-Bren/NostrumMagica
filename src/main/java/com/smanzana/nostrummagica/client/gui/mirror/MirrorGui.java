@@ -16,7 +16,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -241,7 +241,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		// DRAW ICONS
 		EMagicElement element = null; // Which element we know
 		SpellTrigger trigger = null;
-		SpellShape shape = null;
+		LegacySpellShape shape = null;
 		
 		Map<EMagicElement, Boolean> map = attr.getKnownElements();
 		Boolean val;
@@ -306,8 +306,8 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			color = new float[] {1f, 1f, 1f, 1f};
 		else {
 			color = new float[] {.8f, .5f, .5f, .5f};
-			Collection<SpellShape> shapes = SpellShape.getAllShapes();
-			SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
+			Collection<LegacySpellShape> shapes = LegacySpellShape.getAllShapes();
+			LegacySpellShape[] shapeArray = shapes.toArray(new LegacySpellShape[0]);
 			shape = shapeArray[
 				  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 			      ];

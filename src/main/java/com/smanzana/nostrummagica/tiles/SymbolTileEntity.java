@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.tiles;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -57,8 +57,6 @@ public class SymbolTileEntity extends TileEntity {
 			setAlteration(wrapper.getAlteration());
 		else if (wrapper.isShape())
 			setShape(wrapper.getShape());
-		else
-			setTrigger(wrapper.getTrigger());
 		
 		dirty();
 	}
@@ -68,8 +66,6 @@ public class SymbolTileEntity extends TileEntity {
 			return new SpellComponentWrapper(element);
 		if (alteration != null)
 			return new SpellComponentWrapper(alteration);
-		if (trigger != null)
-			return new SpellComponentWrapper(trigger);
 		if (shape != null)
 			return new SpellComponentWrapper(shape);
 		

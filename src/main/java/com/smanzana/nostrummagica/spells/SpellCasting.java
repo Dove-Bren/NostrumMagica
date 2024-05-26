@@ -16,8 +16,6 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.items.ISpellCastingTool;
 import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.entity.LivingEntity;
@@ -177,25 +175,25 @@ public class SpellCasting {
 					cost -= avail;
 				}
 				
-				if (cost > 0 && playerCast != null && dragons != null) {
-					for (ITameDragon dragon : dragons) {
-						LivingEntity ent = (LivingEntity) dragon;
-						NostrumMagica.instance.proxy.spawnEffect(entity.world, new SpellComponentWrapper(BeamTrigger.instance()),
-								null, entity.getPositionVec().add(0, entity.getEyeHeight(), 0),
-								null, ent.getPositionVec().add(0, ent.getEyeHeight(), 0),
-								new SpellComponentWrapper(EMagicElement.ICE), false, 0);
-						
-						int dAvail = dragon.getMana();
-						if (dAvail >= cost) {
-							dragon.addMana(-cost);
-							cost = 0;
-							break;
-						} else {
-							dragon.addMana(-dAvail);
-							cost -= dAvail;
-						}
-					}
-				}
+//				if (cost > 0 && playerCast != null && dragons != null) {
+//					for (ITameDragon dragon : dragons) {
+//						LivingEntity ent = (LivingEntity) dragon;
+//						NostrumMagica.instance.proxy.spawnEffect(entity.world, new SpellComponentWrapper(BeamTrigger.instance()),
+//								null, entity.getPositionVec().add(0, entity.getEyeHeight(), 0),
+//								null, ent.getPositionVec().add(0, ent.getEyeHeight(), 0),
+//								new SpellComponentWrapper(EMagicElement.ICE), false, 0);
+//						
+//						int dAvail = dragon.getMana();
+//						if (dAvail >= cost) {
+//							dragon.addMana(-cost);
+//							cost = 0;
+//							break;
+//						} else {
+//							dragon.addMana(-dAvail);
+//							cost -= dAvail;
+//						}
+//					}
+//				}
 				
 				if (cost > 0) {
 					return false;

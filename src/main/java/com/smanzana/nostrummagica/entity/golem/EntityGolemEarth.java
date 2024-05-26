@@ -4,8 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 
@@ -20,21 +20,21 @@ public class EntityGolemEarth extends EntityGolem {
 	
 	public static final String ID = "earth_golem";
 	
-	private static Spell spellBuff1;
-	private static Spell spellBuff2;
+	private static LegacySpell spellBuff1;
+	private static LegacySpell spellBuff2;
 	
 	private static void init() {
 		if (spellBuff1 == null) {
-			spellBuff1 = Spell.CreateAISpell("Earthern Shield");
-			spellBuff1.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellBuff1.addPart(new SpellPart(SingleShape.instance(),
+			spellBuff1 = LegacySpell.CreateAISpell("Earthern Shield");
+			spellBuff1.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellBuff1.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.EARTH,
 					1,
 					EAlteration.SUPPORT));
 			
-			spellBuff2 = Spell.CreateAISpell("Impact Enchantment");
-			spellBuff2.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellBuff2.addPart(new SpellPart(SingleShape.instance(),
+			spellBuff2 = LegacySpell.CreateAISpell("Impact Enchantment");
+			spellBuff2.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellBuff2.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.EARTH,
 					1,
 					EAlteration.RESIST));
@@ -66,7 +66,7 @@ public class EntityGolemEarth extends EntityGolem {
 		boolean canStrength = target.getActivePotionEffect(Effects.STRENGTH) == null;
 		boolean canShield = target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
 		
-		Spell spell;
+		LegacySpell spell;
 		if (canStrength && canShield) {
 			if (NostrumMagica.rand.nextBoolean())
 				spell = spellBuff1;

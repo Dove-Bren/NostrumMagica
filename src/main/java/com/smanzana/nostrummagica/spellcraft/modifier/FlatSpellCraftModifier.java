@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellPartBuilder;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.util.text.ITextComponent;
@@ -28,11 +28,11 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	protected final int elementCountModifier;
 	protected final @Nullable EMagicElement elementOverride;
 	protected final @Nullable EAlteration alterationOverride;
-	protected final @Nullable SpellShape shapeOverride;
+	protected final @Nullable LegacySpellShape shapeOverride;
 	protected final @Nullable SpellTrigger triggerOverride;
 	
 	protected FlatSpellCraftModifier(int weightModifier, float manaRateModifier, int elementCountModifier,
-			EMagicElement elementOverride, EAlteration alterationOverride, SpellShape shapeOverride,
+			EMagicElement elementOverride, EAlteration alterationOverride, LegacySpellShape shapeOverride,
 			SpellTrigger triggerOverride) {
 		super();
 		this.weightModifier = weightModifier;
@@ -45,7 +45,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	}
 
 	@Override
-	public boolean canModify(SpellCraftContext context, SpellPart originalPart) {
+	public boolean canModify(SpellCraftContext context, LegacySpellPart originalPart) {
 		// If mana or weight is involved, it's definitely applicable
 		if (this.weightModifier != 0 || this.manaRateModifier != 0) {
 			return true;
@@ -61,7 +61,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	}
 
 	@Override
-	public void modify(SpellCraftContext context, SpellPart originalPart, SpellPartBuilder builder) {
+	public void modify(SpellCraftContext context, LegacySpellPart originalPart, SpellPartBuilder builder) {
 		builder.addWeightModifier(weightModifier)
 			.addManaRate(manaRateModifier)
 			.addElementCountModifier(elementCountModifier);
@@ -126,7 +126,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		protected int elementCountModifier = 0;
 		protected @Nullable EMagicElement elementOverride;
 		protected @Nullable EAlteration alterationOverride;
-		protected @Nullable SpellShape shapeOverride;
+		protected @Nullable LegacySpellShape shapeOverride;
 		protected @Nullable SpellTrigger triggerOverride;
 		
 		public Builder() {
@@ -158,7 +158,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 			return this;
 		}
 
-		public Builder overrideShape(SpellShape shapeOverride) {
+		public Builder overrideShape(LegacySpellShape shapeOverride) {
 			this.shapeOverride = shapeOverride;
 			return this;
 		}

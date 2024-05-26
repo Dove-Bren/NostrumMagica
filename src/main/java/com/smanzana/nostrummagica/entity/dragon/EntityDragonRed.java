@@ -26,10 +26,10 @@ import com.smanzana.nostrummagica.serializers.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -122,27 +122,27 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	
 	private static final String DRAGON_SERIAL_PHASE_TOK = "DragonPhase";
 
-	private static Spell DSPELL_Fireball;
-	private static Spell DSPELL_Fireball2;
-	private static Spell DSPELL_Speed;
-	private static Spell DSPELL_Shield;
-	private static Spell DSPELL_Weaken;
-	private static Spell DSPELL_Curse;
+	private static LegacySpell DSPELL_Fireball;
+	private static LegacySpell DSPELL_Fireball2;
+	private static LegacySpell DSPELL_Speed;
+	private static LegacySpell DSPELL_Shield;
+	private static LegacySpell DSPELL_Weaken;
+	private static LegacySpell DSPELL_Curse;
 	
 	private static final int DRAGON_CAST_TIME = 20 * 3;
 	
-	private static Spell makeSpell(
+	private static LegacySpell makeSpell(
 			String name,
 			Object ... objects) {
-		Spell spell = Spell.CreateAISpell(name);
+		LegacySpell spell = LegacySpell.CreateAISpell(name);
 		
 		for (int i = 0; i < objects.length; i++) {
 			Object o = objects[i];
 			if (o instanceof SpellTrigger) {
 				SpellTrigger trigger = (SpellTrigger) o;
-				spell.addPart(new SpellPart(trigger));
-			} else if (o instanceof SpellShape) {
-				SpellShape shape = (SpellShape) o;
+				spell.addPart(new LegacySpellPart(trigger));
+			} else if (o instanceof LegacySpellShape) {
+				LegacySpellShape shape = (LegacySpellShape) o;
 				EMagicElement element = (EMagicElement) objects[++i];
 				Integer level = (Integer) objects[++i];
 				EAlteration alt = (EAlteration) objects[++i];
@@ -152,7 +152,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 					param = new SpellPartProperties(0, false);
 				}
 				
-				spell.addPart(new SpellPart(shape, element, level, alt, param));
+				spell.addPart(new LegacySpellPart(shape, element, level, alt, param));
 			}
 		}
 		
@@ -658,7 +658,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	private class DragonSpellAttackTask extends EntitySpellAttackTask<EntityDragonRed> {
 
 		public DragonSpellAttackTask(EntityDragonRed entity, int delay, int odds, boolean needsTarget, Predicate<EntityDragonRed> predicate,
-				int castTime, Spell ... spells) {
+				int castTime, LegacySpell ... spells) {
 			super(entity, delay, odds, needsTarget, predicate, castTime, spells);
 		}
 		

@@ -13,9 +13,9 @@ import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
@@ -67,11 +67,11 @@ public class SpellCrafting {
 		return valid;
 	}
 	
-	protected static List<SpellPartBuilder> MakeIngredients(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, List<SpellPart> parts) {
+	protected static List<SpellPartBuilder> MakeIngredients(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, List<LegacySpellPart> parts) {
 		List<SpellPartBuilder> ingredients = new ArrayList<>(parts.size());
 		
 		for (int i = 0; i < parts.size(); i++) {
-			final SpellPart part = parts.get(i);
+			final LegacySpellPart part = parts.get(i);
 			final SpellPartBuilder builder = new SpellPartBuilder(part);
 			
 			if (context != null && pattern != null) {
@@ -86,15 +86,15 @@ public class SpellCrafting {
 		return ingredients;
 	}
 	
-	public static @Nullable Spell CreateSpellFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, IInventory inventory, int startIdx, int slotCount) {
-		List<SpellPart> parts = new ArrayList<>(slotCount);
+	public static @Nullable LegacySpell CreateSpellFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, IInventory inventory, int startIdx, int slotCount) {
+		List<LegacySpellPart> parts = new ArrayList<>(slotCount);
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
 			if (stack.isEmpty()) {
 				break;
 			}
 			
-			SpellPart part = SpellRune.getPart(stack);
+			LegacySpellPart part = SpellRune.getPart(stack);
 			if (part == null) {
 				NostrumMagica.logger.error("Got null SpellPart from rune: " + stack + " :: " + (stack.hasTag() ? stack.getTag().toString() : "NO NBT"));
 				return null;
@@ -106,7 +106,7 @@ public class SpellCrafting {
 		return CreateSpellFromParts(context, pattern, spellName, parts, true);
 	}
 	
-	public static Spell CreateSpellFromParts(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<SpellPart> parts, boolean trans) {
+	public static LegacySpell CreateSpellFromParts(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<LegacySpellPart> parts, boolean trans) {
 		return CreateSpellFromPartsInternal(context, pattern, spellName, parts, trans);
 	}
 	
@@ -118,17 +118,17 @@ public class SpellCrafting {
 	 * @param trans
 	 * @return
 	 */
-	public static Spell CreateSpellFromPartsNoContext(String spellName, List<SpellPart> parts, boolean trans) {
+	public static LegacySpell CreateSpellFromPartsNoContext(String spellName, List<LegacySpellPart> parts, boolean trans) {
 		return CreateSpellFromPartsInternal(null, null, spellName, parts, trans);
 	}
 	
-	protected static Spell CreateSpellFromPartsInternal(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<SpellPart> parts, boolean trans) {
+	protected static LegacySpell CreateSpellFromPartsInternal(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<LegacySpellPart> parts, boolean trans) {
 		
 		List<SpellPartBuilder> ingredients = MakeIngredients(context, pattern, parts);
 		
 		final int manaCost = CalculateManaCost(ingredients);
 		final int weight = CalculateWeight(ingredients);
-		Spell spell = new Spell(spellName, trans, manaCost, weight);
+		LegacySpell spell = new LegacySpell(spellName, trans, manaCost, weight);
 		for (SpellPartBuilder ingredient : ingredients) {
 			spell.addPart(ingredient.build());
 		}
@@ -154,11 +154,11 @@ public class SpellCrafting {
 		return cost;
 	}
 	
-	public static final int CalculateManaCost(SpellPart part) {
+	public static final int CalculateManaCost(LegacySpellPart part) {
 		return CalculateManaCost(part, 1f);
 	}
 	
-	protected static final int CalculateManaCost(SpellPart part, float multiplier) {
+	protected static final int CalculateManaCost(LegacySpellPart part, float multiplier) {
 		float cost = 0f;
 		if (part.isTrigger())
 			cost += multiplier * (float) part.getTrigger().getManaCost();
@@ -174,14 +174,14 @@ public class SpellCrafting {
 	
 	public static int CalculateManaCostFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, IInventory inventory, int startIdx, int slotCount) {
 		
-		List<SpellPart> parts = new ArrayList<>(slotCount);
+		List<LegacySpellPart> parts = new ArrayList<>(slotCount);
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
 			if (stack.isEmpty()) {
 				break;
 			}
 			
-			SpellPart part = SpellRune.getPart(stack);
+			LegacySpellPart part = SpellRune.getPart(stack);
 			if (part == null) {
 				NostrumMagica.logger.error("Got null SpellPart from rune: " + stack + " :: " + (stack.hasTag() ? stack.getTag().toString() : "NO NBT"));
 			} else {
@@ -192,7 +192,7 @@ public class SpellCrafting {
 		return CalculateManaCost(MakeIngredients(context, pattern, parts));
 	}
 	
-	public static final int CalculateWeight(SpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+	public static final int CalculateWeight(LegacySpellShape shape, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
 		// In shapes, the shape itself and alteration report their own cost.
 		// Elements are free.
 		int weight = shape.getWeight();
@@ -202,7 +202,7 @@ public class SpellCrafting {
 		return weight;
 	}
 	
-	public static final int CalculateWeight(SpellPart part) {
+	public static final int CalculateWeight(LegacySpellPart part) {
 		final int weight;
 		if (part.isTrigger()) {
 			weight = part.getTrigger().getWeight();
@@ -226,14 +226,14 @@ public class SpellCrafting {
 	
 	public static int CalculateWeightFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, IInventory inventory, int startIdx, int slotCount) {
 		
-		List<SpellPart> parts = new ArrayList<>(slotCount);
+		List<LegacySpellPart> parts = new ArrayList<>(slotCount);
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
 			if (stack.isEmpty()) {
 				break;
 			}
 			
-			SpellPart part = SpellRune.getPart(stack);
+			LegacySpellPart part = SpellRune.getPart(stack);
 			if (part == null) {
 				NostrumMagica.logger.error("Got null SpellPart from rune: " + stack + " :: " + (stack.hasTag() ? stack.getTag().toString() : "NO NBT"));
 			} else {

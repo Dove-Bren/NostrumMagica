@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.spells.components;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -175,11 +175,11 @@ public class SpellAction {
 		@Override
 		public boolean applyEffect(LivingEntity caster, LivingEntity entity, float efficiency) {
 			float fin = calcDamage(caster, entity, amount * efficiency, element);
-			source.setLastAttackedEntity(entity);
+			caster.setLastAttackedEntity(entity);
 			entity.setRevengeTarget(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 			entity.hurtResistantTime = 0;
-			entity.attackEntityFrom(new MagicDamageSource(source, element), fin);
+			entity.attackEntityFrom(new MagicDamageSource(caster, element), fin);
 			
 			NostrumMagicaSounds sound;
 			switch (element) {
@@ -233,11 +233,11 @@ public class SpellAction {
 		@Override
 		public boolean apply(LivingEntity caster, LivingEntity entity, float efficiency) {
 			if (entity.isEntityUndead()) {
-				source.setLastAttackedEntity(entity);
+				caster.setLastAttackedEntity(entity);
 				entity.setRevengeTarget(caster);
 				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 				entity.hurtResistantTime = 0;
-				entity.attackEntityFrom(new MagicDamageSource(source, EMagicElement.ICE), amount * efficiency);
+				entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ICE), amount * efficiency);
 			} else {
 				entity.heal(amount * efficiency);
 				if (entity instanceof EntityTameDragonRed) {
@@ -2009,13 +2009,11 @@ public class SpellAction {
 		
 	}
 	
-	private LivingEntity source;
 	private List<SpellEffect> effects;
 	private String nameKey;
 	
-	public SpellAction(LivingEntity source) {
-		this.source = source;
-		effects = new LinkedList<>();
+	public SpellAction() {
+		effects = new ArrayList<>(2);
 	}
 	
 	/**
@@ -2025,7 +2023,7 @@ public class SpellAction {
 	 * @param efficiency
 	 * @return
 	 */
-	public boolean apply(LivingEntity entity, float efficiency) {
+	public boolean apply(LivingEntity source, LivingEntity entity, float efficiency) {
 		if (entity.world.isRemote)
 			return false;
 		
@@ -2058,7 +2056,7 @@ public class SpellAction {
 	 * @param efficiency
 	 * @return
 	 */
-	public boolean apply(World world, BlockPos pos, float efficiency) {
+	public boolean apply(LivingEntity source, World world, BlockPos pos, float efficiency) {
 		if (world.isRemote)
 			return false;
 		

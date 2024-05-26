@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +13,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.loretag.LoreCache;
@@ -27,13 +25,11 @@ import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -103,16 +99,12 @@ public class NostrumMagic implements INostrumMagic {
 	private int baseMaxMana; // Max mana without mana bonuses
 	
 	private List<LivingEntity> familiars;
-	private SpellComponentWrapper bindingComponent;
-	private Spell bindingSpell;
-	private int bindingTomeID;
 	
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
 	private Map<EMagicElement, ElementalMastery> elementalMastery;
 	private Map<EMagicElement, Boolean> elementTrials;
 	private List<SpellShape> shapes; // list of shape keys
-	private List<SpellTrigger> triggers; // list of trigger keys
 	private Map<EAlteration, Boolean> alterations;
 	private List<String> completedQuests;
 	private List<String> currentQuests;
@@ -131,21 +123,18 @@ public class NostrumMagic implements INostrumMagic {
 	
 	public NostrumMagic() {
 		unlocked = false;
-		//familiars = new LinkedList<>();
+		//familiars = new ArrayList<>();
 		loreLevels = new HashMap<>();
 		spellCRCs = new HashSet<>();
 		elementalMastery = new EnumMap<>(EMagicElement.class);
 		elementTrials = new EnumMap<>(EMagicElement.class);
-		shapes = new LinkedList<>();
-		triggers = new LinkedList<>();
+		shapes = new ArrayList<>();
 		alterations = new EnumMap<>(EAlteration.class);
-		currentQuests = new LinkedList<>();
-		completedQuests = new LinkedList<>();
+		currentQuests = new ArrayList<>();
+		completedQuests = new ArrayList<>();
 		questData = new HashMap<>();
-		completedResearch = new LinkedList<>();
-		bindingSpell = null;
-		bindingComponent = null;
-		familiars = new LinkedList<>();
+		completedResearch = new ArrayList<>();
+		familiars = new ArrayList<>();
 		sorceryPortalDim = World.OVERWORLD;
 		sorceryPortalPos = null;
 		savedRespawnInfo = null;
@@ -173,8 +162,6 @@ public class NostrumMagic implements INostrumMagic {
 			mana = getMaxMana();
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = control = tech = finesse = 0;
-			bindingSpell = null;
-			bindingComponent = null;
 			
 			this.setElementalMastery(EMagicElement.PHYSICAL, ElementalMastery.NOVICE);
 			this.completeResearch("origin");
@@ -489,11 +476,6 @@ public class NostrumMagic implements INostrumMagic {
 		return shapes;
 	}
 
-	@Override
-	public List<SpellTrigger> getTriggers() {
-		return triggers;
-	}
-	
 	public Map<EMagicElement, Boolean> getKnownElements() {
 		Map<EMagicElement, Boolean> map = new EnumMap<>(EMagicElement.class);
 		for (EMagicElement element : EMagicElement.values()) {
@@ -537,13 +519,6 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void addTrigger(SpellTrigger trigger) {
-		triggers.add(trigger);
-		
-		doUnlockCheck();
-	}
-
-	@Override
 	public void unlockAlteration(EAlteration alteration) {
 		alterations.put(alteration, Boolean.TRUE);
 		doUnlockCheck();
@@ -556,7 +531,8 @@ public class NostrumMagic implements INostrumMagic {
 		// Unlock (ritual of discovery) if at least one shape and trigger
 		// and an element have been 'discovered'.
 		
-		if (shapes.isEmpty() || triggers.isEmpty())
+		int unused; // Revisit this process now that there are no triggers
+		if (shapes.isEmpty())
 			return;
 		
 		boolean found = false;
@@ -669,16 +645,12 @@ public class NostrumMagic implements INostrumMagic {
 		this.elementTrials = cap.serializeElementTrials();
 		this.alterations = cap.serializeAlterations();
 		this.shapes = cap.getShapes();
-		this.triggers = cap.getTriggers();
 		this.markLocation = cap.getMarkLocation();
 		this.markDimension = cap.getMarkDimension();
 		this.currentQuests = cap.getCurrentQuests();
 		this.completedQuests = cap.getCompletedQuests();
 		this.questData = cap.getQuestDataMap();
 		this.completedResearch = cap.getCompletedResearches();
-		this.bindingTomeID = cap.getBindingID();
-		this.bindingSpell = cap.getBindingSpell();
-		this.bindingComponent = cap.getBindingComponent();
 		this.spellKnowledge = cap.getSpellKnowledge();
 		this.enhancedTeleport = cap.hasEnhancedTeleport(); 
 		this.transmuteKnowledge = cap.getTransmuteKnowledge();
@@ -800,62 +772,6 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void setQuestDataMap(Map<String, IObjectiveState> map) {
 		this.questData = map;
-	}
-
-	@Override
-	public SpellComponentWrapper getBindingComponent() {
-		return this.bindingComponent;
-	}
-
-	@Override
-	public Spell getBindingSpell() {
-		return this.bindingSpell;
-	}
-
-	@Override
-	public void startBinding(Spell spell, SpellComponentWrapper comp, int tomeID) {
-		this.bindingSpell = spell;
-		this.bindingComponent = comp;
-		this.bindingTomeID = tomeID;
-	}
-
-	@Override
-	public boolean isBinding() {
-		return this.bindingSpell != null;
-	}
-	
-	@Override
-	public int getBindingID() {
-		return this.bindingTomeID;
-	}
-
-	@Override
-	public void completeBinding(ItemStack tome) {
-		
-		if (this.entity != null && this.entity instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) entity;
-			
-			if (tome.isEmpty()) {
-				tome = NostrumMagica.findTome(player, bindingTomeID);
-				if (tome.isEmpty()) {
-					player.sendMessage(new TranslationTextComponent(
-							"info.tome.bind_missing", new Object[] {bindingSpell.getName()}), Util.DUMMY_UUID);
-					return;
-				}
-			}
-			
-			if (!this.entity.world.isRemote) {
-				NostrumMagicaSounds.LEVELUP.play(player);
-				player.sendMessage(new TranslationTextComponent(
-						"info.tome.bind_finish", new Object[] {bindingSpell.getName()}), Util.DUMMY_UUID);
-			}
-			
-			SpellTome.addSpell(tome, this.bindingSpell);
-		}
-
-		this.bindingSpell = null;
-		this.bindingTomeID = 0;
-		this.bindingComponent = null;
 	}
 
 	@Override

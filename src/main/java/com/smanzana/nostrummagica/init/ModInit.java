@@ -50,14 +50,14 @@ import com.smanzana.nostrummagica.items.EssenceItem;
 import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.armor.DragonArmor;
-import com.smanzana.nostrummagica.items.armor.MagicArmor;
-import com.smanzana.nostrummagica.items.armor.MagicArmorBase;
 import com.smanzana.nostrummagica.items.armor.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.items.armor.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
+import com.smanzana.nostrummagica.items.armor.MagicArmorBase;
 import com.smanzana.nostrummagica.items.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.items.equipment.WarlockSword;
-import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.loot.NostrumLoot;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -96,7 +96,6 @@ import com.smanzana.nostrummagica.rituals.requirements.RRequirementAlterationMas
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementElementMastery;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementResearch;
 import com.smanzana.nostrummagica.rituals.requirements.RRequirementShapeMastery;
-import com.smanzana.nostrummagica.rituals.requirements.RRequirementTriggerMastery;
 import com.smanzana.nostrummagica.serializers.ArcaneWolfElementalTypeSerializer;
 import com.smanzana.nostrummagica.serializers.DragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.serializers.FloatArraySerializer;
@@ -113,32 +112,9 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.AtFeetTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.AuraTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.BeamTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.CasterTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.DamagedTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.DelayTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.FieldTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.FoodTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.HealthTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.ManaTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.OtherTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.ProximityTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.WallTrigger;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.trials.TrialEarth;
 import com.smanzana.nostrummagica.trials.TrialEnder;
@@ -333,19 +309,19 @@ public class ModInit {
 			registry.register(recipe);
 		}
 
-		for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
-			recipe = RitualRecipe.createTier3("rune." + trigger.getTriggerKey().toLowerCase(),
-					SpellRune.getRune(trigger), null,
-					new ReagentType[] {
-							ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG },
-					Ingredient.fromTag(NostrumTags.Items.MagicToken),
-					new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(trigger.getCraftItem()), Ingredient.EMPTY,
-							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
-					IRitualRequirement.AND(new RRequirementTriggerMastery(trigger),
-							new RRequirementResearch("spellrunes")),
-					new OutcomeSpawnItem(SpellRune.getRune(trigger)));
-			registry.register(recipe);
-		}
+//		for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
+//			recipe = RitualRecipe.createTier3("rune." + trigger.getTriggerKey().toLowerCase(),
+//					SpellRune.getRune(trigger), null,
+//					new ReagentType[] {
+//							ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG },
+//					Ingredient.fromTag(NostrumTags.Items.MagicToken),
+//					new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(trigger.getCraftItem()), Ingredient.EMPTY,
+//							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
+//					IRitualRequirement.AND(new RRequirementTriggerMastery(trigger),
+//							new RRequirementResearch("spellrunes")),
+//					new OutcomeSpawnItem(SpellRune.getRune(trigger)));
+//			registry.register(recipe);
+//		}
 
 		// Boons
 		{
@@ -2120,9 +2096,9 @@ public class ModInit {
 	public static void registerShapes(RegistryEvent.Register<Item> event) {
 		// Note: these are happening in the register<item> phase because they drive what items get
 		// generated!
-    	SpellShape.register(SingleShape.instance());
-    	SpellShape.register(AoEShape.instance());
-    	SpellShape.register(ChainShape.instance());
+    	LegacySpellShape.register(SingleShape.instance());
+    	LegacySpellShape.register(AoEShape.instance());
+    	LegacySpellShape.register(ChainShape.instance());
     }
     
 	@SubscribeEvent(priority=EventPriority.HIGH)

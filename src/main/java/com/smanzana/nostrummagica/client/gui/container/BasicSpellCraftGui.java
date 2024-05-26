@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.tiles.BasicSpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
@@ -308,7 +308,7 @@ public class BasicSpellCraftGui {
 			getContainer().validate();
 			if (getContainer().spellValid) {
 				// whoo make spell
-				Spell spell = getContainer().makeSpell(true);
+				LegacySpell spell = getContainer().makeSpell(true);
 				if (spell != null) {
 					// All of this happens again and is synced back to client
 					// But in the mean, might as well do it here for the

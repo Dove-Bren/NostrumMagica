@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
 import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
 import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
@@ -19,22 +19,22 @@ public class EntityGolemPhysical extends EntityGolem {
 	
 	public static final String ID = "physical_golem";
 	
-	private static Spell spellRanged;
-	private static Spell spellDebuff;
+	private static LegacySpell spellRanged;
+	private static LegacySpell spellDebuff;
 	
 	private static void init() {
 		if (spellRanged == null) {
-			spellRanged = Spell.CreateAISpell("Massive Blow");
+			spellRanged = LegacySpell.CreateAISpell("Massive Blow");
 			//spellRanged.addPart(new SpellPart()); should be projectile
-			spellRanged.addPart(new SpellPart(ProjectileTrigger.instance()));
-			spellRanged.addPart(new SpellPart(SingleShape.instance(),
+			spellRanged.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
+			spellRanged.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					1,
 					null));
 			
-			spellDebuff = Spell.CreateAISpell("Corrupt Offense");
-			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellDebuff.addPart(new SpellPart(SingleShape.instance(),
+			spellDebuff = LegacySpell.CreateAISpell("Corrupt Offense");
+			spellDebuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellDebuff.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					1,
 					EAlteration.INFLICT));

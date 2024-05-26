@@ -15,16 +15,15 @@ import com.smanzana.nostrummagica.items.MagicCharm;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.armor.MagicArmor;
-import com.smanzana.nostrummagica.items.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.items.SpellPlate;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.armor.MagicArmor;
+import com.smanzana.nostrummagica.items.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.tiles.NostrumTileEntities;
 
 import net.minecraft.inventory.EquipmentSlotType;
@@ -66,12 +65,10 @@ public class PortingUtil {
 			component = new SpellComponentWrapper(alter);
 			break;
 		case "shape":
+		case "trigger":
+			// TRY to do a shape anways
 			SpellShape shape = SpellShape.get(oldName);
 			component = new SpellComponentWrapper(shape);
-			break;
-		case "trigger":
-			SpellTrigger trigger = SpellTrigger.get(oldName);
-			component = new SpellComponentWrapper(trigger);
 			break;
 		}
 		

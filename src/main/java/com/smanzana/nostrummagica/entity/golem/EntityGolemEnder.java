@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -21,30 +21,30 @@ public class EntityGolemEnder extends EntityGolem {
 	
 	public static final String ID = "ender_golem";
 	
-	private static Spell spellRange;
-	private static Spell spellDebuff;
-	private static Spell spellBuff;
+	private static LegacySpell spellRange;
+	private static LegacySpell spellDebuff;
+	private static LegacySpell spellBuff;
 	
 	private static void init() {
 		if (spellRange == null) {
-			spellRange = Spell.CreateAISpell("Overwhelm");
-			spellRange.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellRange.addPart(new SpellPart(AoEShape.instance(),
+			spellRange = LegacySpell.CreateAISpell("Overwhelm");
+			spellRange.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellRange.addPart(new LegacySpellPart(AoEShape.instance(),
 					EMagicElement.ENDER,
 					1,
 					null,
 					new SpellPartProperties(2, false)));
 			
-			spellDebuff = Spell.CreateAISpell("Blind");
-			spellDebuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellDebuff.addPart(new SpellPart(SingleShape.instance(),
+			spellDebuff = LegacySpell.CreateAISpell("Blind");
+			spellDebuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellDebuff.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.ENDER,
 					1,
 					EAlteration.INFLICT));
 			
-			spellBuff = Spell.CreateAISpell("Cloak");
-			spellBuff.addPart(new SpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new SpellPart(SingleShape.instance(),
+			spellBuff = LegacySpell.CreateAISpell("Cloak");
+			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
+			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
 					EMagicElement.ENDER,
 					1,
 					EAlteration.RESIST));

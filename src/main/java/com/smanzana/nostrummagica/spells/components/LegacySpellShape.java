@@ -19,15 +19,15 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public abstract class SpellShape {
+public abstract class LegacySpellShape {
 	
-	private static Map<String, SpellShape> registry = new HashMap<>();
+	private static Map<String, LegacySpellShape> registry = new HashMap<>();
 	
-	public static void register(SpellShape shape) {
+	public static void register(LegacySpellShape shape) {
 		registry.put(shape.getShapeKey(), shape);
 	}
 	
-	public static SpellShape get(String name) {
+	public static LegacySpellShape get(String name) {
 		return registry.get(name);
 	}
 	
@@ -35,13 +35,13 @@ public abstract class SpellShape {
 		return registry.keySet();
 	}
 	
-	public static Collection<SpellShape> getAllShapes() {
+	public static Collection<LegacySpellShape> getAllShapes() {
 		return registry.values();
 	}
 	
 	private String key;
 	
-	public SpellShape(String key) {
+	public LegacySpellShape(String key) {
 		this.key = key;
 	}
 	

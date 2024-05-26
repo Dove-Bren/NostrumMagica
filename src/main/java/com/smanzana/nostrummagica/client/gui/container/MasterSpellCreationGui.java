@@ -23,7 +23,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -367,17 +367,17 @@ public class MasterSpellCreationGui {
 			if (reagentStrings == null)
 				reagentStrings = new LinkedList<>();
 			
-			Spell spell = makeSpell(name, iconIdx);
+			LegacySpell spell = makeSpell(name, iconIdx);
 			spellValid = (spell != null);
 		}
 		
-		public Spell makeSpell(String name, int iconIdx) {
+		public LegacySpell makeSpell(String name, int iconIdx) {
 			return makeSpell(name, iconIdx, false);
 		}
 		
-		public Spell makeSpell(String name, int iconIdx, boolean clear) {
+		public LegacySpell makeSpell(String name, int iconIdx, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			LegacySpell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;
@@ -390,7 +390,7 @@ public class MasterSpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
+		public static LegacySpell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -430,7 +430,7 @@ public class MasterSpellCreationGui {
 			
 			// Actually make spell
 			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
-			Spell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1);
+			LegacySpell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1);
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
@@ -721,7 +721,7 @@ public class MasterSpellCreationGui {
 							container.validate();
 							if (container.spellValid) {
 								// whoo make spell
-								Spell spell = container.makeSpell(container.name.toString(), container.iconIndex, true);
+								LegacySpell spell = container.makeSpell(container.name.toString(), container.iconIndex, true);
 								if (spell != null) {
 									// All of this happens again and is synced back to client
 									// But in the mean, might as well do it here for the

@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellTomeSlotModifyMessage;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -296,13 +296,13 @@ public class TomeWorkshopScreen extends Screen {
 	}
 	
 	protected void addLibrary() {
-		List<Spell> librarySpells = SpellTome.getSpellLibrary(playerStackSelected);
+		List<LegacySpell> librarySpells = SpellTome.getSpellLibrary(playerStackSelected);
 		final int x = getGuiLeft() + POS_LIBRARY_HOFFSET;
 		final int yAnchor = getGuiTop() + POS_LIBRARY_VOFFSET;
 		final int buttonWidth = 79;
 		final int buttonHeight = 20;
 		for (int i = 0; i < librarySpells.size(); i++) {
-			final Spell spell = librarySpells.get(i);
+			final LegacySpell spell = librarySpells.get(i);
 			final int y = yAnchor + (i * buttonHeight);
 			
 			SpellLibraryPane pane = new SpellLibraryPane(this, spell, i, x, y, buttonWidth, buttonHeight);
@@ -482,7 +482,7 @@ public class TomeWorkshopScreen extends Screen {
 	protected boolean attemptAssignment() {
 		if (this.pageSlotSelected != -1 && this.librarySlotSelected != -1 && !this.playerStackSelected.isEmpty()) {
 			// Assign from library into slot
-			Spell spell = null;
+			LegacySpell spell = null;
 			for (SpellLibraryPane pane : this.spellLibraryWidgets) {
 				if (pane.idx == this.librarySlotSelected) {
 					spell = pane.spell;
@@ -525,7 +525,7 @@ public class TomeWorkshopScreen extends Screen {
 		return true;
 	}
 	
-	protected @Nullable Spell getSpellForSlot(int idx) {
+	protected @Nullable LegacySpell getSpellForSlot(int idx) {
 		if (playerStackSelected.isEmpty() || SpellTome.getSlots(playerStackSelected) <= idx) {
 			return null;
 		}
@@ -667,7 +667,7 @@ public class TomeWorkshopScreen extends Screen {
 		//super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
-	protected void renderSpellSlide(MatrixStack matrixStackIn, Spell spell, int width, int height, float partialTicks) {
+	protected void renderSpellSlide(MatrixStack matrixStackIn, LegacySpell spell, int width, int height, float partialTicks) {
 		final Minecraft mc = getMinecraft();
 		final int iconLen = Math.min(32, height-2);
 		final int yMargin = Math.max(0, (iconLen+2) - height) / 2; // Get how much vertical space that means we have
@@ -702,12 +702,12 @@ public class TomeWorkshopScreen extends Screen {
 	protected static class SpellLibraryPane extends AbstractButton {
 		
 		private final TomeWorkshopScreen screen;
-		private final Spell spell;
+		private final LegacySpell spell;
 		private final int idx;
 		private final int baseY;
 		protected boolean selected;
 		
-		public SpellLibraryPane(TomeWorkshopScreen screen, Spell spell, int idx, int x, int y, int width, int height) {
+		public SpellLibraryPane(TomeWorkshopScreen screen, LegacySpell spell, int idx, int x, int y, int width, int height) {
 			//int x, int y, int width, int height, ITextComponent title
 			super(x, y, width, height, StringTextComponent.EMPTY);
 			this.screen = screen;
@@ -776,7 +776,7 @@ public class TomeWorkshopScreen extends Screen {
 		
 		private final TomeWorkshopScreen screen;
 		private final int idx;
-		private @Nullable Spell spell;
+		private @Nullable LegacySpell spell;
 		protected boolean selected;
 		
 		public SpellSlotPane(TomeWorkshopScreen screen, int idx, int x, int y, int width, int height) {
@@ -813,7 +813,7 @@ public class TomeWorkshopScreen extends Screen {
 			this.selected = selected;
 		}
 		
-		public void setSpell(@Nullable Spell spell) {
+		public void setSpell(@Nullable LegacySpell spell) {
 			this.spell = spell;
 		}
 		

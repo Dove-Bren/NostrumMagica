@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
@@ -14,10 +13,7 @@ import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -56,17 +52,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	//private static final String NBT_FAMILIARS = "familiars";
 	
-	private static final String NBT_BINDING_COMPONENT = "binding_component";
-	private static final String NBT_BINDING_SPELL = "binding_spell";
-	private static final String NBT_BINDING_TOME_ID = "binding_tomeid";
-	//private static final String NBT_BINDING_COMPONENT = "binding";
-	
 	private static final String NBT_LORELEVELS = "lore";
 	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
 	private static final String NBT_MASTERED_ELEMENTS = "mastered_elements";
 	private static final String NBT_ELEMENT_TRIALS = "element_trials";
 	private static final String NBT_SHAPES = "shapes"; // list of shape keys
-	private static final String NBT_TRIGGERS = "triggers"; // list of trigger keys
 	private static final String NBT_ALTERATIONS = "alterations";
 	
 	private static final String NBT_MARK_DIMENSION = "mark_dim";
@@ -202,13 +192,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_SHAPES, list);
 		
-		list = new ListNBT();
-		for (SpellTrigger trigger : instance.getTriggers()) {
-			String key = trigger.getTriggerKey();
-			list.add(StringNBT.valueOf(key));
-		}
-		nbt.put(NBT_TRIGGERS, list);
-		
 		compound = new CompoundNBT();
 		{
 			Map<EAlteration, Boolean> map = instance.serializeAlterations();
@@ -270,12 +253,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				tagList.add(StringNBT.valueOf(research));
 			}
 			nbt.put(NBT_RESEARCHES, tagList);
-		}
-		
-		if (instance.isBinding()) {
-			nbt.putString(NBT_BINDING_COMPONENT, instance.getBindingComponent().getKeyString());
-			nbt.putInt(NBT_BINDING_TOME_ID, instance.getBindingID());
-			nbt.putInt(NBT_BINDING_SPELL, instance.getBindingSpell().getRegistryID());
 		}
 		
 		compound = new CompoundNBT();;
@@ -373,13 +350,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			instance.addShape(shape);
 		}
 		
-		// TRIGGERS
-		list = tag.getList(NBT_TRIGGERS, NBT.TAG_STRING);
-		for (int i = 0; i < list.size(); i++) {
-			SpellTrigger trigger = SpellTrigger.get(list.getString(i));
-			instance.addTrigger(trigger);
-		}
-		
 		// ALTERATIONS
 
 		compound = tag.getCompound(NBT_ALTERATIONS);
@@ -447,19 +417,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			for (int i = 0; i < tagList.size(); i++) {
 				String research = tagList.getString(i);
 				instance.completeResearch(research);
-			}
-		}
-		
-		if (tag.contains(NBT_BINDING_COMPONENT, NBT.TAG_STRING)
-				&& tag.contains(NBT_BINDING_SPELL, NBT.TAG_INT)
-				&& tag.contains(NBT_BINDING_TOME_ID, NBT.TAG_INT)) {
-			Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(tag.getInt(NBT_BINDING_SPELL));
-			if (spell != null) {
-				SpellComponentWrapper comp = SpellComponentWrapper.fromKeyString(tag.getString(NBT_BINDING_COMPONENT));
-				int tomeID = tag.getInt(NBT_BINDING_TOME_ID);
-				instance.startBinding(spell, comp, tomeID);
-			} else {
-				NostrumMagica.logger.warn("Found illegal spell ID. Player will lose binding information");
 			}
 		}
 		

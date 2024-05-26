@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.LegacySpell;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -52,7 +52,7 @@ public class CommandForceBind {
 					|| SpellScroll.getSpell(offhand) == null) {
 				context.getSource().sendFeedback(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
 			} else {
-				Spell spell = SpellScroll.getSpell(offhand);
+				LegacySpell spell = SpellScroll.getSpell(offhand);
 				attr.startBinding(spell, null, SpellTome.getTomeID(stack));
 				attr.completeBinding(stack);
 			}

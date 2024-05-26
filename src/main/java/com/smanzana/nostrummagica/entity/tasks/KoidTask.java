@@ -10,10 +10,10 @@ import java.util.Random;
 import com.smanzana.nostrummagica.entity.EntityKoid;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
@@ -40,20 +40,20 @@ public class KoidTask extends Goal {
 		}
 	}
 
-	private static Map<EMagicElement, List<Spell>> rangedSpells;
-	private static Map<EMagicElement, List<Spell>> meleeSpells;
-	private static Map<EMagicElement, List<Spell>> buffSpells;
+	private static Map<EMagicElement, List<LegacySpell>> rangedSpells;
+	private static Map<EMagicElement, List<LegacySpell>> meleeSpells;
+	private static Map<EMagicElement, List<LegacySpell>> buffSpells;
 	
-	private static void putSpell(Map<EMagicElement, List<Spell>> map,
+	private static void putSpell(Map<EMagicElement, List<LegacySpell>> map,
 			String name,
 			SpellTrigger trigger,
-			SpellShape shape,
+			LegacySpellShape shape,
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		Spell spell = Spell.CreateAISpell(name);
-		spell.addPart(new SpellPart(trigger));
-		spell.addPart(new SpellPart(shape, element, power, alteration));
+		LegacySpell spell = LegacySpell.CreateAISpell(name);
+		spell.addPart(new LegacySpellPart(trigger));
+		spell.addPart(new LegacySpellPart(shape, element, power, alteration));
 		
 		if (map.get(element) == null)
 			map.put(element, new LinkedList<>());
@@ -66,7 +66,7 @@ public class KoidTask extends Goal {
 			meleeSpells = new EnumMap<>(EMagicElement.class);
 			buffSpells = new EnumMap<>(EMagicElement.class);
 			
-			Spell spell;
+			LegacySpell spell;
 			
 			// Physical
 			putSpell(buffSpells, "Summon Golem",
@@ -151,9 +151,9 @@ public class KoidTask extends Goal {
 					EMagicElement.FIRE,
 					1,
 					null);
-			spell = Spell.CreateAISpell("Fireball");
-			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
-			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.FIRE,
+			spell = LegacySpell.CreateAISpell("Fireball");
+			spell.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
+			spell.addPart(new LegacySpellPart(AoEShape.instance(), EMagicElement.FIRE,
 					1, null, new SpellPartProperties(3, false)));
 			rangedSpells.get(EMagicElement.FIRE).add(spell);
 			putSpell(rangedSpells, "Flare",
@@ -176,9 +176,9 @@ public class KoidTask extends Goal {
 					EMagicElement.ICE,
 					1,
 					null);
-			spell = Spell.CreateAISpell("Group Frostbite");
-			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
-			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.ICE,
+			spell = LegacySpell.CreateAISpell("Group Frostbite");
+			spell.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
+			spell.addPart(new LegacySpellPart(AoEShape.instance(), EMagicElement.ICE,
 					1, EAlteration.INFLICT, new SpellPartProperties(5, false)));
 			rangedSpells.get(EMagicElement.ICE).add(spell);
 			
@@ -266,10 +266,10 @@ public class KoidTask extends Goal {
 					EMagicElement.ENDER,
 					2,
 					EAlteration.RESIST);
-			spell = Spell.CreateAISpell("Blinker");
-			spell.addPart(new SpellPart(SelfTrigger.instance()));
-			spell.addPart(new SpellPart(DamagedTrigger.instance()));
-			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER,
+			spell = LegacySpell.CreateAISpell("Blinker");
+			spell.addPart(new LegacySpellPart(SelfTrigger.instance()));
+			spell.addPart(new LegacySpellPart(DamagedTrigger.instance()));
+			spell.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ENDER,
 					2, EAlteration.GROWTH));
 			buffSpells.get(EMagicElement.ENDER).add(spell);
 			putSpell(rangedSpells, "Blindness",
@@ -301,9 +301,9 @@ public class KoidTask extends Goal {
 	private boolean hasMelee;
 	private boolean hasRange;
 	private boolean hasAux;
-	private List<Spell> meleeSkills;
-	private List<Spell> buffSkills;
-	private List<Spell> rangedSkills;
+	private List<LegacySpell> meleeSkills;
+	private List<LegacySpell> buffSkills;
+	private List<LegacySpell> rangedSkills;
 	
 	private int meleeCooldown;
 	private int rangeCooldown;
@@ -403,7 +403,7 @@ public class KoidTask extends Goal {
 				// Figure out who to do it to.
 				// Usually do ourselves, but have a chance to aid master first
 				
-				Spell buff = this.getBuff();
+				LegacySpell buff = this.getBuff();
 				buff.cast(koid, 1.0f);
 				auxCooldown = 20 * 5 * (1 + KoidTask.rand.nextInt(3));
 				done = true;
@@ -424,7 +424,7 @@ public class KoidTask extends Goal {
 			if (!done && !inMelee && hasRange && inRange && rangeCooldown <= 0) {
 				// Can we do a ranged attack?
 				if (koid.canEntityBeSeen(target)) {
-					Spell spell = this.getRanged();
+					LegacySpell spell = this.getRanged();
 					spell.cast(koid, 1.0f);
 					rangeCooldown = 20 * 3 * (1 + KoidTask.rand.nextInt(3));
 					done = true;
@@ -432,7 +432,7 @@ public class KoidTask extends Goal {
 			}
 			
 			if (!done && hasMelee && inMelee && meleeCooldown <= 0) {
-				Spell spell = this.getMelee();
+				LegacySpell spell = this.getMelee();
 				spell.cast(koid, 1.0f);
 				meleeCooldown = 20 * 1;
 				done = true;
@@ -556,9 +556,9 @@ public class KoidTask extends Goal {
 			int type = rand.nextInt(3);
 			if (type-- == 0) {
 				// Melee, if it's there
-				List<Spell> list = meleeSpells.get(koid.getElement());
+				List<LegacySpell> list = meleeSpells.get(koid.getElement());
 				if (list != null) {
-					Spell spell = list.get(rand.nextInt(list.size()));
+					LegacySpell spell = list.get(rand.nextInt(list.size()));
 					if (!this.hasMelee) {
 						this.hasMelee = true;
 						this.meleeSkills = new LinkedList<>();
@@ -570,9 +570,9 @@ public class KoidTask extends Goal {
 				continue;
 			} else if (type-- == 0) {
 				// Ranged, if it's there
-				List<Spell> list = rangedSpells.get(koid.getElement());
+				List<LegacySpell> list = rangedSpells.get(koid.getElement());
 				if (list != null) {
-					Spell spell = list.get(rand.nextInt(list.size()));
+					LegacySpell spell = list.get(rand.nextInt(list.size()));
 					if (!this.hasRange) {
 						this.hasRange = true;
 						this.rangedSkills = new LinkedList<>();
@@ -584,9 +584,9 @@ public class KoidTask extends Goal {
 				continue;
 			} else {
 				// Buff, if it's there
-				List<Spell> list = buffSpells.get(koid.getElement());
+				List<LegacySpell> list = buffSpells.get(koid.getElement());
 				if (list != null) {
-					Spell spell = list.get(rand.nextInt(list.size()));
+					LegacySpell spell = list.get(rand.nextInt(list.size()));
 					if (!this.hasAux) {
 						this.hasAux = true;
 						this.buffSkills = new LinkedList<>();
@@ -601,21 +601,21 @@ public class KoidTask extends Goal {
 		}
 	}
 	
-	private Spell getMelee() {
+	private LegacySpell getMelee() {
 		if (!hasMelee)
 			return null;
 		
 		return meleeSkills.get(rand.nextInt(meleeSkills.size()));
 	}
 	
-	private Spell getRanged() {
+	private LegacySpell getRanged() {
 		if (!hasRange)
 			return null;
 		
 		return rangedSkills.get(rand.nextInt(rangedSkills.size()));
 	}
 	
-	private Spell getBuff() {
+	private LegacySpell getBuff() {
 		if (!hasAux)
 			return null;
 		

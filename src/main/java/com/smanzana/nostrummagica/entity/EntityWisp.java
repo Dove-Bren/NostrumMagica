@@ -27,9 +27,9 @@ import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPart;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
@@ -96,7 +96,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 	private int perilTicks;
 	private @Nullable BlockPos perilLoc;
 
-	private Spell defaultSpell;
+	private LegacySpell defaultSpell;
 	
 	public EntityWisp(EntityType<? extends EntityWisp> type, World worldIn) {
 		super(type, worldIn);
@@ -121,9 +121,9 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
 		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityWisp>(this, 20, 4, true, (wisp) -> {
 			return wisp.getAttackTarget() != null;
-		}, new Spell[0]){
+		}, new LegacySpell[0]){
 			@Override
-			public Spell pickSpell(Spell[] spells, EntityWisp wisp) {
+			public LegacySpell pickSpell(LegacySpell[] spells, EntityWisp wisp) {
 				// Ignore empty array and use spell from the wisp
 				return getSpellToUse();
 			}
@@ -423,17 +423,17 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		this.setElement(elem);
 	}
 	
-	protected Spell getDefaultSpell() {
+	protected LegacySpell getDefaultSpell() {
 		init();
 		return getRandSpell(getRNG(), this.getElement());
 	}
 	
-	protected Spell getSpellToUse() {
+	protected LegacySpell getSpellToUse() {
 		if (this.defaultSpell == null || this.defaultSpell.getPrimaryElement() != this.getElement()) {
 			this.defaultSpell = getDefaultSpell();
 		}
 		
-		Spell spell = this.defaultSpell;
+		LegacySpell spell = this.defaultSpell;
 		
 		return spell;
 	}
@@ -639,10 +639,10 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		}
 	}
 	
-	private static Map<EMagicElement, List<Spell>> defaultSpells;
+	private static Map<EMagicElement, List<LegacySpell>> defaultSpells;
 	
-	private static @Nullable Spell getRandSpell(Random rand, EMagicElement element) {
-		List<Spell> list = defaultSpells.get(element);
+	private static @Nullable LegacySpell getRandSpell(Random rand, EMagicElement element) {
+		List<LegacySpell> list = defaultSpells.get(element);
 		if (list == null || list.isEmpty()) {
 			return null;
 		}
@@ -650,8 +650,8 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		return list.get(rand.nextInt(list.size()));
 	}
 	
-	private static void putSpell(Spell spell, EMagicElement element) {
-		List<Spell> list = defaultSpells.get(element);
+	private static void putSpell(LegacySpell spell, EMagicElement element) {
+		List<LegacySpell> list = defaultSpells.get(element);
 		if (list == null) {
 			list = new ArrayList<>();
 			defaultSpells.put(element, list);
@@ -662,13 +662,13 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 	
 	private static void putSpell(String name,
 			SpellTrigger trigger,
-			SpellShape shape,
+			LegacySpellShape shape,
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		Spell spell = Spell.CreateAISpell(name);
-		spell.addPart(new SpellPart(trigger));
-		spell.addPart(new SpellPart(shape, element, power, alteration));
+		LegacySpell spell = LegacySpell.CreateAISpell(name);
+		spell.addPart(new LegacySpellPart(trigger));
+		spell.addPart(new LegacySpellPart(shape, element, power, alteration));
 		
 		putSpell(spell, element);
 	}
@@ -677,7 +677,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		if (defaultSpells == null) {
 			defaultSpells = new EnumMap<>(EMagicElement.class);
 			
-			Spell spell;
+			LegacySpell spell;
 			
 			// Physical
 			putSpell("Physic Blast",
@@ -775,11 +775,11 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 //					null);
 
 			// Ice
-			spell = Spell.CreateAISpell("Frostbite");
-			spell.addPart(new SpellPart(ProjectileTrigger.instance()));
-			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE,
+			spell = LegacySpell.CreateAISpell("Frostbite");
+			spell.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
+			spell.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ICE,
 					1, EAlteration.INFLICT));
-			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ICE,
+			spell.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ICE,
 					1, null));
 			putSpell(spell, EMagicElement.ICE);
 //			putSpell("Magic Aegis",

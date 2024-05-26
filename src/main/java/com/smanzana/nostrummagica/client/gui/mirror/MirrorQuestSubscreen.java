@@ -382,8 +382,6 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			
 			if (reward instanceof AlterationReward) {
 				this.icon = SpellComponentIcon.get(((AlterationReward) reward).getAlteration());
-			} else if (reward instanceof TriggerReward) {
-				this.icon = SpellComponentIcon.get(((TriggerReward) reward).getTrigger());
 			} else if (reward instanceof AttributeReward) {
 				AwardType type = ((AttributeReward) reward).getType();
 				switch (type) {

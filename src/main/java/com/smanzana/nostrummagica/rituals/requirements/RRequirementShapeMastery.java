@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.rituals.requirements;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.spells.components.SpellShape;
+import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 
 public class RRequirementShapeMastery implements IRitualRequirement{
 
-	private SpellShape shape;
+	private LegacySpellShape shape;
 	
-	public RRequirementShapeMastery(SpellShape shape) {
+	public RRequirementShapeMastery(LegacySpellShape shape) {
 		this.shape = shape;
 	}
 
