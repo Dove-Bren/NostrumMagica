@@ -61,6 +61,11 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	}
 	
 	@Override
+	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+		return true;
+	}
+	
+	@Override
 	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
 		this.attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -181,7 +186,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	@Override
 	public void drawBackground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		RenderFuncs.drawGradientRect(matrixStackIn, 0, 0, width, height,
-				0xFF442266, 0xFF331155, 0xFF553388, 0xFF663377
+				0xFF332266, 0xFF221155, 0xFF443388, 0xFF443377
 				);
 	}
 

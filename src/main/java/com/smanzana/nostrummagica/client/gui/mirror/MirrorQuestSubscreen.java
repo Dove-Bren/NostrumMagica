@@ -75,6 +75,11 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	}
 	
 	@Override
+	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+		return true;
+	}
+	
+	@Override
 	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
 		this.player = player;
 		attr = NostrumMagica.getMagicWrapper(player);

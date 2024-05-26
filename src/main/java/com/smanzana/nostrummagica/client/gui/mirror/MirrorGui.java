@@ -176,6 +176,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		int leftOffset = guiLeft();
 		int topOffset = guiTop();
 		
+		final IMirrorSubscreen existingSubscreen = this.subscreen;
 		lastMinorTab = null;
 		
 		{
@@ -190,7 +191,22 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				majorTabs.add(new MajorTabButton(this, subscreen, leftOffset - POS_MAJORTAB_WIDTH, topOffset + (POS_MAJORTAB_HEIGHT * majorTabs.size()), POS_MAJORTAB_WIDTH, POS_MAJORTAB_HEIGHT));
 			}
 		
-			this.setScreen(subscreens.get(0));
+			if (existingSubscreen == null) {
+				this.setScreen(subscreens.get(0));
+			} else {
+				boolean found = false;
+				for (IMirrorSubscreen subscreen : subscreens) {
+					if (subscreen.getName().equals(existingSubscreen.getName())) {
+						this.setScreen(subscreen);
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found) {
+					this.setScreen(subscreens.get(0));
+				}
+			}
 		}
 	}
 	
@@ -349,6 +365,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		matrixStackIn.pop();
 
+		organizeTabs();
 		super.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		
 		// Undo mask and allow free drawing again
@@ -443,6 +460,26 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		MinorTabButton button = (MinorTabButton) buttonIn;
 		lastMinorTab = button.tab; 
 		button.tab.onClick(this, this.subscreen);
+	}
+	
+	private void organizeTabs() {
+		// Tabs can pop in and out of visibility. When they do, react to it!
+		int count = 0;
+		for (MajorTabButton tab : majorTabs) {
+			if (tab.subscreen.isVisible(this, this.player)) {
+				tab.y = this.guiTop() + (count++ * POS_MAJORTAB_HEIGHT);
+			} else {
+				tab.y = -500;
+			}
+		}
+		count = 0;
+		for (MinorTabButton tab : minorTabs) {
+			if (tab.tab.isVisible(this, subscreen)) {
+				tab.x = this.guiLeft() + (count++ * POS_MINORTAB_WIDTH);
+			} else {
+				tab.x = -500;
+			}
+		}
 	}
 	
 	@Override
@@ -605,7 +642,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			tab.renderTab(gui, gui.subscreen, matrixStackIn, this.width, this.height);
 			
 			// Draw new tab if there's something new
-			if (tab.hasNewEntry()) {
+			if (tab.hasNewEntry(gui, gui.subscreen)) {
 				Minecraft.getInstance().getTextureManager().bindTexture(RES_BASE);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						TEX_MINORTAB_NEW_HOFFSET, TEX_MINORTAB_NEW_VOFFSET, TEX_MINORTAB_NEW_WIDTH, TEX_MINORTAB_NEW_HEIGHT,

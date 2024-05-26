@@ -12,6 +12,8 @@ public interface IMirrorMinorTab {
 	
 	public void renderTab(IMirrorScreen parent, IMirrorSubscreen subscreen, MatrixStack matrixStackIn, int width, int height);
 	
-	public boolean hasNewEntry();
+	public boolean hasNewEntry(IMirrorScreen parent, IMirrorSubscreen subscreen);
+	
+	public boolean isVisible(IMirrorScreen parent, IMirrorSubscreen subscreen);
 	
 }

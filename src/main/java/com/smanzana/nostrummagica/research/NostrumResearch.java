@@ -23,8 +23,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Represents a piece of research a player can complete.
@@ -493,11 +491,6 @@ public class NostrumResearch {
 		 */
 		private final @Nonnull ItemStack icon;
 		
-		/**
-		 * Client-only. Whether a new research event has happened on this tab.
-		 */
-		private boolean hasNew;
-		
 		public NostrumResearchTab(String key, @Nonnull ItemStack icon) {
 			this.key = key;
 			this.icon = icon;
@@ -515,21 +508,6 @@ public class NostrumResearch {
 		
 		public String getNameKey() {
 			return "research.tab." + key + ".name";
-		}
-		
-		@OnlyIn(Dist.CLIENT)
-		public void markHasNew() {
-			hasNew = true;
-		}
-		
-		@OnlyIn(Dist.CLIENT)
-		public void clearNew() {
-			hasNew = false;
-		}
-		
-		@OnlyIn(Dist.CLIENT)
-		public boolean hasNew() {
-			return hasNew;
 		}
 		
 		public static NostrumResearchTab MAGICA = null;

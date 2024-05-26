@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.mirror;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,10 +61,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	private static final ResourceLocation RES_ICONS = NostrumMagica.Loc("textures/gui/mirror_research.png");
 	private static final ResourceLocation RES_BACK = NostrumMagica.Loc("textures/gui/mirror_back_research.png");
 	
-	private static Set<NostrumResearch> newResearch = null;
 	private static Set<NostrumResearch> seenResearch = null;
-	
-	private static NostrumResearchTab currentTab = NostrumResearchTab.MAGICA;
 	
 	private final ITextComponent name;
 	private final ItemStack icon;
@@ -97,6 +96,11 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	public ItemStack getIcon() {
 		return icon;
 	}
+	
+	@Override
+	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+		return true;
+	}
 
 	@Override
 	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
@@ -114,20 +118,17 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		// Add buttons that show up on the research screen.
 		// We discover which tabs to display at the same time.
-		Set<NostrumResearchTab> visibleTabs = new HashSet<>();
+		Map<NostrumResearchTab, List<NostrumResearch>> tabs = new HashMap<>();
 		boolean firstTime = false;
 		
 		// Set up seen research if this is our first time through
 		if (seenResearch == null) {
 			seenResearch = new HashSet<>();
-			newResearch = new HashSet<>();
 			firstTime = true;
 		}
 		
 		final Rectangle2d bounds = new Rectangle2d(guiLeft, guiTop, width, height);
 		for (NostrumResearch research: NostrumResearch.AllResearch()) {
-			visibleTabs.add(research.getTab());
-			
 			final int buttonCenterX = guiLeft + (width/2) + (research.getX() * GRID_SCALE);
 			final int buttonCenterY = guiTop + (height/2) + (research.getY() * GRID_SCALE);
 			final int buttonWidth = WidthForSize(research.getSize());
@@ -140,33 +141,26 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 					);
 			button.setBounds(bounds);
 			
-			if (!seenResearch.contains(research)) {
-				// play animation
-				button.startAnim();
-				seenResearch.add(research);
-			}
 			//parent.addWidget(button); Wait to add till after tabs
 			researchButtons.put(research, button);
 			
+			if (!tabs.containsKey(research.getTab())) {
+				tabs.put(research.getTab(), new ArrayList<>(32));
+			}
+			tabs.get(research.getTab()).add(research);
+			
 			// If actually visible, update new counts
 			if (!button.isHidden()) {
+				
+				// If it's the first time through, pretend we've already seen it since presumably
+				// it's unlocked from a previous time unlocking stuff in the mirror.
 				if (firstTime) {
 					seenResearch.add(research);
-					newResearch.add(research);
 				}
-				
-				if (research.getTab() != currentTab) {
-					if (!newResearch.contains(research)) {
-						research.getTab().markHasNew();
-						newResearch.add(research);
-					}
-				}
-				
-				newResearch.add(research);
 			}
 		}
 		
-		List<NostrumResearchTab> tabList = Lists.newArrayList(visibleTabs);
+		List<NostrumResearchTab> tabList = Lists.newArrayList(tabs.keySet());
 		Collections.sort(tabList, (l, r) -> {
 			if (l == NostrumResearchTab.MAGICA) {
 				return -1;
@@ -178,6 +172,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		});
 		for (NostrumResearchTab tab : tabList) {
 			ResearchMirrorTab mirrorTab = mirrorTabs.get(tab);
+			mirrorTab.setChildren(tabs.get(tab));
 			parent.addMinorTab(mirrorTab); // Has the side effect of setting this.activeTab
 		}
 		
@@ -287,7 +282,6 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	
 	protected void onButtonResearchTab(NostrumResearchTab tab) {
 		this.activeTab = tab;
-		tab.clearNew();
 		
 		this.resetPan();
 	}
@@ -337,6 +331,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		private ResearchState state;
 		private long animStartMS;
+		private boolean wasHidden;
 		
 		public ResearchButton(MirrorResearchSubscreen subscreen, NostrumResearch research, int x, int y, int width, int height) {
 			super(x, y, width, height, StringTextComponent.EMPTY);
@@ -344,6 +339,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			this.research = research;
 			this.tooltip = genTooltip();
 			updateResearchState();
+			wasHidden = this.isHidden();
 		}
 		
 		protected void updateResearchState() {
@@ -356,7 +352,11 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		protected boolean isHidden() {
-			return this.research.getTab() != subscreen.activeTab || !NostrumMagica.getResearchVisible(subscreen.player, research);
+			return !NostrumMagica.getResearchVisible(subscreen.player, research);
+		}
+		
+		protected boolean shouldShow() {
+			return this.research.getTab() == subscreen.activeTab && !isHidden();
 		}
 		
 		public void startAnim() {
@@ -523,7 +523,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			updateResearchState();
 			
-			if (!this.isHidden()) {
+			if (this.shouldShow()) {
+				if (this.wasHidden != this.isHidden()) {
+					this.startAnim();
+					this.wasHidden = isHidden();
+				}
+				
 				RenderSystem.enableDepthTest();
 				matrixStackIn.push();
 				matrixStackIn.translate(0, 0, .1);
@@ -621,7 +626,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		@Override
 		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-			if (!isHidden() && this.visible && isHovered()) {
+			if (shouldShow() && this.visible && isHovered()) {
 				final Minecraft mc = Minecraft.getInstance();
 				final FontRenderer font = mc.fontRenderer;
 		        matrixStackIn.push();
@@ -634,7 +639,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (!this.isHidden()) {
+			if (shouldShow()) {
 				return super.mouseClicked(mouseX, mouseY, button);
 			}
 			
@@ -718,15 +723,28 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		protected final NostrumResearchTab tab;
 		private final ITextComponent name;
+		private final List<NostrumResearch> children;
+		
+		private boolean hasNew;
 		
 		public ResearchMirrorTab(MirrorResearchSubscreen subscreen, NostrumResearchTab tab) {
 			this.tab = tab;
 			this.name = new TranslationTextComponent(tab.getNameKey());
+			this.children = new ArrayList<>(32);
+			hasNew = false;
 		}
 
 		@Override
-		public void onClick(IMirrorScreen parent, IMirrorSubscreen subscreen) {
-			((MirrorResearchSubscreen) subscreen).onButtonResearchTab(this.tab);
+		public void onClick(IMirrorScreen parent, IMirrorSubscreen subscreenIn) {
+			MirrorResearchSubscreen subscreen = ((MirrorResearchSubscreen) subscreenIn);
+			subscreen.onButtonResearchTab(this.tab);
+			hasNew = false;
+			
+			for (NostrumResearch child : children) {
+				if (!subscreen.researchButtons.get(child).isHidden()) {
+					MirrorResearchSubscreen.seenResearch.add(child);
+				}
+			}
 		}
 
 		@Override
@@ -740,8 +758,48 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		}
 
 		@Override
-		public boolean hasNewEntry() {
-			return tab.hasNew();
+		public boolean hasNewEntry(IMirrorScreen parent, IMirrorSubscreen subscreenIn) {
+			MirrorResearchSubscreen subscreen = ((MirrorResearchSubscreen) subscreenIn);
+			
+			if (subscreen.activeTab == this.tab) {
+				hasNew = false;
+				for (NostrumResearch child : children) {
+					if (!subscreen.researchButtons.get(child).isHidden()) {
+						MirrorResearchSubscreen.seenResearch.add(child);
+					}
+				}
+				return false;
+			}
+			
+			if (hasNew) {
+				return true;
+			}
+			
+			// Scan
+			for (NostrumResearch child : children) {
+				if (!subscreen.researchButtons.get(child).isHidden()
+						&& !MirrorResearchSubscreen.seenResearch.contains(child)) {
+					hasNew = true;
+					break;
+				}
+			}
+			return hasNew;
+		}
+
+		@Override
+		public boolean isVisible(IMirrorScreen parent, IMirrorSubscreen subscreenIn) {
+			MirrorResearchSubscreen subscreen = (MirrorResearchSubscreen) subscreenIn;
+			for (NostrumResearch child : children) {
+				if (NostrumMagica.getResearchVisible(subscreen.player, child)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public void setChildren(Collection<NostrumResearch> children) {
+			this.children.clear();
+			this.children.addAll(children);
 		}
 	}
 	
@@ -815,7 +873,6 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	
 	public static void ResetSeenCache() {
 		seenResearch = null;
-		newResearch = null;
 	}
 
 }

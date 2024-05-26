@@ -11,6 +11,8 @@ public interface IMirrorSubscreen {
 	public ITextComponent getName();
 	
 	public ItemStack getIcon();
+	
+	public boolean isVisible(IMirrorScreen parent, PlayerEntity player);
 
 	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop);
 	
