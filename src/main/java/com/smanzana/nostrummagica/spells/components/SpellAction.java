@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attributes.NostrumAttributes;
 import com.smanzana.nostrummagica.blocks.Candle;
@@ -54,6 +55,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.EndermanEntity;
@@ -61,6 +65,7 @@ import net.minecraft.entity.monster.EndermiteEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BoneMealItem;
@@ -2094,6 +2099,27 @@ public class SpellAction {
 		return new SpellActionProperties(this);
 	}
 	
+	protected static final float getPhysicalAttributeBonus(LivingEntity caster) {
+		// Get raw amount
+		double amt = caster.getAttributeValue(Attributes.ATTACK_DAMAGE);
+		amt -= 1; // Players always have +1 attack
+		
+		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
+		ItemStack held = caster.getHeldItemMainhand();
+		if (!held.isEmpty()) {
+			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
+			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
+				double extra = 0;
+				for (AttributeModifier mod : heldAttribs.get(Attributes.ATTACK_DAMAGE)) {
+					extra += mod.getAmount();
+				}
+				amt -= extra;
+			}
+		}
+		
+		return (float) amt;
+	}
+	
 	public static final float calcDamage(LivingEntity caster, LivingEntity target, float base, EMagicElement element) {
 		float amt = 0f;
 		
@@ -2112,9 +2138,10 @@ public class SpellAction {
 		}
 		
 		if (element == EMagicElement.PHYSICAL) {
+			base += getPhysicalAttributeBonus(target);
 			base = applyArmor(target, base);
 			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
-			// It still gains power from magic boost (above) AND is still reduces with magic reduction (below).
+			// It still gains power from magic boost (above) AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).
 		} else {
 		
 			final int armor = target.getTotalArmorValue();
