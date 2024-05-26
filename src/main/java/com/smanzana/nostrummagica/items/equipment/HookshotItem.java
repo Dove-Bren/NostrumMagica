@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.Entities;
 

@@ -21,7 +21,7 @@ import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
 import com.smanzana.nostrummagica.tiles.MysticSpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;

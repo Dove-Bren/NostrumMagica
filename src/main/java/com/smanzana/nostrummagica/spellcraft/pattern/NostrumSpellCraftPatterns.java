@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spellcraft.modifier.FlatSpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
 
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

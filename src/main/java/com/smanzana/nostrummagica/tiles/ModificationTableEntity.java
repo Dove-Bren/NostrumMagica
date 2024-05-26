@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.items.SpellTomePage;
 import com.smanzana.nostrummagica.items.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.items.equipment.WarlockSword;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.block.BlockState;
@@ -201,7 +201,7 @@ public class ModificationTableEntity extends TileEntity implements IInventory {
 			}
 		} else if (stack.getItem() instanceof SpellRune) {
 			this.setInventorySlotContents(1, ItemStack.EMPTY);
-			SpellRune.setPieceParam(stack, new SpellPartProperties(valF, valB));
+			SpellRune.setPieceParam(stack, new SpellShapePartProperties(valF, valB));
 		} else if (stack.getItem() instanceof SpellScroll) {
 			Spell spell = SpellScroll.getSpell(stack);
 			if (spell != null) {

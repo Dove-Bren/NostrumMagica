@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
 
 public class SpellPartBuilder {
 

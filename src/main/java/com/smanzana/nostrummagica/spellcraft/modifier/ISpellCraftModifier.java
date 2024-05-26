@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellPartBuilder;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
 
 import net.minecraft.util.text.ITextComponent;
 

@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.SpellCharacteristics;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 
@@ -20,6 +19,9 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
  * Area that is hit in a spell
@@ -30,7 +32,7 @@ public abstract class SpellShape {
 	
 	private static Map<String, SpellShape> registry = new HashMap<>();
 	
-	public static void register(SpellShape shape) {
+	protected static void register(SpellShape shape) {
 		registry.put(shape.getShapeKey(), shape);
 	}
 	
@@ -44,6 +46,28 @@ public abstract class SpellShape {
 	
 	public static Collection<SpellShape> getAllShapes() {
 		return registry.values();
+	}
+	
+	public static void fireRegisterEvent() {
+		FMLJavaModLoadingContext.get().getModEventBus().post(new RegisterSpellShapeEvent(SpellShape::register));
+	}
+	
+	public static final class RegisterSpellShapeEvent extends Event implements IModBusEvent {
+		
+		public static interface ISpellShapeRegistry {
+			public void register(SpellShape shape);
+		}
+		
+		protected final ISpellShapeRegistry registry;
+		
+		protected RegisterSpellShapeEvent(ISpellShapeRegistry registry) {
+			this.registry = registry;
+		}
+		
+		public ISpellShapeRegistry getRegistry() {
+			return this.registry;
+		}
+		
 	}
 	
 	public static abstract class SpellShapeInstance {
@@ -188,6 +212,12 @@ public abstract class SpellShape {
 	public abstract NonNullList<ItemStack> getReagents();
 	
 	/**
+	 * Get the item used in the crafting recipe for a spell rune of this shape
+	 * @return
+	 */
+	public abstract ItemStack getCraftItem();
+	
+	/**
 	 * Whether this shape supports a boolean switch in its SpellPartParam
 	 * @return
 	 */
@@ -218,6 +248,12 @@ public abstract class SpellShape {
 	 * Display name for the float option. Should be translated already
 	 */
 	public abstract String supportedFloatName();
+	
+	/**
+	 * How much using this shape should cost
+	 * @return
+	 */
+	public abstract int getManaCost();
 	
 	/**
 	 * Return the weight cost of this shape. Should be 0+.

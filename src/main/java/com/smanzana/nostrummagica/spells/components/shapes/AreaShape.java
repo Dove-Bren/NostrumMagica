@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,8 +8,8 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -22,9 +22,9 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public abstract class TriggerAreaTrigger extends SpellTrigger {
+public abstract class AreaShape extends SpellShape {
 	
-	public abstract class TriggerAreaTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
+	public abstract class AreaShapeInstance extends SpellShape.SpellShapeInstance implements IGenericListener {
 		
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
@@ -43,7 +43,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		private boolean dead;
 		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
-		public TriggerAreaTriggerInstance(SpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround) {
+		public AreaShapeInstance(SpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -62,9 +62,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 		protected abstract boolean isInArea(World world, BlockPos pos);
 		
 		@Override
-		public void init(LivingEntity caster) {
-			// We are instant! Whoo!
-			
+		public void spawn(LivingEntity caster) {
 			NostrumMagica.playerListener.registerProximity(this, world, pos, radiusHint);
 			
 			// Register timer for life and for effects
@@ -96,7 +94,6 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 					}
 					TriggerData data = new TriggerData(
 							null,
-							null,
 							world,
 							list
 							);
@@ -118,7 +115,6 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 				if (visitEntity(entity)) {
 					TriggerData data = new TriggerData(
 							Lists.newArrayList(entity),
-							Lists.newArrayList(this.getState().getSelf()),
 							null,
 							null
 							);
@@ -153,7 +149,7 @@ public abstract class TriggerAreaTrigger extends SpellTrigger {
 	}
 
 	
-	protected TriggerAreaTrigger(String key) {
+	protected AreaShape(String key) {
 		super(key);
 	}
 }

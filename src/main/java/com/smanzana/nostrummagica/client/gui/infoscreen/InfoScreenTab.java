@@ -21,8 +21,8 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;

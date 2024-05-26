@@ -10,8 +10,8 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

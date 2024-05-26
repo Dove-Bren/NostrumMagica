@@ -1,86 +1,79 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class AoEShape extends LegacySpellShape {
+public class BurstShape extends InstantShape {
 
-	private static final String SHAPE_KEY = "aoe";
-	private static AoEShape instance = null;
+	private static final String ID = "aoe";
 	
-	public static AoEShape instance() {
-		if (instance == null)
-			instance = new AoEShape();
-		
-		return instance;
+	protected BurstShape(String id) {
+		super(id);
 	}
 	
-	private AoEShape() {
-		super(SHAPE_KEY);
+	public BurstShape() {
+		this(ID);
 	}
-
+	
 	@Override
-	protected List<LivingEntity> getTargets(SpellPartProperties param, LivingEntity target, World world, BlockPos pos) {
-		List<LivingEntity> ret = new LinkedList<>();
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+		List<LivingEntity> ret = new ArrayList<>();
 		
-		double radius = Math.max(supportedFloats()[0], (double) param.level) + .5;
+		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + .5;
 		final boolean ignoreAllies = param.flip;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
-				new AxisAlignedBB(pos.getX() - radius,
-							pos.getY() - radius,
-							pos.getZ() - radius,
-							pos.getX() + radius,
-							pos.getY() + radius,
-							pos.getZ() + radius))) {
+				new AxisAlignedBB(pos.getX() - radiusEnts,
+							pos.getY() - radiusEnts,
+							pos.getZ() - radiusEnts,
+							pos.getX() + radiusEnts,
+							pos.getY() + radiusEnts,
+							pos.getZ() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
-			if (living != null && (!ignoreAllies || (target != null && !NostrumMagica.IsSameTeam(target, living))))
-				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(pos.getX(), pos.getY(), pos.getZ()))) <= radius)
+			if (living != null && (!ignoreAllies || (state.getCaster() != null && !NostrumMagica.IsSameTeam(state.getCaster(), living))))
+				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(pos.getX(), pos.getY(), pos.getZ()))) <= radiusEnts)
 					ret.add(living);
 		}
 		
-		return ret;
-	}
-
-	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartProperties param, LivingEntity target, World world,
-			BlockPos pos) {
-		List<BlockPos> list = new LinkedList<>();
+		List<BlockPos> list = new ArrayList<>();
 		
-		final int radius = Math.round(Math.abs(Math.max(2.0f, param.level)));
+		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level)));
 		
-		if (radius == 0) {
-			list.add(pos);
+		final BlockPos center = new BlockPos(pos);
+		if (radiusBlocks == 0) {
+			list.add(center);
 		} else {
-			for (int i = -radius; i <= radius; i++) {
+			for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
 				// x loop. I is offset of x
-				int innerRadius = radius - Math.abs(i);
+				int innerRadius = radiusBlocks - Math.abs(i);
 				for (int j = -innerRadius; j <= innerRadius; j++) {
 					int yRadius = innerRadius - Math.abs(j);
 					// 0 means just that cell. Otherwise, +- n
 					if (yRadius == 0) {
-						list.add(pos.add(i, j, 0));
+						list.add(center.add(i, j, 0));
 					} else {
 						for (int k = -yRadius; k <= yRadius; k++) {
-							list.add(pos.add(i, j, k));
+							list.add(center.add(i, j, k));
 						}
 					}
 				}
@@ -88,7 +81,7 @@ public class AoEShape extends LegacySpellShape {
 			}
 		}
 		
-		return list;
+		return new TriggerData(ret, world, list);
 	}
 
 	@Override
@@ -103,7 +96,7 @@ public class AoEShape extends LegacySpellShape {
 
 	@Override
 	public String getDisplayName() {
-		return "Area of Effect";
+		return "Burst";
 	}
 
 	@Override
@@ -142,7 +135,22 @@ public class AoEShape extends LegacySpellShape {
 	
 	@Override
 	public int getWeight() {
-		return 0;
+		return 1;
 	}
-	
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.TNT);
+	}
+
+	@Override
+	public int getManaCost() {
+		return 40;
+	}
+
+	@Override
+	public boolean shouldTrace(SpellShapePartProperties params) {
+		return false;
+	}
+
 }

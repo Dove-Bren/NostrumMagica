@@ -3,15 +3,15 @@ package com.smanzana.nostrummagica.spells.components.shapes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -20,39 +20,33 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class ChainShape extends LegacySpellShape {
+public class ChainShape extends InstantShape {
 
-	private static final String SHAPE_KEY = "chain";
-	private static ChainShape instance = null;
+	private static final String ID = "chain";
 	
-	public static ChainShape instance() {
-		if (instance == null)
-			instance = new ChainShape();
-		
-		return instance;
+	protected ChainShape(String id) {
+		super(id);
 	}
 	
-	private ChainShape() {
-		super(SHAPE_KEY);
+	public ChainShape() {
+		this(ID);
 	}
 	
 	@Override
-	protected List<LivingEntity> getTargets(SpellPartProperties param, LivingEntity target, World world, BlockPos pos) {
-		List<LivingEntity> ret = new LinkedList<>();
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		List<LivingEntity> ret = new ArrayList<>();
 		
-		if (target == null) {
-			return ret;
-		}
+		LivingEntity target = state.getSelf();
 		
 		double radius = 7.0;
 		if (world == null)
 			world = target.world;
 		
-		int arc = Math.max((int) supportedFloats()[0], (int) param.level) + 1; // +1 to include center
-		final boolean teamLock = param.flip;
+		int arc = Math.max((int) supportedFloats()[0], (int) params.level) + 1; // +1 to include center
+		final boolean teamLock = params.flip;
 		
 		final Set<Entity> seen = new HashSet<>();
 		final List<LivingEntity> next = new ArrayList<>(arc * 2);
@@ -117,17 +111,7 @@ public class ChainShape extends LegacySpellShape {
 			}
 		}
 		
-		return ret;
-	}
-
-	@Override
-	protected List<BlockPos> getTargetLocations(SpellPartProperties param, LivingEntity target, World world,
-			BlockPos pos) {
-		List<BlockPos> list = new LinkedList<>();
-		
-		list.add(pos);
-		
-		return list;
+		return new TriggerData(ret, world, null);
 	}
 
 	@Override
@@ -181,7 +165,22 @@ public class ChainShape extends LegacySpellShape {
 	
 	@Override
 	public int getWeight() {
-		return 0;
+		return 1;
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.QUARTZ);
+	}
+
+	@Override
+	public int getManaCost() {
+		return 35;
+	}
+
+	@Override
+	public boolean shouldTrace(SpellShapePartProperties params) {
+		return false;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -7,8 +7,9 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -19,26 +20,29 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Lazy;
 
-public class FieldTrigger extends TriggerAreaTrigger {
+public class FieldShape extends AreaShape {
 	
-	public class FieldTriggerInstance extends TriggerAreaTrigger.TriggerAreaTriggerInstance {
+	public class FieldShapeInstance extends AreaShape.AreaShapeInstance {
 		
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 10) / TICK_RATE; // 20 seconds
 
-		private Vector3d origin;
-		private float radius;
+		private final Vector3d origin;
+		private final float radius;
+		private final SpellCharacteristics characteristics;
 		
-		public FieldTriggerInstance(SpellState state, World world, Vector3d pos, float radius, boolean continuous) {
-			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, true);
+		public FieldShapeInstance(SpellState state, World world, Vector3d pos, float radius, boolean continuous, SpellCharacteristics characteristics) {
+			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, true, characteristics);
 			this.radius = radius;
 			this.origin = pos;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
-			super.init(caster); // Inits listening and stuff
+		public void spawn(LivingEntity caster) {
+			super.spawn(caster); // Inits listening and stuff
 		}
 		
 		@Override
@@ -57,25 +61,6 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		@Override
 		protected void doEffect() {
 			for (int i = 0; i < radius/2 + 1; i++) {
-//				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-//						2,
-//						origin.x,
-//						origin.y, // technically correct but visually sucky cause 50% will be underground
-//						origin.z,
-//						radius,
-//						20, 0, // lifetime + jitter
-//						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
-//						).color(getState().getNextElement().getColor()));
-//				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
-//						2,
-//						origin.x,
-//						origin.y, // technically correct but visually sucky cause 50% will be underground
-//						origin.z,
-//						radius,
-//						20, 0, // lifetime + jitter
-//						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
-//						).color(getState().getNextElement().getColor()));
-				
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
 						origin.x,
@@ -84,7 +69,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 						0,
 						60, 10, // lifetime + jitter
 						origin
-						).color(getState().getNextElement().getColor())
+						).color(characteristics.getElement().getColor())
 						.setTargetBehavior(TargetBehavior.ORBIT)
 						.setOrbitRadius(((NostrumMagica.rand.nextFloat() * .5f) + .5f) * radius));
 			}
@@ -98,7 +83,7 @@ public class FieldTrigger extends TriggerAreaTrigger {
 					0,
 					60, 10, // lifetime + jitter
 					origin
-					).color(getState().getNextElement().getColor())
+					).color(characteristics.getElement().getColor())
 					.setTargetBehavior(TargetBehavior.ORBIT)
 					.setOrbitRadius(radius));
 			
@@ -122,37 +107,27 @@ public class FieldTrigger extends TriggerAreaTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "field";
-	private static FieldTrigger instance = null;
+	private static String ID = "field";
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
+			ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
 	
-	public static FieldTrigger instance() {
-		if (instance == null)
-			instance = new FieldTrigger();
-		
-		return instance;
+	protected FieldShape(String key) {
+		super(key);
 	}
 	
-	private FieldTrigger() {
-		super(TRIGGER_KEY);
-	}
-	
-	@Override
-	public int getManaCost() {
-		return 100;
+	public FieldShape() {
+		this(ID);
 	}
 
 	@Override
-	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
-				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
-				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
+	public String getDisplayName() {
+		return "Field";
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
-		
+	public FieldShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
+			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		// Blindly guess if trigger put us in a wall but above us isn't that t he player
 		// wants us up one
 		BlockPos blockPos = new BlockPos(pos);
@@ -160,13 +135,13 @@ public class FieldTrigger extends TriggerAreaTrigger {
 			pos = pos.add(0, 1, 0);
 		}
 		
-		return new FieldTriggerInstance(state, world, pos,
-				Math.max(supportedFloats()[0], params.level), !params.flip);
+		return new FieldShapeInstance(state, world, pos,
+				Math.max(supportedFloats()[0], properties.level), !properties.flip, characteristics);
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Field";
+	public NonNullList<ItemStack> getReagents() {
+		return REAGENTS.get();
 	}
 
 	@Override
@@ -182,6 +157,16 @@ public class FieldTrigger extends TriggerAreaTrigger {
 	@Override
 	public float[] supportedFloats() {
 		return new float[] {1.5f, 2f, 2.5f, 3f, 4f};
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return I18n.format("modification.field.bool.name", (Object[]) null);
+	}
+
+	@Override
+	public String supportedFloatName() {
+		return I18n.format("modification.field.float.name", (Object[]) null);
 	}
 
 	public static NonNullList<ItemStack> costs = null;
@@ -200,22 +185,18 @@ public class FieldTrigger extends TriggerAreaTrigger {
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.field.bool.name", (Object[]) null);
+	public int getManaCost() {
+		return 100;
 	}
 
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.field.float.name", (Object[]) null);
-	}
-	
 	@Override
 	public int getWeight() {
 		return 2;
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+
 }

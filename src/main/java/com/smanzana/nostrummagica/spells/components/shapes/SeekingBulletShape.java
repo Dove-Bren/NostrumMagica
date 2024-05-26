@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
@@ -35,33 +35,35 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class SeekingBulletTrigger extends SpellTrigger {
+public class SeekingBulletShape extends SpellShape {
 	
 	public static final float MAX_DIST = 30f;
 	
-	public class SeekingBulletTriggerInstance extends SpellTrigger.SpellTriggerInstance {
+	public class SeekingBulletShapeInstance extends SpellShape.SpellShapeInstance {
 
-		private World world;
-		private Vector3d pos;
+		private final World world;
+		private final Vector3d pos;
 		
 		// Just initial parameters for setup
-		private float pitch;
-		private float yaw;
+		private final float pitch;
+		private final float yaw;
 		private final boolean ignoreAllies;
+		private final SpellCharacteristics characteristics;
 		
 		private LivingEntity target;
 		
-		public SeekingBulletTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean ignoreAllies) {
+		public SeekingBulletShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean ignoreAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
 			this.ignoreAllies = ignoreAllies;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vector3d dir;
@@ -71,10 +73,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 				dir = null;
 			} else {
 				target = null; // Solve for target on main thread with raytrace
-				dir = SeekingBulletTrigger.getVectorForRotation(pitch, yaw);
+				dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 			}
 			
-			final SeekingBulletTriggerInstance self = this;
+			final SeekingBulletShapeInstance self = this;
 			
 			caster.getServer().runAsync(new Runnable() {
 
@@ -162,7 +164,7 @@ public class SeekingBulletTrigger extends SpellTrigger {
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, Lists.newArrayList(getState().getOther()), world, Lists.newArrayList(pos));
+			getState().trigger(null, world, Lists.newArrayList(pos));
 		}
 		
 		public void onProjectileHit(Entity entity) {
@@ -172,28 +174,20 @@ public class SeekingBulletTrigger extends SpellTrigger {
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
 			}
 		}
 		
 		public EMagicElement getElement() {
 			// Return element on next shape
-			return getState().getNextElement();
+			return this.characteristics.getElement();
 		}
 	}
 
-	private static final String TRIGGER_KEY = "bullet";
-	private static SeekingBulletTrigger instance = null;
+	private static final String ID = "bullet";
 	
-	public static SeekingBulletTrigger instance() {
-		if (instance == null)
-			instance = new SeekingBulletTrigger();
-		
-		return instance;
-	}
-	
-	private SeekingBulletTrigger() {
-		super(TRIGGER_KEY);
+	public SeekingBulletShape() {
+		super(ID);
 	}
 
 	@Override
@@ -202,10 +196,10 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartProperties params) {
+	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new SeekingBulletTriggerInstance(state, world, pos, pitch, yaw, params.flip);
+		return new SeekingBulletShapeInstance(state, world, pos, pitch, yaw, params.flip, characteristics);
 	}
 
 	// Copied from vanilla entity class
@@ -268,12 +262,12 @@ public class SeekingBulletTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellPartProperties params) {
+	public double getTraceRange(SpellShapePartProperties params) {
 		return MAX_DIST;
 	}
 	

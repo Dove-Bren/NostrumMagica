@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +13,10 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -29,52 +29,51 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Lazy;
 
-public class FoodTrigger extends SpellTrigger {
-	
-	public class FoodTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
+/**
+ * Shape that waits until an entities health reaches a certain level.
+ * @author Skyler
+ *
+ */
+public class OnHealthShape extends SpellShape {
 
-		private int amount;
+	public static class HealthShapeInstance extends SpellShapeInstance implements IGenericListener {
+
+		private float amount;
 		private boolean onHigh;
 		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
 		
-		public FoodTriggerInstance(SpellState state, LivingEntity entity, int amount, boolean higher, int duration) {
+		public HealthShapeInstance(SpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellCharacteristics characteristics) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
 			this.entity = entity;
 			this.duration = duration;
 			
-			if (this.amount <= 0)
-				this.amount = 10;
+			if (this.amount <= 0f)
+				this.amount = .5f;
 			if (this.duration <= 0)
 				this.duration = 20;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
-			if (entity instanceof PlayerEntity) {
-				NostrumMagica.playerListener.registerFood(this, (PlayerEntity) entity, amount, onHigh);
-				NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
-			} else {
-				NostrumMagica.playerListener.registerTimer(this, 20, 0);
-			}
-			
+		public void spawn(LivingEntity caster) {
+			NostrumMagica.playerListener.registerHealth(this, entity, amount, onHigh);
+			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
 			if (SetTrigger(entity, this)) {
-				NostrumMagica.magicEffectProxy.applyOnFoodEffect(entity, entity.ticksExisted, 20 * duration);
+				NostrumMagica.magicEffectProxy.applyOnHealthEffect(entity, entity.ticksExisted, 20 * duration);
 			}
-			
 		}
-
+		
 		@Override
 		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
-			if (type == Event.FOOD || (type == Event.TIME && !(this.entity instanceof PlayerEntity))) {
+			if (type == Event.HEALTH) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
-							Lists.newArrayList(this.getState().getSelf()),
 							Lists.newArrayList(this.getState().getSelf()),
 							null,
 							null
@@ -83,9 +82,9 @@ public class FoodTrigger extends SpellTrigger {
 					this.entity.world.getServer().runAsync(() -> {
 						this.trigger(data);
 						NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
-								new SpellComponentWrapper(instance()),
+								new SpellComponentWrapper(NostrumSpellShapes.OnHealth),
 								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
-						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
 					});
 					expired = true;
 				}
@@ -95,7 +94,7 @@ public class FoodTrigger extends SpellTrigger {
 					if (this.entity instanceof PlayerEntity) {
 						PlayerEntity player = (PlayerEntity) this.entity;
 						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"), Util.DUMMY_UUID);
-						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
+						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
 					}
 				}
 			}
@@ -103,58 +102,48 @@ public class FoodTrigger extends SpellTrigger {
 			return true;
 		}
 	}
-
-	private static final String TRIGGER_KEY = "food";
-	private static FoodTrigger instance = null;
 	
-	public static FoodTrigger instance() {
-		if (instance == null)
-			instance = new FoodTrigger();
-		
-		return instance;
-	}
+	private static final Map<UUID, HealthShapeInstance> ActiveMap = new HashMap<>();
 	
-	private static final Map<UUID, FoodTriggerInstance> ActiveMap = new HashMap<>();
-	
-	private static final boolean SetTrigger(LivingEntity entity, @Nullable FoodTriggerInstance trigger) {
-		FoodTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+	private static final boolean SetTrigger(LivingEntity entity, @Nullable HealthShapeInstance trigger) {
+		HealthShapeInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;
 		}
 		return existing == null || existing != trigger;
 	}
 	
-	private FoodTrigger() {
-		super(TRIGGER_KEY);
+	private static final String ID = "health";
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
+			ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
+	
+	protected OnHealthShape(String key) {
+		super(key);
+	}
+	
+	public OnHealthShape() {
+		this(ID);
 	}
 	
 	@Override
-	public int getManaCost() {
-		return 20;
+	public HealthShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new HealthShapeInstance(state, state.getCaster(),
+				Math.max((int) supportedFloats()[0], (int) params.level), params.flip, 300, characteristics);
+	}
+	
+	@Override
+	public String getDisplayName() {
+		return "Health Level";
 	}
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.GINSENG, 1),
-				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
-	}
-
-	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
-		return new FoodTriggerInstance(state, state.getCaster(),
-				Math.max((int) supportedFloats()[0], (int) params.level), params.flip, 300);
-	}
-
-	@Override
-	public String getDisplayName() {
-		return "Food Level";
+		return REAGENTS.get();
 	}
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Items.GOLDEN_CARROT);
+		return new ItemStack(Items.GOLDEN_APPLE, 1);
 	}
 
 	@Override
@@ -188,16 +177,22 @@ public class FoodTrigger extends SpellTrigger {
 
 	@Override
 	public String supportedFloatName() {
-		return I18n.format("modification.food.name", (Object[]) null);
+		return I18n.format("modification.health.name", (Object[]) null);
 	}
-	
+
+	@Override
+	public int getManaCost() {
+		return 20;
+	}
+
 	@Override
 	public int getWeight() {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+	
 }

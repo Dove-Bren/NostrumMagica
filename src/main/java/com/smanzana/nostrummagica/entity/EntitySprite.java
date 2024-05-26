@@ -14,10 +14,10 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.TouchTrigger;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;

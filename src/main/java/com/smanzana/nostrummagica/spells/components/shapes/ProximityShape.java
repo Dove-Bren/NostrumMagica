@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -6,10 +6,10 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -20,28 +20,30 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class ProximityTrigger extends SpellTrigger {
+public class ProximityShape extends SpellShape {
 	
-	public class ProximityTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
+	public class ProximityShapeInstance extends SpellShapeInstance implements IGenericListener {
 
-		private World world;
-		private Vector3d pos;
+		private final World world;
+		private final Vector3d pos;
+		private final float range;
+		private final SpellCharacteristics characteristics;
 		private boolean set;
-		private float range;
 		private boolean dead;
 		
-		public ProximityTriggerInstance(SpellState state, World world,
-				Vector3d pos, float range) {
+		public ProximityShapeInstance(SpellState state, World world,
+				Vector3d pos, float range, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.set = false;
 			this.pos = pos;
 			this.range = range;
+			this.characteristics = characteristics;
 			dead = false;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			// We are instant! Whoo!
 			NostrumMagica.playerListener.registerTimer(this, 20, 100);
 			
@@ -54,8 +56,8 @@ public class ProximityTrigger extends SpellTrigger {
 				if (dead)
 					return true;
 				
-				NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(instance()),
-						null, null, null, this.pos, new SpellComponentWrapper(getState().getNextElement()), false, range);
+				NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(NostrumSpellShapes.Proximity),
+						null, null, null, this.pos, new SpellComponentWrapper(this.characteristics.getElement()), false, range);
 				if (!set) {
 					// Trap is now set!
 					set = true;
@@ -70,7 +72,6 @@ public class ProximityTrigger extends SpellTrigger {
 			// Else we've already been set. Just BOOM
 			TriggerData data = new TriggerData(
 					Lists.newArrayList(entity),
-					Lists.newArrayList(this.getState().getSelf()),
 					null,
 					null
 					);
@@ -80,18 +81,10 @@ public class ProximityTrigger extends SpellTrigger {
 		}
 	}
 
-	private static final String TRIGGER_KEY = "proximity";
-	private static ProximityTrigger instance = null;
+	private static final String ID = "proximity";
 	
-	public static ProximityTrigger instance() {
-		if (instance == null)
-			instance = new ProximityTrigger();
-		
-		return instance;
-	}
-	
-	private ProximityTrigger() {
-		super(TRIGGER_KEY);
+	public ProximityShape() {
+		super(ID);
 	}
 	
 	@Override
@@ -107,10 +100,10 @@ public class ProximityTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
-		return new ProximityTriggerInstance(state, world, pos,
-				Math.max(supportedFloats()[0], params.level));
+	public ProximityShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
+			SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new ProximityShapeInstance(state, world, pos,
+				Math.max(supportedFloats()[0], params.level), characteristics);
 	}
 
 	@Override
@@ -163,7 +156,7 @@ public class ProximityTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
 }

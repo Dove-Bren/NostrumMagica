@@ -17,10 +17,10 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;

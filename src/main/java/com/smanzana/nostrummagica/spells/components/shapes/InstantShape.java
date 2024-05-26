@@ -38,7 +38,7 @@ public abstract class InstantShape extends SpellShape {
 		@Override
 		public void spawn(LivingEntity caster) {
 			// We are instant! Whoo!
-			TriggerData data = shape.getTargetData(this.getState(), world, pos, pitch, yaw, this.characteristics);
+			TriggerData data = shape.getTargetData(this.getState(), world, pos, pitch, yaw, null, this.characteristics);
 			this.trigger(data);
 		}
 	}
@@ -54,12 +54,13 @@ public abstract class InstantShape extends SpellShape {
 	
 	/**
 	 * 
-	 * @param caster
 	 * @param pos
 	 * @param pitch
 	 * @param yaw
+	 * @param params TODO
+	 * @param caster
 	 * @return
 	 */
-	protected abstract TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics);
+	protected abstract TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics);
 	
 }

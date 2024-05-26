@@ -19,7 +19,7 @@ import com.smanzana.nostrummagica.items.armor.MagicArmor.Type;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.SeekingBulletTrigger;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;

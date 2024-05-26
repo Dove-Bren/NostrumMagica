@@ -11,10 +11,10 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell;
-import com.smanzana.nostrummagica.spells.LegacySpell.ICastListener;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell.ICastListener;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;

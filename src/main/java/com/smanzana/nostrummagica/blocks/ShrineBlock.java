@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
-import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
+import com.smanzana.nostrummagica.spells.components.legacy.ChainShape;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
 
 import net.minecraft.block.Block;

@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelHookShot;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.culling.ClippingHelper;

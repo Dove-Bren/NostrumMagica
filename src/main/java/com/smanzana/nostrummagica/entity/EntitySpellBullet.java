@@ -8,7 +8,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.triggers.SeekingBulletTrigger.SeekingBulletTriggerInstance;
+import com.smanzana.nostrummagica.spells.components.shapes.SeekingBulletShape.SeekingBulletShapeInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.Entity;
@@ -41,7 +41,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellBullet.class, MagicElementDataSerializer.instance);
 	
-	private SeekingBulletTriggerInstance trigger;
+	private SeekingBulletShapeInstance trigger;
 	private @Nullable Predicate<Entity> filter;
 	private LivingEntity target;
 	private LivingEntity shooter;
@@ -65,7 +65,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	}
 	
 	public EntitySpellBullet(EntityType<? extends EntitySpellBullet> type, 
-			SeekingBulletTriggerInstance self,
+			SeekingBulletShapeInstance self,
 			LivingEntity shooter,
 			LivingEntity target,
 			Direction.Axis axis) {
@@ -73,7 +73,7 @@ public class EntitySpellBullet extends ShulkerBulletEntity {
 	}
 	
 	public EntitySpellBullet(EntityType<? extends EntitySpellBullet> type, 
-			SeekingBulletTriggerInstance self,
+			SeekingBulletShapeInstance self,
 			LivingEntity shooter,
 			LivingEntity target,
 			Direction.Axis axis,

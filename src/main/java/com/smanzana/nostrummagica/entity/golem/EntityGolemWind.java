@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
-import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

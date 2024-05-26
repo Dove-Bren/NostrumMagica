@@ -13,9 +13,9 @@ import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;

@@ -112,9 +112,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.shapes.AoEShape;
-import com.smanzana.nostrummagica.spells.components.shapes.ChainShape;
-import com.smanzana.nostrummagica.spells.components.shapes.SingleShape;
+import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
+import com.smanzana.nostrummagica.spells.components.legacy.ChainShape;
+import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.trials.TrialEarth;
 import com.smanzana.nostrummagica.trials.TrialEnder;
@@ -2096,9 +2097,7 @@ public class ModInit {
 	public static void registerShapes(RegistryEvent.Register<Item> event) {
 		// Note: these are happening in the register<item> phase because they drive what items get
 		// generated!
-    	LegacySpellShape.register(SingleShape.instance());
-    	LegacySpellShape.register(AoEShape.instance());
-    	LegacySpellShape.register(ChainShape.instance());
+    	SpellShape.fireRegisterEvent();
     }
     
 	@SubscribeEvent(priority=EventPriority.HIGH)
@@ -2108,10 +2107,10 @@ public class ModInit {
     	SpellTrigger.register(SelfTrigger.instance());
     	SpellTrigger.register(TouchTrigger.instance());
     	SpellTrigger.register(AITargetTrigger.instance());
-    	SpellTrigger.register(ProjectileTrigger.instance());
+    	SpellTrigger.register(ProjectileShape.instance());
     	SpellTrigger.register(BeamTrigger.instance());
     	SpellTrigger.register(DelayTrigger.instance());
-    	SpellTrigger.register(ProximityTrigger.instance());
+    	SpellTrigger.register(ProximityShape.instance());
     	SpellTrigger.register(HealthTrigger.instance());
     	SpellTrigger.register(FoodTrigger.instance());
     	SpellTrigger.register(ManaTrigger.instance());
@@ -2119,9 +2118,9 @@ public class ModInit {
     	SpellTrigger.register(OtherTrigger.instance());
     	SpellTrigger.register(MagicCutterTrigger.instance());
     	SpellTrigger.register(MagicCyclerTrigger.instance());
-    	SpellTrigger.register(SeekingBulletTrigger.instance());
-    	SpellTrigger.register(WallTrigger.instance());
-    	SpellTrigger.register(MortarTrigger.instance());
+    	SpellTrigger.register(SeekingBulletShape.instance());
+    	SpellTrigger.register(WallShape.instance());
+    	SpellTrigger.register(MortarShape.instance());
     	SpellTrigger.register(FieldTrigger.instance());
     	SpellTrigger.register(AtFeetTrigger.instance());
     	SpellTrigger.register(AuraTrigger.instance());

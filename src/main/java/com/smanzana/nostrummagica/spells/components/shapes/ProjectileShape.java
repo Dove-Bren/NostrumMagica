@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.petcommand.api.PetFuncs;
 
@@ -20,7 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -31,18 +30,19 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class ProjectileTrigger extends SpellTrigger {
+public class ProjectileShape extends SpellShape {
 	
-	public class ProjectileTriggerInstance extends SpellTrigger.SpellTriggerInstance {
+	public class ProjectileShapeInstance extends SpellShapeInstance {
 
-		private World world;
-		private Vector3d pos;
-		private float pitch;
-		private float yaw;
-		private boolean atMax;
-		private boolean hitAllies;
+		private final World world;
+		private final Vector3d pos;
+		private final float pitch;
+		private final float yaw;
+		private final boolean atMax;
+		private final boolean hitAllies;
+		private final SpellCharacteristics characteristics;
 		
-		public ProjectileTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean atMax, boolean hitAllies) {
+		public ProjectileShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean atMax, boolean hitAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -50,10 +50,11 @@ public class ProjectileTrigger extends SpellTrigger {
 			this.yaw = yaw;
 			this.atMax = atMax;
 			this.hitAllies = hitAllies;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vector3d dir;
@@ -62,16 +63,14 @@ public class ProjectileTrigger extends SpellTrigger {
 				dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
 						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
 			} else {
-				dir = ProjectileTrigger.getVectorForRotation(pitch, yaw);
+				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
-			
-			final ProjectileTriggerInstance self = this;
 			
 			caster.getServer().runAsync(new Runnable() {
 
 				@Override
 				public void run() {
-					EntitySpellProjectile projectile = new EntitySpellProjectile(self,
+					EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
 							getState().getSelf(),
 							world,
 							pos.x, pos.y, pos.z,
@@ -112,7 +111,7 @@ public class ProjectileTrigger extends SpellTrigger {
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, Lists.newArrayList(getState().getOther()), world, Lists.newArrayList(pos));
+			getState().trigger(null, world, Lists.newArrayList(pos));
 		}
 		
 		public void onProjectileHit(Entity entity) {
@@ -122,7 +121,7 @@ public class ProjectileTrigger extends SpellTrigger {
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
 			}
 		}
 		
@@ -135,25 +134,16 @@ public class ProjectileTrigger extends SpellTrigger {
 		
 		public EMagicElement getElement() {
 			// Return element on next shape
-			return getState().getNextElement();
+			return this.characteristics.getElement();
 		}
 	}
 
-	private static final String TRIGGER_KEY = "projectile";
-	private static ProjectileTrigger instance = null;
-	
-	public static ProjectileTrigger instance() {
-		if (instance == null)
-			instance = new ProjectileTrigger();
-		
-		return instance;
-	}
-	
-	private ProjectileTrigger() {
-		super(TRIGGER_KEY);
-	}
-
+	private static final String ID = "projectile";
 	private static final double PROJECTILE_RANGE = 30.0;
+	
+	public ProjectileShape() {
+		super(ID);
+	}
 	
 	@Override
 	public int getManaCost() {
@@ -161,7 +151,7 @@ public class ProjectileTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartProperties params) {
+	public ProjectileShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean atMax = false; // legacy
 		boolean hitAllies = false;
 		
@@ -171,17 +161,8 @@ public class ProjectileTrigger extends SpellTrigger {
 		
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new ProjectileTriggerInstance(state, world, pos, pitch, yaw, atMax, hitAllies);
+		return new ProjectileShapeInstance(state, world, pos, pitch, yaw, atMax, hitAllies, characteristics);
 	}
-
-	// Copied from vanilla entity class
-	public static final Vector3d getVectorForRotation(float pitch, float yaw) {
-        float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
-        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
-        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
-    }
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
@@ -230,12 +211,12 @@ public class ProjectileTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellPartProperties params) {
+	public double getTraceRange(SpellShapePartProperties params) {
 		return PROJECTILE_RANGE;
 	}
 	

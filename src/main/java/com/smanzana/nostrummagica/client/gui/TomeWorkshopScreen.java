@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellTomeSlotModifyMessage;
-import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;

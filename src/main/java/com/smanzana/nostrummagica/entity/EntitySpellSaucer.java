@@ -36,7 +36,7 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellSaucer.class, MagicElementDataSerializer.instance);
 	
-	public static interface ISpellSaucerTrigger {
+	public static interface ISpellSaucerShape {
 
 		public void onProjectileHit(BlockPos pos);
 		
@@ -47,7 +47,7 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	}
 	
 	protected LivingEntity shootingEntity;
-	protected ISpellSaucerTrigger trigger;
+	protected ISpellSaucerShape trigger;
 	
 	protected float speed;
 	protected int ticksInAir;
@@ -62,7 +62,7 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 		this.hitBlocks = new HashSet<>();
 	}
 	
-	public EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, World world, LivingEntity shooter, ISpellSaucerTrigger trigger, float speed) {
+	public EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, World world, LivingEntity shooter, ISpellSaucerShape trigger, float speed) {
 		this(type, world);
         this.speed = speed;
         this.shootingEntity = shooter;

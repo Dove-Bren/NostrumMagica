@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.triggers.MortarTrigger.MortarTriggerInstance;
+import com.smanzana.nostrummagica.spells.components.shapes.MortarShape.MortarShapeInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.BlockState;
@@ -34,7 +34,7 @@ public class EntitySpellMortar extends FireballEntity {
 	
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellMortar.class, MagicElementDataSerializer.instance);
 	
-	private MortarTriggerInstance trigger;
+	private MortarShapeInstance trigger;
 	private Vector3d origin;
 	
 	private double gravity;
@@ -45,7 +45,7 @@ public class EntitySpellMortar extends FireballEntity {
 		super(type, world);
 	}
 	
-	public EntitySpellMortar(EntityType<? extends EntitySpellMortar> type, MortarTriggerInstance trigger, LivingEntity shooter,
+	public EntitySpellMortar(EntityType<? extends EntitySpellMortar> type, MortarShapeInstance trigger, LivingEntity shooter,
 			World world, Vector3d start, Vector3d velocity,
 			float speedFactor, double gravity) {
 		//super(world, start.x, start.y, start.z, 0, 0, 0);

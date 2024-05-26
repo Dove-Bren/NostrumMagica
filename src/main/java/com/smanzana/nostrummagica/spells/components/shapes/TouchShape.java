@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -37,7 +38,7 @@ public class TouchShape extends InstantShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		pos = pos.add(0, state.getSelf().getEyeHeight(), 0);
 		
 		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
@@ -108,6 +109,16 @@ public class TouchShape extends InstantShape {
 	@Override
 	public double getTraceRange(SpellShapePartProperties params) {
 		return TOUCH_RANGE;
+	}
+
+	@Override
+	public ItemStack getCraftItem() {
+		return new ItemStack(Items.IRON_INGOT);
+	}
+
+	@Override
+	public int getManaCost() {
+		return 10;
 	}
 
 }

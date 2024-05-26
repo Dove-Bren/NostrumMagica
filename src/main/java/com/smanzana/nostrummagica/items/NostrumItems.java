@@ -44,8 +44,8 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.inventory.EquipmentSlotType;

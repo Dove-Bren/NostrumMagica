@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.triggers.ProjectileTrigger.ProjectileTriggerInstance;
+import com.smanzana.nostrummagica.spells.components.shapes.ProjectileShape.ProjectileShapeInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.block.BlockState;
@@ -33,13 +33,13 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 	public static final String ID = "spell_projectile";
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellProjectile.class, MagicElementDataSerializer.instance);
 	
-	private ProjectileTriggerInstance trigger;
+	private ProjectileShapeInstance trigger;
 	private double maxDistance; // Squared distance so no sqrt
 	private Vector3d origin;
 	
 	private @Nullable Predicate<Entity> filter;
 
-	public EntitySpellProjectile(ProjectileTriggerInstance trigger,
+	public EntitySpellProjectile(ProjectileShapeInstance trigger,
 			LivingEntity shooter, float speedFactor, double maxDistance) {
 		this(trigger,
 				shooter,
@@ -54,7 +54,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 		super(type, world);
 	}
 	
-	public EntitySpellProjectile(ProjectileTriggerInstance trigger, LivingEntity shooter,
+	public EntitySpellProjectile(ProjectileShapeInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ, Vector3d direction,
 			float speedFactor, double maxDistance) {

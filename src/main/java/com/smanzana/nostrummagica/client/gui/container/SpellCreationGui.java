@@ -21,8 +21,8 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 

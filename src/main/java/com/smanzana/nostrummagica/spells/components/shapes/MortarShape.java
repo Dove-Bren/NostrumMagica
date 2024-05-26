@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.utils.Curves;
 import com.smanzana.nostrummagica.utils.Projectiles;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -36,32 +36,34 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class MortarTrigger extends SpellTrigger {
+public class MortarShape extends SpellShape {
 	
 	public static final float MaxHDist = 40;
 	public static final double OverworldGravity = 0.025D;
 	
-	public class MortarTriggerInstance extends SpellTrigger.SpellTriggerInstance {
+	public class MortarShapeInstance extends SpellShapeInstance {
 		
 		protected static final double HVel = .5; 
 
-		private World world;
-		private Vector3d pos;
-		private float pitch;
-		private float yaw;
-		private boolean noArc;
+		private final World world;
+		private final Vector3d pos;
+		private final float pitch;
+		private final float yaw;
+		private final boolean noArc;
+		private final SpellCharacteristics characteristics;
 		
-		public MortarTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean noArc) {
+		public MortarShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean noArc, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
 			this.noArc = noArc;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			
 			// Do a little more work of getting a good vector for things
 			// that aren't players
@@ -73,11 +75,9 @@ public class MortarTrigger extends SpellTrigger {
 				dir = null;
 			} else {
 				target = null; // Solve for target on main thread with raytrace
-				dir = SeekingBulletTrigger.getVectorForRotation(pitch, yaw);
+				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 
-			
-			final MortarTriggerInstance self = this;
 			
 			caster.getServer().runAsync(new Runnable() {
 			
@@ -109,7 +109,7 @@ public class MortarTrigger extends SpellTrigger {
 					// Figure out angle to hit destination from source. Ignore blocks and stuff
 					final Vector3d startVelocity;
 					final Vector3d startPos;
-					if (self.noArc) {
+					if (MortarShapeInstance.this.noArc) {
 						// Drop from above
 						// Try not to start in the ceiling
 						BlockPos.Mutable cursor = new BlockPos.Mutable();
@@ -132,7 +132,7 @@ public class MortarTrigger extends SpellTrigger {
 						startVelocity = Curves.getMortarArcVelocity(pos, dest, HVel, OverworldGravity);
 					}
 					
-					EntitySpellMortar projectile = new EntitySpellMortar(NostrumEntityTypes.spellMortar, self,
+					EntitySpellMortar projectile = new EntitySpellMortar(NostrumEntityTypes.spellMortar, MortarShapeInstance.this,
 							getState().getSelf(),
 							world,
 							startPos,
@@ -178,7 +178,7 @@ public class MortarTrigger extends SpellTrigger {
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, Lists.newArrayList(getState().getOther()), world, Lists.newArrayList(pos));
+			getState().trigger(null, world, Lists.newArrayList(pos));
 		}
 		
 		public void onProjectileHit(Entity entity) {
@@ -188,28 +188,20 @@ public class MortarTrigger extends SpellTrigger {
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
 			}
 		}
 		
 		public EMagicElement getElement() {
 			// Return element on next shape
-			return getState().getNextElement();
+			return characteristics.getElement();
 		}
 	}
 
-	private static final String TRIGGER_KEY = "mortar";
-	private static MortarTrigger instance = null;
+	private static final String ID = "mortar";
 	
-	public static MortarTrigger instance() {
-		if (instance == null)
-			instance = new MortarTrigger();
-		
-		return instance;
-	}
-	
-	private MortarTrigger() {
-		super(TRIGGER_KEY);
+	public MortarShape() {
+		super(ID);
 	}
 
 	@Override
@@ -218,7 +210,7 @@ public class MortarTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartProperties params) {
+	public MortarShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean noArc = false;
 		
 		// We use param's flip to indicate whether to drop from the sky or not
@@ -227,7 +219,7 @@ public class MortarTrigger extends SpellTrigger {
 		
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new MortarTriggerInstance(state, world, pos, pitch, yaw, noArc);
+		return new MortarShapeInstance(state, world, pos, pitch, yaw, noArc, characteristics);
 	}
 
 	@Override
@@ -277,12 +269,12 @@ public class MortarTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellPartProperties params) {
+	public double getTraceRange(SpellShapePartProperties params) {
 		return MaxHDist;
 	}
 	

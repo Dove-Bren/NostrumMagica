@@ -1,8 +1,8 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
@@ -18,29 +18,22 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class AITargetTrigger extends InstantTrigger {
+public class AIShape extends InstantShape {
 
-	private static final String TRIGGER_KEY = "ai";
-	private static AITargetTrigger instance = null;
+	private static final String ID = "ai";
 	
-	public static AITargetTrigger instance() {
-		if (instance == null)
-			instance = new AITargetTrigger();
-		
-		return instance;
-	}
-	
-	private AITargetTrigger() {
-		super(TRIGGER_KEY);
+	public AIShape() {
+		super(ID);
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw) {
+	protected TriggerData getTargetData(com.smanzana.nostrummagica.spells.Spell.SpellState state, World world,
+			Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
 		if (state.getCaster() instanceof MobEntity) {
 			target = ((MobEntity) state.getCaster()).getAttackTarget();
 		}
-		return new TriggerData(Lists.newArrayList(target), null, world, null);
+		return new TriggerData(Lists.newArrayList(target), world, null);
 	}
 	
 	@Override
@@ -94,7 +87,7 @@ public class AITargetTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
 }

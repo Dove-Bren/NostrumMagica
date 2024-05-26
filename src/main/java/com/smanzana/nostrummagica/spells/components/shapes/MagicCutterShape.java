@@ -1,17 +1,18 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerTrigger;
+import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerShape;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -22,22 +23,29 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Lazy;
 
-public class MagicCutterTrigger extends SpellTrigger {
-	
-	public class MagicCutterTriggerInstance extends SpellTrigger.SpellTriggerInstance implements ISpellSaucerTrigger {
+/**
+ * Disc projectile with a curved trajectory
+ * @author Skyler
+ *
+ */
+public class MagicCutterShape extends SpellShape {
 
-		private World world;
-		private Vector3d pos;
-		private float pitch;
-		private float yaw;
-		private boolean piercing;
+	public static class MagicCutterShapeInstance extends SpellShapeInstance implements ISpellSaucerShape {
+
+		private final World world;
+		private final Vector3d pos;
+		private final float pitch;
+		private final float yaw;
+		private final boolean piercing;
+		private final SpellCharacteristics characteristics;
+		
 		private int trips;
 		
-		public MagicCutterTriggerInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean piercing, int trips) {
+		public MagicCutterShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean piercing, int trips, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -45,10 +53,11 @@ public class MagicCutterTrigger extends SpellTrigger {
 			this.yaw = yaw;
 			this.piercing = piercing;
 			this.trips = trips;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vector3d dir;
@@ -57,10 +66,10 @@ public class MagicCutterTrigger extends SpellTrigger {
 				dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
 						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
 			} else {
-				dir = MagicCutterTrigger.getVectorForRotation(pitch, yaw);
+				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 			
-			final MagicCutterTriggerInstance self = this;
+			final MagicCutterShapeInstance self = this;
 			
 			caster.getServer().runAsync(new Runnable() {
 
@@ -73,19 +82,15 @@ public class MagicCutterTrigger extends SpellTrigger {
 							dir,
 							5.0f, piercing ? PROJECTILE_RANGE/2 : PROJECTILE_RANGE, piercing, trips);
 					
-//					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(self,
-//							getState().getSelf(),
-//							5.0f, 500);
-					
 					world.addEntity(projectile);
 				}
 			
 			});
 		}
-		
+
 		@Override
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, Lists.newArrayList(getState().getOther()), world, Lists.newArrayList(pos), piercing); /// TODO only force split if piercing
+			getState().trigger(null, world, Lists.newArrayList(pos), piercing); /// TODO only force split if piercing
 		}
 		
 		@Override
@@ -96,40 +101,30 @@ public class MagicCutterTrigger extends SpellTrigger {
 			else if (NostrumMagica.resolveLivingEntity(entity) == null) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), Lists.newArrayList(getState().getOther()), null, null, piercing);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null, piercing);
 			}
 		}
-		
+
 		@Override
 		public EMagicElement getElement() {
-			// Return element on next shape
-			return getState().getNextElement();
+			return characteristics.getElement();
 		}
 	}
-
-	private static final String TRIGGER_KEY = "cutter";
-	private static MagicCutterTrigger instance = null;
 	
-	public static MagicCutterTrigger instance() {
-		if (instance == null)
-			instance = new MagicCutterTrigger();
-		
-		return instance;
-	}
-	
-	private MagicCutterTrigger() {
-		super(TRIGGER_KEY);
-	}
-
+	private static final String ID = "cutter";
 	private static final double PROJECTILE_RANGE = 50.0;
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
+	
+	protected MagicCutterShape(String key) {
+		super(key);
+	}
+	
+	public MagicCutterShape() {
+		this(ID);
+	}
 	
 	@Override
-	public int getManaCost() {
-		return 20;
-	}
-
-	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellPartProperties params) {
+	public MagicCutterShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// We use param's flip to indicate whether we should be piercing or not
 		boolean piercing = false;
 		if (params != null)
@@ -140,22 +135,17 @@ public class MagicCutterTrigger extends SpellTrigger {
 		
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new MagicCutterTriggerInstance(state, world, pos, pitch, yaw, piercing, trips);
+		return new MagicCutterShapeInstance(state, world, pos, pitch, yaw, piercing, trips, characteristics);
 	}
-
-	// Copied from vanilla entity class
-	public static final Vector3d getVectorForRotation(float pitch, float yaw) {
-        float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
-        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
-        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
-    }
+	
+	@Override
+	public int getManaCost() {
+		return 20;
+	}
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
+		return REAGENTS.get();
 	}
 
 	@Override
@@ -207,13 +197,12 @@ public class MagicCutterTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellPartProperties params) {
+	public double getTraceRange(SpellShapePartProperties params) {
 		return PROJECTILE_RANGE;
 	}
-	
 }

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
@@ -17,31 +17,34 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Lazy;
 
-public class DelayTrigger extends SpellTrigger {
-	
-	public class DelayTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
+/**
+ * Shape that waits some time before proceeding
+ * @author Skyler
+ *
+ */
+public class DelayShape extends SpellShape {
 
-		private int delayTicks;
+	public static class DelayShapeInstance extends SpellShapeInstance implements IGenericListener {
+
+		private final int delayTicks;
 		
-		public DelayTriggerInstance(SpellState state, int delayTicks) {
+		public DelayShapeInstance(SpellState state, int delayTicks, SpellCharacteristics characteristics) {
 			super(state);
 			this.delayTicks = delayTicks;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
-			// We are instant! Whoo!
+		public void spawn(LivingEntity caster) {
 			NostrumMagica.playerListener.registerTimer(this, 0, delayTicks);
-			
 		}
-
+		
 		@Override
 		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
 			// We only registered for time, so don't bother checking
 			
 			TriggerData data = new TriggerData(
-					Lists.newArrayList(this.getState().getSelf()),
 					Lists.newArrayList(this.getState().getSelf()),
 					null,
 					null
@@ -50,41 +53,31 @@ public class DelayTrigger extends SpellTrigger {
 			return true;
 		}
 	}
-
-	private static final String TRIGGER_KEY = "delay";
-	private static DelayTrigger instance = null;
 	
-	public static DelayTrigger instance() {
-		if (instance == null)
-			instance = new DelayTrigger();
-		
-		return instance;
+	private static final String ID = "delay";
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
+	
+	protected DelayShape(String key) {
+		super(key);
 	}
 	
-	private DelayTrigger() {
-		super(TRIGGER_KEY);
+	public DelayShape() {
+		this(ID);
 	}
 	
 	@Override
-	public int getManaCost() {
-		return 20;
+	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new DelayShapeInstance(state, Math.max(20 * (int) supportedFloats()[0], (int) params.level), characteristics);
+	}
+	
+	@Override
+	public String getDisplayName() {
+		return "Delay";
 	}
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
-	}
-
-	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
-		return new DelayTriggerInstance(state, Math.max(20 * (int) supportedFloats()[0], (int) params.level));
-	}
-
-	@Override
-	public String getDisplayName() {
-		return "Delay";
+		return REAGENTS.get();
 	}
 
 	@Override
@@ -95,6 +88,11 @@ public class DelayTrigger extends SpellTrigger {
 	@Override
 	public boolean supportsBoolean() {
 		return false;
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
 	}
 
 	@Override
@@ -118,22 +116,23 @@ public class DelayTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
 	public String supportedFloatName() {
 		return I18n.format("modification.delay.name", (Object[]) null);
 	}
-	
+
+	@Override
+	public int getManaCost() {
+		return 20;
+	}
+
 	@Override
 	public int getWeight() {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+	
 }

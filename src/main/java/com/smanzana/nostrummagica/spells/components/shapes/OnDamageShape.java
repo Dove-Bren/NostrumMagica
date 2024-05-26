@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +13,9 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -28,16 +28,23 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Lazy;
 
-public class DamagedTrigger extends SpellTrigger {
-	
-	public class DamagedTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
+/**
+ * Shape that waits for something to damage the entity it's applied to.
+ * Sets the thing that attacked as the new spell target.
+ * @author Skyler
+ *
+ */
+public class OnDamageShape extends SpellShape {
+
+	public static class OnDamageShapeInstance extends SpellShapeInstance implements IGenericListener {
 
 		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
 		
-		public DamagedTriggerInstance(SpellState state, LivingEntity entity, int duration) {
+		public OnDamageShapeInstance(SpellState state, LivingEntity entity, int duration, SpellCharacteristics characteristics) {
 			super(state);
 			this.entity = entity;
 			this.duration = duration == 0 ? 20 : duration;
@@ -45,8 +52,7 @@ public class DamagedTrigger extends SpellTrigger {
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
-			// We are instant! Whoo!
+		public void spawn(LivingEntity caster) {
 			NostrumMagica.playerListener.registerHit(this, entity);
 			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
@@ -54,13 +60,12 @@ public class DamagedTrigger extends SpellTrigger {
 				NostrumMagica.magicEffectProxy.applyOnHitEffect(entity, entity.ticksExisted, 20 * duration);
 			}
 		}
-
+		
 		@Override
 		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
 			if (type == Event.DAMAGED) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
-							Lists.newArrayList(this.getState().getSelf()),
 							Lists.newArrayList(this.entity),
 							null,
 							null
@@ -86,52 +91,42 @@ public class DamagedTrigger extends SpellTrigger {
 			return true;
 		}
 	}
-
-	private static final String TRIGGER_KEY = "hit";
-	private static DamagedTrigger instance = null;
 	
-	public static DamagedTrigger instance() {
-		if (instance == null)
-			instance = new DamagedTrigger();
-		
-		return instance;
-	}
+	private static final Map<UUID, OnDamageShapeInstance> ActiveMap = new HashMap<>();
 	
-	private static final Map<UUID, DamagedTriggerInstance> ActiveMap = new HashMap<>();
-	
-	private static final boolean SetTrigger(LivingEntity entity, @Nullable DamagedTriggerInstance trigger) {
-		DamagedTriggerInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+	private static final boolean SetTrigger(LivingEntity entity, @Nullable OnDamageShapeInstance trigger) {
+		OnDamageShapeInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;
 		}
 		return existing == null || existing != trigger;
 	}
 	
-	private DamagedTrigger() {
-		super(TRIGGER_KEY);
+	private static final String ID = "hit";
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1),
+			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
+	
+	protected OnDamageShape(String key) {
+		super(key);
+	}
+	
+	public OnDamageShape() {
+		this(ID);
 	}
 	
 	@Override
-	public int getManaCost() {
-		return 30;
+	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new OnDamageShapeInstance(state, state.getSelf(), (int) params.level, characteristics);
+	}
+	
+	@Override
+	public String getDisplayName() {
+		return "On Damage";
 	}
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1),
-				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
-	}
-
-	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
-		return new DamagedTriggerInstance(state, state.getSelf(), (int) params.level);
-	}
-
-	@Override
-	public String getDisplayName() {
-		return "On Damage";
+		return REAGENTS.get();
 	}
 
 	@Override
@@ -142,6 +137,11 @@ public class DamagedTrigger extends SpellTrigger {
 	@Override
 	public boolean supportsBoolean() {
 		return false;
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
 	}
 
 	@Override
@@ -165,22 +165,23 @@ public class DamagedTrigger extends SpellTrigger {
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
 	public String supportedFloatName() {
 		return I18n.format("modification.damaged_duration.name", (Object[]) null);
 	}
-	
+
+	@Override
+	public int getManaCost() {
+		return 30;
+	}
+
 	@Override
 	public int getWeight() {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+	
 }

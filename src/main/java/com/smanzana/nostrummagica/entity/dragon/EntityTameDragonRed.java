@@ -40,7 +40,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.petcommand.api.PetCommandAPI;

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.rituals.requirements;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 

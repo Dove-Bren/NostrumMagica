@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
-import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

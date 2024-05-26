@@ -46,9 +46,9 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
-import com.smanzana.nostrummagica.spells.LegacySpell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.Transmutation;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 

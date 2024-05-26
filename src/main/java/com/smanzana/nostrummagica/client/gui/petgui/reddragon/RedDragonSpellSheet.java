@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.RedDragonSpe
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;

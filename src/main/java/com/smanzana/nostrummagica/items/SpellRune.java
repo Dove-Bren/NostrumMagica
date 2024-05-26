@@ -14,11 +14,11 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;

@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.spells.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;

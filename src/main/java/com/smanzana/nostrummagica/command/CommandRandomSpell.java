@@ -15,11 +15,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.LegacySpell;
-import com.smanzana.nostrummagica.spells.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.LegacySpellShape;
 import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
+import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

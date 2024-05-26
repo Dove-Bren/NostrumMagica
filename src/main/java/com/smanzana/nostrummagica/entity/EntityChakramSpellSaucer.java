@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.entity;
 
-import com.smanzana.nostrummagica.spells.components.triggers.MagicCutterTrigger.MagicCutterTriggerInstance;
+import com.smanzana.nostrummagica.spells.components.shapes.MagicCutterShape.MagicCutterShapeInstance;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
 import net.minecraft.entity.Entity;
@@ -31,13 +31,13 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 		super(type, world);
 	}
 	
-	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type, World world, LivingEntity shooter, MagicCutterTriggerInstance trigger, float speed) {
+	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type, World world, LivingEntity shooter, MagicCutterShapeInstance trigger, float speed) {
 		super(type, world, shooter, trigger, speed);
         this.returning = false;
 	}
 	
 	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type,
-			MagicCutterTriggerInstance trigger, LivingEntity shooter,
+			MagicCutterShapeInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ, Vector3d direction,
 			float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
@@ -74,7 +74,7 @@ public class EntityChakramSpellSaucer extends EntitySpellSaucer {
 	}
 
 	public EntityChakramSpellSaucer(EntityType<? extends EntityChakramSpellSaucer> type,
-			MagicCutterTriggerInstance trigger,
+			MagicCutterShapeInstance trigger,
 			LivingEntity shooter, float speedFactor, double maxDistance, boolean piercing, int maxTrips) {
 		this(type,
 				trigger,

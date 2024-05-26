@@ -1,12 +1,13 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -18,16 +19,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class WallTrigger extends TriggerAreaTrigger {
+public class WallShape extends AreaShape {
 	
-	public class WallTriggerInstance extends TriggerAreaTrigger.TriggerAreaTriggerInstance {
+	public class WallShapeInstance extends AreaShape.AreaShapeInstance {
 		
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
 		private static final int BLOCK_HEIGHT = 3;
 
-		private boolean northsouth;
-		private float radius;
+		private final boolean northsouth;
+		private final float radius;
+		private final SpellCharacteristics characteristics;
 		
 		// For blocks
 		private BlockPos minPos;
@@ -39,14 +41,15 @@ public class WallTrigger extends TriggerAreaTrigger {
 		private double minZ;
 		private double maxZ;
 		
-		public WallTriggerInstance(SpellState state, World world, Vector3d pos, boolean northsouth, float radius, boolean ignoreBlocks) {
-			super(state, world, new Vector3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, true, !ignoreBlocks);
+		public WallShapeInstance(SpellState state, World world, Vector3d pos, boolean northsouth, float radius, boolean ignoreBlocks, SpellCharacteristics characteristics) {
+			super(state, world, new Vector3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, true, !ignoreBlocks, characteristics);
 			this.radius = radius;
 			this.northsouth = northsouth;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			// Figure out bounds
 			
 			final int minBlockX;
@@ -78,7 +81,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 			this.minPos = new BlockPos(minBlockX, pos.y, minBlockZ);
 			this.maxPos = new BlockPos(maxBlockX, pos.y + BLOCK_HEIGHT, maxBlockZ);
 			
-			super.init(caster); // Inits listening and stuff
+			super.spawn(caster); // Inits listening and stuff
 		}
 		
 		@Override
@@ -111,7 +114,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 						0, // pos + posjitter
 						40, 10, // lifetime + jitter
 						new Vector3d(0, .05, 0), null
-						).color(getState().getNextElement().getColor()));
+						).color(characteristics.getElement().getColor()));
 			}
 			
 			if (NostrumMagica.rand.nextBoolean()) {
@@ -128,24 +131,16 @@ public class WallTrigger extends TriggerAreaTrigger {
 							0, // pos + posjitter
 							40, 10, // lifetime + jitter
 							new Vector3d(0, .05, 0), null
-							).color(getState().getNextElement().getColor()));
+							).color(characteristics.getElement().getColor()));
 				}
 			}
 		}
 	}
 
-	private static final String TRIGGER_KEY = "wall";
-	private static WallTrigger instance = null;
+	private static final String ID = "wall";
 	
-	public static WallTrigger instance() {
-		if (instance == null)
-			instance = new WallTrigger();
-		
-		return instance;
-	}
-	
-	private WallTrigger() {
-		super(TRIGGER_KEY);
+	public WallShape() {
+		super(ID);
 	}
 	
 	@Override
@@ -161,8 +156,8 @@ public class WallTrigger extends TriggerAreaTrigger {
 	}
 
 	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
+	public WallShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
+			SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Get N/S or E/W from target positions
 		final double dz = Math.abs(state.getCaster().getPosZ() - pos.z);
 		final double dx = Math.abs(state.getCaster().getPosX() - pos.x);
@@ -175,8 +170,8 @@ public class WallTrigger extends TriggerAreaTrigger {
 			pos = pos.add(0, 1, 0);
 		}
 		
-		return new WallTriggerInstance(state, world, pos,
-				northsouth, Math.max(supportedFloats()[0], params.level), params.flip);
+		return new WallShapeInstance(state, world, pos,
+				northsouth, Math.max(supportedFloats()[0], params.level), params.flip, characteristics);
 	}
 
 	@Override
@@ -229,7 +224,7 @@ public class WallTrigger extends TriggerAreaTrigger {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
 }

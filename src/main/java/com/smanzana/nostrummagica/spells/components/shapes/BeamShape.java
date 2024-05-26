@@ -1,15 +1,15 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.utils.RayTrace;
 
@@ -21,48 +21,41 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Lazy;
 
 /**
- * Touch. Returns one target -- either an entity or a blockpos
- * Other is set to current self in either case
+ * Instant ray returning all entities and blocks in it's path
  * @author Skyler
  *
  */
-public class BeamTrigger extends InstantTrigger {
+public class BeamShape extends InstantShape {
 
-	private static final String TRIGGER_KEY = "beam";
-	private static BeamTrigger instance = null;
+	public static final String ID = "beam";
+	public static final float BEAM_RANGE = 15.0f;
 	
-	public static BeamTrigger instance() {
-		if (instance == null)
-			instance = new BeamTrigger();
-		
-		return instance;
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
+			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
+	
+	public BeamShape() {
+		this(ID);
 	}
 	
-	private BeamTrigger() {
-		super(TRIGGER_KEY);
+	protected BeamShape(String key) {
+		super(key);
 	}
 
-	private static final float BEAM_RANGE = 15.0f;
-	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world,
-				Vector3d pos, float pitch, float yaw) {
-		
+	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Cast from eyes
 		pos = pos.add(0, state.getCaster().getEyeHeight(), 0);
 		
 		Collection<RayTraceResult> traces = RayTrace.allInPath(world, state.getSelf(), pos, pitch, yaw, BEAM_RANGE, new RayTrace.OtherLiving(state.getCaster()));
-		List<LivingEntity> others = null;
 		List<LivingEntity> targs = null;
 		List<BlockPos> blocks = null;
 		
 		Vector3d end = null;
 		
 		if (traces != null && !traces.isEmpty()) {
-		
-			others = Lists.newArrayList(state.getSelf());
 			targs = new LinkedList<>();
 			blocks = new LinkedList<>();
 			
@@ -89,19 +82,7 @@ public class BeamTrigger extends InstantTrigger {
 		NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
 				null, pos, null, end, null, false, 0);
 		
-		return new TriggerData(targs, others, world, blocks);
-	}
-	
-	@Override
-	public int getManaCost() {
-		return 35;
-	}
-
-	@Override
-	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
-				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1));
+		return new TriggerData(targs, world, blocks);
 	}
 
 	@Override
@@ -110,6 +91,11 @@ public class BeamTrigger extends InstantTrigger {
 	}
 
 	@Override
+	public NonNullList<ItemStack> getReagents() {
+		return REAGENTS.get();
+	}
+	
+	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.BLAZE_ROD);
 	}
@@ -117,6 +103,11 @@ public class BeamTrigger extends InstantTrigger {
 	@Override
 	public boolean supportsBoolean() {
 		return false;
+	}
+
+	@Override
+	public String supportedBooleanName() {
+		return null;
 	}
 
 	@Override
@@ -130,28 +121,28 @@ public class BeamTrigger extends InstantTrigger {
 	}
 
 	@Override
-	public String supportedBooleanName() {
+	public String supportedFloatName() {
 		return null;
 	}
 
 	@Override
-	public String supportedFloatName() {
-		return null	;
-	}
-	
-	@Override
 	public int getWeight() {
-		return 3;
+		return 2;
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellPartProperties params) {
+	public double getTraceRange(SpellShapePartProperties params) {
 		return BEAM_RANGE;
 	}
-	
+
+	@Override
+	public int getManaCost() {
+		return 35;
+	}
+
 }

@@ -16,5 +16,13 @@ public class SpellCharacteristics {
 		this.harmful = harmful;
 		this.element = element;
 	}
+
+	public boolean isHarmful() {
+		return harmful;
+	}
+
+	public EMagicElement getElement() {
+		return element;
+	}
 	
 }

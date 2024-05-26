@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.spells.components.triggers.MagicCyclerTrigger.MagicCyclerTriggerInstance;
+import com.smanzana.nostrummagica.spells.components.shapes.MagicCyclerShape.MagicCyclerShapeInstance;
 import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.entity.Entity;
@@ -36,7 +36,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 		super(type, world);
 	}
 	
-	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, World world, LivingEntity shooter, MagicCyclerTriggerInstance trigger, float speed) {
+	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, World world, LivingEntity shooter, MagicCyclerShapeInstance trigger, float speed) {
 		super(type, world, shooter, trigger, speed);
         this.duration = 10; // Long neough to flash so I know things are going on
         this.onBlocks = true;
@@ -46,7 +46,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	}
 	
 	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, 
-			MagicCyclerTriggerInstance trigger, LivingEntity shooter,
+			MagicCyclerShapeInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ,
 			float speedFactor, int durationTicks, boolean onBlocks) {
@@ -60,7 +60,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	}
 
 	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, 
-			MagicCyclerTriggerInstance trigger,
+			MagicCyclerShapeInstance trigger,
 			LivingEntity shooter, float speedFactor, int durationTicks, boolean onBlocks) {
 		this(type,
 				trigger,

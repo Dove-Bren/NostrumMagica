@@ -1,4 +1,8 @@
-package com.smanzana.nostrummagica.spells.components.triggers;
+package com.smanzana.nostrummagica.spells.components.shapes;
+
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +16,8 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
-import com.smanzana.nostrummagica.spells.LegacySpell.SpellState;
-import com.smanzana.nostrummagica.spells.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
-import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
@@ -26,29 +27,38 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Lazy;
 
-public class AuraTrigger extends TriggerAreaTrigger {
-	
-	public class AuraTriggerInstance extends SpellTrigger.SpellTriggerInstance implements IGenericListener {
-		
+/**
+ * Shape that can immediately be resolved.
+ * For example, touch is resolve instantly.
+ * @author Skyler
+ *
+ */
+public class AuraShape extends AreaShape {
+
+	public static class AuraTriggerInstance extends SpellShapeInstance implements IGenericListener {
+
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
 
-		private LivingEntity origin;
-		private float radius;
-		private World world;
-		private boolean includeAllies;
+		private final LivingEntity origin;
+		private final float radius;
+		private final World world;
+		private final boolean includeAllies;
+		private final SpellCharacteristics characteristics;
 		
 		private int aliveCycles;
 		private boolean dead;
-		private Map<LivingEntity, Integer> affected;
+		private final Map<LivingEntity, Integer> affected;
 		
-		public AuraTriggerInstance(SpellState state, World world, LivingEntity entity, float radius, boolean includeAllies) {
+		public AuraTriggerInstance(SpellState state, World world, LivingEntity entity, float radius, boolean includeAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.radius = radius;
 			this.origin = entity;
 			this.world = world;
 			this.includeAllies = includeAllies;
+			this.characteristics = characteristics;
 			
 			dead = false;
 			aliveCycles = 0;
@@ -56,7 +66,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 		}
 		
 		@Override
-		public void init(LivingEntity caster) {
+		public void spawn(LivingEntity caster) {
 			// Register timer for life and for effects
 			NostrumMagica.playerListener.registerTimer(this, 0, TICK_RATE);
 			
@@ -87,7 +97,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 						.1,
 						30, 0, // lifetime + jitter
 						Vector3d.ZERO, (new Vector3d(.2, .2, .2)).scale(radius / 4)
-						).color(getState().getNextElement().getColor())
+						).color(characteristics.element.getColor())
 						);
 				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
 						2,
@@ -97,7 +107,7 @@ public class AuraTrigger extends TriggerAreaTrigger {
 						radius,
 						20, 0, // lifetime + jitter
 						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
-						).color(getState().getNextElement().getColor()));
+						).color(characteristics.element.getColor()));
 			}
 		}
 
@@ -126,7 +136,6 @@ public class AuraTrigger extends TriggerAreaTrigger {
 					if (visitEntity(e)) {
 						TriggerData data = new TriggerData(
 								Lists.newArrayList(e),
-								Lists.newArrayList(this.getState().getSelf()),
 								null,
 								null
 								);
@@ -161,46 +170,38 @@ public class AuraTrigger extends TriggerAreaTrigger {
 			return false;
 		}
 	}
-
-	private static final String TRIGGER_KEY = "aura";
-	private static AuraTrigger instance = null;
 	
-	public static AuraTrigger instance() {
-		if (instance == null)
-			instance = new AuraTrigger();
-		
-		return instance;
+	private static final String ID = "aura";
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY,
+			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
+			ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+			ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1),
+			ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
+	
+	protected AuraShape(String key) {
+		super(key);
 	}
 	
-	private AuraTrigger() {
-		super(TRIGGER_KEY);
+	public AuraShape() {
+		this(ID);
 	}
 	
 	@Override
-	public int getManaCost() {
-		return 300;
-	}
-
-	@Override
-	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
-				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
-				ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1),
-				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
-	}
-
-	@Override
-	public SpellTriggerInstance instance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
-			SpellPartProperties params) {
+	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new AuraTriggerInstance(state, world, state.getSelf(),
 				Math.max(supportedFloats()[0], params.level),
-				params.flip);
+				params.flip,
+				characteristics);
 	}
 
 	@Override
 	public String getDisplayName() {
 		return "Aura";
+	}
+
+	@Override
+	public NonNullList<ItemStack> getReagents() {
+		return REAGENTS.get();
 	}
 
 	@Override
@@ -241,14 +242,20 @@ public class AuraTrigger extends TriggerAreaTrigger {
 	public String supportedFloatName() {
 		return I18n.format("modification.aura.float.name", (Object[]) null);
 	}
-	
+
+	@Override
+	public int getManaCost() {
+		return 300;
+	}
+
 	@Override
 	public int getWeight() {
 		return 3;
 	}
 
 	@Override
-	public boolean shouldTrace(SpellPartProperties params) {
+	public boolean shouldTrace(SpellShapePartProperties params) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 }
