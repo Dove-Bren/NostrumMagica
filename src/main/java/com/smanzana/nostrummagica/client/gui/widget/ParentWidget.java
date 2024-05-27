@@ -56,7 +56,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button);
+		//return super.mouseClicked(mouseX, mouseY, button);
+		return false;
 	}
 	
 	@Override
@@ -71,7 +72,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.mouseReleased(mouseX, mouseY, button);
+		//return super.mouseReleased(mouseX, mouseY, button);
+		return false;
 	}
 	
 	@Override
@@ -84,7 +86,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+		//return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+		return false;
 	}
 	
 	@Override
@@ -104,7 +107,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.mouseScrolled(mouseX, mouseY, delta);
+		//return super.mouseScrolled(mouseX, mouseY, delta);
+		return false;
 	}
 	
 	@Override
@@ -116,7 +120,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		//return super.keyPressed(keyCode, scanCode, modifiers);
+		return false;
 	}
 	
 	@Override
@@ -128,7 +133,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.keyReleased(keyCode, scanCode, modifiers);
+		//return super.keyReleased(keyCode, scanCode, modifiers);
+		return false;
 	}
 	
 	@Override
@@ -140,7 +146,8 @@ public abstract class ParentWidget extends Widget {
 			}
 		}
 		
-		return super.charTyped(codePoint, modifiers);
+		//return super.charTyped(codePoint, modifiers);
+		return false;
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.tiles;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +22,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class SpellTableEntity extends TileEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
@@ -221,7 +219,7 @@ public class SpellTableEntity extends TileEntity implements ISpellCraftingInvent
 		
 		SpellCraftContext context = new SpellCraftContext(crafter, this.world, this.pos);
 		Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
-				context, pattern, name, iconIndex, this, crafter, new LinkedList<ITextComponent>(), new LinkedList<ITextComponent>(), true);
+				context, pattern, name, iconIndex, this, crafter, null, null, null, true);
 		
 		if (spell != null) {
 			spell.promoteFromTrans();

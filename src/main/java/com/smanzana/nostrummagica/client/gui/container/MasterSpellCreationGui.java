@@ -429,7 +429,7 @@ public class MasterSpellCreationGui {
 			
 			// Actually make spell
 			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
-			Spell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors);
+			Spell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors, null);
 			if (spell == null) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {

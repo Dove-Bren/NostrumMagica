@@ -66,9 +66,30 @@ public class SpellCrafting {
 		return valid;
 	}
 	
-	public static @Nullable Spell CreateSpellFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, IInventory inventory, int startIdx, int slotCount, @Nullable List<String> errorsOut) {
+	public static @Nullable Spell CreateSpellFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern,
+			String spellName, IInventory inventory, int startIdx, int slotCount,
+			@Nullable List<String> errorsOut, @Nullable List<SpellPartSummary> partSummaryOut) {
 		List<SpellPart> parts = new ArrayList<>(slotCount);
-		if (!ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, errorsOut)) {
+		boolean parseSuccess = ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, errorsOut);
+		
+		// Convert any parts that were made to summaries (even on failure)
+		if (partSummaryOut != null) {
+			for (SpellPart part : parts) {
+				partSummaryOut.add(new SpellPartSummary(part));
+			}
+			
+			if (!parseSuccess) {
+				final int badIdx;
+				if (parts.isEmpty()) {
+					badIdx = 0;
+				} else {
+					badIdx = parts.get(parts.size() - 1).endIdx + 1;
+				}
+				partSummaryOut.add(new SpellPartSummary(badIdx, badIdx));
+			}
+		}
+		
+		if (!parseSuccess) {
 			return null;
 		}
 		
@@ -211,8 +232,10 @@ public class SpellCrafting {
 		int elementCount = 0;
 		int weightBonus = 0;
 		float manaRate = 1f;
+		int elemBeginIdx = -1;
 		
-		for (int i = 0; i < slotCount; i++) {
+		int i;
+		for (i = 0; i < slotCount; i++) {
 			final int slotIdx = startIdx + i;
 			ItemStack stack = inventory.getStackInSlot(slotIdx);
 			if (stack.isEmpty()) {
@@ -253,23 +276,25 @@ public class SpellCrafting {
 			// Now interpret
 			if (ingredient.shape != null) {
 				if (element != null) {
-					partsOut.add(new SpellPart(element, elementCount, null, weightBonus, manaRate));
+					partsOut.add(new SpellPart(elemBeginIdx, i - 1, element, elementCount, null, weightBonus, manaRate));
 					element = null;
 					elementCount = 0;
 					weightBonus = 0;
 					manaRate = 1f;
+					elemBeginIdx = -1;
 				}
 				
-				partsOut.add(new SpellPart(ingredient.shape, ingredient.weight, ingredient.manaRate));
+				partsOut.add(new SpellPart(i, i, ingredient.shape, ingredient.weight, ingredient.manaRate));
 			} else if (ingredient.alteration != null) {
 				if (element != null) {
 					weightBonus += ingredient.weight;
 					manaRate += (ingredient.manaRate - 1f);
-					partsOut.add(new SpellPart(element, elementCount, ingredient.alteration, weightBonus, manaRate));
+					partsOut.add(new SpellPart(elemBeginIdx, i, element, elementCount, ingredient.alteration, weightBonus, manaRate));
 					element = null;
 					elementCount = 0;
 					weightBonus = 0;
 					manaRate = 1f;
+					elemBeginIdx = -1;
 				} else {
 					if (errorsOut != null) {
 						errorsOut.add("Alteration in slot " + slotIdx + " must be proceeded by element runes");
@@ -278,33 +303,42 @@ public class SpellCrafting {
 				}
 			} else {
 				EMagicElement runeElement = ingredient.element == null ? EMagicElement.PHYSICAL : ingredient.element;
-				if (element != null && element != runeElement) {
-					partsOut.add(new SpellPart(element, elementCount, null, weightBonus, manaRate));
+				if ((element != null && element != runeElement)
+						|| elementCount == 3) {
+					partsOut.add(new SpellPart(elemBeginIdx, i - 1, element, elementCount, null, weightBonus, manaRate));
 					elementCount = 0;
 					weightBonus = 0;
 					manaRate = 1f;
+					elemBeginIdx = -1;
 				}
 				
 				element = runeElement;
 				elementCount += 1 + ingredient.elementCountBonus;
 				weightBonus += ingredient.weight;
 				manaRate += (ingredient.manaRate-1f);
+				if (elemBeginIdx == -1) {
+					elemBeginIdx = i;
+				}
 				while (elementCount > 3) { // Don't go at 3 so that an alteration can come next
-					partsOut.add(new SpellPart(element, 3, null, weightBonus, manaRate));
+					partsOut.add(new SpellPart(elemBeginIdx, i, element, 3, null, weightBonus, manaRate));
 					elementCount -= 3;
 					weightBonus = 0;
 					manaRate = 1f;
+					elemBeginIdx = i; // Even if multiple start here, it'll be all on this idx
 				}
 				
 				if (elementCount == 0) {
 					element = null;
+					weightBonus = 0;
+					manaRate = 1f;
+					elemBeginIdx = -1;
 				}
 			}
 		}
 		
 		// Check for leftover non-full effect
 		if (element != null) {
-			partsOut.add(new SpellPart(element, elementCount, null, weightBonus, manaRate));
+			partsOut.add(new SpellPart(elemBeginIdx, i-1, element, elementCount, null, weightBonus, manaRate));
 		}
 		
 		return true;
@@ -323,6 +357,9 @@ public class SpellCrafting {
 	}
 	
 	protected static final class SpellPart {
+		public final int startIdx;
+		public final int endIdx;
+		
 		public final @Nullable SpellShapePart shape;
 		// OR
 		public final @Nullable SpellEffectPart effect;
@@ -330,31 +367,37 @@ public class SpellCrafting {
 		public final int weightBonus;
 		public final float manaRate;
 		
-		protected SpellPart(SpellShapePart shape, SpellEffectPart effect, int weightBonus, float manaRate) {
+		// Not-so-abstraction-happy place to stash results
+		public int finalWeight;
+		public int finalMana;
+		
+		protected SpellPart(int startIdx, int endIdx, SpellShapePart shape, SpellEffectPart effect, int weightBonus, float manaRate) {
+			this.startIdx = startIdx;
+			this.endIdx = endIdx;
 			this.shape = shape;
 			this.effect = effect;
 			this.weightBonus = weightBonus;
 			this.manaRate = manaRate;
 		}
 		
-		public SpellPart(SpellShapePart shape, int weightBonus, float manaRate) {
-			this(shape, null, weightBonus, manaRate);
+		public SpellPart(int startIdx, int endIdx, SpellShapePart shape, int weightBonus, float manaRate) {
+			this(startIdx, endIdx, shape, null, weightBonus, manaRate);
 		}
 		
-		public SpellPart(SpellShape shape, SpellShapePartProperties props, int weightBonus, float manaRate) {
-			this(new SpellShapePart(shape, props), weightBonus, manaRate);
+		public SpellPart(int startIdx, int endIdx, SpellShape shape, SpellShapePartProperties props, int weightBonus, float manaRate) {
+			this(startIdx, endIdx, new SpellShapePart(shape, props), weightBonus, manaRate);
 		}
 		
-		public SpellPart(SpellShape shape, int weightBonus, float manaRate) {
-			this(shape, new SpellShapePartProperties(), weightBonus, manaRate);
+		public SpellPart(int startIdx, int endIdx, SpellShape shape, int weightBonus, float manaRate) {
+			this(startIdx, endIdx, shape, new SpellShapePartProperties(), weightBonus, manaRate);
 		}
 		
-		public SpellPart(SpellEffectPart effect, int weightBonus, float manaRate) {
-			this(null, effect, weightBonus, manaRate);
+		public SpellPart(int startIdx, int endIdx, SpellEffectPart effect, int weightBonus, float manaRate) {
+			this(startIdx, endIdx, null, effect, weightBonus, manaRate);
 		}
 		
-		public SpellPart(EMagicElement element, int elementCount, @Nullable EAlteration alteration, int weightBonus, float manaRate) {
-			this(new SpellEffectPart(element, elementCount, alteration), weightBonus, manaRate);
+		public SpellPart(int startIdx, int endIdx, EMagicElement element, int elementCount, @Nullable EAlteration alteration, int weightBonus, float manaRate) {
+			this(startIdx, endIdx, new SpellEffectPart(element, elementCount, alteration), weightBonus, manaRate);
 		}
 		
 		public boolean isShape() {
@@ -395,6 +438,83 @@ public class SpellCrafting {
 
 		public float getManaRate() {
 			return manaRate;
+		}
+	}
+	
+	public static final class SpellPartSummary {
+		
+		protected final int startIdx;
+		protected final int lastIdx;
+		protected final boolean isError;
+		protected final @Nullable SpellEffectPart effect;
+		protected final @Nullable SpellShapePart shape;
+		protected final int weight;
+		protected final int mana;
+		
+		private SpellPartSummary(int startIdx, int lastIdx, boolean isError, SpellEffectPart effect,
+				SpellShapePart shape, int weight, int mana) {
+			this.startIdx = startIdx;
+			this.lastIdx = lastIdx;
+			this.weight = weight;
+			this.mana = mana;
+			
+			// One of shape and effect have to be null
+			if (!isError && !((effect == null) ^ (shape == null))) {
+				isError = true;
+				effect = null;
+				shape = null;
+			}
+			
+			this.isError = isError;
+			this.effect = effect;
+			this.shape = shape;
+		}
+		
+		/**
+		 * ERROR part
+		 * @param startIdx
+		 * @param lastIdx
+		 */
+		public SpellPartSummary(int startIdx, int lastIdx) {
+			this(startIdx, lastIdx, true, null, null, 0, 0);
+		}
+		
+		public SpellPartSummary(SpellPart part) {
+			this(part.startIdx, part.endIdx, false, part.getEffectPart(), part.getShapePart(), 
+					part.finalWeight, part.finalMana
+					);
+		}
+		
+		public int getStartIdx() {
+			return this.startIdx;
+		}
+		
+		public int getLastIdx() {
+			return this.lastIdx;
+		}
+		
+		public boolean isError() {
+			return this.isError;
+		}
+		
+		public boolean isShape() {
+			return !isError() && this.shape != null;
+		}
+		
+		public @Nullable SpellEffectPart getEffect() {
+			return isError() ? null : this.effect;
+		}
+		
+		public @Nullable SpellShapePart getShape() {
+			return isError() ? null : this.shape;
+		}
+		
+		public int getWeight() {
+			return this.weight;
+		}
+		
+		public int getMana() {
+			return this.mana;
 		}
 	}
 }

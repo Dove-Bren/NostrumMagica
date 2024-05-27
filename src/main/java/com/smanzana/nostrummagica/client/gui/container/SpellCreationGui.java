@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,6 +13,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
+import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.BlankScroll;
 import com.smanzana.nostrummagica.items.ReagentItem;
@@ -20,6 +22,7 @@ import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
+import com.smanzana.nostrummagica.spellcraft.SpellCrafting.SpellPartSummary;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.ColorUtil;
@@ -41,6 +44,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -178,11 +182,12 @@ public class SpellCreationGui {
 		protected final PlayerEntity player;
 		protected final SpellCraftContext context; // Made once for efficiency
 		
-		
+		protected final List<Consumer<@Nullable Spell>> spellListeners;
 		protected boolean hasScroll; // has an acceptable scroll
 		protected boolean spellValid; // grammar checks out
-		protected List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
-		protected List<ITextComponent> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
+		protected final List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
+		protected final List<ITextComponent> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
+		protected final List<SpellPartSummary> parts; // Updated on validate; what spell parts make up our spell?
 		protected int lastManaCost;
 		protected int lastWeight;
 		
@@ -193,7 +198,10 @@ public class SpellCreationGui {
 			this.pos = tablePos;
 			this.context = new SpellCraftContext(crafter, crafter.world, pos);
 			
-			spellErrorStrings = new LinkedList<>();
+			spellErrorStrings = new ArrayList<>();
+			reagentStrings = new ArrayList<>();
+			parts = new ArrayList<>(inventory.getRuneSlotCount());
+			spellListeners = new ArrayList<>();
 			
 			// Dont auto call this; let children, so that they can set up things they need to first.
 			//validate();
@@ -204,6 +212,10 @@ public class SpellCreationGui {
 		public abstract int getSpellIcon();
 		
 		public abstract @Nullable SpellCraftPattern getCraftPattern();
+		
+		public void addListener(Consumer<@Nullable Spell> listener) {
+			this.spellListeners.add(listener);
+		}
 		
 		protected boolean isValidScroll(ItemStack stack) {
 			return !stack.isEmpty() && stack.getItem() instanceof BlankScroll;
@@ -343,17 +355,20 @@ public class SpellCreationGui {
 		}
 		
 		protected void validate() {
-			if (spellErrorStrings == null)
-				spellErrorStrings = new LinkedList<>();
-			if (reagentStrings == null)
-				reagentStrings = new LinkedList<>();
-			
 			checkScroll();
 			if (this.hasScroll) {
 				Spell spell = makeSpell();
 				spellValid = (spell != null);
+				alertListeners(spell);
 			} else {
 				spellValid = false;
+				alertListeners(null);
+			}
+		}
+		
+		private void alertListeners(@Nullable Spell spell) {
+			for (Consumer<@Nullable Spell> listener : this.spellListeners) {
+				listener.accept(spell);
 			}
 		}
 		
@@ -371,7 +386,7 @@ public class SpellCreationGui {
 		
 		public Spell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
 			// Don't cache from validate... just in case...
-			Spell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			Spell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, this.parts, clear);
 			
 			if (spell == null)
 				return null;
@@ -391,13 +406,14 @@ public class SpellCreationGui {
 		}
 		
 		public static Spell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
-				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
+				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings, List<SpellPartSummary> parts,
 				boolean deductReagents) {
 			boolean fail = false;
 			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
 			boolean locked = !SpellCrafting.CanCraftSpells(crafter);
 			spellErrorStrings.clear();
 			reagentStrings.clear();
+			parts.clear();
 			
 			if (locked) {
 				spellErrorStrings.add(new StringTextComponent("The runes on the board don't respond to your hands"));
@@ -416,21 +432,18 @@ public class SpellCreationGui {
 			
 			List<String> rawSpellErrors = new ArrayList<>();
 			if (!SpellCrafting.CheckForValidRunes(inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors)) {
-				// Dump raw errors into output strings and return
-				for (String error : rawSpellErrors) {
-					spellErrorStrings.add(new StringTextComponent(error));
-				}
-				return null;
+				fail = true;
 			}
 			
-			// Stop here if already failing and avoid creating the spell
-			if (fail) {
-				return null;
-			}
+//			// Stop here if already failing and avoid creating the spell
+//			if (fail) {
+//				return null;
+//			}
 			
 			// Actually make spell
-			Spell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors);
-			if (spell == null) {
+			Spell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors, parts);
+			
+			if (fail || spell == null) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {
 					spellErrorStrings.add(new StringTextComponent(error));
@@ -860,6 +873,94 @@ public class SpellCreationGui {
 			}
 		}
 		
+		private static class SpellPartSegment extends FixedWidget {
+
+			private final SpellGui<?> gui;
+			
+			private final List<ITextComponent> tooltip;
+			private final int color;
+			
+			public SpellPartSegment(SpellGui<?> gui, SpellPartSummary part, int x, int y, int width, int height) {
+				super(x, y, width, height, StringTextComponent.EMPTY);
+				this.gui = gui;
+				
+				this.tooltip = new ArrayList<>(4);
+				if (part.isError()) {
+					tooltip.add(new StringTextComponent("Error"));
+					color = 0xFFFF0000;
+				} else if (part.isShape()) {
+					color = 0xFFCCCC44;
+					tooltip.add(new StringTextComponent("Shape"));
+				} else {
+					color = part.getEffect().getElement().getColor();
+					tooltip.add(new StringTextComponent("Effect"));
+				}
+			}
+			
+			@Override
+			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+				if (tooltip != null) {
+					gui.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
+				}
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0xFF404040);
+				RenderFuncs.drawRect(matrixStackIn, x + 1, y + 1, x + width - 1, y + height - 1, color);
+				
+				if (this.isHovered()) {
+					this.renderToolTip(matrixStackIn, mouseX, mouseY);
+				}
+			}
+		}
+		
+		protected static class SpellPartBar extends ParentWidget {
+			
+			private final SpellGui<?> gui;
+			private final List<SpellPartSegment> bars;
+			private final Vector3i[] slots;
+			private final int slotWidth;
+			
+			public SpellPartBar(SpellGui<?> gui, Vector3i[] slots, int slotWidth) {
+				super(gui.getGuiLeft(), gui.guiTop, gui.xSize, gui.ySize, StringTextComponent.EMPTY);
+				this.gui = gui;
+				this.bars = new ArrayList<>(slots.length);
+				this.slots = slots;
+				this.slotWidth = slotWidth;
+				
+				gui.getContainer().addListener((spell) -> {
+					this.refreshTo(gui.getContainer().parts);
+				});
+			}
+			
+			public void refreshTo(List<SpellPartSummary> parts) {
+				this.clearChildren();
+				for (SpellPartSummary part : parts) {
+					final int startX;
+					final int endX;
+					final int y;
+					final int barHeight;
+					
+					final Vector3i startSlot = slots[part.getStartIdx()];
+					final Vector3i endSlot = slots[part.getLastIdx()];
+					startX = startSlot.getX();
+					endX = endSlot.getX() + slotWidth;
+					y = startSlot.getY();
+					barHeight = 4;
+					
+					SpellPartSegment segment = new SpellPartSegment(gui, part, gui.getGuiLeft() + startX, gui.getGuiTop() + y, (endX - startX), barHeight);
+					bars.add(segment);
+					this.addChild(segment);
+				}
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				; // INVISIBLE
+			}
+		}
+		
 		protected static final void drawScrollMessage(MatrixStack matrixStackIn, int width, int height, FontRenderer fonter) {
 			final String message = "Insert Blank Scroll";
 			final int msgWidth = fonter.getStringWidth(message);
@@ -867,7 +968,7 @@ public class SpellCreationGui {
 			RenderFuncs.drawRect(matrixStackIn, -width/2, -height/2, width/2, height/2, 0xDD000000);
 			fonter.drawString(matrixStackIn, message, -msgWidth / 2, -fonter.FONT_HEIGHT/2, 0xFFFFFFFF);
 		}
-
+		
 		private T container;
 		
 		public SpellGui(T container, PlayerInventory playerInv, ITextComponent name) {

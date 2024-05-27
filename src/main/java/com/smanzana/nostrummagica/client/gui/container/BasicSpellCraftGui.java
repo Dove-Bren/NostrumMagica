@@ -208,6 +208,7 @@ public class BasicSpellCraftGui {
 		
 		protected TextFieldWidget nameField;
 		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
+		protected SpellPartBar partBarWidget;
 		protected List<Rectangle2d> extraAreas;
 		
 		private Vector3i[] runeSlots;
@@ -295,6 +296,19 @@ public class BasicSpellCraftGui {
 				this.addButton(this.extraInventoryWidget);
 				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getContainer().extraInventory.y, this.getContainer().extraInventory.width, this.getContainer().extraInventory.height));
 			}
+			
+			Vector3i[] belowSlots = new Vector3i[runeSlots.length];
+			for (int i = 0; i < runeSlots.length; i++) {
+				belowSlots[i] = new Vector3i(
+						runeSlots[i].getX(),
+						runeSlots[i].getY() + POS_SLOT_RUNES_WIDTH + 1,
+						runeSlots[i].getZ()
+					);
+			}
+			this.partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH);
+			this.addButton(partBarWidget);
+
+			this.getContainer().validate();
 		}
 
 		@Override
