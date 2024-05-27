@@ -207,7 +207,7 @@ public class ProjectileShape extends SpellShape {
 	
 	@Override
 	public int getWeight() {
-		return 0;
+		return 1;
 	}
 
 	@Override

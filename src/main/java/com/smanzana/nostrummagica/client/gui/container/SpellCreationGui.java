@@ -21,7 +21,6 @@ import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.BlankScroll;
-import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
@@ -479,9 +478,9 @@ public class SpellCreationGui {
 				if (count == null || count == 0)
 					continue;
 				
-				int left = takeReagent(crafter, inventory, type, count, false);
-				if (left != 0) {
-					spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
+				final int available = NostrumMagica.getReagentCount(crafter, type);
+				if (available < count) {
+					spellErrorStrings.add(new StringTextComponent("Need " + (count-available) + " more " + type.prettyName()));
 					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()).mergeStyle(TextFormatting.DARK_RED));
 					fail = true;
 				} else {
@@ -502,10 +501,9 @@ public class SpellCreationGui {
 					if (count == null)
 						continue;
 					
-					int left = takeReagent(crafter, inventory, type, count, true);
-					if (left != 0) {
+					if (!NostrumMagica.removeReagents(crafter, type, count)) {
 						System.out.println("Couldn't take all " + type.name());
-						spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
+						spellErrorStrings.add(new StringTextComponent("Need more " + type.prettyName()));
 						return null;
 					}
 					
@@ -513,34 +511,6 @@ public class SpellCreationGui {
 			}
 			
 			return spell;
-		}
-		
-		// if take, actually removes. Otherwise, just checks
-		// returns amount needed still. 0 means all that were needed are there
-		private static int takeReagent(PlayerEntity player, ISpellCraftingInventory craftingInventory, ReagentType type, int count, boolean take) {
-			final IInventory inventory = player.inventory;
-			for (int i = 0; i < inventory.getSizeInventory(); i++) {
-				@Nonnull ItemStack stack = inventory.getStackInSlot(i);
-				if (stack.isEmpty())
-					continue;
-				
-				if (ReagentItem.FindType(stack) == type) {
-					if (stack.getCount() > count) {
-						if (take)
-							inventory.decrStackSize(i, count);
-						count = 0;
-					} else {
-						count -= stack.getCount();
-						if (take)
-							inventory.setInventorySlotContents(i, ItemStack.EMPTY);
-					}
-					
-					if (count == 0)
-						break;
-				}
-			}
-			
-			return count;
 		}
 	}
 	
