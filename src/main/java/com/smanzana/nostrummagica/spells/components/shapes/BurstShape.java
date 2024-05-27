@@ -25,7 +25,7 @@ import net.minecraft.world.World;
 
 public class BurstShape extends InstantShape {
 
-	private static final String ID = "aoe";
+	private static final String ID = "burst";
 	
 	protected BurstShape(String id) {
 		super(id);

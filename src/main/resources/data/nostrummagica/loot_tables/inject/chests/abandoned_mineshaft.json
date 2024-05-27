@@ -10,31 +10,19 @@
       },
       {
         "type": "item",
-        "name": "nostrummagica:rune_shape_single",
-        "entryName": "rune1",
-        "weight": 4
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:rune_trigger_self",
-        "entryName": "rune2",
-        "weight": 4
-      },
-      {
-        "type": "item",
-        "name": "nostrummagica:rune_trigger_touch",
+        "name": "nostrummagica:rune_shape_touch",
         "entryName": "rune3",
         "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:rune_trigger_projectile",
+        "name": "nostrummagica:rune_shape_projectile",
         "entryName": "rune4",
         "weight": 4
       },
       {
         "type": "item",
-        "name": "nostrummagica:rune_shape_aoe",
+        "name": "nostrummagica:rune_shape_burst",
         "entryName": "rune5",
         "weight": 2
       },

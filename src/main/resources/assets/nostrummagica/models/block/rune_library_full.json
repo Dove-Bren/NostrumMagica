@@ -4,7 +4,7 @@
 	"textures": {
 		"particle": "nostrummagica:block/red_wood_planks",
 		"wood": "nostrummagica:block/red_wood_planks",
-		"rune_1": "nostrummagica:item/rune_single",
+		"rune_1": "nostrummagica:item/rune_feet",
 		"rune_2": "nostrummagica:item/rune_self",
 		"rune_3": "nostrummagica:item/rune_fire",
 		"rune_4": "nostrummagica:item/rune_touch",

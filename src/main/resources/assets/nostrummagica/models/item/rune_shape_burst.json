@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nostrummagica:item/rune_trigger_caster"
+        "layer0": "nostrummagica:item/rune_burst"
     }
 }

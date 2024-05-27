@@ -1,6 +1,0 @@
-{
-    "parent": "item/handheld",
-    "textures": {
-        "layer0": "nostrummagica:item/rune_trigger_feet"
-    }
-}
