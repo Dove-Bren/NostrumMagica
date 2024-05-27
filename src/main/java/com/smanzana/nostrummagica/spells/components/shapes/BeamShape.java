@@ -144,5 +144,10 @@ public class BeamShape extends InstantShape {
 	public int getManaCost() {
 		return 35;
 	}
+	
+	@Override
+	public boolean isTerminal(SpellShapePartProperties params) {
+		return true;
+	}
 
 }

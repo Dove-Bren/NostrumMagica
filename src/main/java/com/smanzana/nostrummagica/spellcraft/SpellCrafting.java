@@ -36,6 +36,7 @@ public class SpellCrafting {
 		
 		// All shapes must be first. (This isn't enforced or required by the rest of spellcrafting logic.)
 		boolean foundElement = false;
+		boolean foundTerminalShape = false;
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
 			stack = inventory.getStackInSlot(i);
 			if (stack.isEmpty()) {
@@ -53,6 +54,14 @@ public class SpellCrafting {
 				if (foundElement) {
 					errorsOut.add("Shape in slot " + (i - (startIdx-1)) + " is not allowed after effects have started");
 					valid = false;
+				} if (foundTerminalShape) {
+					errorsOut.add("Shape in slot " + (i - (startIdx-1)) + " is not allowed after a previous terminal shape");
+					valid = false;
+				} else {
+					SpellShapePart shapePart = SpellRune.getShapePart(stack);
+					if (shapePart.getShape().isTerminal(shapePart.getProperties())) {
+						foundTerminalShape = true;
+					}
 				}
 			}
 		}

@@ -155,5 +155,10 @@ public class BurstShape extends InstantShape {
 	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+	
+	@Override
+	public boolean isTerminal(SpellShapePartProperties params) {
+		return true;
+	}
 
 }

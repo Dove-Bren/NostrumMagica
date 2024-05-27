@@ -205,4 +205,9 @@ public class MagicCutterShape extends SpellShape {
 	public double getTraceRange(SpellShapePartProperties params) {
 		return PROJECTILE_RANGE;
 	}
+	
+	@Override
+	public boolean isTerminal(SpellShapePartProperties params) {
+		return true;
+	}
 }
