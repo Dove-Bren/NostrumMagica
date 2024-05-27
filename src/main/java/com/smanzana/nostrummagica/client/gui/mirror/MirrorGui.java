@@ -224,12 +224,12 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		int y = 0;
 		String str = "Magic Not Yet Unlocked";
 		int len = this.font.getStringWidth(str);
-		this.font.drawStringWithShadow(matrixStackIn, str, (this.width - len) / 2, guiHeight / 2, 0xFFFFFFFF);
+		this.font.drawStringWithShadow(matrixStackIn, str, (this.guiWidth - len) / 2, guiHeight / 3, 0xFFFFFFFF);
 		
 		y = font.FONT_HEIGHT + 2;
 		
 		len = this.font.getStringWidth(unlockPrompt);
-		this.font.drawString(matrixStackIn, unlockPrompt, (this.width - len) / 2, y + (guiHeight / 2), 0xFFDFD000);
+		this.font.drawString(matrixStackIn, unlockPrompt, (this.guiWidth - len) / 2, y + (guiHeight / 3), 0xFFDFD000);
 	}
 	
 	private void drawLockedScreenForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
@@ -257,7 +257,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		final int width = 24;
 		final int space = 32;
 		final long cycle = 1500;
-		int x = (int) (.5 * guiWidth) + (-width / 2) + (-space) + (-width);
+		int x = (int) (.5 * guiWidth) + (-width) + (-space / 2);
 		int y = (int)(guiHeight * .75f);
 		int strLen;
 		String str;
@@ -343,8 +343,10 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		matrixStackIn.pop();
 
-		organizeTabs();
-		super.render(matrixStackIn, mouseX, mouseY, partialTicks);
+		if (unlocked) {
+			organizeTabs();
+			super.render(matrixStackIn, mouseX, mouseY, partialTicks);
+		}
 		
 		// Undo mask and allow free drawing again
 		{

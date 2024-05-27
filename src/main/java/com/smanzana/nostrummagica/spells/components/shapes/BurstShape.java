@@ -37,6 +37,9 @@ public class BurstShape extends InstantShape {
 	
 	@Override
 	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+		
+		this.spawnShapeEffect(state.getCaster(), state.getSelf(), world, pos, param, characteristics);
+		
 		List<LivingEntity> ret = new ArrayList<>();
 		
 		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + .5;

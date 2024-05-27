@@ -95,8 +95,8 @@ public class SpellIngredientBuilder {
 		return base.weight + this.getWeightModifier();
 	}
 
-	public int getCurrentMana() {
-		return (int) (base.manaCost * this.getManaRate());
+	public float getCurrentMana() {
+		return base.manaRate * this.getManaRate();
 	}
 
 	public int getCurrentElementCountBonus() {
@@ -121,6 +121,16 @@ public class SpellIngredientBuilder {
 
 	public final SpellIngredient build() {
 		// Prefer element, then alteration, then shape since that goes from most-likely-to-produce-a-good-spell to least
+		if (getElementOverride() != null) {
+			return new SpellIngredient(getCurrentElement(), getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus());
+		}
+		if (getAlterationOverride() != null) {
+			return new SpellIngredient(getCurrentAlteration(), getCurrentWeight(), getCurrentMana());
+		}
+		if (getShapeOverride() != null) {
+			return new SpellIngredient(new SpellShapePart(getCurrentShape(), base.shape.getProperties()), getCurrentWeight(), getCurrentMana());
+		}
+
 		if (getCurrentElement() != null) {
 			return new SpellIngredient(getCurrentElement(), getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus());
 		}

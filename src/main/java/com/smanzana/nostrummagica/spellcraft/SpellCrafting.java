@@ -122,9 +122,9 @@ public class SpellCrafting {
 	
 	protected static int CalculateManaCost(SpellPart part, float multiplier) {
 		if (part.isShape()) {
-			return Math.max(0, CalculateManaCost(part.getShapePart(), multiplier + part.getManaRate()));
+			return Math.max(0, CalculateManaCost(part.getShapePart(), multiplier * part.getManaRate()));
 		} else {
-			return Math.max(0, CalculateManaCost(part.getEffectPart(), multiplier + part.getManaRate()));
+			return Math.max(0, CalculateManaCost(part.getEffectPart(), multiplier * part.getManaRate()));
 		}
 	}
 	
@@ -260,12 +260,12 @@ public class SpellCrafting {
 					manaRate = 1f;
 				}
 				
-				partsOut.add(new SpellPart(ingredient.shape, ingredient.weight, ingredient.manaCost));
+				partsOut.add(new SpellPart(ingredient.shape, ingredient.weight, ingredient.manaRate));
 			} else if (ingredient.alteration != null) {
 				if (element != null) {
 					weightBonus += ingredient.weight;
-					manaRate += (ingredient.manaCost - 1f);
-					partsOut.add(new SpellPart(element, elementCount, SpellRune.getAlteration(stack), weightBonus, manaRate));
+					manaRate += (ingredient.manaRate - 1f);
+					partsOut.add(new SpellPart(element, elementCount, ingredient.alteration, weightBonus, manaRate));
 					element = null;
 					elementCount = 0;
 					weightBonus = 0;
@@ -288,8 +288,8 @@ public class SpellCrafting {
 				element = runeElement;
 				elementCount += 1 + ingredient.elementCountBonus;
 				weightBonus += ingredient.weight;
-				manaRate += (ingredient.manaCost-1f);
-				while (elementCount >= 3) {
+				manaRate += (ingredient.manaRate-1f);
+				while (elementCount > 3) { // Don't go at 3 so that an alteration can come next
 					partsOut.add(new SpellPart(element, 3, null, weightBonus, manaRate));
 					elementCount -= 3;
 					weightBonus = 0;
@@ -312,11 +312,11 @@ public class SpellCrafting {
 	
 	public static final @Nullable SpellIngredient MakeIngredient(ItemStack rune) {
 		if (SpellRune.isShape(rune)) {
-			return new SpellIngredient(SpellRune.getShapePart(rune), 0, 0);
+			return new SpellIngredient(SpellRune.getShapePart(rune), 0, 1f);
 		} else if (SpellRune.isAlteration(rune)) {
-			return new SpellIngredient(SpellRune.getAlteration(rune), 0, 0);
+			return new SpellIngredient(SpellRune.getAlteration(rune), 0, 1f);
 		} else if (SpellRune.isElement(rune)) {
-			return new SpellIngredient(SpellRune.getElement(rune), 0, 0, 0);
+			return new SpellIngredient(SpellRune.getElement(rune), 0, 1f, 0);
 		} else {
 			return null; // Error
 		}

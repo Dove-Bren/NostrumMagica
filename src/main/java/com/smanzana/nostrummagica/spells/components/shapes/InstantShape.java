@@ -23,22 +23,24 @@ public abstract class InstantShape extends SpellShape {
 		private final Vector3d pos;
 		private final float pitch;
 		private final float yaw;
+		private final SpellShapePartProperties params;
 		private final SpellCharacteristics characteristics;
 		
-		public InstantShapeInstance(InstantShape shape, SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics) {
+		public InstantShapeInstance(InstantShape shape, SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 			super(state);
 			this.shape = shape;
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
+			this.params = params;
 			this.characteristics = characteristics;
 		}
 		
 		@Override
 		public void spawn(LivingEntity caster) {
 			// We are instant! Whoo!
-			TriggerData data = shape.getTargetData(this.getState(), world, pos, pitch, yaw, null, this.characteristics);
+			TriggerData data = shape.getTargetData(this.getState(), world, pos, pitch, yaw, params, this.characteristics);
 			this.trigger(data);
 		}
 	}
@@ -49,7 +51,7 @@ public abstract class InstantShape extends SpellShape {
 	
 	@Override
 	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new InstantShapeInstance(this, state, world, pos, pitch, yaw, characteristics);
+		return new InstantShapeInstance(this, state, world, pos, pitch, yaw, params, characteristics);
 	}
 	
 	/**

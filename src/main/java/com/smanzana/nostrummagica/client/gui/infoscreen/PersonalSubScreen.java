@@ -384,9 +384,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			drawY += 5 + iconWidth;
 			drawX = x + 20;
 			
-			mc.fontRenderer.drawString(matrixStackIn, I18n.format("trigger.name", (Object[]) null) + "(s):",
-					drawX, drawY, 0xFFFFFFFF);
-			drawY += 10;
+//			mc.fontRenderer.drawString(matrixStackIn, I18n.format("trigger.name", (Object[]) null) + "(s):",
+//					drawX, drawY, 0xFFFFFFFF);
+//			drawY += 10;
 			
 //			List<SpellTrigger> knownTriggers = attr.getTriggers();
 //			for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {

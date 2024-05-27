@@ -67,7 +67,7 @@ public class SpellEffectPart {
 		
 		if (tag.contains(NBT_ELEMENT, NBT.TAG_STRING)) {
 			try {
-				element = EMagicElement.valueOf(tag.getString(NBT_ELEMENT));
+				element = EMagicElement.valueOf(tag.getString(NBT_ELEMENT).toUpperCase());
 			} catch (Exception e) {
 				
 			}
@@ -79,7 +79,7 @@ public class SpellEffectPart {
 		
 		if (tag.contains(NBT_ALTERATION, NBT.TAG_STRING)) {
 			try {
-				alteration = EAlteration.valueOf(tag.getString(NBT_ALTERATION));
+				alteration = EAlteration.valueOf(tag.getString(NBT_ALTERATION).toUpperCase());
 			} catch (Exception e) {
 				
 			}

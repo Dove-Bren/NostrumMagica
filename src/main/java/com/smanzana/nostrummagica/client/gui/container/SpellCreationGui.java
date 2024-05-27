@@ -124,12 +124,13 @@ public class SpellCreationGui {
 				if (!(stack.getItem() instanceof SpellRune))
 					return false;
 				
-				boolean shape = SpellRune.isShape(stack);
-				if (!shape && prev == null) {
-					return false;
+				if (SpellRune.isShape(stack)) {
+					return prev == null || SpellRune.isShape(prev.getStack());
 				}
-				
-				return !shape || SpellRune.isShape(prev.getStack());
+				if (SpellRune.isAlteration(stack)) {
+					return prev != null && SpellRune.isElement(prev.getStack());
+				}
+				return true;
 			}
 			
 			@Override

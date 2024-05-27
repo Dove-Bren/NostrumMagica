@@ -66,7 +66,7 @@ public class OnDamageShape extends SpellShape {
 			if (type == Event.DAMAGED) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
-							Lists.newArrayList(this.entity),
+							Lists.newArrayList(entity),
 							null,
 							null
 							);
