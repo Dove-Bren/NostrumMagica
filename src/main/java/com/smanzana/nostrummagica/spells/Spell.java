@@ -163,7 +163,12 @@ public class Spell {
 					this.finish(targets, world, locations);
 				} else {
 					if (index > 0) {
-						NostrumMagicaSounds.CAST_CONTINUE.play(self);
+						if (locations != null && !locations.isEmpty()) {
+							Vector3d where = Vector3d.copyCentered(locations.get(0));
+							NostrumMagicaSounds.CAST_CONTINUE.play(world, where.getX(), where.getY(), where.getZ());
+						} else if (targets != null && !targets.isEmpty()) {
+							NostrumMagicaSounds.CAST_CONTINUE.play(targets.get(0));
+						}
 					}
 					
 					SpellShapePart shape = spell.shapes.get(index);

@@ -402,7 +402,7 @@ public class SpellCrafting {
 		}
 		
 		public SpellPart(int startIdx, int endIdx, SpellShape shape, int weightBonus, float manaRate) {
-			this(startIdx, endIdx, shape, new SpellShapePartProperties(), weightBonus, manaRate);
+			this(startIdx, endIdx, shape, shape.getDefaultProperties(), weightBonus, manaRate);
 		}
 		
 		public SpellPart(int startIdx, int endIdx, SpellEffectPart effect, int weightBonus, float manaRate) {

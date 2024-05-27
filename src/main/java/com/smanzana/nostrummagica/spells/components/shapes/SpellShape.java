@@ -278,6 +278,16 @@ public abstract class SpellShape {
 	public double getTraceRange(SpellShapePartProperties params) {
 		return 0;
 	}
+
+	public SpellShapePartProperties getDefaultProperties() {
+		final float val;
+		if (this.supportedFloats() != null) {
+			val = supportedFloats()[0];
+		} else {
+			val = 0f;
+		}
+		return new SpellShapePartProperties(val, false);
+	}
 	
 	
 }

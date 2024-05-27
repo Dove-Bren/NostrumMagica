@@ -110,9 +110,6 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	public static @Nullable SpellShapePartProperties GetPieceShapeParam(ItemStack piece) {
-		if (!piece.hasTag())
-			return null;
-		
 		if (piece.getItem() instanceof ShapeSpellRune) {
 			return ((ShapeSpellRune) piece.getItem()).getPieceShapeParam(piece);
 		}
@@ -121,9 +118,6 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	public static void setPieceParam(ItemStack piece, SpellShapePartProperties params) {
-		if (!piece.hasTag())
-			return;
-		
 		if (piece.getItem() instanceof ShapeSpellRune) {
 			((ShapeSpellRune) piece.getItem()).setPieceShapeParam(piece, params);
 		}
@@ -328,8 +322,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		public SpellShapePartProperties getPieceShapeParam(ItemStack piece) {
-			if (!piece.hasTag()) {
-				return new SpellShapePartProperties();
+			if (!piece.hasTag() || !piece.getTag().contains(NBT_SHAPE_PROPS)) {
+				return shape.getDefaultProperties();
 			}
 			
 			return SpellShapePartProperties.FromNBT(piece.getTag().getCompound(NBT_SHAPE_PROPS));

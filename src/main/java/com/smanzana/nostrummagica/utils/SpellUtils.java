@@ -23,7 +23,7 @@ public class SpellUtils {
 				if (i < objects.length - 1 && objects[i+1] instanceof SpellShapePartProperties) {
 					param = (SpellShapePartProperties) objects[++i];
 				} else {
-					param = new SpellShapePartProperties();
+					param = shape.getDefaultProperties();
 				}
 				
 				spell.addPart(new SpellShapePart(shape, param));

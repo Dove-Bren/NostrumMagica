@@ -23,7 +23,7 @@ public class SpellShapePart {
 	}
 	
 	public SpellShapePart(SpellShape shape) {
-		this(shape, new SpellShapePartProperties());
+		this(shape, shape.getDefaultProperties());
 	}
 
 	public SpellShape getShape() {
