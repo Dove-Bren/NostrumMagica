@@ -11,23 +11,15 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellRune.AlterationSpellRune;
-import com.smanzana.nostrummagica.items.SpellRune.ElementSpellRune;
-import com.smanzana.nostrummagica.items.SpellRune.PackedShapeSpellRune;
-import com.smanzana.nostrummagica.items.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProximityTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tiles.RuneShaperEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
@@ -37,7 +29,6 @@ import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftResultInventory;
@@ -55,6 +46,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class RuneShaperGui {
+	
+	private static int unused; // I will come back for you, RuneShaper <3
 	
 	private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/rune_shaper.png");
 	
@@ -216,7 +209,7 @@ public class RuneShaperGui {
 					
 				} else {
 					// Trying to add an item
-					if (SpellRune.isShape(cur) && !SpellRune.isPackedShape(cur)) {
+					if (SpellRune.isShape(cur)) {
 						// Shape piece, so only care about first slot
 						ItemStack existingStack = shaper.getStackInSlot(0);
 						
@@ -371,91 +364,93 @@ public class RuneShaperGui {
 		}
 		
 		protected @Nonnull ItemStack getOutput() {
-			// Shape and some elems are required
-			@Nullable LegacySpellShape shape = null;
-			@Nullable SpellPartProperties params = null;
-			@Nullable EAlteration alteration = null;
-			@Nullable EMagicElement element = null;
-			int elementCount = 0;
-			
-			for (int i = 0; i < shaper.getSizeInventory(); i++) {
-				ItemStack stack = shaper.getStackInSlot(i);
-				if (stack.isEmpty())
-					continue;
-				
-				if (!(stack.getItem() instanceof SpellRune))
-					return ItemStack.EMPTY;
-				
-				if (SpellRune.isTrigger(stack)) {
-					return ItemStack.EMPTY;
-				}
-				
-				if (SpellRune.isPackedShape(stack)) {
-					return ItemStack.EMPTY;
-				}
-				
-				if (SpellRune.isShape(stack)) {
-					if (shape != null) {
-						return ItemStack.EMPTY; // Already found a shape
-					}
-					
-					ShapeSpellRune shapeRune = (ShapeSpellRune) stack.getItem();
-					shape = shapeRune.getShape();
-					params = SpellRune.getPieceParam(stack);
-					continue;
-				}
-				
-				if (SpellRune.isAlteration(stack)) {
-					if (alteration != null) {
-						return ItemStack.EMPTY; // Only one alteration allowed
-					}
-					
-					AlterationSpellRune altRune = (AlterationSpellRune) stack.getItem();
-					alteration = altRune.getAlteration();
-					continue;
-				}
-				
-				if (SpellRune.isElement(stack)) {
-					EMagicElement runeElem = ((ElementSpellRune) stack.getItem()).getElement();
-					if (element != null && element != runeElem) {
-						// Already have an element, and it's different than this rune's
-						return ItemStack.EMPTY;
-					}
-					
-					if (elementCount + 1 > 4) {
-						// Have too many elements
-						return ItemStack.EMPTY;
-					}
-					
-					element = runeElem;
-					elementCount += 1;
-					continue;
-				}
-				
-				NostrumMagica.logger.warn("Found unknown rune type while doing rune combine recipe");
-				return ItemStack.EMPTY; // What is this?
-			}
-			
-			// If we've got this far, we didn't find any dupes but we still may not have all required pieces. Check
-			if (shape != null
-					&& element != null // implies count [1-4]
-					// not checking alteration because it 's optional
-					) {
-				
-				// 1 => 1
-				// 2 => 2
-				// 3 => 2
-				// 4 => 3
-				// log2(count) + 1
-				// log2(count) = log(count) / log(2)
-				int elemLevel = 1 + (int) (Math.log(elementCount) / Math.log(2));
-				
-				ItemStack output = SpellRune.getRune(shape, element, elemLevel, alteration);
-				SpellRune.setPieceParam(output, params);
-				return output;
-			}
-			
 			return ItemStack.EMPTY;
+			
+//			// Shape and some elems are required
+//			@Nullable LegacySpellShape shape = null;
+//			@Nullable SpellPartProperties params = null;
+//			@Nullable EAlteration alteration = null;
+//			@Nullable EMagicElement element = null;
+//			int elementCount = 0;
+//			
+//			for (int i = 0; i < shaper.getSizeInventory(); i++) {
+//				ItemStack stack = shaper.getStackInSlot(i);
+//				if (stack.isEmpty())
+//					continue;
+//				
+//				if (!(stack.getItem() instanceof SpellRune))
+//					return ItemStack.EMPTY;
+//				
+//				if (SpellRune.isTrigger(stack)) {
+//					return ItemStack.EMPTY;
+//				}
+//				
+//				if (SpellRune.isPackedShape(stack)) {
+//					return ItemStack.EMPTY;
+//				}
+//				
+//				if (SpellRune.isShape(stack)) {
+//					if (shape != null) {
+//						return ItemStack.EMPTY; // Already found a shape
+//					}
+//					
+//					ShapeSpellRune shapeRune = (ShapeSpellRune) stack.getItem();
+//					shape = shapeRune.getShape();
+//					params = SpellRune.getPieceParam(stack);
+//					continue;
+//				}
+//				
+//				if (SpellRune.isAlteration(stack)) {
+//					if (alteration != null) {
+//						return ItemStack.EMPTY; // Only one alteration allowed
+//					}
+//					
+//					AlterationSpellRune altRune = (AlterationSpellRune) stack.getItem();
+//					alteration = altRune.getAlteration();
+//					continue;
+//				}
+//				
+//				if (SpellRune.isElement(stack)) {
+//					EMagicElement runeElem = ((ElementSpellRune) stack.getItem()).getElement();
+//					if (element != null && element != runeElem) {
+//						// Already have an element, and it's different than this rune's
+//						return ItemStack.EMPTY;
+//					}
+//					
+//					if (elementCount + 1 > 4) {
+//						// Have too many elements
+//						return ItemStack.EMPTY;
+//					}
+//					
+//					element = runeElem;
+//					elementCount += 1;
+//					continue;
+//				}
+//				
+//				NostrumMagica.logger.warn("Found unknown rune type while doing rune combine recipe");
+//				return ItemStack.EMPTY; // What is this?
+//			}
+//			
+//			// If we've got this far, we didn't find any dupes but we still may not have all required pieces. Check
+//			if (shape != null
+//					&& element != null // implies count [1-4]
+//					// not checking alteration because it 's optional
+//					) {
+//				
+//				// 1 => 1
+//				// 2 => 2
+//				// 3 => 2
+//				// 4 => 3
+//				// log2(count) + 1
+//				// log2(count) = log(count) / log(2)
+//				int elemLevel = 1 + (int) (Math.log(elementCount) / Math.log(2));
+//				
+//				ItemStack output = SpellRune.getRune(shape, element, elemLevel, alteration);
+//				SpellRune.setPieceParam(output, params);
+//				return output;
+//			}
+//			
+//			return ItemStack.EMPTY;
 		}
 		
 		public void refreshOutput() {
@@ -510,12 +505,12 @@ public class RuneShaperGui {
 		}
 		
 		protected void drawAffectEntity(MatrixStack matrixStackIn, float[] color) {
-			SpellComponentIcon.get(SingleShape.instance())
+			SpellComponentIcon.get(NostrumSpellShapes.AtFeet)
 				.draw(this, matrixStackIn, this.font, 0, 0, 12, 12, color[0], color[1], color[2], color[3]);
 		}
 		
 		protected void drawAffectBlock(MatrixStack matrixStackIn, float[] color) {
-			SpellComponentIcon.get(ProximityTrigger.instance())
+			SpellComponentIcon.get(NostrumSpellShapes.Proximity)
 				.draw(this, matrixStackIn, this.font, 0, 0, 12, 12, color[0], color[1], color[2], color[3]);
 		}
 		
@@ -564,68 +559,68 @@ public class RuneShaperGui {
 			
 			// Draw info about current rune output
 			if (container.outputSlot.getHasStack()) {
-				ItemStack output = container.outputSlot.getStack();
-				PackedShapeSpellRune rune = (PackedShapeSpellRune) output.getItem();
-				
-				final EMagicElement element = rune.getNestedElement(output);
-				final EAlteration alteration = rune.getNestedAlteration(output);
-				final int elementLevel = rune.getNestedElementCount(output);
-				
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
-				final boolean known = attr != null && attr.hasKnowledge(element, alteration);
-				final String name;
-				final String desc;
-				
-				if (known) {
-					final String suffix = elementLevel <= 1 ? ""
-							: elementLevel <= 2 ? " II"
-							: " III";
-					
-					lastAction = getAction(element, alteration);
-					name = I18n.format("effect." + lastAction.getName() + ".name", (Object[]) null) + suffix;
-					desc = I18n.format("effect." + lastAction.getName() + ".desc", (Object[]) null);
-					
-					lastProps = lastAction.getProperties();
-					
-				} else {
-					name = "Unknown Effect";
-					desc = "You haven't seen this effect before. Make a spell with it to find out what it does!";
-					lastProps = null;
-					lastAction = null;
-				}
-				
-				int len = mc.fontRenderer.getStringWidth(name);
-				mc.fontRenderer.drawStringWithShadow(matrixStackIn, name,
-						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
-						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
-				
-				RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, desc,
-						horizontalMargin + (PANEL_HOFFSET) + 10,
-						verticalMargin + PANEL_VOFFSET + 5 + 15,
-						PANEL_WIDTH - 20,
-						0xFFA0A0A0);
-				
-				if (lastProps != null) {
-					matrixStackIn.push();
-					matrixStackIn.translate(horizontalMargin + PANEL_WIDTH - (30), verticalMargin + PANEL_VOFFSET - 3, 0); // duped in foreground
-					
-					float color[] = {1f, 1f, 1f, 1f};
-					if (!lastProps.affectsEntity) {
-						color = new float[] {.3f, .3f, .3f, .4f};
-					}
-					drawAffectEntity(matrixStackIn, color);
-					
-					matrixStackIn.translate(12 + 4, 0, 0);
-					if (lastProps.affectsBlock) {
-						color = new float[] {1f, 1f, 1f, 1f};
-					} else {
-						color = new float[] {.3f, .3f, .3f, .4f};
-					}
-					drawAffectBlock(matrixStackIn, color);
-					
-					
-					matrixStackIn.pop();
-				}
+//				ItemStack output = container.outputSlot.getStack();
+//				PackedShapeSpellRune rune = (PackedShapeSpellRune) output.getItem();
+//				
+//				final EMagicElement element = rune.getNestedElement(output);
+//				final EAlteration alteration = rune.getNestedAlteration(output);
+//				final int elementLevel = rune.getNestedElementCount(output);
+//				
+//				INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
+//				final boolean known = attr != null && attr.hasKnowledge(element, alteration);
+//				final String name;
+//				final String desc;
+//				
+//				if (known) {
+//					final String suffix = elementLevel <= 1 ? ""
+//							: elementLevel <= 2 ? " II"
+//							: " III";
+//					
+//					lastAction = getAction(element, alteration);
+//					name = I18n.format("effect." + lastAction.getName() + ".name", (Object[]) null) + suffix;
+//					desc = I18n.format("effect." + lastAction.getName() + ".desc", (Object[]) null);
+//					
+//					lastProps = lastAction.getProperties();
+//					
+//				} else {
+//					name = "Unknown Effect";
+//					desc = "You haven't seen this effect before. Make a spell with it to find out what it does!";
+//					lastProps = null;
+//					lastAction = null;
+//				}
+//				
+//				int len = mc.fontRenderer.getStringWidth(name);
+//				mc.fontRenderer.drawStringWithShadow(matrixStackIn, name,
+//						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
+//						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
+//				
+//				RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, desc,
+//						horizontalMargin + (PANEL_HOFFSET) + 10,
+//						verticalMargin + PANEL_VOFFSET + 5 + 15,
+//						PANEL_WIDTH - 20,
+//						0xFFA0A0A0);
+//				
+//				if (lastProps != null) {
+//					matrixStackIn.push();
+//					matrixStackIn.translate(horizontalMargin + PANEL_WIDTH - (30), verticalMargin + PANEL_VOFFSET - 3, 0); // duped in foreground
+//					
+//					float color[] = {1f, 1f, 1f, 1f};
+//					if (!lastProps.affectsEntity) {
+//						color = new float[] {.3f, .3f, .3f, .4f};
+//					}
+//					drawAffectEntity(matrixStackIn, color);
+//					
+//					matrixStackIn.translate(12 + 4, 0, 0);
+//					if (lastProps.affectsBlock) {
+//						color = new float[] {1f, 1f, 1f, 1f};
+//					} else {
+//						color = new float[] {.3f, .3f, .3f, .4f};
+//					}
+//					drawAffectBlock(matrixStackIn, color);
+//					
+//					
+//					matrixStackIn.pop();
+//				}
 			}
 		}
 		
@@ -667,7 +662,7 @@ public class RuneShaperGui {
 			
 			SpellAction action = map.get(element);
 			if (action == null) {
-				action = LegacySpell.solveAction(null, alteration, element, 1);
+				action = Spell.solveAction(alteration, element, 1);
 				map.put(element, action);
 			}
 			
