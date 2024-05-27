@@ -23,7 +23,6 @@ import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
 import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.quests.rewards.IReward;
-import com.smanzana.nostrummagica.quests.rewards.TriggerReward;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;

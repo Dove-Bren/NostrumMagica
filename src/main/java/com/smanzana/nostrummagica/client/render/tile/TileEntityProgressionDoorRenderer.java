@@ -117,10 +117,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 			for (SpellComponentWrapper comp : tileEntityIn.getRequiredComponents()) {
 				boolean has = false;
 				SpellComponentIcon icon;
-				if (comp.isTrigger()) {
-					icon = SpellComponentIcon.get(comp.getTrigger());
-					has = attr != null && attr.getTriggers().contains(comp.getTrigger());
-				} else if (comp.isShape()) {
+				if (comp.isShape()) {
 					icon = SpellComponentIcon.get(comp.getShape());
 					has = attr != null && attr.getShapes().contains(comp.getShape());
 				} else if (comp.isAlteration()) {

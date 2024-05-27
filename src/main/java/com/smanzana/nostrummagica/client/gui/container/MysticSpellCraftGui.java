@@ -14,14 +14,14 @@ import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCre
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
+import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
 import com.smanzana.nostrummagica.tiles.MysticSpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -429,7 +429,7 @@ public class MysticSpellCraftGui {
 			getContainer().validate();
 			if (getContainer().spellValid) {
 				// whoo make spell
-				LegacySpell spell = getContainer().makeSpell(true);
+				Spell spell = getContainer().makeSpell(true);
 				if (spell != null) {
 					// All of this happens again and is synced back to client
 					// But in the mean, might as well do it here for the
@@ -558,7 +558,7 @@ public class MysticSpellCraftGui {
 							hasModifier = true;
 							final ItemStack rune = getContainer().inventory.getRuneSlotContents(runeSlotIdx);
 							if (!rune.isEmpty()) {
-								isModified = modifier.canModify(context, SpellRune.getPart(rune));
+								isModified = modifier.canModify(context, SpellCrafting.MakeIngredient(rune));
 							} else {
 								isModified = false;
 							}

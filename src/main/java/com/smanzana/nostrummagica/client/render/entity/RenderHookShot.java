@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelHookShot;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.EntityHookShot;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.culling.ClippingHelper;
@@ -100,7 +100,7 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 		
 		// First, render chain
 		if (shooter != null) {
-			Vector3d offset = ProjectileTrigger.getVectorForRotation(shooter.rotationPitch - 90f, shooter.rotationYawHead + 90f).scale(.1);
+			Vector3d offset = Projectiles.getVectorForRotation(shooter.rotationPitch - 90f, shooter.rotationYawHead + 90f).scale(.1);
 			final Vector3d diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
 			final float totalLength = (float) diff.distanceTo(new Vector3d(0,0,0));
 			final float segments = totalLength / texLen;

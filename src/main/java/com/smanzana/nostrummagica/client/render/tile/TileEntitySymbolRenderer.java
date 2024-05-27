@@ -27,9 +27,7 @@ public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntit
 		// Get the model from the tile entity
 		SpellComponentWrapper comp = tileEntityIn.getComponent();
 		SpellComponentIcon icon;
-		if (comp.isTrigger())
-			icon = SpellComponentIcon.get(comp.getTrigger());
-		else if (comp.isShape())
+		if (comp.isShape())
 			icon = SpellComponentIcon.get(comp.getShape());
 		else if (comp.isAlteration())
 			icon = SpellComponentIcon.get(comp.getAlteration());

@@ -17,10 +17,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -52,11 +51,8 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			if (attr.isUnlocked()) {
 				desc = I18n.format("info.discovery.spells", new Object[0]);
 			} else {
-				SpellTrigger trigger = null;
-				LegacySpellShape shape = null;
+				SpellShape shape = null;
 				EMagicElement element = null;
-				if (!attr.getTriggers().isEmpty())
-					trigger = attr.getTriggers().get(0);
 				if (!attr.getShapes().isEmpty())
 					shape = attr.getShapes().get(0);
 				
@@ -70,7 +66,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					}
 				}
 				
-				if (trigger != null || shape != null || element != null) {
+				if (shape != null || element != null) {
 					desc = I18n.format("info.discovery.starting2", new Object[0]);
 				} else {
 					desc = I18n.format("info.discovery.starting", new Object[0]);
@@ -103,29 +99,12 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 				drawx += iconWidth + space;
 				RenderFuncs.drawRect(matrixStackIn, drawx - 2, drawy - 2, drawx + iconWidth + 2, drawy + iconWidth + 2, 0xA0000000);
-				if (trigger != null)
-					color = new float[] {1f, 1f, 1f, 1f};
-				else {
-					color = new float[] {.8f, .5f, .5f, .5f};
-					Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
-					SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
-					trigger = trigArray[
-		                  (int) (System.currentTimeMillis() / cycle) % trigArray.length
-					      ];
-				}
-				SpellComponentIcon.get(trigger).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
-				str = I18n.format("trigger.name", new Object[0]);
-				strLen = mc.fontRenderer.getStringWidth(str);
-				mc.fontRenderer.drawString(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
-				
-				drawx += iconWidth + space;
-				RenderFuncs.drawRect(matrixStackIn, drawx - 2, drawy - 2, drawx + iconWidth + 2, drawy + iconWidth + 2, 0xA0000000);
 				if (shape != null)
 					color = new float[] {1f, 1f, 1f, 1f};
 				else {
 					color = new float[] {.8f, .5f, .5f, .5f};
-					Collection<LegacySpellShape> shapes = LegacySpellShape.getAllShapes();
-					LegacySpellShape[] shapeArray = shapes.toArray(new LegacySpellShape[0]);
+					Collection<SpellShape> shapes = SpellShape.getAllShapes();
+					SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
 					shape = shapeArray[
 		                  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 					      ];
@@ -262,10 +241,10 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				labels.add(label);
 				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
 				drawY += 15;
-				label = new StatLabel("maxtriggers", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
+//				label = new StatLabel("maxtriggers", drawX, drawY);
+//				labels.add(label);
+//				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
+//				drawY += 15;
 				label = new StatLabel("maxelements", drawX, drawY);
 				labels.add(label);
 				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
@@ -327,9 +306,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
-			text = String.format("%4d", NostrumMagica.getMaxTriggers(attr));
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
+//			text = String.format("%4d", NostrumMagica.getMaxTriggers(attr));
+//			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+//			drawY += 15;
 			
 			text = String.format("%4d", NostrumMagica.getMaxElements(attr));
 			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
@@ -409,37 +388,37 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					drawX, drawY, 0xFFFFFFFF);
 			drawY += 10;
 			
-			List<SpellTrigger> knownTriggers = attr.getTriggers();
-			for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
-				if (knownTriggers.contains(trigger))
-					alpha = known;
-				else
-					alpha = unknown;
-				
-				RenderFuncs.drawRect(matrixStackIn, drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
-				SpellComponentIcon.get(trigger).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
-				
-				if (mouseX >= drawX && mouseY >= drawY
-						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
-					if (knownTriggers.contains(trigger)) {
-						tooltipText = trigger.getDisplayName();
-					} else {
-						tooltipText = "Unknown Trigger";
-					}
-				}
-				
-				drawX += 5 + iconWidth;
-			}
-			
-			drawY += 5 + iconWidth;
-			drawX = x + 20;
+//			List<SpellTrigger> knownTriggers = attr.getTriggers();
+//			for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
+//				if (knownTriggers.contains(trigger))
+//					alpha = known;
+//				else
+//					alpha = unknown;
+//				
+//				RenderFuncs.drawRect(matrixStackIn, drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
+//				SpellComponentIcon.get(trigger).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
+//				
+//				if (mouseX >= drawX && mouseY >= drawY
+//						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
+//					if (knownTriggers.contains(trigger)) {
+//						tooltipText = trigger.getDisplayName();
+//					} else {
+//						tooltipText = "Unknown Trigger";
+//					}
+//				}
+//				
+//				drawX += 5 + iconWidth;
+//			}
+//			
+//			drawY += 5 + iconWidth;
+//			drawX = x + 20;
 			
 			mc.fontRenderer.drawString(matrixStackIn, I18n.format("shape.name", (Object[]) null) + "(s):",
 					drawX, drawY, 0xFFFFFFFF);
 			drawY += 10;
 			
-			List<LegacySpellShape> knownShapes = attr.getShapes();
-			for (LegacySpellShape shape : LegacySpellShape.getAllShapes()) {
+			List<SpellShape> knownShapes = attr.getShapes();
+			for (SpellShape shape : SpellShape.getAllShapes()) {
 				if (knownShapes.contains(shape))
 					alpha = known;
 				else
@@ -679,7 +658,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			SpellAction action = map.get(element);
 			if (action == null) {
-				action = LegacySpell.solveAction(null, alteration, element, 1);
+				action = Spell.solveAction(alteration, element, 1);
 				map.put(element, action);
 			}
 			

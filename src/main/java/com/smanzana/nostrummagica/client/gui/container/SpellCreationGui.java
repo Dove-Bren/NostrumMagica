@@ -21,8 +21,7 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -125,11 +124,12 @@ public class SpellCreationGui {
 				if (!(stack.getItem() instanceof SpellRune))
 					return false;
 				
-				boolean trigger = SpellRune.isTrigger(stack);
-				if (!trigger && !SpellRune.isPackedShape(stack))
+				boolean shape = SpellRune.isShape(stack);
+				if (!shape && prev == null) {
 					return false;
+				}
 				
-				return (prev != null || trigger);
+				return !shape || SpellRune.isShape(prev.getStack());
 			}
 			
 			@Override
@@ -264,16 +264,18 @@ public class SpellCreationGui {
 							// Table will naturally shift things down
 						} else {
 							// If this is anything but shape or trigger, do nothing
-							SpellComponentWrapper wrapper = SpellRune.toComponentWrapper(cur);
-							boolean add = false;
-							if (wrapper.isTrigger()) {
-								// Can always add triggers
-								add = true;
-							} else if (SpellRune.isPackedShape(cur)) {
-								// Must have a trigger in first slot already
-								if (!inventory.getRuneSlotContents(0).isEmpty())
-									add = true;
-							}
+							//SpellComponentWrapper wrapper = SpellRune.toComponentWrapper(cur);
+							boolean add = true;
+//							if (wrapper.isElement()) {
+//								// Can always add elements
+//								add = true;
+//							} else if (wrapper.isAlteration()) {
+//								add = 
+//							} else if (SpellRune.isPackedShape(cur)) {
+//								// Must have a trigger in first slot already
+//								if (!inventory.getRuneSlotContents(0).isEmpty())
+//									add = true;
+//							}
 							
 							if (add) {
 								int index = 0;
@@ -347,7 +349,7 @@ public class SpellCreationGui {
 			
 			checkScroll();
 			if (this.hasScroll) {
-				LegacySpell spell = makeSpell();
+				Spell spell = makeSpell();
 				spellValid = (spell != null);
 			} else {
 				spellValid = false;
@@ -358,17 +360,17 @@ public class SpellCreationGui {
 			return this.context;
 		}
 		
-		public LegacySpell makeSpell() {
+		public Spell makeSpell() {
 			return makeSpell(false);
 		}
 		
-		public LegacySpell makeSpell(boolean clear) {
+		public Spell makeSpell(boolean clear) {
 			return makeSpell(this.getName(), this.getSpellIcon(), this.getCraftPattern(), clear);
 		}
 		
-		public LegacySpell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
+		public Spell makeSpell(String name, int iconIdx, @Nullable SpellCraftPattern pattern, boolean clear) {
 			// Don't cache from validate... just in case...
-			LegacySpell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			Spell spell = craftSpell(getCraftContext(), pattern, name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;
@@ -387,7 +389,7 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static LegacySpell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
+		public static Spell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -426,7 +428,14 @@ public class SpellCreationGui {
 			}
 			
 			// Actually make spell
-			LegacySpell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount());
+			Spell spell = SpellCrafting.CreateSpellFromRunes(context, pattern, name, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors);
+			if (spell == null) {
+				// Dump raw errors into output strings and return
+				for (String error : rawSpellErrors) {
+					spellErrorStrings.add(new StringTextComponent(error));
+				}
+				return null;
+			}
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.tiles;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.block.BlockState;
@@ -18,7 +17,6 @@ public class SymbolTileEntity extends TileEntity {
 	
 	private EMagicElement element;
 	private EAlteration alteration;
-	private SpellTrigger trigger;
 	private SpellShape shape;
 	private float scale;
 	
@@ -75,28 +73,18 @@ public class SymbolTileEntity extends TileEntity {
 	private void setElement(EMagicElement element) {
 		this.element = element;
 		this.alteration = null;
-		this.trigger = null;
 		this.shape = null;
 	}
 	
 	private void setAlteration(EAlteration alteration) {
 		this.element = null;
 		this.alteration = alteration;
-		this.trigger = null;
-		this.shape = null;
-	}
-	
-	private void setTrigger(SpellTrigger trigger) {
-		this.element = null;
-		this.alteration = null;
-		this.trigger = trigger;
 		this.shape = null;
 	}
 	
 	private void setShape(SpellShape shape) {
 		this.element = null;
 		this.alteration = null;
-		this.trigger = null;
 		this.shape = shape;
 	}
 	
@@ -117,9 +105,6 @@ public class SymbolTileEntity extends TileEntity {
 		} else if (shape != null) {
 			nbt.putString(NBT_TYPE, "shape");
 			nbt.putString(NBT_KEY, shape.getShapeKey());
-		} else if (trigger != null) {
-			nbt.putString(NBT_TYPE, "trigger");
-			nbt.putString(NBT_KEY, trigger.getTriggerKey());
 		}
 		
 		nbt.putFloat(NBT_SCALE, scale);
@@ -161,13 +146,6 @@ public class SymbolTileEntity extends TileEntity {
 				setElement(EMagicElement.PHYSICAL);
 			else
 				setShape(shape);
-			break;
-		case "trigger":
-			SpellTrigger trigger = SpellTrigger.get(key);
-			if (trigger == null)
-				setElement(EMagicElement.PHYSICAL);
-			else
-				setTrigger(trigger);
 			break;
 		default:
 			setElement(EMagicElement.PHYSICAL);

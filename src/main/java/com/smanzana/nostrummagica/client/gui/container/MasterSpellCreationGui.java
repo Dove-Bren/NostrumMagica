@@ -23,8 +23,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.tiles.SpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
@@ -325,16 +324,16 @@ public class MasterSpellCreationGui {
 							// Table will naturally shift things down
 						} else {
 							// If this is anything but shape or trigger, do nothing
-							SpellComponentWrapper wrapper = SpellRune.toComponentWrapper(cur);
-							boolean add = false;
-							if (wrapper.isTrigger()) {
-								// Can always add triggers
-								add = true;
-							} else if (SpellRune.isPackedShape(cur)) {
-								// Must have a trigger in first slot already
-								if (!inventory.getStackInSlot(inventory.getRuneSlotIndex()).isEmpty())
-									add = true;
-							}
+							//SpellComponentWrapper wrapper = SpellRune.toComponentWrapper(cur);
+							boolean add = true;
+//							if (wrapper.isTrigger()) {
+//								// Can always add triggers
+//								add = true;
+//							} else if (SpellRune.isPackedShape(cur)) {
+//								// Must have a trigger in first slot already
+//								if (!inventory.getStackInSlot(inventory.getRuneSlotIndex()).isEmpty())
+//									add = true;
+//							}
 							
 							if (add) {
 								int index = inventory.getRuneSlotIndex();
@@ -367,17 +366,17 @@ public class MasterSpellCreationGui {
 			if (reagentStrings == null)
 				reagentStrings = new LinkedList<>();
 			
-			LegacySpell spell = makeSpell(name, iconIdx);
+			Spell spell = makeSpell(name, iconIdx);
 			spellValid = (spell != null);
 		}
 		
-		public LegacySpell makeSpell(String name, int iconIdx) {
+		public Spell makeSpell(String name, int iconIdx) {
 			return makeSpell(name, iconIdx, false);
 		}
 		
-		public LegacySpell makeSpell(String name, int iconIdx, boolean clear) {
+		public Spell makeSpell(String name, int iconIdx, boolean clear) {
 			// Don't cache from validate... just in case...
-			LegacySpell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
+			Spell spell = craftSpell(name, iconIdx, this.inventory, this.player, this.spellErrorStrings, this.reagentStrings, clear);
 			
 			if (spell == null)
 				return null;
@@ -390,7 +389,7 @@ public class MasterSpellCreationGui {
 			return spell;
 		}
 		
-		public static LegacySpell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
+		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -430,7 +429,14 @@ public class MasterSpellCreationGui {
 			
 			// Actually make spell
 			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
-			LegacySpell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1);
+			Spell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors);
+			if (spell == null) {
+				// Dump raw errors into output strings and return
+				for (String error : rawSpellErrors) {
+					spellErrorStrings.add(new StringTextComponent(error));
+				}
+				return null;
+			}
 			
 			// Do reagent check
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();
@@ -721,7 +727,7 @@ public class MasterSpellCreationGui {
 							container.validate();
 							if (container.spellValid) {
 								// whoo make spell
-								LegacySpell spell = container.makeSpell(container.name.toString(), container.iconIndex, true);
+								Spell spell = container.makeSpell(container.name.toString(), container.iconIndex, true);
 								if (spell != null) {
 									// All of this happens again and is synced back to client
 									// But in the mean, might as well do it here for the
@@ -806,11 +812,12 @@ public class MasterSpellCreationGui {
 			if (!(stack.getItem() instanceof SpellRune))
 				return false;
 			
-			boolean trigger = SpellRune.isTrigger(stack);
-			if (!trigger && !SpellRune.isPackedShape(stack))
-				return false;
-			
-			return (prev != null || trigger);
+//			boolean trigger = SpellRune.isTrigger(stack);
+//			if (!trigger && !SpellRune.isPackedShape(stack))
+//				return false;
+//			
+//			return (prev != null || trigger);
+			return true;
 		}
 		
 		@Override

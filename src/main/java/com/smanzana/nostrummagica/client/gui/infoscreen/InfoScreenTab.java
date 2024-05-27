@@ -21,8 +21,7 @@ import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.RitualRegistry;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -146,7 +145,7 @@ public abstract class InfoScreenTab {
 		};
 		
 		INFO_SPELLS = new InfoScreenTab(InfoScreenTabs.INFO_SPELLS,
-				SpellRune.getRune(EMagicElement.FIRE, 1)) {
+				SpellRune.getRune(EMagicElement.FIRE)) {
 
 			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
 				List<ILoreTagged> list = new LinkedList<>();
@@ -337,21 +336,15 @@ public abstract class InfoScreenTab {
 				buttons.add(button);
 				index("builtin::guides::spells", button);
 				
-				button = new SubscreenInfoButton(screen, "trigger",
-						new PaginatedInfoSubScreen(screen, "trigger"),
-						SpellRune.getRune(SelfTrigger.instance()));
-				buttons.add(button);
-				index("builtin::guides::trigger", button);
-				
 				button = new SubscreenInfoButton(screen, "shape",
 						new PaginatedInfoSubScreen(screen, "shape"),
-						SpellRune.getRune(SingleShape.instance()));
+						SpellRune.getRune(NostrumSpellShapes.Touch));
 				buttons.add(button);
 				index("builtin::guides::shape", button);
 				
 				button = new SubscreenInfoButton(screen, "element",
 						new PaginatedInfoSubScreen(screen, "element"),
-						SpellRune.getRune(EMagicElement.FIRE, 1));
+						SpellRune.getRune(EMagicElement.FIRE));
 				buttons.add(button);
 				index("builtin::guides::element", button);
 				
@@ -442,43 +435,43 @@ public abstract class InfoScreenTab {
 				
 				button = new SubscreenInfoButton(screen, "trial.fire",
 						new PaginatedInfoSubScreen(screen, "trial.fire"),
-						SpellRune.getRune(EMagicElement.FIRE, 1));
+						SpellRune.getRune(EMagicElement.FIRE));
 				buttons.add(button);
 				this.index("builtin::trials::fire", button);
 				
 				button = new SubscreenInfoButton(screen, "trial.ice",
 						new PaginatedInfoSubScreen(screen, "trial.ice"),
-						SpellRune.getRune(EMagicElement.ICE, 1));
+						SpellRune.getRune(EMagicElement.ICE));
 				buttons.add(button);
 				this.index("builtin::trials::ice", button);
 				
 				button = new SubscreenInfoButton(screen, "trial.earth",
 						new PaginatedInfoSubScreen(screen, "trial.earth"),
-						SpellRune.getRune(EMagicElement.EARTH, 1));
+						SpellRune.getRune(EMagicElement.EARTH));
 				buttons.add(button);
 				this.index("builtin::trials::earth", button);
 				
 				button = new SubscreenInfoButton(screen, "trial.wind",
 						new PaginatedInfoSubScreen(screen, "trial.wind"),
-						SpellRune.getRune(EMagicElement.WIND, 1));
+						SpellRune.getRune(EMagicElement.WIND));
 				buttons.add(button);
 				this.index("builtin::trials::wind", button);
 				
 				button = new SubscreenInfoButton(screen, "trial.ender",
 						new PaginatedInfoSubScreen(screen, "trial.ender"),
-						SpellRune.getRune(EMagicElement.ENDER, 1));
+						SpellRune.getRune(EMagicElement.ENDER));
 				buttons.add(button);
 				this.index("builtin::trials::ender", button);
 				
 				button = new SubscreenInfoButton(screen, "trial.lightning",
 						new PaginatedInfoSubScreen(screen, "trial.lightning"),
-						SpellRune.getRune(EMagicElement.LIGHTNING, 1));
+						SpellRune.getRune(EMagicElement.LIGHTNING));
 				buttons.add(button);
 				this.index("builtin::trials::lightning", button);
 				
 				button = new SubscreenInfoButton(screen, "trial.physical",
 						new PaginatedInfoSubScreen(screen, "trial.physical"),
-						SpellRune.getRune(EMagicElement.PHYSICAL, 1));
+						SpellRune.getRune(EMagicElement.PHYSICAL));
 				buttons.add(button);
 				this.index("builtin::trials::physical", button);
 					

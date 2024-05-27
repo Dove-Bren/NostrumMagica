@@ -149,10 +149,6 @@ public class SpellTableEntity extends TileEntity implements ISpellCraftingInvent
 		
 			if (!(stack.getItem() instanceof SpellRune))
 				return false;
-			
-			if (index == 1) {
-				return SpellRune.isTrigger(stack);
-			}
 
 			return true;
 		}

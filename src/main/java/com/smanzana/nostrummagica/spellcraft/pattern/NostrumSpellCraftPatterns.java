@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spellcraft.modifier.FlatSpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -67,14 +67,14 @@ public class NostrumSpellCraftPatterns {
 				
 		registry.register(new StaticSpellCraftPattern(
 				halfMana,
-				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(SingleShape.instance()).overrideAlteration(EAlteration.RESIST).build(),
-				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(SingleShape.instance()).overrideAlteration(EAlteration.RUIN).build()
+				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(NostrumSpellShapes.Touch).overrideAlteration(EAlteration.RESIST).build(),
+				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(NostrumSpellShapes.Touch).overrideAlteration(EAlteration.RUIN).build()
 				).setRegistryName(ID_TICKTOCK));
 		
 		registry.register(new StaticSpellCraftPattern(
 				halfMana,
-				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(SingleShape.instance()).overrideAlteration(EAlteration.CORRUPT).build(),
-				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(SingleShape.instance()).overrideAlteration(EAlteration.GROWTH).build()
+				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(NostrumSpellShapes.Touch).overrideAlteration(EAlteration.CORRUPT).build(),
+				new FlatSpellCraftModifier.Builder().weight(-1).overrideShape(NostrumSpellShapes.Touch).overrideAlteration(EAlteration.GROWTH).build()
 				).setRegistryName(ID_TOCKTICK));
 				
 	}

@@ -67,7 +67,7 @@ public class LoreInfoButton extends InfoButton {
 		if (iconStack.isEmpty() && iconEntity == null) {
 			if (lore instanceof Item) {
 				if (lore instanceof SpellRune) {
-					iconStack = SpellRune.getRune(EMagicElement.FIRE, 1);
+					iconStack = SpellRune.getRune(EMagicElement.FIRE);
 				} else {
 					iconStack = new ItemStack((Item) lore, 1);
 				}

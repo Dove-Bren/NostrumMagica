@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.RedDragonSpe
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
@@ -335,7 +335,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				}
 				
 				if (scroll.getItem() instanceof SpellScroll) {
-					LegacySpell spell = SpellScroll.getSpell(scroll);
+					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
@@ -354,7 +354,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				}
 				
 				if (scroll.getItem() instanceof SpellScroll) {
-					LegacySpell spell = SpellScroll.getSpell(scroll);
+					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
@@ -373,7 +373,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				}
 				
 				if (scroll.getItem() instanceof SpellScroll) {
-					LegacySpell spell = SpellScroll.getSpell(scroll);
+					Spell spell = SpellScroll.getSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);

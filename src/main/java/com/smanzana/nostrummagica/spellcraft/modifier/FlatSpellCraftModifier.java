@@ -5,12 +5,11 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
-import com.smanzana.nostrummagica.spellcraft.SpellPartBuilder;
+import com.smanzana.nostrummagica.spellcraft.SpellIngredient;
+import com.smanzana.nostrummagica.spellcraft.SpellIngredientBuilder;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -28,12 +27,10 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	protected final int elementCountModifier;
 	protected final @Nullable EMagicElement elementOverride;
 	protected final @Nullable EAlteration alterationOverride;
-	protected final @Nullable LegacySpellShape shapeOverride;
-	protected final @Nullable SpellTrigger triggerOverride;
+	protected final @Nullable SpellShape shapeOverride;
 	
 	protected FlatSpellCraftModifier(int weightModifier, float manaRateModifier, int elementCountModifier,
-			EMagicElement elementOverride, EAlteration alterationOverride, LegacySpellShape shapeOverride,
-			SpellTrigger triggerOverride) {
+			EMagicElement elementOverride, EAlteration alterationOverride, SpellShape shapeOverride) {
 		super();
 		this.weightModifier = weightModifier;
 		this.manaRateModifier = manaRateModifier;
@@ -41,45 +38,41 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		this.elementOverride = elementOverride;
 		this.alterationOverride = alterationOverride;
 		this.shapeOverride = shapeOverride;
-		this.triggerOverride = triggerOverride;
 	}
 
 	@Override
-	public boolean canModify(SpellCraftContext context, LegacySpellPart originalPart) {
+	public boolean canModify(SpellCraftContext context, SpellIngredient originalPart) {
 		// If mana or weight is involved, it's definitely applicable
 		if (this.weightModifier != 0 || this.manaRateModifier != 0) {
 			return true;
 		}
-		if (originalPart.isTrigger()) {
-			return this.triggerOverride != null;
+		
+		if (originalPart.shape != null) {
+			return this.shapeOverride != null;
 		} else {
-			return this.elementCountModifier != 0
-					|| this.shapeOverride != null
-					|| this.alterationOverride != null
-					|| this.elementOverride != null;
+			return this.elementOverride != null
+					|| this.elementCountModifier != 0
+					|| this.alterationOverride != null;
 		}
 	}
 
 	@Override
-	public void modify(SpellCraftContext context, LegacySpellPart originalPart, SpellPartBuilder builder) {
+	public void modify(SpellCraftContext context, SpellIngredient originalPart, SpellIngredientBuilder builder) {
 		builder.addWeightModifier(weightModifier)
-			.addManaRate(manaRateModifier)
-			.addElementCountModifier(elementCountModifier);
+			.addManaRate(manaRateModifier);
 		
-		if (elementOverride != null) {
-			builder.setElementOverride(elementOverride);
-		}
-		
-		if (alterationOverride != null) {
-			builder.setAlterationOverride(alterationOverride);
-		}
-		
-		if (shapeOverride != null) {
-			builder.setShapeOverride(shapeOverride);
-		}
-		
-		if (triggerOverride != null) {
-			builder.setTriggerOverride(triggerOverride);
+		if (originalPart.shape != null) {
+			if (shapeOverride != null) {
+				builder.setShapeOverride(shapeOverride);
+			}
+		} else {
+			if (elementOverride != null) {
+				builder.setElementOverride(elementOverride);
+			}
+			
+			if (alterationOverride != null) {
+				builder.setAlterationOverride(alterationOverride);
+			}
 		}
 	}
 
@@ -110,10 +103,6 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 			lines.add(new TranslationTextComponent("spellcraftmod.override.shape", shapeOverride.getDisplayName())
 					.mergeStyle(STYLE_OVERRIDE));
 		}
-		if (triggerOverride != null) {
-			lines.add(new TranslationTextComponent("spellcraftmod.override.trigger", triggerOverride.getDisplayName())
-					.mergeStyle(STYLE_OVERRIDE));
-		}
 		
 		return lines;
 	}
@@ -126,8 +115,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		protected int elementCountModifier = 0;
 		protected @Nullable EMagicElement elementOverride;
 		protected @Nullable EAlteration alterationOverride;
-		protected @Nullable LegacySpellShape shapeOverride;
-		protected @Nullable SpellTrigger triggerOverride;
+		protected @Nullable SpellShape shapeOverride;
 		
 		public Builder() {
 			
@@ -158,18 +146,13 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 			return this;
 		}
 
-		public Builder overrideShape(LegacySpellShape shapeOverride) {
+		public Builder overrideShape(SpellShape shapeOverride) {
 			this.shapeOverride = shapeOverride;
 			return this;
 		}
 
-		public Builder overrideTrigger(SpellTrigger triggerOverride) {
-			this.triggerOverride = triggerOverride;
-			return this;
-		}
-		
 		public FlatSpellCraftModifier build() {
-			return new FlatSpellCraftModifier(weightModifier, manaRateModifier, elementCountModifier, elementOverride, alterationOverride, shapeOverride, triggerOverride);
+			return new FlatSpellCraftModifier(weightModifier, manaRateModifier, elementCountModifier, elementOverride, alterationOverride, shapeOverride);
 		}
 		
 	}

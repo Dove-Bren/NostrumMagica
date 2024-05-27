@@ -16,8 +16,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -240,8 +239,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		
 		// DRAW ICONS
 		EMagicElement element = null; // Which element we know
-		SpellTrigger trigger = null;
-		LegacySpellShape shape = null;
+		SpellShape shape = null;
 		
 		Map<EMagicElement, Boolean> map = attr.getKnownElements();
 		Boolean val;
@@ -252,9 +250,6 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				break;
 			}
 		}
-		
-		if (!attr.getTriggers().isEmpty())
-			trigger = attr.getTriggers().get(0);
 		
 		if (!attr.getShapes().isEmpty())
 			shape = attr.getShapes().get(0);
@@ -285,29 +280,12 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		
 		x += width + space;
 		RenderFuncs.drawRect(matrixStackIn, x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
-		if (trigger != null)
-			color = new float[] {1f, 1f, 1f, 1f};
-		else {
-			color = new float[] {8f, .5f, .5f, .5f};
-			Collection<SpellTrigger> triggers = SpellTrigger.getAllTriggers();
-			SpellTrigger[] trigArray = triggers.toArray(new SpellTrigger[0]);
-			trigger = trigArray[
-				  (int) (System.currentTimeMillis() / cycle) % trigArray.length
-			      ];
-		}
-		SpellComponentIcon.get(trigger).draw(this, matrixStackIn, this.font, x, y, width, width, color[0], color[1], color[2], color[3]);
-		str = I18n.format("trigger.name", new Object[0]);
-		strLen = this.font.getStringWidth(str);
-		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
-		
-		x += width + space;
-		RenderFuncs.drawRect(matrixStackIn, x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
 		if (shape != null)
 			color = new float[] {1f, 1f, 1f, 1f};
 		else {
 			color = new float[] {.8f, .5f, .5f, .5f};
-			Collection<LegacySpellShape> shapes = LegacySpellShape.getAllShapes();
-			LegacySpellShape[] shapeArray = shapes.toArray(new LegacySpellShape[0]);
+			Collection<SpellShape> shapes = SpellShape.getAllShapes();
+			SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
 			shape = shapeArray[
 				  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 			      ];
@@ -434,9 +412,6 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		if (!found)
 			return "Unlock an element";
-		
-		if (attr.getTriggers().isEmpty())
-			return "Unlock at least one trigger";
 		
 		return "Unlock at least one shape";
 	}

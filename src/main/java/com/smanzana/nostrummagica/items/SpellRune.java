@@ -141,6 +141,20 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return !stack.isEmpty() && stack.getItem() instanceof ElementSpellRune;
 	}
 	
+	public static @Nullable EAlteration getAlteration(ItemStack stack) {
+		if (isAlteration(stack)) {
+			return ((AlterationSpellRune) stack.getItem()).getAlteration();
+		}
+		return null;
+	}
+	
+	public static @Nullable EMagicElement getElement(ItemStack stack) {
+		if (isElement(stack)) {
+			return ((ElementSpellRune) stack.getItem()).getElement();
+		}
+		return null;
+	}
+	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 		// Probably wnat this later

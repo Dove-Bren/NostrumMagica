@@ -9,8 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -27,7 +26,6 @@ public class SpellComponentIcon {
 	private static Map<EMagicElement, SpellComponentIcon> elementCache = new EnumMap<>(EMagicElement.class);
 	private static Map<EAlteration, SpellComponentIcon> alterationCache = new EnumMap<>(EAlteration.class);
 	private static Map<String, SpellComponentIcon> shapeCache = new HashMap<>();
-	private static Map<String, SpellComponentIcon> triggerCache = new HashMap<>(); 
 	
 	public static SpellComponentIcon get(EMagicElement element) {
 		SpellComponentIcon icon = elementCache.get(element);
@@ -49,7 +47,7 @@ public class SpellComponentIcon {
 		return icon;
 	}
 	
-	public static SpellComponentIcon get(LegacySpellShape shape) {
+	public static SpellComponentIcon get(SpellShape shape) {
 		String name = shape.getShapeKey();
 		SpellComponentIcon icon = shapeCache.get(name);
 		
@@ -61,21 +59,8 @@ public class SpellComponentIcon {
 		return icon;
 	}
 	
-	public static SpellComponentIcon get(SpellTrigger trigger) {
-		String name = trigger.getTriggerKey();
-		SpellComponentIcon icon = triggerCache.get(name);
-		
-		if (icon == null) {
-			icon = new SpellComponentIcon(trigger);
-			triggerCache.put(trigger.getTriggerKey(), icon);
-		}
-		
-		return icon;
-	}
-	
 	private static int uWidthElement = 32;
 	private static int uWidthAlteration = 32;
-	private static int uWidthTrigger = 32;
 	private static int uWidthShape = 32;
 	
 	private int width;
@@ -98,15 +83,7 @@ public class SpellComponentIcon {
 				"textures/models/symbol/alteration_" + alteration.name().toLowerCase() + ".png");
 	}
 	
-	public SpellComponentIcon(SpellTrigger trigger) {
-		width = uWidthTrigger;
-		height = uWidthTrigger;
-		
-		model = new ResourceLocation(NostrumMagica.MODID,
-				"textures/models/symbol/trigger_" + trigger.getTriggerKey().toLowerCase() + ".png");
-	}
-	
-	public SpellComponentIcon(LegacySpellShape shape) {
+	public SpellComponentIcon(SpellShape shape) {
 		width = uWidthShape;
 		height = uWidthShape;
 		
