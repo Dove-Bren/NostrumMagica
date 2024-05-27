@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
@@ -19,9 +20,14 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
+import com.smanzana.nostrummagica.spellcraft.SpellCrafting.SpellPartSummary;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tiles.ISpellCraftingTileEntity;
 import com.smanzana.nostrummagica.tiles.MysticSpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
@@ -33,6 +39,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -325,6 +332,8 @@ public class MysticSpellCraftGui {
 		
 		private Vector3i[] runeSlots;
 		private Vector3i[] spacerSpots;
+
+		private @Nullable SpellPartSummary hoveredPart;
 		
 		public Gui(MysticContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
@@ -425,7 +434,9 @@ public class MysticSpellCraftGui {
 						runeSlots[i].getZ()
 					);
 			}
-			SpellPartBar partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH);
+			SpellPartBar partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH, (part, matrix, mouseX, mouseY) -> {
+				this.hoveredPart = part;
+			});
 			this.addButton(partBarWidget);
 
 			this.getContainer().validate();
@@ -623,13 +634,91 @@ public class MysticSpellCraftGui {
 			matrixStackIn.push();
 			matrixStackIn.translate(xOffset, yOffset, 0);
 			
-			// Decide whether to show summary or modifier info
+			// Decide whether to show summary, part info, or modifier info
 			int highlightedRuneIdx = -1;
 			if (this.hoveredSlot != null && this.hoveredSlot instanceof RuneSlot) {
 				highlightedRuneIdx = ((RuneSlot) this.hoveredSlot).getSlotIndex() - getContainer().inventory.getRuneSlotStartingIndex();
 			}
 			
-			if (highlightedRuneIdx == -1) {
+			if (this.hoveredPart != null) {
+				final String titleText = hoveredPart.isError() ? "Error" : hoveredPart.isShape() ? "Shape" : "Effect";
+				final int titleTextWidth = fontRenderer.getStringWidth(titleText);
+				fontRenderer.drawString(matrixStackIn, titleText, ((POS_INFOPANEL_WIDTH-8) - titleTextWidth)/2, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				if (!hoveredPart.isError()) {
+					matrixStackIn.scale(.5f, .5f, 1f);
+					matrixStackIn.push();
+					
+					// Mana cost
+					fontRenderer.drawString(matrixStackIn, "Mana Cost: " + hoveredPart.getMana(), 0, 0, 0xFF000000);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					
+					// Weight
+					fontRenderer.drawString(matrixStackIn, "Weight: " + hoveredPart.getWeight(), 0, 0, 0xFF000000);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					
+					if (!hoveredPart.isShape()) {
+						final SpellEffectPart effect = hoveredPart.getEffect();
+						final int subWidth = (POS_INFOPANEL_WIDTH-8) * 2;
+						final String name;
+						final String desc;
+						@Nullable SpellAction action = SpellGui.getKnownActionForPart(effect);
+						if (action == null) {
+							name = "Unknown Effect";
+							desc = "You haven't seen this effect before. Make a spell with it to find out what it does!";
+						} else {
+							final String suffix = effect.getElementCount() <= 1 ? ""
+									: effect.getElementCount() <= 2 ? " II"
+									: " III";
+							
+							name = I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
+							desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+						}
+						
+						int len = fontRenderer.getStringWidth(name);
+						fontRenderer.drawString(matrixStackIn, name,
+								(subWidth - len) / 2,
+								0,
+								0xFFFFFFFF);
+						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+						
+						if (action != null) {
+							final SpellActionProperties props = action.getProperties();
+							final int iconWidth = 12;
+							final int iconHeight = 12;
+							matrixStackIn.push();
+							matrixStackIn.translate(subWidth / 2, 0, 0);
+							matrixStackIn.translate(-(4 + iconWidth), 0, 0);
+							
+							float color[] = {1f, 1f, 1f, 1f};
+							if (!props.affectsEntity) {
+								color = new float[] {.3f, .3f, .3f, .4f};
+							}
+							drawAffectEntity(matrixStackIn, iconWidth, iconHeight, color);
+							
+							matrixStackIn.translate(12 + 4, 0, 0);
+							if (props.affectsBlock) {
+								color = new float[] {1f, 1f, 1f, 1f};
+							} else {
+								color = new float[] {.3f, .3f, .3f, .4f};
+							}
+							drawAffectBlock(matrixStackIn, iconWidth, iconHeight, color);
+							matrixStackIn.pop();
+							
+							matrixStackIn.translate(0, iconHeight + 2, 0);
+						}
+						
+						int yUsed = RenderFuncs.drawSplitString(matrixStackIn, fontRenderer, desc,
+								0,
+								0,
+								subWidth,
+								0xFFA0A0A0);
+						matrixStackIn.translate(0, yUsed, 0);
+					}
+					matrixStackIn.pop();
+				}
+			} else if (highlightedRuneIdx == -1) {
 				// Summary info
 				final MysticContainer container = getContainer();
 				final String summaryText = "Summary";
@@ -718,6 +807,16 @@ public class MysticSpellCraftGui {
 						TEX_WIDTH, TEX_HEIGHT
 						);
 			}
+		}
+		
+		protected void drawAffectEntity(MatrixStack matrixStackIn, int width, int height, float[] color) {
+			SpellComponentIcon.get(NostrumSpellShapes.AtFeet)
+				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
+		}
+		
+		protected void drawAffectBlock(MatrixStack matrixStackIn, int width, int height, float[] color) {
+			SpellComponentIcon.get(NostrumSpellShapes.Proximity)
+				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 	}
 	

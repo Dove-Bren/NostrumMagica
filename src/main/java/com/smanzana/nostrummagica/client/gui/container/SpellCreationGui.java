@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.container;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -11,8 +13,10 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui.SpellPartBar.IHoverHandler;
 import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
@@ -24,7 +28,11 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting.SpellPartSummary;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
+import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -411,6 +419,17 @@ public class SpellCreationGui {
 			boolean fail = false;
 			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
 			boolean locked = !SpellCrafting.CanCraftSpells(crafter);
+			
+			// Lazily make these instead of guarding each place that might use it to see if it's null or not
+			if (spellErrorStrings == null) {
+				spellErrorStrings = new ArrayList<>();
+			}
+			if (reagentStrings == null) {
+				reagentStrings = new ArrayList<>();
+			}
+			if (parts == null) {
+				parts = new ArrayList<>();
+			}
 			spellErrorStrings.clear();
 			reagentStrings.clear();
 			parts.clear();
@@ -876,13 +895,19 @@ public class SpellCreationGui {
 		private static class SpellPartSegment extends FixedWidget {
 
 			private final SpellGui<?> gui;
+			private final SpellPartSummary part;
 			
 			private final List<ITextComponent> tooltip;
 			private final int color;
+			private final @Nullable IHoverHandler onHover;
 			
-			public SpellPartSegment(SpellGui<?> gui, SpellPartSummary part, int x, int y, int width, int height) {
+			private boolean wasHovered;
+			
+			public SpellPartSegment(SpellGui<?> gui, IHoverHandler onHover, SpellPartSummary part, int x, int y, int width, int height) {
 				super(x, y, width, height, StringTextComponent.EMPTY);
 				this.gui = gui;
+				this.onHover = onHover;
+				this.part = part;
 				
 				this.tooltip = new ArrayList<>(4);
 				if (part.isError()) {
@@ -910,24 +935,47 @@ public class SpellCreationGui {
 				RenderFuncs.drawRect(matrixStackIn, x + 1, y + 1, x + width - 1, y + height - 1, color);
 				
 				if (this.isHovered()) {
-					this.renderToolTip(matrixStackIn, mouseX, mouseY);
+					RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0x20FFFFFF);
+					
+					if (onHover != null) {
+						onHover.onHover(part, matrixStackIn, mouseX, mouseY);
+					} else {
+						this.renderToolTip(matrixStackIn, mouseX, mouseY);
+					}
+				} else if (this.wasHovered) {
+					if (onHover != null) {
+						onHover.onHover(null, matrixStackIn, mouseX, mouseY);
+					}
 				}
+				
+				wasHovered = this.isHovered();
+			}
+			
+			@Override
+			public boolean mouseClicked(double mouseX, double mouseY, int button) {
+				return false;
 			}
 		}
 		
 		protected static class SpellPartBar extends ParentWidget {
 			
+			public static interface IHoverHandler {
+				public void onHover(@Nullable SpellPartSummary summary, MatrixStack matrixStackIn, int mouseX, int mouseY);
+			}
+			
 			private final SpellGui<?> gui;
 			private final List<SpellPartSegment> bars;
 			private final Vector3i[] slots;
 			private final int slotWidth;
+			private final @Nullable IHoverHandler onHover;
 			
-			public SpellPartBar(SpellGui<?> gui, Vector3i[] slots, int slotWidth) {
+			public SpellPartBar(SpellGui<?> gui, Vector3i[] slots, int slotWidth, @Nullable IHoverHandler onHover) {
 				super(gui.getGuiLeft(), gui.guiTop, gui.xSize, gui.ySize, StringTextComponent.EMPTY);
 				this.gui = gui;
 				this.bars = new ArrayList<>(slots.length);
 				this.slots = slots;
 				this.slotWidth = slotWidth;
+				this.onHover = onHover;
 				
 				gui.getContainer().addListener((spell) -> {
 					this.refreshTo(gui.getContainer().parts);
@@ -949,7 +997,7 @@ public class SpellCreationGui {
 					y = startSlot.getY();
 					barHeight = 4;
 					
-					SpellPartSegment segment = new SpellPartSegment(gui, part, gui.getGuiLeft() + startX, gui.getGuiTop() + y, (endX - startX), barHeight);
+					SpellPartSegment segment = new SpellPartSegment(gui, onHover, part, gui.getGuiLeft() + startX, gui.getGuiTop() + y, (endX - startX), barHeight);
 					bars.add(segment);
 					this.addChild(segment);
 				}
@@ -1003,12 +1051,35 @@ public class SpellCreationGui {
 		}
 		
 		protected abstract void onSubmit();
+
+		@Override
+		public abstract List<Rectangle2d> getGuiExtraAreas();
 		
 		protected static boolean isValidChar(int codepoint) {
 			return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint) || Character.isSpaceChar(codepoint);
 		}
-
-		@Override
-		public abstract List<Rectangle2d> getGuiExtraAreas();
+		
+		private static final Map<EAlteration, Map<EMagicElement, SpellAction>> actionCache = new HashMap<>();
+		protected static @Nullable SpellAction getKnownActionForPart(SpellEffectPart part) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
+			final boolean known = attr != null && attr.hasKnowledge(part.getElement(), part.getAlteration());
+			if (!known) {
+				return null;
+			}
+			
+			Map<EMagicElement, SpellAction> map = actionCache.get(part.getAlteration());
+			if (map == null) {
+				map = new EnumMap<>(EMagicElement.class);
+				actionCache.put(part.getAlteration(), map);
+			}
+			
+			SpellAction action = map.get(part.getElement());
+			if (action == null) {
+				action = Spell.solveAction(part.getAlteration(), part.getElement(), 1);
+				map.put(part.getElement(), action);
+			}
+			
+			return action;
+		}
 	}
 }

@@ -74,6 +74,9 @@ public class SpellCrafting {
 		
 		// Convert any parts that were made to summaries (even on failure)
 		if (partSummaryOut != null) {
+			CalculateManaCost(parts);
+			CalculateWeight(parts);
+			
 			for (SpellPart part : parts) {
 				partSummaryOut.add(new SpellPartSummary(part));
 			}
@@ -142,10 +145,15 @@ public class SpellCrafting {
 	}
 	
 	protected static int CalculateManaCost(SpellPart part, float multiplier) {
+		int cost;
 		if (part.isShape()) {
-			return Math.max(0, CalculateManaCost(part.getShapePart(), multiplier * part.getManaRate()));
+			cost = Math.max(0, CalculateManaCost(part.getShapePart(), multiplier * part.getManaRate()));
+			part.finalMana = cost;
+			return cost;
 		} else {
-			return Math.max(0, CalculateManaCost(part.getEffectPart(), multiplier * part.getManaRate()));
+			cost = Math.max(0, CalculateManaCost(part.getEffectPart(), multiplier * part.getManaRate()));
+			part.finalMana = cost;
+			return cost;
 		}
 	}
 	
@@ -192,10 +200,15 @@ public class SpellCrafting {
 	}
 	
 	protected static int CalculateWeight(SpellPart part) {
+		int cost;
 		if (part.isShape()) {
-			return Math.max(0, CalculateWeight(part.getShapePart()) + part.getWeightBonus());
+			cost = Math.max(0, CalculateWeight(part.getShapePart()) + part.getWeightBonus());
+			part.finalWeight = cost;
+			return cost;
 		} else {
-			return Math.max(0, CalculateWeight(part.getEffectPart()) + part.getWeightBonus());
+			cost = Math.max(0, CalculateWeight(part.getEffectPart()) + part.getWeightBonus());
+			part.finalWeight = cost;
+			return cost;
 		}
 	}
 	
