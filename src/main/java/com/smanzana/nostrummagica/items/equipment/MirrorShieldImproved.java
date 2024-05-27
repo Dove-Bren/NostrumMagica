@@ -80,7 +80,7 @@ public class MirrorShieldImproved extends MirrorShield {
 				
 				// If there was a caster, reflect part of the spell back
 				if (data.caster != null && data.caster != entity) {
-					data.summary.getAction().apply(data.caster, reduc);
+					data.summary.getAction().apply(entity, data.caster, reduc);
 				}
 				
 				// If fully blocked, cancel. Otherwise, reduce

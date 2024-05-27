@@ -13,6 +13,10 @@ public class SpellShapePartProperties {
 		 this.flip = flip;
 	 }
 	 
+	 public SpellShapePartProperties() {
+		 this(0f, false);
+	 }
+	 
 	 private static final String NBT_LEVEL = "level";
 	 private static final String NBT_FLIP = "flip";
 	 

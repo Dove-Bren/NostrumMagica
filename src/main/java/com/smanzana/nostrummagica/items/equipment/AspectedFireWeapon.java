@@ -15,11 +15,10 @@ import com.smanzana.nostrummagica.items.IRaytraceOverlay;
 import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.armor.MagicArmor;
-import com.smanzana.nostrummagica.items.armor.MagicArmor.Type;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.SeekingBulletShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;
@@ -48,7 +47,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 
 	public static final String ID = "sword_fire";
 	private static final int USE_DURATION = 20; // In ticks
-	private static final float CAST_RANGE = SeekingBulletTrigger.MAX_DIST;
+	private static final float CAST_RANGE = SeekingBulletShape.MAX_DIST;
 	
 	public AspectedFireWeapon() {
 		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().maxDamage(1240));
@@ -133,7 +132,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	protected @Nullable LivingEntity getCastTarget(LivingEntity caster) {
 		// We have a target?
 		RayTraceResult result = RayTrace.raytraceApprox(caster.world, caster, caster.getPositionVec().add(0, caster.getEyeHeight(), 0),
-				caster.rotationPitch, caster.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
+				caster.rotationPitch, caster.rotationYaw, CAST_RANGE, (ent) -> {
 					return ent != null
 							&& ent != caster
 							&& ent instanceof LivingEntity

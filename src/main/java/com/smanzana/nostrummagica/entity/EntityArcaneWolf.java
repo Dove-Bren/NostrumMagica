@@ -38,17 +38,12 @@ import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.ChainShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.MagicCutterTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SeekingBulletTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spells.components.shapes.TouchShape;
 import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Inventories;
 import com.smanzana.petcommand.api.PetCommandAPI;
@@ -288,7 +283,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	protected static enum WolfSpell implements IWolfAbility {
 		GROUP_SPEED("packspeed", WolfSpellTargetGroup.SELF, 50,
-				(LegacySpell.CreateAISpell("WolfSpeed")).addPart(new LegacySpellPart(SelfTrigger.instance())).addPart(new LegacySpellPart(ChainShape.instance(), EMagicElement.WIND, 1, EAlteration.SUPPORT, new SpellPartProperties(8, true))),
+				(Spell.CreateAISpell("WolfSpeed")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, new SpellShapePartProperties(8, true))).addPart(new SpellEffectPart(EMagicElement.WIND, 1, EAlteration.SUPPORT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.WIND, 1),
 				(wolf, target) -> {
 					return wolf.getAttackTarget() == null // Not in battle
@@ -296,30 +291,30 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							;
 				}),
 		WIND_CUTTER("windcutter", WolfSpellTargetGroup.ENEMY, 20,
-				(LegacySpell.CreateAISpell("WolfWindCutter")).addPart(new LegacySpellPart(MagicCutterTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.WIND, 2, EAlteration.RUIN)),
+				(Spell.CreateAISpell("WolfWindCutter")).addPart(new SpellShapePart(NostrumSpellShapes.Cutter)).addPart(new SpellEffectPart(EMagicElement.WIND, 2, EAlteration.RUIN)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.WIND, 3),
 				(wolf, target) -> true),
 		ROOTS("roots", WolfSpellTargetGroup.ENEMY, 25,
-				(LegacySpell.CreateAISpell("WolfRoots")).addPart(new LegacySpellPart(SeekingBulletTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfRoots")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellEffectPart(EMagicElement.EARTH, 2, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 1),
 				(wolf, target) -> {
 					return target.getActivePotionEffect(NostrumEffects.rooted) == null;
 				}),
 		REGEN("wolfregen", WolfSpellTargetGroup.ALLY, 50,
-				(LegacySpell.CreateAISpell("WolfRegen")).addPart(new LegacySpellPart(AITargetTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.EARTH, 2, EAlteration.GROWTH)),
+				(Spell.CreateAISpell("WolfRegen")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.EARTH, 2, EAlteration.GROWTH)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 3),
 				(wolf, target) -> {
 					return target.getHealth() < target.getMaxHealth()
 							&& target.getActivePotionEffect(Effects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD("magicshield", WolfSpellTargetGroup.SELF, 30,
-				(LegacySpell.CreateAISpell("WolfMagicShield")).addPart(new LegacySpellPart(SelfTrigger.instance())).addPart(new LegacySpellPart(ChainShape.instance(), EMagicElement.ICE, 1, EAlteration.SUPPORT, new SpellPartProperties(8, true))),
+				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, new SpellShapePartProperties(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 1, EAlteration.SUPPORT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 1),
 				(wolf, target) -> {
 					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
 		WOLF_HEAL("heal", null, 20,
-				(LegacySpell.CreateAISpell("WolfHeal")).addPart(new LegacySpellPart(AITargetTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ICE, 2, EAlteration.GROWTH)),
+				(Spell.CreateAISpell("WolfHeal")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.ICE, 2, EAlteration.GROWTH)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 2),
 				(wolf, target) -> {
 					if (target.isEntityUndead()) {
@@ -330,19 +325,19 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 					}
 				}),
 		ICE_FANGS("icefang", WolfSpellTargetGroup.SELF, 100,
-				(LegacySpell.CreateAISpell("WolfIceFangs")).addPart(new LegacySpellPart(SelfTrigger.instance())).addPart(new LegacySpellPart(ChainShape.instance(), EMagicElement.ICE, 2, EAlteration.ENCHANT, new SpellPartProperties(8, true))),
+				(Spell.CreateAISpell("WolfIceFangs")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, new SpellShapePartProperties(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 2, EAlteration.ENCHANT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 3),
 				(wolf, target) -> {
 					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
 		FIRE_TOUCH("firefang", WolfSpellTargetGroup.ENEMY, 10,
-				(LegacySpell.CreateAISpell("WolfFireBite")).addPart(new LegacySpellPart(TouchTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.FIRE, 2, EAlteration.RUIN)),
+				(Spell.CreateAISpell("WolfFireBite")).addPart(new SpellShapePart(NostrumSpellShapes.Touch)).addPart(new SpellEffectPart(EMagicElement.FIRE, 2, EAlteration.RUIN)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 1),
 				(wolf, target) -> {
-					return wolf.getDistance(target) <= TouchTrigger.TOUCH_RANGE;
+					return wolf.getDistance(target) <= TouchShape.TOUCH_RANGE;
 				}),
 		MAGIC_BOOST("magicboost", WolfSpellTargetGroup.ALLY, 20,
-				(LegacySpell.CreateAISpell("WolfMagicBoost")).addPart(new LegacySpellPart(AITargetTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
+				(Spell.CreateAISpell("WolfMagicBoost")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 3),
 				(wolf, target) -> {
 					return target.getActivePotionEffect(NostrumEffects.magicBoost) == null
@@ -350,23 +345,23 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							;
 				}),
 		ENDER_SHROUD("endershroud", WolfSpellTargetGroup.ENEMY, 20,
-				(LegacySpell.CreateAISpell("WolfEnderShroud")).addPart(new LegacySpellPart(SeekingBulletTrigger.instance())).addPart(new LegacySpellPart(AoEShape.instance(), EMagicElement.ENDER, 2, null, new SpellPartProperties(3, true))).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ENDER, 1, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapePartProperties(3, true))).addPart(new SpellEffectPart(EMagicElement.ENDER, 2, null)).addPart(new SpellEffectPart(EMagicElement.ENDER, 1, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ENDER, 1),
 				(wolf, target) -> true),
 		ENDER_FANGS("enderfang", WolfSpellTargetGroup.SELF, 75,
-				(LegacySpell.CreateAISpell("WolfEnderFangs")).addPart(new LegacySpellPart(SelfTrigger.instance())).addPart(new LegacySpellPart(ChainShape.instance(), EMagicElement.ENDER, 1, EAlteration.ENCHANT, new SpellPartProperties(8, true))),
+				(Spell.CreateAISpell("WolfEnderFangs")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, new SpellShapePartProperties(8, true))).addPart(new SpellEffectPart(EMagicElement.ENDER, 1, EAlteration.ENCHANT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ENDER, 3),
 				(wolf, target) -> {
 					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
 				}),
 		SLOW("slow", WolfSpellTargetGroup.ENEMY, 10,
-				(LegacySpell.CreateAISpell("WolfSlow")).addPart(new LegacySpellPart(AITargetTrigger.instance())).addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfSlow")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.LIGHTNING, 1),
 				(wolf, target) -> {
 					return target.getActivePotionEffect(Effects.SLOWNESS) == null;
 				}),
 		CHAIN_LIGHTNING("chainlighting", WolfSpellTargetGroup.ENEMY, 40,
-				(LegacySpell.CreateAISpell("WolfChainLightning")).addPart(new LegacySpellPart(SeekingBulletTrigger.instance())).addPart(new LegacySpellPart(ChainShape.instance(), EMagicElement.LIGHTNING, 2, EAlteration.RUIN, new SpellPartProperties(6, true))),
+				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellShapePart(NostrumSpellShapes.Chain, new SpellShapePartProperties(6, true))).addPart(new SpellEffectPart(EMagicElement.LIGHTNING, 2, EAlteration.RUIN)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.LIGHTNING, 3),
 				(wolf, target) -> true),
 		;
@@ -381,7 +376,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		
 		protected final String key;
 		private final @Nullable WolfSpellTargetGroup group;
-		private final LegacySpell spell;
+		private final Spell spell;
 		private final ISpellPredicate predicate;
 		private final IWolfPredicate wolfChecker;
 		private final int cost;
@@ -389,7 +384,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		private final ITextComponent name;
 		private final ITextComponent description;
 		
-		private WolfSpell(String key, @Nullable WolfSpellTargetGroup group, int cost, LegacySpell spell, IWolfPredicate wolfChecker, ISpellPredicate predicate) {
+		private WolfSpell(String key, @Nullable WolfSpellTargetGroup group, int cost, Spell spell, IWolfPredicate wolfChecker, ISpellPredicate predicate) {
 			this.key = key;
 			this.group = group;
 			this.spell = spell;
@@ -401,7 +396,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			this.description = new TranslationTextComponent("info.wolf_ability." + key + ".desc");
 		}
 		
-		public LegacySpell getSpell() {
+		public Spell getSpell() {
 			return spell;
 		}
 		
@@ -625,9 +620,9 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		});
 		// Attack/Offensive spells
 		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 4, true, (w) -> {return !w.isSitting();}) {
-			private List<LegacySpell> spellList = new ArrayList<>();
+			private List<Spell> spellList = new ArrayList<>();
 			@Override
-			protected LegacySpell pickSpell(LegacySpell[] spells, EntityArcaneWolf entity) {
+			protected Spell pickSpell(Spell[] spells, EntityArcaneWolf entity) {
 				spellList = EntityArcaneWolf.this.getTargetSpells(getTarget(), spellList);
 				if (spellList.isEmpty()) {
 					return null;
@@ -636,7 +631,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 			
 			@Override
-			protected void deductMana(LegacySpell spell, EntityArcaneWolf wolf) {
+			protected void deductMana(Spell spell, EntityArcaneWolf wolf) {
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
@@ -649,9 +644,9 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		});
 		// Ally spells
 		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 3, 20, false, (w) -> {return !w.isSitting();}) {
-			private List<LegacySpell> spellList = new ArrayList<>();
+			private List<Spell> spellList = new ArrayList<>();
 			@Override
-			protected LegacySpell pickSpell(LegacySpell[] spells, EntityArcaneWolf entity) {
+			protected Spell pickSpell(Spell[] spells, EntityArcaneWolf entity) {
 				spellList = EntityArcaneWolf.this.getAllySpells(getTarget(), spellList);
 				if (spellList.isEmpty()) {
 					return null;
@@ -676,7 +671,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 			
 			@Override
-			protected void deductMana(LegacySpell spell, EntityArcaneWolf wolf) {
+			protected void deductMana(Spell spell, EntityArcaneWolf wolf) {
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
@@ -689,9 +684,9 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		});
 		// Self spells (longer recast)
 		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityArcaneWolf>(this, 20 * 5, 100, false, (w) -> {return !w.isSitting();}) {
-			private List<LegacySpell> spellList = new ArrayList<>();
+			private List<Spell> spellList = new ArrayList<>();
 			@Override
-			protected LegacySpell pickSpell(LegacySpell[] spells, EntityArcaneWolf entity) {
+			protected Spell pickSpell(Spell[] spells, EntityArcaneWolf entity) {
 				spellList = EntityArcaneWolf.this.getSelfSpells(getTarget(), spellList);
 				if (spellList.isEmpty()) {
 					return null;
@@ -705,7 +700,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 			}
 			
 			@Override
-			protected void deductMana(LegacySpell spell, EntityArcaneWolf wolf) {
+			protected void deductMana(Spell spell, EntityArcaneWolf wolf) {
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
@@ -2009,7 +2004,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return FollowOwnerGenericGoal.TeleportAroundEntity(this, target);
 	}
 	
-	protected List<LegacySpell> getTargetSpells(LivingEntity target, List<LegacySpell> listToAddTo) {
+	protected List<Spell> getTargetSpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
 		if (target != null) {
 			for (WolfSpell spell : WolfSpell.values()) {
@@ -2022,7 +2017,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return listToAddTo;
 	}
 	
-	protected List<LegacySpell> getSelfSpells(LivingEntity target, List<LegacySpell> listToAddTo) {
+	protected List<Spell> getSelfSpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
 		for (WolfSpell spell : WolfSpell.values()) {
 			if (this.getMana() >= spell.getCost()
@@ -2033,7 +2028,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return listToAddTo;
 	}
 	
-	protected List<LegacySpell> getAllySpells(LivingEntity target, List<LegacySpell> listToAddTo) {
+	protected List<Spell> getAllySpells(LivingEntity target, List<Spell> listToAddTo) {
 		listToAddTo.clear();
 		if (target != null) {
 			for (WolfSpell spell : WolfSpell.values()) {
@@ -2046,7 +2041,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return listToAddTo;
 	}
 	
-	protected int getWolfSpellCost(LegacySpell realSpell) {
+	protected int getWolfSpellCost(Spell realSpell) {
 		for (WolfSpell spell : WolfSpell.values()) {
 			if (spell.getSpell() == realSpell) {
 				return spell.getCost();
@@ -2055,7 +2050,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		return 0;
 	}
 	
-	protected void onWolfCast(LegacySpell spell, int cost) {
+	protected void onWolfCast(Spell spell, int cost) {
 		if (getTrainingElement() == spell.getPrimaryElement()) {
 			addTrainingXP(2 * Math.max(1, (int)Math.ceil((float)cost/25f)));
 		}

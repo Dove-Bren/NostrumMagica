@@ -27,23 +27,14 @@ import com.smanzana.nostrummagica.serializers.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.BeamTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.DamagedTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.MagicCutterTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.MagicCyclerTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.OtherTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SeekingBulletTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.WallTrigger;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.utils.SpellUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -124,9 +115,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		int priority = 1;
 		this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntityWillo>(this, 20, 4, true, (willo) -> {
 			return willo.getAttackTarget() != null && willo.getStatus() != WilloStatus.PANIC;
-		}, new LegacySpell[0]){
+		}, new Spell[0]){
 			@Override
-			public LegacySpell pickSpell(LegacySpell[] spells, EntityWillo wisp) {
+			public Spell pickSpell(Spell[] spells, EntityWillo wisp) {
 				// Ignore empty array and use spell from the wisp
 				return getSpellToUse();
 			}
@@ -464,9 +455,9 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		return this.dataManager.get(ELEMENT);
 	}
 	
-	protected LegacySpell getSpellToUse() {
+	protected Spell getSpellToUse() {
 		init();
-		List<LegacySpell> spells = defaultSpells.get(this.getElement());
+		List<Spell> spells = defaultSpells.get(this.getElement());
 		int idx = (this.getStatus() == WilloStatus.NEUTRAL
 				? this.rand.nextInt(2)
 				: this.rand.nextInt(spells.size()));
@@ -717,30 +708,37 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		}
 	}
 	
-	private static Map<EMagicElement, List<LegacySpell>> defaultSpells;
+	private static Map<EMagicElement, List<Spell>> defaultSpells;
 	
 	private static void putSpell(String name,
-			SpellTrigger trigger,
-			LegacySpellShape shape,
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		putSpell(name, trigger, null, shape, element, power, alteration);
+		putSpell(name, null, null, element, power, alteration);
 	}
 	
 	private static void putSpell(String name,
-			SpellTrigger trigger1,
-			SpellTrigger trigger2,
-			LegacySpellShape shape,
+			SpellShape shape,
 			EMagicElement element,
 			int power,
 			EAlteration alteration) {
-		LegacySpell spell = LegacySpell.CreateAISpell(name);
-		spell.addPart(new LegacySpellPart(trigger1));
-		if (trigger2 != null) {
-			spell.addPart(new LegacySpellPart(trigger2));
+		putSpell(name, shape, null, element, power, alteration);
+	}
+	
+	private static void putSpell(String name,
+			SpellShape shape1,
+			SpellShape shape2,
+			EMagicElement element,
+			int power,
+			EAlteration alteration) {
+		Spell spell = Spell.CreateAISpell(name);
+		if (shape1 != null) {
+			spell.addPart(new SpellShapePart(shape1));
 		}
-		spell.addPart(new LegacySpellPart(shape, element, power, alteration));
+		if (shape2 != null) {
+			spell.addPart(new SpellShapePart(shape2));
+		}
+		spell.addPart(new SpellEffectPart(element, power, alteration));
 		
 		if (!defaultSpells.containsKey(element) || defaultSpells.get(element) == null) {
 			defaultSpells.put(element, new ArrayList<>());
@@ -752,56 +750,49 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		if (defaultSpells == null) {
 			defaultSpells = new EnumMap<>(EMagicElement.class);
 			
-			LegacySpell spell;
+			Spell spell;
 			
 			// Note: spell spot 1 and 2 are 'neutral' spells and can be cast on passing-by players.
 			// The others are only cast when aggro or panicking
 			
 			// Physical
 			putSpell("Physic Blast",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.PHYSICAL,
 					2,
 					null);
 			putSpell("Shield",
-					SelfTrigger.instance(),
-					AoEShape.instance(),
+					NostrumSpellShapes.Burst,
 					EMagicElement.PHYSICAL,
 					1,
 					EAlteration.RESIST);
 			putSpell("Shield",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					2,
 					EAlteration.SUPPORT);
 			putSpell("Weaken",
-					ProjectileTrigger.instance(),
-					AoEShape.instance(),
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Burst,
 					EMagicElement.PHYSICAL,
 					1,
 					EAlteration.INFLICT);
 			putSpell("Weaken II",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.PHYSICAL,
 					2,
 					EAlteration.INFLICT);
 			putSpell("Summon Pets",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					2,
 					EAlteration.SUMMON);
 //			putSpell("Crush",
-//					ProjectileTrigger.instance(),
+//					NostrumSpellShapes.Projectile,
 //					SingleShape.instance(),
 //					EMagicElement.PHYSICAL,
 //					1,
 //					null);
 //			putSpell("Bone Crusher",
-//					ProjectileTrigger.instance(),
+//					NostrumSpellShapes.Projectile,
 //					SingleShape.instance(),
 //					EMagicElement.PHYSICAL,
 //					2,
@@ -809,218 +800,177 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			
 			// Lightning
 			putSpell("Lightning Ball I",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.RUIN);
 			putSpell("Shock",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.INFLICT);
 			putSpell("Magic Shell",
-					SelfTrigger.instance(),
-					AoEShape.instance(),
+					NostrumSpellShapes.Burst,
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.RESIST);
 			putSpell("Bolt",
-					BeamTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Beam,
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.CONJURE);
 			putSpell("Lightning Ball I",
-					ProjectileTrigger.instance(),
-					AoEShape.instance(),
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Burst,
 					EMagicElement.LIGHTNING,
 					3,
 					null);
 			putSpell("Lightning Ball II",
-					ProjectileTrigger.instance(),
-					AoEShape.instance(),
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Burst,
 					EMagicElement.LIGHTNING,
 					2,
 					EAlteration.RUIN);
 			
 			// Fire
 			putSpell("Burn",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.FIRE,
 					2,
 					EAlteration.CONJURE);
 			putSpell("Overheat",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.FIRE,
 					2,
 					EAlteration.INFLICT);
 			putSpell("Flare",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.FIRE,
 					3,
 					EAlteration.RUIN);
 			putSpell("HeatUp",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.FIRE,
 					3,
 					EAlteration.SUPPORT);
 			putSpell("Summon Pets (Fire)",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					3,
 					EAlteration.SUMMON);
 
 			// Ice
 			putSpell("Magic Aegis",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.ICE,
 					1,
 					EAlteration.SUPPORT);
 			putSpell("Ice Shard",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.ICE,
 					2,
 					EAlteration.RUIN);
 			putSpell("Frostbite",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.ICE,
 					1,
 					EAlteration.INFLICT);
 			putSpell("Heal",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.ICE,
 					2,
 					EAlteration.GROWTH);
 			putSpell("Dispel",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.ICE,
 					1,
 					EAlteration.RESIST);
 			putSpell("Hand Of Cold",
-					MagicCyclerTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Cycler,
 					EMagicElement.ICE,
 					3,
 					EAlteration.RUIN);
 			
 			// Earth
 			putSpell("Rock Fling",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.EARTH,
 					1,
 					EAlteration.RUIN);
 			putSpell("Roots",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.EARTH,
 					1,
 					EAlteration.INFLICT);
 			putSpell("Earth Aegis",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.EARTH,
 					2,
 					EAlteration.SUPPORT);
 			putSpell("Earthen Regen",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.EARTH,
 					2,
 					EAlteration.GROWTH);
 			putSpell("Earth Bash",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.EARTH,
 					2,
 					EAlteration.RUIN);
 			putSpell("Summon Pets (Earth)",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.EARTH,
 					1,
 					EAlteration.SUMMON);
 			
 			// Wind
 			putSpell("Wind Slash",
-					MagicCutterTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Cutter,
 					EMagicElement.WIND,
 					1,
 					EAlteration.RUIN);
 			putSpell("Poison",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.WIND,
 					1,
 					EAlteration.INFLICT);
 			putSpell("Gust",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.WIND,
 					3,
 					EAlteration.RESIST);
 			putSpell("Wind Wall",
-					ProjectileTrigger.instance(),
-					WallTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Wall,
 					EMagicElement.WIND,
 					3,
 					null);
 			putSpell("Wind Ball I",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					1,
 					EAlteration.RUIN);
 			putSpell("Wind Ball II",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					2,
 					EAlteration.RUIN);
 			
 			// Ender
 			putSpell("Ender Beam",
-					BeamTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Beam,
 					EMagicElement.ENDER,
 					1,
 					EAlteration.RUIN);
 			putSpell("Blindness",
-					ProjectileTrigger.instance(),
-					AoEShape.instance(),
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Burst,
 					EMagicElement.ENDER,
 					1,
 					EAlteration.INFLICT);
-			spell = LegacySpell.CreateAISpell("Blinker");
-			spell.addPart(new LegacySpellPart(SelfTrigger.instance()));
-			spell.addPart(new LegacySpellPart(DamagedTrigger.instance()));
-			spell.addPart(new LegacySpellPart(OtherTrigger.instance()));
-			spell.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.ENDER,
-					2, EAlteration.GROWTH));
+			spell = SpellUtils.MakeSpell("Blinker", 
+					NostrumSpellShapes.OnDamage,
+					EMagicElement.ENDER,
+					2, EAlteration.GROWTH);
 			defaultSpells.get(EMagicElement.ENDER).add(spell);
 			putSpell("Random Teleport",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+					NostrumSpellShapes.Projectile,
 					EMagicElement.ENDER,
 					2,
 					EAlteration.CONJURE);
 			putSpell("Invisibility",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
 					EMagicElement.ENDER,
 					3,
 					EAlteration.RESIST);

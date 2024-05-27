@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -14,19 +13,12 @@ import com.smanzana.nostrummagica.blocks.NostrumBlocks;
 import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.ChainShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.BeamTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProximityTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -35,9 +27,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.tileentity.TileEntity;
@@ -46,7 +35,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraftforge.common.util.Constants.NBT;
 
 public class RoomLectern extends StaticRoom {
 	
@@ -255,35 +243,28 @@ public class RoomLectern extends StaticRoom {
 		}
 		
 		// Build the spell
-		List<LegacySpellPart> parts = new ArrayList<>(8);
+		Spell spell = Spell.CreateAISpell(genSpellName(rand, element, harmful, status));
 		if (harmful) {
 			
-			if (rand.nextBoolean() && rand.nextBoolean()) {
-				parts.add(new LegacySpellPart(BeamTrigger.instance()));
-			} else {
-				parts.add(new LegacySpellPart(ProjectileTrigger.instance()));
-				
-				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) {
-					parts.add(new LegacySpellPart(ProximityTrigger.instance()));
-				}
-			}
+			int roll = rand.nextInt(10);
+			if (roll < 1) {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Beam));
+			} else if (roll < 2) {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Chain));
+			} else if (roll < 4) {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst));
+			} else if (roll < 6) {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Touch));
+			} else if (roll < 8) {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+			} // else no shape
 			
 			int effects = 1;
 			if (rand.nextBoolean() && rand.nextBoolean())
 				effects++;
 			
 			for (int i = 0; i < effects; i++) {
-				LegacySpellShape shape;
-				if (rand.nextBoolean() && rand.nextBoolean()) {
-					shape = AoEShape.instance();
-				}
-				else if (rand.nextBoolean() && rand.nextBoolean()) {
-					shape = ChainShape.instance();
-				}
-				else {
-					shape = SingleShape.instance();
-				}
-				
 				int potency = 1;
 				if (rand.nextBoolean())
 					potency++;
@@ -293,14 +274,21 @@ public class RoomLectern extends StaticRoom {
 					alt = EAlteration.INFLICT;
 				}
 				
-				parts.add(new LegacySpellPart(shape, element, potency, alt));
+				spell.addPart(new SpellEffectPart(element, potency, alt));
 			}
 		} else {
 			boolean self = rand.nextBoolean();
-			if (self) {
-				parts.add(new LegacySpellPart(SelfTrigger.instance()));
-			} else {
-				parts.add(new LegacySpellPart(ProjectileTrigger.instance()));
+			if (!self) {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+			}
+			
+			// Roll for chaining or bursting
+			if (rand.nextBoolean() && rand.nextBoolean()) {
+				if (rand.nextBoolean()) {
+					spell.addPart(new SpellShapePart(NostrumSpellShapes.Chain));
+				} else {
+					spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst));
+				}
 			}
 			
 			int effects = 1;
@@ -323,22 +311,11 @@ public class RoomLectern extends StaticRoom {
 				int potency = 1;
 				if (rand.nextInt(6) == 0)
 					potency = 2;
-				LegacySpellShape shape;
-				if (rand.nextBoolean() && rand.nextBoolean()) {
-					shape = AoEShape.instance();
-				}
-				else if (rand.nextBoolean() && rand.nextBoolean()) {
-					shape = ChainShape.instance();
-				}
-				else {
-					shape = SingleShape.instance();
-				}
-				
-				parts.add(new LegacySpellPart(shape, element, potency, alts.get(rand.nextInt(alts.size()))));
+				spell.addPart(new SpellEffectPart(element, potency, alts.get(rand.nextInt(alts.size()))));
 			}
 		}
 		
-		return SpellCrafting.CreateSpellFromPartsNoContext(genSpellName(rand, element, harmful, status), parts, false);
+		return spell;
 	}
 	
 	@Override
@@ -365,16 +342,6 @@ public class RoomLectern extends StaticRoom {
 				Spell spell =  genSpell(world.getRandom());
 				SpellScroll.setSpell(scroll, spell);
 				scroll.setDamage(NostrumMagica.rand.nextInt(10));
-				
-				// Set description
-				CompoundNBT nbt = scroll.getTag();
-				ListNBT list = nbt.getList("Lore", NBT.TAG_STRING);
-				if (null == list)
-					list = new ListNBT();
-				
-				list.add(StringNBT.valueOf(spell.getDescription()));
-				nbt.put("Lore", list);
-				scroll.setTag(nbt);
 				
 				if (world instanceof WorldGenRegion) {
 					te.setItemNoDirty(scroll);

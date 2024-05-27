@@ -40,7 +40,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.serializers.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.utils.ArrayUtil;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.petcommand.api.PetCommandAPI;
@@ -289,19 +289,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					return null;
 				}
 				
-				LegacySpell[] spells = getSpells(); // To reuse the login in there
+				Spell[] spells = getSpells(); // To reuse the login in there
 				
 				return Arrays.copyOf(selfDragon.spellInventory.getTargetGambits(), spells.length);
 			}
 
 			@Override
-			public LegacySpell[] getSpells() {
+			public Spell[] getSpells() {
 				if (!selfDragon.getCanUseMagic()) {
 					return null;
 				}
 				
 				NonNullList<ItemStack> scrolls = selfDragon.spellInventory.getTargetSpells();
-				LegacySpell[] spells = new LegacySpell[scrolls.size()];
+				Spell[] spells = new Spell[scrolls.size()];
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
@@ -330,19 +330,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					return null;
 				}
 				
-				LegacySpell[] spells = getSpells(); // To reuse the login in there
+				Spell[] spells = getSpells(); // To reuse the login in there
 				
 				return Arrays.copyOf(selfDragon.spellInventory.getSelfGambits(), spells.length);
 			}
 
 			@Override
-			public LegacySpell[] getSpells() {
+			public Spell[] getSpells() {
 				if (!selfDragon.getCanUseMagic()) {
 					return null;
 				}
 				
 				NonNullList<ItemStack> scrolls = selfDragon.spellInventory.getSelfSpells();
-				LegacySpell[] spells = new LegacySpell[scrolls.size()];
+				Spell[] spells = new Spell[scrolls.size()];
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
@@ -371,19 +371,19 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 					return null;
 				}
 				
-				LegacySpell[] spells = getSpells(); // To reuse the login in there
+				Spell[] spells = getSpells(); // To reuse the login in there
 				
 				return Arrays.copyOf(selfDragon.spellInventory.getAllyGambits(), spells.length);
 			}
 
 			@Override
-			public LegacySpell[] getSpells() {
+			public Spell[] getSpells() {
 				if (!selfDragon.getCanUseMagic()) {
 					return null;
 				}
 				
 				NonNullList<ItemStack> scrolls = selfDragon.spellInventory.getAllySpells();
-				LegacySpell[] spells = new LegacySpell[scrolls.size()];
+				Spell[] spells = new Spell[scrolls.size()];
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement

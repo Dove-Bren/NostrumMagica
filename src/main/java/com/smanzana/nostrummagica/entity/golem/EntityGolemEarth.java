@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -20,21 +20,21 @@ public class EntityGolemEarth extends EntityGolem {
 	
 	public static final String ID = "earth_golem";
 	
-	private static LegacySpell spellBuff1;
-	private static LegacySpell spellBuff2;
+	private static Spell spellBuff1;
+	private static Spell spellBuff2;
 	
 	private static void init() {
 		if (spellBuff1 == null) {
-			spellBuff1 = LegacySpell.CreateAISpell("Earthern Shield");
-			spellBuff1.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellBuff1.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellBuff1 = Spell.CreateAISpell("Earthern Shield");
+			spellBuff1.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellBuff1.addPart(new SpellEffectPart(
 					EMagicElement.EARTH,
 					1,
 					EAlteration.SUPPORT));
 			
-			spellBuff2 = LegacySpell.CreateAISpell("Impact Enchantment");
-			spellBuff2.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellBuff2.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellBuff2 = Spell.CreateAISpell("Impact Enchantment");
+			spellBuff2.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellBuff2.addPart(new SpellEffectPart(
 					EMagicElement.EARTH,
 					1,
 					EAlteration.RESIST));
@@ -66,7 +66,7 @@ public class EntityGolemEarth extends EntityGolem {
 		boolean canStrength = target.getActivePotionEffect(Effects.STRENGTH) == null;
 		boolean canShield = target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
 		
-		LegacySpell spell;
+		Spell spell;
 		if (canStrength && canShield) {
 			if (NostrumMagica.rand.nextBoolean())
 				spell = spellBuff1;

@@ -3,13 +3,11 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -23,39 +21,38 @@ public class EntityGolemFire extends EntityGolem {
 	
 	public static final String ID = "fire_golem";
 	
-	private static LegacySpell spellRanged1;
-	private static LegacySpell spellRanged2;
-	private static LegacySpell spellRanged3;
-	private static LegacySpell spellBuff;
+	private static Spell spellRanged1;
+	private static Spell spellRanged2;
+	private static Spell spellRanged3;
+	private static Spell spellBuff;
 	
 	private static void init() {
 		if (spellRanged1 == null) {
-			spellRanged1 = LegacySpell.CreateAISpell("Fireball");
-			spellRanged1.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
-			spellRanged1.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellRanged1 = Spell.CreateAISpell("Fireball");
+			spellRanged1.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+			spellRanged1.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
 					null));
 			
-			spellRanged2 = LegacySpell.CreateAISpell("Blaze");
-			spellRanged2.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
-			spellRanged2.addPart(new LegacySpellPart(AoEShape.instance(),
+			spellRanged2 = Spell.CreateAISpell("Blaze");
+			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapePartProperties(2, false)));
+			spellRanged2.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
-					EAlteration.CONJURE,
-					new SpellPartProperties(2, false)));
+					EAlteration.CONJURE));
 			
-			spellRanged3 = LegacySpell.CreateAISpell("Melt Armor");
-			spellRanged3.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
-			spellRanged3.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellRanged3 = Spell.CreateAISpell("Melt Armor");
+			spellRanged3.addPart(new SpellShapePart(NostrumSpellShapes.Projectile, new SpellShapePartProperties(1, false)));
+			spellRanged3.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
-					EAlteration.GROWTH,
-					new SpellPartProperties(1, false)));
+					EAlteration.GROWTH));
 			
-			spellBuff = LegacySpell.CreateAISpell("Fire Shield");
-			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellBuff = Spell.CreateAISpell("Fire Shield");
+			spellBuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellBuff.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
 					EAlteration.SUPPORT));

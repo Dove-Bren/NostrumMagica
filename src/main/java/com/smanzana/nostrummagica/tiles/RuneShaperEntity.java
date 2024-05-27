@@ -130,7 +130,7 @@ public class RuneShaperEntity extends TileEntity implements IInventory {
 			return true;
 		
 		if (index == 0) {
-			return SpellRune.isShape(stack) && !SpellRune.isPackedShape(stack);
+			return SpellRune.isShape(stack);// && !SpellRune.isPackedShape(stack);
 		}
 		
 		if (index >= 1 && index <= 4) {

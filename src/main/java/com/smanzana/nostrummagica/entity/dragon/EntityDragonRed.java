@@ -26,18 +26,10 @@ import com.smanzana.nostrummagica.serializers.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.DamagedTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.OtherTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.utils.SpellUtils;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -122,96 +114,57 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	
 	private static final String DRAGON_SERIAL_PHASE_TOK = "DragonPhase";
 
-	private static LegacySpell DSPELL_Fireball;
-	private static LegacySpell DSPELL_Fireball2;
-	private static LegacySpell DSPELL_Speed;
-	private static LegacySpell DSPELL_Shield;
-	private static LegacySpell DSPELL_Weaken;
-	private static LegacySpell DSPELL_Curse;
+	private static Spell DSPELL_Fireball;
+	private static Spell DSPELL_Fireball2;
+	private static Spell DSPELL_Speed;
+	private static Spell DSPELL_Shield;
+	private static Spell DSPELL_Weaken;
+	private static Spell DSPELL_Curse;
 	
 	private static final int DRAGON_CAST_TIME = 20 * 3;
-	
-	private static LegacySpell makeSpell(
-			String name,
-			Object ... objects) {
-		LegacySpell spell = LegacySpell.CreateAISpell(name);
-		
-		for (int i = 0; i < objects.length; i++) {
-			Object o = objects[i];
-			if (o instanceof SpellTrigger) {
-				SpellTrigger trigger = (SpellTrigger) o;
-				spell.addPart(new LegacySpellPart(trigger));
-			} else if (o instanceof LegacySpellShape) {
-				LegacySpellShape shape = (LegacySpellShape) o;
-				EMagicElement element = (EMagicElement) objects[++i];
-				Integer level = (Integer) objects[++i];
-				EAlteration alt = (EAlteration) objects[++i];
-				SpellPartProperties param = (SpellPartProperties) objects[++i];
-				
-				if (param == null) {
-					param = new SpellPartProperties(0, false);
-				}
-				
-				spell.addPart(new LegacySpellPart(shape, element, level, alt, param));
-			}
-		}
-		
-		return spell;
-	}
 	
 	private static void initSpells() {
 		
 		if (DSPELL_Fireball == null) {
-			DSPELL_Fireball = makeSpell("Fireball",
-					ProjectileTrigger.instance(),
-					AoEShape.instance(),
+			DSPELL_Fireball = SpellUtils.MakeSpell("Fireball",
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Burst,
+					new SpellShapePartProperties(3, false),
 					EMagicElement.FIRE,
 					2,
-					null,
-					new SpellPartProperties(3, false));
-			DSPELL_Fireball2 = makeSpell("Fireball2",
-					ProjectileTrigger.instance(),
-					AoEShape.instance(),
+					null
+					);
+			DSPELL_Fireball2 = SpellUtils.MakeSpell("Fireball2",
+					NostrumSpellShapes.Projectile,
+					NostrumSpellShapes.Burst,
+					new SpellShapePartProperties(3, false),
 					EMagicElement.FIRE,
 					3,
-					null,
-					new SpellPartProperties(3, false));
-			DSPELL_Speed = makeSpell("Speed",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
+					null);
+			DSPELL_Speed = SpellUtils.MakeSpell("Speed",
 					EMagicElement.WIND,
 					1,
-					EAlteration.SUPPORT,
-					null);
-			DSPELL_Shield = makeSpell("Shield",
-					SelfTrigger.instance(),
-					SingleShape.instance(),
+					EAlteration.SUPPORT
+					);
+			DSPELL_Shield = SpellUtils.MakeSpell("Shield",
 					EMagicElement.EARTH,
 					2,
-					EAlteration.SUPPORT,
-					null);
-			DSPELL_Weaken = makeSpell("Weaken",
-					AITargetTrigger.instance(),
-					SingleShape.instance(),
+					EAlteration.SUPPORT
+					);
+			DSPELL_Weaken = SpellUtils.MakeSpell("Weaken",
+					NostrumSpellShapes.AI,
 					EMagicElement.PHYSICAL,
 					2,
-					EAlteration.INFLICT,
-					null);
-			DSPELL_Curse = makeSpell("Curse",
-					SelfTrigger.instance(),
-					DamagedTrigger.instance(),
-					OtherTrigger.instance(),
-					DamagedTrigger.instance(),
-					SingleShape.instance(),
+					EAlteration.INFLICT);
+			DSPELL_Curse = SpellUtils.MakeSpell("Curse",
+					NostrumSpellShapes.OnDamage,
+					NostrumSpellShapes.Delay,
 					EMagicElement.PHYSICAL,
 					2,
 					null,
-					null,
-					SingleShape.instance(),
 					EMagicElement.PHYSICAL,
 					1,
-					EAlteration.INFLICT,
-					null);
+					EAlteration.INFLICT);
 		}
 	}
 	
@@ -658,7 +611,7 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 	private class DragonSpellAttackTask extends EntitySpellAttackTask<EntityDragonRed> {
 
 		public DragonSpellAttackTask(EntityDragonRed entity, int delay, int odds, boolean needsTarget, Predicate<EntityDragonRed> predicate,
-				int castTime, LegacySpell ... spells) {
+				int castTime, Spell ... spells) {
 			super(entity, delay, odds, needsTarget, predicate, castTime, spells);
 		}
 		

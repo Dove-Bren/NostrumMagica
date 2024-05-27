@@ -2,11 +2,10 @@ package com.smanzana.nostrummagica.entity.golem;
 
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -19,22 +18,22 @@ public class EntityGolemPhysical extends EntityGolem {
 	
 	public static final String ID = "physical_golem";
 	
-	private static LegacySpell spellRanged;
-	private static LegacySpell spellDebuff;
+	private static Spell spellRanged;
+	private static Spell spellDebuff;
 	
 	private static void init() {
 		if (spellRanged == null) {
-			spellRanged = LegacySpell.CreateAISpell("Massive Blow");
+			spellRanged = Spell.CreateAISpell("Massive Blow");
 			//spellRanged.addPart(new SpellPart()); should be projectile
-			spellRanged.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
-			spellRanged.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellRanged.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+			spellRanged.addPart(new SpellEffectPart(
 					EMagicElement.PHYSICAL,
 					1,
 					null));
 			
-			spellDebuff = LegacySpell.CreateAISpell("Corrupt Offense");
-			spellDebuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellDebuff.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellDebuff = Spell.CreateAISpell("Corrupt Offense");
+			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellDebuff.addPart(new SpellEffectPart(
 					EMagicElement.PHYSICAL,
 					1,
 					EAlteration.INFLICT));

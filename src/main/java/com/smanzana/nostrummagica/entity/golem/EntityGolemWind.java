@@ -3,11 +3,10 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SelfTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -20,21 +19,20 @@ public class EntityGolemWind extends EntityGolem {
 	
 	public static final String ID = "wind_golem";
 	
-	private static LegacySpell spellPush;
-	private static LegacySpell spellBuff;
+	private static Spell spellPush;
+	private static Spell spellBuff;
 	
 	private static void init() {
 		if (spellPush == null) {
-			spellPush = LegacySpell.CreateAISpell("Gust");
-			spellPush.addPart(new LegacySpellPart(SelfTrigger.instance()));
-			spellPush.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellPush = Spell.CreateAISpell("Gust");
+			spellPush.addPart(new SpellEffectPart(
 					EMagicElement.WIND,
 					1,
 					EAlteration.RESIST));
 			
-			spellBuff = LegacySpell.CreateAISpell("Speed");
-			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellBuff = Spell.CreateAISpell("Speed");
+			spellBuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellBuff.addPart(new SpellEffectPart(
 					EMagicElement.WIND,
 					1,
 					EAlteration.SUPPORT));

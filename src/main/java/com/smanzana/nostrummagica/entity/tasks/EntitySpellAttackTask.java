@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -22,16 +22,16 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 	protected boolean needsTarget;
 	protected Predicate<T> predicate;
 	
-	protected LegacySpell spells[];
+	protected Spell spells[];
 	
 	protected int attackTicks;
 	protected int castTicks;
 	
-	public EntitySpellAttackTask(T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, LegacySpell ... spells) {
+	public EntitySpellAttackTask(T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, Spell ... spells) {
 		this(entity, delay, odds, needsTarget, predicate, 0, spells);
 	}
 	
-	public EntitySpellAttackTask(T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, int castTime, LegacySpell ... spells) {
+	public EntitySpellAttackTask(T entity, int delay, int odds, boolean needsTarget, Predicate<T> predicate, int castTime, Spell ... spells) {
 		this.entity = entity;
 		this.spells = spells;
 		this.delay = delay;
@@ -78,7 +78,7 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 		return castTicks < castTime;
 	}
 	
-	protected LegacySpell pickSpell(LegacySpell[] spells, T entity) {
+	protected Spell pickSpell(Spell[] spells, T entity) {
 		if (spells == null || spells.length == 0)
 			return null;
 		
@@ -93,12 +93,12 @@ public class EntitySpellAttackTask<T extends MobEntity> extends Goal {
 		return null;
 	}
 	
-	protected void deductMana(LegacySpell spell, T entity) {
+	protected void deductMana(Spell spell, T entity) {
 		; // Usually, don't actually take mana
 	}
 	
 	protected void castSpell() {
-		LegacySpell spell = pickSpell(spells, entity);
+		Spell spell = pickSpell(spells, entity);
 		
 		if (spell == null) {
 			return;

@@ -14,9 +14,9 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
 import com.smanzana.nostrummagica.utils.DimensionUtils;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.Projectiles;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PaneBlock;
@@ -156,7 +156,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"), Util.DUMMY_UUID);
 					} else {
 						EntityHookShot hook = new EntityHookShot(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
-								ProjectileTrigger.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
+								Projectiles.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
 								this.type);
 						worldIn.addEntity(hook);
 						SetHook(itemStackIn, hook);
@@ -165,13 +165,6 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 				}
 			}
 		}
-		
-//		if (worldIn.isRemote && type == HookshotType.CLAW && hand == Hand.MAIN_HAND) {
-//			@Nullable ItemStack offHandStack = playerIn.getHeldItemOffhand();
-//			if (offHandStack != null && offHandStack.getItem() instanceof HookshotItem) {
-//				return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
-//			}
-//		}
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 	}

@@ -585,7 +585,7 @@ public class PlayerListener {
 						if (ench.shouldTrigger(false, stack)) {
 							SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 							if (action != null)
-								action.apply(livingSource, 1.0f);
+								action.apply(livingTarget, livingSource, 1.0f);
 						}
 					}
 					if (NostrumMagica.instance.curios.isEnabled() && livingTarget instanceof PlayerEntity) {
@@ -600,7 +600,7 @@ public class PlayerListener {
 								if (ench.shouldTrigger(false, stack)) {
 									SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 									if (action != null)
-										action.apply(livingSource, 1.0f);
+										action.apply(livingTarget, livingSource, 1.0f);
 								}
 							}
 						}
@@ -616,7 +616,7 @@ public class PlayerListener {
 					if (ench.shouldTrigger(true, stack)) {
 						SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 						if (action != null)
-							action.apply(livingTarget, 1.0f);
+							action.apply(livingSource, livingTarget, 1.0f);
 					}
 				}
 				if (NostrumMagica.instance.curios.isEnabled() && livingSource instanceof PlayerEntity) {
@@ -631,7 +631,7 @@ public class PlayerListener {
 							if (ench.shouldTrigger(true, stack)) {
 								SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 								if (action != null)
-									action.apply(livingTarget, 1.0f);
+									action.apply(livingSource, livingTarget, 1.0f);
 							}
 						}
 					}

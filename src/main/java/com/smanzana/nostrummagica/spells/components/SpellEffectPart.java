@@ -15,18 +15,22 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class SpellEffectPart {
 
-	private final EAlteration alteration;
+	private final @Nullable EAlteration alteration;
 	private final EMagicElement element;
 	private final int elementCount;
 	
-	public SpellEffectPart(EAlteration alteration, EMagicElement element, int elementCount) {
+	public SpellEffectPart(@Nullable EAlteration alteration, EMagicElement element, int elementCount) {
 		super();
 		this.alteration = alteration;
 		this.element = element;
 		this.elementCount = elementCount;
 	}
+	
+	public SpellEffectPart(EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+		this(alteration, element, elementCount);
+	}
 
-	public EAlteration getAlteration() {
+	public @Nullable EAlteration getAlteration() {
 		return alteration;
 	}
 

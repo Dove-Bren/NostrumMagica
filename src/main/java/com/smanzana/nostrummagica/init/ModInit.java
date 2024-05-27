@@ -112,9 +112,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.ChainShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.trials.TrialEarth;
@@ -256,47 +254,61 @@ public class ModInit {
 
 		for (EMagicElement element : EMagicElement.values()) {
 			recipe = RitualRecipe
-					.createTier2("rune." + element.name().toLowerCase(), SpellRune.getRune(element, 1), null,
+					.createTier2("rune." + element.name().toLowerCase(), SpellRune.getRune(element), null,
 							new ReagentType[] { ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT,
 									ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST },
 							Ingredient.fromStacks(EssenceItem.getEssence(element, 1)),
 							IRitualRequirement.AND(new RRequirementElementMastery(element),
 									new RRequirementResearch("spellrunes")),
-							new OutcomeSpawnItem(SpellRune.getRune(element, 1)));
+							new OutcomeSpawnItem(SpellRune.getRune(element)));
 			registry.register(recipe);
 		}
 
 		// Shape Runes
-		recipe = RitualRecipe.createTier2("rune.single", SpellRune.getRune(SingleShape.instance()), null,
-				new ReagentType[] {
-						ReagentType.GINSENG, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH },
-				Ingredient.fromTag(NostrumTags.Items.MagicToken),
-				IRitualRequirement.AND(new RRequirementShapeMastery(SingleShape.instance()),
-						new RRequirementResearch("spellrunes")),
-				new OutcomeSpawnItem(SpellRune.getRune(SingleShape.instance())));
-		registry.register(recipe);
-
-		recipe = RitualRecipe.createTier3("rune.chain", SpellRune.getRune(ChainShape.instance()), null,
-				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK,
-						ReagentType.MANDRAKE_ROOT },
-				Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())),
-				new Ingredient[] { Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
-						Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())) },
-				IRitualRequirement.AND(new RRequirementShapeMastery(ChainShape.instance()),
-						new RRequirementResearch("spellrunes")),
-				new OutcomeSpawnItem(SpellRune.getRune(ChainShape.instance())));
-		registry.register(recipe);
-
-		recipe = RitualRecipe.createTier3(
-				"rune.aoe", SpellRune.getRune(AoEShape.instance()), null, new ReagentType[] { ReagentType.MANI_DUST,
-						ReagentType.GRAVE_DUST, ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT },
-				Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())),
-				new Ingredient[] { Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND),
-						Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())) },
-				IRitualRequirement.AND(new RRequirementShapeMastery(AoEShape.instance()),
-						new RRequirementResearch("spellrunes")),
-				new OutcomeSpawnItem(SpellRune.getRune(AoEShape.instance())));
-		registry.register(recipe);
+		for (SpellShape shape: SpellShape.getAllShapes()) {
+			recipe = RitualRecipe.createTier3("rune." + shape.getShapeKey().toLowerCase(),
+					SpellRune.getRune(shape), null,
+					new ReagentType[] {
+							ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.SPIDER_SILK },
+					Ingredient.fromTag(NostrumTags.Items.MagicToken),
+					new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(shape.getCraftItem()), Ingredient.EMPTY,
+							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
+					IRitualRequirement.AND(new RRequirementShapeMastery(shape),
+							new RRequirementResearch("spellrunes")),
+					new OutcomeSpawnItem(SpellRune.getRune(shape)));
+			registry.register(recipe);
+		}
+		
+//		recipe = RitualRecipe.createTier2("rune.single", SpellRune.getRune(SingleShape.instance()), null,
+//				new ReagentType[] {
+//						ReagentType.GINSENG, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH },
+//				Ingredient.fromTag(NostrumTags.Items.MagicToken),
+//				IRitualRequirement.AND(new RRequirementShapeMastery(SingleShape.instance()),
+//						new RRequirementResearch("spellrunes")),
+//				new OutcomeSpawnItem(SpellRune.getRune(SingleShape.instance())));
+//		registry.register(recipe);
+//
+//		recipe = RitualRecipe.createTier3("rune.chain", SpellRune.getRune(ChainShape.instance()), null,
+//				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK,
+//						ReagentType.MANDRAKE_ROOT },
+//				Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())),
+//				new Ingredient[] { Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+//						Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())) },
+//				IRitualRequirement.AND(new RRequirementShapeMastery(ChainShape.instance()),
+//						new RRequirementResearch("spellrunes")),
+//				new OutcomeSpawnItem(SpellRune.getRune(ChainShape.instance())));
+//		registry.register(recipe);
+//
+//		recipe = RitualRecipe.createTier3(
+//				"rune.aoe", SpellRune.getRune(AoEShape.instance()), null, new ReagentType[] { ReagentType.MANI_DUST,
+//						ReagentType.GRAVE_DUST, ReagentType.SPIDER_SILK, ReagentType.MANDRAKE_ROOT },
+//				Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())),
+//				new Ingredient[] { Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND),
+//						Ingredient.fromStacks(SpellRune.getRune(SingleShape.instance())), Ingredient.fromStacks(SpellRune.getRune(ChainShape.instance())) },
+//				IRitualRequirement.AND(new RRequirementShapeMastery(AoEShape.instance()),
+//						new RRequirementResearch("spellrunes")),
+//				new OutcomeSpawnItem(SpellRune.getRune(AoEShape.instance())));
+//		registry.register(recipe);
 
 		for (EAlteration alteration : EAlteration.values()) {
 			recipe = RitualRecipe.createTier2("rune." + alteration.name().toLowerCase(), SpellRune.getRune(alteration),
@@ -309,20 +321,6 @@ public class ModInit {
 					new OutcomeSpawnItem(SpellRune.getRune(alteration)));
 			registry.register(recipe);
 		}
-
-//		for (SpellTrigger trigger : SpellTrigger.getAllTriggers()) {
-//			recipe = RitualRecipe.createTier3("rune." + trigger.getTriggerKey().toLowerCase(),
-//					SpellRune.getRune(trigger), null,
-//					new ReagentType[] {
-//							ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.GINSENG },
-//					Ingredient.fromTag(NostrumTags.Items.MagicToken),
-//					new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(trigger.getCraftItem()), Ingredient.EMPTY,
-//							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
-//					IRitualRequirement.AND(new RRequirementTriggerMastery(trigger),
-//							new RRequirementResearch("spellrunes")),
-//					new OutcomeSpawnItem(SpellRune.getRune(trigger)));
-//			registry.register(recipe);
-//		}
 
 		// Boons
 		{
@@ -1400,7 +1398,7 @@ public class ModInit {
 		new NostrumQuest("lvl7-fin7", QuestType.REGULAR, 7, 0, 0, 7, new String[] { "lvl7-fin" }, null, null,
 				wrapAttribute(AwardType.REGEN, 0.010f));
 		new NostrumQuest("lvl10-fin10", QuestType.CHALLENGE, 10, 0, 0, 10, new String[] { "lvl7-fin7" }, null,
-				new ObjectiveSpellCast().numTriggers(10).requiredElement(EMagicElement.ICE),
+				new ObjectiveSpellCast().numComps(8).requiredElement(EMagicElement.ICE),
 				new IReward[] { new AlterationReward(EAlteration.SUPPORT) });
 
 		// LVL-control tree
@@ -1521,7 +1519,7 @@ public class ModInit {
 				0, // Technique
 				3, // Finesse
 				new String[] { "fin1" }, null,
-				new ObjectiveSpellCast().numTriggers(3).requiredAlteration(EAlteration.INFLICT),
+				new ObjectiveSpellCast().requiredAlteration(EAlteration.INFLICT),
 				wrapAttribute(AwardType.REGEN, 0.008f));
 		new NostrumQuest("fin5", QuestType.REGULAR, 0, 0, // Control
 				0, // Technique
@@ -1538,7 +1536,7 @@ public class ModInit {
 		new NostrumQuest("fin5-tec2", QuestType.CHALLENGE, 0, 0, // Control
 				2, // Technique
 				5, // Finesse
-				new String[] { "fin5", "fin2-tec3" }, null, new ObjectiveSpellCast().requiredShape(AoEShape.instance()),
+				new String[] { "fin5", "fin2-tec3" }, null, new ObjectiveSpellCast().requiredShape(NostrumSpellShapes.Burst),
 				new IReward[] { new AlterationReward(EAlteration.GROWTH) });
 		new NostrumQuest("fin1-tec2", QuestType.REGULAR, 0, 0, // Control
 				2, // Technique
@@ -1855,7 +1853,7 @@ public class ModInit {
 				.reference("ritual::rune.touch", "ritual.rune.touch.name")
 				.reference("ritual::rune.self", "ritual.rune.self.name").build("spellrunes",
 						NostrumResearchTab.MYSTICISM, Size.GIANT, 0, 0, true,
-						SpellRune.getRune(SingleShape.instance()));
+						SpellRune.getRune(EMagicElement.FIRE));
 
 		NostrumResearch.startBuilding().hiddenParent("kani")
 				.reference("ritual::fierce_infusion", "ritual.fierce_infusion.name").build("fierce_infusion",
@@ -2100,33 +2098,6 @@ public class ModInit {
     	SpellShape.fireRegisterEvent();
     }
     
-	@SubscribeEvent(priority=EventPriority.HIGH)
-    public static void registerTriggers(RegistryEvent.Register<Item> event) {
-		// Note: these are happening in the register<item> phase because they drive what items get
-		// generated!
-    	SpellTrigger.register(SelfTrigger.instance());
-    	SpellTrigger.register(TouchTrigger.instance());
-    	SpellTrigger.register(AITargetTrigger.instance());
-    	SpellTrigger.register(ProjectileShape.instance());
-    	SpellTrigger.register(BeamTrigger.instance());
-    	SpellTrigger.register(DelayTrigger.instance());
-    	SpellTrigger.register(ProximityShape.instance());
-    	SpellTrigger.register(HealthTrigger.instance());
-    	SpellTrigger.register(FoodTrigger.instance());
-    	SpellTrigger.register(ManaTrigger.instance());
-    	SpellTrigger.register(DamagedTrigger.instance());
-    	SpellTrigger.register(OtherTrigger.instance());
-    	SpellTrigger.register(MagicCutterTrigger.instance());
-    	SpellTrigger.register(MagicCyclerTrigger.instance());
-    	SpellTrigger.register(SeekingBulletShape.instance());
-    	SpellTrigger.register(WallShape.instance());
-    	SpellTrigger.register(MortarShape.instance());
-    	SpellTrigger.register(FieldTrigger.instance());
-    	SpellTrigger.register(AtFeetTrigger.instance());
-    	SpellTrigger.register(AuraTrigger.instance());
-    	SpellTrigger.register(CasterTrigger.instance());
-    }
-	
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
     	event.getRegistry().register(EnchantmentManaRecovery.instance());

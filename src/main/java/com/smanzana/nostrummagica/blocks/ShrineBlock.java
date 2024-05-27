@@ -6,15 +6,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.items.SpellRune;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.ChainShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
 import com.smanzana.nostrummagica.tiles.SymbolTileEntity;
 
 import net.minecraft.block.Block;
@@ -34,7 +27,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -154,74 +146,75 @@ public class ShrineBlock extends SymbolBlock {
 		}
 		
 		if (component.isShape()) {
-			boolean pass = false;
-			if (component.getShape() instanceof SingleShape) {
-				pass = true;
-			}
-			
-			if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellScroll) {
-				Spell spell = SpellScroll.getSpell(heldItem);
-				if (spell != null) {
-					// What we require depends on the shape
-					if (component.getShape() instanceof AoEShape) {
-						boolean speed, leap;
-						speed = leap = false;
-						for (LegacySpellPart part : spell.getSpellParts()) {
-							if (part.isTrigger())
-								continue;
-							if (!(part.getShape() instanceof SingleShape))
-								continue;
-							
-							if (part.getAlteration() == null)
-								continue;
-							
-							if (!speed
-									&& part.getElement() == EMagicElement.WIND
-									&& part.getAlteration() == EAlteration.SUPPORT) {
-								speed = true;
-								continue;
-							}
-							
-							if (!leap
-									&& part.getElement() == EMagicElement.LIGHTNING
-									&& part.getAlteration() == EAlteration.GROWTH) {
-								leap = true;
-								continue;
-							}
-						}
-						
-						if (speed && leap)
-							pass = true;
-					} else if (component.getShape() instanceof ChainShape) {
-						boolean ice, weak;
-						ice = weak = false;
-						for (LegacySpellPart part : spell.getSpellParts()) {
-							if (part.isTrigger())
-								continue;
-							if (!(part.getShape() instanceof SingleShape))
-								continue;
-							
-							if (!ice
-									&& part.getElement() == EMagicElement.ICE
-									&& part.getAlteration() == null
-									&& part.getElementCount() >= 2) {
-								ice = true;
-								continue;
-							}
-							
-							if (!weak
-									&& part.getElement() == EMagicElement.PHYSICAL
-									&& part.getAlteration() == EAlteration.INFLICT) {
-								weak = true;
-								continue;
-							}
-						}
-						
-						if (ice && weak)
-							pass = true;
-					}
-				}
-			}
+			boolean pass = true;
+//			boolean pass = false;
+//			if (component.getShape() instanceof SingleShape) {
+//				pass = true;
+//			}
+//			
+//			if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellScroll) {
+//				Spell spell = SpellScroll.getSpell(heldItem);
+//				if (spell != null) {
+//					// What we require depends on the shape
+//					if (component.getShape() instanceof AoEShape) {
+//						boolean speed, leap;
+//						speed = leap = false;
+//						for (LegacySpellPart part : spell.getSpellParts()) {
+//							if (part.isTrigger())
+//								continue;
+//							if (!(part.getShape() instanceof SingleShape))
+//								continue;
+//							
+//							if (part.getAlteration() == null)
+//								continue;
+//							
+//							if (!speed
+//									&& part.getElement() == EMagicElement.WIND
+//									&& part.getAlteration() == EAlteration.SUPPORT) {
+//								speed = true;
+//								continue;
+//							}
+//							
+//							if (!leap
+//									&& part.getElement() == EMagicElement.LIGHTNING
+//									&& part.getAlteration() == EAlteration.GROWTH) {
+//								leap = true;
+//								continue;
+//							}
+//						}
+//						
+//						if (speed && leap)
+//							pass = true;
+//					} else if (component.getShape() instanceof ChainShape) {
+//						boolean ice, weak;
+//						ice = weak = false;
+//						for (LegacySpellPart part : spell.getSpellParts()) {
+//							if (part.isTrigger())
+//								continue;
+//							if (!(part.getShape() instanceof SingleShape))
+//								continue;
+//							
+//							if (!ice
+//									&& part.getElement() == EMagicElement.ICE
+//									&& part.getAlteration() == null
+//									&& part.getElementCount() >= 2) {
+//								ice = true;
+//								continue;
+//							}
+//							
+//							if (!weak
+//									&& part.getElement() == EMagicElement.PHYSICAL
+//									&& part.getAlteration() == EAlteration.INFLICT) {
+//								weak = true;
+//								continue;
+//							}
+//						}
+//						
+//						if (ice && weak)
+//							pass = true;
+//					}
+//				}
+//			}
 			
 			if (pass && !attr.getShapes().contains(component.getShape())) {
 				attr.addShape(component.getShape());
@@ -230,28 +223,29 @@ public class ShrineBlock extends SymbolBlock {
 					playerIn.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {component.getShape().getDisplayName()}), Util.DUMMY_UUID);
 				}
 				
-				if (!(component.getShape() instanceof SingleShape)) {
-					playerIn.setHeldItem(hand, ItemStack.EMPTY);
-				}
-			} else if (!pass) {
-				// Shape that we haven't correctly unlocked yet
-				if (playerIn.world.isRemote) {
-					String suffix = "";
-					if (component.getShape() instanceof AoEShape) {
-						suffix = "aoe";
-					} else if (component.getShape() instanceof ChainShape) {
-						suffix = "chain";
-					}
-					
-					TranslationTextComponent trans = new TranslationTextComponent("info.shapehint.preamble", new Object[0]);
-					trans.getStyle().applyFormatting(TextFormatting.DARK_GRAY);
-					playerIn.sendMessage(trans, Util.DUMMY_UUID);
-					
-					trans = new TranslationTextComponent("info.shapehint." + suffix, new Object[0]);
-					trans.getStyle().applyFormatting(TextFormatting.LIGHT_PURPLE);
-					playerIn.sendMessage(trans, Util.DUMMY_UUID);
-				}
+//				if (!(component.getShape() instanceof SingleShape)) {
+//					playerIn.setHeldItem(hand, ItemStack.EMPTY);
+//				}
 			}
+//			else if (!pass) {
+//				// Shape that we haven't correctly unlocked yet
+//				if (playerIn.world.isRemote) {
+//					String suffix = "";
+//					if (component.getShape() instanceof AoEShape) {
+//						suffix = "aoe";
+//					} else if (component.getShape() instanceof ChainShape) {
+//						suffix = "chain";
+//					}
+//					
+//					TranslationTextComponent trans = new TranslationTextComponent("info.shapehint.preamble", new Object[0]);
+//					trans.getStyle().applyFormatting(TextFormatting.DARK_GRAY);
+//					playerIn.sendMessage(trans, Util.DUMMY_UUID);
+//					
+//					trans = new TranslationTextComponent("info.shapehint." + suffix, new Object[0]);
+//					trans.getStyle().applyFormatting(TextFormatting.LIGHT_PURPLE);
+//					playerIn.sendMessage(trans, Util.DUMMY_UUID);
+//				}
+//			}
 		}
 		
 		return ActionResultType.SUCCESS;

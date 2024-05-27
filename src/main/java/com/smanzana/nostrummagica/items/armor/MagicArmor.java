@@ -571,15 +571,15 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		switch (element) {
 		case EARTH:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction(user).status(NostrumEffects.rooted, 20 * 5 * (Math.min(2, type.scale) + 1), 0);
+			action = new SpellAction().status(NostrumEffects.rooted, 20 * 5 * (Math.min(2, type.scale) + 1), 0);
 			break;
 		case ENDER:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction(user).phase(Math.min(2, type.scale));
+			action = new SpellAction().phase(Math.min(2, type.scale));
 			break;
 		case FIRE:
 //			if (NostrumMagica.rand.nextFloat() <= 0.35f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction(user).burn(5 * 20);
+			action = new SpellAction().burn(5 * 20);
 			break;
 		case PHYSICAL:
 		case WIND:

@@ -4,19 +4,17 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.world.World;
 
 public class EntityGolemLightning extends EntityGolem {
@@ -26,30 +24,30 @@ public class EntityGolemLightning extends EntityGolem {
 	private static final AttributeModifier MOVEMENT_STORM_MODIFIER
 		= new AttributeModifier("lightning_storm_boost", .2, AttributeModifier.Operation.MULTIPLY_BASE);
 	
-	private static LegacySpell spellRanged1;
-	private static LegacySpell spellRanged2;
-	private static LegacySpell spellBuff;
+	private static Spell spellRanged1;
+	private static Spell spellRanged2;
+	private static Spell spellBuff;
 	
 	private static void init() {
 		if (spellRanged1 == null) {
-			spellRanged1 = LegacySpell.CreateAISpell("Lightning Strike");
-			spellRanged1.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellRanged1.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellRanged1 = Spell.CreateAISpell("Lightning Strike");
+			spellRanged1.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellRanged1.addPart(new SpellEffectPart(
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.CONJURE));
 			
-			spellRanged2 = LegacySpell.CreateAISpell("Spark");
-			spellRanged2.addPart(new LegacySpellPart(ProjectileTrigger.instance()));
-			spellRanged2.addPart(new LegacySpellPart(AoEShape.instance(),
+			spellRanged2 = Spell.CreateAISpell("Spark");
+			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
+			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapePartProperties(1, false)));
+			spellRanged2.addPart(new SpellEffectPart(
 					EMagicElement.LIGHTNING,
 					1,
-					null,
-					new SpellPartProperties(1, false)));
+					null));
 			
-			spellBuff = LegacySpell.CreateAISpell("Magic Ward");
-			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellBuff = Spell.CreateAISpell("Magic Ward");
+			spellBuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellBuff.addPart(new SpellEffectPart(
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.RESIST));

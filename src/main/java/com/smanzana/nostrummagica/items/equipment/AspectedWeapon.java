@@ -22,7 +22,6 @@ import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.items.IReactiveEquipment;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.armor.MagicArmor;
-import com.smanzana.nostrummagica.items.armor.MagicArmor.Type;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
@@ -279,11 +278,11 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			break;
 		case LIGHTNING:
 			if (NostrumMagica.rand.nextFloat() < 0.1f * typeScale(this.type))
-				action = new SpellAction(user).lightning();
+				action = new SpellAction().lightning();
 			break;
 		case ICE:
 			if (NostrumMagica.rand.nextFloat() < 0.5f * typeScale(this.type))
-				action = new SpellAction(user).status(
+				action = new SpellAction().status(
 						NostrumEffects.frostbite, 5 * 20, typeScale(this.type) > 2 ? typeScale(this.type) - 2 : 0);
 			break;
 		default:
@@ -742,9 +741,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	@Override
 	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (element == EMagicElement.WIND) {
-			SpellAction fly = new SpellAction(playerIn);
+			SpellAction fly = new SpellAction();
 			fly.push(5.0f, typeScale(this.type));
-			fly.apply(target, 1.0f);
+			fly.apply(playerIn, target, 1.0f);
 			ItemStacks.damageItem(stack, playerIn, hand, 2);
 			return ActionResultType.SUCCESS;
 		}

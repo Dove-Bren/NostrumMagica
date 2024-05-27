@@ -110,18 +110,6 @@ public class SpellCrafting {
 		return CreateSpellFromPartsInternal(context, pattern, spellName, parts, trans);
 	}
 	
-	/**
-	 * Specialized spell creation when there isn't a player context available.
-	 * Examples include randomly-generated spells in dungeons.
-	 * @param spellName
-	 * @param parts
-	 * @param trans
-	 * @return
-	 */
-	public static LegacySpell CreateSpellFromPartsNoContext(String spellName, List<LegacySpellPart> parts, boolean trans) {
-		return CreateSpellFromPartsInternal(null, null, spellName, parts, trans);
-	}
-	
 	protected static LegacySpell CreateSpellFromPartsInternal(@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<LegacySpellPart> parts, boolean trans) {
 		
 		List<SpellPartBuilder> ingredients = MakeIngredients(context, pattern, parts);

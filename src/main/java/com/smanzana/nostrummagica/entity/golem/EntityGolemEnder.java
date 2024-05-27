@@ -3,12 +3,11 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.AITargetTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -21,30 +20,30 @@ public class EntityGolemEnder extends EntityGolem {
 	
 	public static final String ID = "ender_golem";
 	
-	private static LegacySpell spellRange;
-	private static LegacySpell spellDebuff;
-	private static LegacySpell spellBuff;
+	private static Spell spellRange;
+	private static Spell spellDebuff;
+	private static Spell spellBuff;
 	
 	private static void init() {
 		if (spellRange == null) {
-			spellRange = LegacySpell.CreateAISpell("Overwhelm");
-			spellRange.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellRange.addPart(new LegacySpellPart(AoEShape.instance(),
+			spellRange = Spell.CreateAISpell("Overwhelm");
+			spellRange.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellRange.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapePartProperties(2, false)));
+			spellRange.addPart(new SpellEffectPart(
 					EMagicElement.ENDER,
 					1,
-					null,
-					new SpellPartProperties(2, false)));
+					null));
 			
-			spellDebuff = LegacySpell.CreateAISpell("Blind");
-			spellDebuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellDebuff.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellDebuff = Spell.CreateAISpell("Blind");
+			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellDebuff.addPart(new SpellEffectPart(
 					EMagicElement.ENDER,
 					1,
 					EAlteration.INFLICT));
 			
-			spellBuff = LegacySpell.CreateAISpell("Cloak");
-			spellBuff.addPart(new LegacySpellPart(AITargetTrigger.instance()));
-			spellBuff.addPart(new LegacySpellPart(SingleShape.instance(),
+			spellBuff = Spell.CreateAISpell("Cloak");
+			spellBuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellBuff.addPart(new SpellEffectPart(
 					EMagicElement.ENDER,
 					1,
 					EAlteration.RESIST));

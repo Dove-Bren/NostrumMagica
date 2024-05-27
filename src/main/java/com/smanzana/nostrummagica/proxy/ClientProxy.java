@@ -54,13 +54,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellCasting;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spells.components.legacy.AoEShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.BeamTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.FoodTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.HealthTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ManaTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.OtherTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProximityTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 
@@ -440,7 +434,7 @@ public class ClientProxy extends CommonProxy {
 	public void initDefaultEffects() {
 		ClientEffectRenderer renderer = this.effectRenderer;
 		
-		renderer.registerEffect(new SpellComponentWrapper(AoEShape.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Burst),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					// TODO get the shape params in here to modify scale
 					// TODO get whether it's a good thing or not
@@ -500,7 +494,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		// triggers (that have them)
-		renderer.registerEffect(new SpellComponentWrapper(BeamTrigger.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Beam),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.getPositionVec() : sourcePos,
 							targetPos == null ? target.getPositionVec() : targetPos,
@@ -541,30 +535,30 @@ public class ClientProxy extends CommonProxy {
 //				});
 		// Can't think of a cool one for self. Oh well
 		
-		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
-							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
-							500L, 6);
-					
-					if (target != null) {
-						effect.modify(new ClientEffectModifierFollow(target));
-					}
-					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
-					
-					effect
-					.modify(new ClientEffectModifierTranslate(0, 1, -1))
-					.modify(new ClientEffectModifierRotate(.4f, 0f, 1.2f))
-					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .3f))
-					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .2f, .8f))
-					;
-					return effect;
-				});
+//		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
+//				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+//					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+//							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
+//							500L, 6);
+//					
+//					if (target != null) {
+//						effect.modify(new ClientEffectModifierFollow(target));
+//					}
+//					
+//					if (flavor != null && flavor.isElement()) {
+//						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
+//					}
+//					
+//					effect
+//					.modify(new ClientEffectModifierTranslate(0, 1, -1))
+//					.modify(new ClientEffectModifierRotate(.4f, 0f, 1.2f))
+//					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .3f))
+//					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .2f, .8f))
+//					;
+//					return effect;
+//				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(HealthTrigger.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.OnHealth),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
@@ -583,7 +577,7 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(ManaTrigger.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.OnMana),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
@@ -602,7 +596,7 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(FoodTrigger.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.OnFood),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
@@ -621,7 +615,7 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(ProximityTrigger.instance()),
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Proximity),
 				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),

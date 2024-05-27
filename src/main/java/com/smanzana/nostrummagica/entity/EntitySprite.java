@@ -14,10 +14,10 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.TouchTrigger;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spells.components.shapes.TouchShape;
+import com.smanzana.nostrummagica.utils.SpellUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -67,15 +67,15 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 
 	private static final DataParameter<Boolean> SPRITE_ANGRY = EntityDataManager.<Boolean>createKey(EntitySprite.class, DataSerializers.BOOLEAN);
 	
-	private static LegacySpell EARTH_ZAP = null;
+	private static Spell EARTH_ZAP = null;
 	
 	private static final double EFFECT_DISTANCE_SQ = 256.0;
 	
 	private static void initStaticSpells() {
 		if (EARTH_ZAP == null) {
-			EARTH_ZAP = LegacySpell.CreateAISpell("Sprite_EARTHZAP");
-			EARTH_ZAP.addPart(new LegacySpellPart(TouchTrigger.instance()));
-			EARTH_ZAP.addPart(new LegacySpellPart(SingleShape.instance(), EMagicElement.EARTH, 3, null));
+			EARTH_ZAP = SpellUtils.MakeSpell("Sprite_EARTHZAP",
+					NostrumSpellShapes.Touch,
+					EMagicElement.EARTH, 3, null);
 		}
 	}
 	
@@ -97,7 +97,7 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
     	int priority = 1;
     	this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntitySprite>(this, 20, 4, true, (sprite) -> {
     		return sprite.isAngry() && sprite.getAttackTarget() != null
-    				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchTrigger.TOUCH_RANGE * TouchTrigger.TOUCH_RANGE;
+    				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchShape.TOUCH_RANGE * TouchShape.TOUCH_RANGE;
     	}, EARTH_ZAP));
         this.goalSelector.addGoal(priority++, new SwimGoal(this));
         this.goalSelector.addGoal(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 2f, 4f, false, null) {

@@ -26,15 +26,15 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spells.components.shapes.SeekingBulletShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.utils.ItemStacks;
 import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.utils.SpellUtils;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -371,21 +371,21 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
 	}
 
-	private static LegacySpell[] MissleSpells = null;
+	private static Spell[] MissleSpells = null;
 	
 	private static void InitMissleSpells() {
 		if (MissleSpells == null) {
-			MissleSpells = new LegacySpell[EMagicElement.values().length];
+			MissleSpells = new Spell[EMagicElement.values().length];
 			for (EMagicElement elem : EMagicElement.values()) {
-				LegacySpell spell = LegacySpell.CreateAISpell("WarlockMissle_" + elem.name());
-				spell.addPart(new LegacySpellPart(SeekingBulletTrigger.instance()));
-				spell.addPart(new LegacySpellPart(SingleShape.instance(), elem, 1, null));
+				Spell spell = SpellUtils.MakeSpell("WarlockMissle_" + elem.name(),
+						NostrumSpellShapes.SeekingBullet,
+						elem, 1, null);
 				MissleSpells[elem.ordinal()] = spell;
 			}
 		}
 	}
 	
-	private static LegacySpell GetMissleSpell(EMagicElement elem) {
+	private static Spell GetMissleSpell(EMagicElement elem) {
 		InitMissleSpells();
 		return MissleSpells[elem.ordinal()];
 	}
@@ -435,7 +435,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			if (!worldIn.isRemote) {
 				// We have a target?
 				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0),
-						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletTrigger.MAX_DIST, (ent) -> {
+						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletShape.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
 								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getOwner() != null) {
 									if (playerIn.getUniqueID().equals(((ITameableEntity) ent).getOwner().getUniqueID())) {
@@ -454,7 +454,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 					for (EMagicElement elem : EMagicElement.values()) {
 						Float val = power.get(elem);
 						if (val != null && val >= 1f) {
-							LegacySpell missle = GetMissleSpell(elem);
+							Spell missle = GetMissleSpell(elem);
 							missle.cast(playerIn, .5f * (int) (float) val);
 							any = true;
 						}
@@ -498,7 +498,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 
 	@Override
 	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
-		return SeekingBulletTrigger.MAX_DIST;
+		return SeekingBulletShape.MAX_DIST;
 	}
 
 }

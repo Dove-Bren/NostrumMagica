@@ -108,7 +108,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 				
 				// If there was a caster, reflect part of the spell back
 				if (data.caster != null && data.caster != entity) {
-					data.summary.getAction().apply(data.caster, 0.2f);
+					data.summary.getAction().apply(entity, data.caster, 0.2f);
 				}
 				
 				// Regardless, reduce efficiency

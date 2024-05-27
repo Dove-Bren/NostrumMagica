@@ -11,10 +11,9 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.quests.NostrumQuest;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell.ICastListener;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.Spell.ICastListener;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
@@ -49,17 +48,14 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 	private NostrumQuest quest;
 	private int numElems;
 	private int numComps;
-	private int numTriggers;
 	private Map<EMagicElement, Integer> elements;
 	private Map<EAlteration, Integer> alterations;
-	private Map<SpellTrigger, Integer> triggers;
-	private Map<LegacySpellShape, Integer> shapes;
+	private Map<SpellShape, Integer> shapes;
 
 	public ObjectiveSpellCast() {
-		LegacySpell.registerCastListener(this);
+		Spell.registerCastListener(this);
 		this.elements = new EnumMap<>(EMagicElement.class);
 		this.alterations = new EnumMap<>(EAlteration.class);
-		this.triggers = new HashMap<>();
 		this.shapes = new HashMap<>();
 	}
 	
@@ -70,11 +66,6 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 	
 	public ObjectiveSpellCast numComps(int count) {
 		this.numComps = count;
-		return this;
-	}
-	
-	public ObjectiveSpellCast numTriggers(int count) {
-		this.numTriggers = count;
 		return this;
 	}
 	
@@ -94,19 +85,11 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		return this;
 	}
 	
-	public ObjectiveSpellCast requiredShape(LegacySpellShape shape) {
+	public ObjectiveSpellCast requiredShape(SpellShape shape) {
 		int count = 0;
 		if (this.shapes.get(shape) != null)
 			count = shapes.get(shape);
 		this.shapes.put(shape, ++count);
-		return this;
-	}
-	
-	public ObjectiveSpellCast requiredTrigger(SpellTrigger trigger) {
-		int count = 0;
-		if (this.triggers.get(trigger) != null)
-			count = triggers.get(trigger);
-		this.triggers.put(trigger, ++count);
 		return this;
 	}
 	
@@ -135,7 +118,7 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 	}
 
 	@Override
-	public void onCast(LivingEntity entity, LegacySpell spell) {
+	public void onCast(LivingEntity entity, Spell spell) {
 		
 		if (entity instanceof PlayerEntity) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -172,12 +155,9 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		return;
 	}
 	
-	private boolean spellMatches(LegacySpell spell) {
+	private boolean spellMatches(Spell spell) {
 		if (numElems > 0)
 			if (numElems > spell.getElementCount())
-				return false;
-		if (numTriggers > 0)
-			if (numTriggers > spell.getTriggerCount())
 				return false;
 		if (numComps > 0)
 			if (numComps > spell.getComponentCount())
@@ -212,26 +192,12 @@ public class ObjectiveSpellCast implements IObjective, ICastListener {
 		}
 		
 		if (!shapes.isEmpty()) {
-			Map<LegacySpellShape, Integer> spellMap = spell.getShapes();
-			for (LegacySpellShape shape: shapes.keySet()) {
+			Map<SpellShape, Integer> spellMap = spell.getShapes();
+			for (SpellShape shape: shapes.keySet()) {
 				Integer count = shapes.get(shape);
 				if (count == null || count == 0)
 					continue;
 				Integer spellCount = spellMap.get(shape);
-				if (spellCount == null || spellCount == 0)
-					return false;
-				if (spellCount < count)
-					return false;
-			}
-		}
-		
-		if (!triggers.isEmpty()) {
-			Map<SpellTrigger, Integer> spellMap = spell.getTriggers();
-			for (SpellTrigger trigger: triggers.keySet()) {
-				Integer count = triggers.get(trigger);
-				if (count == null || count == 0)
-					continue;
-				Integer spellCount = spellMap.get(trigger);
 				if (spellCount == null || spellCount == 0)
 					return false;
 				if (spellCount < count)

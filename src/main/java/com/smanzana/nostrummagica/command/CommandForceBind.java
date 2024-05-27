@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.items.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
+import com.smanzana.nostrummagica.spells.Spell;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -41,9 +41,7 @@ public class CommandForceBind {
 			context.getSource().sendFeedback(new StringTextComponent("To force a bind, hold the tome that's being binded to in your main hand"), true);
 			return 1;
 		}
-		if (attr.isBinding()) {
-			attr.completeBinding(stack);
-		} if (SpellTome.getPlayerID(stack) == null) {
+		if (SpellTome.getPlayerID(stack) == null) {
 			// bonding tome. Force it!
 			SpellTome.bond(stack, player.world, player);
 		} else {
@@ -52,9 +50,12 @@ public class CommandForceBind {
 					|| SpellScroll.getSpell(offhand) == null) {
 				context.getSource().sendFeedback(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
 			} else {
-				LegacySpell spell = SpellScroll.getSpell(offhand);
-				attr.startBinding(spell, null, SpellTome.getTomeID(stack));
-				attr.completeBinding(stack);
+				Spell spell = SpellScroll.getSpell(offhand);
+				if (SpellTome.hasRoom(stack, spell)) {
+					SpellTome.addSpell(stack, spell);
+				} else {
+					context.getSource().sendFeedback(new StringTextComponent("The tome is full"), true);
+				}
 			}
 		}
 		NetworkHandler.sendTo(

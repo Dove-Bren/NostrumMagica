@@ -21,6 +21,10 @@ public class SpellShapePart {
 		this.shape = shape;
 		this.properties = properties;
 	}
+	
+	public SpellShapePart(SpellShape shape) {
+		this(shape, new SpellShapePartProperties());
+	}
 
 	public SpellShape getShape() {
 		return shape;

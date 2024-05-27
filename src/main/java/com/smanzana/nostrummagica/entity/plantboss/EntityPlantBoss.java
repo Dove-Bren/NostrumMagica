@@ -29,19 +29,12 @@ import com.smanzana.nostrummagica.serializers.OptionalMagicElementDataSerializer
 import com.smanzana.nostrummagica.serializers.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
-import com.smanzana.nostrummagica.spells.components.SpellTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpell;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellPart;
-import com.smanzana.nostrummagica.spells.components.legacy.LegacySpellShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SingleShape;
-import com.smanzana.nostrummagica.spells.components.legacy.SpellPartProperties;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.FieldTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.MagicCutterTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.MortarTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.ProjectileTrigger;
-import com.smanzana.nostrummagica.spells.components.legacy.triggers.SeekingBulletTrigger;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.utils.SpellUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -138,50 +131,44 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	public static final String ID = "entity_plant_boss";
 	public static final int NumberOfLeaves = 8;
 	
-	private static LegacySpell[] IdleSpells = null;
+	private static Spell[] IdleSpells = null;
 	
-	protected static LegacySpell[] GetIdleSpells() {
+	protected static Spell[] GetIdleSpells() {
 		if (IdleSpells == null) {
-			List<LegacySpell> spells = new ArrayList<>();
+			List<Spell> spells = new ArrayList<>();
 			
-			spells.add(makeSpell("Leaf Blade",
-					MagicCutterTrigger.instance(),
-					new SpellPartProperties(1, true),
-					SingleShape.instance(),
+			spells.add(SpellUtils.MakeSpell("Leaf Blade",
+					NostrumSpellShapes.Cutter,
+					new SpellShapePartProperties(1, true),
 					EMagicElement.WIND,
 					2,
-					EAlteration.RUIN,
-					null
+					EAlteration.RUIN
 					));
-			spells.add(makeSpell("Spore",
-					SeekingBulletTrigger.instance(),
-					new SpellPartProperties(0, true),
-					SingleShape.instance(),
+			spells.add(SpellUtils.MakeSpell("Spore",
+					NostrumSpellShapes.SeekingBullet,
+					new SpellShapePartProperties(0, true),
 					EMagicElement.LIGHTNING,
 					1,
-					EAlteration.INFLICT,
-					null
+					EAlteration.INFLICT
 					));
 			
 			
-			IdleSpells = spells.toArray(new LegacySpell[0]);
+			IdleSpells = spells.toArray(new Spell[0]);
 		}
 		
 		return IdleSpells;
 	}
 	
-	private static LegacySpell SeedBombSpell = null;
-	protected static LegacySpell GetSeedBombSpell() {
+	private static Spell SeedBombSpell = null;
+	protected static Spell GetSeedBombSpell() {
 		if (SeedBombSpell == null) {
-			SeedBombSpell = makeSpell("Seed Bomb",
-					MortarTrigger.instance(),
-					new SpellPartProperties(0, true),
-					FieldTrigger.instance(),
-					new SpellPartProperties(2, false),
-					SingleShape.instance(),
+			SeedBombSpell = SpellUtils.MakeSpell("Seed Bomb",
+					NostrumSpellShapes.Mortar,
+					new SpellShapePartProperties(0, true),
+					NostrumSpellShapes.Field,
+					new SpellShapePartProperties(2, false),
 					EMagicElement.EARTH,
 					1,
-					null,
 					null
 					);
 		}
@@ -189,74 +176,32 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		return SeedBombSpell;
 	}
 	
-	private static LegacySpell PollenSpell = null;
-	protected static LegacySpell GetPollenSpell() {
+	private static Spell PollenSpell = null;
+	protected static Spell GetPollenSpell() {
 		if (PollenSpell == null) {
-			PollenSpell = makeSpell("Pollinate",
-					SeekingBulletTrigger.instance(),
-					SingleShape.instance(),
+			PollenSpell = SpellUtils.MakeSpell("Pollinate",
+					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.EARTH,
 					1,
-					EAlteration.INFLICT,
-					null
+					EAlteration.INFLICT
 					);
 		}
 		
 		return PollenSpell;
 	}
 	
-	private static LegacySpell BulletSeedSpell = null;
-	protected static LegacySpell GetBulletSeedSpell() {
+	private static Spell BulletSeedSpell = null;
+	protected static Spell GetBulletSeedSpell() {
 		if (BulletSeedSpell == null) {
-			BulletSeedSpell = makeSpell("Bullet Seed",
-					ProjectileTrigger.instance(),
-					SingleShape.instance(),
+			BulletSeedSpell = SpellUtils.MakeSpell("Bullet Seed",
+					NostrumSpellShapes.Projectile,
 					EMagicElement.EARTH,
 					3,
-					null,
 					null
 					);
 		}
 		
 		return BulletSeedSpell;
-	}
-	
-	private static LegacySpell makeSpell(
-			String name,
-			Object ... objects) {
-		LegacySpell spell = LegacySpell.CreateAISpell(name);
-		
-		for (int i = 0; i < objects.length; i++) {
-			Object o = objects[i];
-			if (o instanceof SpellTrigger) {
-				SpellTrigger trigger = (SpellTrigger) o;
-				final SpellPartProperties param;
-				
-				// Peek at next
-				if (objects.length > i + 1
-						&& objects[i+1] instanceof SpellPartProperties) {
-					param = (SpellPartProperties) objects[++i];
-				} else {
-					param = new SpellPartProperties(0, false); // matches SpellPart constructor with no second param
-				}
-				
-				spell.addPart(new LegacySpellPart(trigger, param));
-			} else if (o instanceof LegacySpellShape) {
-				LegacySpellShape shape = (LegacySpellShape) o;
-				EMagicElement element = (EMagicElement) objects[++i];
-				Integer level = (Integer) objects[++i];
-				EAlteration alt = (EAlteration) objects[++i];
-				SpellPartProperties param = (SpellPartProperties) objects[++i];
-				
-				if (param == null) {
-					param = new SpellPartProperties(0, false);
-				}
-				
-				spell.addPart(new LegacySpellPart(shape, element, level, alt, param));
-			}
-		}
-		
-		return spell;
 	}
 	
 	protected static final DataParameter<Float[]> LEAF_PITCHES = EntityDataManager.<Float[]>createKey(EntityPlantBoss.class, FloatArraySerializer.instance);
@@ -868,7 +813,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		return this.getEntitySenses().canSee(target);
 	}
 	
-	protected void setCasting(@Nullable LegacySpell spell) {
+	protected void setCasting(@Nullable Spell spell) {
 		; // TODO
 	}
 	
@@ -876,7 +821,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 		return false; // TODO
 	}
 	
-	public @Nullable LegacySpell getCastingSpell() {
+	public @Nullable Spell getCastingSpell() {
 		return null; // TODO
 	}
 	
@@ -1281,7 +1226,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			;
 		}
 		
-		protected final void doSpellCast(@Nonnull LivingEntity target, @Nonnull LegacySpell spell, float castHeight) {
+		protected final void doSpellCast(@Nonnull LivingEntity target, @Nonnull Spell spell, float castHeight) {
 			@Nullable LivingEntity oldTarget = parent.getAttackTarget();
 			if (target != null) {
 				parent.faceEntity(target, 360f, 180f);
@@ -1303,16 +1248,16 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 	
 	protected class BattleStateTaskIdle extends BattleStateTask {
 		
-		protected final LegacySpell[] spells;
+		protected final Spell[] spells;
 		private final float castChance;
 		private final int castDuration;
 		private final int castCooldown;
 		
-		protected @Nullable LegacySpell castingSpell;
+		protected @Nullable Spell castingSpell;
 		protected @Nullable LivingEntity castingTarget;
 		protected int castTicks; // 0 means nothing. 1-castDuration means casting. -castCooldown to -1 is cooling down.
 		
-		public BattleStateTaskIdle(EntityPlantBoss parent, int duration, int durationJitter, float castChance, int castDuration, int castCooldown, LegacySpell ... spells) {
+		public BattleStateTaskIdle(EntityPlantBoss parent, int duration, int durationJitter, float castChance, int castDuration, int castCooldown, Spell ... spells) {
 			super(parent, BattleState.IDLE, duration, durationJitter);
 			this.spells = spells;
 			this.castChance = castChance;
@@ -1347,7 +1292,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			// While idling, we sometimes cast spells
 			if (this.castTicks == 0
 					&& parent.rand.nextFloat() < castChance) {
-				LegacySpell spell = chooseSpell();
+				Spell spell = chooseSpell();
 				LivingEntity target = parent.getRandomTarget();
 				if (spell != null && target != null) {
 					startCastingSpell(spell, target);
@@ -1364,13 +1309,13 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 //			}
 		}
 		
-		protected @Nullable LegacySpell chooseSpell() {
+		protected @Nullable Spell chooseSpell() {
 			return (spells != null && spells.length > 0)
 					? spells[parent.rand.nextInt(spells.length)]
 					: null;
 		}
 		
-		protected void startCastingSpell(@Nonnull LegacySpell spell, @Nonnull LivingEntity target) {
+		protected void startCastingSpell(@Nonnull Spell spell, @Nonnull LivingEntity target) {
 			this.castingSpell = spell;
 			this.castingTarget = target;
 			
@@ -1379,7 +1324,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			parent.setCasting(spell);
 		}
 		
-		protected void finishCastingSpell(@Nonnull LegacySpell spell, @Nonnull LivingEntity target, @Nullable LivingEntity altTarget) {
+		protected void finishCastingSpell(@Nonnull Spell spell, @Nonnull LivingEntity target, @Nullable LivingEntity altTarget) {
 			
 			if (!target.isAlive() || !parent.isStillTargetable(target)) {
 				target = altTarget;
@@ -1428,12 +1373,12 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			super.update();
 		}
 		
-		protected LegacySpell getBombSpell() {
+		protected Spell getBombSpell() {
 			return EntityPlantBoss.GetSeedBombSpell();
 		}
 		
 		protected void fireBomb() {
-			LegacySpell spell = this.getBombSpell();
+			Spell spell = this.getBombSpell();
 			if (spell != null) {
 				// Pick a platform
 				BlockPos pillar = parent.getRandomPillar();
@@ -1497,12 +1442,12 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			super.update();
 		}
 		
-		protected LegacySpell getPollenSpell() {
+		protected Spell getPollenSpell() {
 			return EntityPlantBoss.GetPollenSpell();
 		}
 		
 		protected void firePollen() {
-			LegacySpell spell = this.getPollenSpell();
+			Spell spell = this.getPollenSpell();
 			List<LivingEntity> targets = parent.getAllTargets();
 			if (spell != null && targets != null && !targets.isEmpty()) {
 				
@@ -1563,12 +1508,12 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			return startingYaw + ((float) (elapsed % period) / (float) period) * 360f;
 		}
 		
-		protected LegacySpell getBulletSpell() {
+		protected Spell getBulletSpell() {
 			return EntityPlantBoss.GetBulletSeedSpell();
 		}
 		
 		protected void fireBullet() {
-			LegacySpell spell = this.getBulletSpell();
+			Spell spell = this.getBulletSpell();
 			if (spell != null) {
 				doSpellCast(null, spell, .5f);
 			}
