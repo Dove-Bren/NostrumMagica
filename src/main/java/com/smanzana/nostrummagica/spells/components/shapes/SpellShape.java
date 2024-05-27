@@ -199,9 +199,11 @@ public abstract class SpellShape {
 	protected final void spawnDefaultShapeEffect(LivingEntity caster,
 			@Nullable LivingEntity target, World world, Vector3d pos,
 			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final float p = (supportedFloats() == null || supportedFloats().length == 0 ? 0 : (
+				properties.level == 0f ? supportedFloats()[0] : properties.level));
 		NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
 				caster, null, target, pos,
-				new SpellComponentWrapper(characteristics.element), characteristics.harmful, properties.level);
+				new SpellComponentWrapper(characteristics.element), characteristics.harmful, p);
 	}
 	
 	/**
