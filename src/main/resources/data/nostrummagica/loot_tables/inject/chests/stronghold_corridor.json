@@ -16,6 +16,12 @@
       },
       {
         "type": "item",
+        "name": "nostrummagica:rune_shape_self",
+        "entryName": "runeself",
+        "weight": 2
+      },
+      {
+        "type": "item",
         "name": "nostrummagica:rune_shape_touch",
         "entryName": "rune3",
         "weight": 4

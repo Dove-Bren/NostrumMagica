@@ -28,6 +28,7 @@ public class NostrumSpellShapes {
 	public static final ProjectileShape Projectile = new ProjectileShape();
 	public static final ProximityShape Proximity = new ProximityShape();
 	public static final SeekingBulletShape SeekingBullet = new SeekingBulletShape();
+	public static final SelfShape Self = new SelfShape();
 	public static final TouchShape Touch = new TouchShape();
 	public static final WallShape Wall = new WallShape();
 	
@@ -51,6 +52,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(Projectile);
 		event.getRegistry().register(Proximity);
 		event.getRegistry().register(SeekingBullet);
+		event.getRegistry().register(Self);
 		event.getRegistry().register(Touch);
 		event.getRegistry().register(Wall);
 	}

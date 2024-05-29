@@ -35,6 +35,7 @@ public class SpellCrafting {
 		boolean valid = true;
 		
 		// All shapes must be first. (This isn't enforced or required by the rest of spellcrafting logic.)
+		boolean foundShape = false;
 		boolean foundElement = false;
 		boolean foundTerminalShape = false;
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
@@ -51,6 +52,7 @@ public class SpellCrafting {
 					valid = false;
 				}
 			} else if (SpellRune.isShape(stack)) {
+				foundShape = true;
 				if (foundElement) {
 					errorsOut.add("Shape in slot " + (i - (startIdx-1)) + " is not allowed after effects have started");
 					valid = false;
@@ -63,6 +65,11 @@ public class SpellCrafting {
 						foundTerminalShape = true;
 					}
 				}
+			}
+			
+			if (i == startIdx && !foundShape) {
+				errorsOut.add("The first rune on the board must be a shape");
+				valid = false;
 			}
 		}
 		
