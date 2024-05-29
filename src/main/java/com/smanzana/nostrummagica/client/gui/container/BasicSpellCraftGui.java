@@ -68,7 +68,7 @@ public class BasicSpellCraftGui {
 
 	protected static final int POS_INFOPANEL_HOFFSET = POS_CONTAINER_WIDTH;
 	protected static final int POS_INFOPANEL_VOFFSET = 0;
-	protected static final int POS_INFOPANEL_WIDTH = 62;
+	protected static final int POS_INFOPANEL_WIDTH = 80;
 	protected static final int POS_INFOPANEL_HEIGHT = 79;
 
 	public static class BasicSpellCraftContainer extends SpellCreationContainer {
@@ -295,7 +295,9 @@ public class BasicSpellCraftGui {
 			this.addButton(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
 			
 			// Weight status
-			this.addButton(new WeightStatus(this, horizontalMargin + POS_WEIGHTBAR_HOFFSET, verticalMargin + POS_WEIGHTBAR_VOFFSET, POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+			this.addButton(new WeightStatus(this,
+					horizontalMargin + POS_WEIGHTBAR_HOFFSET + ((POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4), verticalMargin + POS_WEIGHTBAR_VOFFSET,
+					POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
 			
 			// Extra inventory
 			if (this.getContainer().extraInventory != null) {
