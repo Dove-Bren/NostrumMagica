@@ -43,7 +43,6 @@ public class BurstShape extends InstantShape {
 		List<LivingEntity> ret = new ArrayList<>();
 		
 		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + .5;
-		final boolean ignoreAllies = param.flip;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
 				new AxisAlignedBB(pos.getX() - radiusEnts,
@@ -53,7 +52,7 @@ public class BurstShape extends InstantShape {
 							pos.getY() + radiusEnts,
 							pos.getZ() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
-			if (living != null && (!ignoreAllies || (state.getCaster() != null && !NostrumMagica.IsSameTeam(state.getCaster(), living))))
+			if (living != null)
 				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(pos.getX(), pos.getY(), pos.getZ()))) <= radiusEnts)
 					ret.add(living);
 		}
@@ -104,8 +103,7 @@ public class BurstShape extends InstantShape {
 
 	@Override
 	public boolean supportsBoolean() {
-		int unused; // Remove this since Ring exists now
-		return true;
+		return false;
 	}
 
 	@Override
@@ -129,7 +127,7 @@ public class BurstShape extends InstantShape {
 
 	@Override
 	public String supportedBooleanName() {
-		return I18n.format("modification.aoe.bool.name", (Object[]) null);
+		return null;
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.items.IEnchantableItem;
 import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.IEnchantableItem.Result;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;

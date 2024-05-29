@@ -250,7 +250,6 @@ public class NostrumItems {
 	@ObjectHolder(MasteryOrb.ID) public static MasteryOrb masteryOrb;
 	@ObjectHolder(MirrorShield.ID) public static MirrorShield mirrorShield;
 	@ObjectHolder(MirrorShieldImproved.ID) public static MirrorShieldImproved mirrorShieldImproved;
-	@ObjectHolder(NostrumGuide.ID) public static NostrumGuide nostrumGuide;
 	@ObjectHolder(NostrumResourceItem.ID_TOKEN) public static NostrumResourceItem resourceToken;
 	@ObjectHolder(NostrumResourceItem.ID_PENDANT_LEFT) public static NostrumResourceItem resourcePendantLeft;
 	@ObjectHolder(NostrumResourceItem.ID_PENDANT_RIGHT) public static NostrumResourceItem resourcePendantRight;
@@ -293,7 +292,6 @@ public class NostrumItems {
 	@ObjectHolder(ReagentSeed.ID_ESSENCE_SEED) public static ReagentSeed reagentSeedEssence;
 	@ObjectHolder(RuneBag.ID) public static RuneBag runeBag;
 	@ObjectHolder(SoulDagger.ID) public static SoulDagger soulDagger;
-	@ObjectHolder(SpellcraftGuide.ID) public static SpellcraftGuide spellcraftGuide;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE) public static SpellPlate spellPlateNovice;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED) public static SpellPlate spellPlateAdvanced;
 	@ObjectHolder(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT) public static SpellPlate spellPlateCombat;
@@ -552,7 +550,6 @@ public class NostrumItems {
     	register(registry, new MasteryOrb().setRegistryName(MasteryOrb.ID));
     	register(registry, new MirrorShield().setRegistryName(MirrorShield.ID));
     	register(registry, new MirrorShieldImproved().setRegistryName(MirrorShieldImproved.ID));
-    	register(registry, new NostrumGuide().setRegistryName(NostrumGuide.ID));
     	register(registry, new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_TOKEN));
     	register(registry, new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_PENDANT_LEFT));
     	register(registry, new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_PENDANT_RIGHT));
@@ -595,7 +592,6 @@ public class NostrumItems {
     	register(registry, new ReagentSeed(NostrumBlocks.essenceCrop, PropBase()).setRegistryName(ReagentSeed.ID_ESSENCE_SEED));
     	register(registry, new RuneBag().setRegistryName(RuneBag.ID));
     	register(registry, new SoulDagger().setRegistryName(SoulDagger.ID));
-    	register(registry, new SpellcraftGuide().setRegistryName(SpellcraftGuide.ID));
     	register(registry, new SpellPlate(SpellTome.TomeStyle.NOVICE).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_NOVICE));
     	register(registry, new SpellPlate(SpellTome.TomeStyle.ADVANCED).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_ADVANCED));
     	register(registry, new SpellPlate(SpellTome.TomeStyle.COMBAT).setRegistryName(SpellPlate.ID_PREFIX + SpellTome.TomeStyle.ID_SUFFIX_COMBAT));
