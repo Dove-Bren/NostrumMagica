@@ -75,7 +75,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		
 		if (!playerIn.isCreative()) {
 			//itemStackIn.stackSize--;
-			ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
+			ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, getSpell(itemStackIn)));
 		}
 
 		if (worldIn.isRemote) {
@@ -157,16 +157,19 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 	 * More complex spells have less uses per scroll.
 	 */
 	protected static final int GetMaxUses(Spell spell) {
-		final int count = (spell == null ? 0 : spell.getComponentCount());
-		if (count <= 2) {
+		final int weight = (spell == null ? 0 : spell.getWeight());
+		if (weight == 0) {
 			return 100;
-		} else if (count <= 4) {
+		} else if (weight == 1) {
 			return 50;
-		} else if (count <= 6) {
-			return 35;
 		} else {
-			return 20;
+			return 25;
 		}
+	}
+	
+	protected int getCastDurabilityCost(PlayerEntity caster, Spell spell) {
+		// Let player skills/stats reduce this!
+		return 5;
 	}
 
 	@Override
