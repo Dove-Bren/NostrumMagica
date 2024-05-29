@@ -918,7 +918,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 			
 			// Wind
 			putSpell("Wind Slash",
-					NostrumSpellShapes.Cutter,
+					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					1,
 					EAlteration.RUIN);

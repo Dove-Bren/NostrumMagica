@@ -23,15 +23,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class BurstShape extends InstantShape {
+/**
+ * Affect all entities in a ring around the caster.
+ * @author Skyler
+ *
+ */
+public class RingShape extends BurstShape {
 
-	private static final String ID = "burst";
+	private static final String ID = "ring";
+	private static final int INNER_RADIUS = 2;
 	
-	protected BurstShape(String id) {
+	protected RingShape(String id) {
 		super(id);
 	}
 	
-	public BurstShape() {
+	public RingShape() {
 		this(ID);
 	}
 	
@@ -42,8 +48,7 @@ public class BurstShape extends InstantShape {
 		
 		List<LivingEntity> ret = new ArrayList<>();
 		
-		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + .5;
-		final boolean ignoreAllies = param.flip;
+		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + INNER_RADIUS + .5;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
 				new AxisAlignedBB(pos.getX() - radiusEnts,
@@ -53,14 +58,21 @@ public class BurstShape extends InstantShape {
 							pos.getY() + radiusEnts,
 							pos.getZ() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
-			if (living != null && (!ignoreAllies || (state.getCaster() != null && !NostrumMagica.IsSameTeam(state.getCaster(), living))))
-				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(pos.getX(), pos.getY(), pos.getZ()))) <= radiusEnts)
+			if (living != null) {
+				final Vector3d diff = entity.getPositionVec().subtract(pos);
+				final double distFlat = Math.sqrt(Math.abs(Math.pow(diff.getX(), 2)) + Math.abs(Math.pow(diff.getZ(), 2)));
+				if (distFlat <= radiusEnts
+						&& distFlat >= INNER_RADIUS
+						&& Math.abs(entity.getPosY() - pos.getY()) <= (INNER_RADIUS + .5) // Flatter than a sphere
+					) {
 					ret.add(living);
+				}
+			}
 		}
 		
 		List<BlockPos> list = new ArrayList<>();
 		
-		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level)));
+		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level + INNER_RADIUS)));
 		
 		final BlockPos center = new BlockPos(pos);
 		if (radiusBlocks == 0) {
@@ -70,14 +82,15 @@ public class BurstShape extends InstantShape {
 				// x loop. I is offset of x
 				int innerRadius = radiusBlocks - Math.abs(i);
 				for (int j = -innerRadius; j <= innerRadius; j++) {
-					int yRadius = innerRadius - Math.abs(j);
-					// 0 means just that cell. Otherwise, +- n
-					if (yRadius == 0) {
-						list.add(center.add(i, j, 0));
-					} else {
-						for (int k = -yRadius; k <= yRadius; k++) {
-							list.add(center.add(i, j, k));
-						}
+					// Make sure it's outside the inner radius
+					final int safetyRadius = (characteristics.harmful ? INNER_RADIUS + 1 : INNER_RADIUS);
+					if (Math.abs(i) + Math.abs(j) < safetyRadius) {
+						continue;
+					}
+					
+					int yRadius = 1;
+					for (int k = -yRadius; k <= yRadius; k++) {
+						list.add(center.add(i, k, j));
 					}
 				}
 				
@@ -91,7 +104,7 @@ public class BurstShape extends InstantShape {
 	public NonNullList<ItemStack> getReagents() {
 		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
 			ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
-			ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)
+			ReagentItem.CreateStack(ReagentType.GINSENG, 1)
 		);
 		
 		return list;
@@ -99,18 +112,17 @@ public class BurstShape extends InstantShape {
 
 	@Override
 	public String getDisplayName() {
-		return "Burst";
+		return "Ring";
 	}
 
 	@Override
 	public boolean supportsBoolean() {
-		int unused; // Remove this since Ring exists now
-		return true;
+		return false;
 	}
 
 	@Override
 	public float[] supportedFloats() {
-		return new float[] {2f, 3f, 5f, 10f};
+		return new float[] {2f, 3f, 4f, 6f};
 	}
 
 	public static NonNullList<ItemStack> costs = null;
@@ -119,9 +131,9 @@ public class BurstShape extends InstantShape {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
+				new ItemStack(ReagentItem.GetItem(ReagentType.MANI_DUST)),
 				new ItemStack(Blocks.REDSTONE_BLOCK, 1),
-				new ItemStack(NostrumItems.crystalSmall),
-				new ItemStack(NostrumItems.crystalLarge)
+				new ItemStack(NostrumItems.crystalSmall)
 			);
 		}
 		return costs;
@@ -129,12 +141,12 @@ public class BurstShape extends InstantShape {
 
 	@Override
 	public String supportedBooleanName() {
-		return I18n.format("modification.aoe.bool.name", (Object[]) null);
+		return null;
 	}
 
 	@Override
 	public String supportedFloatName() {
-		return I18n.format("modification.aoe.name", (Object[]) null);
+		return I18n.format("modification.ring.name", (Object[]) null);
 	}
 	
 	@Override
@@ -144,12 +156,12 @@ public class BurstShape extends InstantShape {
 
 	@Override
 	public ItemStack getCraftItem() {
-		return new ItemStack(Items.TNT);
+		return new ItemStack(Items.BONE_MEAL);
 	}
 
 	@Override
 	public int getManaCost() {
-		return 40;
+		return 30;
 	}
 
 	@Override

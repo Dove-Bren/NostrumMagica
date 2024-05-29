@@ -470,6 +470,26 @@ public class ClientProxy extends CommonProxy {
 					
 					return effect;
 				});
+		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Ring),
+				(source, sourcePos, targetIn, targetPosIn, flavorIn, negative, param) -> {
+					final float radius = 2 + param - .5f;
+					
+					ClientEffect effect = new ClientEffectMirrored(targetPosIn == null ? targetIn.getPositionVec() : targetPosIn,
+							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
+							1L * 500L, 6);
+					
+					if (flavorIn != null && flavorIn.isElement()) {
+						effect.modify(new ClientEffectModifierColor(flavorIn.getElement().getColor(), flavorIn.getElement().getColor()));
+					}
+					
+					effect
+					.modify(new ClientEffectModifierRotate(0, -.25f, 0))
+					.modify(new ClientEffectModifierTranslate(0, 1f, radius))
+					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
+					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
+					;
+					return effect;
+				});
 		
 		// elements 
 		for (EMagicElement element : EMagicElement.values()) {

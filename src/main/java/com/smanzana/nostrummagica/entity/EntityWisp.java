@@ -837,7 +837,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 			
 			// Wind
 			putSpell("Wind Slash",
-					NostrumSpellShapes.Cutter,
+					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					1,
 					null);

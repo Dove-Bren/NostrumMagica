@@ -16,7 +16,7 @@ public class NostrumSpellShapes {
 	public static final BeamShape Beam = new BeamShape();
 	public static final BurstShape Burst = new BurstShape();
 	public static final ChainShape Chain = new ChainShape();
-	public static final MagicCutterShape Cutter = new MagicCutterShape();
+	//public static final MagicCutterShape Cutter = new MagicCutterShape();
 	public static final MagicCyclerShape Cycler = new MagicCyclerShape();
 	public static final DelayShape Delay = new DelayShape();
 	public static final FieldShape Field = new FieldShape();
@@ -27,6 +27,7 @@ public class NostrumSpellShapes {
 	public static final OnManaShape OnMana = new OnManaShape();
 	public static final ProjectileShape Projectile = new ProjectileShape();
 	public static final ProximityShape Proximity = new ProximityShape();
+	public static final RingShape Ring = new RingShape();
 	public static final SeekingBulletShape SeekingBullet = new SeekingBulletShape();
 	public static final SelfShape Self = new SelfShape();
 	public static final TouchShape Touch = new TouchShape();
@@ -40,7 +41,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(Beam);
 		event.getRegistry().register(Burst);
 		event.getRegistry().register(Chain);
-		event.getRegistry().register(Cutter);
+		//event.getRegistry().register(Cutter);
 		event.getRegistry().register(Cycler);
 		event.getRegistry().register(Delay);
 		event.getRegistry().register(Field);
@@ -51,6 +52,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(OnMana);
 		event.getRegistry().register(Projectile);
 		event.getRegistry().register(Proximity);
+		event.getRegistry().register(Ring);
 		event.getRegistry().register(SeekingBullet);
 		event.getRegistry().register(Self);
 		event.getRegistry().register(Touch);

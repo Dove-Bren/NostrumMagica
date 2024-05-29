@@ -138,7 +138,7 @@ public class EntityPlantBoss extends MobEntity implements ILoreTagged, IMultiPar
 			List<Spell> spells = new ArrayList<>();
 			
 			spells.add(SpellUtils.MakeSpell("Leaf Blade",
-					NostrumSpellShapes.Cutter,
+					NostrumSpellShapes.Projectile,
 					new SpellShapePartProperties(1, true),
 					EMagicElement.WIND,
 					2,

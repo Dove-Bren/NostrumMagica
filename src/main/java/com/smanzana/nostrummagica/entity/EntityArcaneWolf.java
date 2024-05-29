@@ -291,7 +291,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 							;
 				}),
 		WIND_CUTTER("windcutter", WolfSpellTargetGroup.ENEMY, 20,
-				(Spell.CreateAISpell("WolfWindCutter")).addPart(new SpellShapePart(NostrumSpellShapes.Cutter)).addPart(new SpellEffectPart(EMagicElement.WIND, 2, EAlteration.RUIN)),
+				(Spell.CreateAISpell("WolfWindCutter")).addPart(new SpellShapePart(NostrumSpellShapes.Projectile)).addPart(new SpellEffectPart(EMagicElement.WIND, 2, EAlteration.RUIN)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.WIND, 3),
 				(wolf, target) -> true),
 		ROOTS("roots", WolfSpellTargetGroup.ENEMY, 25,
