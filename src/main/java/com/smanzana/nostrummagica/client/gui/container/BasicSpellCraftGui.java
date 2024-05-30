@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
@@ -17,23 +16,16 @@ import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.SpellCraftMessage;
-import com.smanzana.nostrummagica.spellcraft.SpellCrafting.SpellPartSummary;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.SpellAction;
-import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
-import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
-import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tiles.BasicSpellTableEntity;
 import com.smanzana.nostrummagica.utils.ContainerUtil;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -185,11 +177,6 @@ public class BasicSpellCraftGui {
 		private static final int TEX_RUNESPACER_HEIGHT = TEX_RUNESPACER_DISABLED_HEIGHT;
 		private static final int TEX_RUNESPACER_ANIM_COUNT = 4;
 		
-		private static final int TEX_INFOPANEL_HOFFSET = 36;
-		private static final int TEX_INFOPANEL_VOFFSET = 166;
-		private static final int TEX_INFOPANEL_WIDTH = 62;
-		private static final int TEX_INFOPANEL_HEIGHT = 79;
-		
 		private static final int POS_NAME_HOFFSET = 47;
 		private static final int POS_NAME_VOFFSET = 18;
 		private static final int POS_NAME_WIDTH = 116;
@@ -216,11 +203,11 @@ public class BasicSpellCraftGui {
 		protected TextFieldWidget nameField;
 		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
 		protected SpellPartBar partBarWidget;
+		protected InfoPanel infoPanelWidget;
 		protected List<Rectangle2d> extraAreas;
 		
 		private Vector3i[] runeSlots;
 		private Vector3i[] spacerSpots;
-		private @Nullable SpellPartSummary hoveredPart;
 		
 		public BasicSpellCraftGuiContainer(BasicSpellCraftContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
@@ -285,19 +272,22 @@ public class BasicSpellCraftGui {
 			}
 			
 			// Info panel
-			// this.addButton(); Not actually a widget
+			infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
+			infoPanelWidget.setContent(this::renderSpellPanel);
+			this.addButton(infoPanelWidget);
 			extraAreas.add(new Rectangle2d(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
+			{
+				// Weight status
+				infoPanelWidget.addChild(new WeightStatus(this,
+						horizontalMargin + POS_WEIGHTBAR_HOFFSET + ((POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4), verticalMargin + POS_WEIGHTBAR_VOFFSET,
+						POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+			}
 			
 			// Status icon
 			this.addButton(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
 			
 			// Submit button
 			this.addButton(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
-			
-			// Weight status
-			this.addButton(new WeightStatus(this,
-					horizontalMargin + POS_WEIGHTBAR_HOFFSET + ((POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4), verticalMargin + POS_WEIGHTBAR_VOFFSET,
-					POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
 			
 			// Extra inventory
 			if (this.getContainer().extraInventory != null) {
@@ -316,7 +306,13 @@ public class BasicSpellCraftGui {
 					);
 			}
 			this.partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH, (part, matrix, mouseX, mouseY) -> {
-				this.hoveredPart = part;
+				if (part == null) {
+					infoPanelWidget.setContent(this::renderSpellPanel);
+				} else {
+					this.infoPanelWidget.setContent((matrixStackIn, width, height, partialTicks) -> {
+						this.renderSpellPartPanel(part, matrixStackIn, width, height, partialTicks);
+					});
+				}
 			});
 			this.addButton(partBarWidget);
 
@@ -400,12 +396,6 @@ public class BasicSpellCraftGui {
 				drawRuneCellBackground(matrixStackIn, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH);
 				matrixStackIn.pop();
 			}
-			
-			// Draw info panel since it's not a widget
-			matrixStackIn.push();
-			matrixStackIn.translate(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, 0);
-			drawInfoPanelBackground(matrixStackIn);
-			matrixStackIn.pop();
 		}
 		
 		@Override
@@ -419,132 +409,6 @@ public class BasicSpellCraftGui {
 				SpellGui.drawScrollMessage(matrixStackIn, width, height, mc.fontRenderer);
 				matrixStackIn.pop();
 			}
-		}
-		
-		protected void drawInfoPanelBackground(MatrixStack matrixStackIn) {
-			final Minecraft mc = Minecraft.getInstance();
-			FontRenderer fontRenderer = mc.fontRenderer;
-			
-			// Background
-			mc.getTextureManager().bindTexture(getBackgroundTexture());
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
-					TEX_INFOPANEL_HOFFSET, TEX_INFOPANEL_VOFFSET, TEX_INFOPANEL_WIDTH, TEX_INFOPANEL_HEIGHT,
-					POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT,
-					TEX_WIDTH, TEX_HEIGHT
-					);
-			
-			// info
-			final int xOffset = 4;
-			final int yOffset = (POS_WEIGHTBAR_VOFFSET - POS_INFOPANEL_VOFFSET) + POS_WEIGHTBAR_HEIGHT;
-			matrixStackIn.push();
-			matrixStackIn.translate(xOffset, yOffset, 0);
-			
-			if (this.hoveredPart != null) {
-				final String titleText = hoveredPart.isError() ? "Error" : hoveredPart.isShape() ? "Shape" : "Effect";
-				final int titleTextWidth = fontRenderer.getStringWidth(titleText);
-				fontRenderer.drawString(matrixStackIn, titleText, ((POS_INFOPANEL_WIDTH-8) - titleTextWidth)/2, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-				
-				if (!hoveredPart.isError()) {
-					matrixStackIn.scale(.5f, .5f, 1f);
-					matrixStackIn.push();
-					
-					// Mana cost
-					fontRenderer.drawString(matrixStackIn, "Mana Cost: " + hoveredPart.getMana(), 0, 0, 0xFF000000);
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-					
-					// Weight
-					fontRenderer.drawString(matrixStackIn, "Weight: " + hoveredPart.getWeight(), 0, 0, 0xFF000000);
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-					
-					if (!hoveredPart.isShape()) {
-						final SpellEffectPart effect = hoveredPart.getEffect();
-						final int subWidth = (POS_INFOPANEL_WIDTH-8) * 2;
-						final String name;
-						final String desc;
-						@Nullable SpellAction action = SpellGui.getKnownActionForPart(effect);
-						if (action == null) {
-							name = "Unknown Effect";
-							desc = "You haven't seen this effect before. Make a spell with it to find out what it does!";
-						} else {
-							final String suffix = effect.getElementCount() <= 1 ? ""
-									: effect.getElementCount() <= 2 ? " II"
-									: " III";
-							
-							name = I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
-							desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
-						}
-						
-						int len = fontRenderer.getStringWidth(name);
-						fontRenderer.drawString(matrixStackIn, name,
-								(subWidth - len) / 2,
-								0,
-								0xFFFFFFFF);
-						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-						
-						if (action != null) {
-							final SpellActionProperties props = action.getProperties();
-							final int iconWidth = 12;
-							final int iconHeight = 12;
-							matrixStackIn.push();
-							matrixStackIn.translate(subWidth / 2, 0, 0);
-							matrixStackIn.translate(-(4 + iconWidth), 0, 0);
-							
-							float color[] = {1f, 1f, 1f, 1f};
-							if (!props.affectsEntity) {
-								color = new float[] {.3f, .3f, .3f, .4f};
-							}
-							drawAffectEntity(matrixStackIn, iconWidth, iconHeight, color);
-							
-							matrixStackIn.translate(12 + 4, 0, 0);
-							if (props.affectsBlock) {
-								color = new float[] {1f, 1f, 1f, 1f};
-							} else {
-								color = new float[] {.3f, .3f, .3f, .4f};
-							}
-							drawAffectBlock(matrixStackIn, iconWidth, iconHeight, color);
-							matrixStackIn.pop();
-							
-							matrixStackIn.translate(0, iconHeight + 2, 0);
-						}
-						
-						int yUsed = RenderFuncs.drawSplitString(matrixStackIn, fontRenderer, desc,
-								0,
-								0,
-								subWidth,
-								0xFFA0A0A0);
-						matrixStackIn.translate(0, yUsed, 0);
-					}
-					matrixStackIn.pop();
-				}
-			} else {
-				final BasicSpellCraftContainer container = getContainer();
-				final String summaryText = "Summary";
-				final int summaryTextWidth = fontRenderer.getStringWidth(summaryText);
-				fontRenderer.drawString(matrixStackIn, summaryText, ((POS_INFOPANEL_WIDTH-8) - summaryTextWidth)/2, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-				
-				matrixStackIn.scale(.5f, .5f, 1f);
-				
-				// Mana cost
-				fontRenderer.drawString(matrixStackIn, "Mana Cost: " + container.getManaCost(), 0, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-				
-				// Weight
-				fontRenderer.drawString(matrixStackIn, "Weight: " + container.getCurrentWeight(), 0, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-				
-				// Reagents
-				if (!container.getReagentStrings().isEmpty()) {
-					fontRenderer.drawString(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-					for (ITextComponent string : container.getReagentStrings()) {
-						fontRenderer.func_243248_b(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
-						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-					}
-				}
-			}
-			matrixStackIn.pop();
 		}
 		
 		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height) {
@@ -582,16 +446,6 @@ public class BasicSpellCraftGui {
 						TEX_WIDTH, TEX_HEIGHT
 						);
 			}
-		}
-		
-		protected void drawAffectEntity(MatrixStack matrixStackIn, int width, int height, float[] color) {
-			SpellComponentIcon.get(NostrumSpellShapes.AtFeet)
-				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
-		}
-		
-		protected void drawAffectBlock(MatrixStack matrixStackIn, int width, int height, float[] color) {
-			SpellComponentIcon.get(NostrumSpellShapes.Proximity)
-				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 	}
 	

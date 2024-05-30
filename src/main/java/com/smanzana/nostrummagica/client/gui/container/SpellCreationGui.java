@@ -15,6 +15,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
+import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui.SpellPartBar.IHoverHandler;
 import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
@@ -26,12 +27,15 @@ import com.smanzana.nostrummagica.items.SpellRune;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting.SpellPartSummary;
+import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
+import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -41,6 +45,7 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -572,6 +577,51 @@ public class SpellCreationGui {
 		private static final int TEX_PATTERN_WIDTH = 20;
 		private static final int TEX_PATTERN_HEIGHT = 20;
 		
+		private static final int TEX_INFPANEL_BORDER_TL_HOFFSET = 52;
+		private static final int TEX_INFPANEL_BORDER_TL_VOFFSET = 20;
+		private static final int TEX_INFPANEL_BORDER_TL_WIDTH = 4;
+		private static final int TEX_INFPANEL_BORDER_TL_HEIGHT = 4;
+		
+		private static final int TEX_INFPANEL_BORDER_TOP_HOFFSET = TEX_INFPANEL_BORDER_TL_HOFFSET + TEX_INFPANEL_BORDER_TL_WIDTH;
+		private static final int TEX_INFPANEL_BORDER_TOP_VOFFSET = TEX_INFPANEL_BORDER_TL_VOFFSET;
+		private static final int TEX_INFPANEL_BORDER_TOP_WIDTH = 1;
+		private static final int TEX_INFPANEL_BORDER_TOP_HEIGHT = 4;
+		
+		private static final int TEX_INFPANEL_BORDER_TR_HOFFSET = TEX_INFPANEL_BORDER_TOP_HOFFSET + TEX_INFPANEL_BORDER_TOP_WIDTH;
+		private static final int TEX_INFPANEL_BORDER_TR_VOFFSET = TEX_INFPANEL_BORDER_TOP_VOFFSET;
+		private static final int TEX_INFPANEL_BORDER_TR_WIDTH = 4;
+		private static final int TEX_INFPANEL_BORDER_TR_HEIGHT = 4;
+		
+		private static final int TEX_INFPANEL_BORDER_LEFT_HOFFSET = TEX_INFPANEL_BORDER_TL_HOFFSET;
+		private static final int TEX_INFPANEL_BORDER_LEFT_VOFFSET = TEX_INFPANEL_BORDER_TL_VOFFSET + TEX_INFPANEL_BORDER_TL_HEIGHT;
+		private static final int TEX_INFPANEL_BORDER_LEFT_WIDTH = 4;
+		private static final int TEX_INFPANEL_BORDER_LEFT_HEIGHT = 1;
+		
+		private static final int TEX_INFPANEL_CENTER_HOFFSET = TEX_INFPANEL_BORDER_LEFT_HOFFSET + TEX_INFPANEL_BORDER_LEFT_WIDTH;
+		private static final int TEX_INFPANEL_CENTER_VOFFSET = TEX_INFPANEL_BORDER_LEFT_VOFFSET;
+		private static final int TEX_INFPANEL_CENTER_WIDTH = 1;
+		private static final int TEX_INFPANEL_CENTER_HEIGHT = 1;
+		
+		private static final int TEX_INFPANEL_BORDER_RIGHT_HOFFSET = TEX_INFPANEL_CENTER_HOFFSET + TEX_INFPANEL_CENTER_WIDTH;
+		private static final int TEX_INFPANEL_BORDER_RIGHT_VOFFSET = TEX_INFPANEL_CENTER_VOFFSET;
+		private static final int TEX_INFPANEL_BORDER_RIGHT_WIDTH = 4;
+		private static final int TEX_INFPANEL_BORDER_RIGHT_HEIGHT = 1;
+		
+		private static final int TEX_INFPANEL_BORDER_BL_HOFFSET = TEX_INFPANEL_BORDER_TL_HOFFSET;
+		private static final int TEX_INFPANEL_BORDER_BL_VOFFSET = TEX_INFPANEL_BORDER_LEFT_VOFFSET + TEX_INFPANEL_BORDER_LEFT_HEIGHT;
+		private static final int TEX_INFPANEL_BORDER_BL_WIDTH = 4;
+		private static final int TEX_INFPANEL_BORDER_BL_HEIGHT = 4;
+		
+		private static final int TEX_INFPANEL_BORDER_BOTTOM_HOFFSET = TEX_INFPANEL_BORDER_BL_HOFFSET + TEX_INFPANEL_BORDER_BL_WIDTH;
+		private static final int TEX_INFPANEL_BORDER_BOTTOM_VOFFSET = TEX_INFPANEL_BORDER_BL_VOFFSET;
+		private static final int TEX_INFPANEL_BORDER_BOTTOM_WIDTH = 1;
+		private static final int TEX_INFPANEL_BORDER_BOTTOM_HEIGHT = 4;
+		
+		private static final int TEX_INFPANEL_BORDER_BR_HOFFSET = TEX_INFPANEL_BORDER_BOTTOM_HOFFSET + TEX_INFPANEL_BORDER_BOTTOM_WIDTH;
+		private static final int TEX_INFPANEL_BORDER_BR_VOFFSET = TEX_INFPANEL_BORDER_BOTTOM_VOFFSET;
+		private static final int TEX_INFPANEL_BORDER_BR_WIDTH = 4;
+		private static final int TEX_INFPANEL_BORDER_BR_HEIGHT = 4;
+		
 		protected static class SpellIconButton extends Button {
 			
 			private final int value;
@@ -979,6 +1029,84 @@ public class SpellCreationGui {
 			}
 		}
 		
+		public static class InfoPanel extends ParentWidget {
+			
+			public static interface InfoPanelContent {
+				public void render(MatrixStack matrixStackIn, int width, int height, float partialTicks);
+			}
+			
+			protected float red;
+			protected float green;
+			protected float blue;
+			protected float alpha;
+			
+			protected InfoPanelContent content;
+			
+			public InfoPanel(int x, int y, int width, int height) {
+				super(x, y, width, height, StringTextComponent.EMPTY);
+				color(0xFFFFFFFF);
+			}
+			
+			public InfoPanel color(int color) {
+				float[] colors = ColorUtil.ARGBToColor(color);
+				return color(colors[0], colors[1], colors[2], colors[3]);
+			}
+			
+			public InfoPanel color(float red, float green, float blue, float alpha) {
+				this.red = red;
+				this.green = green;
+				this.blue = blue;
+				this.alpha = alpha;
+				return this;
+			}
+			
+			public InfoPanel setContent(InfoPanelContent content) {
+				this.content = content;
+				return this;
+			}
+			
+			protected void renderBackground(MatrixStack matrixStackIn) {
+				Minecraft.getInstance().getTextureManager().bindTexture(TEXT_UTILS);
+				
+				// Note: hardcoding border size to be 4
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_INFPANEL_BORDER_TL_HOFFSET, TEX_INFPANEL_BORDER_TL_VOFFSET, TEX_INFPANEL_BORDER_TL_WIDTH, TEX_INFPANEL_BORDER_TL_HEIGHT, 4, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, width-4, 0, TEX_INFPANEL_BORDER_TR_HOFFSET, TEX_INFPANEL_BORDER_TR_VOFFSET, TEX_INFPANEL_BORDER_TR_WIDTH, TEX_INFPANEL_BORDER_TR_HEIGHT, 4, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, height-4, TEX_INFPANEL_BORDER_BL_HOFFSET, TEX_INFPANEL_BORDER_BL_VOFFSET, TEX_INFPANEL_BORDER_BL_WIDTH, TEX_INFPANEL_BORDER_BL_HEIGHT, 4, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, width-4, height-4, TEX_INFPANEL_BORDER_BR_HOFFSET, TEX_INFPANEL_BORDER_BR_VOFFSET, TEX_INFPANEL_BORDER_BR_WIDTH, TEX_INFPANEL_BORDER_BR_HEIGHT, 4, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 4, 0, TEX_INFPANEL_BORDER_TOP_HOFFSET, TEX_INFPANEL_BORDER_TOP_VOFFSET, TEX_INFPANEL_BORDER_TOP_WIDTH, TEX_INFPANEL_BORDER_TOP_HEIGHT, width-8, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 4, height-4, TEX_INFPANEL_BORDER_BOTTOM_HOFFSET, TEX_INFPANEL_BORDER_BOTTOM_VOFFSET, TEX_INFPANEL_BORDER_BOTTOM_WIDTH, TEX_INFPANEL_BORDER_BOTTOM_HEIGHT, width-8, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 4, TEX_INFPANEL_BORDER_LEFT_HOFFSET, TEX_INFPANEL_BORDER_LEFT_VOFFSET, TEX_INFPANEL_BORDER_LEFT_WIDTH, TEX_INFPANEL_BORDER_LEFT_HEIGHT, 4, height-8, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, width-4, 4, TEX_INFPANEL_BORDER_RIGHT_HOFFSET, TEX_INFPANEL_BORDER_RIGHT_VOFFSET, TEX_INFPANEL_BORDER_RIGHT_WIDTH, TEX_INFPANEL_BORDER_RIGHT_HEIGHT, 4, height-8, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+				
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 4, 4, TEX_INFPANEL_CENTER_HOFFSET, TEX_INFPANEL_CENTER_VOFFSET, TEX_INFPANEL_CENTER_WIDTH, TEX_INFPANEL_CENTER_HEIGHT, width-8, height-8, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
+			}
+			
+			@Override
+			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+				matrixStackIn.push();
+				matrixStackIn.translate(x, y, 0);
+				renderBackground(matrixStackIn);
+				
+				if (this.content != null) {
+					// Find how much to offset tby based on children
+					final int margin = 4;
+					int yOffset = 0;
+					for (Widget child : this.children) {
+						yOffset = Math.max(yOffset, (child.y + child.getHeightRealms()) - this.y);
+					}
+					
+					matrixStackIn.push();
+					matrixStackIn.translate(margin, 2 + yOffset, 0);
+					
+					content.render(matrixStackIn, width - (2 * margin), height - (yOffset + 2 * margin), partialTicks);
+					
+					matrixStackIn.pop();
+				}
+				matrixStackIn.pop();
+			}
+		}
+		
 		protected static final void drawScrollMessage(MatrixStack matrixStackIn, int width, int height, FontRenderer fonter) {
 			final String message = "Insert Blank Scroll";
 			final int msgWidth = fonter.getStringWidth(message);
@@ -1050,6 +1178,151 @@ public class SpellCreationGui {
 			}
 			
 			return action;
+		}
+		
+		protected void drawAffectEntity(MatrixStack matrixStackIn, int width, int height, float[] color) {
+			SpellComponentIcon.get(NostrumSpellShapes.AtFeet)
+				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
+		}
+		
+		protected void drawAffectBlock(MatrixStack matrixStackIn, int width, int height, float[] color) {
+			SpellComponentIcon.get(NostrumSpellShapes.Proximity)
+				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
+		}
+		
+		protected final void renderSpellPanel(MatrixStack matrixStackIn, int width, int height, float partialTicks) {
+			final Minecraft mc = Minecraft.getInstance();
+			final FontRenderer fontRenderer = mc.fontRenderer;
+			final T container = this.getContainer();
+			final String summaryText = "Summary";
+			final int summaryTextWidth = fontRenderer.getStringWidth(summaryText);
+			fontRenderer.drawString(matrixStackIn, summaryText, (width - summaryTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			matrixStackIn.scale(.5f, .5f, 1f);
+			
+			// Mana cost
+			fontRenderer.drawString(matrixStackIn, "Mana Cost: " + container.getManaCost(), 0, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			// Weight
+			fontRenderer.drawString(matrixStackIn, "Weight: " + container.getCurrentWeight(), 0, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			// Reagents
+			if (!container.getReagentStrings().isEmpty()) {
+				fontRenderer.drawString(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				for (ITextComponent string : container.getReagentStrings()) {
+					fontRenderer.func_243248_b(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				}
+			}
+		}
+		
+		protected void renderModifierPanel(@Nullable ISpellCraftModifier modifier, MatrixStack matrixStackIn, int width, int height, float partialTicks) {
+			final Minecraft mc = Minecraft.getInstance();
+			final FontRenderer fontRenderer = mc.fontRenderer;
+			final String modifierText = "Modifier";
+			final int modifierTextWidth = fontRenderer.getStringWidth(modifierText);
+			fontRenderer.drawString(matrixStackIn, modifierText, ((width-8) - modifierTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			matrixStackIn.scale(.5f, .5f, 1f);
+			
+			if (modifier != null) {
+				List<ITextComponent> lines = new ArrayList<>(4);
+				lines = modifier.getDetails(lines);
+				for (ITextComponent line : lines) {
+					fontRenderer.func_243248_b(matrixStackIn, line, 0, 0, 0xFF000000);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT + 1, 0);
+				}
+			} else {
+				fontRenderer.drawString(matrixStackIn, "No Slot Modifier", 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			}
+		}
+		
+		protected void renderSpellPartPanel(SpellPartSummary part, MatrixStack matrixStackIn, int width, int height, float partialTicks) {
+			final Minecraft mc = Minecraft.getInstance();
+			final FontRenderer fontRenderer = mc.fontRenderer;
+			final String titleText = part.isError() ? "Error" : part.isShape() ? "Shape" : "Effect";
+			final int titleTextWidth = fontRenderer.getStringWidth(titleText);
+			fontRenderer.drawString(matrixStackIn, titleText, (width - titleTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			
+			if (!part.isError()) {
+				matrixStackIn.scale(.5f, .5f, 1f);
+				matrixStackIn.push();
+				
+				// Mana cost
+				fontRenderer.drawString(matrixStackIn, "Mana Cost: " + part.getMana(), 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				// Weight
+				fontRenderer.drawString(matrixStackIn, "Weight: " + part.getWeight(), 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				
+				if (!part.isShape()) {
+					final SpellEffectPart effect = part.getEffect();
+					final int subWidth = width * 2;
+					final String name;
+					final String desc;
+					@Nullable SpellAction action = SpellGui.getKnownActionForPart(effect);
+					if (action == null) {
+						name = "Unknown Effect";
+						desc = "You haven't seen this effect before. Make a spell with it to find out what it does!";
+					} else {
+						final String suffix = effect.getElementCount() <= 1 ? ""
+								: effect.getElementCount() <= 2 ? " II"
+								: " III";
+						
+						name = I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
+						desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+					}
+					
+					int len = fontRenderer.getStringWidth(name);
+					fontRenderer.drawString(matrixStackIn, name,
+							(subWidth - len) / 2,
+							0,
+							0xFFFFFFFF);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					
+					if (action != null) {
+						final SpellActionProperties props = action.getProperties();
+						final int iconWidth = 12;
+						final int iconHeight = 12;
+						matrixStackIn.push();
+						matrixStackIn.translate(subWidth / 2, 0, 0);
+						matrixStackIn.translate(-(4 + iconWidth), 0, 0);
+						
+						float color[] = {1f, 1f, 1f, 1f};
+						if (!props.affectsEntity) {
+							color = new float[] {.3f, .3f, .3f, .4f};
+						}
+						drawAffectEntity(matrixStackIn, iconWidth, iconHeight, color);
+						
+						matrixStackIn.translate(12 + 4, 0, 0);
+						if (props.affectsBlock) {
+							color = new float[] {1f, 1f, 1f, 1f};
+						} else {
+							color = new float[] {.3f, .3f, .3f, .4f};
+						}
+						drawAffectBlock(matrixStackIn, iconWidth, iconHeight, color);
+						matrixStackIn.pop();
+						
+						matrixStackIn.translate(0, iconHeight + 2, 0);
+					}
+					
+					int yUsed = RenderFuncs.drawSplitString(matrixStackIn, fontRenderer, desc,
+							0,
+							0,
+							subWidth,
+							0xFFA0A0A0);
+					matrixStackIn.translate(0, yUsed, 0);
+				}
+				matrixStackIn.pop();
+			}
 		}
 	}
 }
