@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.SpellCharacteristics;
 import com.smanzana.nostrummagica.spells.Spell.SpellState;
+import com.smanzana.nostrummagica.spells.SpellCharacteristics;
 import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
 import com.smanzana.nostrummagica.utils.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
@@ -269,6 +269,11 @@ public class SeekingBulletShape extends SpellShape {
 	@Override
 	public double getTraceRange(SpellShapePartProperties params) {
 		return MAX_DIST;
+	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, false);
 	}
 	
 }

@@ -92,4 +92,9 @@ public class SelfShape extends InstantShape {
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.GOLD_INGOT);
 	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, false);
+	}
 }

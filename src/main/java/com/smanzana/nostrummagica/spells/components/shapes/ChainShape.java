@@ -184,8 +184,8 @@ public class ChainShape extends InstantShape {
 	}
 	
 	@Override
-	public boolean isTerminal(SpellShapePartProperties params) {
-		return true;
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(true, true, false);
 	}
 
 }

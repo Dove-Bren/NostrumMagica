@@ -187,4 +187,9 @@ public class MagicCyclerShape extends SpellShape {
 	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, params.flip);
+	}
 }

@@ -184,4 +184,9 @@ public class OnDamageShape extends SpellShape {
 		return false;
 	}
 	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, false);
+	}
+	
 }

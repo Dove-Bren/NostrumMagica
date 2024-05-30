@@ -61,7 +61,7 @@ public class SpellCrafting {
 					valid = false;
 				} else {
 					SpellShapePart shapePart = SpellRune.getShapePart(stack);
-					if (shapePart.getShape().isTerminal(shapePart.getProperties())) {
+					if (shapePart.getShape().getAttributes(shapePart.getProperties()).terminal) {
 						foundTerminalShape = true;
 					}
 				}

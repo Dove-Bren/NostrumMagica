@@ -93,4 +93,9 @@ public class AtFeetShape extends InstantShape {
 	public ItemStack getCraftItem() {
 		return new ItemStack(Blocks.DIRT);
 	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, false, true);
+	}
 }

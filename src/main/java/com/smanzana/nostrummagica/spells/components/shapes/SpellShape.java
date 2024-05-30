@@ -70,6 +70,18 @@ public abstract class SpellShape {
 		
 	}
 	
+	public static final class SpellShapeAttributes {
+		public final boolean terminal;
+		public final boolean selectsEntities;
+		public final boolean selectsBlocks;
+		
+		public SpellShapeAttributes(boolean terminal, boolean selectsEntities, boolean selectsBlocks) {
+			this.terminal = terminal;
+			this.selectsEntities = selectsEntities;
+			this.selectsBlocks = selectsBlocks;
+		}
+	}
+	
 	public static abstract class SpellShapeInstance {
 		private SpellState state; // The state to trigger
 		
@@ -279,8 +291,8 @@ public abstract class SpellShape {
 		return 0;
 	}
 	
-	public boolean isTerminal(SpellShapePartProperties params) {
-		return false;
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, true);
 	}
 
 	public SpellShapePartProperties getDefaultProperties() {

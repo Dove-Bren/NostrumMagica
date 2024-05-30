@@ -159,4 +159,9 @@ public class ProximityShape extends SpellShape {
 	public boolean shouldTrace(SpellShapePartProperties params) {
 		return false;
 	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, false);
+	}
 }

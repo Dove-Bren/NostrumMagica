@@ -170,8 +170,8 @@ public class RingShape extends BurstShape {
 	}
 	
 	@Override
-	public boolean isTerminal(SpellShapePartProperties params) {
-		return true;
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(true, true, true);
 	}
 
 }

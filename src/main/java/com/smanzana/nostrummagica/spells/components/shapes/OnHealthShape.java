@@ -195,4 +195,9 @@ public class OnHealthShape extends SpellShape {
 		return false;
 	}
 	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(false, true, false);
+	}
+	
 }

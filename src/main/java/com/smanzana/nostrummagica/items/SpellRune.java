@@ -309,7 +309,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			SpellShapePartProperties params = getPieceShapeParam(stack);
 			tooltip.add(new StringTextComponent("Shape").mergeStyle(TextFormatting.DARK_RED));
-			if (shape.isTerminal(params)) {
+			if (shape.getAttributes(params).terminal) {
 				tooltip.add(new StringTextComponent("Terminal Shape").mergeStyle(TextFormatting.GRAY));
 			}
 			tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
