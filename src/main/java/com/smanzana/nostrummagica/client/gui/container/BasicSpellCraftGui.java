@@ -422,11 +422,6 @@ public class BasicSpellCraftGui {
 		
 		protected void drawRuneSpacerBackground(MatrixStack matrixStackIn, int width, int height, boolean animate) {
 			Minecraft.getInstance().getTextureManager().bindTexture(getBackgroundTexture());
-//			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
-//					TEX_RUNESPACER_HOFFSET, TEX_RUNESPACER_VOFFSET, TEX_RUNESPACER_WIDTH, TEX_RUNESPACER_HEIGHT,
-//					width, height,
-//					TEX_WIDTH, TEX_HEIGHT
-//					);
 			
 			if (animate) {
 				final int frameTimeMS = 500;

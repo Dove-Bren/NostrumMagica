@@ -67,7 +67,7 @@ public class MysticSpellCraftGui {
 	protected static final int POS_INFOPANEL_HOFFSET = POS_CONTAINER_WIDTH;
 	protected static final int POS_INFOPANEL_VOFFSET = 0;
 	protected static final int POS_INFOPANEL_WIDTH = 80;
-	protected static final int POS_INFOPANEL_HEIGHT = 79;
+	protected static final int POS_INFOPANEL_HEIGHT = 90;
 
 	public static class MysticContainer extends SpellCreationContainer {
 		

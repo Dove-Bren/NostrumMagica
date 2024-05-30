@@ -35,7 +35,9 @@ import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.spells.components.SpellShapePart;
 import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape.SpellShapeAttributes;
 import com.smanzana.nostrummagica.utils.ColorUtil;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -1248,12 +1250,16 @@ public class SpellCreationGui {
 			final FontRenderer fontRenderer = mc.fontRenderer;
 			final String titleText = part.isError() ? "Error" : part.isShape() ? "Shape" : "Effect";
 			final int titleTextWidth = fontRenderer.getStringWidth(titleText);
-			fontRenderer.drawString(matrixStackIn, titleText, (width - titleTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.push();
+			matrixStackIn.scale(.75f, .75f, 1f);
+			int subWidth = (int) (width / (.75f));
+			
+			fontRenderer.drawString(matrixStackIn, titleText, (subWidth - titleTextWidth)/2, 0, 0xFF000000);
 			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
 			
+			matrixStackIn.scale((.5f/.75f), (.5f/.75f), 1f);
+			subWidth = width * 2;
 			if (!part.isError()) {
-				matrixStackIn.scale(.5f, .5f, 1f);
-				matrixStackIn.push();
 				
 				// Mana cost
 				fontRenderer.drawString(matrixStackIn, "Mana Cost: " + part.getMana(), 0, 0, 0xFF000000);
@@ -1262,10 +1268,9 @@ public class SpellCreationGui {
 				// Weight
 				fontRenderer.drawString(matrixStackIn, "Weight: " + part.getWeight(), 0, 0, 0xFF000000);
 				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-				
+
 				if (!part.isShape()) {
 					final SpellEffectPart effect = part.getEffect();
-					final int subWidth = width * 2;
 					final String name;
 					final String desc;
 					@Nullable SpellAction action = SpellGui.getKnownActionForPart(effect);
@@ -1320,9 +1325,55 @@ public class SpellCreationGui {
 							subWidth,
 							0xFFA0A0A0);
 					matrixStackIn.translate(0, yUsed, 0);
+				} else {
+					final SpellShapePart shape = part.getShape();
+					final String name;
+					final String desc;
+					name = shape.getShape().getDisplayName();//I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
+					desc = I18n.format("shape." + shape.getShape().getShapeKey() + ".desc", (Object[]) null);
+					
+					int len = fontRenderer.getStringWidth(name);
+					fontRenderer.drawString(matrixStackIn, name,
+							(subWidth - len) / 2,
+							0,
+							0xFFFFFFFF);
+					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					
+					{
+						final SpellShapeAttributes props = shape.getShape().getAttributes(shape.getProperties());
+						final int iconWidth = 12;
+						final int iconHeight = 12;
+						matrixStackIn.push();
+						matrixStackIn.translate(subWidth / 2, 0, 0);
+						matrixStackIn.translate(-(4 + iconWidth), 0, 0);
+						
+						float color[] = {1f, 1f, 1f, 1f};
+						if (!props.selectsEntities) {
+							color = new float[] {.3f, .3f, .3f, .4f};
+						}
+						drawAffectEntity(matrixStackIn, iconWidth, iconHeight, color);
+						
+						matrixStackIn.translate(12 + 4, 0, 0);
+						if (props.selectsBlocks) {
+							color = new float[] {1f, 1f, 1f, 1f};
+						} else {
+							color = new float[] {.3f, .3f, .3f, .4f};
+						}
+						drawAffectBlock(matrixStackIn, iconWidth, iconHeight, color);
+						matrixStackIn.pop();
+						
+						matrixStackIn.translate(0, iconHeight + 2, 0);
+					}
+					
+					int yUsed = RenderFuncs.drawSplitString(matrixStackIn, fontRenderer, desc,
+							0,
+							0,
+							subWidth,
+							0xFFA0A0A0);
+					matrixStackIn.translate(0, yUsed, 0);
 				}
-				matrixStackIn.pop();
 			}
+			matrixStackIn.pop();
 		}
 	}
 }
