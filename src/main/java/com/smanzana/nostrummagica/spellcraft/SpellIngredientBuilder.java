@@ -16,7 +16,8 @@ public class SpellIngredientBuilder {
 	
 	protected int weightModifier;
 	protected float manaRate;
-
+	
+	protected float efficiency;
 	protected int elementCountModifier;
 	protected @Nullable EMagicElement elementOverride;
 	protected @Nullable EAlteration alterationOverride;
@@ -26,6 +27,7 @@ public class SpellIngredientBuilder {
 		
 		weightModifier = 0;
 		manaRate = 1f;
+		efficiency = 1f;
 		elementCountModifier = 0;
 		elementOverride = null;
 		alterationOverride = null;
@@ -39,6 +41,11 @@ public class SpellIngredientBuilder {
 	
 	public SpellIngredientBuilder addManaRate(float delta) {
 		this.manaRate += delta;
+		return this;
+	}
+	
+	public SpellIngredientBuilder addEfficiency(float delta) {
+		this.efficiency += delta;
 		return this;
 	}
 	
@@ -74,6 +81,10 @@ public class SpellIngredientBuilder {
 	public float getManaRate() {
 		return manaRate;
 	}
+	
+	public float getEfficiency() {
+		return efficiency;
+	}
 
 	public int getElementCountModifier() {
 		return elementCountModifier;
@@ -97,6 +108,14 @@ public class SpellIngredientBuilder {
 
 	public float getCurrentMana() {
 		return base.manaRate * this.getManaRate();
+	}
+	
+	public float getCurrentEfficiency() {
+		if (base.element == null) {
+			return 1f;
+		}
+		
+		return base.efficiency * this.getEfficiency();
 	}
 
 	public int getCurrentElementCountBonus() {
@@ -122,26 +141,26 @@ public class SpellIngredientBuilder {
 	public final SpellIngredient build() {
 		// Prefer element, then alteration, then shape since that goes from most-likely-to-produce-a-good-spell to least
 		if (getElementOverride() != null) {
-			return new SpellIngredient(getCurrentElement(), getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus());
+			return new SpellIngredient(getCurrentElement(), getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus(), getCurrentEfficiency());
 		}
 		if (getAlterationOverride() != null) {
-			return new SpellIngredient(getCurrentAlteration(), getCurrentWeight(), getCurrentMana());
+			return new SpellIngredient(getCurrentAlteration(), getCurrentWeight(), getCurrentMana(), getCurrentEfficiency());
 		}
 		if (getShapeOverride() != null) {
 			return new SpellIngredient(new SpellShapePart(getCurrentShape(), base.shape.getProperties()), getCurrentWeight(), getCurrentMana());
 		}
 
 		if (getCurrentElement() != null) {
-			return new SpellIngredient(getCurrentElement(), getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus());
+			return new SpellIngredient(getCurrentElement(), getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus(), getCurrentEfficiency());
 		}
 		if (getCurrentAlteration() != null) {
-			return new SpellIngredient(getCurrentAlteration(), getCurrentWeight(), getCurrentMana());
+			return new SpellIngredient(getCurrentAlteration(), getCurrentWeight(), getCurrentMana(), getCurrentEfficiency());
 		}
 		if (getCurrentShape() != null) {
 			return new SpellIngredient(new SpellShapePart(getCurrentShape(), base.shape.getProperties()), getCurrentWeight(), getCurrentMana());
 		}
 		
 		NostrumMagica.logger.error("Null spell ingredient");
-		return new SpellIngredient(EMagicElement.PHYSICAL, getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus());
+		return new SpellIngredient(EMagicElement.PHYSICAL, getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus(), getCurrentEfficiency());
 	}
 }

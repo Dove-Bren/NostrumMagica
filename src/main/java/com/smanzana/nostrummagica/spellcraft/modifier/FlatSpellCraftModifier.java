@@ -25,11 +25,12 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	protected final float manaRateModifier;
 
 	protected final int elementCountModifier;
+	protected final float efficiencyModifier;
 	protected final @Nullable EMagicElement elementOverride;
 	protected final @Nullable EAlteration alterationOverride;
 	protected final @Nullable SpellShape shapeOverride;
 	
-	protected FlatSpellCraftModifier(int weightModifier, float manaRateModifier, int elementCountModifier,
+	protected FlatSpellCraftModifier(int weightModifier, float manaRateModifier, int elementCountModifier, float efficiencyModifier,
 			EMagicElement elementOverride, EAlteration alterationOverride, SpellShape shapeOverride) {
 		super();
 		this.weightModifier = weightModifier;
@@ -38,6 +39,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		this.elementOverride = elementOverride;
 		this.alterationOverride = alterationOverride;
 		this.shapeOverride = shapeOverride;
+		this.efficiencyModifier = efficiencyModifier;
 	}
 
 	@Override
@@ -52,7 +54,8 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		} else {
 			return this.elementOverride != null
 					|| this.elementCountModifier != 0
-					|| this.alterationOverride != null;
+					|| this.alterationOverride != null
+					|| this.efficiencyModifier != 0f;
 		}
 	}
 
@@ -73,6 +76,12 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 			if (alterationOverride != null) {
 				builder.setAlterationOverride(alterationOverride);
 			}
+			
+			if (elementCountModifier != 0) {
+				builder.addElementCountModifier(elementCountModifier);
+			}
+			
+			builder.addEfficiency(efficiencyModifier);
 		}
 	}
 
@@ -86,6 +95,10 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 			final int manaPerc = (int) (manaRateModifier * 100);
 			lines.add(new TranslationTextComponent("spellcraftmod.mana", (manaRateModifier < 0 ? "" : "+"), manaPerc)
 					.mergeStyle(manaRateModifier < 0 ? STYLE_GOOD : STYLE_BAD));
+		}
+		if (efficiencyModifier != 0) {
+			lines.add(new TranslationTextComponent("spellcraftmod.efficiency", (efficiencyModifier < 0 ? "" : "+"), efficiencyModifier)
+					.mergeStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementCountModifier != 0) {
 			lines.add(new TranslationTextComponent("spellcraftmod.elementcount", (elementCountModifier < 0 ? "" : "+"), elementCountModifier)
@@ -112,6 +125,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		protected int weightModifier = 0;
 		protected float manaRateModifier = 0;
 
+		protected float efficiencyModifier = 0;
 		protected int elementCountModifier = 0;
 		protected @Nullable EMagicElement elementOverride;
 		protected @Nullable EAlteration alterationOverride;
@@ -128,6 +142,11 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 
 		public Builder manaRate(float manaRateModifier) {
 			this.manaRateModifier = manaRateModifier;
+			return this;
+		}
+		
+		public Builder efficiency(float efficiencyModifier) {
+			this.efficiencyModifier = efficiencyModifier;
 			return this;
 		}
 
@@ -152,7 +171,7 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 		}
 
 		public FlatSpellCraftModifier build() {
-			return new FlatSpellCraftModifier(weightModifier, manaRateModifier, elementCountModifier, elementOverride, alterationOverride, shapeOverride);
+			return new FlatSpellCraftModifier(weightModifier, manaRateModifier, elementCountModifier, efficiencyModifier, elementOverride, alterationOverride, shapeOverride);
 		}
 		
 	}

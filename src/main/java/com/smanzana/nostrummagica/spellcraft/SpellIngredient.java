@@ -20,27 +20,29 @@ public class SpellIngredient {
 	public final int weight;
 	public final float manaRate;
 	public final int elementCountBonus;
+	public final float efficiency;
 	
 	private SpellIngredient(SpellShapePart shape, EMagicElement element, EAlteration alteration,
-			int weight, float manaRate, int elementCountBonus) {
+			int weight, float manaRate, int elementCountBonus, float efficiency) {
 		this.shape = shape;
 		this.element = element;
 		this.alteration = alteration;
 		this.weight = weight;
 		this.manaRate = manaRate;
 		this.elementCountBonus = elementCountBonus;
+		this.efficiency = efficiency;
 	}
 	
 	public SpellIngredient(SpellShapePart shape, int weight, float manaRate) {
-		this(shape, null, null, weight, manaRate, 0);
+		this(shape, null, null, weight, manaRate, 0, 1f);
 	}
 	
-	public SpellIngredient(EMagicElement element, int weight, float manaRate, int elementCountBonus) {
-		this(null, element, null, weight, manaRate, elementCountBonus);
+	public SpellIngredient(EMagicElement element, int weight, float manaRate, int elementCountBonus, float efficiency) {
+		this(null, element, null, weight, manaRate, elementCountBonus, efficiency);
 	}
 	
-	public SpellIngredient(EAlteration alteration, int weight, float manaRate) {
-		this(null, null, alteration, weight, manaRate, 0);
+	public SpellIngredient(EAlteration alteration, int weight, float manaRate, float efficiency) {
+		this(null, null, alteration, weight, manaRate, 0, efficiency);
 	}
 	
 }
