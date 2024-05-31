@@ -41,23 +41,20 @@ public class CommandForceBind {
 			context.getSource().sendFeedback(new StringTextComponent("To force a bind, hold the tome that's being binded to in your main hand"), true);
 			return 1;
 		}
-		if (SpellTome.getPlayerID(stack) == null) {
-			// bonding tome. Force it!
-			SpellTome.bond(stack, player.world, player);
+		
+		ItemStack offhand = player.getHeldItemOffhand();
+		if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)
+				|| SpellScroll.getSpell(offhand) == null) {
+			context.getSource().sendFeedback(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
 		} else {
-			ItemStack offhand = player.getHeldItemOffhand();
-			if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)
-					|| SpellScroll.getSpell(offhand) == null) {
-				context.getSource().sendFeedback(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
+			Spell spell = SpellScroll.getSpell(offhand);
+			if (SpellTome.hasRoom(stack, spell)) {
+				SpellTome.addSpell(stack, spell);
 			} else {
-				Spell spell = SpellScroll.getSpell(offhand);
-				if (SpellTome.hasRoom(stack, spell)) {
-					SpellTome.addSpell(stack, spell);
-				} else {
-					context.getSource().sendFeedback(new StringTextComponent("The tome is full"), true);
-				}
+				context.getSource().sendFeedback(new StringTextComponent("The tome is full"), true);
 			}
 		}
+			
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
 				, player);

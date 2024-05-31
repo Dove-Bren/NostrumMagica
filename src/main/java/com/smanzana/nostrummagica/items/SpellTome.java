@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.items;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -17,11 +16,9 @@ import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.HSplitPage;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.LinedTextPage;
-import com.smanzana.nostrummagica.client.gui.book.PlainTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.effects.NostrumEffects;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -44,8 +41,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.IntArrayNBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -53,7 +48,6 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -139,9 +133,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	private static final String NBT_ENHANCEMENTS = "tome_enhancements";
 	private static final String NBT_ENHANCEMENT_KEY = "enhancement_key";
 	private static final String NBT_ENHANCEMENT_LEVEL = "enhancement_level";
-	private static final String NBT_PLAYER = "tome_player";
-	private static final String NBT_PLAYER_NAME = "tome_player_name";
-	private static final String NBT_FINISH_TIME = "tome_finish_time";
 	private static final String NBT_LEVEL = "tome_level";
 	private static final String NBT_XP = "tome_xp";
 	private static final String NBT_MODIFICATIONS = "tome_mods";
@@ -619,47 +610,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		itemStack.setTag(nbt);
 	}
 	
-	public static UUID getPlayerID(ItemStack itemStack) {
-		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
-			return null;
-
-		CompoundNBT nbt = itemStack.getTag();
-		if (nbt == null)
-			return null;
-		
-		try {
-			return UUID.fromString(nbt.getString(NBT_PLAYER));
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public static String getPlayerName(ItemStack itemStack) {
-		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
-			return null;
-
-		CompoundNBT nbt = itemStack.getTag();
-		if (nbt == null)
-			return null;
-		return nbt.getString(NBT_PLAYER_NAME);
-	}
-	
-	public static void setPlayer(ItemStack itemStack, PlayerEntity player) {
-		setPlayer(itemStack, player.getDisplayName().getString(), player.getUniqueID());
-	}
-	
-	public static void setPlayer(ItemStack itemStack, String name, UUID id) {
-		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
-			return;
-
-		CompoundNBT nbt = itemStack.getTag();
-		if (nbt == null)
-			nbt = new CompoundNBT();
-		nbt.putString(NBT_PLAYER, id.toString());
-		nbt.putString(NBT_PLAYER_NAME, name);
-		itemStack.setTag(nbt);
-	}
-	
 	private static int genID(ItemStack tome) {
 		int id = NostrumMagica.rand.nextInt();
 		CompoundNBT nbt = tome.getTag();
@@ -684,27 +634,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (id == 0)
 			id = genID(itemStack);
 		return id;
-	}
-	
-	public static long getBondTime(ItemStack itemStack) {
-		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
-			return 0;
-
-		CompoundNBT nbt = itemStack.getTag();
-		if (nbt == null)
-			return 0;
-		return nbt.getLong(NBT_FINISH_TIME);
-	}
-	
-	public static void setBondTime(ItemStack itemStack, long time) {
-		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
-			return;
-
-		CompoundNBT nbt = itemStack.getTag();
-		if (nbt == null)
-			nbt = new CompoundNBT();
-		nbt.putLong(NBT_FINISH_TIME, time);
-		itemStack.setTag(nbt);
 	}
 	
 	/**
@@ -811,53 +740,44 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		// height 40
 		// width 110
-		String ownerName = getPlayerName(stack);
-		if (ownerName == null || ownerName.isEmpty()) {
-			// Tome has not been bound yet
-			pages.add(new HSplitPage(
-					new TitlePage("Unbonded Spelltome", false),
-					new PlainTextPage("  This tome is still being bonded.")
-					));
-		} else {
-			String title = stack.getDisplayName().getString();
-			int level = getLevel(stack);
-			List<Spell> spells = getSpellLibrary(stack);
-			int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
-			int weightCapacity = getCapacity(stack);
-			int weightSum = getUsedCapacity(stack);
-			int spellPages = getPageCount(stack);
-			int xp = getXP(stack);
-			int maxxp = LevelCurve.getMaxXP(level);
-			int modifications = getModifications(stack);
-			pages.add(new TitlePage(title, false));
-			pages.add(new LinedTextPage("", "",
-					"Level: " + level, "XP: " + xp + "/" + maxxp, "",
-					"Spell Pages: " + spellPages,
-					"Modifications: " + modifications,
-					"",
-					spellCount + " Spells",
-					weightSum + "/" + weightCapacity + " Weight Capacity"
-					)
-				);
-			
-			if (spells != null && spellCount > 0) {
-				boolean top = true;
-				SpellPreviewPage page = null;
-				for (Spell spell : spells) {
-					if (top) {
-						page = new SpellPreviewPage(stack, spell);
-					} else {
-						HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(stack, spell));
-						pages.add(hp);
-					}
-					
-					top = !top;
-				}
-				if (!top) {
-					// Last one is partial page and didn't get finished.
-					HSplitPage hp = new HSplitPage(page, null);
+		String title = stack.getDisplayName().getString();
+		int level = getLevel(stack);
+		List<Spell> spells = getSpellLibrary(stack);
+		int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
+		int weightCapacity = getCapacity(stack);
+		int weightSum = getUsedCapacity(stack);
+		int spellPages = getPageCount(stack);
+		int xp = getXP(stack);
+		int maxxp = LevelCurve.getMaxXP(level);
+		int modifications = getModifications(stack);
+		pages.add(new TitlePage(title, false));
+		pages.add(new LinedTextPage("", "",
+				"Level: " + level, "XP: " + xp + "/" + maxxp, "",
+				"Spell Pages: " + spellPages,
+				"Modifications: " + modifications,
+				"",
+				spellCount + " Spells",
+				weightSum + "/" + weightCapacity + " Weight Capacity"
+				)
+			);
+		
+		if (spells != null && spellCount > 0) {
+			boolean top = true;
+			SpellPreviewPage page = null;
+			for (Spell spell : spells) {
+				if (top) {
+					page = new SpellPreviewPage(stack, spell);
+				} else {
+					HSplitPage hp = new HSplitPage(page, new SpellPreviewPage(stack, spell));
 					pages.add(hp);
 				}
+				
+				top = !top;
+			}
+			if (!top) {
+				// Last one is partial page and didn't get finished.
+				HSplitPage hp = new HSplitPage(page, null);
+				pages.add(hp);
 			}
 		}
 		
@@ -966,73 +886,13 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 				);
 			}
 		}
-		
-		String name = getPlayerName(stack);
-		if (name != null && !name.isEmpty()) {
-			tooltip.add(new StringTextComponent(""));
-			tooltip.add(new StringTextComponent("Bound to " + name).mergeStyle(TextFormatting.DARK_RED));
-		}
 	}
 	
 	@Override
 	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
-		
-		if (worldIn.isRemote)
-			return;
-		
-		UUID owner = getPlayerID(stack);
-		if (owner != null)
-			return;
-		
-		if (!(entityIn instanceof PlayerEntity) || ((PlayerEntity) entityIn).isCreative()) {
-			return;
-		}
-		
-		long time = getBondTime(stack);
-		if (time == 0) {
-			setBondTime(stack, System.currentTimeMillis() + SpellTome.genBondTime(stack));
-			return;
-		}
-		
-		long current = System.currentTimeMillis();
-		if (current >= time) {
-			// Bond!
-			bond(stack, worldIn, (PlayerEntity) entityIn);
-		}
-		
-		
 	}
 	
-	@Override
-	public boolean onDroppedByPlayer(ItemStack item, PlayerEntity player) {
-		boolean ret = super.onDroppedByPlayer(item, player);
-		if (ret)
-			setBondTime(item, 0);
-		return ret;
-	}
-	
-	public static long genBondTime(ItemStack tome) {
-		// Can be cool later. For now, just do 10 minutes
-		return 1000L * 10;//60L * 10L;
-	}
-	
-	public static void bond(ItemStack tome, World world, PlayerEntity player) {
-		setPlayer(tome, player);
-		NostrumMagicaSounds.SHIELD_APPLY.play(player);
-		if (!world.isRemote) {
-			player.sendMessage(new TranslationTextComponent("info.tome.bond"), Util.DUMMY_UUID);
-		}
-	}
-	
-	public static boolean isOwner(ItemStack tome, PlayerEntity player) {
-		UUID owner = getPlayerID(tome);
-		if (owner == null)
-			return false;
-		
-		return owner.equals(player.getUniqueID());
-	}
-
 	/**
 	 * Does any special effects when casting a spell from a tome
 	 * @param tome
@@ -1042,84 +902,18 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (sp.world.isRemote)
 			return;
 		
-		boolean isOwner = isOwner(tome, sp);
-		if (!isOwner) {
-			UUID id = getPlayerID(tome);
-			if (id == null)
-				return;
-			PlayerEntity player = 
-					sp.world.getServer().getPlayerList().getPlayerByUUID(id);
-			if (player != null && player.isAlive()) {
-				switch (NostrumMagica.rand.nextInt(4)) {
-				case 0:
-					// Poison them
-					player.addPotionEffect(new EffectInstance(
-							Effects.POISON,
-							20 * 10,
-							0
-							));
-					player.addPotionEffect(new EffectInstance(
-							Effects.NAUSEA,
-							20 * 10,
-							1
-							));
-					break;
-				case 1:
-					// Frostbite
-					player.addPotionEffect(new EffectInstance(
-							NostrumEffects.frostbite,
-							20 * 10,
-							0
-							));
-					player.addPotionEffect(new EffectInstance(
-							Effects.NAUSEA,
-							20 * 10,
-							1
-							));
-					break;
-				case 2:
-					// Slow
-					player.addPotionEffect(new EffectInstance(
-							Effects.SLOWNESS,
-							20 * 10,
-							1
-							));
-					player.addPotionEffect(new EffectInstance(
-							Effects.NAUSEA,
-							20 * 10,
-							1
-							));
-					break;
-				case 3:
-				default:
-					// Blindness
-					player.addPotionEffect(new EffectInstance(
-							Effects.BLINDNESS,
-							20 * 10,
-							0
-							));
-					player.addPotionEffect(new EffectInstance(
-							Effects.NAUSEA,
-							20 * 10,
-							1
-							));
-					break;
-				}
-			}
-		} else {
-			while (true) {
-				int xp = getXP(tome) + 1;
-				int level = getLevel(tome);
-				int maxxp = LevelCurve.getMaxXP(level);
-				if (xp >= maxxp) {
-					xp -= maxxp;
-					setXP(tome, xp);
-					
-					doLevelup(tome, sp);
-				} else {
-					setXP(tome, xp);
-					break;
-				}
+		while (true) {
+			int xp = getXP(tome) + 1;
+			int level = getLevel(tome);
+			int maxxp = LevelCurve.getMaxXP(level);
+			if (xp >= maxxp) {
+				xp -= maxxp;
+				setXP(tome, xp);
+				
+				doLevelup(tome, sp);
+			} else {
+				setXP(tome, xp);
+				break;
 			}
 		}
 		
@@ -1186,14 +980,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		Spell spell = SpellScroll.getSpell(scroll);
 		if (spell == null)
 			return false;
-		
-		if (!SpellTome.isOwner(tome, player)) {
-			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.noowner"), Util.DUMMY_UUID);
-				
-			}
-			return false;
-		}
 		
 		if (!hasRoom(tome, spell)) {
 			if (!player.world.isRemote) {
