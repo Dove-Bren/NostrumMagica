@@ -358,43 +358,37 @@ public class SpellCrafting {
 					elemBeginIdx = idx;
 				}
 				while (elementCount > 3) { // Don't go at 3 so that an alteration can come next
-					output.add(new SpellCraftPart(elemBeginIdx, idx, element, 3, null, weightBonus, manaRate, efficiency, new SpellPartAttributes()));
-					previousElement = element;
-					elementCount -= 3;
-					weightBonus = 0;
-					manaRate = 1f;
+					flushEffect(idx, null);
 					elemBeginIdx = idx; // Even if multiple start here, it'll be all on this idx
+					if (elementCount > 0) {
+						element = runeElement;
+					}
 				}
 				
 				if (elementCount == 0) {
-					previousElement = element;
-					element = null;
-					weightBonus = 0;
-					manaRate = 1f;
-					efficiency = 1f;
-					elemBeginIdx = -1;
+					flushEffect(idx, null); // Reset variables
 				}
 			}
 			return true;
 		}
 		
 		public void flush(int idx) {
-			if (element != null) {
-				output.add(new SpellCraftPart(elemBeginIdx, idx-1, element, elementCount, null, weightBonus, manaRate, efficiency, new SpellPartAttributes()));
-			}
+			flushEffect(idx-1, null);
 		}
 		
 		private void flushEffect(int idx, @Nullable EAlteration alteration) {
 			if (element != null) {
-				output.add(new SpellCraftPart(elemBeginIdx, idx, element, elementCount, alteration, weightBonus, manaRate, efficiency, new SpellPartAttributes()));
+				final int consumeCount = Math.min(3, elementCount);
+				output.add(new SpellCraftPart(elemBeginIdx, idx, element, consumeCount, alteration, weightBonus, manaRate, efficiency, new SpellPartAttributes()));
 				previousElement = element;
-				element = null;
-				elementCount = 0;
-				weightBonus = 0;
-				manaRate = 1f;
-				efficiency = 1f;
-				elemBeginIdx = -1;
+				elementCount -= consumeCount;
 			}
+			
+			weightBonus = 0;
+			manaRate = 1f;
+			efficiency = 1f;
+			elemBeginIdx = -1;
+			element = null;
 		}
 	}
 	
