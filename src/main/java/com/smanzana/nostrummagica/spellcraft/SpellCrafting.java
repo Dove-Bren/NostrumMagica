@@ -379,7 +379,21 @@ public class SpellCrafting {
 		private void flushEffect(int idx, @Nullable EAlteration alteration) {
 			if (element != null) {
 				final int consumeCount = Math.min(3, elementCount);
-				output.add(new SpellCraftPart(elemBeginIdx, idx, element, consumeCount, alteration, weightBonus, manaRate, efficiency, new SpellPartAttributes()));
+				boolean elementalBoost = false;
+				boolean elementalInterference = false;
+				
+				if (previousElement != null) {
+					if (element.isOpposingElement(previousElement)) {
+						elementalInterference = true;
+						efficiency -= .5f;
+					} else if (element.isSupportingElement(previousElement)) {
+						elementalBoost = true;
+						efficiency += .5f;
+					}
+				}
+				
+				final SpellPartAttributes attributes = new SpellPartAttributes(elementalBoost, elementalInterference);
+				output.add(new SpellCraftPart(elemBeginIdx, idx, element, consumeCount, alteration, weightBonus, manaRate, efficiency, attributes));
 				previousElement = element;
 				elementCount -= consumeCount;
 			}
@@ -414,14 +428,13 @@ public class SpellCrafting {
 		
 		public final int weightBonus;
 		public final float manaRate;
-		public final float efficiency;
 		public final SpellPartAttributes attributes;
 		
 		// Not-so-abstraction-happy place to stash results
 		public int finalWeight;
 		public int finalMana;
 		
-		protected SpellCraftPart(int startIdx, int endIdx, SpellShapePart shape, SpellEffectPart effect, int weightBonus, float manaRate, float efficiency,
+		protected SpellCraftPart(int startIdx, int endIdx, SpellShapePart shape, SpellEffectPart effect, int weightBonus, float manaRate,
 				SpellPartAttributes attributes) {
 			this.startIdx = startIdx;
 			this.endIdx = endIdx;
@@ -429,12 +442,11 @@ public class SpellCrafting {
 			this.effect = effect;
 			this.weightBonus = weightBonus;
 			this.manaRate = manaRate;
-			this.efficiency = efficiency;
 			this.attributes = attributes;
 		}
 		
 		public SpellCraftPart(int startIdx, int endIdx, SpellShapePart shape, int weightBonus, float manaRate, SpellPartAttributes attributes) {
-			this(startIdx, endIdx, shape, null, weightBonus, manaRate, 1f, attributes);
+			this(startIdx, endIdx, shape, null, weightBonus, manaRate, attributes);
 		}
 		
 		public SpellCraftPart(int startIdx, int endIdx, SpellShape shape, SpellShapePartProperties props, int weightBonus, float manaRate, SpellPartAttributes attributes) {
@@ -445,12 +457,12 @@ public class SpellCrafting {
 			this(startIdx, endIdx, shape, shape.getDefaultProperties(), weightBonus, manaRate, attributes);
 		}
 		
-		public SpellCraftPart(int startIdx, int endIdx, SpellEffectPart effect, int weightBonus, float manaRate, float efficiency, SpellPartAttributes attributes) {
-			this(startIdx, endIdx, null, effect, weightBonus, manaRate, efficiency, attributes);
+		public SpellCraftPart(int startIdx, int endIdx, SpellEffectPart effect, int weightBonus, float manaRate, SpellPartAttributes attributes) {
+			this(startIdx, endIdx, null, effect, weightBonus, manaRate, attributes);
 		}
 		
 		public SpellCraftPart(int startIdx, int endIdx, EMagicElement element, int elementCount, @Nullable EAlteration alteration, int weightBonus, float manaRate, float efficiency, SpellPartAttributes attributes) {
-			this(startIdx, endIdx, new SpellEffectPart(element, elementCount, alteration), weightBonus, manaRate, efficiency, attributes);
+			this(startIdx, endIdx, new SpellEffectPart(element, elementCount, alteration, efficiency), weightBonus, manaRate, attributes);
 		}
 		
 		public boolean isShape() {
@@ -491,10 +503,6 @@ public class SpellCrafting {
 
 		public float getManaRate() {
 			return manaRate;
-		}
-		
-		public float getEfficiency() {
-			return this.efficiency;
 		}
 	}
 	
@@ -590,7 +598,7 @@ public class SpellCrafting {
 		public int getMana() {
 			return this.mana;
 		}
-		
+
 		public SpellPartAttributes getAttributes() {
 			return this.attributes;
 		}

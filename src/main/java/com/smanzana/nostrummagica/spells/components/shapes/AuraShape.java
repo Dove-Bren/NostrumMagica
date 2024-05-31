@@ -1,9 +1,5 @@
 package com.smanzana.nostrummagica.spells.components.shapes;
 
-import com.smanzana.nostrummagica.spells.Spell.SpellState;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
-import com.smanzana.nostrummagica.utils.Entities;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +12,11 @@ import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listeners.PlayerListener.Event;
 import com.smanzana.nostrummagica.listeners.PlayerListener.IGenericListener;
+import com.smanzana.nostrummagica.spells.Spell.SpellState;
 import com.smanzana.nostrummagica.spells.SpellCharacteristics;
 import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
+import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.utils.Entities;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
@@ -257,5 +256,10 @@ public class AuraShape extends AreaShape {
 	public boolean shouldTrace(SpellShapePartProperties params) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+		return new SpellShapeAttributes(true, true, false);
 	}
 }

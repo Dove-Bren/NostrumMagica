@@ -77,6 +77,48 @@ public enum EMagicElement {
 		return null;
 	}
 	
+	public boolean isSupportingElement(EMagicElement element) {
+		switch (this) {
+		case EARTH:
+			return element == ICE;
+		case ENDER:
+			return element == LIGHTNING;
+		case FIRE:
+			return element == EARTH;
+		case ICE:
+			return element == WIND;
+		case LIGHTNING:
+			return element == ENDER;
+		case PHYSICAL:
+			return element != PHYSICAL;
+		case WIND:
+			return element == FIRE;
+		}
+		
+		return false;
+	}
+	
+	public boolean isOpposingElement(EMagicElement element) {
+		switch (this) {
+		case EARTH:
+			return element == FIRE;
+		case ENDER:
+			return element == PHYSICAL;
+		case FIRE:
+			return element == WIND;
+		case ICE:
+			return element == EARTH;
+		case LIGHTNING:
+			return element == PHYSICAL;
+		case PHYSICAL:
+			return false;
+		case WIND:
+			return element == ICE;
+		}
+		
+		return false;
+	}
+	
 	public static EMagicElement getRandom(Random rand) {
 		return EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
 	}

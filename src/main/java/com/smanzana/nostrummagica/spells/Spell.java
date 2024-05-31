@@ -75,89 +75,6 @@ public class Spell {
 			if (forceSplit) {
 				this.split().trigger(targets, world, locations, false);
 			} else {
-			
-//				if (ModConfig.config.spellDebug() && this.caster instanceof PlayerEntity) {
-//					TextComponent comp = new StringTextComponent(""),
-//							sib;
-//					
-//					sib = new StringTextComponent(name +  "> ");
-//					sib.setStyle(Style.EMPTY.setBold(true).applyFormatting(TextFormatting.GOLD));
-//					comp.append(sib);
-//					sib = new StringTextComponent("");
-//					
-//					// Get current trigger
-//					if (index == -1) {
-//						sib.appendString(" <<Start Cast>> ");
-//					}
-//					else {
-//						LegacySpellPart part = parts.get(index);
-//						sib.appendString("[" + part.getTrigger().getDisplayName() + "] " );
-//						if (part.getParam().flip || Math.abs(part.getParam().level) > .001) {
-//							Style style = Style.EMPTY;
-//							String buf = "";
-//							if (part.getParam().flip) {
-//								buf = "Inverted ";
-//							}
-//							if (Math.abs(part.getParam().level) > .001) {
-//								buf += String.format("Level %02.1f", part.getParam().level);
-//							}
-//							style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT,
-//									new StringTextComponent(buf)));
-//							sib.setStyle(style);
-//						}
-//					}
-//					
-//					if (targets != null && targets.size() > 0) {
-//						String buf = "";
-//						for (LivingEntity ent : targets) {
-//							buf += ent.getName() + " ";
-//						}
-//						sib.appendString("on ");
-//						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.AQUA).setBold(false));
-//						comp.append(sib);
-//						sib = new StringTextComponent(targets.size() + " entities");
-//						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.RED)
-//								.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, 
-//										new StringTextComponent(buf))));
-//						comp.append(sib);
-//	
-//						sib = new StringTextComponent(" (others)");
-//						Style style = Style.EMPTY;
-//						style.applyFormatting(TextFormatting.DARK_PURPLE);
-//						buf = "";
-//						if (others.size() > 0) {
-//							for (LivingEntity ent : others)
-//								buf += ent.getName() + " ";
-//						} else {
-//							buf += this.getSelf().getName();
-//						}
-//						style.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new StringTextComponent(buf)));
-//						sib.setStyle(style);
-//						
-//						comp.append(sib);
-//					} else if (locations != null && !locations.isEmpty()) {
-//						sib.appendString("on ");
-//						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.AQUA).setBold(false));
-//						comp.append(sib);
-//						sib = new StringTextComponent(locations.size() + " location(s)");
-//						String buf = "";
-//						for (BlockPos pos : locations) {
-//							buf += "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") ";
-//						}
-//						
-//						sib.setStyle(Style.EMPTY.applyFormatting(TextFormatting.DARK_GREEN).setHoverEvent(
-//								new HoverEvent(Action.SHOW_TEXT, new StringTextComponent(buf))));
-//						comp.append(sib);
-//					} else {
-//						sib.appendString("no targets");
-//						sib.setStyle((Style.EMPTY).applyFormatting(TextFormatting.AQUA));
-//						comp.append(sib);
-//					}
-//					
-//					//caster.addChatMessage(comp);
-//					NostrumMagica.instance.proxy.sendSpellDebug((PlayerEntity) this.caster, comp);
-//				}
-				
 				index++;
 				if (index >= spell.shapes.size()) {
 					this.finish(targets, world, locations);
@@ -256,6 +173,7 @@ public class Spell {
 			boolean first = true;
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
+				final float efficiency = this.efficiency + (part.getPotency() - 1f);
 				
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 				if (attr != null && attr.isUnlocked()) {
@@ -268,7 +186,7 @@ public class Spell {
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
-						if (action.apply(caster, targ, this.efficiency)) {
+						if (action.apply(caster, targ, efficiency)) {
 							affectedEnts.add(targ);
 						}
 					}
@@ -555,7 +473,7 @@ public class Spell {
 		case ICE:
 		case LIGHTNING:
 		case WIND:
-			return new SpellAction().damage(element, 2f + (float) (2 * (elementCount+1)))
+			return new SpellAction().damage(element, 2f + (float) (2 * elementCount))
 					.name("ruin." + element.name().toLowerCase());
 		}
 		

@@ -82,9 +82,9 @@ public class CommandRandomSpell {
 			alt = null;
 		}
 		spell.addPart(new SpellEffectPart(
-				alt,
 				elem,
-				power
+				power,
+				alt
 				));
 		
 		return spell;

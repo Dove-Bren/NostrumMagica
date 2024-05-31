@@ -624,6 +624,16 @@ public class SpellCreationGui {
 		private static final int TEX_INFPANEL_BORDER_BR_WIDTH = 4;
 		private static final int TEX_INFPANEL_BORDER_BR_HEIGHT = 4;
 		
+		private static final int TEX_BOOST_HOFFSET = 52;
+		private static final int TEX_BOOST_VOFFSET = 29;
+		private static final int TEX_BOOST_WIDTH = 9;
+		private static final int TEX_BOOST_HEIGHT = 5;
+		
+		private static final int TEX_PENALTY_HOFFSET = TEX_BOOST_HOFFSET;
+		private static final int TEX_PENALTY_VOFFSET = TEX_BOOST_VOFFSET + TEX_BOOST_HEIGHT;
+		private static final int TEX_PENALTY_WIDTH = 9;
+		private static final int TEX_PENALTY_HEIGHT = 5;
+		
 		protected static class SpellIconButton extends Button {
 			
 			private final int value;
@@ -955,6 +965,19 @@ public class SpellCreationGui {
 			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0xFF404040);
 				RenderFuncs.drawRect(matrixStackIn, x + 1, y + 1, x + width - 1, y + height - 1, color);
+
+				final int iconHeight = height;
+				final int iconWidth = iconHeight*2;
+				matrixStackIn.push();
+				matrixStackIn.translate(x + (width-iconWidth)/2, y, 0);
+				{
+					if (part.getAttributes().elementalBoost) {
+						gui.drawElementalBoost(matrixStackIn, iconWidth, iconHeight, part.getEffect().getElement());
+					} else if (part.getAttributes().elementalInterference) {
+						gui.drawElementalPenalty(matrixStackIn, iconWidth, iconHeight, part.getEffect().getElement());
+					}
+				}
+				matrixStackIn.pop();
 				
 				if (this.isHovered()) {
 					RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0x20FFFFFF);
@@ -1192,6 +1215,26 @@ public class SpellCreationGui {
 				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 		
+		protected void drawElementalBoost(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
+			Minecraft.getInstance().getTextureManager().bindTexture(TEXT_UTILS);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
+					TEX_BOOST_HOFFSET, TEX_BOOST_VOFFSET, TEX_BOOST_WIDTH, TEX_BOOST_HEIGHT,
+					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
+			
+			SpellComponentIcon.get(element)
+				.draw(this, matrixStackIn, this.font, width/2, 0, width/2, height);
+		}
+		
+		protected void drawElementalPenalty(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
+			Minecraft.getInstance().getTextureManager().bindTexture(TEXT_UTILS);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
+					TEX_PENALTY_HOFFSET, TEX_PENALTY_VOFFSET, TEX_PENALTY_WIDTH, TEX_PENALTY_HEIGHT,
+					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
+			
+			SpellComponentIcon.get(element)
+				.draw(this, matrixStackIn, this.font, width/2, 0, width/2, height);
+		}
+		
 		protected final void renderSpellPanel(MatrixStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			final FontRenderer fontRenderer = mc.fontRenderer;
@@ -1268,9 +1311,20 @@ public class SpellCreationGui {
 				// Weight
 				fontRenderer.drawString(matrixStackIn, "Weight: " + part.getWeight(), 0, 0, 0xFF000000);
 				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
-
+				
 				if (!part.isShape()) {
 					final SpellEffectPart effect = part.getEffect();
+					
+					// Potency
+					{
+						final int color = (effect.getPotency() > 1 ? 0xFF44EE66 : 
+							effect.getPotency() < 1f ? 0xFFCC4422
+									: 0xFF000000);
+						fontRenderer.drawString(matrixStackIn, String.format("Potency: %.0f%%", effect.getPotency() * 100f), 0, 0, color);
+						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					}
+					
+					
 					final String name;
 					final String desc;
 					@Nullable SpellAction action = SpellGui.getKnownActionForPart(effect);
