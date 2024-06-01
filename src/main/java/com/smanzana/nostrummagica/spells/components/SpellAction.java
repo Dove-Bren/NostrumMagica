@@ -2099,6 +2099,10 @@ public class SpellAction {
 	
 	protected static final float getPhysicalAttributeBonus(LivingEntity caster) {
 		// Get raw amount
+		if (!caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
+			return 0f;
+		}
+		
 		double amt = caster.getAttributeValue(Attributes.ATTACK_DAMAGE);
 		amt -= 1; // Players always have +1 attack
 		
@@ -2138,7 +2142,7 @@ public class SpellAction {
 		}
 		
 		if (element == EMagicElement.PHYSICAL) {
-			base += getPhysicalAttributeBonus(target);
+			base += getPhysicalAttributeBonus(caster);
 			base = applyArmor(target, base);
 			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
 			// It still gains power from magic boost (above) AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).

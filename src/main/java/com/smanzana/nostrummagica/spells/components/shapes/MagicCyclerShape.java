@@ -32,8 +32,6 @@ import net.minecraftforge.common.util.Lazy;
  */
 public class MagicCyclerShape extends SpellShape {
 	
-	private int unused; // Maybe make it continue even when it hits something?
-
 	public static class MagicCyclerShapeInstance extends SpellShapeInstance implements ISpellSaucerShape {
 
 		private final World world;
@@ -59,7 +57,7 @@ public class MagicCyclerShape extends SpellShape {
 				public void run() {
 					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(NostrumEntityTypes.cyclerSpellSaucer, MagicCyclerShapeInstance.this,
 							getState().getSelf(),
-							5.0f, (int) duration * 20, onBlocks);
+							5.0f, (int) duration * 20, onBlocks, false);
 					
 					world.addEntity(projectile);
 			
@@ -190,6 +188,6 @@ public class MagicCyclerShape extends SpellShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
-		return new SpellShapeAttributes(false, true, params.flip);
+		return new SpellShapeAttributes(true, true, params.flip);
 	}
 }

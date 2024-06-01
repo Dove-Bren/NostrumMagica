@@ -1093,7 +1093,7 @@
 	"shape.ring.desc": "Affects all entities and blocks in a certain radius. Does not affect close blocks or entities.",
 	"shape.self.desc": "Affects the caster of the spell.",
 	"shape.touch.desc": "Targets the entity or block the caster is looking at.",
-	"shape.vortex_blade.desc": "Creates a magical blade that circles the caster and applies its effects when it hits an entity.",
+	"shape.vortex_blade.desc": "Creates a magical blade that circles the caster and applies its effects to any entities it hits.",
 	"shape.wall.desc": "Erects a magical wall that applies its effects to any entities and blocks inside it.",
 
     "ritual.buff.luck.name": "Ritual of Luck",

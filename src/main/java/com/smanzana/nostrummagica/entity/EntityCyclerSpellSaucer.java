@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.entity;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,21 +27,30 @@ import net.minecraft.world.World;
 public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	
 	public static final String ID = "entity_internal_spellsaucer_cycler";
+	static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);
 	
 	protected static final DataParameter<Optional<UUID>> SHOOTER = EntityDataManager.<Optional<UUID>>createKey(EntityCyclerSpellSaucer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	
 	// Cycler:
 	private int duration;
 	private boolean onBlocks;
+	private boolean dieOnImpact;
+	private final Map<LivingEntity, Integer> entityHitCache;
+	private final Map<Vector, Integer> posHitCache;
 	
 	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, World world) {
 		super(type, world);
+		entityHitCache = new HashMap<>();
+		posHitCache = new HashMap<>();
 	}
 	
 	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, World world, LivingEntity shooter, MagicCyclerShapeInstance trigger, float speed) {
 		super(type, world, shooter, trigger, speed);
+		this.entityHitCache = new HashMap<>();
+		posHitCache = new HashMap<>();
         this.duration = 10; // Long neough to flash so I know things are going on
         this.onBlocks = true;
+        this.dieOnImpact = false;
         
         // Set up shooter as data parameter to communicate to client
         this.dataManager.set(SHOOTER, Optional.ofNullable(shooter.getUniqueID()));
@@ -49,7 +60,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			MagicCyclerShapeInstance trigger, LivingEntity shooter,
 			World world,
 			double fromX, double fromY, double fromZ,
-			float speedFactor, int durationTicks, boolean onBlocks) {
+			float speedFactor, int durationTicks, boolean onBlocks, boolean dieOnImpact) {
 		this(type, world, shooter, trigger, speedFactor);
 		
 		this.setLocationAndAngles(fromX, fromY, fromZ, this.rotationYaw, this.rotationPitch);
@@ -57,17 +68,18 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
         
         duration = durationTicks;
         this.onBlocks = onBlocks;
+        this.dieOnImpact = dieOnImpact;
 	}
 
 	public EntityCyclerSpellSaucer(EntityType<? extends EntityCyclerSpellSaucer> type, 
 			MagicCyclerShapeInstance trigger,
-			LivingEntity shooter, float speedFactor, int durationTicks, boolean onBlocks) {
+			LivingEntity shooter, float speedFactor, int durationTicks, boolean onBlocks, boolean dieOnImpact) {
 		this(type,
 				trigger,
 				shooter,
 				shooter.world,
 				shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight(), shooter.getPosZ(),
-				speedFactor, durationTicks, onBlocks
+				speedFactor, durationTicks, onBlocks, dieOnImpact
 				);
 	}
 	
@@ -222,41 +234,6 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 				}
 			}
 	        
-			//RayTraceResult raytraceresult = ProjectileHelper.forwardsRaycast(this, true, this.ticksInAir >= 25, this.shootingEntity);
-			
-//			// Also calc pitch and yaw
-//			float f = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
-//            this.rotationPitch = (float)(MathHelper.atan2(motionY, (double)f) * (180D / Math.PI));
-//            this.rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * (180D / Math.PI));
-//			
-//			this.getMotion().x -= accel.x;
-//	        this.getMotion().y -= accel.y;
-//	        this.getMotion().z -= accel.z;
-
-//	        if (raytraceresult != null)
-//	        {
-//	            this.onImpact(raytraceresult);
-//	        }
-	        
-//	        this.getPosX() += this.getMotion().x;
-//	        this.getPosY() += this.getMotion().y;
-//	        this.getPosZ() += this.getMotion().z;
-//	        this.getPosX() += accel.x;
-//	        this.getPosY() += accel.y;
-//	        this.getPosZ() += accel.z;
-//	        
-//	        // Apply air-friction, making motion's sort-of our initial motion
-//	        this.getMotion().x *= 0.8;
-//	        this.getMotion().y *= 0.8;
-//	        this.getMotion().z *= 0.8;
-//			
-////				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
-////				if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
-////					trigger.onFizzle(this.getPosition());
-////					this.remove();
-////				}
-//			
-//			this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
 		}
 	}
 	
@@ -265,10 +242,51 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 		return onBlocks && !this.world.isAirBlock(pos) && this.world.getBlockState(pos).isOpaqueCube(world, pos);
 	}
 	
-	static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);
+	@Override
+	public boolean canImpact(LivingEntity entity) {
+		return super.canImpact(entity);
+	}
+	
+	@Override
+	protected void addHit(LivingEntity entity) {
+		this.entityHitCache.put(entity, entity.ticksExisted);
+	}
+
+	@Override
+	protected boolean hasBeenHit(LivingEntity entity) {
+		Integer lastAgeTick = this.entityHitCache.get(entity);
+		if (lastAgeTick == null || entity.ticksExisted - lastAgeTick > 20) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	protected void addHit(Vector pos) {
+		posHitCache.put(pos.copy(), this.ticksExisted);
+	}
+
+	@Override
+	protected boolean hasBeenHit(Vector pos) {
+		Integer lastAgeTick = this.posHitCache.get(pos);
+		if (lastAgeTick == null || this.ticksExisted - lastAgeTick > 20) {
+			return false;
+		}
+		return true;
+	}
 	
 	public AxisAlignedBB getCollisionBoundingBox() {
 		return _BoundingBox;
+	}
+	
+	@Override
+	public boolean dieOnImpact(BlockPos pos) {
+		return this.onBlocks && this.dieOnImpact;
+	}
+	
+	@Override
+	public boolean dieOnImpact(LivingEntity ent) {
+		return this.dieOnImpact;
 	}
 	
 }

@@ -80,7 +80,6 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	public void tick() {
 		super.tick();
 		ticksInAir++;
-		ticksExisted++;
 		
 		if (this.ticksExisted % 5 == 0 && world.isRemote) {
 			this.world.addParticle(ParticleTypes.CRIT,

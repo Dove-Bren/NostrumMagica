@@ -118,7 +118,7 @@ public class BasicSpellCraftGui {
 			if (extraInventory != null) {
 				this.extraInventory = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new,
 						POS_CONTAINER_WIDTH, POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT, POS_INFOPANEL_WIDTH, POS_CONTAINER_HEIGHT - (POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT),
-						new StringTextComponent("Extra"));
+						new StringTextComponent("Rune Library"));
 			}
 			
 		}
