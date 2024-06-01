@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
+import com.smanzana.nostrummagica.stats.PlayerStatTracker;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -310,7 +311,13 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void addMana(int mana) {
+		final int startingMana = this.mana;
 		this.mana = Math.max(0, Math.min(this.mana + mana, this.getMaxMana()));
+		if (startingMana > this.mana) {
+			if (entity != null && entity instanceof PlayerEntity) {
+				PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.addManaSpent(startingMana - this.mana));
+			}
+		}
 	}
 
 	@Override
@@ -329,12 +336,16 @@ public class NostrumMagic implements INostrumMagic {
 	
 	@Override
 	public void setReservedMana(int reserved) {
+		this.reservedMana = reserved;
 	}
 	
 	@Override
 	public void addReservedMana(int reserved) {
 		// Bound between 0 and max mana
 		this.reservedMana = Math.max(0, Math.min(this.getMaxMana(), this.reservedMana + reserved));
+		if (mana < 0 && entity != null && entity instanceof PlayerEntity) {
+			PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.recordReservedMana(this.reservedMana));
+		}
 	}
 
 //	@Override

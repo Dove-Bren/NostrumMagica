@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
@@ -62,6 +63,20 @@ public class PlayerStatTracker extends WorldSavedData {
 		return nbt;
 	}
 	
+	public static final void Update(@Nonnull PlayerEntity player, Consumer<PlayerStats> updater) {
+		if (player.world.isRemote()) {
+			return;
+		}
+		Update(player.getUniqueID(), updater);
+	}
+	
+	public static final void Update(@Nonnull UUID playerID, Consumer<PlayerStats> updater) {
+		PlayerStatTracker tracker = NostrumMagica.instance.getPlayerStats();
+		PlayerStats stats = tracker.get(playerID);
+		updater.accept(stats);
+		tracker.update(playerID, stats);
+	}
+	
 	public PlayerStats get(@Nonnull PlayerEntity player) {
 		return get(player.getUniqueID());
 	}
@@ -76,6 +91,9 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 	
 	public void update(@Nonnull PlayerEntity player, PlayerStats stats) {
+		if (player.world.isRemote()) {
+			return;
+		}
 		update(player.getUniqueID(), stats);
 	}
 	

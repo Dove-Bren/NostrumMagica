@@ -20,10 +20,13 @@ import com.smanzana.nostrummagica.spells.components.SpellAction;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
 import com.smanzana.nostrummagica.spells.components.SpellShapePart;
+import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionResult;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape.SpellShapeInstance;
+import com.smanzana.nostrummagica.stats.PlayerStatTracker;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -171,6 +174,7 @@ public class Spell {
 		
 		private void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
 			boolean first = true;
+			float damageTotal = 0f;
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
 				final float efficiency = this.efficiency + (part.getPotency() - 1f);
@@ -186,14 +190,17 @@ public class Spell {
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
-						if (action.apply(caster, targ, efficiency)) {
+						SpellActionResult result = action.apply(caster, targ, efficiency); 
+						if (result.applied) {
 							affectedEnts.add(targ);
+							damageTotal += result.damage;
 						}
 					}
 				} else if (positions != null && !positions.isEmpty()) {
 					// use locations
 					for (BlockPos pos : positions) {
-						if (action.apply(caster, world, pos, efficiency)) {
+						SpellActionResult result = action.apply(caster, world, pos, efficiency); 
+						if (result.applied) {
 							affectedPos.add(pos);
 						}
 					}
@@ -233,6 +240,16 @@ public class Spell {
 				}
 				
 				first = false;
+			}
+			
+			if (!caster.world.isRemote() && caster instanceof PlayerEntity) {
+				final float damageTotalFinal = damageTotal;
+				PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> {
+					if (damageTotalFinal > 0) {
+						stats.recordSpellDamageDealt(damageTotalFinal);
+					}
+					// Per element damage calculated by damage listener
+				});
 			}
 		}
 	}
@@ -346,6 +363,9 @@ public class Spell {
 		state.trigger(Lists.newArrayList(caster), null, null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
+		if (caster instanceof PlayerEntity) {
+			PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> stats.addSpellsCast(1).addTotalSpellWeight(weight));
+		}
 	}
 	
 	public String crc() {
