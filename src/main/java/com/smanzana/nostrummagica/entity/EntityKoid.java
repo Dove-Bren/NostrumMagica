@@ -45,7 +45,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityKoid extends MonsterEntity implements ILoreSupplier {
+public class EntityKoid extends MonsterEntity implements ILoreSupplier, IElementalEntity {
 	
 	public static final String ID = "entity_koid";
 
@@ -209,6 +209,7 @@ public class EntityKoid extends MonsterEntity implements ILoreSupplier {
 		}
 	}
 	
+	@Override
 	public EMagicElement getElement() {
 		return EMagicElement.values()[
               this.dataManager.get(KOID_VARIANT).intValue()];

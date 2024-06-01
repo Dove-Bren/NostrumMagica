@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
@@ -60,7 +61,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerBossInfo;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEntity {
+public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEntity, IElementalEntity {
 
 	public static enum DragonBodyPartType {
 		BODY("body", 2.5f, 3f, Vector3d.ZERO),
@@ -668,6 +669,11 @@ public class EntityDragonRed extends EntityDragonRedBase implements IMultiPartEn
 		protected void writeAdditional(CompoundNBT compound) {
 			super.writeAdditional(compound);
 		}
+	}
+
+	@Override
+	public EMagicElement getElement() {
+		return EMagicElement.FIRE;
 	}
 
 }

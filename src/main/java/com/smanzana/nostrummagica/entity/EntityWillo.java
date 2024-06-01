@@ -84,7 +84,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityWillo extends MonsterEntity implements ILoreTagged {
+public class EntityWillo extends MonsterEntity implements ILoreTagged, IElementalEntity {
 	
 	public static enum WilloStatus {
 		NEUTRAL,
@@ -451,6 +451,7 @@ public class EntityWillo extends MonsterEntity implements ILoreTagged {
 		}
 	}
 	
+	@Override
 	public EMagicElement getElement() {
 		return this.dataManager.get(ELEMENT);
 	}

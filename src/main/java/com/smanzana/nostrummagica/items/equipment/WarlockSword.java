@@ -16,9 +16,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityWillo;
-import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.items.IRaytraceOverlay;
 import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.NostrumItems;
@@ -324,16 +322,12 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			}
 		}
 		
-		// Get experience if attacking a golem!
-		if (target instanceof EntityGolem) {
-			EntityGolem golem = (EntityGolem) target;
-			awardExperience(stack, golem.getElement());
-		} else if (target instanceof EntityKoid) {
-			EntityKoid koid = (EntityKoid) target;
-			awardExperience(stack, koid.getElement());
-		} else if (target instanceof EntityWillo) {
-			EntityWillo willo = (EntityWillo) target;
-			awardExperience(stack, willo.getElement());
+		// Get experience if attacking an elemental!
+		if (target instanceof IElementalEntity) {
+			EMagicElement element = ((IElementalEntity) target).getElement();
+			if (element != null) {
+				awardExperience(stack, element);
+			}
 		}
 		
 		return super.hitEntity(stack, target, attacker);

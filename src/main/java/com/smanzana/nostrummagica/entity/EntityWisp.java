@@ -78,7 +78,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantableEntity {
+public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantableEntity, IElementalEntity {
 	
 	public static final String ID = "entity_wisp";
 	
@@ -405,6 +405,7 @@ public class EntityWisp extends GolemEntity implements ILoreSupplier, IEnchantab
 		}
 	}
 	
+	@Override
 	public EMagicElement getElement() {
 		return this.dataManager.get(ELEMENT);
 	}

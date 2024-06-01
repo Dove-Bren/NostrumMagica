@@ -61,7 +61,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
 
-public class EntitySprite extends CreatureEntity implements ILoreSupplier {
+public class EntitySprite extends CreatureEntity implements ILoreSupplier, IElementalEntity {
 	
 	public static final String ID = "entity_sprite";
 
@@ -462,5 +462,10 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier {
 		}
 		
 		return tolerance - worldIn.getLight(pos);
+	}
+
+	@Override
+	public EMagicElement getElement() {
+		return EMagicElement.EARTH;
 	}
 }
