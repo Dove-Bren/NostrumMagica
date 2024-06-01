@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.network.messages.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.messages.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.messages.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.messages.ManaMessage;
+import com.smanzana.nostrummagica.network.messages.PlayerStatSyncMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.network.messages.SpellCraftingCapabilitySyncMessage;
@@ -29,6 +30,7 @@ import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.stats.PlayerStats;
 import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.entity.Entity;
@@ -183,6 +185,11 @@ public class CommonProxy {
 		}
 		
 		NetworkHandler.sendToAllTracking(new ManaMessage(player, mana), player);
+	}
+	
+	public void sendPlayerStatSync(PlayerEntity player) {
+		PlayerStats stats = NostrumMagica.instance.getPlayerStats().get(player);
+		NetworkHandler.sendTo(new PlayerStatSyncMessage(player.getUniqueID(), stats), (ServerPlayerEntity) player);
 	}
 	
 	public void sendManaArmorCapability(PlayerEntity player) {

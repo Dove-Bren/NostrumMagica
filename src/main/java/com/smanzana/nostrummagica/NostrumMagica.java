@@ -37,11 +37,12 @@ import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.items.NostrumItems;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.items.equipment.ReagentBag;
 import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.items.equipment.ReagentBag;
 import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.ManaArmorListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
+import com.smanzana.nostrummagica.listeners.PlayerStatListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
@@ -55,6 +56,7 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
 import com.smanzana.nostrummagica.spells.SpellRegistry;
 import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
+import com.smanzana.nostrummagica.stats.PlayerStatTracker;
 import com.smanzana.nostrummagica.utils.Entities;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
@@ -104,6 +106,7 @@ public class NostrumMagica {
 	public static ItemGroup enhancementTab;
 	public static Logger logger = LogManager.getLogger(MODID);
 	public static PlayerListener playerListener;
+	public static PlayerStatListener statListener;
 	public static MagicEffectProxy magicEffectProxy;
 	public static ManaArmorListener manaArmorListener;
 
@@ -112,6 +115,7 @@ public class NostrumMagica {
 	private static NostrumDimensionMapper serverDimensionMapper;
 	private static PetSoulRegistry petSoulRegistry;
 	private static NostrumKeyRegistry worldKeys;
+	private static PlayerStatTracker playerStats;
 
 	public static boolean initFinished = false;
 	
@@ -129,6 +133,7 @@ public class NostrumMagica {
 		playerListener = new PlayerListener();
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
+		statListener = new PlayerStatListener();
 
 		NostrumMagica.creativeTab = new ItemGroup(MODID) {
 			@Override
@@ -705,31 +710,6 @@ public class NostrumMagica {
 
 	public static List<ITameDragon> getNearbyTamedDragons(LivingEntity entity, double blockRadius,
 			boolean onlyOwned) {
-//		List<ITameDragon> list = new LinkedList<>();
-//
-//		AxisAlignedBB box = new AxisAlignedBB(entity.getPosX() - blockRadius, entity.getPosY() - blockRadius,
-//				entity.getPosZ() - blockRadius, entity.getPosX() + blockRadius, entity.getPosY() + blockRadius,
-//				entity.getPosZ() + blockRadius);
-//
-//		List<EntityTameDragonRed> dragonList = entity.world.getEntitiesWithinAABB(EntityTameDragonRed.class, box,
-//				(dragon) -> {
-//					return dragon instanceof ITameDragon;
-//				});
-//
-//		if (dragonList != null && !dragonList.isEmpty()) {
-//			for (EntityTameDragonRed dragon : dragonList) {
-//				ITameDragon tame = (ITameDragon) dragon;
-//
-//				if (onlyOwned && (!tame.isEntityTamed() || tame.getLivingOwner() != entity)) {
-//					continue;
-//				}
-//
-//				list.add((ITameDragon) dragon);
-//			}
-//		}
-//
-//		return list;
-		
 		double blockRadiusSq = blockRadius * blockRadius;
 		return PetFuncs.GetTamedEntities(entity, (ent) -> {
 			if (!(ent instanceof ITameDragon)) {
@@ -781,6 +761,17 @@ public class NostrumMagica {
 		}
 		return worldKeys;
 	}
+	
+	public PlayerStatTracker getPlayerStats() {
+		if (playerStats == null) {
+			if (proxy.isServer()) {
+				throw new RuntimeException("Accessing PlayerStats before a world has been loaded!");
+			} else {
+				playerStats = new PlayerStatTracker();
+			}
+		}
+		return playerStats;
+	}
 
 	/**
 	 * Finds (or creates) the offset for a player in the sorcery dimension
@@ -804,12 +795,6 @@ public class NostrumMagica {
 				.getSavedData()
 				.getOrCreate(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
 
-		// TODO I think this is automatic now?
-//		if (mapper == null) { // still
-//			mapper = new NostrumDimensionMapper();
-//			worldAccess.getMapStorage().setData(NostrumDimensionMapper.DATA_NAME, mapper);
-//		}
-
 		serverDimensionMapper = mapper;
 		return mapper;
 	}
@@ -817,28 +802,21 @@ public class NostrumMagica {
 	private void initSpellRegistry(World world) {
 		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(SpellRegistry::new,
 				SpellRegistry.DATA_NAME);
-
-		// TODO I think this is automatic now?
-//		if (spellRegistry == null) { // still
-//			spellRegistry = new SpellRegistry();
-//			world.getMapStorage().setData(SpellRegistry.DATA_NAME, spellRegistry);
-//		}
 	}
 
 	private void initPetSoulRegistry(World world) {
 		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PetSoulRegistry::new,
 				PetSoulRegistry.DATA_NAME);
-
-		// TODO I think this is automatic now?
-//		if (petSoulRegistry == null) {
-//			petSoulRegistry = new PetSoulRegistry();
-//			world.getMapStorage().setData(PetSoulRegistry.DATA_NAME, petSoulRegistry);
-//		}
 	}
 
 	private void initWorldKeys(World world) {
 		worldKeys = (NostrumKeyRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(NostrumKeyRegistry::new,
 				NostrumKeyRegistry.DATA_NAME);
+	}
+	
+	private void initPlayerStats(World world) {
+		playerStats = (PlayerStatTracker) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PlayerStatTracker::new,
+				PlayerStatTracker.DATA_NAME);
 	}
 
 	@SubscribeEvent
@@ -867,6 +845,7 @@ public class NostrumMagica {
 			getDimensionMapper(world);
 			initPetSoulRegistry(world);
 			initWorldKeys(world);
+			initPlayerStats(world);
 		}
 	}
 

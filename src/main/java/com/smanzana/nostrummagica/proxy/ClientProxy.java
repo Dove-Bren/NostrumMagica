@@ -942,6 +942,15 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
+	public void sendPlayerStatSync(PlayerEntity player) {
+		if (player.world.isRemote()) {
+			return;
+		}
+		
+		super.sendPlayerStatSync(player);
+	}
+	
+	@Override
 	public void sendManaArmorCapability(PlayerEntity player) {
 		if (player.world.isRemote) {
 			return;
