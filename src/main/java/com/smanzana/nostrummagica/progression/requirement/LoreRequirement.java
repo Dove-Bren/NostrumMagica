@@ -5,7 +5,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
@@ -13,29 +14,32 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class RequirementElementMastery implements IRequirement{
+public class LoreRequirement implements IRequirement{
 
-	private EMagicElement element;
+	private ILoreTagged lore;
 	
-	public RequirementElementMastery(EMagicElement element) {
-		this.element = element;
+	public LoreRequirement(String key) {
+		this(LoreRegistry.instance().lookup(key));
+	}
+	
+	public LoreRequirement(ILoreTagged tagged) {
+		this.lore = tagged;
 	}
 
 	@Override
 	public boolean matches(PlayerEntity player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		Boolean known = attr.getKnownElements().get(element);
-		return (known != null && known);
+		return attr.hasLore(lore);
 	}
 
 	@Override
 	public boolean isValid() {
-		return element != null;
+		return lore != null;
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.element", 
-				new StringTextComponent(element.getName()).mergeStyle(TextFormatting.DARK_RED)));
+	public List<ITextComponent> getDescription(PlayerEntity player) {
+		return Lists.newArrayList(new TranslationTextComponent("info.requirement.lore", 
+				new StringTextComponent(lore.getLoreDisplayName()).mergeStyle(TextFormatting.DARK_BLUE)));
 	}
 }

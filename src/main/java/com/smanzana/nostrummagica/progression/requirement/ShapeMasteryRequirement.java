@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.spells.EAlteration;
+import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
@@ -13,29 +13,28 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class RequirementAlterationMastery implements IRequirement{
+public class ShapeMasteryRequirement implements IRequirement{
 
-	private EAlteration alteration;
+	private final SpellShape shape;
 	
-	public RequirementAlterationMastery(EAlteration alteration) {
-		this.alteration = alteration;
+	public ShapeMasteryRequirement(SpellShape shape) {
+		this.shape = shape;
 	}
 
 	@Override
 	public boolean matches(PlayerEntity player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		Boolean bool = attr.getAlterations().get(alteration);
-		return (bool != null && bool);
+		return attr.getShapes().contains(shape);
 	}
 
 	@Override
 	public boolean isValid() {
-		return alteration != null;
+		return shape != null;
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.alteration", 
-				new StringTextComponent(alteration.getName()).mergeStyle(TextFormatting.AQUA)));
+	public List<ITextComponent> getDescription(PlayerEntity player) {
+		return Lists.newArrayList(new TranslationTextComponent("info.requirement.shape", 
+				new StringTextComponent(shape.getDisplayName()).mergeStyle(TextFormatting.DARK_GREEN)));
 	}
 }

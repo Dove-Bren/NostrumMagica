@@ -17,7 +17,7 @@ public interface IRequirement {
 	 */
 	public abstract boolean isValid();
 	
-	public List<ITextComponent> getDescription();
+	public List<ITextComponent> getDescription(PlayerEntity player);
 	
 	public static IRequirement AND(IRequirement ... requirements) {
 		return new IRequirement() {
@@ -43,10 +43,10 @@ public interface IRequirement {
 			}
 
 			@Override
-			public List<ITextComponent> getDescription() {
+			public List<ITextComponent> getDescription(PlayerEntity player) {
 				List<ITextComponent> list = new ArrayList<>();
 				for (IRequirement req : requirements) {
-					list.addAll(req.getDescription());
+					list.addAll(req.getDescription(player));
 				}
 				return list;
 			}

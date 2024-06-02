@@ -11,6 +11,9 @@ import com.smanzana.nostrummagica.spells.EMagicElement;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class PlayerStat {
 	
@@ -64,9 +67,8 @@ public class PlayerStat {
 	//////////////////////
 	
 	// Generic kills per entity type
-	private static final Map<ResourceLocation, PlayerStat> EntityKills = new HashMap<>();
-	public static final PlayerStat EntityKills(ResourceLocation entRegKey) {return EntityKills.computeIfAbsent(entRegKey, (k) -> new PlayerStat(NostrumMagica.Loc(k.getNamespace() + "_" + k.getPath())));}
-	public static final PlayerStat EntityKills(EntityType<?> type) {return EntityKills(type.getRegistryName());}
+	private static final Map<EntityType<?>, PlayerStat> EntityKills = new HashMap<>();
+	public static final PlayerStat EntityKills(EntityType<?> type) {return EntityKills.computeIfAbsent(type, (t) -> new EntityTypeStat(t, NostrumMagica.Loc("kills.entity")));}
 	// Kills per elementally-attuned entity
 	private static final Map<EMagicElement, PlayerStat> ElementalKillsMap = new EnumMap<>(EMagicElement.class);
 	public static final PlayerStat ElementalKills(EMagicElement element) {return ElementalKillsMap.computeIfAbsent(element, (e) -> new ElementalPlayerStat(e, NostrumMagica.Loc("kills.elementalskilled")));}
@@ -77,9 +79,11 @@ public class PlayerStat {
 	public static final PlayerStat KillsWithMagic = new PlayerStat(NostrumMagica.Loc("kills.totalwithmagic")); 
 
 	private final ResourceLocation id;
+	private final TextComponent name;
 	
 	public PlayerStat(ResourceLocation id) {
 		this.id = id;
+		this.name = new TranslationTextComponent("stat." + this.id.getNamespace() + "." + this.id.getPath()); 
 	}
 	
 	public @Nonnull ResourceLocation getID() {
@@ -95,10 +99,27 @@ public class PlayerStat {
 	public int hashCode() {
 		return id.hashCode() * 1773 + 97;
 	}
+
+	public TextComponent getName() {
+		return name;
+	}
 	
 	public static class ElementalPlayerStat extends PlayerStat {
 		public ElementalPlayerStat(EMagicElement element, ResourceLocation idBase) {
 			super(new ResourceLocation(idBase.getNamespace(), idBase.getPath() + "_" + element.name().toLowerCase()));
+		}
+	}
+	
+	public static class EntityTypeStat extends PlayerStat {
+		private final TextComponent name;
+		public EntityTypeStat(EntityType<?> type, ResourceLocation idBase) {
+			super(new ResourceLocation(idBase.getNamespace(), idBase.getPath() + "." + type.getRegistryName().getNamespace() + "." + type.getRegistryName().getPath()));
+			this.name = (TextComponent) ((TextComponent) type.getName()).append(new StringTextComponent(" ")).append(new TranslationTextComponent("stat." + idBase.getNamespace() + "." + idBase.getPath())); 
+		}
+
+		@Override
+		public TextComponent getName() {
+			return name;
 		}
 	}
 	

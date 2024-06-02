@@ -17,12 +17,12 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class RequirementSpellKnowledge implements IRequirement{
+public class SpellKnowledgeRequirement implements IRequirement{
 
 	private final EMagicElement element;
 	private final @Nullable EAlteration alteration;
 	
-	public RequirementSpellKnowledge(EMagicElement element, @Nullable EAlteration alteration) {
+	public SpellKnowledgeRequirement(EMagicElement element, @Nullable EAlteration alteration) {
 		this.element = element;
 		this.alteration = alteration;
 	}
@@ -39,7 +39,7 @@ public class RequirementSpellKnowledge implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<ITextComponent> getDescription(PlayerEntity player) {
 		SpellAction action = Spell.solveAction(alteration, element, 1);
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.spellknowledge", 
 				new TranslationTextComponent("effect." + action.getName() + ".name").mergeStyle(TextFormatting.DARK_PURPLE)));

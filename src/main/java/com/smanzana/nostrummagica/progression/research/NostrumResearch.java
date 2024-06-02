@@ -13,9 +13,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
-import com.smanzana.nostrummagica.progression.requirement.RequirementLore;
-import com.smanzana.nostrummagica.progression.requirement.RequirementQuest;
-import com.smanzana.nostrummagica.progression.requirement.RequirementSpellKnowledge;
+import com.smanzana.nostrummagica.progression.requirement.LoreRequirement;
+import com.smanzana.nostrummagica.progression.requirement.QuestRequirement;
+import com.smanzana.nostrummagica.progression.requirement.SpellKnowledgeRequirement;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -248,22 +248,22 @@ public class NostrumResearch {
 		}
 		
 		public Builder lore(String lore) {
-			this.requirements.add(new RequirementLore(lore));
+			this.requirements.add(new LoreRequirement(lore));
 			return this;
 		}
 		
 		public Builder lore(ILoreTagged lore) {
-			this.requirements.add(new RequirementLore(lore));
+			this.requirements.add(new LoreRequirement(lore));
 			return this;
 		}
 		
 		public Builder quest(String quest) {
-			this.requirements.add(new RequirementQuest(quest));
+			this.requirements.add(new QuestRequirement(quest));
 			return this;
 		}
 		
 		public Builder spellComponent(EMagicElement element, EAlteration alteration) {
-			this.requirements.add(new RequirementSpellKnowledge(element, alteration));
+			this.requirements.add(new SpellKnowledgeRequirement(element, alteration));
 			return this;
 		}
 		

@@ -68,10 +68,10 @@ import com.smanzana.nostrummagica.progression.quests.objectives.ObjectiveKill;
 import com.smanzana.nostrummagica.progression.quests.objectives.ObjectiveRitual;
 import com.smanzana.nostrummagica.progression.quests.objectives.ObjectiveSpellCast;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
-import com.smanzana.nostrummagica.progression.requirement.RequirementAlterationMastery;
-import com.smanzana.nostrummagica.progression.requirement.RequirementElementMastery;
-import com.smanzana.nostrummagica.progression.requirement.RequirementResearch;
-import com.smanzana.nostrummagica.progression.requirement.RequirementShapeMastery;
+import com.smanzana.nostrummagica.progression.requirement.AlterationMasteryRequirement;
+import com.smanzana.nostrummagica.progression.requirement.ElementMasteryRequirement;
+import com.smanzana.nostrummagica.progression.requirement.ResearchRequirement;
+import com.smanzana.nostrummagica.progression.requirement.ShapeMasteryRequirement;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
@@ -258,8 +258,8 @@ public class ModInit {
 							new ReagentType[] { ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT,
 									ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST },
 							Ingredient.fromStacks(EssenceItem.getEssence(element, 1)),
-							IRequirement.AND(new RequirementElementMastery(element),
-									new RequirementResearch("spellrunes")),
+							IRequirement.AND(new ElementMasteryRequirement(element),
+									new ResearchRequirement("spellrunes")),
 							new OutcomeSpawnItem(SpellRune.getRune(element)));
 			registry.register(recipe);
 		}
@@ -273,8 +273,8 @@ public class ModInit {
 					Ingredient.fromTag(NostrumTags.Items.MagicToken),
 					new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(shape.getCraftItem()), Ingredient.EMPTY,
 							Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
-					IRequirement.AND(new RequirementShapeMastery(shape),
-							new RequirementResearch("spellrunes")),
+					IRequirement.AND(new ShapeMasteryRequirement(shape),
+							new ResearchRequirement("spellrunes")),
 					new OutcomeSpawnItem(SpellRune.getRune(shape)));
 			registry.register(recipe);
 		}
@@ -316,8 +316,8 @@ public class ModInit {
 					new ReagentType[] {
 							ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.GRAVE_DUST },
 					Ingredient.fromStacks(alteration.getCraftItem()),
-					IRequirement.AND(new RequirementAlterationMastery(alteration),
-							new RequirementResearch("spellrunes")),
+					IRequirement.AND(new AlterationMasteryRequirement(alteration),
+							new ResearchRequirement("spellrunes")),
 					new OutcomeSpawnItem(SpellRune.getRune(alteration)));
 			registry.register(recipe);
 		}
@@ -325,48 +325,48 @@ public class ModInit {
 		// Boons
 		{
 			recipe = RitualRecipe.createTier1("buff.luck", new ItemStack(Items.RABBIT_FOOT), EMagicElement.PHYSICAL,
-					ReagentType.SPIDER_SILK, new RequirementResearch("boon"),
+					ReagentType.SPIDER_SILK, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.LUCK, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.speed", new ItemStack(Items.ARROW), EMagicElement.WIND,
-					ReagentType.SKY_ASH, new RequirementResearch("boon"),
+					ReagentType.SKY_ASH, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.SPEED, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.strength", new ItemStack(Items.IRON_SWORD), EMagicElement.FIRE,
-					ReagentType.MANDRAKE_ROOT, new RequirementResearch("boon"),
+					ReagentType.MANDRAKE_ROOT, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.STRENGTH, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.leaping",
 					new ItemStack(Blocks.QUARTZ_STAIRS), EMagicElement.LIGHTNING,
-					ReagentType.MANI_DUST, new RequirementResearch("boon"),
+					ReagentType.MANI_DUST, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.JUMP_BOOST, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.regen", new ItemStack(Items.GOLDEN_APPLE), EMagicElement.EARTH,
-					ReagentType.GINSENG, new RequirementResearch("boon"),
+					ReagentType.GINSENG, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.REGENERATION, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.fireresist", new ItemStack(Items.MAGMA_CREAM), EMagicElement.FIRE,
-					ReagentType.CRYSTABLOOM, new RequirementResearch("boon"),
+					ReagentType.CRYSTABLOOM, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.FIRE_RESISTANCE, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.invisibility", new ItemStack(Items.ENDER_EYE), EMagicElement.ENDER,
-					ReagentType.GRAVE_DUST, new RequirementResearch("boon"),
+					ReagentType.GRAVE_DUST, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.INVISIBILITY, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.nightvision", new ItemStack(Items.GOLDEN_CARROT),
-					EMagicElement.PHYSICAL, ReagentType.BLACK_PEARL, new RequirementResearch("boon"),
+					EMagicElement.PHYSICAL, ReagentType.BLACK_PEARL, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.NIGHT_VISION, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.waterbreathing", new ItemStack(Items.SALMON), EMagicElement.ICE,
-					ReagentType.MANI_DUST, new RequirementResearch("boon"),
+					ReagentType.MANI_DUST, new ResearchRequirement("boon"),
 					new OutcomePotionEffect(Effects.WATER_BREATHING, 0, 120 * 20));
 			registry.register(recipe);
 		}
@@ -388,11 +388,11 @@ public class ModInit {
 				Ingredient.fromTag(NostrumTags.Items.InfusedGemEarth),
 				new Ingredient[] { enderpearl, Ingredient.fromStacks(new ItemStack(Items.COMPASS)),
 						Ingredient.fromStacks(new ItemStack(Items.MAP)), enderpearl },
-				new RequirementResearch("markrecall"), new OutcomeMark());
+				new ResearchRequirement("markrecall"), new OutcomeMark());
 		registry.register(recipe);
 
 		recipe = RitualRecipe.createTier1("recall", new ItemStack(Items.COMPASS), EMagicElement.LIGHTNING,
-				ReagentType.SKY_ASH, new RequirementResearch("markrecall"), new OutcomeRecall());
+				ReagentType.SKY_ASH, new ResearchRequirement("markrecall"), new OutcomeRecall());
 		registry.register(recipe);
 
 		// medium crystal -- tier 2. Small crystal, reagents, basic crystal
@@ -401,7 +401,7 @@ public class ModInit {
 				.register(RitualRecipe.createTier2("kani", new ItemStack(NostrumItems.crystalMedium), null,
 						new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.GINSENG,
 								ReagentType.GRAVE_DUST },
-						Ingredient.fromTag(NostrumTags.Items.CrystalSmall), new RequirementResearch("kani"),
+						Ingredient.fromTag(NostrumTags.Items.CrystalSmall), new ResearchRequirement("kani"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.crystalMedium))));
 
 		// large crystal -- tier 3. Medium crystal, 4 medium crystals, reagents, basic
@@ -413,13 +413,13 @@ public class ModInit {
 						new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.MANI_DUST, ReagentType.BLACK_PEARL,
 								ReagentType.CRYSTABLOOM },
 						crystal, new Ingredient[] { crystal, crystal, crystal, crystal },
-						new RequirementResearch("vani"),
+						new ResearchRequirement("vani"),
 						new OutcomeSpawnItem( new ItemStack(NostrumItems.crystalLarge))));
 
 		// magic token -- tier 1. Mani dust.
 		registry
 				.register(RitualRecipe.createTier1("magic_token", new ItemStack(NostrumItems.resourceToken),
-						null, ReagentType.MANI_DUST, new RequirementResearch("magic_token"),
+						null, ReagentType.MANI_DUST, new ResearchRequirement("magic_token"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceToken))));
 
 		// magic token x 3 -- tier 3. 9 reagents.
@@ -433,7 +433,7 @@ public class ModInit {
 										Ingredient.fromTag(NostrumTags.Items.ReagentManiDust),
 										Ingredient.fromTag(NostrumTags.Items.ReagentSkyAsh),
 										Ingredient.fromTag(NostrumTags.Items.ReagentSpiderSilk) },
-								new RequirementResearch("magic_token_3"),
+								new ResearchRequirement("magic_token_3"),
 								new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceToken, 3))));
 
 		// essence plant seed
@@ -445,7 +445,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.Essence),
 						Ingredient.fromTag(NostrumTags.Items.Essence),
 						Ingredient.fromItems(NostrumItems.reagentSeedGinseng) },
-				new RequirementResearch("essence_seeds"), new OutcomeSpawnItem(new ItemStack(NostrumItems.reagentSeedEssence))));
+				new ResearchRequirement("essence_seeds"), new OutcomeSpawnItem(new ItemStack(NostrumItems.reagentSeedEssence))));
 		
 		// fierce slab -- tier 3. Kani crystal. Fire + Wind gems
 		registry
@@ -456,7 +456,7 @@ public class ModInit {
 						crystal,
 						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.InfusedGemFire), Ingredient.EMPTY,
 								Ingredient.EMPTY, Ingredient.fromTag(NostrumTags.Items.InfusedGemWind) },
-						new RequirementResearch("fierce_infusion"),
+						new ResearchRequirement("fierce_infusion"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabFierce))));
 
 		// kind slab -- tier 3. Kani crystal. Ice + Earth gems
@@ -467,7 +467,7 @@ public class ModInit {
 				crystal,
 				new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.InfusedGemIce), Ingredient.EMPTY,
 						Ingredient.EMPTY, Ingredient.fromTag(NostrumTags.Items.InfusedGemEarth) },
-				new RequirementResearch("kind_infusion"),
+				new ResearchRequirement("kind_infusion"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabKind))));
 
 		// balanced slab -- tier 3. Vani crystal. Fierce and Kind slabs, + ender and
@@ -481,7 +481,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.InfusedGemEnder),
 						Ingredient.fromTag(NostrumTags.Items.InfusedGemLightning),
 						Ingredient.fromTag(NostrumTags.Items.SlabFierce) },
-				new RequirementResearch("balanced_infusion"),
+				new ResearchRequirement("balanced_infusion"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabBalanced))));
 
 		// Thano Pendant -- tier 3. gold ingot. Paliv + Cerci fragments + 2 mani
@@ -494,7 +494,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
 						Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
 						Ingredient.fromStacks(new ItemStack(NostrumItems.resourcePendantRight)) },
-				new RequirementResearch("thano_pendant"),
+				new ResearchRequirement("thano_pendant"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.thanoPendant))));
 
 		// Obelisk -- tier 3. Vani crystal. Balanced slab, 2 eyes of ender, compass.
@@ -505,7 +505,7 @@ public class ModInit {
 				Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 				new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.SlabBalanced),
 						Ingredient.fromItems(Items.ENDER_EYE), Ingredient.fromItems(Items.ENDER_EYE), Ingredient.fromItems(Items.COMPASS) },
-				new RequirementResearch("obelisks"), new OutcomeCreateObelisk()));
+				new ResearchRequirement("obelisks"), new OutcomeCreateObelisk()));
 
 		// GeoGem -- tier 3. Compass center. 2x Crystal, 2x reagent, Earth Crystal
 		registry
@@ -518,7 +518,7 @@ public class ModInit {
 										Ingredient.fromTag(NostrumTags.Items.Reagent),
 										Ingredient.fromTag(NostrumTags.Items.Reagent),
 										Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
-								new RequirementResearch("geogems"),
+								new ResearchRequirement("geogems"),
 								new OutcomeSpawnItem(new ItemStack(NostrumItems.positionCrystal, 4))));
 
 		// GeoToken -- tier 3. Geogem center. Magic Token, earth crystal, blank scroll,
@@ -532,7 +532,7 @@ public class ModInit {
 								Ingredient.fromItems(NostrumItems.resourceToken),
 								Ingredient.fromTag(NostrumTags.Items.InfusedGemEarth),
 								Ingredient.fromItems(NostrumItems.blankScroll) },
-						new RequirementResearch("geotokens"), new OutcomeConstructGeotoken(1)));
+						new ResearchRequirement("geotokens"), new OutcomeConstructGeotoken(1)));
 
 		// GeoToken clone -- tier 3. Geotoken center. Magic Tokens and mani crystal
 		registry.register(RitualRecipe.createTier3("geotoken_3", "geotoken",
@@ -543,7 +543,7 @@ public class ModInit {
 						Ingredient.fromItems(NostrumItems.resourceToken),
 						Ingredient.fromItems(NostrumItems.resourceToken),
 						Ingredient.fromItems(NostrumItems.resourceToken) },
-				new RequirementResearch("geotokens"), new OutcomeConstructGeotoken(4)));
+				new ResearchRequirement("geotokens"), new OutcomeConstructGeotoken(4)));
 
 		// Mystic Anchor
 		registry.register(RitualRecipe.createTier3("mystic_anchor", new ItemStack(NostrumBlocks.mysticAnchor),
@@ -554,7 +554,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.SpriteCore),
 								Ingredient.fromItems(Items.ENDER_PEARL),
 								Ingredient.fromTag(NostrumTags.Items.Rose) },
-						new RequirementResearch("mystic_anchor"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mysticAnchor))));
+						new ResearchRequirement("mystic_anchor"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mysticAnchor))));
 
 		// Tele to obelisk -- tier 2. Position gem, reagents
 		registry
@@ -562,7 +562,7 @@ public class ModInit {
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 								ReagentType.SPIDER_SILK },
-						Ingredient.fromItems(NostrumItems.positionCrystal), new RequirementResearch("obelisks"),
+						Ingredient.fromItems(NostrumItems.positionCrystal), new ResearchRequirement("obelisks"),
 						new OutcomeTeleportObelisk()));
 
 		// Spawn Koids -- tier 3. Kani center. Magic Token, gold, gold, essence
@@ -574,7 +574,7 @@ public class ModInit {
 				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.MagicToken),
 						Ingredient.fromTag(NostrumTags.Items.Essence),
 						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
-				new RequirementResearch("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
+				new ResearchRequirement("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
 					public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem) {
 						EntityKoid koid = new EntityKoid(NostrumEntityTypes.koid, world);
@@ -598,7 +598,7 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
 						Ingredient.fromItems(Items.BLAZE_POWDER),
 						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
-				new RequirementResearch("elemental_trials"),
+				new ResearchRequirement("elemental_trials"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.masteryOrb))));
 
 		// Spell Tome Creation
@@ -608,14 +608,14 @@ public class ModInit {
 				Ingredient.fromTag(NostrumTags.Items.TomePlate),
 				new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.fromItems(NostrumItems.spellTomePage),
 						Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.fromItems(NostrumItems.spellTomePage) },
-				new RequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
+				new ResearchRequirement("spelltomes_advanced"), new OutcomeCreateTome()));
 		registry.register(RitualRecipe.createTier3("tome2", "tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 				new ReagentType[] {
 						ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST },
 				Ingredient.fromTag(NostrumTags.Items.TomePlate),
 				new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.fromItems(NostrumItems.spellTomePage),
 						Ingredient.EMPTY, Ingredient.fromItems(NostrumItems.spellTomePage) },
-				new RequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
+				new ResearchRequirement("spelltomes_advanced"), new OutcomeCreateTome()));
 		registry
 				.register(RitualRecipe.createTier3("tome3", "tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK,
@@ -623,7 +623,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.TomePlate),
 						new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.EMPTY, Ingredient.EMPTY,
 								Ingredient.fromItems(NostrumItems.spellTomePage) },
-						new RequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
+						new ResearchRequirement("spelltomes_advanced"), new OutcomeCreateTome()));
 		registry
 				.register(RitualRecipe.createTier3("tome4", "tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK,
@@ -631,12 +631,12 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.TomePlate),
 						new Ingredient[] { Ingredient.fromItems(NostrumItems.spellTomePage), Ingredient.EMPTY, Ingredient.EMPTY,
 								Ingredient.EMPTY },
-						new RequirementResearch("spelltomes_advanced"), new OutcomeCreateTome()));
+						new ResearchRequirement("spelltomes_advanced"), new OutcomeCreateTome()));
 		registry.register(RitualRecipe.createTier2("tome5", "tome", new ItemStack(NostrumItems.spellTomeNovice), null,
 				new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK,
 						ReagentType.MANI_DUST },
 				Ingredient.fromTag(NostrumTags.Items.TomePlate),
-				new RequirementResearch("spelltomes"), new OutcomeCreateTome()));
+				new ResearchRequirement("spelltomes"), new OutcomeCreateTome()));
 
 		// Spell Binding
 		registry
@@ -648,7 +648,7 @@ public class ModInit {
 								Ingredient.fromItems(NostrumItems.spellScroll),
 								Ingredient.fromTag(NostrumTags.Items.MagicToken),
 								Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
-						new RequirementResearch("spellbinding"), new OutcomeBindSpell()));
+						new ResearchRequirement("spellbinding"), new OutcomeBindSpell()));
 
 		// Magic Charms
 		for (EMagicElement element : EMagicElement.values()) {
@@ -657,7 +657,7 @@ public class ModInit {
 							MagicCharm.getCharm(element, 1), null,
 							new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST,
 									ReagentType.MANDRAKE_ROOT },
-							Ingredient.fromItems(EssenceItem.getEssenceItem(element)), new RequirementResearch("charms"),
+							Ingredient.fromItems(EssenceItem.getEssenceItem(element)), new ResearchRequirement("charms"),
 							new OutcomeSpawnItem(MagicCharm.getCharm(element, 8))));
 		}
 
@@ -673,7 +673,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.DragonWing),
 								Ingredient.fromTag(NostrumTags.Items.CrystalMedium)
 								},
-						new RequirementResearch("stat_items_wing"),
+						new ResearchRequirement("stat_items_wing"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 
 		// Mirror from roses
@@ -688,7 +688,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.RoseBlood),
 								Ingredient.fromTag(NostrumTags.Items.RoseBlood)
 								},
-						new RequirementResearch("stat_items_adv"),
+						new ResearchRequirement("stat_items_adv"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 		registry
 		.register(RitualRecipe.createTier3("form_primordial_mirror_pale", "form_primordial_mirror",
@@ -701,7 +701,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.RosePale),
 						Ingredient.fromTag(NostrumTags.Items.RosePale)
 						},
-				new RequirementResearch("stat_items_adv"),
+				new ResearchRequirement("stat_items_adv"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 		registry
 		.register(RitualRecipe.createTier3("form_primordial_mirror_eldrich", "form_primordial_mirror", 
@@ -714,7 +714,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.RoseEldrich),
 						Ingredient.fromTag(NostrumTags.Items.RoseEldrich)
 						},
-				new RequirementResearch("stat_items_adv"),
+				new ResearchRequirement("stat_items_adv"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 
 		// Ooze
@@ -727,7 +727,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 								Ingredient.fromTag(NostrumTags.Items.RosePale),
 								Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
-						new RequirementResearch("stat_items"),
+						new ResearchRequirement("stat_items"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillOoze))));
 
 		// Flute
@@ -741,7 +741,7 @@ public class ModInit {
 										Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 										Ingredient.fromTag(NostrumTags.Items.RoseBlood),
 										Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
-								new RequirementResearch("stat_items"),
+								new ResearchRequirement("stat_items"),
 								new OutcomeSpawnItem(new ItemStack(NostrumItems.skillFlute))));
 
 		// Pendant
@@ -754,7 +754,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 						Ingredient.fromTag(NostrumTags.Items.RoseEldrich),
 						Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
-				new RequirementResearch("stat_items"),
+				new ResearchRequirement("stat_items"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillPendant))));
 
 		// Ender pin
@@ -767,7 +767,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 								Ingredient.fromTag(NostrumTags.Items.EnderBristle),
 										Ingredient.fromTag(NostrumTags.Items.EnderBristle) },
-						new RequirementResearch("ender_pin"),
+						new ResearchRequirement("ender_pin"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillEnderPin))));
 
 		// Mirror Shield
@@ -780,7 +780,7 @@ public class ModInit {
 				Ingredient.fromItems(Items.SHIELD),
 				new Ingredient[] { extra, Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 						Ingredient.fromTag(Tags.Items.GLASS_PANES), extra },
-				new RequirementResearch("mirror_shield"),
+				new ResearchRequirement("mirror_shield"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShield))));
 
 		extra = (NostrumMagica.instance.curios.isEnabled() ? Ingredient.fromItems(NostrumCurios.mediumRibbon)
@@ -793,7 +793,7 @@ public class ModInit {
 						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.PendantLeft),
 								Ingredient.fromTag(NostrumTags.Items.CrystalLarge), extra,
 								Ingredient.fromTag(NostrumTags.Items.PendantRight) },
-						new RequirementResearch("true_mirror_shield"),
+						new ResearchRequirement("true_mirror_shield"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShieldImproved))));
 
 		registry
@@ -801,7 +801,7 @@ public class ModInit {
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT,
 								ReagentType.MANI_DUST },
-						Ingredient.fromItems(NostrumItems.resourceSeekingGem), new RequirementResearch("sorceryportal"),
+						Ingredient.fromItems(NostrumItems.resourceSeekingGem), new ResearchRequirement("sorceryportal"),
 						new OutcomeCreatePortal()));
 
 		registry
@@ -813,7 +813,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 								Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								Ingredient.fromItems(NostrumItems.mageStaff) },
-						new RequirementResearch("warlock_sword"),
+						new ResearchRequirement("warlock_sword"),
 						new OutcomeSpawnItem(WarlockSword.addCapacity(new ItemStack(NostrumItems.warlockSword), 10))));
 
 		registry
@@ -826,7 +826,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.SlabFierce),
 								Ingredient.EMPTY
 								},
-						new RequirementResearch("mage_blade"),
+						new ResearchRequirement("mage_blade"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.mageBlade))));
 		
 		registry.register(RitualRecipe.createTier3("spawn_sword_fire", new ItemStack(NostrumItems.flameRod),
@@ -838,7 +838,7 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.RODS_BLAZE),
 						Ingredient.EMPTY
 						},
-				new RequirementResearch("sword_fire"),
+				new ResearchRequirement("sword_fire"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.flameRod))));
 		
 		registry.register(RitualRecipe.createTier3("spawn_sword_ender", new ItemStack(NostrumItems.enderRod),
@@ -850,7 +850,7 @@ public class ModInit {
 						Ingredient.fromItems(Items.END_ROD),
 						Ingredient.EMPTY
 						},
-				new RequirementResearch("sword_ender"),
+				new ResearchRequirement("sword_ender"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.enderRod))));
 		
 		registry.register(RitualRecipe.createTier3("spawn_sword_earth", new ItemStack(NostrumItems.earthPike),
@@ -862,7 +862,7 @@ public class ModInit {
 						Ingredient.fromItems(Items.DIAMOND_PICKAXE),
 						Ingredient.EMPTY
 						},
-				new RequirementResearch("sword_earth"),
+				new ResearchRequirement("sword_earth"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.earthPike))));
 		
 		registry.register(RitualRecipe.createTier3("spawn_sword_physical", new ItemStack(NostrumItems.deepMetalAxe),
@@ -874,7 +874,7 @@ public class ModInit {
 						Ingredient.fromItems(Items.SHULKER_SHELL),
 						Ingredient.EMPTY
 						},
-				new RequirementResearch("sword_physical"),
+				new ResearchRequirement("sword_physical"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.deepMetalAxe))));
 
 		registry.register(RitualRecipe.createTier3("create_seeking_gem",
@@ -887,7 +887,7 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
 						Ingredient.EMPTY
 						},
-				new RequirementResearch("seeking_gems"),
+				new ResearchRequirement("seeking_gems"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSeekingGem))));
 
 		// Rituals for base the magic armors
@@ -938,7 +938,7 @@ public class ModInit {
 							new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 									ReagentType.MANI_DUST },
 							input, new Ingredient[] { essence, gem, essence, essence },
-							new RequirementResearch(research), new OutcomeSpawnItem(outcome.copy())));
+							new ResearchRequirement(research), new OutcomeSpawnItem(outcome.copy())));
 				}
 			}
 		}
@@ -973,7 +973,7 @@ public class ModInit {
 								input,
 								new Ingredient[] { Ingredient.fromTag(Tags.Items.OBSIDIAN),
 										wings, augment, Ingredient.fromTag(NostrumTags.Items.CrystalLarge) },
-								new RequirementResearch(research), outcome));
+								new ResearchRequirement(research), outcome));
 			}
 		}
 		
@@ -1016,7 +1016,7 @@ public class ModInit {
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 								ReagentType.MANI_DUST },
 						input, new Ingredient[] { essence, gem, essence, essence },
-						new RequirementResearch(research), new OutcomeSpawnItem(outcome.copy())));
+						new ResearchRequirement(research), new OutcomeSpawnItem(outcome.copy())));
 			}
 		}
 
@@ -1092,7 +1092,7 @@ public class ModInit {
 								new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 										ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
 								base, new Ingredient[] { Ingredient.EMPTY, base, cost, Ingredient.EMPTY },
-								new RequirementResearch("dragon_armor"), new OutcomeSpawnItem(result.copy())));
+								new ResearchRequirement("dragon_armor"), new OutcomeSpawnItem(result.copy())));
 
 				if (prev != Ingredient.EMPTY) {
 					// Upgrade ritual
@@ -1103,7 +1103,7 @@ public class ModInit {
 									new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 											ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
 									prev, new Ingredient[] { Ingredient.EMPTY, augment, cost, Ingredient.EMPTY },
-									new RequirementResearch("dragon_armor"), new OutcomeSpawnItem(result.copy())));
+									new ResearchRequirement("dragon_armor"), new OutcomeSpawnItem(result.copy())));
 				}
 			}
 		}
@@ -1118,7 +1118,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 						Ingredient.EMPTY,
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON) },
-				new RequirementResearch("hookshot_medium"), new OutcomeSpawnItem(
+				new ResearchRequirement("hookshot_medium"), new OutcomeSpawnItem(
 						new ItemStack(NostrumItems.hookshotMedium))));
 
 		registry.register(RitualRecipe.createTier3("improve_hookshot_strong",
@@ -1130,7 +1130,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON) },
-				new RequirementResearch("hookshot_strong"), new OutcomeSpawnItem(
+				new ResearchRequirement("hookshot_strong"), new OutcomeSpawnItem(
 						new ItemStack(NostrumItems.hookshotStrong))));
 
 		registry.register(RitualRecipe.createTier3("improve_hookshot_claw",
@@ -1142,7 +1142,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON),
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_IRON) },
-				new RequirementResearch("hookshot_claw"), new OutcomeSpawnItem(
+				new ResearchRequirement("hookshot_claw"), new OutcomeSpawnItem(
 						new ItemStack(NostrumItems.hookshotClaw))));
 
 		// Reagent bag
@@ -1155,7 +1155,7 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.LEATHER),
 						Ingredient.fromTag(Tags.Items.LEATHER),
 						},
-				new RequirementResearch("reagent_bag"), new OutcomeSpawnItem(new ItemStack(NostrumItems.reagentBag))));
+				new ResearchRequirement("reagent_bag"), new OutcomeSpawnItem(new ItemStack(NostrumItems.reagentBag))));
 
 		// Rune bag
 		registry.register(RitualRecipe.createTier3(
@@ -1167,7 +1167,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.RuneAny),
 						Ingredient.fromTag(Tags.Items.LEATHER)
 						},
-				new RequirementResearch("rune_bag"), new OutcomeSpawnItem(new ItemStack(NostrumItems.runeBag))));
+				new ResearchRequirement("rune_bag"), new OutcomeSpawnItem(new ItemStack(NostrumItems.runeBag))));
 
 		// Mage Staff
 		registry.register(RitualRecipe.createTier3("mage_staff", new ItemStack(NostrumItems.mageStaff),
@@ -1179,7 +1179,7 @@ public class ModInit {
 						Ingredient.fromTag(ItemTags.PLANKS),
 						Ingredient.fromTag(ItemTags.PLANKS),
 						Ingredient.fromTag(Tags.Items.LEATHER) },
-				new RequirementResearch("mage_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.mageStaff))));
+				new ResearchRequirement("mage_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.mageStaff))));
 
 		// Thanos Staff
 		registry.register(RitualRecipe.createTier3("thanos_staff",
@@ -1190,7 +1190,7 @@ public class ModInit {
 				new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
 						Ingredient.fromItems(NostrumItems.mageStaff), Ingredient.fromItems(NostrumItems.mageStaff),
 						Ingredient.fromTag(NostrumTags.Items.CrystalSmall) },
-				new RequirementResearch("thanos_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.thanosStaff))));
+				new ResearchRequirement("thanos_staff"), new OutcomeSpawnItem(new ItemStack(NostrumItems.thanosStaff))));
 
 		// Lore Table
 		registry.register(RitualRecipe.createTier3("lore_table", new ItemStack(NostrumBlocks.loreTable),
@@ -1201,7 +1201,7 @@ public class ModInit {
 				new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
 						Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(Blocks.CRAFTING_TABLE),
 						Ingredient.fromTag(ItemTags.PLANKS) },
-				new RequirementResearch("loretable"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.loreTable))));
+				new ResearchRequirement("loretable"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.loreTable))));
 
 		// Modification Table
 		registry
@@ -1212,7 +1212,7 @@ public class ModInit {
 						new Ingredient[] { Ingredient.fromTag(ItemTags.PLANKS),
 								Ingredient.fromItems(Items.PAPER), Ingredient.fromItems(NostrumBlocks.loreTable),
 								Ingredient.fromTag(ItemTags.PLANKS) },
-						new RequirementResearch("modification_table"),
+						new ResearchRequirement("modification_table"),
 						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.modificationTable))));
 
 		// Teleport Runes
@@ -1226,7 +1226,7 @@ public class ModInit {
 								Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
 								Ingredient.fromItems(NostrumItems.chalkItem),
 								Ingredient.fromTag(NostrumTags.Items.CrystalSmall) },
-						new RequirementResearch("teleportrune"),
+						new ResearchRequirement("teleportrune"),
 						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.teleportRune, 2))));
 
 		// Putter
@@ -1234,7 +1234,7 @@ public class ModInit {
 				.register(RitualRecipe.createTier2("putter", new ItemStack(NostrumBlocks.putterBlock), null,
 						new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL,
 								ReagentType.BLACK_PEARL },
-						Ingredient.fromItems(Blocks.DROPPER), new RequirementResearch("putter"),
+						Ingredient.fromItems(Blocks.DROPPER), new ResearchRequirement("putter"),
 						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.putterBlock))));
 
 		// Active Hopper
@@ -1244,7 +1244,7 @@ public class ModInit {
 				Ingredient.fromItems(Blocks.HOPPER),
 				new Ingredient[] { Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)), Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE),
 						Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)), Ingredient.fromStacks(new ItemStack(Blocks.HOPPER)) },
-				new RequirementResearch("active_hopper"),
+				new ResearchRequirement("active_hopper"),
 				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.activeHopper, 4))));
 
 		// Item Duct
@@ -1257,7 +1257,7 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.INGOTS_IRON),
 						Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE),
 						},
-				new RequirementResearch("item_duct"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.itemDuct, 16))));
+				new ResearchRequirement("item_duct"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.itemDuct, 16))));
 
 		// Facade
 		registry.register(RitualRecipe.createTier3("mimic_facade", new ItemStack(NostrumBlocks.mimicFacade),
@@ -1270,7 +1270,7 @@ public class ModInit {
 						Ingredient.fromItems(NostrumItems.reagentManiDust),
 						Ingredient.fromItems(Items.GLOWSTONE)
 						},
-				new RequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mimicFacade, 8))));
+				new ResearchRequirement("magicfacade"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mimicFacade, 8))));
 
 		// Door
 		registry.register(RitualRecipe.createTier3("mimic_door", new ItemStack(NostrumBlocks.mimicDoor),
@@ -1283,7 +1283,7 @@ public class ModInit {
 						Ingredient.fromStacks(new ItemStack(NostrumBlocks.mimicFacade)),
 						Ingredient.fromStacks(new ItemStack(NostrumBlocks.mimicFacade))
 						},
-				new RequirementResearch("magicfacade"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mimicDoor, 1))));
+				new ResearchRequirement("magicfacade"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mimicDoor, 1))));
 
 		// Dragon revive
 		registry
@@ -1293,7 +1293,7 @@ public class ModInit {
 						Ingredient.fromItems(NostrumItems.dragonSoulItem),
 						new Ingredient[] { Ingredient.EMPTY, Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								Ingredient.fromTag(Tags.Items.EGGS), Ingredient.EMPTY },
-						new RequirementResearch("soulbound_pets"), new OutcomeReviveSoulboundPet()));
+						new ResearchRequirement("soulbound_pets"), new OutcomeReviveSoulboundPet()));
 
 		// Wolf revive
 		registry
@@ -1303,7 +1303,7 @@ public class ModInit {
 						Ingredient.fromItems(NostrumItems.arcaneWolfSoulItem),
 						new Ingredient[] { Ingredient.EMPTY, Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								Ingredient.fromTag(Tags.Items.EGGS), Ingredient.EMPTY },
-						new RequirementResearch("soulbound_pets"), new OutcomeReviveSoulboundPet()));
+						new ResearchRequirement("soulbound_pets"), new OutcomeReviveSoulboundPet()));
 
 		// Soul dagger
 		registry.register(RitualRecipe.createTier3("spawn_soul_dagger",
@@ -1314,7 +1314,7 @@ public class ModInit {
 						Ingredient.fromItems(AspectedWeapon.get(EMagicElement.LIGHTNING, AspectedWeapon.Type.NOVICE)),
 						Ingredient.fromTag(NostrumTags.Items.SlabFierce),
 						Ingredient.fromItems(AspectedWeapon.get(EMagicElement.ICE, AspectedWeapon.Type.NOVICE)) },
-				new RequirementResearch("soul_daggers"),
+				new ResearchRequirement("soul_daggers"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.soulDagger))));
 
 		// Mark wolf for transformation
@@ -1327,7 +1327,7 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.BONES),
 						Ingredient.fromTag(NostrumTags.Items.SlabKind),
 						Ingredient.fromTag(NostrumTags.Items.ReagentManiDust) },
-				new RequirementResearch("wolf_transformation"), new OutcomeApplyTransformation(20 * 60, (e) -> {
+				new ResearchRequirement("wolf_transformation"), new OutcomeApplyTransformation(20 * 60, (e) -> {
 					return e instanceof WolfEntity;
 				})));
 
@@ -1342,7 +1342,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
 								Ingredient.fromTag(Tags.Items.GEMS_EMERALD)
 								},
-						new RequirementResearch("paradox_mirrors"),
+						new ResearchRequirement("paradox_mirrors"),
 						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.paradoxMirror, 2))));
 
 		// Mana Armorer
@@ -1356,7 +1356,7 @@ public class ModInit {
 										Ingredient.fromItems(NostrumItems.resourceManaLeaf),
 										Ingredient.fromTag(NostrumTags.Items.SlabBalanced),
 										Ingredient.fromItems(NostrumItems.dragonEggFragment) },
-								new RequirementResearch("mana_armor"),
+								new ResearchRequirement("mana_armor"),
 								new OutcomeSpawnItem(new ItemStack(NostrumBlocks.manaArmorerBlock, 1))));
 
 //		registry.register(

@@ -678,7 +678,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 							tooltip.add(new StringTextComponent(""));
 							tooltip.add(new TranslationTextComponent("info.requirement.missing"));
 						}
-	        			for (ITextComponent line : req.getDescription()) {
+	        			for (ITextComponent line : req.getDescription(subscreen.player)) {
 	        				if (line instanceof TextComponent) {
 	        					tooltip.add(((TextComponent) line).mergeStyle(bad));
 	        				} else {

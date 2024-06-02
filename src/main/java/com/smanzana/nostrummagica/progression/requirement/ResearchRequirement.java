@@ -12,11 +12,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class RequirementResearch implements IRequirement{
+public class ResearchRequirement implements IRequirement{
 
 	private String researchKey;
 	
-	public RequirementResearch(String key) {
+	public ResearchRequirement(String key) {
 		this.researchKey = key;
 	}
 
@@ -32,7 +32,7 @@ public class RequirementResearch implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.research", 
 				new TranslationTextComponent("research." + researchKey + ".name").mergeStyle(TextFormatting.DARK_AQUA)));
 	}
