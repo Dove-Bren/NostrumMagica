@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandRandomSpell;
 import com.smanzana.nostrummagica.command.CommandReadRoom;
+import com.smanzana.nostrummagica.command.CommandReloadQuests;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
@@ -62,10 +63,10 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.quests.NostrumQuest.QuestType;
 import com.smanzana.nostrummagica.progression.requirement.AlterationMasteryRequirement;
 import com.smanzana.nostrummagica.progression.requirement.ElementMasteryRequirement;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
-import com.smanzana.nostrummagica.progression.requirement.LoreRequirement;
 import com.smanzana.nostrummagica.progression.requirement.ResearchRequirement;
 import com.smanzana.nostrummagica.progression.requirement.ShapeMasteryRequirement;
 import com.smanzana.nostrummagica.progression.requirement.StatRequirement;
@@ -1366,227 +1367,125 @@ public class ModInit {
 		return new AttributeReward(type, val);
 	}
 
-	private static void registerDefaultQuests() {
+	public static void registerDefaultQuests() {
 		// key, type, parentKeys, int x, int y, IReward reward, ... requirements
 		// key, parentKeys, int x, int y, IReward reward, ... requirements
-		// key, type, parentKey, int x, int y, IReward reward, ... requirements
-		// key, type, int x, int y, IReward reward, ... requirements
+		// key, parentKey, int x, int y, IReward reward, ... requirements
+		// key, int x, int y, IReward reward, ... requirements
 		
-		new NostrumQuest("start", 0, 0, wrapAttribute(AwardType.MANA, 0.05f));
-		new NostrumQuest("next", "start", 0, 1, wrapAttribute(AwardType.MANA, 0.05f), new LoreRequirement(NostrumItems.warlockSword));
-		new NostrumQuest("kills", "start", 0, -1, wrapAttribute(AwardType.MANA, 0.05f), new StatRequirement(PlayerStat.KillsWithMagic, 1));
+		new NostrumQuest("start", QuestType.CHALLENGE, null, 0, 0, wrapAttribute(AwardType.MANA, 0.025f));
 		
+		int x = 0;
+		int y = 1;
+		new NostrumQuest("spells1", "start", x, y++, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.SpellsCast, 1));
+		new NostrumQuest("spells2", "spells1", x, y++, wrapAttribute(AwardType.MANA, 0.015f), new StatRequirement(PlayerStat.SpellsCast, 25));
+		new NostrumQuest("spells3", "spells2", x, y++, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.SpellsCast, 500));
+		new NostrumQuest("spells4", "spells3", x, y++, wrapAttribute(AwardType.MANA, 0.025f), new StatRequirement(PlayerStat.SpellsCast, 2000));
+		new NostrumQuest("spells5", "spells4", x, y++, wrapAttribute(AwardType.MANA, 0.03f), new StatRequirement(PlayerStat.SpellsCast, 5000));
+		new NostrumQuest("spells6", "spells5", x, y++, wrapAttribute(AwardType.MANA, 0.05f), new StatRequirement(PlayerStat.SpellsCast, 10000));
 		
-		/*
-		 * String key, QuestType type, int reqLevel, int reqControl, int reqTechnique,
-		 * int reqFinesse, String[] parentKeys, IObjective objective, IReward[] rewards
-		 */
-//		new NostrumQuest("start", QuestType.REGULAR, 0, 0, 0, 0, null, null, null,
-//				wrapAttribute(AwardType.MANA, 0.0500f));
-//		new NostrumQuest("lvl1", QuestType.REGULAR, 2, 0, 0, 0, new String[] { "start" }, null, null,
-//				wrapAttribute(AwardType.MANA, 0.010f));
-//		new NostrumQuest("lvl2-fin", QuestType.REGULAR, 3, 0, 0, 1, new String[] { "lvl1" }, null, null,
-//				wrapAttribute(AwardType.REGEN, 0.0050f));
-//		new NostrumQuest("lvl2-con", QuestType.REGULAR, 3, 1, 0, 0, new String[] { "lvl1" }, null, null,
-//				wrapAttribute(AwardType.COST, -0.005f));
-////		new NostrumQuest("lvl2", QuestType.REGULAR, 3, 0, 0, 0, new String[] { "lvl2-fin", "lvl2-con" }, null, null,
-////				new IReward[] { new TriggerReward(AtFeetTrigger.instance()) });
-//		new NostrumQuest("lvl3", QuestType.CHALLENGE, 4, 0, 0, 0, new String[] { "lvl2-fin", "lvl2-con" }, null,
-//				new ObjectiveRitual("magic_token"), wrapAttribute(AwardType.MANA, 0.005f));
-//		new NostrumQuest("lvl4", QuestType.CHALLENGE, 5, 0, 0, 0, new String[] { "lvl3" }, null,
-//				new ObjectiveRitual("spell_binding"), new IReward[] { new AlterationReward(EAlteration.INFLICT) });
-//
-//		// LVL-finesse tree
-//		new NostrumQuest("lvl6-fin", QuestType.REGULAR, 6, 0, 0, 3, new String[] { "lvl4" }, null, null,
-//				wrapAttribute(AwardType.REGEN, 0.005f));
-//		new NostrumQuest("lvl7-fin", QuestType.REGULAR, 7, 0, 0, 4, new String[] { "lvl6-fin" }, null, null,
-//				wrapAttribute(AwardType.MANA, 0.010f));
-//		new NostrumQuest("lvl7-fin7", QuestType.REGULAR, 7, 0, 0, 7, new String[] { "lvl7-fin" }, null, null,
-//				wrapAttribute(AwardType.REGEN, 0.010f));
-//		new NostrumQuest("lvl10-fin10", QuestType.CHALLENGE, 10, 0, 0, 10, new String[] { "lvl7-fin7" }, null,
-//				new ObjectiveSpellCast().numComps(8).requiredElement(EMagicElement.ICE),
-//				new IReward[] { new AlterationReward(EAlteration.SUPPORT) });
-//
-//		// LVL-control tree
-//		new NostrumQuest("lvl6-con", QuestType.REGULAR, 6, 3, 0, 0, new String[] { "lvl4" }, null, null,
-//				wrapAttribute(AwardType.COST, -0.005f));
-//		new NostrumQuest("lvl7-con", QuestType.REGULAR, 7, 4, 0, 0, new String[] { "lvl6-con" }, null, null,
-//				wrapAttribute(AwardType.COST, -0.005f));
-//		new NostrumQuest("lvl7-con7", QuestType.REGULAR, 7, 7, 0, 0, new String[] { "lvl7-con" }, null, null,
-//				wrapAttribute(AwardType.COST, -0.010f));
-//		new NostrumQuest("lvl10-con10", QuestType.CHALLENGE, 10, 10, 0, 0, new String[] { "lvl7-con7" }, null,
-//				new ObjectiveSpellCast().numElems(10).requiredElement(EMagicElement.EARTH),
-//				new IReward[] { new AlterationReward(EAlteration.RESIST) });
-//
-//		// LVL main tree
-//		new NostrumQuest("lvl7", QuestType.CHALLENGE, 7, 0, 0, 0, new String[] { "lvl6-con", "lvl6-fin" }, null,
-//				new ObjectiveRitual("kani"), wrapAttribute(AwardType.MANA, 0.020f));
-//		new NostrumQuest("lvl8", QuestType.CHALLENGE, 8, 0, 0, 0, new String[] { "lvl7" }, null, null,
-//				new IReward[] { new AlterationReward(EAlteration.CORRUPT) });
-//		new NostrumQuest("lvl8-fin3", QuestType.REGULAR, 8, 0, 0, 3, new String[] { "lvl7" }, null, null,
-//				wrapAttribute(AwardType.COST, -0.005f));
-//		new NostrumQuest("lvl8-fin5", QuestType.REGULAR, 8, 0, 0, 5, new String[] { "lvl7" }, null, null,
-//				wrapAttribute(AwardType.MANA, 0.020f));
-//		new NostrumQuest("lvl10-fin6", QuestType.REGULAR, 10, 0, 0, 6, new String[] { "lvl8-fin5" }, null, null,
-//				wrapAttribute(AwardType.REGEN, 0.100f));
-//		new NostrumQuest("lvl8-con3", QuestType.REGULAR, 8, 3, 0, 0, new String[] { "lvl7" }, null, null,
-//				wrapAttribute(AwardType.REGEN, 0.005f));
-//		new NostrumQuest("lvl8-con5", QuestType.REGULAR, 8, 5, 0, 0, new String[] { "lvl7" }, null, null,
-//				wrapAttribute(AwardType.MANA, 0.040f));
-//		new NostrumQuest("lvl10-con6", QuestType.REGULAR, 10, 6, 0, 0, new String[] { "lvl8-con5" }, null, null,
-//				wrapAttribute(AwardType.COST, -0.050f));
-//		new NostrumQuest("lvl10", QuestType.REGULAR, 10, 0, 0, 0, new String[] { "lvl8-con3", "lvl8-fin3" }, null, null,
-//				wrapAttribute(AwardType.MANA, 0.100f));
-////		new NostrumQuest("lvl12", QuestType.REGULAR, 12, 0, 0, 0, new String[] { "lvl10" }, null, null,
-////				new IReward[] { new TriggerReward(AuraTrigger.instance()) });
-//
-//		new NostrumQuest("con1", QuestType.REGULAR, 0, 1, // Control
-//				0, // Technique
-//				0, // Finesse
-//				new String[] { "start" }, null, null, wrapAttribute(AwardType.COST, -0.002f));
-//		new NostrumQuest("con2", QuestType.REGULAR, 0, 2, // Control
-//				0, // Technique
-//				0, // Finesse
-//				new String[] { "con1" }, null, null, wrapAttribute(AwardType.MANA, 0.010f));
-//		new NostrumQuest("con7", QuestType.CHALLENGE, 0, 7, // Control
-//				0, // Technique
-//				0, // Finesse
-//				new String[] { "con2" }, null, new ObjectiveRitual("koid"), wrapAttribute(AwardType.COST, -0.050f));
-//		new NostrumQuest("con7-tec1", QuestType.CHALLENGE, 0, 7, // Control
-//				1, // Technique
-//				0, // Finesse
-//				new String[] { "con7", "con6-tec3" }, null,
-//				new ObjectiveSpellCast().numElems(6).requiredElement(EMagicElement.EARTH),
-//				new IReward[] { new AlterationReward(EAlteration.RUIN) });
-//		new NostrumQuest("con3-tec2", QuestType.REGULAR, 0, 3, // Control
-//				2, // Technique
-//				0, // Finesse
-//				new String[] { "con2" }, null, null, wrapAttribute(AwardType.REGEN, 0.005f));
-//		new NostrumQuest("con5-tec2", QuestType.REGULAR, 0, 5, // Control
-//				2, // Technique
-//				0, // Finesse
-//				new String[] { "con3-tec2" }, null, null, wrapAttribute(AwardType.COST, -0.010f));
-//		new NostrumQuest("con5-tec3", QuestType.REGULAR, 0, 5, // Control
-//				3, // Technique
-//				0, // Finesse
-//				new String[] { "con5-tec2", "con1-tec3" }, null, null, wrapAttribute(AwardType.COST, -0.015f));
-//		new NostrumQuest("con5-tec4", QuestType.REGULAR, 0, 5, // Control
-//				4, // Technique
-//				0, // Finesse
-//				new String[] { "con5-tec3" }, null, null, wrapAttribute(AwardType.COST, -0.015f));
-//		new NostrumQuest("con6-tec3", QuestType.REGULAR, 0, 6, // Control
-//				3, // Technique
-//				0, // Finesse
-//				new String[] { "con5-tec3" }, null, null, wrapAttribute(AwardType.REGEN, 0.005f));
-//		new NostrumQuest("con6-tec4", QuestType.CHALLENGE, 0, 6, // Control
-//				4, // Technique
-//				0, // Finesse
-//				new String[] { "con6-tec3", "con5-tec4" }, null, new ObjectiveKill(EntityGolem.class, "Golem", 30),
-//				new IReward[] { new AlterationReward(EAlteration.SUMMON) });
-//		new NostrumQuest("con1-tec2", QuestType.REGULAR, 0, 1, // Control
-//				2, // Technique
-//				0, // Finesse
-//				new String[] { "con1" }, null, null, wrapAttribute(AwardType.COST, -0.008f));
-//		new NostrumQuest("con1-tec3", QuestType.CHALLENGE, 0, 1, // Control
-//				3, // Technique
-//				0, // Finesse
-//				new String[] { "con1-tec2" }, null,
-//				new ObjectiveSpellCast().numElems(3).requiredElement(EMagicElement.LIGHTNING),
-//				wrapAttribute(AwardType.MANA, 0.030f));
-////		new NostrumQuest("con2-tec3", QuestType.CHALLENGE, 0, 2, // Control
-////				3, // Technique
-////				0, // Finesse
-////				new String[] { "con1-tec2" }, null, null, new IReward[] { new TriggerReward(WallTrigger.instance()) });
-//		new NostrumQuest("con1-tec5", QuestType.REGULAR, 0, 1, // Control
-//				5, // Technique
-//				0, // Finesse
-//				new String[] { "con1-tec3", "tec3" }, null, null, wrapAttribute(AwardType.COST, -0.005f));
-//
-//		new NostrumQuest("tec1", QuestType.REGULAR, 0, 0, // Control
-//				1, // Technique
-//				0, // Finesse
-//				new String[] { "start" }, null, null, wrapAttribute(AwardType.MANA, 0.01f));
-////		new NostrumQuest("tec3", QuestType.CHALLENGE, 0, 0, // Control
-////				3, // Technique
-////				0, // Finesse
-////				new String[] { "con1-tec2", "fin1-tec2" }, null, null,
-////				new IReward[] { new TriggerReward(SeekingBulletTrigger.instance()) });
-//		new NostrumQuest("tec7", QuestType.CHALLENGE, 0, 0, // Control
-//				7, // Technique
-//				0, // Finesse
-//				new String[] { "con1-tec5", "fin1-tec5" }, null, new ObjectiveRitual("vani"),
-//				new IReward[] { new AlterationReward(EAlteration.ENCHANT) });
-//
-//		new NostrumQuest("fin1", QuestType.REGULAR, 0, 0, // Control
-//				0, // Technique
-//				1, // Finesse
-//				new String[] { "start" }, null, null, wrapAttribute(AwardType.REGEN, 0.002f));
-//		new NostrumQuest("fin3", QuestType.CHALLENGE, 0, 0, // Control
-//				0, // Technique
-//				3, // Finesse
-//				new String[] { "fin1" }, null,
-//				new ObjectiveSpellCast().requiredAlteration(EAlteration.INFLICT),
-//				wrapAttribute(AwardType.REGEN, 0.008f));
-//		new NostrumQuest("fin5", QuestType.REGULAR, 0, 0, // Control
-//				0, // Technique
-//				5, // Finesse
-//				new String[] { "fin3" }, null, null, wrapAttribute(AwardType.MANA, 0.020f));
-//		new NostrumQuest("fin7", QuestType.REGULAR, 0, 0, // Control
-//				0, // Technique
-//				7, // Finesse
-//				new String[] { "fin5" }, null, null, wrapAttribute(AwardType.REGEN, 0.075f));
-////		new NostrumQuest("fin2-tec1", QuestType.CHALLENGE, 0, 0, // Control
-////				1, // Technique
-////				2, // Finesse
-////				new String[] { "fin1" }, null, null, new IReward[] { new TriggerReward(CasterTrigger.instance()) });
-//		new NostrumQuest("fin5-tec2", QuestType.CHALLENGE, 0, 0, // Control
-//				2, // Technique
-//				5, // Finesse
-//				new String[] { "fin5", "fin2-tec3" }, null, new ObjectiveSpellCast().requiredShape(NostrumSpellShapes.Burst),
-//				new IReward[] { new AlterationReward(EAlteration.GROWTH) });
-//		new NostrumQuest("fin1-tec2", QuestType.REGULAR, 0, 0, // Control
-//				2, // Technique
-//				1, // Finesse
-//				new String[] { "fin1" }, null, null, wrapAttribute(AwardType.REGEN, 0.010f));
-//		new NostrumQuest("fin2-tec2", QuestType.REGULAR, 0, 0, // Control
-//				2, // Technique
-//				2, // Finesse
-//				new String[] { "fin1-tec2" }, null, null, wrapAttribute(AwardType.COST, -0.010f));
-//		new NostrumQuest("fin1-tec3", QuestType.CHALLENGE, 0, 0, // Control
-//				3, // Technique
-//				1, // Finesse
-//				new String[] { "fin1-tec2" }, null, new ObjectiveKill(EntityKoid.class, "Koid", 5),
-//				wrapAttribute(AwardType.MANA, 0.025f));
-////    	new NostrumQuest("fin2-tec3", QuestType.CHALLENGE, 0,
-////    			0, // Control
-////    			3, // Technique
-////    			2, // Finesse
-////    			new String[]{"con1-tec2", "fin1-tec2"},
-////    			null, null,
-////    			new IReward[] {new TriggerReward(WallTrigger.instance())});
-//		new NostrumQuest("fin1-tec5", QuestType.REGULAR, 0, 0, // Control
-//				5, // Technique
-//				1, // Finesse
-//				new String[] { "fin1-tec3", "tec3" }, null, null, wrapAttribute(AwardType.REGEN, 0.050f));
-////		new NostrumQuest("fin2-tec3", QuestType.REGULAR, 0, 0, // Control
-////				3, // Technique
-////				2, // Finesse
-////				new String[] { "fin1-tec3", "fin2-tec5" }, null, null,
-////				new IReward[] { new TriggerReward(MortarTrigger.instance()) });
-////		;
-//		new NostrumQuest("fin3-tec3", QuestType.REGULAR, 0, 0, // Control
-//				3, // Technique
-//				3, // Finesse
-//				new String[] { "fin2-tec3" }, null, null, wrapAttribute(AwardType.MANA, 0.050f));
-//		new NostrumQuest("fin2-tec5", QuestType.REGULAR, 0, 0, // Control
-//				5, // Technique
-//				2, // Finesse
-//				new String[] { "fin1-tec5" }, null, null, wrapAttribute(AwardType.REGEN, 0.020f));
-//		new NostrumQuest("fin3-tec6", QuestType.CHALLENGE, 0, 0, // Control
-//				6, // Technique
-//				3, // Finesse
-//				new String[] { "fin2-tec5" }, null, new ObjectiveRitual("balanced_infusion"),
-//				new IReward[] { new AlterationReward(EAlteration.CONJURE) });
+		x = 1;
+		y = 2;
+		new NostrumQuest("uniqspells1", "spells2", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.UniqueSpellsCast, 5));
+		new NostrumQuest("uniqspells2", "uniqspells1", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.UniqueSpellsCast, 10));
+		new NostrumQuest("uniqspells3", "uniqspells2", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.UniqueSpellsCast, 20));
+		new NostrumQuest("uniqspells4", "uniqspells3", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.UniqueSpellsCast, 50));
+		new NostrumQuest("uniqspells5", "uniqspells4", x, y++, wrapAttribute(AwardType.COST, -0.02f), new StatRequirement(PlayerStat.UniqueSpellsCast, 100));
+		
+		x = -1;
+		y = 2;
+		new NostrumQuest("spellweight1", "spells2", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.TotalSpellWeight, 5));
+		new NostrumQuest("spellweight2", "spellweight1", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.TotalSpellWeight, 25));
+		new NostrumQuest("spellweight3", "spellweight2", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.TotalSpellWeight, 100));
+		new NostrumQuest("spellweight4", "spellweight3", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.TotalSpellWeight, 500));
+		new NostrumQuest("spellweight5", "spellweight4", x, y++, wrapAttribute(AwardType.COST, -0.02f), new StatRequirement(PlayerStat.TotalSpellWeight, 1000));
+		
+		x = -2;
+		y = 1;
+		new NostrumQuest("kills1", "spells1", x, y++, wrapAttribute(AwardType.REGEN, 0.01f), new StatRequirement(PlayerStat.KillsWithMagic, 1));
+		new NostrumQuest("kills2", "kills1", x, y++, wrapAttribute(AwardType.REGEN, 0.01f), new StatRequirement(PlayerStat.KillsWithMagic, 10));
+		new NostrumQuest("kills3", "kills2", x, y++, wrapAttribute(AwardType.REGEN, 0.02f), new StatRequirement(PlayerStat.KillsWithMagic, 50));
+		new NostrumQuest("kills4", "kills3", x, y++, wrapAttribute(AwardType.REGEN, 0.03f), new StatRequirement(PlayerStat.KillsWithMagic, 200));
+		new NostrumQuest("kills5", "kills4", x, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithMagic, 500));
+		new NostrumQuest("kills6", "kills5", x, y++, wrapAttribute(AwardType.REGEN, 0.05f), new StatRequirement(PlayerStat.KillsWithMagic, 2000));
+		new NostrumQuest("kills7", "kills6", x, y++, wrapAttribute(AwardType.REGEN, 0.06f), new StatRequirement(PlayerStat.KillsWithMagic, 5000));
+		
+		// Specialty types
+		x = -3;
+		y = 0;
+		new NostrumQuest("phykills1", "kills1", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.PHYSICAL), 25));
+		new NostrumQuest("phykills2", "phykills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.PHYSICAL), 1000));
+		new NostrumQuest("firekills1", "kills2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.FIRE), 50));
+		new NostrumQuest("firekills2", "firekills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.FIRE), 1000));
+		new NostrumQuest("icekills1", "kills2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.ICE), 50));
+		new NostrumQuest("icekills2", "icekills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.ICE), 1000));
+		new NostrumQuest("earthkills1", "kills3", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.EARTH), 100));
+		new NostrumQuest("earthkills2", "earthkills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.EARTH), 1000));
+		new NostrumQuest("windkills1", "kills3", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.WIND), 100));
+		new NostrumQuest("windkills2", "windkills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.WIND), 1000));
+		new NostrumQuest("enderkills1", "kills4", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.ENDER), 250));
+		new NostrumQuest("enderkills2", "enderkills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.ENDER), 1000));
+		new NostrumQuest("lightningkills1", "kills4", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.LIGHTNING), 250));
+		new NostrumQuest("lightningkills2", "lightningkills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.LIGHTNING), 1000));
+		
+		x = 2;
+		y = 1;
+		new NostrumQuest("dmgdealt1", "spells1", x, y++, wrapAttribute(AwardType.REGEN, 0.01f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 10));
+		new NostrumQuest("dmgdealt2", "dmgdealt1", x, y++, wrapAttribute(AwardType.REGEN, 0.01f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 100));
+		new NostrumQuest("dmgdealt3", "dmgdealt2", x, y++, wrapAttribute(AwardType.REGEN, 0.02f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 500));
+		new NostrumQuest("dmgdealt4", "dmgdealt3", x, y++, wrapAttribute(AwardType.REGEN, 0.03f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 1000));
+		new NostrumQuest("dmgdealt5", "dmgdealt4", x, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 2500));
+		new NostrumQuest("dmgdealt6", "dmgdealt5", x, y++, wrapAttribute(AwardType.REGEN, 0.05f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 7500));
+		new NostrumQuest("dmgdealt7", "dmgdealt6", x, y++, wrapAttribute(AwardType.REGEN, 0.05f), new StatRequirement(PlayerStat.MagicDamageDealtTotal, 10000));
+		
+		// Specialty types
+		x = 3;
+		y = 0;
+		new NostrumQuest("phydmgdealt1", "dmgdealt1", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.PHYSICAL), 50));
+		new NostrumQuest("phydmgdealt2", "phydmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.PHYSICAL), 5000));
+		new NostrumQuest("firedmgdealt1", "dmgdealt2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.FIRE), 200));
+		new NostrumQuest("firedmgdealt2", "firedmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.FIRE), 5000));
+		new NostrumQuest("icedmgdealt1", "dmgdealt2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.ICE), 200));
+		new NostrumQuest("icedmgdealt2", "icedmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.ICE), 5000));
+		new NostrumQuest("earthdmgdealt1", "dmgdealt3", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.EARTH), 500));
+		new NostrumQuest("earthdmgdealt2", "earthdmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.EARTH), 5000));
+		new NostrumQuest("winddmgdealt1", "dmgdealt3", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.WIND), 500));
+		new NostrumQuest("winddmgdealt2", "winddmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.WIND), 5000));
+		new NostrumQuest("enderdmgdealt1", "dmgdealt4", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.ENDER), 1000));
+		new NostrumQuest("enderdmgdealt2", "enderdmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.ENDER), 5000));
+		new NostrumQuest("lightningdmgdealt1", "dmgdealt4", x, y, wrapAttribute(AwardType.MANA, 0.02f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.LIGHTNING), 1000));
+		new NostrumQuest("lightningdmgdealt2", "lightningdmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.LIGHTNING), 5000));
+		
+		x = 0;
+		y = -1;
+		new NostrumQuest("manaspent1", new String[] {"start", "spells1"}, x, y--, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ManaSpentTotal, 100));
+		new NostrumQuest("manaspent2", "manaspent1", x, y--, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ManaSpentTotal, 1000));
+		new NostrumQuest("manaspent3", "manaspent2", x, y--, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ManaSpentTotal, 5000));
+		new NostrumQuest("manaspent4", "manaspent3", x, y--, wrapAttribute(AwardType.MANA, 0.015f), new StatRequirement(PlayerStat.ManaSpentTotal, 20000));
+		new NostrumQuest("manaspent5", "manaspent4", x, y--, wrapAttribute(AwardType.MANA, 0.015f), new StatRequirement(PlayerStat.ManaSpentTotal, 50000));
+		new NostrumQuest("manaspent6", "manaspent5", x, y--, wrapAttribute(AwardType.MANA, 0.015f), new StatRequirement(PlayerStat.ManaSpentTotal, 75000));
+		new NostrumQuest("manaspent7", "manaspent6", x, y--, wrapAttribute(AwardType.MANA, 0.03f), new StatRequirement(PlayerStat.ManaSpentTotal, 100000));
+		
+		x = -2;
+		y = -1;
+		new NostrumQuest("dmgrecv1", "manaspent1", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 10));
+		new NostrumQuest("dmgrecv2", "dmgrecv1", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 50));
+		new NostrumQuest("dmgrecv3", "dmgrecv2", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 100));
+		new NostrumQuest("dmgrecv4", "dmgrecv3", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 250));
+		new NostrumQuest("dmgrecv5", "dmgrecv4", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 500));
+		new NostrumQuest("dmgrecv6", "dmgrecv5", x, y--, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 1000));
+		new NostrumQuest("dmgrecv7", "dmgrecv6", x, y--, wrapAttribute(AwardType.COST, -0.015f), new StatRequirement(PlayerStat.MagicDamageReceivedTotal, 2500));
+		
+		x = 2;
+		y = -1;
+		new NostrumQuest("maxdmg1", "manaspent1", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 4));
+		new NostrumQuest("maxdmg2", "maxdmg1", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 8));
+		new NostrumQuest("maxdmg3", "maxdmg2", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 20));
+		new NostrumQuest("maxdmg4", "maxdmg3", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 35));
+		new NostrumQuest("maxdmg5", "maxdmg4", x, y--, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 50));
+		new NostrumQuest("maxdmg6", "maxdmg5", x, y--, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 100));
+		new NostrumQuest("maxdmg7", "maxdmg6", x, y--, wrapAttribute(AwardType.COST, -0.015f), new StatRequirement(PlayerStat.MaxSpellDamageDealt, 300));
+		
 	}
 
 	private static void registerDefaultTrials() {
@@ -2018,6 +1917,7 @@ public class ModInit {
 		CommandDebugEffect.register(dispatcher);
 		CommandSetManaArmor.register(dispatcher);
 		CommandAllPatterns.register(dispatcher);
+		CommandReloadQuests.register(dispatcher);
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

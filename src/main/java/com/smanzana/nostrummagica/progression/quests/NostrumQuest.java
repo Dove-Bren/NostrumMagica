@@ -279,4 +279,8 @@ public class NostrumQuest {
 			NostrumMagica.logger.info("Validated " + count + " quest requirements");
 	}
 	
+	public static void ClearAllQuests() {
+		Registry.clear();
+	}
+	
 }

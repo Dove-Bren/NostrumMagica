@@ -93,7 +93,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		final Rectangle2d bounds = new Rectangle2d(guiLeft, guiTop, width, height);
 		for (NostrumQuest quest : NostrumQuest.allQuests()) {
 			final int buttonX = guiLeft + (width/2) + (quest.getPlotX() * GRID_SCALE);
-			final int buttonY = guiTop + (height/2) + (quest.getPlotY() * GRID_SCALE);
+			final int buttonY = guiTop + (height/2) + (-quest.getPlotY() * GRID_SCALE);
 			
 			QuestButton button = new QuestButton(this, quest,
 					buttonX, buttonY,
@@ -254,15 +254,17 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			BufferBuilder buf = Tessellator.getInstance().getBuffer();
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
+			RenderSystem.lineWidth(3f);
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-	        buf.pos(transform, x - 1, y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        buf.pos(transform, other.x - 1, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.pos(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.pos(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
 	        Tessellator.getInstance().draw();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
 	        RenderSystem.disableBlend();
+			RenderSystem.lineWidth(1f);
 			
 //	        GlStateManager.popAttributes();
 	        matrixStackIn.pop();

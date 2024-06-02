@@ -36,7 +36,8 @@ public class StatRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		final PlayerStats stats = NostrumMagica.instance.getPlayerStats().get(player);
-		final String amtString = String.format("%.2f / %.2f ", stats.getStat(stat), amount);
+		//final String amtString = String.format("%.2f / %.2f ", stats.getStat(stat), amount);
+		final String amtString = String.format("%.0f / %.0f ", stats.getStat(stat), amount);
 		return Lists.newArrayList(new StringTextComponent(amtString).append( 
 				stat.getName().mergeStyle(TextFormatting.BLUE)));
 	}

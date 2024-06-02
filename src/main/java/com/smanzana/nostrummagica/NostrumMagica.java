@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -400,7 +399,7 @@ public class NostrumMagica {
 		return list;
 	}
 
-	private List<Function<Integer, Integer>> researchReloadHooks = new LinkedList<>();
+	private List<Runnable> researchReloadHooks = new LinkedList<>();
 
 	public void reloadDefaultResearch() {
 		NostrumResearch.ClearAllResearch();
@@ -415,14 +414,30 @@ public class NostrumMagica {
 //			enderIO.reinitResearch();
 //		}
 
-		for (Function<Integer, Integer> hook : researchReloadHooks) {
-			hook.apply(0);
+		for (Runnable hook : researchReloadHooks) {
+			hook.run();
 		}
 		NostrumResearch.Validate();
 	}
 
-	public void registerResearchReloadHook(Function<Integer, Integer> hook) {
+	public void registerResearchReloadHook(Runnable hook) {
 		this.researchReloadHooks.add(hook);
+	}
+	
+	private List<Runnable> questReloadHooks = new LinkedList<>();
+	
+	public void reloadDefaultQuests() {
+		NostrumQuest.ClearAllQuests();
+		ModInit.registerDefaultQuests();
+		
+		for (Runnable hook : questReloadHooks) {
+			hook.run();
+		}
+		NostrumQuest.Validate();
+	}
+	
+	public void registerQuestReloadHook(Runnable hook) {
+		questReloadHooks.add(hook);
 	}
 
 	/**
