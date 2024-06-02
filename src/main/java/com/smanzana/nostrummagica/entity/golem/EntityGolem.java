@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.entity.tasks.GolemTask;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -46,7 +47,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public abstract class EntityGolem extends TameableEntity implements ILoreSupplier {
+public abstract class EntityGolem extends TameableEntity implements ILoreSupplier, IElementalEntity {
 
 	Entity e;
 	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>createKey(EntityGolem.class, DataSerializers.FLOAT);
@@ -264,6 +265,7 @@ public abstract class EntityGolem extends TameableEntity implements ILoreSupplie
 		}
 	}
 	
+	@Override
 	public EMagicElement getElement() {
 		return this.element;
 	}
