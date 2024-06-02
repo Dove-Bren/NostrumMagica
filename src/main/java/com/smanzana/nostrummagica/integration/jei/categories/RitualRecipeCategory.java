@@ -13,9 +13,9 @@ import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRe
 import com.smanzana.nostrummagica.items.InfusedGemItem;
 import com.smanzana.nostrummagica.items.ReagentItem;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.rituals.RitualRecipe;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
-import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -296,8 +296,8 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 			if (!attr.isUnlocked()) {
 				canPerform = false;
 			} else if (ritual.getRequirement() != null) {
-				IRitualRequirement req = ritual.getRequirement();
-				if (!req.matches(player, attr)) {
+				IRequirement req = ritual.getRequirement();
+				if (!req.matches(player)) {
 					canPerform = false;
 				}
 			}

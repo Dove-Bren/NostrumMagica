@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.quests;
+package com.smanzana.nostrummagica.progression.quests;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,8 +9,8 @@ import java.util.Map;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.quests.objectives.IObjective;
-import com.smanzana.nostrummagica.quests.rewards.IReward;
+import com.smanzana.nostrummagica.progression.quests.objectives.IObjective;
+import com.smanzana.nostrummagica.progression.rewards.IReward;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.entity.player.PlayerEntity;

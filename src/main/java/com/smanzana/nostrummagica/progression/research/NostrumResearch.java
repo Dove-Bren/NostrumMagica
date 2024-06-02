@@ -1,20 +1,21 @@
-package com.smanzana.nostrummagica.research;
+package com.smanzana.nostrummagica.progression.research;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
+import com.smanzana.nostrummagica.progression.requirement.RequirementLore;
+import com.smanzana.nostrummagica.progression.requirement.RequirementQuest;
+import com.smanzana.nostrummagica.progression.requirement.RequirementSpellKnowledge;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -57,19 +58,9 @@ public class NostrumResearch {
 	protected String[] hiddenParentKeys;
 	
 	/**
-	 * List of lore keys that are required before this research can be seen/purchased.
+	 * Requirements (besides parent keys) that are required to be able to see/purchase this research
 	 */
-	protected String[] loreKeys;
-	
-	/**
-	 * List of quest keys. Each quest must be completed before this research item can be seen/purchased.
-	 */
-	protected String[] questKeys;
-	
-	/**
-	 * List of spell components that the player must have seen before this research can be seen/purchased.
-	 */
-	protected SpellSpec[] spellKeys;
+	protected IRequirement[] requirements;
 	
 	/**
 	 * Positional offsets for display.
@@ -107,9 +98,7 @@ public class NostrumResearch {
 	
 	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon,
 			String[] parents, String[] hiddenParents, String[] linked,
-			String[] lore,
-			String[] quests,
-			SpellSpec[] spellComponents,
+			IRequirement[] requirements,
 			String[] references, String[] referenceDisplays) {
 		this.key = key;
 		this.size = size;
@@ -120,12 +109,10 @@ public class NostrumResearch {
 		this.parentKeys = (parents != null && parents.length == 0) ? null : parents; // empty->null
 		this.hiddenParentKeys = (hiddenParents != null && hiddenParents.length == 0) ? null : hiddenParents;
 		this.linkedKeys = (linked != null && linked.length == 0) ? null : linked;
-		this.loreKeys = (lore != null && lore.length == 0) ? null : lore;
-		this.questKeys = (quests != null && quests.length == 0) ? null : quests;
+		this.requirements = (requirements != null && requirements.length == 0) ? null : requirements;
 		this.references = (references != null && references.length == 0) ? null : references;
 		this.referenceDisplays = (references != null && references.length == 0) ? null : referenceDisplays; // note uses 'references'
 		this.tab = tab;
-		this.spellKeys = spellComponents;
 		
 		NostrumResearch.register(this);
 	}
@@ -182,16 +169,8 @@ public class NostrumResearch {
 		return allParents;
 	}
 	
-	public String[] getRequiredLore() {
-		return this.loreKeys;
-	}
-	
-	public String[] getRequiredQuests() {
-		return this.questKeys;
-	}
-	
-	public SpellSpec[] getRequiredSpellComponents() {
-		return this.spellKeys;
+	public IRequirement[] getRequirements() {
+		return this.requirements;
 	}
 	
 	public boolean isHidden() {
@@ -240,21 +219,17 @@ public class NostrumResearch {
 		protected final List<String> parentKeys;
 		protected final List<String> hiddenParentKeys;
 		protected final List<String> linkedKeys;
-		protected final List<String> loreKeys;
-		protected final List<String> questKeys;
 		protected final List<String> references;
 		protected final List<String> referenceDisplays;
-		protected final List<SpellSpec> spellComps;
+		protected final List<IRequirement> requirements;
 		
 		protected Builder() {
-			parentKeys = new LinkedList<>();
-			hiddenParentKeys = new LinkedList<>();
-			linkedKeys = new LinkedList<>();
-			loreKeys = new LinkedList<>();
-			questKeys = new LinkedList<>();
-			references = new LinkedList<>();
-			referenceDisplays = new LinkedList<>();
-			spellComps = new LinkedList<>();
+			parentKeys = new ArrayList<>();
+			hiddenParentKeys = new ArrayList<>();
+			linkedKeys = new ArrayList<>();
+			requirements = new ArrayList<>();
+			references = new ArrayList<>();
+			referenceDisplays = new ArrayList<>();
 		}
 		
 		public Builder parent(String parent) {
@@ -273,16 +248,22 @@ public class NostrumResearch {
 		}
 		
 		public Builder lore(String lore) {
-			loreKeys.add(lore);
+			this.requirements.add(new RequirementLore(lore));
 			return this;
 		}
 		
 		public Builder lore(ILoreTagged lore) {
-			return this.lore(lore.getLoreKey());
+			this.requirements.add(new RequirementLore(lore));
+			return this;
 		}
 		
 		public Builder quest(String quest) {
-			questKeys.add(quest);
+			this.requirements.add(new RequirementQuest(quest));
+			return this;
+		}
+		
+		public Builder spellComponent(EMagicElement element, EAlteration alteration) {
+			this.requirements.add(new RequirementSpellKnowledge(element, alteration));
 			return this;
 		}
 		
@@ -307,23 +288,12 @@ public class NostrumResearch {
 			}
 		}
 		
-		public Builder spellComponent(SpellSpec component) {
-			this.spellComps.add(component);
-			return this;
-		}
-		
-		public Builder spellComponent(EMagicElement element, EAlteration alteration) {
-			return spellComponent(new SpellSpec(element, alteration));
-		}
-		
 		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon) {
 			return new NostrumResearch(key, tab, size, x, y, hidden, icon,
 					parentKeys.isEmpty() ? null : parentKeys.toArray(new String[parentKeys.size()]),
 					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new String[hiddenParentKeys.size()]),
 					linkedKeys.isEmpty() ? null : linkedKeys.toArray(new String[linkedKeys.size()]),
-					loreKeys.isEmpty() ? null : loreKeys.toArray(new String[loreKeys.size()]),
-					questKeys.isEmpty() ? null : questKeys.toArray(new String[questKeys.size()]),
-					spellComps.isEmpty() ? null : spellComps.toArray(new SpellSpec[spellComps.size()]),
+					requirements.isEmpty() ? null : requirements.toArray(new IRequirement[requirements.size()]),
 					references.isEmpty() ? null : references.toArray(new String[references.size()]),
 					referenceDisplays.isEmpty() ? null : referenceDisplays.toArray(new String[referenceDisplays.size()])
 					);
@@ -375,7 +345,7 @@ public class NostrumResearch {
 		for (NostrumResearch research : Registry.values()) {
 			boolean counted = false;
 			if (research.parentKeys != null) {
-				List<String> outList = new LinkedList<>();
+				List<String> outList = new ArrayList<>();
 				for (String dep : research.parentKeys) {
 					if (Registry.containsKey(dep))
 						outList.add(dep);
@@ -390,7 +360,7 @@ public class NostrumResearch {
 			}
 			
 			if (research.hiddenParentKeys != null) {
-				List<String> outList = new LinkedList<>();
+				List<String> outList = new ArrayList<>();
 				for (String dep : research.hiddenParentKeys) {
 					if (Registry.containsKey(dep))
 						outList.add(dep);
@@ -422,49 +392,27 @@ public class NostrumResearch {
 		
 		count = 0;
 		for (NostrumResearch research : Registry.values()) {
-			if (research.loreKeys == null) {
+			if (research.requirements == null) {
 				continue;
 			}
 			
 			count++;
 			
-			List<String> outList = new LinkedList<>();
-			for (String dep : research.loreKeys) {
-				if (LoreRegistry.instance().lookup(dep) != null)
-					outList.add(dep);
+			List<IRequirement> outList = new ArrayList<>();
+			for (IRequirement req : research.getRequirements()) {
+				if (req.isValid()) {
+					outList.add(req);
+				}
 			}
 			
 			if (outList.isEmpty())
-				research.loreKeys = null;
+				research.requirements = null;
 			else
-				research.loreKeys = outList.toArray(new String[0]);
+				research.requirements = outList.toArray(new IRequirement[0]);
 		}
 		
 		if (count != 0)
-			NostrumMagica.logger.info("Validated " + count + " research lore dependencies");
-		
-		count = 0;
-		for (NostrumResearch research : Registry.values()) {
-			if (research.questKeys == null) {
-				continue;
-			}
-			
-			count++;
-			
-			List<String> outList = new LinkedList<>();
-			for (String dep : research.questKeys) {
-				if (NostrumQuest.lookup(dep) != null)
-					outList.add(dep);
-			}
-			
-			if (outList.isEmpty())
-				research.questKeys = null;
-			else
-				research.questKeys = outList.toArray(new String[0]);
-		}
-		
-		if (count != 0)
-			NostrumMagica.logger.info("Validated " + count + " research quest dependencies");
+			NostrumMagica.logger.info("Validated " + count + " research requirements");
 	}
 	
 	
@@ -516,40 +464,10 @@ public class NostrumResearch {
 		public static NostrumResearchTab TINKERING = null;
 		public static NostrumResearchTab OUTFITTING = null;
 		
-		private static List<NostrumResearchTab> AllTabs = new LinkedList<>();
+		private static List<NostrumResearchTab> AllTabs = new ArrayList<>();
 		
 		public static List<NostrumResearchTab> All() {
 			return AllTabs;
-		}
-	}
-	
-	
-	
-	/***********************************************
-	 *               Helper classes
-	 ***********************************************/
-	
-	public static final class SpellSpec {
-		@Nullable
-		public final EMagicElement element;
-		
-		@Nullable
-		public final EAlteration alteration;
-		
-		public SpellSpec(@Nullable EMagicElement element, @Nullable EAlteration alteration) {
-			this.element = element;
-			this.alteration = alteration;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			return (o instanceof SpellSpec && ((SpellSpec) o).alteration == this.alteration && ((SpellSpec) o).element == this.element);
-		}
-		
-		@Override
-		public int hashCode() {
-			return (1217 * (element == null ? 1 : element.ordinal() + 2)
-					+ 887 * (alteration == null ? 1 : alteration.ordinal() + 2));
 		}
 	}
 }

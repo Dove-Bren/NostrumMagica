@@ -46,11 +46,11 @@ import com.smanzana.nostrummagica.listeners.PlayerStatListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
+import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
-import com.smanzana.nostrummagica.research.NostrumResearch;
-import com.smanzana.nostrummagica.research.NostrumResearch.SpellSpec;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -557,50 +557,11 @@ public class NostrumMagica {
 		if (attr == null)
 			return false;
 
-		// Check quest requirements
-		if (research.getRequiredQuests() != null && research.getRequiredQuests().length != 0) {
-			List<String> completedQuests = attr.getCompletedQuests();
-			for (String questKey : research.getRequiredQuests()) {
-				if (!completedQuests.contains(questKey)) {
+		// Check requirements
+		if (research.getRequirements() != null && research.getRequirements().length != 0) {
+			for (IRequirement req: research.getRequirements()) {
+				if (!req.matches(player)) {
 					return false;
-				}
-			}
-		}
-
-		// Check lore requirements
-		if (research.getRequiredLore() != null && research.getRequiredLore().length != 0) {
-			for (String lore : research.getRequiredLore()) {
-				ILoreTagged loreItem = LoreRegistry.instance().lookup(lore);
-				if (loreItem != null) {
-					if (!attr.hasLore(loreItem)) {
-						return false;
-					}
-				}
-			}
-		}
-
-		// Check spell requirements
-		if (research.getRequiredSpellComponents() != null && research.getRequiredSpellComponents().length != 0) {
-			for (SpellSpec spec : research.getRequiredSpellComponents()) {
-				if (spec.element == null && spec.alteration == null) {
-					continue;
-				} else if (spec.element == null) {
-					// Just alteration
-					if (!attr.getAlterations().containsKey(spec.alteration)
-							|| !attr.getAlterations().get(spec.alteration)) {
-						return false;
-					}
-				} else if (spec.alteration == null) {
-					// Just element
-					if (!attr.getKnownElements().containsKey(spec.element)
-							|| !attr.getKnownElements().get(spec.element)) {
-						return false;
-					}
-				} else {
-					// Both. Check that it's actually been cast, not just unlocked :)
-					if (!attr.hasKnowledge(spec.element, spec.alteration)) {
-						return false;
-					}
 				}
 			}
 		}

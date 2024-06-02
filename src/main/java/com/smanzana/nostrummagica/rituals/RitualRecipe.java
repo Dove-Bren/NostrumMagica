@@ -16,9 +16,9 @@ import com.smanzana.nostrummagica.blocks.ChalkBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
 import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
-import com.smanzana.nostrummagica.rituals.requirements.IRitualRequirement;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.tiles.AltarTileEntity;
 import com.smanzana.nostrummagica.tiles.CandleTileEntity;
@@ -76,7 +76,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 	private @Nonnull Ingredient centerItem;
 	private NonNullList<Ingredient> extraItems;
 	private IRitualOutcome hook;
-	private IRitualRequirement req;
+	private IRequirement req;
 	private final String titleKey;
 	
 	private @Nonnull ItemStack icon;
@@ -86,7 +86,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType reagent,
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		RitualRecipe recipe = new RitualRecipe(registryName, titleKey, element, 0);
 		
@@ -104,7 +104,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			@Nonnull ItemStack icon,
 			EMagicElement element,
 			ReagentType reagent,
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		return createTier1(titleKey, titleKey, icon, element, reagent, requirement, outcome);
 	}
@@ -115,7 +115,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			EMagicElement element,
 			ReagentType[] reagents,
 			@Nonnull Ingredient center, 
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		if (center == null || center == Ingredient.EMPTY) {
 			throw new RuntimeException("Center item of tier 2 ritual cannot be empty!");
@@ -143,7 +143,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			EMagicElement element,
 			ReagentType[] reagents,
 			@Nonnull Ingredient center, 
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		return createTier2(titleKey, titleKey, icon, element, reagents, center, requirement, outcome);
 	}
@@ -154,7 +154,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			EMagicElement element,
 			ReagentType[] reagents,
 			@Nonnull ItemStack center, 
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		return createTier2(titleKey,
 				icon,
@@ -173,7 +173,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			ReagentType[] reagents,
 			@Nonnull Ingredient center,
 			@Nonnull Ingredient extras[],
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		if (center == null || center == Ingredient.EMPTY) {
 			throw new RuntimeException("Center item of tier 3 ritual cannot be empty!");
@@ -208,7 +208,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			ReagentType[] reagents,
 			@Nonnull Ingredient center,
 			@Nonnull Ingredient extras[],
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		return createTier3(titleKey, titleKey, icon, element, reagents, center, extras, requirement, outcome);
 	}
@@ -220,7 +220,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			ReagentType[] reagents,
 			@Nonnull ItemStack center,
 			@Nonnull ItemStack extras[],
-			IRitualRequirement requirement,
+			IRequirement requirement,
 			IRitualOutcome outcome) {
 		
 		Ingredient[] extraTags;
@@ -402,7 +402,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		if (!attr.getCompletedResearches().contains("rituals"))
 			return RitualMatchInfo.Fail();
 		
-		if (this.req != null && !req.matches(player, attr))
+		if (this.req != null && !req.matches(player))
 			return RitualMatchInfo.Fail();
 		
 		// check chalk
@@ -556,7 +556,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		return this.hook;
 	}
 	
-	public IRitualRequirement getRequirement() {
+	public IRequirement getRequirement() {
 		return this.req;
 	}
 	

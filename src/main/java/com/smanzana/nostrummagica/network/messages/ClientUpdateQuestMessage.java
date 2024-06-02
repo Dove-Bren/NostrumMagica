@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
 
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.entity.player.ServerPlayerEntity;

@@ -1,7 +1,7 @@
-package com.smanzana.nostrummagica.quests.objectives;
+package com.smanzana.nostrummagica.progression.quests.objectives;
 
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
 
 public interface IObjective {
 	

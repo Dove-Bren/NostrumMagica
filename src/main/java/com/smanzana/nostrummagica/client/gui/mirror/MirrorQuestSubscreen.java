@@ -18,11 +18,11 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
-import com.smanzana.nostrummagica.quests.rewards.AlterationReward;
-import com.smanzana.nostrummagica.quests.rewards.AttributeReward;
-import com.smanzana.nostrummagica.quests.rewards.AttributeReward.AwardType;
-import com.smanzana.nostrummagica.quests.rewards.IReward;
+import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.rewards.AlterationReward;
+import com.smanzana.nostrummagica.progression.rewards.AttributeReward;
+import com.smanzana.nostrummagica.progression.rewards.IReward;
+import com.smanzana.nostrummagica.progression.rewards.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;

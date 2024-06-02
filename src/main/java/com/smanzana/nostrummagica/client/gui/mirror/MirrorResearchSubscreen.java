@@ -25,14 +25,12 @@ import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.ReferencePage;
 import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientPurchaseResearchMessage;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
-import com.smanzana.nostrummagica.research.NostrumResearch;
-import com.smanzana.nostrummagica.research.NostrumResearch.NostrumResearchTab;
-import com.smanzana.nostrummagica.research.NostrumResearch.Size;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch.NostrumResearchTab;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.utils.Curves;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
@@ -52,6 +50,7 @@ import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
@@ -668,43 +667,50 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			tooltip.add(new TranslationTextComponent(research.getDescKey(), new Object[0]).mergeStyle(TextFormatting.GRAY));
 			
 			TextFormatting bad = TextFormatting.RED;
-			TextFormatting missingQuest = TextFormatting.DARK_PURPLE;
-			TextFormatting missingLore = TextFormatting.DARK_AQUA;
-			boolean first = false;
+			boolean first = true;
 			
-	        // Quest reqs?
-	        if (research.getRequiredQuests() != null) {
-	        	for (String questKey : research.getRequiredQuests()) {
-					if (!subscreen.attr.getCompletedQuests().contains(questKey)) {
-						if (!first) {
-							first = true;
+	        // Requirements?
+	        if (research.getRequirements() != null) {
+	        	for (IRequirement req : research.getRequirements()) {
+	        		if (!req.matches(subscreen.player)) {
+	        			if (first) {
+							first = false;
 							tooltip.add(new StringTextComponent(""));
+							tooltip.add(new TranslationTextComponent("info.requirement.missing"));
 						}
-						
-						NostrumQuest questItem = NostrumQuest.lookup(questKey);
-						String display = questItem == null ? questKey : I18n.format("quest." + questItem.getKey() + ".name");
-						
-						tooltip.add(new TranslationTextComponent("info.research.quest_missing", new Object[]{missingQuest + display + bad}).mergeStyle(bad));
-					}
+	        			for (ITextComponent line : req.getDescription()) {
+	        				if (line instanceof TextComponent) {
+	        					tooltip.add(((TextComponent) line).mergeStyle(bad));
+	        				} else {
+	        					tooltip.add(line);
+	        				}
+	        			}
+	        		}
 	        	}
 	        }
-			
-			// Lore reqs?
-			if (research.getRequiredLore() != null) {
-				for (String loreKey : research.getRequiredLore()) {
-					ILoreTagged loreItem = LoreRegistry.instance().lookup(loreKey);
-					if (loreItem != null) {
-						if (!subscreen.attr.hasLore(loreItem)) {
-							if (!first) {
-								first = true;
-								tooltip.add(new StringTextComponent(""));
-							}
-							
-							tooltip.add(new TranslationTextComponent("info.research.lore_missing", new Object[]{missingLore + loreItem.getLoreDisplayName() + bad}).mergeStyle(bad));
-						}
-					}
-				}
-			}
+	        		
+//					if (!subscreen.attr.getCompletedQuests().contains(questKey)) {
+//						if (!first) {
+//							first = true;
+//							tooltip.add(new StringTextComponent(""));
+//						}
+//						
+//						NostrumQuest questItem = NostrumQuest.lookup(questKey);
+//						String display = questItem == null ? questKey : I18n.format("quest." + questItem.getKey() + ".name");
+//						
+//						tooltip.add(new TranslationTextComponent("info.research.quest_missing", new Object[]{missingQuest + display + bad}).mergeStyle(bad));
+//					}
+//			
+//					if (loreItem != null) {
+//						if (!subscreen.attr.hasLore(loreItem)) {
+//							if (!first) {
+//								first = true;
+//								tooltip.add(new StringTextComponent(""));
+//							}
+//							
+//							tooltip.add(new TranslationTextComponent("info.research.lore_missing", new Object[]{missingLore + loreItem.getLoreDisplayName() + bad}).mergeStyle(bad));
+//						}
+//					}
 			
 			
 			if (this.state == ResearchState.INACTIVE && subscreen.attr.getResearchPoints() > 0 && NostrumMagica.canPurchaseResearch(subscreen.player, research)) {

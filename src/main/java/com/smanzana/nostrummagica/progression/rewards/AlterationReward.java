@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.quests.rewards;
+package com.smanzana.nostrummagica.progression.rewards;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;

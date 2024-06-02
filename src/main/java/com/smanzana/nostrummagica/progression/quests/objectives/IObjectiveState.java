@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.quests.objectives;
+package com.smanzana.nostrummagica.progression.quests.objectives;
 
 import net.minecraft.nbt.CompoundNBT;
 

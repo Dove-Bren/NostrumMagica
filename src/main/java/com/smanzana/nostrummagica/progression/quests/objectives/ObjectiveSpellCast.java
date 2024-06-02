@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.quests.objectives;
+package com.smanzana.nostrummagica.progression.quests.objectives;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;

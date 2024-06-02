@@ -921,10 +921,17 @@
 
     "info.quest.lore_missing": "Knowledge of %1$s is required",
     "info.quest.accept": "Click to Accept",
-    "info.research.lore_missing": "Knowledge of %1$s is required",
-    "info.research.quest_missing": "Must have completed %1$s",
     "info.research.purchase": "Click to Purchase",
     "info.research.view": "Click to View",
+	
+	"info.requirement.missing": "Need:",
+    "info.requirement.lore": "Knowledge of %1$s",
+    "info.requirement.quest": "Completed quest %1$s",
+    "info.requirement.spellknowledge": "Cast the %1$s spell effect",
+	"info.requirement.shape": "Mastery of the %1$s shape",
+	"info.requirement.element": "%1$s element",
+	"info.requirement.research": "Researched %1$s",
+	"info.requirement.alteration": "Mastery of the %1$s alteration",
 
     "maxelements.name": "Max Elements",
     "maxelements.desc": "Maximum total number of elements allowed in a spell for you to cast it. Spells with more elements than this cannot be cast.|Increases by 3 for each point invested in control.",
