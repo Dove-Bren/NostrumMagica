@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity.plantboss;
 
 import java.util.List;
 
-import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

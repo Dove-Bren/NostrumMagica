@@ -5,15 +5,15 @@ import java.util.EnumSet;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
-import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.SpawnPredefinedEffectMessage;
+import com.smanzana.nostrummagica.network.message.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;

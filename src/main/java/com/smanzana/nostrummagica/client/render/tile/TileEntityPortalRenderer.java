@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.NostrumPortal.NostrumPortalTileEntityBase;
+import com.smanzana.nostrummagica.block.NostrumPortal.NostrumPortalTileEntityBase;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.utils.ColorUtil;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

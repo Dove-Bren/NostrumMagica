@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierF
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierMove;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

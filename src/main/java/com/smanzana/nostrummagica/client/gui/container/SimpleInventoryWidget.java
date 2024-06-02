@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget.IScrollbarListener;
-import com.smanzana.nostrummagica.utils.ColorUtil;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

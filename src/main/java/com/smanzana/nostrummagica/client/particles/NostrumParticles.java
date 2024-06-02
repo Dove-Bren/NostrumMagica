@@ -6,9 +6,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.SpawnNostrumParticleMessage;
-import com.smanzana.nostrummagica.utils.ColorUtil;
-import com.smanzana.nostrummagica.utils.NetUtils;
+import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
+import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;

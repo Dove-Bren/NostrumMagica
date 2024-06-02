@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntitySize;

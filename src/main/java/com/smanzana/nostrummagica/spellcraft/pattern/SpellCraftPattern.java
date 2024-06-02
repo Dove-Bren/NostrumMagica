@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
-import com.smanzana.nostrummagica.utils.TextUtils;
+import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;

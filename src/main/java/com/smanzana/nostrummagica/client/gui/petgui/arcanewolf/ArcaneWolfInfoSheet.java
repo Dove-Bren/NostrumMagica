@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 

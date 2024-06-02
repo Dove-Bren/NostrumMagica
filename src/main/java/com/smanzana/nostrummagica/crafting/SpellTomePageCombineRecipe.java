@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.crafting;
 
-import com.smanzana.nostrummagica.items.SpellTomePage;
+import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
 import net.minecraft.inventory.CraftingInventory;

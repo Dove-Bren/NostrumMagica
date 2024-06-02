@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.client.model.ModelPlantBoss;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
 import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.utils.ColorUtil;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

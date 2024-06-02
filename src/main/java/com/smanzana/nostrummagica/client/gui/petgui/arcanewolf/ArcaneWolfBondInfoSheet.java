@@ -5,7 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 

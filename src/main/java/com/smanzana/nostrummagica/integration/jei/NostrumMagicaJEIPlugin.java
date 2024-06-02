@@ -23,11 +23,11 @@ import com.smanzana.nostrummagica.integration.jei.ingredients.RitualOutcomeJEIRe
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceIngredientType;
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceJEIHelper;
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceJEIRenderer;
-import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.rituals.RitualRecipe;
-import com.smanzana.nostrummagica.rituals.RitualRegistry;
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationRecipe;
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationSource;
+import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.ritual.RitualRecipe;
+import com.smanzana.nostrummagica.ritual.RitualRegistry;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationRecipe;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;

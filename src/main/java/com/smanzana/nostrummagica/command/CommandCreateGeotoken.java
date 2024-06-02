@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.smanzana.nostrummagica.items.NostrumItems;
-import com.smanzana.nostrummagica.items.PositionToken;
+import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.item.PositionToken;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

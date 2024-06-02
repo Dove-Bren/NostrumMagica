@@ -8,16 +8,16 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.items.SpellRune;
+import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
-import com.smanzana.nostrummagica.spells.components.SpellShapePart;
-import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;

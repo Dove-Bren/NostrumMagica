@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.gui.FontRenderer;
 

@@ -7,12 +7,12 @@ import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.SpellPlate;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
-import com.smanzana.nostrummagica.spells.components.SpellShapePart;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.item.SpellPlate;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;

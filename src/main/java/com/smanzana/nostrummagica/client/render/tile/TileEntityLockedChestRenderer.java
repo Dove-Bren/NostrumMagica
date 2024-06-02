@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.LockedChest;
+import com.smanzana.nostrummagica.block.LockedChest;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.items.WorldKeyItem;
-import com.smanzana.nostrummagica.tiles.LockedChestEntity;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.item.WorldKeyItem;
+import com.smanzana.nostrummagica.tile.LockedChestEntity;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;

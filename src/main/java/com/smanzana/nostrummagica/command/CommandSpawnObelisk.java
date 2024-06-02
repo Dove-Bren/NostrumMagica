@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.smanzana.nostrummagica.blocks.NostrumObelisk;
+import com.smanzana.nostrummagica.block.NostrumObelisk;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

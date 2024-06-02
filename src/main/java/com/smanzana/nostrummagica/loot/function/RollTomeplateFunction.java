@@ -4,7 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
-import com.smanzana.nostrummagica.items.SpellPlate;
+import com.smanzana.nostrummagica.item.SpellPlate;
 import com.smanzana.nostrummagica.loot.NostrumLoot;
 
 import net.minecraft.item.ItemStack;

@@ -9,9 +9,9 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

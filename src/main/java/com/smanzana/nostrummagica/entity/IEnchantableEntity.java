@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.entity;
 
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.Entity;
 

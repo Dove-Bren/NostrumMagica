@@ -17,8 +17,8 @@ import com.smanzana.nostrummagica.progression.requirement.LoreRequirement;
 import com.smanzana.nostrummagica.progression.requirement.QuestRequirement;
 import com.smanzana.nostrummagica.progression.requirement.SpellKnowledgeRequirement;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;

@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui.BasicS
 import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui.BasicSpellCraftGuiContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
-import com.smanzana.nostrummagica.tiles.BasicSpellTableEntity;
-import com.smanzana.nostrummagica.utils.ContainerUtil;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.tile.BasicSpellTableEntity;
+import com.smanzana.nostrummagica.util.ContainerUtil;
+import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

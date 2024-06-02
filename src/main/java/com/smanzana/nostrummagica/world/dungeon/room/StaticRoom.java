@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
-import com.smanzana.nostrummagica.utils.WorldUtil;
+import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;

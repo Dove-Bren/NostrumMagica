@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.items.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.MagicArmor;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;

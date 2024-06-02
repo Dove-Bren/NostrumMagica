@@ -9,9 +9,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity.NostrumObeliskTarget;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.NostrumObeliskEntity.NostrumObeliskTarget;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

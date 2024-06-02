@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.AgeableEntity;

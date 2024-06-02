@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.particles;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;

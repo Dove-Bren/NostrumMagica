@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBillboard;
 import com.smanzana.nostrummagica.client.model.ModelKeySwitchTrigger;
 import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
-import com.smanzana.nostrummagica.items.WorldKeyItem;
-import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.item.WorldKeyItem;
+import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;

@@ -6,8 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

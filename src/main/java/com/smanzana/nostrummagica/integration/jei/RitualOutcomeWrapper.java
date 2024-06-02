@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.integration.jei;
 
-import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
+import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
 
 public class RitualOutcomeWrapper {
 

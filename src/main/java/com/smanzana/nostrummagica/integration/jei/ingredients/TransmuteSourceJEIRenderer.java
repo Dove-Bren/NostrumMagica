@@ -5,8 +5,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationSource;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;

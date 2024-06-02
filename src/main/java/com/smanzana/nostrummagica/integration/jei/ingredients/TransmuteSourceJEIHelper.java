@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.integration.jei.ingredients;
 import java.util.ArrayList;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationSource;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 
 import mezz.jei.api.ingredients.IIngredientHelper;
 

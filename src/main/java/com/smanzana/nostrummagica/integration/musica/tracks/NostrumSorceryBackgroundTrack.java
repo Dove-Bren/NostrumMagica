@@ -4,7 +4,7 @@ import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 

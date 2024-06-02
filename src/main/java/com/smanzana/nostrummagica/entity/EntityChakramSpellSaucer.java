@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
-import com.smanzana.nostrummagica.spells.components.shapes.MagicCutterShape.MagicCutterShapeInstance;
-import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.spell.component.shapes.MagicCutterShape.MagicCutterShapeInstance;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

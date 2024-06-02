@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.tiles.KeySwitchBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
+import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
+import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;

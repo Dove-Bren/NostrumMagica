@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.blocks.NostrumBlocks;
-import com.smanzana.nostrummagica.blocks.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 

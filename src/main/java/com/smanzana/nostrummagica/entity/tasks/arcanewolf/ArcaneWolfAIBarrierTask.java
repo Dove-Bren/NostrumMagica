@@ -5,11 +5,11 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.EffectData;
-import com.smanzana.nostrummagica.listeners.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
+import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.entity.LivingEntity;

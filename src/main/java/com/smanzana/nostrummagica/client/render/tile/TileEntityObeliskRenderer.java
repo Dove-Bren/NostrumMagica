@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.tiles.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.utils.ModelUtils;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.util.ModelUtils;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

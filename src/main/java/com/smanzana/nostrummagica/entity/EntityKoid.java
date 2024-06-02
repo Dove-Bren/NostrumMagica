@@ -5,13 +5,13 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.items.InfusedGemItem;
+import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

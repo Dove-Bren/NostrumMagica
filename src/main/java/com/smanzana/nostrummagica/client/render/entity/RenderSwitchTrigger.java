@@ -8,10 +8,10 @@ import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.model.ModelTimedSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
-import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity;
-import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchHitType;
-import com.smanzana.nostrummagica.tiles.SwitchBlockTileEntity.SwitchTriggerType;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
+import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchHitType;
+import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchTriggerType;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;

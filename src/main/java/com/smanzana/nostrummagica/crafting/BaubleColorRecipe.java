@@ -7,8 +7,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.smanzana.nostrummagica.integration.curios.items.IColorableCurio;
-import com.smanzana.nostrummagica.items.EssenceItem;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;

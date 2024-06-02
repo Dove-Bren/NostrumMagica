@@ -8,9 +8,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
-import com.smanzana.nostrummagica.rituals.outcomes.IItemRitualOutcome;
-import com.smanzana.nostrummagica.rituals.outcomes.IRitualOutcome;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.ritual.outcome.IItemRitualOutcome;
+import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;

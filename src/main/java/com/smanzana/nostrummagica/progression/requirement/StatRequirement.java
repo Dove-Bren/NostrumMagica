@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.stats.PlayerStat;
-import com.smanzana.nostrummagica.stats.PlayerStats;
+import com.smanzana.nostrummagica.stat.PlayerStat;
+import com.smanzana.nostrummagica.stat.PlayerStats;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;

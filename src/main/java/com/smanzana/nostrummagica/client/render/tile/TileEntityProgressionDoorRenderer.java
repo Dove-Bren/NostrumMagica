@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
-import com.smanzana.nostrummagica.tiles.ProgressionDoorTileEntity;
+import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.tile.ProgressionDoorTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

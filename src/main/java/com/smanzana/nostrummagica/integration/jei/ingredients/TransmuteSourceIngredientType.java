@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.integration.jei.ingredients;
 
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationSource;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 
 import mezz.jei.api.ingredients.IIngredientType;
 

@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.spellcraft;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.SpellShapePart;
-import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 public class SpellIngredientBuilder {
 

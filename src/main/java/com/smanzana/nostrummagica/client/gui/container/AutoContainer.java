@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.utils.ContainerUtil.IAutoContainerInventory;
+import com.smanzana.nostrummagica.util.ContainerUtil.IAutoContainerInventory;
 
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;

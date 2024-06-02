@@ -10,8 +10,8 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceIngredientType;
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationRecipe;
-import com.smanzana.nostrummagica.spells.components.Transmutation.TransmutationSource;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationRecipe;
+import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;

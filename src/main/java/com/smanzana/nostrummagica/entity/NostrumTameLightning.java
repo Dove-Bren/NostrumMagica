@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.spells.EMagicElement;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

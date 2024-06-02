@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import com.smanzana.nostrummagica.utils.Inventories.ItemStackArrayWrapper;
+import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

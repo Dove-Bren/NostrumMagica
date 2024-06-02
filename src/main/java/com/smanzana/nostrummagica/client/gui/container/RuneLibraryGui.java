@@ -4,11 +4,11 @@ import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.tiles.RuneLibraryTileEntity;
-import com.smanzana.nostrummagica.utils.ContainerUtil;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.utils.Inventories;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.tile.RuneLibraryTileEntity;
+import com.smanzana.nostrummagica.util.ContainerUtil;
+import com.smanzana.nostrummagica.util.Inventories;
+import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

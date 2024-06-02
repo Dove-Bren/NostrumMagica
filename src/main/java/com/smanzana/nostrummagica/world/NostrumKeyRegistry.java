@@ -7,7 +7,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.PortingUtil;
+import com.smanzana.nostrummagica.util.PortingUtil;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;

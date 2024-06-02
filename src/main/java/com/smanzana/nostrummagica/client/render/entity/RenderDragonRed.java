@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonArmorPart;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonOverlayMaterial;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
-import com.smanzana.nostrummagica.items.armor.DragonArmor;
-import com.smanzana.nostrummagica.items.armor.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.item.armor.DragonArmor;
+import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

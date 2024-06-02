@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.blocks.NostrumBlocks;
-import com.smanzana.nostrummagica.tiles.ManaArmorerTileEntity;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.tile.ManaArmorerTileEntity;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;

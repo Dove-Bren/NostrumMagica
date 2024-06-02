@@ -7,10 +7,10 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.MysticAnchor;
-import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.block.MysticAnchor;
+import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

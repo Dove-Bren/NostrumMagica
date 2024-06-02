@@ -6,11 +6,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.items.armor.DragonArmor;
-import com.smanzana.nostrummagica.items.armor.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.item.armor.DragonArmor;
+import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.utils.NonNullEnumMap;
+import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntitySize;

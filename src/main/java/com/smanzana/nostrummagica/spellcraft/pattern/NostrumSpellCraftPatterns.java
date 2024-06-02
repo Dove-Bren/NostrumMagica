@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.spellcraft.pattern;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spellcraft.modifier.FlatSpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
 
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

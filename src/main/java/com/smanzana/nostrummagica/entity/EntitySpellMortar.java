@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
-import com.smanzana.nostrummagica.blocks.MysticAnchor;
+import com.smanzana.nostrummagica.block.MysticAnchor;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.shapes.MortarShape.MortarShapeInstance;
-import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.shapes.MortarShape.MortarShapeInstance;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

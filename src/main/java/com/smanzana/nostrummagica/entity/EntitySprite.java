@@ -6,18 +6,18 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.EntityAIFollowEntityGeneric;
 import com.smanzana.nostrummagica.entity.tasks.EntitySpellAttackTask;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
-import com.smanzana.nostrummagica.spells.components.shapes.TouchShape;
-import com.smanzana.nostrummagica.utils.SpellUtils;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spell.component.shapes.TouchShape;
+import com.smanzana.nostrummagica.util.SpellUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;

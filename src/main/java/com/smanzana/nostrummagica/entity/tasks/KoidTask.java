@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.spells.EAlteration;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.spells.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spells.components.SpellEffectPart;
-import com.smanzana.nostrummagica.spells.components.SpellShapePart;
-import com.smanzana.nostrummagica.spells.components.shapes.NostrumSpellShapes;
-import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;

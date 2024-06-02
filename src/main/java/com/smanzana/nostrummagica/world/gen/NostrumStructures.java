@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.DragonStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.PlantBossStructure;

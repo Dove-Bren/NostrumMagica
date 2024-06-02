@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
-import com.smanzana.nostrummagica.utils.ColorUtil;
+import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;

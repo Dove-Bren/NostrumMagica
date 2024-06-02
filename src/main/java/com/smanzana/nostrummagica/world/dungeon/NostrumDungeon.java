@@ -12,9 +12,9 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.ReagentItem;
-import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.utils.WorldUtil;
+import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
 import net.minecraft.item.ItemStack;

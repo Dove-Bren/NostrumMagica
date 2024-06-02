@@ -7,11 +7,11 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.SpellTomeSlotModifyMessage;
-import com.smanzana.nostrummagica.spells.Spell;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.network.message.SpellTomeSlotModifyMessage;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;

@@ -9,8 +9,8 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.serializers.OptionalParticleDataSerializer;
-import com.smanzana.nostrummagica.utils.ParticleHelper;
+import com.smanzana.nostrummagica.serializer.OptionalParticleDataSerializer;
+import com.smanzana.nostrummagica.util.ParticleHelper;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.AreaEffectCloudEntity;

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
-import com.smanzana.nostrummagica.effects.NostrumEffects;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;

@@ -6,8 +6,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelDragonFlightWings;
-import com.smanzana.nostrummagica.items.IDragonWingRenderItem;
-import com.smanzana.nostrummagica.utils.ColorUtil;
+import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
+import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

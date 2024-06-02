@@ -6,8 +6,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
+import com.smanzana.nostrummagica.network.message.StatSyncMessage;
+import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

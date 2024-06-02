@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.world.gen;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.blocks.NostrumBlocks;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;

@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.spells.components.shapes.MagicCyclerShape.MagicCyclerShapeInstance;
-import com.smanzana.nostrummagica.utils.Entities;
+import com.smanzana.nostrummagica.spell.component.shapes.MagicCyclerShape.MagicCyclerShapeInstance;
+import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

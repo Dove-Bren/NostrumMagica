@@ -6,10 +6,10 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.serializers.MagicElementDataSerializer;
-import com.smanzana.nostrummagica.spells.EMagicElement;
-import com.smanzana.nostrummagica.spells.components.shapes.SeekingBulletShape.SeekingBulletShapeInstance;
-import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.shapes.SeekingBulletShape.SeekingBulletShapeInstance;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

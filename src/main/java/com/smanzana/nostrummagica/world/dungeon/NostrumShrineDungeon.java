@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
-import com.smanzana.nostrummagica.spells.components.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.room.ISpellComponentRoom;
 
 import net.minecraft.world.IWorld;

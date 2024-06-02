@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.world.gen;
 import java.util.List;
 import java.util.Random;
 
-import com.smanzana.nostrummagica.utils.DimensionUtils;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;

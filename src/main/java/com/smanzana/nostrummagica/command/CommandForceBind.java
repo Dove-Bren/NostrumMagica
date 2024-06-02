@@ -5,11 +5,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.items.SpellScroll;
-import com.smanzana.nostrummagica.items.SpellTome;
+import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.messages.StatSyncMessage;
-import com.smanzana.nostrummagica.spells.Spell;
+import com.smanzana.nostrummagica.network.message.StatSyncMessage;
+import com.smanzana.nostrummagica.spell.Spell;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

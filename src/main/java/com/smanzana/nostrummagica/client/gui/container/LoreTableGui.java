@@ -6,10 +6,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.tiles.LoreTableEntity;
-import com.smanzana.nostrummagica.utils.ContainerUtil;
-import com.smanzana.nostrummagica.utils.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.utils.RenderFuncs;
+import com.smanzana.nostrummagica.tile.LoreTableEntity;
+import com.smanzana.nostrummagica.util.ContainerUtil;
+import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;

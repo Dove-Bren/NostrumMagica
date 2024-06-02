@@ -7,12 +7,12 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.items.equipment.HookshotItem;
-import com.smanzana.nostrummagica.items.equipment.HookshotItem.HookshotType;
-import com.smanzana.nostrummagica.serializers.HookshotTypeDataSerializer;
+import com.smanzana.nostrummagica.item.equipment.HookshotItem;
+import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.serializer.HookshotTypeDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.utils.Entities;
-import com.smanzana.nostrummagica.utils.RayTrace;
+import com.smanzana.nostrummagica.util.Entities;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
