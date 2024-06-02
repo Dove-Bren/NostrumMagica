@@ -114,14 +114,6 @@ public interface INostrumMagic {
 	public void addResearchPoint();
 	public void takeResearchPoint();
 	
-	// Spell crafting attributes
-	public int getControl();
-	public void addControl();
-	public int getTech();
-	public void addTech();
-	public int getFinesse();
-	public void addFinesse();
-	
 	// Mana
 	public int getMana();
 	public int getMaxMana();
@@ -198,9 +190,6 @@ public interface INostrumMagic {
 			float xp,
 			int skillpoints,
 			int researchpoints,
-			int control,
-			int tech,
-			int finesse,
 			int mana,
 			int reserved_mana
 			);

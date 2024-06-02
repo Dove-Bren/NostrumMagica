@@ -579,47 +579,9 @@ public class NostrumMagica {
 		return true;
 	}
 
-	public static int getMaxComponents(INostrumMagic attr) {
-		if (attr.isUnlocked())
-			return 2 * (attr.getTech() + 1);
-
-		return 0;
-	}
-
-//	public static int getMaxTriggers(INostrumMagic attr) {
-//		if (attr.isUnlocked())
-//			return 1 + (attr.getFinesse());
-//
-//		return 0;
-//	}
-
-	public static int getMaxElements(INostrumMagic attr) {
-		if (attr.isUnlocked())
-			return 1 + attr.getControl() * 3;
-
-		return 0;
-	}
-
 	public static boolean canCast(Spell spell, INostrumMagic attr, @Nonnull List<ITextComponent> problemsOut) {
-		int comps = getMaxComponents(attr);
-		int elements = getMaxElements(attr);
-		
 		boolean success = true;
 
-		int unused; // REVISIT
-		if (spell.getComponentCount() > comps) {
-			success = false;
-			problemsOut.add(new TranslationTextComponent("info.spell.low_tech"));
-		}
-//		if (spell.getTriggerCount() > triggers) {
-//			success = false;
-//			problemsOut.add(new TranslationTextComponent("info.spell.low_finesse"));
-//		}
-		if (spell.getElementCount() > elements) {
-			success = false;
-			problemsOut.add(new TranslationTextComponent("info.spell.low_control"));
-		}
-		
 		Map<EMagicElement, ElementalMastery> neededMasteries = new EnumMap<>(EMagicElement.class);
 
 		for (SpellEffectPart part : spell.getSpellEffectParts()) {

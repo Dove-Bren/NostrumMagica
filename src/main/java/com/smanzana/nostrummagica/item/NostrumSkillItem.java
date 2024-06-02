@@ -128,9 +128,11 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 	public static class Ooze extends NostrumSkillItem {
 		public Ooze() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
-				attr.addControl();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_OOZE), Util.DUMMY_UUID);
-				return true;
+				int unused;
+				return false;
+//				attr.addControl();
+//				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_OOZE), Util.DUMMY_UUID);
+//				return true;
 			});
 		}
 	}
@@ -138,9 +140,11 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 	public static class Pendant extends NostrumSkillItem {
 		public Pendant() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
-				attr.addTech();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_PENDANT), Util.DUMMY_UUID);
-				return true;
+				int unused;
+				return false;
+//				attr.addTech();
+//				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_PENDANT), Util.DUMMY_UUID);
+//				return true;
 			});
 		}
 	}
@@ -148,9 +152,11 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 	public static class Flute extends NostrumSkillItem {
 		public Flute() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
-				attr.addFinesse();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_FLUTE), Util.DUMMY_UUID);
-				return true;
+				int unused;
+				return false;
+//				attr.addFinesse();
+//				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_FLUTE), Util.DUMMY_UUID);
+//				return true;
 			});
 		}
 	}

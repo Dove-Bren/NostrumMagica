@@ -11,7 +11,6 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -269,19 +268,6 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
-			text = String.format("%2d", attr.getTech());
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			text = String.format("%2d", attr.getFinesse());
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			text = String.format("%2d", attr.getControl());
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			
 			//text = String.format("3.1%f%%", );
 			drawX = x + 20 + (width - 200) + valueOffsetDerived;
 			drawY = y + 20;
@@ -301,19 +287,6 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			text = String.format("%+05.1f%%", attr.getManaRegenModifier() * 100f);
 			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
-			
-			text = String.format("%4d", NostrumMagica.getMaxComponents(attr));
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-//			text = String.format("%4d", NostrumMagica.getMaxTriggers(attr));
-//			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-//			drawY += 15;
-			
-			text = String.format("%4d", NostrumMagica.getMaxElements(attr));
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
 			
 			String desc;
 			int len;

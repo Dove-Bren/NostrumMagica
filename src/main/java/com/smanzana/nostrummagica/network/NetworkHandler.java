@@ -6,7 +6,6 @@ import com.smanzana.nostrummagica.network.message.CandleIgniteMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseResearchMessage;
-import com.smanzana.nostrummagica.network.message.ClientSkillUpMessage;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
@@ -86,7 +85,6 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellDebugMessage.class, SpellDebugMessage::encode, SpellDebugMessage::decode, SpellDebugMessage::handle);
 		syncChannel.registerMessage(discriminator++, ObeliskTeleportationRequestMessage.class, ObeliskTeleportationRequestMessage::encode, ObeliskTeleportationRequestMessage::decode, ObeliskTeleportationRequestMessage::handle);
 		syncChannel.registerMessage(discriminator++, ObeliskSelectMessage.class, ObeliskSelectMessage::encode, ObeliskSelectMessage::decode, ObeliskSelectMessage::handle);
-		syncChannel.registerMessage(discriminator++, ClientSkillUpMessage.class, ClientSkillUpMessage::encode, ClientSkillUpMessage::decode, ClientSkillUpMessage::handle);
 		syncChannel.registerMessage(discriminator++, ClientUpdateQuestMessage.class, ClientUpdateQuestMessage::encode, ClientUpdateQuestMessage::decode, ClientUpdateQuestMessage::handle);
 		syncChannel.registerMessage(discriminator++, StatRequestMessage.class, StatRequestMessage::encode, StatRequestMessage::decode, StatRequestMessage::handle);
 		syncChannel.registerMessage(discriminator++, ClientEffectRenderMessage.class, ClientEffectRenderMessage::encode, ClientEffectRenderMessage::decode, ClientEffectRenderMessage::handle);

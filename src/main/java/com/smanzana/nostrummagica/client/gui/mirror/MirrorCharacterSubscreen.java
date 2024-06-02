@@ -10,9 +10,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.widget.LabeledTextWidget;
-import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.message.ClientSkillUpMessage;
-import com.smanzana.nostrummagica.network.message.ClientSkillUpMessage.Type;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.TextUtils;
@@ -149,12 +146,11 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		}
 		
 		y = guiTop + 150;
-		parent.addWidget(new SectionLabel("Spellcraft", font, leftMargin, y, width - 30, 20));
+		parent.addWidget(new SectionLabel("Skills", font, leftMargin, y, width - 30, 20));
 		y += font.FONT_HEIGHT + 4;
 		{
 			final float scale = .5f;
 			final int yPer = (int) (font.FONT_HEIGHT * scale) + 1;
-			final int xPer = (width / 3);
 			int x = leftMargin + 4;
 			
 			// First row: resources
@@ -162,15 +158,15 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			y += yPer;
 			
 			// Second row: stats
-			parent.addWidget(new LabeledTextWidget(helper, "Control: ", () -> "" + attr.getControl(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("control.desc")));
-			buttonControl = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
-			x += xPer;
-			parent.addWidget(new LabeledTextWidget(helper, "Technique: ", () -> "" + attr.getTech(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("technique.desc")));
-			buttonTechnique = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
-			x += xPer;
-			parent.addWidget(new LabeledTextWidget(helper, "Finesse: ", () -> "" + attr.getFinesse(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("finesse.desc")));
-			buttonFinesse = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
-			x += xPer;
+//			parent.addWidget(new LabeledTextWidget(helper, "Control: ", () -> "" + attr.getControl(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("control.desc")));
+//			buttonControl = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
+//			x += xPer;
+//			parent.addWidget(new LabeledTextWidget(helper, "Technique: ", () -> "" + attr.getTech(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("technique.desc")));
+//			buttonTechnique = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
+//			x += xPer;
+//			parent.addWidget(new LabeledTextWidget(helper, "Finesse: ", () -> "" + attr.getFinesse(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("finesse.desc")));
+//			buttonFinesse = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
+//			x += xPer;
 		}
 		
 		refreshButtons(); // Set visibility on buttons based on attributes
@@ -245,18 +241,18 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	protected void onImproveButton(Button button) {
 		//if (ignoreButton(button)) return;
 		
-		final Type type;
-		if (button == this.buttonControl) {
-			type = Type.CONTROL;
-		} else if (button == this.buttonFinesse) {
-			type = Type.FINESSE;
-		} else {
-			type = Type.TECHNIQUE;
-		}
-		attr.takeSkillPoint(); // take a local point so our update makes sense
-		NetworkHandler.sendToServer(
-				new ClientSkillUpMessage(type)
-				);
+//		final Type type;
+//		if (button == this.buttonControl) {
+//			type = Type.CONTROL;
+//		} else if (button == this.buttonFinesse) {
+//			type = Type.FINESSE;
+//		} else {
+//			type = Type.TECHNIQUE;
+//		}
+//		attr.takeSkillPoint(); // take a local point so our update makes sense
+//		NetworkHandler.sendToServer(
+//				new ClientSkillUpMessage(type)
+//				);
 		
 		refreshButtons();
 	}
@@ -316,8 +312,5 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	private static final int TEX_BUTTON_VOFFSET = 0;
 	private static final int TEX_BUTTON_WIDTH = 32;
 	private static final int TEX_BUTTON_HEIGHT = 32;
-	
-	private static final int POS_IMPROVE_BUTTON_WIDTH = 16;
-	private static final int POS_IMPROVE_BUTTON_HEIGHT = 16;
 
 }

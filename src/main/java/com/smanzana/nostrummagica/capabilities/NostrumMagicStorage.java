@@ -35,9 +35,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_XP = "xp";
 	private static final String NBT_SKILLPOINTS = "skillpoints";
 	private static final String NBT_RESEARCHPOINTS = "researchpoints";
-	private static final String NBT_CONTROL = "control";
-	private static final String NBT_TECH = "tech";
-	private static final String NBT_FINESSE = "finesse";
 	private static final String NBT_MANA = "mana";
 	private static final String NBT_RESERVED_MANA = "reserved_mana";
 	
@@ -87,9 +84,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.putFloat(NBT_XP, instance.getXP());
 		nbt.putInt(NBT_SKILLPOINTS, instance.getSkillPoints());
 		nbt.putInt(NBT_RESEARCHPOINTS, instance.getResearchPoints());
-		nbt.putInt(NBT_CONTROL, instance.getControl());
-		nbt.putInt(NBT_TECH, instance.getTech());
-		nbt.putInt(NBT_FINESSE, instance.getFinesse());
 		nbt.putInt(NBT_MANA, instance.getMana());
 		nbt.putInt(NBT_RESERVED_MANA, instance.getReservedMana());
 		
@@ -290,9 +284,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getFloat(NBT_XP),
 			tag.getInt(NBT_SKILLPOINTS),
 			tag.getInt(NBT_RESEARCHPOINTS),
-			tag.getInt(NBT_CONTROL),
-			tag.getInt(NBT_TECH),
-			tag.getInt(NBT_FINESSE),
 			tag.getInt(NBT_MANA),
 			tag.getInt(NBT_RESERVED_MANA)
 			);
