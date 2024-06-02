@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.spells.components.SpellShapePart;
 import com.smanzana.nostrummagica.spells.components.SpellAction.SpellActionResult;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape.SpellShapeInstance;
+import com.smanzana.nostrummagica.stats.PlayerStat;
 import com.smanzana.nostrummagica.stats.PlayerStatTracker;
 
 import net.minecraft.entity.LivingEntity;
@@ -246,7 +247,7 @@ public class Spell {
 				final float damageTotalFinal = damageTotal;
 				PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> {
 					if (damageTotalFinal > 0) {
-						stats.recordSpellDamageDealt(damageTotalFinal);
+						stats.takeMax(PlayerStat.MaxSpellDamageDealt, damageTotalFinal);
 					}
 					// Per element damage calculated by damage listener
 				});
@@ -364,7 +365,7 @@ public class Spell {
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
 		if (caster instanceof PlayerEntity) {
-			PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> stats.addSpellsCast(1).addTotalSpellWeight(weight));
+			PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> stats.incrStat(PlayerStat.SpellsCast).addStat(PlayerStat.TotalSpellWeight, weight));
 		}
 	}
 	

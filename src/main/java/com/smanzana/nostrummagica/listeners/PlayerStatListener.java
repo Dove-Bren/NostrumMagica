@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.MagicDamageSource;
+import com.smanzana.nostrummagica.stats.PlayerStat;
 import com.smanzana.nostrummagica.stats.PlayerStatTracker;
 
 import net.minecraft.entity.LivingEntity;
@@ -59,18 +60,18 @@ public class PlayerStatListener {
 		if (event.getSource() != null && event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof PlayerEntity) {
 			final PlayerEntity player = (PlayerEntity) event.getSource().getTrueSource();
 			final LivingEntity killed = event.getEntityLiving();
-			PlayerStatTracker.Update(player, (stats) -> stats.addEntityKills(killed.getType(), 1));
+			PlayerStatTracker.Update(player, (stats) -> stats.incrStat(PlayerStat.EntityKills(killed.getType())));
 			
 			if (event.getSource() instanceof MagicDamageSource) {
 				MagicDamageSource magicSource = (MagicDamageSource) event.getSource();
-				PlayerStatTracker.Update(player, (stats) -> stats.addKillsWithMagic(1).addKillsWithElement(magicSource.getElement(), 1));
+				PlayerStatTracker.Update(player, (stats) -> stats.incrStat(PlayerStat.KillsWithMagic).incrStat(PlayerStat.KillsWithElement(magicSource.getElement())));
 			}
 			
 			
 			if (killed instanceof IElementalEntity) {
 				@Nullable EMagicElement element = ((IElementalEntity) killed).getElement();
 				if (element != null) {
-					PlayerStatTracker.Update(player, (stats) -> stats.addElementalKills(element, 1));
+					PlayerStatTracker.Update(player, (stats) -> stats.incrStat(PlayerStat.ElementalKills(element)));
 				}
 			}
 		}

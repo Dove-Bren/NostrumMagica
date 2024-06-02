@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.items.ISpellCastingTool;
 import com.smanzana.nostrummagica.items.ISpellEquipment;
 import com.smanzana.nostrummagica.items.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
+import com.smanzana.nostrummagica.stats.PlayerStat;
 import com.smanzana.nostrummagica.stats.PlayerStatTracker;
 
 import net.minecraft.entity.LivingEntity;
@@ -217,7 +218,7 @@ public class SpellCasting {
 			}
 			
 			if (!seen && entity instanceof PlayerEntity) {
-				PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.addUniqueSpellsCast(1));
+				PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.incrStat(PlayerStat.UniqueSpellsCast));
 			}
 		}
 		
