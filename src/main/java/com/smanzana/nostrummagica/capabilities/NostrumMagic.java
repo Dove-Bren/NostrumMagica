@@ -19,7 +19,6 @@ import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.LoreMessage;
-import com.smanzana.nostrummagica.progression.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
@@ -110,7 +109,6 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<EAlteration, Boolean> alterations;
 	private List<String> completedQuests;
 	private List<String> currentQuests;
-	private Map<String, IObjectiveState> questData;
 	private List<String> completedResearch;
 	private BlockPos markLocation;
 	private RegistryKey<World> markDimension;
@@ -134,7 +132,6 @@ public class NostrumMagic implements INostrumMagic {
 		alterations = new EnumMap<>(EAlteration.class);
 		currentQuests = new ArrayList<>();
 		completedQuests = new ArrayList<>();
-		questData = new HashMap<>();
 		completedResearch = new ArrayList<>();
 		familiars = new ArrayList<>();
 		sorceryPortalDim = World.OVERWORLD;
@@ -661,7 +658,6 @@ public class NostrumMagic implements INostrumMagic {
 		this.markDimension = cap.getMarkDimension();
 		this.currentQuests = cap.getCurrentQuests();
 		this.completedQuests = cap.getCompletedQuests();
-		this.questData = cap.getQuestDataMap();
 		this.completedResearch = cap.getCompletedResearches();
 		this.spellKnowledge = cap.getSpellKnowledge();
 		this.enhancedTeleport = cap.hasEnhancedTeleport(); 
@@ -761,29 +757,6 @@ public class NostrumMagic implements INostrumMagic {
 			completedQuests.add(quest);
 		}
 			
-	}
-
-	@Override
-	public IObjectiveState getQuestData(String quest) {
-		return questData.get(quest);
-	}
-	
-	@Override
-	public void setQuestData(String quest, IObjectiveState data) {
-		if (data == null)
-			questData.remove(quest);
-		else
-			questData.put(quest, data);
-	}
-	
-	@Override
-	public Map<String, IObjectiveState> getQuestDataMap() {
-		return questData;
-	}
-	
-	@Override
-	public void setQuestDataMap(Map<String, IObjectiveState> map) {
-		this.questData = map;
 	}
 
 	@Override

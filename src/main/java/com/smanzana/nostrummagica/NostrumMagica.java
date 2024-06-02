@@ -43,8 +43,6 @@ import com.smanzana.nostrummagica.listeners.MagicEffectProxy;
 import com.smanzana.nostrummagica.listeners.ManaArmorListener;
 import com.smanzana.nostrummagica.listeners.PlayerListener;
 import com.smanzana.nostrummagica.listeners.PlayerStatListener;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
@@ -430,9 +428,7 @@ public class NostrumMagica {
 	/**
 	 * Whether a quest is visible in the mirror by normal rules. This is either that
 	 * one of the parents of the quest has been finished, OR that the quest has no
-	 * parent but the conditions to take the quest are fulfilled. Note: If there are
-	 * lore requirements and those aren't filled, this returns false even if the
-	 * other two conditions are true.
+	 * parent but the conditions to take the quest are fulfilled.
 	 * 
 	 * @param player
 	 * @param quest
@@ -443,18 +439,6 @@ public class NostrumMagica {
 
 		if (attr == null)
 			return false;
-
-		// Check lore requirements
-		if (quest.getLoreKeys() != null && quest.getLoreKeys().length != 0) {
-			for (String lore : quest.getLoreKeys()) {
-				ILoreTagged loreItem = LoreRegistry.instance().lookup(lore);
-				if (loreItem != null) {
-					if (!attr.hasLore(loreItem)) {
-						return false;
-					}
-				}
-			}
-		}
 
 		if (quest.getParentKeys() == null || quest.getParentKeys().length == 0) {
 			return canTakeQuest(player, quest);
@@ -481,14 +465,11 @@ public class NostrumMagica {
 		if (attr == null)
 			return false;
 
-		// Check lore requirements
-		if (quest.getLoreKeys() != null && quest.getLoreKeys().length != 0) {
-			for (String lore : quest.getLoreKeys()) {
-				ILoreTagged loreItem = LoreRegistry.instance().lookup(lore);
-				if (loreItem != null) {
-					if (!attr.hasLore(loreItem)) {
-						return false;
-					}
+		// Check requirements
+		if (quest.getRequirements() != null) {
+			for (IRequirement req : quest.getRequirements()) {
+				if (!req.matches(player)) {
+					return false;
 				}
 			}
 		}
@@ -515,8 +496,7 @@ public class NostrumMagica {
 			}
 		}
 
-		return quest.getReqLevel() <= attr.getLevel() && quest.getReqControl() <= attr.getControl()
-				&& quest.getReqTechnique() <= attr.getTech() && quest.getReqFinesse() <= attr.getFinesse();
+		return true;
 	}
 
 	public static boolean getResearchVisible(PlayerEntity player, NostrumResearch research) {

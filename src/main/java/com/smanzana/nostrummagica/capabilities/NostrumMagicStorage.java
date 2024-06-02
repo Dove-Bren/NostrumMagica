@@ -9,8 +9,6 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
-import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
-import com.smanzana.nostrummagica.progression.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.components.shapes.SpellShape;
@@ -65,7 +63,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	
 	private static final String NBT_QUESTS_COMPLETED = "quests_completed";
 	private static final String NBT_QUESTS_CURRENT = "quests_current";
-	private static final String NBT_QUESTS_DATA = "quest_data";
 	
 	private static final String NBT_RESEARCHES = "research_completed";
 	
@@ -232,20 +229,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			nbt.put(NBT_QUESTS_COMPLETED, tagList);
 		}
 		
-		{
-			Map<String, IObjectiveState> data = instance.getQuestDataMap();
-			if (data != null && !data.isEmpty()) {
-				compound = new CompoundNBT();
-				
-				for (String quest : data.keySet()) {
-					compound.put(quest, data.get(quest).toNBT());
-				}
-				
-				nbt.put(NBT_QUESTS_DATA, compound);
-			}
-		
-		}
-		
 		stringList = instance.getCompletedResearches();
 		if (stringList != null && !stringList.isEmpty()) {
 			ListNBT tagList = new ListNBT();
@@ -395,22 +378,6 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				instance.completeQuest(quest);
 			}
 		}
-		Map<String, IObjectiveState> data = new HashMap<>();
-		if (tag.contains(NBT_QUESTS_DATA, NBT.TAG_COMPOUND)) {
-			CompoundNBT dataTag = tag.getCompound(NBT_QUESTS_DATA);
-			for (String key : dataTag.keySet()) {
-				NostrumQuest quest = NostrumQuest.lookup(key);
-				if (quest == null)
-					continue;
-				
-				if (quest.getObjective() != null) {
-					IObjectiveState state = quest.getObjective().getBaseState();
-					state.fromNBT(dataTag.getCompound(key));
-					data.put(key, state);
-				}
-			}
-		}
-		instance.setQuestDataMap(data);
 		
 		if (tag.contains(NBT_RESEARCHES, NBT.TAG_LIST)) {
 			ListNBT tagList = tag.getList(NBT_RESEARCHES, NBT.TAG_STRING);

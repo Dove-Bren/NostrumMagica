@@ -919,8 +919,7 @@
     "modifier.name": "Modifier",
     "modifier.desc": "Modifiers are used to add additional tome pages to spell tomes, adding new enhancements.",
 
-    "info.quest.lore_missing": "Knowledge of %1$s is required",
-    "info.quest.accept": "Click to Accept",
+    "info.quest.accept": "Click to Complete",
     "info.research.purchase": "Click to Purchase",
     "info.research.view": "Click to View",
 	

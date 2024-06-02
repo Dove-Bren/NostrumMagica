@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.progression.quests.objectives.IObjectiveState;
 import com.smanzana.nostrummagica.spells.EAlteration;
 import com.smanzana.nostrummagica.spells.EMagicElement;
 import com.smanzana.nostrummagica.spells.Spell;
@@ -233,10 +232,6 @@ public interface INostrumMagic {
 	public List<String> getCurrentQuests();
 	public void addQuest(String quest);
 	public void completeQuest(String quest);
-	public IObjectiveState getQuestData(String quest);
-	public void setQuestData(String quest, IObjectiveState data);
-	public Map<String, IObjectiveState> getQuestDataMap();
-	public void setQuestDataMap(Map<String, IObjectiveState> map);
 	
 	// Research
 	public List<String> getCompletedResearches();

@@ -32,13 +32,8 @@ public class ClientUpdateQuestMessage {
 				return;
 			}
 			
-			if (att.getCurrentQuests().contains(message.quest.getKey())) {
-				if (message.quest.getObjective().isComplete(att))
-					message.quest.completeQuest(sp);
-			} else {
-				if (NostrumMagica.canTakeQuest(sp, message.quest))
-					message.quest.startQuest(sp);
-			}
+			if (NostrumMagica.canTakeQuest(sp, message.quest))
+				message.quest.startQuest(sp);
 
 			 NetworkHandler.sendTo(new StatSyncMessage(att), sp);
 		});

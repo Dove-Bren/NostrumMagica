@@ -1,15 +1,14 @@
 package com.smanzana.nostrummagica.progression.quests;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
-import com.smanzana.nostrummagica.progression.quests.objectives.IObjective;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.rewards.IReward;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
@@ -18,15 +17,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 
 /**
  * Base class for Nostrum quests.
- * These are objectives/quests that are presented in the character tab of the mirror.
+ * These are objectives/quests that are presented in the quest tab of the mirror.
  * They have parents.
  * They have rewards.
- * If they are a challenge type, they have the challenge specifications
  * <p>
- * Quests should be <emphasis>instantiated</emphasis> during the init phase.
- * The constructor in this base class performs registration. Registration is
- * validated during post-init. Registering quests in post-init or afterwards
- * produced undefined behavior.
+ * The constructor in this base class performs registration.
  * </p>
  * @author Skyler
  *
@@ -41,22 +36,13 @@ public class NostrumQuest {
 	/**
 	 * Unique key for this quest. Used for parent lookups and translations
 	 */
-	protected String key;
+	protected final String key;
 	
 	/**
 	 * Type of quest this is. Challenge quests have objectives that must
 	 * be completed before rewards are given
 	 */
-	protected QuestType type;
-
-	/**
-	 * Requires attributes to unlock this quest.
-	 * Also used to calculate the location of the quest on the mirror screen.
-	 */
-	protected int reqLevel;
-	protected int reqControl;
-	protected int reqTechnique;
-	protected int reqFinesse;
+	protected final QuestType type;
 	
 	/**
 	 * List of parent quests. This is a sanitized array and expects each to exist.
@@ -65,26 +51,21 @@ public class NostrumQuest {
 	protected String[] parentKeys;
 	
 	/**
-	 * List of lore keys that are required before this quest can be seen/taken
-	 */
-	protected String[] loreKeys;
-	
-	/**
-	 * Challenge objective. Not used if this is not a challenge type.
-	 */
-	protected IObjective objective;
-	
-	/**
-	 * Rewards distributes after the quest is completed.
+	 * Reward distributed after the quest is completed.
 	 * Rewards are only received once.
 	 */
-	protected IReward[] rewards;
+	protected final IReward reward;
+
+	/**
+	 * Requirements to be able to complete this quest.
+	 */
+	protected /*final*/ IRequirement[] requirements;
 	
 	/**
-	 * Optional graphical offsets
+	 * Graphical offsets from the center of the quest screen
 	 */
-	protected int offsetX;
-	protected int offsetY;
+	protected final int offsetX;
+	protected final int offsetY;
 
 	/**
 	 * Creates a new quest.
@@ -111,40 +92,54 @@ public class NostrumQuest {
 	public NostrumQuest(
 			String key,
 			QuestType type,
-			int reqLevel,
-			int reqControl,
-			int reqTechnique,
-			int reqFinesse,
 			String[] parentKeys,
-			String[] loreKeys,
-			IObjective objective,
-			IReward[] rewards
+			int x,
+			int y,
+			IReward reward,
+			IRequirement ... requirements
 			) {
-		super();
 		this.key = key;
 		this.type = type;
-		this.reqLevel = reqLevel;
-		this.reqControl = reqControl;
-		this.reqTechnique = reqTechnique;
-		this.reqFinesse = reqFinesse;
 		this.parentKeys = parentKeys;
-		this.loreKeys = loreKeys;
-		this.objective = objective;
-		this.rewards = rewards;
+		this.reward = reward;
+		this.requirements = requirements;
 		
-		if (this.objective != null)
-			this.objective.setParentQuest(this);
-		
-		this.offsetX = 0;
-		this.offsetY = 0;
+		this.offsetX = x;
+		this.offsetY = y;
 		
 		NostrumQuest.register(this);
 	}
 	
-	public NostrumQuest offset(int x, int y) {
-		this.offsetX = x;
-		this.offsetY = y;
-		return this;
+	public NostrumQuest(
+			String key,
+			String[] parentKeys,
+			int x,
+			int y,
+			IReward reward,
+			IRequirement ... requirements
+			) {
+		this(key, QuestType.REGULAR, parentKeys, x, y, reward, requirements);
+	}
+	
+	public NostrumQuest(
+			String key,
+			String parentKey,
+			int x,
+			int y,
+			IReward reward,
+			IRequirement ... requirements
+			) {
+		this(key, QuestType.REGULAR, new String[] {parentKey}, x, y, reward, requirements);
+	}
+	
+	public NostrumQuest(
+			String key,
+			int x,
+			int y,
+			IReward reward,
+			IRequirement ... requirements
+			) {
+		this(key, QuestType.REGULAR, (String[]) null, x, y, reward, requirements);
 	}
 	
 	public String getKey() {
@@ -159,46 +154,24 @@ public class NostrumQuest {
 		return parentKeys;
 	}
 	
-	public String[] getLoreKeys() {
-		return loreKeys;
+	public IRequirement[] getRequirements() {
+		return requirements;
 	}
 
-	public IObjective getObjective() {
-		return objective;
+	public IReward getReward() {
+		return reward;
 	}
 
-	public IReward[] getRewards() {
-		return rewards;
-	}
-
-	public int getReqLevel() {
-		return reqLevel;
-	}
-
-	public int getReqControl() {
-		return reqControl;
-	}
-
-	public int getReqTechnique() {
-		return reqTechnique;
-	}
-
-	public int getReqFinesse() {
-		return reqFinesse;
-	}
-	
 	public int getPlotX() {
-		return this.offsetX + (reqControl - reqFinesse);
+		return this.offsetX;
 	}
 	
 	public int getPlotY() {
-		return this.offsetY + (-(reqLevel != 0 ? reqLevel-1 : 0) + reqTechnique);
+		return this.offsetY;
 	}
 	
 	public void grantReward(PlayerEntity player) {
-		for (IReward reward : this.rewards) {
-			reward.award(player);
-		}
+		reward.award(player);
 	}
 	
 	/**
@@ -229,15 +202,9 @@ public class NostrumQuest {
 		if (attr.getCurrentQuests().contains(getKey()))
 			return;
 		
+		// Remnant of old system where some quests had middle parts
 		attr.addQuest(getKey());
-		
-		// If we have an objective, write in object data on the attribute
-		// Otherwise, just complete the quest
-		if (this.objective != null) {
-			
-		} else {
-			this.completeQuest(player);
-		}
+		this.completeQuest(player);
 	}
 
 	private static Map<String, NostrumQuest> Registry = new HashMap<>();
@@ -272,7 +239,7 @@ public class NostrumQuest {
 			}
 			count++;
 				
-			List<String> outList = new LinkedList<>();
+			List<String> outList = new ArrayList<>();
 			for (String dep : quest.parentKeys) {
 				if (Registry.containsKey(dep))
 					outList.add(dep);
@@ -289,27 +256,27 @@ public class NostrumQuest {
 		
 		count = 0;
 		for (NostrumQuest quest : Registry.values()) {
-			if (quest.loreKeys == null || quest.loreKeys.length == 0) {
-				quest.loreKeys = null;
+			if (quest.requirements == null || quest.requirements.length == 0) {
 				continue;
 			}
 			
 			count++;
 			
-			List<String> outList = new LinkedList<>();
-			for (String dep : quest.loreKeys) {
-				if (LoreRegistry.instance().lookup(dep) != null)
-					outList.add(dep);
+			List<IRequirement> outList = new ArrayList<>();
+			for (IRequirement req : quest.getRequirements()) {
+				if (req.isValid()) {
+					outList.add(req);
+				}
 			}
 			
 			if (outList.isEmpty())
-				quest.loreKeys = null;
+				quest.requirements = null;
 			else
-				quest.loreKeys = outList.toArray(new String[0]);
+				quest.requirements = outList.toArray(new IRequirement[0]);
 		}
 		
 		if (count != 0)
-			NostrumMagica.logger.info("Validated " + count + " quest lore dependencies");
+			NostrumMagica.logger.info("Validated " + count + " quest requirements");
 	}
 	
 }

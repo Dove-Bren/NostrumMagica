@@ -99,7 +99,9 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			// Second column: Mana modifiers
 			y = yTop;
 			x = leftMargin + width/2;
-			parent.addWidget(new LabeledTextWidget(helper, "Bonus Mana: ", () -> String.format("%+.1f%%", attr.getManaBonus() * 100f), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledTextWidget(helper, "Bonus Mana: ", () -> String.format("%+.1f%%", attr.getManaModifier() * 100f), x, y, width/2, yPer).scale(scale));
+			y += yPer;
+			parent.addWidget(new LabeledTextWidget(helper, "Bonus Mana (Flat): ", () -> "" + attr.getManaBonus(), x, y, width/2, yPer).scale(scale));
 			y += yPer;
 			parent.addWidget(new LabeledTextWidget(helper, "Reserved Mana: ", () -> "" + attr.getReservedMana(), x, y, width/2, yPer).scale(scale).tooltip(getMiscDesc("info.reserved_mana.desc")));
 			y += yPer;

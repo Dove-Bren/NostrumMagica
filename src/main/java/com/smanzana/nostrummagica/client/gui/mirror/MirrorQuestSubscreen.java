@@ -14,15 +14,14 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.messages.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.progression.quests.NostrumQuest;
+import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.rewards.AlterationReward;
 import com.smanzana.nostrummagica.progression.rewards.AttributeReward;
-import com.smanzana.nostrummagica.progression.rewards.IReward;
 import com.smanzana.nostrummagica.progression.rewards.AttributeReward.AwardType;
+import com.smanzana.nostrummagica.progression.rewards.IReward;
 import com.smanzana.nostrummagica.utils.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -39,6 +38,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
@@ -159,7 +159,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		// Quest button
 		NostrumQuest quest = button.quest;
 		
-		if (button.state == QuestState.INACTIVE || button.state == QuestState.TAKEN) {
+		if (button.state == QuestState.INACTIVE) {
 			NetworkHandler.sendToServer(
 				new ClientUpdateQuestMessage(quest)	
 				);
@@ -169,7 +169,6 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	protected static enum QuestState {
 		UNAVAILABLE,
 		INACTIVE,
-		TAKEN,
 		COMPLETED
 	}
 	
@@ -182,7 +181,6 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		private final float fontScale = 0.75f;
 		
 		private QuestState state;
-		private boolean canTurnin;
 		private SpellComponentIcon icon; // Icon to use as this icon
 		private int iconU; // If icon is null, uv coords for our icon on the icon texture
 		private int iconV;
@@ -193,20 +191,12 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			this.quest = quest;
 			this.tooltip = genTooltip();
 			this.state = updateQuestState();
-			
-			if (state == QuestState.TAKEN && quest.getObjective().isComplete(subscreen.attr)) {
-				canTurnin = true;
-			} else {
-				canTurnin = false;
-			}
 			getIcon();
 		}
 		
 		protected QuestState updateQuestState() {
 			if (NostrumMagica.getCompletedQuests(subscreen.attr).contains(quest))
 				state = QuestState.COMPLETED;
-			else if (NostrumMagica.getActiveQuests(subscreen.attr).contains(quest))
-				state = QuestState.TAKEN;
 			else if (NostrumMagica.canTakeQuest(subscreen.player, quest))
 				state = QuestState.INACTIVE;
 			else
@@ -323,15 +313,6 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			case INACTIVE:
 				color = new float[] {2f/3f, 0f, 2f/3f, 1f};
 				break;
-			case TAKEN: {
-				float amt = 0f;
-				if (canTurnin) {
-					amt = (float) Math.sin(2.0 * Math.PI * (double) (System.currentTimeMillis() % 1000) / 1000.0);
-					amt *= .1f;
-				}
-				color = new float[] {1f/3f + amt, .2f + amt, 2f/3f + amt, 1f};
-				break;
-			}
 			case UNAVAILABLE:
 				color = new float[] {.8f, .0f, .0f, 1f};
 				break;
@@ -375,7 +356,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			icon = null;
 			iconU = 0;
 			iconV = 0;
-			IReward reward = quest.getRewards()[0];
+			IReward reward = quest.getReward();
 			if (reward == null)
 				return;
 			
@@ -408,41 +389,28 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 					.mergeStyle(TextFormatting.BLUE));
 			
 			TextFormatting bad = TextFormatting.RED;
-			TextFormatting good = TextFormatting.GREEN;
-			TextFormatting unique = TextFormatting.DARK_AQUA;
-			if (quest.getReqLevel() > 0)
-				tooltip.add(new TranslationTextComponent("level.name").mergeStyle(subscreen.attr.getLevel() >= quest.getReqLevel() ? good : bad)
-						.append(new StringTextComponent(" " + quest.getReqLevel())));
-			if (quest.getReqControl() > 0)
-				tooltip.add(new TranslationTextComponent("control.name").mergeStyle(subscreen.attr.getControl() >= quest.getReqControl() ? good : bad)
-						.append(new StringTextComponent(" " + quest.getReqControl())));
-			if (quest.getReqTechnique() > 0)
-				tooltip.add(new TranslationTextComponent("technique.name").mergeStyle(subscreen.attr.getTech() >= quest.getReqTechnique() ? good : bad)
-						.append(new StringTextComponent(" " + quest.getReqTechnique())));
-			if (quest.getReqFinesse() > 0)
-				tooltip.add(new TranslationTextComponent("finesse.name").mergeStyle(subscreen.attr.getFinesse() >= quest.getReqFinesse() ? good : bad)
-						.append(new StringTextComponent(" " + quest.getReqFinesse())));
 			
-			// Lore reqs?
-			if (quest.getLoreKeys() != null) {
-				for (String loreKey : quest.getLoreKeys()) {
-					ILoreTagged loreItem = LoreRegistry.instance().lookup(loreKey);
-					if (loreItem != null) {
-						if (!subscreen.attr.hasLore(loreItem)) {
-							tooltip.add(new TranslationTextComponent("info.quest.lore_missing", new Object[]{unique + loreItem.getLoreDisplayName()})
-									.mergeStyle(bad));
-						}
-					}
-				}
-			}
+			// Requirements
+	        if (quest.getRequirements() != null && quest.getRequirements().length > 0) {
+	        	tooltip.add(new TranslationTextComponent("info.requirement.missing"));
+	        	for (IRequirement req : quest.getRequirements()) {
+	        		TextFormatting style = TextFormatting.GRAY;
+	        		if (!req.matches(subscreen.player)) {
+	        			style = bad;
+	        		}
+        			for (ITextComponent line : req.getDescription(subscreen.player)) {
+        				if (line instanceof TextComponent) {
+        					tooltip.add(((TextComponent) line).mergeStyle(style));
+        				} else {
+        					tooltip.add(line);
+        				}
+        			}
+	        	}
+	        	tooltip.add(new StringTextComponent(""));
+	        }
 			
-			if (quest.getObjective() != null) {
-				tooltip.add(new StringTextComponent(quest.getObjective().getDescription()));
-			}
-			
-			if (quest.getRewards() != null && quest.getRewards().length != 0)
-			for (IReward reward : quest.getRewards()) {
-				String desc = reward.getDescription();
+			if (quest.getReward() != null) {
+				String desc = quest.getReward().getDescription();
 				if (desc != null && !desc.isEmpty())
 					tooltip.add(new StringTextComponent(desc).mergeStyle(TextFormatting.GOLD));
 			}
@@ -451,7 +419,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 				tooltip.add(new TranslationTextComponent("info.quest.accept").mergeStyle(TextFormatting.GREEN));
 			}
 			
-			if (this.state == QuestState.TAKEN || this.state == QuestState.COMPLETED) {
+			if (this.state == QuestState.COMPLETED) {
 				final Minecraft mc = Minecraft.getInstance();
 				final FontRenderer font = mc.fontRenderer;
 	            for (ITextComponent line : tooltip) {

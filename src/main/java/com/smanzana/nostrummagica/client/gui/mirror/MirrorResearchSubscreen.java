@@ -688,30 +688,6 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        		}
 	        	}
 	        }
-	        		
-//					if (!subscreen.attr.getCompletedQuests().contains(questKey)) {
-//						if (!first) {
-//							first = true;
-//							tooltip.add(new StringTextComponent(""));
-//						}
-//						
-//						NostrumQuest questItem = NostrumQuest.lookup(questKey);
-//						String display = questItem == null ? questKey : I18n.format("quest." + questItem.getKey() + ".name");
-//						
-//						tooltip.add(new TranslationTextComponent("info.research.quest_missing", new Object[]{missingQuest + display + bad}).mergeStyle(bad));
-//					}
-//			
-//					if (loreItem != null) {
-//						if (!subscreen.attr.hasLore(loreItem)) {
-//							if (!first) {
-//								first = true;
-//								tooltip.add(new StringTextComponent(""));
-//							}
-//							
-//							tooltip.add(new TranslationTextComponent("info.research.lore_missing", new Object[]{missingLore + loreItem.getLoreDisplayName() + bad}).mergeStyle(bad));
-//						}
-//					}
-			
 			
 			if (this.state == ResearchState.INACTIVE && subscreen.attr.getResearchPoints() > 0 && NostrumMagica.canPurchaseResearch(subscreen.player, research)) {
 				tooltip.add(new StringTextComponent(""));
