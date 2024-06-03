@@ -182,6 +182,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			List<IMirrorSubscreen> subscreens = new ArrayList<>(4);
 			subscreens.add(new MirrorCharacterSubscreen());
 			subscreens.add(new MirrorQuestSubscreen());
+			subscreens.add(new MirrorSkillSubscreen());
 			subscreens.add(new MirrorResearchSubscreen());
 			// Event to get others?
 

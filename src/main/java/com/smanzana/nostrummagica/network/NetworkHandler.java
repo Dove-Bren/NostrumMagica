@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.network.message.CandleIgniteMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.ClientEffectRenderMessage;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseResearchMessage;
+import com.smanzana.nostrummagica.network.message.ClientPurchaseSkillMessage;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
@@ -105,6 +106,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellTomeSlotModifyMessage.class, SpellTomeSlotModifyMessage::encode, SpellTomeSlotModifyMessage::decode, SpellTomeSlotModifyMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellCraftingCapabilitySyncMessage.class, SpellCraftingCapabilitySyncMessage::encode, SpellCraftingCapabilitySyncMessage::decode, SpellCraftingCapabilitySyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, PlayerStatSyncMessage.class, PlayerStatSyncMessage::encode, PlayerStatSyncMessage::decode, PlayerStatSyncMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientPurchaseSkillMessage.class, ClientPurchaseSkillMessage::encode, ClientPurchaseSkillMessage::decode, ClientPurchaseSkillMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.capabilities;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
+import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -107,6 +109,7 @@ public class NostrumMagic implements INostrumMagic {
 	private List<String> completedQuests;
 	private List<String> currentQuests;
 	private List<String> completedResearch;
+	private Set<Skill> skills;
 	private BlockPos markLocation;
 	private RegistryKey<World> markDimension;
 	private boolean enhancedTeleport;
@@ -136,6 +139,7 @@ public class NostrumMagic implements INostrumMagic {
 		savedRespawnInfo = null;
 		enhancedTeleport = false;
 		transmuteKnowledge = new HashMap<>();
+		skills = new HashSet<>();
 		
 		modMana = new HashMap<>();
 		modManaFlat = new HashMap<>();
@@ -627,6 +631,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.enhancedTeleport = cap.hasEnhancedTeleport(); 
 		this.transmuteKnowledge = cap.getTransmuteKnowledge();
 		this.setModifierMaps(cap.getManaModifiers(), cap.getManaBonusModifiers(), cap.getManaCostModifiers(), cap.getManaRegenModifiers());
+		this.skills.clear(); this.skills.addAll(cap.getSkills());
 	}
 	
 	@Override
@@ -953,5 +958,20 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void setSavedRespawnInfo(VanillaRespawnInfo info) {
 		this.savedRespawnInfo = info;
+	}
+	
+	@Override
+	public Collection<Skill> getSkills() {
+		return skills;
+	}
+	
+	@Override
+	public boolean hasSkill(Skill skill) {
+		return skills.contains(skill);
+	}
+	
+	@Override
+	public void addSkill(Skill skill) {
+		skills.add(skill);
 	}
 }

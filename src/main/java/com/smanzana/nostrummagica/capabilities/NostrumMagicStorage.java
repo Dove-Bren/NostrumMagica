@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
+import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -44,6 +46,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_MOD_MANA_BONUS = "mod_mana_bonus";
 	private static final String NBT_MOD_INTERNAL_ID = "id";
 	private static final String NBT_MOD_INTERNAL_VALUE = "value";
+	
+	private static final String NBT_SKILLS = "skills";
 	
 	//private static final String NBT_FAMILIARS = "familiars";
 	
@@ -232,6 +236,15 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			nbt.put(NBT_RESEARCHES, tagList);
 		}
 		
+		Collection<Skill> skills = instance.getSkills();
+		if (skills != null && !skills.isEmpty()) {
+			ListNBT tagList = new ListNBT();
+			for (Skill skill : skills) {
+				tagList.add(StringNBT.valueOf(skill.getKey().toString()));
+			}
+			nbt.put(NBT_SKILLS, tagList);
+		}
+		
 		compound = new CompoundNBT();;
 		Map<EMagicElement, Map<EAlteration, Boolean>> knowledge = instance.getSpellKnowledge();
 		if (knowledge != null && !knowledge.isEmpty())
@@ -375,6 +388,17 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			for (int i = 0; i < tagList.size(); i++) {
 				String research = tagList.getString(i);
 				instance.completeResearch(research);
+			}
+		}
+		
+		if (tag.contains(NBT_SKILLS, NBT.TAG_LIST)) {
+			ListNBT tagList = tag.getList(NBT_SKILLS, NBT.TAG_STRING);
+			for (int i = 0; i < tagList.size(); i++) {
+				String raw = tagList.getString(i);
+				ResourceLocation loc = new ResourceLocation(raw);
+				if (Skill.lookup(loc) != null) {
+					instance.addSkill(Skill.lookup(loc));
+				}
 			}
 		}
 		

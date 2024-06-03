@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -225,6 +227,11 @@ public interface INostrumMagic {
 	// Research
 	public List<String> getCompletedResearches();
 	public void completeResearch(String research);
+	
+	// Skills
+	public Collection<Skill> getSkills();
+	public boolean hasSkill(Skill skill);
+	public void addSkill(Skill skill);
 	
 	// Spell Knowledge
 	public boolean hasKnowledge(EMagicElement element, EAlteration alteration);

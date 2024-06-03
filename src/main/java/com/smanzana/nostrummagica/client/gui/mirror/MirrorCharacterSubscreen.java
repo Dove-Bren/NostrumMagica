@@ -38,10 +38,6 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	
 	private @Nullable INostrumMagic attr;
 	
-	private ImproveButton buttonControl;
-	private ImproveButton buttonTechnique;
-	private ImproveButton buttonFinesse;
-	
 	public MirrorCharacterSubscreen() {
 		name = new TranslationTextComponent("mirror.tab.character.name");
 		icon = new ItemStack(Items.PLAYER_HEAD, 1);
@@ -170,10 +166,6 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		}
 		
 		refreshButtons(); // Set visibility on buttons based on attributes
-		
-		parent.addWidget(buttonControl);
-		parent.addWidget(buttonTechnique);
-		parent.addWidget(buttonFinesse);
 	}
 
 	@Override
@@ -225,17 +217,6 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	
 	protected void refreshButtons() {
 		// Add buttons that show up on the character screen
-		if (attr.getSkillPoints() == 0) {
-			buttonControl.visible
-				= buttonTechnique.visible
-				= buttonFinesse.visible
-				= false;
-		} else {
-			buttonControl.visible
-			= buttonTechnique.visible
-			= buttonFinesse.visible
-			= true;
-		}
 	}
 	
 	protected void onImproveButton(Button button) {

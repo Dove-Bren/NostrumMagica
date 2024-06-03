@@ -76,6 +76,8 @@ import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.progression.reward.AttributeReward;
 import com.smanzana.nostrummagica.progression.reward.IReward;
 import com.smanzana.nostrummagica.progression.reward.AttributeReward.AwardType;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.RitualRegistry;
 import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
@@ -227,6 +229,7 @@ public class ModInit {
 	private static final void preinit() {
 		NetworkHandler.getInstance();
 		NostrumDimensions.init();
+		NostrumSkills.init();
 	}
 	
 	private static final void init() {
@@ -242,6 +245,7 @@ public class ModInit {
 	private static final void postinit() {
 		NostrumQuest.Validate();
 		NostrumResearch.Validate();
+		Skill.Validate();
 	}
 	
 	public static final void registerDefaultRituals(RitualRegistry.RitualRegisterEvent event) {
