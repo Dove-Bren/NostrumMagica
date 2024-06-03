@@ -12,10 +12,10 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -334,7 +334,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			RenderSystem.enableBlend();
 			Map<EMagicElement, Boolean> elementKnow = attr.getKnownElements();
 			for (EMagicElement elem : EMagicElement.values()) {
-				ElementalMastery mastery = attr.getElementalMastery(elem);
+				EElementalMastery mastery = attr.getElementalMastery(elem);
 				Boolean know = elementKnow.get(elem);
 				if (know != null && know)
 					alpha = known;

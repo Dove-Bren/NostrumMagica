@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.command.CommandRandomSpell;
 import com.smanzana.nostrummagica.command.CommandReadRoom;
 import com.smanzana.nostrummagica.command.CommandReloadQuests;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
+import com.smanzana.nostrummagica.command.CommandReloadSkills;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSetManaArmor;
@@ -1922,6 +1923,7 @@ public class ModInit {
 		CommandSetManaArmor.register(dispatcher);
 		CommandAllPatterns.register(dispatcher);
 		CommandReloadQuests.register(dispatcher);
+		CommandReloadSkills.register(dispatcher);
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

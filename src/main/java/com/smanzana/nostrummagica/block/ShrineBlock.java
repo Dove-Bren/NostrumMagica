@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tile.SymbolTileEntity;
 
@@ -131,8 +131,8 @@ public class ShrineBlock extends SymbolBlock {
 			// Shrine blocks grant novice mastery of their elements
 			final EMagicElement element = component.getElement();
 			
-			if (attr.getElementalMastery(element) == ElementalMastery.UNKNOWN
-					&& attr.setElementalMastery(element, ElementalMastery.NOVICE)) {
+			if (attr.getElementalMastery(element) == EElementalMastery.UNKNOWN
+					&& attr.setElementalMastery(element, EElementalMastery.NOVICE)) {
 				// Just learned!
 				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
 				DoEffect(pos, playerIn, color);

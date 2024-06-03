@@ -18,7 +18,6 @@ import com.smanzana.nostrummagica.block.NostrumPortal;
 import com.smanzana.nostrummagica.block.TemporaryTeleportationPortal;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.capabilities.ManaArmorAttributeProvider;
 import com.smanzana.nostrummagica.capabilities.NostrumMagicAttributeProvider;
@@ -35,8 +34,8 @@ import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
-import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy;
 import com.smanzana.nostrummagica.listener.ManaArmorListener;
@@ -46,10 +45,13 @@ import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellRegistry;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -439,6 +441,22 @@ public class NostrumMagica {
 	public void registerQuestReloadHook(Runnable hook) {
 		questReloadHooks.add(hook);
 	}
+	
+	private List<Runnable> skillReloadHooks = new LinkedList<>();
+	
+	public void reloadDefaultSkills() {
+		Skill.ClearSkills();
+		NostrumSkills.init();
+		
+		for (Runnable hook : skillReloadHooks) {
+			hook.run();
+		}
+		Skill.Validate();
+	}
+	
+	public void registerSkillReloadHook(Runnable hook) {
+		skillReloadHooks.add(hook);
+	}
 
 	/**
 	 * Whether a quest is visible in the mirror by normal rules. This is either that
@@ -582,7 +600,7 @@ public class NostrumMagica {
 	public static boolean canCast(Spell spell, INostrumMagic attr, @Nonnull List<ITextComponent> problemsOut) {
 		boolean success = true;
 
-		Map<EMagicElement, ElementalMastery> neededMasteries = new EnumMap<>(EMagicElement.class);
+		Map<EMagicElement, EElementalMastery> neededMasteries = new EnumMap<>(EMagicElement.class);
 
 		for (SpellEffectPart part : spell.getSpellEffectParts()) {
 			EMagicElement elem = part.getElement();
@@ -590,18 +608,18 @@ public class NostrumMagica {
 				elem = EMagicElement.PHYSICAL;
 			int level = part.getElementCount();
 			
-			final ElementalMastery neededMastery;
+			final EElementalMastery neededMastery;
 			switch (level) {
 			case 0:
 			case 1:
-				neededMastery = ElementalMastery.NOVICE;
+				neededMastery = EElementalMastery.NOVICE;
 				break;
 			case 2:
-				neededMastery = ElementalMastery.ADEPT;
+				neededMastery = EElementalMastery.ADEPT;
 				break;
 			case 3:
 			default:
-				neededMastery = ElementalMastery.MASTER;
+				neededMastery = EElementalMastery.MASTER;
 				break;
 			}
 			
@@ -611,15 +629,15 @@ public class NostrumMagica {
 		}
 		
 		for (EMagicElement elem : neededMasteries.keySet()) {
-			final @Nullable ElementalMastery neededMastery = neededMasteries.get(elem);
+			final @Nullable EElementalMastery neededMastery = neededMasteries.get(elem);
 			if (neededMastery == null) {
 				continue;
 			}
 			
-			final ElementalMastery currentMastery = attr.getElementalMastery(elem);
+			final EElementalMastery currentMastery = attr.getElementalMastery(elem);
 			if (!currentMastery.isGreaterOrEqual(neededMastery)) {
 				success = false;
-				problemsOut.add(new TranslationTextComponent("info.spell.low_mastery", neededMastery.name().toLowerCase(), elem.getName(), currentMastery.name().toLowerCase()));
+				problemsOut.add(new TranslationTextComponent("info.spell.low_mastery", neededMastery.getName(), elem.getName(), currentMastery.getName()));
 			}
 		}
 

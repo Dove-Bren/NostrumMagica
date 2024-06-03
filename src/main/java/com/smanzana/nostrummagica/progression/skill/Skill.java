@@ -160,7 +160,19 @@ public class Skill {
 		return true;
 	}
 	
+	protected void validate() {
+		; // Nothing to check
+	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return o != null && o instanceof Skill && ((Skill) o).key.equals(key);
+	}
+	
+	@Override
+	public int hashCode() {
+		return key.hashCode() * 7907;
+	}
 	
 	
 	private static Map<ResourceLocation, Skill> Registry = new HashMap<>();
@@ -182,12 +194,21 @@ public class Skill {
 		return Registry.values();
 	}
 	
+	public static void ClearSkills() {
+		Registry.clear();
+	}
+	
 	/**
 	 * Iterate over all registered skills.
 	 * Perform parent checks. Fix up dependencies.
 	 */
 	public static void Validate() {
 		int count = 0;
+		
+		for (Skill skill : allSkills()) {
+			count++;
+			skill.validate();
+		}
 		
 		if (count != 0)
 			NostrumMagica.logger.info("Validated " + count + " skills");

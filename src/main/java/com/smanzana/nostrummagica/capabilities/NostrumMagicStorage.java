@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.nbt.CompoundNBT;
@@ -108,7 +108,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		compound = new CompoundNBT();
 		{
-			Map<EMagicElement, ElementalMastery> map = instance.serializeElementMastery();
+			Map<EMagicElement, EElementalMastery> map = instance.serializeElementMastery();
 			for (EMagicElement key : map.keySet()) {
 				compound.put(key.name(), map.get(key).toNBT());
 			}
@@ -318,7 +318,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		compound = tag.getCompound(NBT_MASTERED_ELEMENTS);
 		for (String key : compound.keySet()) {
 			EMagicElement elem = EMagicElement.valueOf(key);
-			instance.setElementalMastery(elem, ElementalMastery.fromNBT(compound.get(key)));
+			instance.setElementalMastery(elem, EElementalMastery.fromNBT(compound.get(key)));
 		}
 		
 		compound = tag.getCompound(NBT_ELEMENT_TRIALS);

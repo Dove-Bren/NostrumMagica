@@ -5,13 +5,13 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.TrialBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.trial.CombatTrial;
 
@@ -130,8 +130,8 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 		if (attr == null)
 			return;
 		
-		final ElementalMastery currentMastery = attr.getElementalMastery(this.getElement());
-		final ElementalMastery newMastery;
+		final EElementalMastery currentMastery = attr.getElementalMastery(this.getElement());
+		final EElementalMastery newMastery;
 		switch (currentMastery) {
 		case MASTER:
 		default:
@@ -139,10 +139,10 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 			break;
 		case UNKNOWN:
 		case NOVICE:
-			newMastery = ElementalMastery.ADEPT;
+			newMastery = EElementalMastery.ADEPT;
 			break;
 		case ADEPT:
-			newMastery = ElementalMastery.MASTER;
+			newMastery = EElementalMastery.MASTER;
 			break;
 		}
 		

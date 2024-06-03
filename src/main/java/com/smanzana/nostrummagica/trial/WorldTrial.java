@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -33,18 +33,18 @@ public abstract class WorldTrial {
 	}
 	
 	public boolean canTake(PlayerEntity entityPlayer, INostrumMagic attr) {
-		final ElementalMastery mastery = attr.getElementalMastery(this.element);
+		final EElementalMastery mastery = attr.getElementalMastery(this.element);
 		
 		return !attr.hasTrial(this.element) // Can't already have this trial
-				&& mastery.isGreaterOrEqual(ElementalMastery.NOVICE) // Have to have at least novice
-				&& !mastery.isGreaterOrEqual(ElementalMastery.MASTER); // Can't be master or better
+				&& mastery.isGreaterOrEqual(EElementalMastery.NOVICE) // Have to have at least novice
+				&& !mastery.isGreaterOrEqual(EElementalMastery.MASTER); // Can't be master or better
 	}
 	
 	public void start(PlayerEntity player, INostrumMagic attr) {
 		attr.startTrial(this.element);
 		
-		final ElementalMastery mastery = attr.getElementalMastery(this.element);
-		if (mastery == ElementalMastery.NOVICE) {
+		final EElementalMastery mastery = attr.getElementalMastery(this.element);
+		if (mastery == EElementalMastery.NOVICE) {
 			if (!player.world.isRemote) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
 				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.DUMMY_UUID);
@@ -59,8 +59,8 @@ public abstract class WorldTrial {
 		if (attr == null)
 			return;
 		
-		final ElementalMastery currentMastery = attr.getElementalMastery(this.element);
-		final ElementalMastery newMastery;
+		final EElementalMastery currentMastery = attr.getElementalMastery(this.element);
+		final EElementalMastery newMastery;
 		switch (currentMastery) {
 		case MASTER:
 		default:
@@ -68,10 +68,10 @@ public abstract class WorldTrial {
 			break;
 		case UNKNOWN:
 		case NOVICE:
-			newMastery = ElementalMastery.ADEPT;
+			newMastery = EElementalMastery.ADEPT;
 			break;
 		case ADEPT:
-			newMastery = ElementalMastery.MASTER;
+			newMastery = EElementalMastery.MASTER;
 			break;
 		}
 		

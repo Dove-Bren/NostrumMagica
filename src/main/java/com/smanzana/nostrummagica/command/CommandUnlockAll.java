@@ -5,11 +5,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.command.CommandSource;
@@ -45,7 +45,7 @@ public class CommandUnlockAll {
 			attr.unlockAlteration(alt);
 		}
 		for (EMagicElement elem : EMagicElement.values()) {
-			attr.setElementalMastery(elem, ElementalMastery.MASTER);
+			attr.setElementalMastery(elem, EElementalMastery.MASTER);
 		}
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)

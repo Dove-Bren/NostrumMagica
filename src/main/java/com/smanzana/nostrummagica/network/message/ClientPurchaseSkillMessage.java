@@ -32,7 +32,7 @@ public class ClientPurchaseSkillMessage {
 				return;
 			}
 			
-			if (!message.skill.isHidden(sp) && message.skill.meetsRequirements(sp) && att.getSkillPoints() > 0) {
+			if (!att.hasSkill(message.skill) && !message.skill.isHidden(sp) && message.skill.meetsRequirements(sp) && att.getSkillPoints() > 0) {
 				att.takeSkillPoint();
 				message.skill.addToPlayer(sp);
 			}

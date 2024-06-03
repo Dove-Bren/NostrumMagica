@@ -14,14 +14,13 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -63,40 +62,6 @@ public interface INostrumMagic {
 		}
 	}
 	
-	public static enum ElementalMastery {
-		UNKNOWN,
-		NOVICE,
-		ADEPT,
-		MASTER;
-		
-		private ElementalMastery() {
-			
-		}
-		
-		public INBT toNBT() {
-			return StringNBT.valueOf(this.name());
-		}
-		
-		public static ElementalMastery fromNBT(INBT nbt) {
-			try {
-				return ElementalMastery.valueOf(
-						((StringNBT) nbt).getString().toUpperCase()
-					);
-			} catch (Exception e) {
-				return ElementalMastery.NOVICE;
-			}
-		}
-		
-		public String getTranslationKey() {
-			return this.name().toLowerCase();
-		}
-		
-		public boolean isGreaterOrEqual(ElementalMastery other) {
-			// Cheat and use ordinals
-			return this.ordinal() >= other.ordinal();
-		}
-	}
-
 	// Unlock
 	public boolean isUnlocked();
 	public void unlock();
@@ -166,8 +131,8 @@ public interface INostrumMagic {
 	
 	// Elemental mastery
 	public Map<EMagicElement, Boolean> getKnownElements();
-	public boolean setElementalMastery(EMagicElement element, ElementalMastery mastery);
-	public ElementalMastery getElementalMastery(EMagicElement element);
+	public boolean setElementalMastery(EMagicElement element, @Nonnull EElementalMastery mastery);
+	public @Nonnull EElementalMastery getElementalMastery(EMagicElement element);
 	
 	// Element Trials
 	public void startTrial(EMagicElement element);
@@ -198,7 +163,7 @@ public interface INostrumMagic {
 	
 	public Map<String, Integer> serializeLoreLevels();
 	public Set<String> serializeSpellHistory();
-	public Map<EMagicElement, ElementalMastery> serializeElementMastery();
+	public Map<EMagicElement, EElementalMastery> serializeElementMastery();
 	public Map<EMagicElement, Boolean> serializeElementTrials();
 	public Map<EAlteration, Boolean> serializeAlterations();
 	public Map<UUID, Float> getManaModifiers();

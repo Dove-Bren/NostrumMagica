@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,17 +16,23 @@ import net.minecraft.util.text.TranslationTextComponent;
 
 public class ElementMasteryRequirement implements IRequirement{
 
-	private EMagicElement element;
+	private final EMagicElement element;
+	private final EElementalMastery level;
+	 
+	public ElementMasteryRequirement(EMagicElement element, EElementalMastery level) {
+		this.element = element;
+		this.level = level;
+	}
 	
 	public ElementMasteryRequirement(EMagicElement element) {
-		this.element = element;
+		this(element, EElementalMastery.NOVICE);
 	}
 
 	@Override
 	public boolean matches(PlayerEntity player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		Boolean known = attr.getKnownElements().get(element);
-		return (known != null && known);
+		final EElementalMastery currentMastery = attr.getElementalMastery(this.element);
+		return currentMastery.isGreaterOrEqual(level);
 	}
 
 	@Override
@@ -35,7 +42,9 @@ public class ElementMasteryRequirement implements IRequirement{
 
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.element", 
-				new StringTextComponent(element.getName()).mergeStyle(TextFormatting.DARK_RED)));
+		return Lists.newArrayList(new TranslationTextComponent("info.requirement.element",
+					level.getName(),
+					new StringTextComponent(element.getName()).mergeStyle(TextFormatting.DARK_RED)
+				));
 	}
 }

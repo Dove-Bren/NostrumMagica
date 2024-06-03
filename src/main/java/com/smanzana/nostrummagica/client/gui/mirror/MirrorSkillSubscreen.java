@@ -132,7 +132,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 				0xFF000000, 0xFF000000,
 				0x40000000, 0x40000000);
 		
-		matrixStackIn.translate(0, 4, 0);
+		matrixStackIn.translate(0, 8, 0);
 		
 		String str = "Skillpoints: " + attr.getSkillPoints();
 		int strWidth = font.getStringWidth(str);
@@ -142,20 +142,6 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		matrixStackIn.pop();
 		
 		matrixStackIn.translate(0, font.FONT_HEIGHT, 0);
-		
-		{
-			final int actKnowledge = NostrumMagic.getKnowledge(attr); 
-			final int knowledge = actKnowledge - NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(actKnowledge) - 1);
-			final int maxKnowledge = NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(actKnowledge))
-					- NostrumMagic.KnowledgeCurves.maxKnowledge(NostrumMagic.KnowledgeCurves.knowledgeLevel(actKnowledge) - 1);
-			
-			final int barWidth = 64;
-			final int barHeight = 3;
-			final int x = Math.round(((float) knowledge / (float) maxKnowledge) * (float) barWidth);
-			RenderFuncs.drawRect(matrixStackIn, - (barWidth/2), 0, + (barWidth / 2), 2 + barHeight, 0xFF555555);
-			RenderFuncs.drawRect(matrixStackIn, - (barWidth/2) + 1, 0 + 1, (barWidth / 2) - 1, 1 + barHeight, 0xFF000000);
-			RenderFuncs.drawRect(matrixStackIn, - (barWidth/2) + 1, 0 + 1, - (barWidth/2) + 1 + x, 1 + barHeight, 0xFFFFFF00);
-		}
 		
 		matrixStackIn.pop();
 	}
@@ -188,7 +174,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		final Skill skill = button.skill;
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		if (attr != null && attr.getSkillPoints() > 0) {
+		if (button.state == SkillState.AVAILABLE && attr != null && attr.getSkillPoints() > 0) {
 			// do on client too for instant feedback
 			attr.addSkill(skill);
 			
@@ -369,6 +355,11 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			List<ITextComponent> tooltip = new LinkedList<>();
 			tooltip.add(((TextComponent) skill.getName()).mergeStyle(TextFormatting.BLUE));
 			tooltip.addAll(skill.getDescription());
+			
+			if (this.subscreen.attr.hasSkill(skill)) {
+				tooltip.add(new StringTextComponent(" "));
+				tooltip.add(new StringTextComponent("Owned").mergeStyle(TextFormatting.BOLD, TextFormatting.DARK_GREEN));
+			}
 			
 			return tooltip;
 		}

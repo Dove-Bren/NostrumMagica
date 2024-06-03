@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.ElementalMastery;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.MasteryOrb;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tile.TrialBlockTileEntity;
 import com.smanzana.nostrummagica.trial.WorldTrial;
@@ -111,11 +111,11 @@ public class TrialBlock extends SymbolBlock {
 		// If the player is a novice, they can do a world trial to become adept.
 		// Otherwise they do a combat trial
 		final EMagicElement element = trialEntity.getElement();
-		final ElementalMastery mastery = attr.getElementalMastery(element);
+		final EElementalMastery mastery = attr.getElementalMastery(element);
 		
-		if (mastery == ElementalMastery.UNKNOWN) {
+		if (mastery == EElementalMastery.UNKNOWN) {
 			playerIn.sendMessage(new TranslationTextComponent("info.trial.weak"), Util.DUMMY_UUID);
-		} else if (mastery == ElementalMastery.NOVICE) {
+		} else if (mastery == EElementalMastery.NOVICE) {
 			WorldTrial trial = WorldTrial.getTrial(element);
 			if (trial == null) {
 				NostrumMagica.logger.error("No trial found for element " + element.name());
@@ -133,7 +133,7 @@ public class TrialBlock extends SymbolBlock {
 				return ActionResultType.SUCCESS;
 			}
 		} else {
-			if (mastery.isGreaterOrEqual(ElementalMastery.MASTER)) {
+			if (mastery.isGreaterOrEqual(EElementalMastery.MASTER)) {
 				playerIn.sendMessage(new TranslationTextComponent("info.trial.none"), Util.DUMMY_UUID);
 			} else {
 				trialEntity.startTrial(playerIn);

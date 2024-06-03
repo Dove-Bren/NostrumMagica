@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -102,7 +103,7 @@ public class NostrumMagic implements INostrumMagic {
 	
 	private Map<String, Integer> loreLevels;
 	private Set<String> spellCRCs; // spells we've done's CRCs
-	private Map<EMagicElement, ElementalMastery> elementalMastery;
+	private Map<EMagicElement, EElementalMastery> elementalMastery;
 	private Map<EMagicElement, Boolean> elementTrials;
 	private List<SpellShape> shapes; // list of shape keys
 	private Map<EAlteration, Boolean> alterations;
@@ -163,7 +164,7 @@ public class NostrumMagic implements INostrumMagic {
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = 0;
 			
-			this.setElementalMastery(EMagicElement.PHYSICAL, ElementalMastery.NOVICE);
+			this.setElementalMastery(EMagicElement.PHYSICAL, EElementalMastery.NOVICE);
 			this.completeResearch("origin");
 			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
@@ -459,15 +460,15 @@ public class NostrumMagic implements INostrumMagic {
 	public Map<EMagicElement, Boolean> getKnownElements() {
 		Map<EMagicElement, Boolean> map = new EnumMap<>(EMagicElement.class);
 		for (EMagicElement element : EMagicElement.values()) {
-			map.put(element, getElementalMastery(element) != ElementalMastery.UNKNOWN);
+			map.put(element, getElementalMastery(element) != EElementalMastery.UNKNOWN);
 		}
 		return map;
 	}
 	
-	public boolean setElementalMastery(EMagicElement element, ElementalMastery mastery) {
+	public boolean setElementalMastery(EMagicElement element, EElementalMastery mastery) {
 		elementalMastery.put(element, mastery);
 		
-		if (mastery != ElementalMastery.UNKNOWN) {
+		if (mastery != EElementalMastery.UNKNOWN) {
 			if (this.entity != null && !this.entity.world.isRemote
 					&& this.entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) this.entity;
@@ -481,9 +482,9 @@ public class NostrumMagic implements INostrumMagic {
 		return true;
 	}
 	
-	public ElementalMastery getElementalMastery(EMagicElement element) {
-		ElementalMastery mastery = elementalMastery.get(element);
-		return mastery == null ? ElementalMastery.UNKNOWN : mastery;
+	public EElementalMastery getElementalMastery(EMagicElement element) {
+		EElementalMastery mastery = elementalMastery.get(element);
+		return mastery == null ? EElementalMastery.UNKNOWN : mastery;
 	}
 
 	@Override
@@ -517,7 +518,7 @@ public class NostrumMagic implements INostrumMagic {
 		
 		boolean found = false;
 		for (EMagicElement e : EMagicElement.values()) {
-			if (this.getElementalMastery(e) != null && this.getElementalMastery(e).isGreaterOrEqual(ElementalMastery.NOVICE)) {
+			if (this.getElementalMastery(e) != null && this.getElementalMastery(e).isGreaterOrEqual(EElementalMastery.NOVICE)) {
 				found = true;
 				break;
 			}
@@ -565,7 +566,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public Map<EMagicElement, ElementalMastery> serializeElementMastery() {
+	public Map<EMagicElement, EElementalMastery> serializeElementMastery() {
 		return this.elementalMastery;
 	}
 	
