@@ -2049,6 +2049,7 @@ public class SpellAction {
 		if (target == null)
 			return amt;
 		
+		INostrumMagic magic = NostrumMagica.getMagicWrapper(caster);
 		System.out.println("Damage base: " + base);
 		
 		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
@@ -2100,6 +2101,10 @@ public class SpellAction {
 				flamy = false;
 			}
 			
+			if (element == EMagicElement.FIRE && magic.hasSkill(NostrumSkills.Fire_Adept)) {
+				base += 2;
+			}
+			
 			EffectInstance resEffect = target.getActivePotionEffect(NostrumEffects.magicResist);
 			if (resEffect != null) {
 				base *= Math.pow(.75, resEffect.getAmplifier() + 1);
@@ -2145,6 +2150,7 @@ public class SpellAction {
 			base -= attr.getValue();
 		}
 		
+		System.out.println("Calculated damage: " + base);
 		return base;
 	}
 	

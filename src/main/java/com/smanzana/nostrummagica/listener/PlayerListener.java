@@ -17,6 +17,8 @@ import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.mirror.MirrorResearchSubscreen;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.enchantment.EnchantmentManaRecovery;
@@ -643,6 +645,10 @@ public class PlayerListener {
 
 	@SubscribeEvent
 	public void onDamage(LivingHurtEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
 		// Make hookshots not damage someone if you reach the wall
 		if (event.getSource() == DamageSource.FLY_INTO_WALL) {
 			LivingEntity ent = event.getEntityLiving();
@@ -700,6 +706,22 @@ public class PlayerListener {
 		}
 		
 		onHealth(event.getEntityLiving());
+		
+		if (event.getSource() == DamageSource.ON_FIRE) {
+			// If any players nearby have fire master skill, they can regain mana
+			for (Entity e : event.getEntityLiving().getEntityWorld().getEntitiesInAABBexcluding(event.getEntity(), event.getEntity().getBoundingBox().grow(10), (e) -> true)) {
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(e);
+				if (e instanceof PlayerEntity && attr != null && attr.hasSkill(NostrumSkills.Fire_Master)) {
+					final LivingEntity source = event.getEntityLiving();
+					regenMana((PlayerEntity) e);
+					NostrumParticles.FILLED_ORB.spawn(e.world, new SpawnParams(
+							5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
+							40, 0,
+							e.getEntityId()
+							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
+				}
+			}
+		}
 	}
 	
 	@SubscribeEvent
