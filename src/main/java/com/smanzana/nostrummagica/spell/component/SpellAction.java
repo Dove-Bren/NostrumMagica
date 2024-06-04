@@ -76,6 +76,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -2114,6 +2115,14 @@ public class SpellAction {
 			
 			if (element == EMagicElement.FIRE && magic.hasSkill(NostrumSkills.Fire_Adept)) {
 				base += 2;
+			}
+			
+			if (element == EMagicElement.EARTH && magic.hasSkill(NostrumSkills.Earth_Adept)) {
+				EffectInstance strength = caster.getActivePotionEffect(Effects.STRENGTH);
+				if (strength != null) {
+					// Matches strength attribute boost
+					base += 3 * (strength.getAmplifier() + 1);
+				}
 			}
 			
 			EffectInstance resEffect = target.getActivePotionEffect(NostrumEffects.magicResist);

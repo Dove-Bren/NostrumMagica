@@ -1530,7 +1530,7 @@
 	"skill.nostrummagica.earth.adept": "Earth Adept Training",
 	"skill.nostrummagica.earth.adept.desc": "Earth damage is boosted by the strength status effect.",
 	"skill.nostrummagica.earth.master": "Earth Master Training",
-	"skill.nostrummagica.earth.master.desc": "Randomly regenerate health any time you have an active physical shield.",
+	"skill.nostrummagica.earth.master.desc": "Regenerate health any time you have an active physical shield.",
 	
 	"skill.nostrummagica.wind.novice": "Wind Novice Training",
 	"skill.nostrummagica.wind.novice.desc": "Boosts potency of wind effects by 20%%.",

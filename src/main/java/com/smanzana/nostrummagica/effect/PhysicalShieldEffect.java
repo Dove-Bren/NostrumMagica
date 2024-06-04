@@ -2,7 +2,9 @@ package com.smanzana.nostrummagica.effect;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.client.Minecraft;
@@ -26,7 +28,15 @@ public class PhysicalShieldEffect extends Effect {
 	
 	@Override
 	public boolean isReady(int duration, int amp) {
-		return duration > 0; // Every tick
+		return duration % 10 == 0; // Every tick
+	}
+	
+	@Override
+	public void performEffect(LivingEntity entityLivingBaseIn, int amplifier) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(entityLivingBaseIn);
+		if (attr != null && attr.hasSkill(NostrumSkills.Earth_Master)) {
+			entityLivingBaseIn.heal(.25f);
+		}
 	}
 	
 	@Override
