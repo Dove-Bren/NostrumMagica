@@ -178,7 +178,7 @@ public class Spell {
 			//NostrumMagicaSounds.CAST_FAIL.play();
 		}
 		
-		protected float getEfficiencyBonuses(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base) {
+		protected float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base) {
 			float bonus = 0f;
 			
 			if (effect.getElement() != EMagicElement.PHYSICAL) {
@@ -187,6 +187,51 @@ public class Spell {
 					bonus += .25f * (1 + target.getActivePotionEffect(boostEffect).getAmplifier());
 					target.removePotionEffect(boostEffect);
 				}
+			}
+			
+			return bonus;
+		}
+		
+		protected float getCasterEfficiencyBonus(LivingEntity caster, SpellEffectPart effect, SpellAction action, float base) {
+			float bonus = 0f;
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			
+			switch (effect.getElement()) {
+			case EARTH:
+				if (attr.hasSkill(NostrumSkills.Earth_Novice)) {
+					bonus += .2f;
+				}
+				break;
+			case ENDER:
+				if (attr.hasSkill(NostrumSkills.Ender_Novice)) {
+					bonus += .2f;
+				}
+				break;
+			case FIRE:
+				if (attr.hasSkill(NostrumSkills.Fire_Novice)) {
+					bonus += .2f;
+				}
+				break;
+			case ICE:
+				if (attr.hasSkill(NostrumSkills.Ice_Novice)) {
+					bonus += .2f;
+				}
+				break;
+			case LIGHTNING:
+				if (attr.hasSkill(NostrumSkills.Lightning_Novice)) {
+					bonus += .2f;
+				}
+				break;
+			case PHYSICAL:
+				if (attr.hasSkill(NostrumSkills.Physical_Novice)) {
+					bonus += .2f;
+				}
+				break;
+			case WIND:
+				if (attr.hasSkill(NostrumSkills.Wind_Novice)) {
+					bonus += .2f;
+				}
+				break;
 			}
 			
 			return bonus;
@@ -202,7 +247,7 @@ public class Spell {
 				float efficiency = this.efficiency + (part.getPotency() - 1f);
 				
 				// Apply part-specific bonuses that don't matter on targets here
-				// ;
+				efficiency += getCasterEfficiencyBonus(caster, part, action, efficiency);
 				
 				if (attr != null && attr.isUnlocked()) {
 					attr.setKnowledge(part.getElement(), part.getAlteration());
@@ -215,7 +260,7 @@ public class Spell {
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
 						// Apply per-target bonuses
-						float perEfficiency = efficiency + getEfficiencyBonuses(caster, targ, part, action, efficiency);
+						float perEfficiency = efficiency + getTargetEfficiencyBonus(caster, targ, part, action, efficiency);
 						
 						SpellActionResult result = action.apply(caster, targ, perEfficiency); 
 						if (result.applied) {
@@ -588,7 +633,7 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction().status(Effects.ABSORPTION, duration * 5, amp).name("lifeboost");
 		case EARTH:
-			return new SpellAction().status(NostrumEffects.physicalShield, duration, amp + 1).name("shield.physical");
+			return new SpellAction().status(NostrumEffects.physicalShield, duration, amp).name("shield.physical");
 		case ENDER:
 			return new SpellAction().blink(15.0f * elementCount).name("blink");
 		case FIRE:

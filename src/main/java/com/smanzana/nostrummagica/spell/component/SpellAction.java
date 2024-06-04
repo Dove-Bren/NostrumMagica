@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.IEnchantableItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
@@ -2029,7 +2030,13 @@ public class SpellAction {
 				for (AttributeModifier mod : heldAttribs.get(Attributes.ATTACK_DAMAGE)) {
 					extra += mod.getAmount();
 				}
-				amt -= extra;
+				
+				// Note that the physical master skill includes using some of this
+				if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Physical_Master)) {
+					amt -= (int) ((float) extra * .8f);
+				} else {
+					amt -= extra;
+				}
 			}
 		}
 		

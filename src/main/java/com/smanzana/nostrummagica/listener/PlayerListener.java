@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
@@ -1012,6 +1013,15 @@ public class PlayerListener {
 				MagicArmor.ServerWorldTick(world);
 			}
 		} else if (event.phase == Phase.END) {
+			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
+				if (world.getPlayers().isEmpty()) {
+					continue;
+				}
+				
+				for (PlayerEntity player : world.getPlayers()) {
+					checkTickSkills(player);
+				}
+			}
 			updateTrackedEntities();
 		}
 	}
@@ -1022,6 +1032,20 @@ public class PlayerListener {
 			if (!Minecraft.getInstance().isIntegratedServerRunning() && Minecraft.getInstance().player != null) {
 				NostrumPortal.tick();
 				//TeleportRune.tick();
+			}
+		}
+	}
+	
+	private void checkTickSkills(PlayerEntity entity) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+		if (attr == null) {
+			return;
+		}
+		
+		// Physical gives shield when armor is reduced
+		if (attr.hasSkill(NostrumSkills.Physical_Adept)) {
+			if (entity.isAlive() && entity.getHealth() > 0f && entity.getTotalArmorValue() < getLastTickArmor(entity)) {
+				entity.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 30, 0));
 			}
 		}
 	}
@@ -1219,11 +1243,17 @@ public class PlayerListener {
 	
 	protected Map<Entity, Vector3d> lastPosCache = new HashMap<>();
 	protected Map<Entity, Vector3d> lastMoveCache = new HashMap<>();
+	protected Map<LivingEntity, Integer> lastArmorCache = new HashMap<>();
 	
 	protected void addEntity(Entity ent) {
 		if (!lastPosCache.containsKey(ent)) {
 			lastPosCache.put(ent, ent.getPositionVec());
 			lastMoveCache.put(ent, ent.getLook(.5f));
+			
+			if (ent instanceof LivingEntity) {
+				LivingEntity living = (LivingEntity) ent;
+				lastArmorCache.put(living, living.getTotalArmorValue());
+			}
 		}
 	}
 	
@@ -1258,8 +1288,18 @@ public class PlayerListener {
 				if (last.squareDistanceTo(cur) > .025) {
 					// Update movement
 					lastMoveCache.put(entry.getKey(), cur.subtract(last));
+					lastPosCache.put(entry.getKey(), cur);
+				}
+				if (entry.getKey() instanceof LivingEntity) {
+					LivingEntity living = (LivingEntity) entry.getKey();
+					lastArmorCache.put(living, living.getTotalArmorValue());
 				}
 			}
 		}
+	}
+	
+	public int getLastTickArmor(LivingEntity ent) {
+		addEntity(ent);
+		return lastArmorCache.get(ent);
 	}
 }

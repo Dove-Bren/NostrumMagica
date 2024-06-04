@@ -33,7 +33,7 @@ public class PhysicalShieldEffect extends Effect {
 	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
 		// Sneaky! We've just been applied
 		//NostrumMagica.specialEffectProxy
-		int armor = 4 * (int) Math.pow(2, amplifier - 1);
+		int armor = 4 * (int) Math.pow(2, amplifier);
 		NostrumMagica.magicEffectProxy.applyPhysicalShield(entity, (double) armor);
 		
 		NostrumMagicaSounds.SHIELD_APPLY.play(entity);
