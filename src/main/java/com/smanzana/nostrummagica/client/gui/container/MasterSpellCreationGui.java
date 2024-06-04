@@ -412,9 +412,10 @@ public class MasterSpellCreationGui {
 				spellErrorStrings.add(new StringTextComponent("Must have a spell icon selected"));
 				fail = true;
 			}
-			
+
+			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
 			List<String> rawSpellErrors = new ArrayList<>();
-			if (!SpellCrafting.CheckForValidRunes(inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors)) {
+			if (!SpellCrafting.CheckForValidRunes(context, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors)) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {
 					spellErrorStrings.add(new StringTextComponent(error));
@@ -428,7 +429,6 @@ public class MasterSpellCreationGui {
 			}
 			
 			// Actually make spell
-			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
 			Spell spell = SpellCrafting.CreateSpellFromRunes(context, null, name, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors, null);
 			if (spell == null) {
 				// Dump raw errors into output strings and return

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -18,20 +17,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	
-	private static final ResourceLocation RES_ICONS = NostrumMagica.Loc("textures/gui/mirror_character.png");
+	//private static final ResourceLocation RES_ICONS = NostrumMagica.Loc("textures/gui/mirror_character.png");
 	
 	private final ITextComponent name;
 	private final ItemStack icon;
@@ -152,17 +149,6 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			// First row: resources
 			parent.addWidget(new LabeledTextWidget(helper, "Available Points: ", () -> "" + attr.getSkillPoints(), x, y, width/2, yPer).scale(scale));
 			y += yPer;
-			
-			// Second row: stats
-//			parent.addWidget(new LabeledTextWidget(helper, "Control: ", () -> "" + attr.getControl(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("control.desc")));
-//			buttonControl = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
-//			x += xPer;
-//			parent.addWidget(new LabeledTextWidget(helper, "Technique: ", () -> "" + attr.getTech(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("technique.desc")));
-//			buttonTechnique = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
-//			x += xPer;
-//			parent.addWidget(new LabeledTextWidget(helper, "Finesse: ", () -> "" + attr.getFinesse(), x, y, width/3, yPer).scale(scale).tooltip(getMiscDesc("finesse.desc")));
-//			buttonFinesse = new ImproveButton(this, x + 20, y + yPer + 2, POS_IMPROVE_BUTTON_WIDTH, POS_IMPROVE_BUTTON_HEIGHT);
-//			x += xPer;
 		}
 		
 		refreshButtons(); // Set visibility on buttons based on attributes
@@ -219,49 +205,6 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		// Add buttons that show up on the character screen
 	}
 	
-	protected void onImproveButton(Button button) {
-		//if (ignoreButton(button)) return;
-		
-//		final Type type;
-//		if (button == this.buttonControl) {
-//			type = Type.CONTROL;
-//		} else if (button == this.buttonFinesse) {
-//			type = Type.FINESSE;
-//		} else {
-//			type = Type.TECHNIQUE;
-//		}
-//		attr.takeSkillPoint(); // take a local point so our update makes sense
-//		NetworkHandler.sendToServer(
-//				new ClientSkillUpMessage(type)
-//				);
-		
-		refreshButtons();
-	}
-	
-	private static class ImproveButton extends Button {
-		
-		public ImproveButton(MirrorCharacterSubscreen screen, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY, (b) -> {
-				screen.onImproveButton(b);
-			});
-		}
-		
-		@Override
-		public void renderButton(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
-			if (visible) {
-				RenderSystem.enableDepthTest();
-				Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
-				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
-						TEX_BUTTON_HOFFSET, TEX_BUTTON_VOFFSET, TEX_BUTTON_WIDTH, TEX_BUTTON_HEIGHT,
-						this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
-				
-				if (this.isHovered()) {
-					RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0x40FFFFFF);
-				}
-			}
-		}
-	}
-	
 	private static class SectionLabel extends Widget {
 		
 		private final String label;
@@ -286,12 +229,12 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		}
 	}
 	
-	private static final int TEX_WIDTH = 64;
-	private static final int TEX_HEIGHT = 64;
-	
-	private static final int TEX_BUTTON_HOFFSET = 0;
-	private static final int TEX_BUTTON_VOFFSET = 0;
-	private static final int TEX_BUTTON_WIDTH = 32;
-	private static final int TEX_BUTTON_HEIGHT = 32;
+//	private static final int TEX_WIDTH = 64;
+//	private static final int TEX_HEIGHT = 64;
+//	
+//	private static final int TEX_BUTTON_HOFFSET = 0;
+//	private static final int TEX_BUTTON_VOFFSET = 0;
+//	private static final int TEX_BUTTON_WIDTH = 32;
+//	private static final int TEX_BUTTON_HEIGHT = 32;
 
 }

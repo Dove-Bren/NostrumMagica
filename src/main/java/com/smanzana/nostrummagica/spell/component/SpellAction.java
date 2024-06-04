@@ -2042,6 +2042,8 @@ public class SpellAction {
 		if (target == null)
 			return amt;
 		
+		System.out.println("Damage base: " + base);
+		
 		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
 		// Attribute made. Should rework
 		EffectInstance boostEffect = caster.getActivePotionEffect(NostrumEffects.magicBoost);

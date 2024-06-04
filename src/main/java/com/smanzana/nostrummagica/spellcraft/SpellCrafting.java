@@ -9,7 +9,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
@@ -30,12 +32,12 @@ public class SpellCrafting {
 		return attr != null && attr.isUnlocked() && attr.getCompletedResearches().contains("spellcraft");
 	}
 	
-	public static boolean CheckForValidRunes(IInventory inventory, int startIdx, int slotCount, @Nonnull List<String> errorsOut) {
+	public static boolean CheckForValidRunes(SpellCraftContext context, IInventory inventory, int startIdx, int slotCount, @Nonnull List<String> errorsOut) {
 		@Nonnull ItemStack stack;
 		boolean valid = true;
 		
 		// All shapes must be first. (This isn't enforced or required by the rest of spellcrafting logic.)
-		boolean foundShape = false;
+		int shapeCount = 0;
 		boolean foundElement = false;
 		boolean foundTerminalShape = false;
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
@@ -52,11 +54,23 @@ public class SpellCrafting {
 					valid = false;
 				}
 			} else if (SpellRune.isShape(stack)) {
-				foundShape = true;
+				shapeCount++;
 				if (foundElement) {
 					errorsOut.add("Shape in slot " + (i - (startIdx-1)) + " is not allowed after effects have started");
 					valid = false;
-				} if (foundTerminalShape) {
+				} else if (shapeCount > 1) {
+					int max = 1;
+					if (context.magic.hasSkill(NostrumSkills.Spellcraft_TwoShapes)) {
+						max++;
+					}
+					if (shapeCount > max) {
+						errorsOut.add("Shape in slot " + (i - (startIdx-1)) + " is not allowed, as only " + max + " shape(s) can fit");
+						valid = false;
+					}
+				}
+				
+				
+				if (foundTerminalShape) {
 					errorsOut.add("Shape in slot " + (i - (startIdx-1)) + " is not allowed after a previous terminal shape");
 					valid = false;
 				} else {
@@ -67,7 +81,7 @@ public class SpellCrafting {
 				}
 			}
 			
-			if (i == startIdx && !foundShape) {
+			if (i == startIdx && shapeCount == 0) {
 				errorsOut.add("The first rune on the board must be a shape");
 				valid = false;
 			}
@@ -90,8 +104,8 @@ public class SpellCrafting {
 		
 		// Convert any parts that were made to summaries (even on failure)
 		if (partSummaryOut != null) {
-			CalculateManaCost(parts);
-			CalculateWeight(parts);
+			CalculateManaCost(context, parts);
+			CalculateWeight(context, parts);
 			
 			for (SpellCraftPart part : parts) {
 				partSummaryOut.add(new SpellPartSummary(part));
@@ -112,17 +126,17 @@ public class SpellCrafting {
 			return null;
 		}
 		
-		return CreateSpellFromPartsInternal(spellName, parts, true);
+		return CreateSpellFromPartsInternal(context, spellName, parts, true);
 	}
 	
 //	public static Spell CreateSpellFromParts(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<SpellPart> parts, boolean trans) {
 //		return CreateSpellFromPartsInternal(context, pattern, spellName, parts, trans);
 //	}
 	
-	protected static Spell CreateSpellFromPartsInternal(String spellName, List<SpellCraftPart> parts, boolean trans) {
+	protected static Spell CreateSpellFromPartsInternal(SpellCraftContext context, String spellName, List<SpellCraftPart> parts, boolean trans) {
 		
-		final int manaCost = CalculateManaCost(parts);
-		final int weight = CalculateWeight(parts);
+		final int manaCost = CalculateManaCost(context, parts);
+		final int weight = CalculateWeight(context, parts);
 		Spell spell = new Spell(spellName, trans, manaCost, weight);
 		for (SpellCraftPart part : parts) {
 			if (part.isShape()) {
@@ -135,20 +149,20 @@ public class SpellCrafting {
 		return spell;
 	}
 	
-	public static final int CalculateManaCost(SpellShapePart part) {
-		return CalculateManaCost(part, 1f);
+	public static final int CalculateManaCost(SpellCraftContext context, SpellShapePart part) {
+		return CalculateManaCost(context, part, 1f);
 	}
 	
-	protected static final int CalculateManaCost(SpellShapePart part, float multiplier) {
+	protected static final int CalculateManaCost(SpellCraftContext context, SpellShapePart part, float multiplier) {
 		float cost = multiplier * (float) part.getShape().getManaCost();
 		return (int) Math.ceil(cost);
 	}
 	
-	public static final int CalculateManaCost(SpellEffectPart part) {
-		return CalculateManaCost(part, 1f);
+	public static final int CalculateManaCost(SpellCraftContext context, SpellEffectPart part) {
+		return CalculateManaCost(context, part, 1f);
 	}
 	
-	protected static final int CalculateManaCost(SpellEffectPart part, float multiplier) {
+	protected static final int CalculateManaCost(SpellCraftContext context, SpellEffectPart part, float multiplier) {
 		float cost = 0f;
 		
 		cost += multiplier * 10f;
@@ -160,27 +174,37 @@ public class SpellCrafting {
 		return (int) Math.ceil(cost);
 	}
 	
-	protected static int CalculateManaCost(SpellCraftPart part, float multiplier) {
+	protected static int CalculateManaCost(SpellCraftContext context, SpellCraftPart part, float multiplier) {
 		int cost;
 		if (part.isShape()) {
-			cost = Math.max(0, CalculateManaCost(part.getShapePart(), multiplier * part.getManaRate()));
-			part.finalMana = cost;
-			return cost;
+			cost = Math.max(0, CalculateManaCost(context, part.getShapePart(), multiplier * part.getManaRate()));
 		} else {
-			cost = Math.max(0, CalculateManaCost(part.getEffectPart(), multiplier * part.getManaRate()));
-			part.finalMana = cost;
-			return cost;
+			cost = Math.max(0, CalculateManaCost(context, part.getEffectPart(), multiplier * part.getManaRate()));
 		}
+		
+		float discount = 0f;
+		if (context.magic.hasSkill(NostrumSkills.Spellcraft_ManaDiscount1)) {
+			discount += .05f;
+		}
+		if (context.magic.hasSkill(NostrumSkills.Spellcraft_ManaDiscount2)) {
+			discount += .1f;
+		}
+		if (discount != 0 && cost > 0) {
+			cost = (int) ((float) cost * (1f-discount));
+		}
+		
+		part.finalMana = cost;
+		return cost;
 	}
 	
-	protected static int CalculateManaCost(List<SpellCraftPart> parts) {
+	protected static int CalculateManaCost(SpellCraftContext context, List<SpellCraftPart> parts) {
 		// Rolling multiplier makes it more expensive for one long spell vs many small
 		// (rate of 1.1x)
 		int cost = 0;
 		float multiplier = 1f;
 		
 		for (SpellCraftPart part : parts) {
-			cost += CalculateManaCost(part, multiplier);
+			cost += CalculateManaCost(context, part, multiplier);
 			multiplier *= 1.25;
 		}
 		return cost;
@@ -190,19 +214,19 @@ public class SpellCrafting {
 		List<SpellCraftPart> parts = new ArrayList<>(slotCount);
 		ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, null);
 		// Not checking return to run on whatever we CAN parse
-		return CalculateManaCost(parts);
+		return CalculateManaCost(context, parts);
 	}
 	
-	public static final int CalculateWeight(SpellShape shape) {
+	public static final int CalculateWeight(SpellCraftContext context, SpellShape shape) {
 		// Shapes report their own weight
 		return shape.getWeight();
 	}
 	
-	public static final int CalculateWeight(SpellShapePart part) {
-		return CalculateWeight(part.getShape());
+	public static final int CalculateWeight(SpellCraftContext context, SpellShapePart part) {
+		return CalculateWeight(context, part.getShape());
 	}
 	
-	public static final int CalculateWeight(EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
+	public static final int CalculateWeight(SpellCraftContext context, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
 		// Elements are free but alterations may have weight
 		if (alteration != null) {
 			return alteration.getWeight();
@@ -211,27 +235,36 @@ public class SpellCrafting {
 		}
 	}
 	
-	public static final int CalculateWeight(SpellEffectPart part) {
-		return CalculateWeight(part.getElement(), part.getElementCount(), part.getAlteration());
+	public static final int CalculateWeight(SpellCraftContext context, SpellEffectPart part) {
+		int raw = CalculateWeight(context, part.getElement(), part.getElementCount(), part.getAlteration());
+		if (raw > 0 && context.magic.hasSkill(NostrumSkills.Spellcraft_ElemWeight)) {
+			if (context.magic.getElementalMastery(part.getElement()).isGreaterOrEqual(EElementalMastery.MASTER)) {
+				raw--;
+			}
+		}
+		return raw;
 	}
 	
-	protected static int CalculateWeight(SpellCraftPart part) {
+	protected static int CalculateWeight(SpellCraftContext context, SpellCraftPart part) {
 		int cost;
 		if (part.isShape()) {
-			cost = Math.max(0, CalculateWeight(part.getShapePart()) + part.getWeightBonus());
+			cost = Math.max(0, CalculateWeight(context, part.getShapePart()) + part.getWeightBonus());
 			part.finalWeight = cost;
 			return cost;
 		} else {
-			cost = Math.max(0, CalculateWeight(part.getEffectPart()) + part.getWeightBonus());
+			cost = Math.max(0, CalculateWeight(context, part.getEffectPart()) + part.getWeightBonus());
 			part.finalWeight = cost;
 			return cost;
 		}
 	}
 	
-	protected static int CalculateWeight(List<SpellCraftPart> parts) {
+	protected static int CalculateWeight(SpellCraftContext context, List<SpellCraftPart> parts) {
 		int weight = 0;
 		for (SpellCraftPart part : parts) {
-			weight += CalculateWeight(part);
+			weight += CalculateWeight(context, part);
+		}
+		if (weight > 0 && context.magic.hasSkill(NostrumSkills.Spellcraft_Weight1)) {
+			weight--;
 		}
 		return weight;
 	}
@@ -240,7 +273,7 @@ public class SpellCrafting {
 		List<SpellCraftPart> parts = new ArrayList<>(slotCount);
 		ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, null);
 		// Not checking return to run on whatever we CAN parse
-		return CalculateWeight(parts);
+		return CalculateWeight(context, parts);
 	}
 	
 	/**
@@ -257,7 +290,7 @@ public class SpellCrafting {
 			@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern,
 			List<SpellCraftPart> partsOut, @Nullable List<String> errorsOut) {
 		
-		SpellParser parser = new SpellParser(partsOut, errorsOut);
+		SpellParser parser = new SpellParser(context, partsOut, errorsOut);
 		
 		int i;
 		for (i = 0; i < slotCount; i++) {
@@ -313,6 +346,7 @@ public class SpellCrafting {
 	private static final class SpellParser {
 		private final List<SpellCraftPart> output;
 		private final List<String> errorsOut;
+		private final SpellCraftContext context;
 		
 		private @Nullable EMagicElement previousElement = null;
 		private @Nullable EMagicElement element = null;
@@ -322,9 +356,10 @@ public class SpellCrafting {
 		private float efficiency = 1f;
 		private int elemBeginIdx = -1;
 		
-		public SpellParser(List<SpellCraftPart> output, List<String> errorsOut) {
+		public SpellParser(SpellCraftContext context, List<SpellCraftPart> output, List<String> errorsOut) {
 			this.output = output;
 			this.errorsOut = errorsOut;
+			this.context = context;
 		}
 		
 		public boolean consume(int idx, SpellIngredient ingredient) {
@@ -386,7 +421,8 @@ public class SpellCrafting {
 					if (element.isOpposingElement(previousElement)) {
 						elementalInterference = true;
 						efficiency -= .5f;
-					} else if (element.isSupportingElement(previousElement)) {
+					} else if (element.isSupportingElement(previousElement)
+							&& context.magic.hasSkill(NostrumSkills.Spellcraft_ElemBuilding)) {
 						elementalBoost = true;
 						efficiency += .5f;
 					}

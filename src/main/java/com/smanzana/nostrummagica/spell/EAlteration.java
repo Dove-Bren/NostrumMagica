@@ -20,7 +20,7 @@ public enum EAlteration {
 	ENCHANT("Enchant", 40, 1, ReagentType.BLACK_PEARL),
 	CONJURE("Conjure", 30, 1, ReagentType.MANDRAKE_ROOT),
 	SUMMON("Summon", 50, 2, ReagentType.MANI_DUST),
-	RUIN("Ruin", 80, 2, ReagentType.SPIDER_SILK),
+	RUIN("Ruin", 30, 2, ReagentType.SPIDER_SILK),
 	CORRUPT("Corrupt", 45, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
 	;
 	

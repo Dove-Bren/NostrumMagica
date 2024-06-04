@@ -11,7 +11,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.network.NetworkHandler;

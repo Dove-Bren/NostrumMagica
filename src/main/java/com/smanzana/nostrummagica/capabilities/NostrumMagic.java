@@ -181,6 +181,8 @@ public class NostrumMagic implements INostrumMagic {
 
 		level++;
 		this.addSkillPoint();
+		this.addSkillPoint();
+		this.addSkillPoint();
 		this.addResearchPoint();
 		this.addResearchPoint();
 		this.addResearchPoint();

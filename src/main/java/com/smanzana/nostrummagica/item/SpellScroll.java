@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.SpellRequestMessage;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -58,6 +58,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		
+		if (worldIn.isRemote()) {
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+		}
+		
 		if (itemStackIn.isEmpty())
 			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
@@ -73,15 +77,16 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay {
 		if (spell == null)
 			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
-		if (!playerIn.isCreative()) {
-			//itemStackIn.stackSize--;
-			ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, getSpell(itemStackIn)));
+		if (SpellCasting.AttemptScrollCast(spell, playerIn)) {
+			if (!playerIn.isCreative()) {
+				ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, getSpell(itemStackIn)));
+			}
 		}
 
-		if (worldIn.isRemote) {
-			NetworkHandler.sendToServer(
-	    			new ClientCastMessage(spell, true, 0));
-		}
+//		if (worldIn.isRemote) {
+//			NetworkHandler.sendToServer(
+//	    			new ClientCastMessage(spell, true, 0));
+//		}
 		
 		if (itemStackIn.getDamage() > itemStackIn.getMaxDamage() // Old way, I think never happens?
 				|| itemStackIn.isEmpty()) {

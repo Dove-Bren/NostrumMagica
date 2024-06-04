@@ -45,6 +45,13 @@ public class NostrumEffects {
 	@ObjectHolder(ElementalEnchantEffect.ID_LIGHTNING) public static ElementalEnchantEffect enchantLightning;
 	@ObjectHolder(ElementalEnchantEffect.ID_PHYSICAL) public static ElementalEnchantEffect enchantPhysical;
 	@ObjectHolder(ElementalEnchantEffect.ID_WIND) public static ElementalEnchantEffect enchantWind;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_EARTH) public static ElementalSpellBoostEffect spellBoostEarth;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_ENDER) public static ElementalSpellBoostEffect spellBoostEnder;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_FIRE) public static ElementalSpellBoostEffect spellBoostFire;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_ICE) public static ElementalSpellBoostEffect spellBoostIce;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_LIGHTNING) public static ElementalSpellBoostEffect spellBoostLightning;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_PHYSICAL) public static ElementalSpellBoostEffect spellBoostPhysical;
+	@ObjectHolder(ElementalSpellBoostEffect.ID_WIND) public static ElementalSpellBoostEffect spellBoostWind;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -81,5 +88,12 @@ public class NostrumEffects {
     	registry.register(new ElementalEnchantEffect(EMagicElement.LIGHTNING).setRegistryName(ElementalEnchantEffect.ID_LIGHTNING));
     	registry.register(new ElementalEnchantEffect(EMagicElement.PHYSICAL).setRegistryName(ElementalEnchantEffect.ID_PHYSICAL));
     	registry.register(new ElementalEnchantEffect(EMagicElement.WIND).setRegistryName(ElementalEnchantEffect.ID_WIND));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.EARTH).setRegistryName(ElementalSpellBoostEffect.ID_EARTH));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.ENDER).setRegistryName(ElementalSpellBoostEffect.ID_ENDER));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.FIRE).setRegistryName(ElementalSpellBoostEffect.ID_FIRE));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.ICE).setRegistryName(ElementalSpellBoostEffect.ID_ICE));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.LIGHTNING).setRegistryName(ElementalSpellBoostEffect.ID_LIGHTNING));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.PHYSICAL).setRegistryName(ElementalSpellBoostEffect.ID_PHYSICAL));
+    	registry.register(new ElementalSpellBoostEffect(EMagicElement.WIND).setRegistryName(ElementalSpellBoostEffect.ID_WIND));
     }
 }

@@ -6,21 +6,24 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.effect.ElementalSpellBoostEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
-import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape.SpellShapeInstance;
 import com.smanzana.nostrummagica.stat.PlayerStat;
@@ -31,6 +34,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -173,14 +178,32 @@ public class Spell {
 			//NostrumMagicaSounds.CAST_FAIL.play();
 		}
 		
+		protected float getEfficiencyBonuses(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base) {
+			float bonus = 0f;
+			
+			if (effect.getElement() != EMagicElement.PHYSICAL) {
+				final Effect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
+				if (target.getActivePotionEffect(boostEffect) != null) {
+					bonus += .25f * (1 + target.getActivePotionEffect(boostEffect).getAmplifier());
+					target.removePotionEffect(boostEffect);
+				}
+			}
+			
+			return bonus;
+		}
+		
 		private void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
 			boolean first = true;
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			float damageTotal = 0f;
+			final Map<LivingEntity, EMagicElement> totalAffectedEntities = new HashMap<>();
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
-				final float efficiency = this.efficiency + (part.getPotency() - 1f);
+				float efficiency = this.efficiency + (part.getPotency() - 1f);
 				
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				// Apply part-specific bonuses that don't matter on targets here
+				// ;
+				
 				if (attr != null && attr.isUnlocked()) {
 					attr.setKnowledge(part.getElement(), part.getAlteration());
 				}
@@ -191,9 +214,13 @@ public class Spell {
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
-						SpellActionResult result = action.apply(caster, targ, efficiency); 
+						// Apply per-target bonuses
+						float perEfficiency = efficiency + getEfficiencyBonuses(caster, targ, part, action, efficiency);
+						
+						SpellActionResult result = action.apply(caster, targ, perEfficiency); 
 						if (result.applied) {
 							affectedEnts.add(targ);
+							totalAffectedEntities.put(targ, part.getElement());
 							damageTotal += result.damage;
 						}
 					}
@@ -241,6 +268,13 @@ public class Spell {
 				}
 				
 				first = false;
+			}
+			
+			if (attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
+				for (Entry<LivingEntity, EMagicElement> entry : totalAffectedEntities.entrySet()) {
+					final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
+					entry.getKey().addPotionEffect(new EffectInstance(effect, 20 * 5, 0));
+				}
 			}
 			
 			if (!caster.world.isRemote() && caster instanceof PlayerEntity) {

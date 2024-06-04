@@ -377,6 +377,14 @@
 	"effect.nostrummagica.enchant_lightning": "Lightning Enchantment",
 	"effect.nostrummagica.enchant_physical": "Physical Enchantment",
 	"effect.nostrummagica.enchant_wind": "Wind Enchantment",
+	
+	"effect.nostrummagica.spellboost_physical": "Physical Spellboost",
+	"effect.nostrummagica.spellboost_fire": "Fire Spellboost",
+	"effect.nostrummagica.spellboost_ice": "Ice Spellboost",
+	"effect.nostrummagica.spellboost_earth": "Earth Spellboost",
+	"effect.nostrummagica.spellboost_wind": "Wind Spellboost",
+	"effect.nostrummagica.spellboost_lightning": "Lightning Spellboost",
+	"effect.nostrummagica.spellboost_ender": "Ender Spellboost",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 
@@ -649,10 +657,10 @@
 	"info.trial.weak": "You must gain more knowledge of the element before you can undertake this trial",
 	"info.trial.already_have": "You are already undergoing the Adept trial for this element",
 	
-	"info.mastery.unknown": "Unknown",
-	"info.mastery.novice": "Novice",
-	"info.mastery.adept": "Adept",
-	"info.mastery.master": "Master",
+	"mastery.unknown.name": "Unknown",
+	"mastery.novice.name": "Novice",
+	"mastery.adept.name": "Adept",
+	"mastery.master.name": "Master",
 
     "info.armor.set_status": "%1$s Set Bonus %3$s(%2$d/4)%4$s",
     "info.armor.set_total": "%1$s Set Bonus %2$s(Complete)%3$s",
@@ -1474,7 +1482,7 @@
 	"skill.nostrummagica.spellcraft.twoshapes": "Dual Shapes",
 	"skill.nostrummagica.spellcraft.twoshapes.desc": "Allows use of two shapes in a single spell.",
 	"skill.nostrummagica.spellcraft.element_building": "Elemental Cooperation",
-	"skill.nostrummagica.spellcraft.element_building.desc": "Boosts a spell effect's potency by 50%% with the correct previous element.|Fire is boosted by earth, earth by ice, ice, by wind, and wind by fire.",
+	"skill.nostrummagica.spellcraft.element_building.desc": "Boosts a spell effect's potency by 50%% with the correct previous element.|Fire is boosted by earth, earth by ice, ice, by wind, and wind by fire.|Lightning and Ender boost each-other but not themselves.|Physical is boosted by any non-physical element.",
 	"skill.nostrummagica.spellcraft.weight1": "Light SpellScribe",
 	"skill.nostrummagica.spellcraft.weight1.desc": "Reduces the weight of all crafted spells by 1.",
 	"skill.nostrummagica.spellcraft.elemweight": "Elemental SpellScribe",
@@ -1490,11 +1498,12 @@
 	"skill.nostrummagica.spellcast.elemmana": "Elemental Conduit",
 	"skill.nostrummagica.spellcast.elemmana.desc": "Reduces the mana cost of a cast spell by 10%% if it contains at least one element that you have reached the Rank of Master with.",
 	"skill.nostrummagica.spellcast.elemlinger": "Spell Weaver",
-	"skill.nostrummagica.spellcast.elemlinger.desc": "Leaves an affect on a target after attacking them with spell that can boost follow-up spells.|Any time you cast a spell with a negative affect that affects an entity, that entity will be more susceptible to that element's opposite.|For example, if you inflict fire damage on an enemy as the end of a spell, and then cast a spell that begins with an icy debuff, that debuff will have its potency boosted by 25%%.",
+	"skill.nostrummagica.spellcast.elemlinger.desc": "Leaves an affect on a target after attacking them with spell that can boost follow-up spells.|Any time you cast a spell with a negative affect that affects an entity, that entity will be more susceptible to that element's opposite.|For example, if you inflict fire damage on an enemy as the end of a spell, and then cast a spell that begins with an icy debuff, that debuff will have its potency boosted by 25%%.|Physical effects do not benefit from this skill.",
 	"skill.nostrummagica.spellcast.weight1": "Trained Tongue",
 	"skill.nostrummagica.spellcast.weight1.desc": "Reduces weight of any cast spell by 1.",
 	"skill.nostrummagica.spellcast.potency1": "Powerful Casting",
 	"skill.nostrummagica.spellcast.potency1.desc": "Increases the potency of all cast spells by 10%%.",
+	
 	"skill.nostrummagica.physical.novice": "Physical Novice Training",
 	"skill.nostrummagica.physical.novice.desc": "Boosts potency of physical effects by 20%%.",
 	"skill.nostrummagica.physical.adept": "Physical Adept Training",

@@ -22,15 +22,15 @@ import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.item.BlankScroll;
-import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
-import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape.SpellShapeAttributes;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
@@ -413,6 +413,15 @@ public class SpellCreationGui {
 				return null;
 			}
 			
+			List<ITextComponent> problems = new ArrayList<>();
+			if (!NostrumMagica.canCast(spell, this.context.magic, problems)) {
+				this.spellErrorStrings.add(new StringTextComponent("You could not cast this spell:"));
+				for (ITextComponent problem : problems) {
+					this.spellErrorStrings.add(problem);
+				}
+				return null;
+			}
+			
 			if (clear)
 				this.inventory.clearSpellBoard();
 			
@@ -456,7 +465,7 @@ public class SpellCreationGui {
 			}
 			
 			List<String> rawSpellErrors = new ArrayList<>();
-			if (!SpellCrafting.CheckForValidRunes(inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors)) {
+			if (!SpellCrafting.CheckForValidRunes(context, inventory, inventory.getRuneSlotStartingIndex(), inventory.getRuneSlotCount(), rawSpellErrors)) {
 				fail = true;
 			}
 			

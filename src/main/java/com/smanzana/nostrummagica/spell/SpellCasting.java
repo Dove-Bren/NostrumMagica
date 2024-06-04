@@ -16,6 +16,8 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.item.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
@@ -56,8 +58,8 @@ public class SpellCasting {
 			return false;
 		}
 		
-		// Check that the player can cast this (if it's not a scroll/creative)
-		if (!freeCast) {
+		// Check that the player can cast this (if it's not creative)
+		if (!playerCast.isCreative()) {
 			List<ITextComponent> problems = new ArrayList<>(4);
 			if (!NostrumMagica.canCast(spell, att, problems)) {
 				NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog... " + entity);
@@ -95,6 +97,27 @@ public class SpellCasting {
 		
 		// Visit an equipped spell armor
 		ISpellEquipment.ApplyAll(entity, summary);
+		
+		// Add skill bonuses
+		boolean hasMasterElem = false;
+		for (SpellEffectPart effect : spell.getSpellEffectParts()) {
+			if (att.getElementalMastery(effect.getElement()).isGreaterOrEqual(EElementalMastery.MASTER)) {
+				hasMasterElem = true;
+				break;
+			}
+		}
+		if (att.hasSkill(NostrumSkills.Spellcasting_ElemWeight) && hasMasterElem) {
+			summary.addWeightDiscount(1);
+		}
+		if (att.hasSkill(NostrumSkills.Spellcasting_ElemMana) && hasMasterElem) {
+			summary.addCostRate(-.1f);
+		}
+		if (att.hasSkill(NostrumSkills.Spellcasting_Weight1)) {
+			summary.addWeightDiscount(1);
+		}
+		if (att.hasSkill(NostrumSkills.Spellcasting_Potency1)) {
+			summary.addEfficiency(.1f);
+		}
 		
 		int cost = Math.max(0, summary.getFinalCost());
 		float xp = summary.getFinalXP();

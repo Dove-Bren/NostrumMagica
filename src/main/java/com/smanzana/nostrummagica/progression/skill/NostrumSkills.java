@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.progression.skill;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.progression.requirement.ElementMasteryRequirement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
