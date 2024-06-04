@@ -1067,7 +1067,7 @@ public class PlayerListener {
 		// Physical gives shield when armor is reduced
 		if (attr.hasSkill(NostrumSkills.Physical_Adept)) {
 			if (entity.isAlive() && entity.getHealth() > 0f && entity.getTotalArmorValue() < getLastTickArmor(entity)) {
-				entity.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 30, 0));
+				entity.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 15, 0));
 			}
 		}
 	}

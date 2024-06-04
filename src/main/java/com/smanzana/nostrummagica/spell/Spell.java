@@ -639,7 +639,7 @@ public class Spell {
 		case FIRE:
 			return new SpellAction().status(NostrumEffects.magicBoost, duration, amp).name("magicboost");
 		case ICE:
-			return new SpellAction().status(NostrumEffects.magicShield, duration, amp + 1).name("shield.magic");
+			return new SpellAction().status(NostrumEffects.magicShield, duration, amp).name("shield.magic");
 		case LIGHTNING:
 			return new SpellAction().pull(5 * elementCount, elementCount).name("pull");
 		case WIND:
@@ -662,7 +662,7 @@ public class Spell {
 		case FIRE:
 			return new SpellAction().burnArmor(elementCount).name("burnarmor");
 		case ICE:
-			return new SpellAction().heal((float) Math.pow(4f, elementCount)).name("heal");
+			return new SpellAction().heal(4f * elementCount).name("heal");
 		case LIGHTNING:
 			return new SpellAction().status(Effects.JUMP_BOOST, duration, amp).name("jumpboost");
 		case WIND:

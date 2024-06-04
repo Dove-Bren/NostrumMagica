@@ -248,15 +248,20 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+			float base = this.amount;
+			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Master)) {
+				base *= 2;
+			}
+			
 			if (entity.isEntityUndead()) {
 				caster.setLastAttackedEntity(entity);
 				entity.setRevengeTarget(caster);
 				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 				entity.hurtResistantTime = 0;
-				entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ICE), amount * efficiency);
-				resultBuilder.damage += amount * efficiency;
+				entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ICE), base * efficiency);
+				resultBuilder.damage += base * efficiency;
 			} else {
-				entity.heal(amount * efficiency);
+				entity.heal(base * efficiency);
 				if (entity instanceof EntityTameDragonRed) {
 					EntityTameDragonRed dragon = (EntityTameDragonRed) entity;
 					if (dragon.isTamed() && dragon.getOwner() == caster) {
@@ -268,7 +273,13 @@ public class SpellAction {
 						wolf.addBond(1f);
 					}
 				}
-				resultBuilder.heals += amount * efficiency;
+				resultBuilder.heals += base * efficiency;
+				
+				if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Adept)) {
+					if (NostrumMagica.rand.nextBoolean()) {
+						entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
+					}
+				}
 			}
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);
