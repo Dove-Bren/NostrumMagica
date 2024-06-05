@@ -83,6 +83,7 @@ public class NostrumBlocks {
 	@ObjectHolder(AdvancedSpellTable.ID) public static AdvancedSpellTable advancedSpellTable;
 	@ObjectHolder(MysticSpellTable.ID) public static MysticSpellTable mysticSpellTable;
 	@ObjectHolder(RuneLibraryBlock.ID) public static RuneLibraryBlock runeLibrary;
+	@ObjectHolder(CursedFireBlock.ID) public static CursedFireBlock cursedFire;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -236,6 +237,7 @@ public class NostrumBlocks {
     	registerBlock(new AdvancedSpellTable(), AdvancedSpellTable.ID, registry);
     	registerBlock(new MysticSpellTable(), MysticSpellTable.ID, registry);
     	registerBlock(new RuneLibraryBlock(), RuneLibraryBlock.ID, registry);
+    	registerBlock(new CursedFireBlock(), CursedFireBlock.ID, registry);
     }
     
 }

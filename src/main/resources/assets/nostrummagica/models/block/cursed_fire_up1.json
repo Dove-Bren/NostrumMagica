@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_fire_up",
+  "textures": {
+    "fire": "nostrummagica:block/cursed_fire_1"
+  }
+}

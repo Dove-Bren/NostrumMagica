@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_fire_side",
+  "textures": {
+    "fire": "nostrummagica:block/cursed_fire_1"
+  }
+}

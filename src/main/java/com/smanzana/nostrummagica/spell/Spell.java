@@ -592,7 +592,8 @@ public class Spell {
 		case ENDER:
 			return new SpellAction().status(Effects.BLINDNESS, duration, amp).name("blindness");
 		case FIRE:
-			return new SpellAction().status(Effects.NAUSEA, duration / 2, amp).damage(EMagicElement.FIRE, 1 + (amp / 2)).name("overheat");
+			//return new SpellAction().status(Effects.NAUSEA, duration / 2, amp).damage(EMagicElement.FIRE, 1 + (amp / 2)).name("overheat");
+			return new SpellAction().damage(EMagicElement.FIRE, 1f + ((float) amp/2f)).burn(elementCount * 20 * 5).name("burn");
 		case ICE:
 			return new SpellAction().status(NostrumEffects.frostbite, duration, amp).name("frostbite");
 		case LIGHTNING:
@@ -686,7 +687,7 @@ public class Spell {
 		case ENDER:
 			return new SpellAction().phase(elementCount).name("phase");
 		case FIRE:
-			return new SpellAction().burn(elementCount * 20 * 5).name("burn");
+			return new SpellAction().cursedFire(elementCount).name("cursed_fire");
 		case ICE:
 			return new SpellAction().cursedIce(elementCount).name("cursedice");
 		case LIGHTNING:

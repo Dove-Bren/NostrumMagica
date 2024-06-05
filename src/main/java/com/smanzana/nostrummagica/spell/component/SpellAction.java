@@ -1643,6 +1643,37 @@ public class SpellAction {
 			return false;
 		}
 	}
+
+	private static class CursedFire implements SpellEffect {
+		
+		private int level;
+		
+		public CursedFire(int level) {
+			this.level = level;
+		}
+
+		@Override
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+			apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency, resultBuilder);
+		}
+
+		@Override
+		public void apply(LivingEntity caster, World world, BlockPos block, float efficiency, SpellActionResult resultBuilder) {
+			world.setBlockState(block, NostrumBlocks.cursedFire.GetWithLevel(level));
+			NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
+			resultBuilder.applied |= true;
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
+	}
 	
 	private static class BreakEffect implements SpellEffect {
 
@@ -2066,7 +2097,6 @@ public class SpellAction {
 			return amt;
 		
 		INostrumMagic magic = NostrumMagica.getMagicWrapper(caster);
-		System.out.println("Damage base: " + base);
 		
 		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
 		// Attribute made. Should rework
@@ -2174,7 +2204,6 @@ public class SpellAction {
 			base -= attr.getValue();
 		}
 		
-		System.out.println("Calculated damage: " + base);
 		return base;
 	}
 	
@@ -2308,6 +2337,11 @@ public class SpellAction {
 	
 	public SpellAction cursedIce(int level) {
 		effects.add(new CursedIce(level));
+		return this;
+	}
+	
+	public SpellAction cursedFire(int level) {
+		effects.add(new CursedFire(level));
 		return this;
 	}
 	
