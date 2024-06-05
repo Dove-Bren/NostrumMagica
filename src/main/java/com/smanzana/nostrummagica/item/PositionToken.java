@@ -77,7 +77,7 @@ public class PositionToken extends PositionCrystal {
 		if (canPerformRecall(playerIn, worldIn, token)) {
 			// Try to do actual recall
 			BlockPos pos = getBlockPosition(token);
-			if (NostrumMagica.attemptTeleport(worldIn, pos, playerIn, !playerIn.isSneaking(), NostrumMagica.rand.nextInt(32) == 0)) {
+			if (NostrumMagica.attemptTeleport(worldIn, pos, playerIn, !playerIn.isSneaking(), NostrumMagica.rand.nextInt(32) == 0, playerIn)) {
 				// If success, take mana andreturn true
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn); // assumption: not null!
 				attr.addMana(-getManaCost(playerIn, worldIn, token));

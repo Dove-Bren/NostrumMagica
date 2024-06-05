@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -206,9 +207,13 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		ball.remove();
 	}
 	
-	protected void teleportEntity(LivingEntity entity, Vector3d pos) {
+	protected void teleportEntity(LivingEntity caster, LivingEntity entity, Vector3d pos) {
 		final Vector3d startPos = entity.getPositionVec();
-		entity.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
+		NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, pos.getX(), pos.getY(), pos.getZ(), caster);
+		if (!event.isCanceled()) {
+			entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+			NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
+		}
 		doCastEffect(entity, startPos, pos);
 	}
 	
@@ -217,7 +222,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		if (ball != null) {
 			final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4;
 			
-			teleportEntity(target, ball.getPositionVec());
+			teleportEntity(caster, target, ball.getPositionVec());
 			consumeBall(caster, ball);
 			
 			if (hasBonus && !NostrumMagica.IsSameTeam(target, caster)) {
@@ -232,7 +237,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	protected boolean dislocateCaster(LivingEntity caster) {
 		@Nullable EntityEnderRodBall ball = findNearestBall(caster);
 		if (ball != null) {
-			teleportEntity(caster, ball.getPositionVec());
+			teleportEntity(caster, caster, ball.getPositionVec());
 			consumeBall(caster, ball);
 			return true;
 		} else {

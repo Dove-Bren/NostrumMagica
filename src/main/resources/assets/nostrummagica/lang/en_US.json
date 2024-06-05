@@ -1550,9 +1550,9 @@
 	"skill.nostrummagica.ender.novice": "Ender Novice Training",
 	"skill.nostrummagica.ender.novice.desc": "Boosts potency of ender effects by 20%%.",
 	"skill.nostrummagica.ender.adept": "Ender Adept Training",
-	"skill.nostrummagica.ender.adept.desc": "Regain health any time you are teleported.",
+	"skill.nostrummagica.ender.adept.desc": "Regain a small amount of health and hunger any time you are teleported.",
 	"skill.nostrummagica.ender.master": "Ender Master Training",
-	"skill.nostrummagica.ender.master.desc": "Regain hunger any time you are teleported.",
+	"skill.nostrummagica.ender.master.desc": "Regain mana from entities when you cause them to teleport.",
 
     "modification.aoe.name":"Effect Radius",
     "modification.aoe.bool.name":"Ignore Allies",

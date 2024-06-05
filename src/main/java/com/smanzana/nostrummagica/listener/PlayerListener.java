@@ -2,10 +2,12 @@ package com.smanzana.nostrummagica.listener;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
@@ -13,6 +15,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportedOtherEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -72,6 +75,7 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
+import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -85,6 +89,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
@@ -1045,6 +1050,7 @@ public class PlayerListener {
 				}
 			}
 			updateTrackedEntities();
+			teleportedEntitiesThisTick.clear();
 		}
 	}
 	
@@ -1103,7 +1109,7 @@ public class PlayerListener {
 		bonus += (stats.getManaRegenModifier());
 		bonus += (player.getAttribute(NostrumAttributes.manaRegen).getValue()/100.0);
 		
-		int mana = 1 + (int) (bonus);
+		int mana = base + (int) (bonus);
 		bonus = bonus - (int) bonus;
 		if (bonus > 0f && NostrumMagica.rand.nextFloat() < bonus)
 			mana++;
@@ -1226,7 +1232,7 @@ public class PlayerListener {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
 				if (ent instanceof PlayerEntity && attr != null && attr.hasSkill(NostrumSkills.Lightning_Master)) {
 					final LivingEntity source = (LivingEntity) e.getEntity();
-					regenMana((PlayerEntity) ent, 10);
+					regenMana((PlayerEntity) ent, 5);
 					NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
 							5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
 							40, 0,
@@ -1354,5 +1360,56 @@ public class PlayerListener {
 	public int getLastTickArmor(LivingEntity ent) {
 		addEntity(ent);
 		return lastArmorCache.get(ent);
+	}
+	
+	private Set<LivingEntity> teleportedEntitiesThisTick = new HashSet<>();
+	
+	@SubscribeEvent(priority=EventPriority.LOWEST)
+	public void onTeleport(EntityTeleportEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		if (!(event.getEntity() instanceof LivingEntity)) {
+			return;
+		}
+		if (event.getEntity().world.isRemote()) {
+			return;
+		}
+		if (event.getEntity() instanceof PlayerEntity && ((PlayerEntity) event.getEntity()).isCreative()) {
+			return;
+		}
+		final LivingEntity ent = (LivingEntity) event.getEntity();
+		if (teleportedEntitiesThisTick.contains(ent)) {
+			return;
+		}
+		teleportedEntitiesThisTick.add(ent);
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
+		if (attr != null) {
+			if (attr.hasSkill(NostrumSkills.Ender_Adept)) {
+				ent.heal(2f);
+				if (ent instanceof PlayerEntity) {
+					((PlayerEntity) ent).getFoodStats().addStats(2, 2);
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onTeleport(NostrumTeleportedOtherEvent event) {
+		final Entity ent = event.getEntity();
+		final LivingEntity causingEntity = event.getCausingEntity();
+		if (causingEntity != null && causingEntity != ent && causingEntity instanceof PlayerEntity && ent instanceof LivingEntity) {
+			INostrumMagic causerAttr = NostrumMagica.getMagicWrapper(causingEntity);
+			if (causerAttr != null) {
+				if (causerAttr.hasSkill(NostrumSkills.Ender_Master)) {
+					regenMana((PlayerEntity) causingEntity, 20);
+					NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
+							5, ent.getPosX(), ent.getPosY() + .75, ent.getPosZ(), 0,
+							40, 0,
+							causingEntity.getEntityId()
+							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
+				}
+			}
+		}
 	}
 }

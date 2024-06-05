@@ -50,8 +50,8 @@ import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellRegistry;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -73,6 +73,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -80,7 +81,10 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
@@ -844,8 +848,63 @@ public class NostrumMagica {
 		return null;
 	}
 
+    @Cancelable
+	public static class NostrumTeleportEvent extends EntityTeleportEvent {
+		
+		private final @Nullable LivingEntity causingEntity;
+
+		public NostrumTeleportEvent(Entity entity, double targetX, double targetY, double targetZ, @Nullable LivingEntity causingEntity) {
+			super(entity, targetX, targetY, targetZ);
+			this.causingEntity = causingEntity;
+		}
+		
+		public @Nullable LivingEntity getCausingEntity() {
+			return this.causingEntity;
+		}
+		
+	}
+    
+    public static class NostrumTeleportedOtherEvent extends EntityEvent {
+    	
+    	private final LivingEntity causingEntity;
+    	private final Vector3d from;
+    	private final Vector3d to;
+    	
+    	public NostrumTeleportedOtherEvent(Entity entity, LivingEntity causingEntity, Vector3d from, Vector3d to) {
+    		super(entity);
+    		this.causingEntity = causingEntity;
+    		this.from = from;
+    		this.to = to;
+    	}
+    	
+    	public @Nonnull LivingEntity getCausingEntity() {
+    		return this.causingEntity;
+    	}
+
+		public Vector3d getFrom() {
+			return from;
+		}
+
+		public Vector3d getTo() {
+			return to;
+		}
+    	
+    }
+	
+	public static NostrumTeleportEvent fireTeleportAttemptEvent(Entity entity, double targetX, double targetY, double targetZ, @Nullable LivingEntity causingEntity) {
+		NostrumTeleportEvent event = new NostrumTeleportEvent(entity, targetX, targetY, targetZ, causingEntity);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event;
+	}
+	
+	public static NostrumTeleportedOtherEvent fireTeleprotedOtherEvent(Entity entity, LivingEntity cause, Vector3d from, Vector3d to) {
+		NostrumTeleportedOtherEvent event = new NostrumTeleportedOtherEvent(entity, cause, from, to);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event;
+	}
+
 	public static boolean attemptTeleport(World world, BlockPos target, PlayerEntity player, boolean allowPortal,
-			boolean spawnBristle) {
+			boolean spawnBristle, @Nullable LivingEntity causingEntity) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		boolean success = false;
 
@@ -857,8 +916,14 @@ public class NostrumMagica {
 				success = true;
 			}
 		} else {
-			player.setPositionAndUpdate(target.getX() + .5, target.getY() + .1, target.getZ() + .5);
-			success = true;
+			NostrumTeleportEvent event = fireTeleportAttemptEvent(player, target.getX() + .5, target.getY() + .1, target.getZ() + .5, causingEntity);
+			if (!event.isCanceled()) {
+				event.getEntity().setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+				success = true;
+				if (causingEntity != null) {
+					fireTeleprotedOtherEvent(event.getEntity(), causingEntity, event.getPrev(), event.getTarget());
+				}
+			}
 		}
 
 		if (success && spawnBristle) {

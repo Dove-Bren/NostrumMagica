@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
@@ -178,34 +179,39 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		}
 		
 		BlockPos target = pos.add(offset);
-		entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
-		entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .005;
-		entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
 		
-		if (!world.isRemote) {
-			NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
-				//Event type, LivingEntity entity, T data
-				entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .005, target.getZ() + .5);
-	
-				double dx = target.getX() + .5;
-				double dy = target.getY() + 1;
-				double dz = target.getZ() + .5;
-				for (int i = 0; i < 10; i++) {
-					
-					((ServerWorld) world).spawnParticle(ParticleTypes.DRAGON_BREATH,
-							dx,
-							dy,
-							dz,
-							10,
-							.25,
-							.6,
-							.25,
-							.1
-							);
-				}
-				NostrumMagicaSounds.DAMAGE_ENDER.play(world, dx, dy, dz);
-				return true;
-			}, 1, 0);
+		NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entityIn, target.getX() + .5, target.getY() + .1, target.getZ() + .5, null);
+		if (!event.isCanceled()) {
+		
+			entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
+			entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .005;
+			entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
+			
+			if (!world.isRemote) {
+				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
+					//Event type, LivingEntity entity, T data
+					entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .005, target.getZ() + .5);
+		
+					double dx = target.getX() + .5;
+					double dy = target.getY() + 1;
+					double dz = target.getZ() + .5;
+					for (int i = 0; i < 10; i++) {
+						
+						((ServerWorld) world).spawnParticle(ParticleTypes.DRAGON_BREATH,
+								dx,
+								dy,
+								dz,
+								10,
+								.25,
+								.6,
+								.25,
+								.1
+								);
+					}
+					NostrumMagicaSounds.DAMAGE_ENDER.play(world, dx, dy, dz);
+					return true;
+				}, 1, 0);
+			}
 		}
 	}
 	

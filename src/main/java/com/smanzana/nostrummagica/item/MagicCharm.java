@@ -274,7 +274,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 				pos = posOpt.get();
 			}
 			
-			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false)) {
+			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false, player)) {
 				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 				return true;
 			}

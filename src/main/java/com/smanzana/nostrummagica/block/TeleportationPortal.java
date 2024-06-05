@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TeleportationPortalTileEntity;
 
@@ -80,39 +81,45 @@ public class TeleportationPortal extends NostrumPortal  {
 				
 				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
 				
-					worldIn.getChunk(target);
-					
-					entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
-					entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .1;
-					entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
-					if (!worldIn.isRemote) {
-						if (entityIn instanceof ServerPlayerEntity) {
-							((ServerPlayerEntity) entityIn).connection.setPlayerLocation(target.getX() + .5, target.getY() + .1, target.getZ() + .5, entityIn.rotationYaw, entityIn.rotationPitch);
-						} else {
-							entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .1, target.getZ() + .5);
-						}
-						entityIn.fallDistance = 0;
-						//entityIn.velocityChanged = true;
-						((ServerWorld) worldIn).updateEntity(entityIn);
-							
-						// effects, sound, etc.
-						double x = target.getX() + .5;
-						double y = target.getY() + 1.4;
-						double z = target.getZ() + .5;
-						NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
-						((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
-								x,
-								y,
-								z,
-								50, // TODO count??
-								.3,
-								.5,
-								.3,
-								.2
-								);
+					NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entityIn, target.getX() + .5, target.getY() + .1, target.getZ() + .5, null);
+					if (!event.isCanceled()) {
+						worldIn.getChunk(target);
 						
+						entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
+						entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .1;
+						entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
+						if (!worldIn.isRemote) {
+						
+						
+							if (entityIn instanceof ServerPlayerEntity) {
+								((ServerPlayerEntity) entityIn).connection.setPlayerLocation(event.getTargetX(), event.getTargetY(), event.getTargetZ(), entityIn.rotationYaw, entityIn.rotationPitch);
+							} else {
+								entityIn.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+							}
+							entityIn.fallDistance = 0;
+							//entityIn.velocityChanged = true;
+							((ServerWorld) worldIn).updateEntity(entityIn);
+								
+							// effects, sound, etc.
+							double x = event.getTargetX() + .5;
+							double y = event.getTargetY() + 1.4;
+							double z = event.getTargetZ() + .5;
+							NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
+							((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
+									x,
+									y,
+									z,
+									50, // TODO count??
+									.3,
+									.5,
+									.3,
+									.2
+									);
+						}
+						return true;
+					}  else {
+						return false;
 					}
-					return true;
 				}, 1, 0);
 			}
 		}

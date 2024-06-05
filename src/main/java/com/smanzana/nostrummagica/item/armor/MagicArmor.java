@@ -20,6 +20,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.attribute.AttributeMagicPotency;
 import com.smanzana.nostrummagica.attribute.AttributeMagicReduction;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
@@ -2265,11 +2266,17 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			}
 		}
 		
-		if (bestResult != null && entity.attemptTeleport(bestResult.x, bestResult.y, bestResult.z, false)) {
-			entity.world.playSound(null, startPos.x, startPos.y, startPos.z,
-					SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS,
-					1f, 1f);
-			return true;
+		if (bestResult != null) {
+			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, bestResult.x, bestResult.y, bestResult.z, entity);
+			if (!event.isCanceled()) { 
+				if (entity.attemptTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
+					entity.world.playSound(null, startPos.x, startPos.y, startPos.z,
+							SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS,
+							1f, 1f);
+					NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), entity, event.getPrev(), event.getTarget());
+					return true;
+				}
+			}
 		}
 		return false;
 	}

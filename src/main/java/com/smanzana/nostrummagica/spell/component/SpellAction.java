@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.Candle;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
@@ -487,17 +488,6 @@ public class SpellAction {
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
-			// Can be disabled via disruption effect
-			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.disruption);
-			if (effect != null && effect.getDuration() > 0) {
-				if (effect.getAmplifier() > 0) {
-					// Damage, too
-					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
-				}
-				
-				return;
-			}
-			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
 				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
@@ -573,13 +563,15 @@ public class SpellAction {
 			}
 			
 			if (dest != null) {
-				entity.setPositionAndUpdate(.5 + Math.floor(dest.x), Math.floor(dest.y), .5 + Math.floor(dest.z));
-				entity.fallDistance = 0;
-				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+				NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, .5 + Math.floor(dest.x), Math.floor(dest.y), .5 + Math.floor(dest.z), caster);
+				if (!event.isCanceled()) {
+					entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+					entity.fallDistance = 0;
+					NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+					NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
+					resultBuilder.applied |= true;
+				}
 			}
-			
-
-			resultBuilder.applied |= dest != null;
 		}
 		
 		private boolean isPassable(World world, BlockPos pos) {
@@ -1116,22 +1108,30 @@ public class SpellAction {
 			float pitch = caster.rotationPitch;
 			float yaw = caster.rotationYawHead;
 			
-			if (caster instanceof PlayerEntity) {
-				caster.setPositionAndRotation(caster.getPosX(), caster.getPosY(), caster.getPosZ(), entity.rotationYawHead, entity.rotationPitch);
-				caster.setPositionAndUpdate(
-						entity.getPosX(), entity.getPosY(), entity.getPosZ());
-			} else {
-				caster.setPositionAndRotation(
-						entity.getPosX(), entity.getPosY(), entity.getPosZ(),
-						entity.rotationPitch, entity.rotationYawHead
-						);
+			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, entity.getPosX(), entity.getPosY(), entity.getPosZ(), caster);
+			if (!event.isCanceled()) {
+				if (caster instanceof PlayerEntity) {
+					caster.setPositionAndRotation(caster.getPosX(), caster.getPosY(), caster.getPosZ(), entity.rotationYawHead, entity.rotationPitch);
+					caster.setPositionAndUpdate(
+							event.getTargetX(), event.getTargetY(), event.getTargetZ());
+				} else {
+					caster.setPositionAndRotation(
+							event.getTargetX(), event.getTargetY(), event.getTargetZ(),
+							entity.rotationPitch, entity.rotationYawHead
+							);
+				}
+				NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
 			}
 			
-			if (entity instanceof PlayerEntity) {
-				entity.setPositionAndRotation(entity.getPosX(), entity.getPosY(), entity.getPosZ(), yaw, pitch);
-				entity.setPositionAndUpdate(pos.x, pos.y, pos.z);
-			} else {
-				entity.setPositionAndRotation(pos.x, pos.y, pos.z, yaw, pitch);
+			event = NostrumMagica.fireTeleportAttemptEvent(entity, pos.x, pos.y, pos.z, caster);
+			if (!event.isCanceled()) {
+				if (entity instanceof PlayerEntity) {
+					entity.setPositionAndRotation(entity.getPosX(), entity.getPosY(), entity.getPosZ(), yaw, pitch);
+					entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+				} else {
+					entity.setPositionAndRotation(event.getTargetX(), event.getTargetY(), event.getTargetZ(), yaw, pitch);
+				}
+				NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
 			}
 			
 			entity.fallDistance = 0;
@@ -1159,20 +1159,15 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, World world, BlockPos pos, float efficiency, SpellActionResult resultBuilder) {
-			// Can be disabled via disruption effect
-			EffectInstance effect = caster.getActivePotionEffect(NostrumEffects.disruption);
-			if (effect != null && effect.getDuration() > 0) {
-				if (effect.getAmplifier() > 0) {
-					// Damage, too
-					caster.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
-				}
-				return;
-			}
-			
 			pos = adjustPosition(world, pos);
-			caster.setPositionAndUpdate(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
-			caster.fallDistance = 0;
-			resultBuilder.applied |= true;
+			
+			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, pos.getX() + .5, pos.getY(), pos.getZ() + .5, caster);
+			if (!event.isCanceled()) {
+				caster.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+				caster.fallDistance = 0;
+				resultBuilder.applied |= true;
+				NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
+			}
 		}
 		
 		@Override
@@ -1235,16 +1230,6 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			// Can be disabled via disruption effect
-			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.disruption);
-			if (effect != null && effect.getDuration() > 0) {
-				if (effect.getAmplifier() > 0) {
-					// Damage, too
-					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
-				}
-				return;
-			}
-			
 			if (caster != entity && entity instanceof MobEntity) {
 				// Make sure they want to attack you if you do it
 				entity.setRevengeTarget(caster);
@@ -1285,8 +1270,16 @@ public class SpellAction {
 		        double z = entity.getPosZ() + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
 	
 			    // Try to teleport
-		        if (entity.attemptTeleport(x, y, z, false))
-		        	break;
+		        NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, x, y, z, caster);
+				if (event.isCanceled()) {
+					// Break on a single cancel
+					break;
+				} else {
+					if (entity.attemptTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
+						NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
+						break;
+					}
+				}
 			}
 			resultBuilder.applied |= true;
 		}

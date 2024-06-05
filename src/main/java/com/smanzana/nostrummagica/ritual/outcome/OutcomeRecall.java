@@ -63,7 +63,7 @@ public class OutcomeRecall implements IRitualOutcome {
 		if (DimensionUtils.InDimension(player, attr.getMarkDimension())) {
 			if (!world.isRemote) {
 				
-				NostrumMagica.attemptTeleport(world, pos, player, true, NostrumMagica.rand.nextInt(4) == 0);
+				NostrumMagica.attemptTeleport(world, pos, player, true, NostrumMagica.rand.nextInt(4) == 0, player);
 				
 //				if (attr.hasEnhancedTeleport()) {
 //					BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, center.up(), 4, true, pos, 20 * 30);
