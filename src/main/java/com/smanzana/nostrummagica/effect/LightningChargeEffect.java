@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class LightningChargeEffect extends Effect {
 
-	public static final String ID = "potions-lightningcharge";
+	public static final String ID = "lightningcharge";
 	
 	public LightningChargeEffect() {
 		super(EffectType.BENEFICIAL, 0xFFFFF200);

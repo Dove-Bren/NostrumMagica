@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MagicBuffEffect extends Effect {
 
-	public static final String ID = "potions-magicbuff";
+	public static final String ID = "magicbuff";
 	
 	public MagicBuffEffect() {
 		super(EffectType.BENEFICIAL, 0xFF80805D);

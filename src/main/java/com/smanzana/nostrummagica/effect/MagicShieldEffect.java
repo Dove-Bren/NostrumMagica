@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MagicShieldEffect extends Effect {
 
-	public static final String ID = "potions-shieldm";
+	public static final String ID = "shieldm";
 	
 	public MagicShieldEffect() {
 		super(EffectType.BENEFICIAL, 0xFF559496);

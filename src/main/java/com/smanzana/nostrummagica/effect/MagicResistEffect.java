@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MagicResistEffect extends Effect {
 
-	public static final String ID = "potions-magres";
+	public static final String ID = "magres";
 	
 	public MagicResistEffect() {
 		super(EffectType.BENEFICIAL, 0xFFA5359A);

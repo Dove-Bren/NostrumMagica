@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class LightningAttackEffect extends Effect {
 
-	public static final String ID = "potions-lightningattack";
+	public static final String ID = "lightningattack";
 	
 	public LightningAttackEffect() {
 		super(EffectType.BENEFICIAL, 0xFFFFF200);

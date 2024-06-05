@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MagicBoostEffect extends Effect {
 
-	public static final String ID = "potions-magboost";
+	public static final String ID = "magboost";
 	
 	public MagicBoostEffect() {
 		super(EffectType.BENEFICIAL, 0xFF47FFAF);

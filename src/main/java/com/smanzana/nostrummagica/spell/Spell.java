@@ -196,6 +196,7 @@ public class Spell {
 			float bonus = 0f;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			
+			if (attr != null)
 			switch (effect.getElement()) {
 			case EARTH:
 				if (attr.hasSkill(NostrumSkills.Earth_Novice)) {
@@ -315,7 +316,7 @@ public class Spell {
 				first = false;
 			}
 			
-			if (attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
+			if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
 				for (Entry<LivingEntity, EMagicElement> entry : totalAffectedEntities.entrySet()) {
 					final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
 					entry.getKey().addPotionEffect(new EffectInstance(effect, 20 * 5, 0));

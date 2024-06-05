@@ -22,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class FamiliarEffect extends Effect {
 	
-	public static final String ID = "potions-familiar-shadow";
+	public static final String ID = "familiar-shadow";
 
 	public FamiliarEffect() {
 		super(EffectType.BENEFICIAL, 0xFF310033);

@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class NaturesBlessingEffect extends Effect {
 
-	public static final String ID = "potions-naturesblessing";
+	public static final String ID = "naturesblessing";
 	
 	public NaturesBlessingEffect() {
 		super(EffectType.BENEFICIAL, 0xFF38810D);

@@ -14,7 +14,7 @@ import net.minecraft.util.DamageSource;
  */
 public class NostrumTransformationEffect extends Effect {
 
-	public static final String ID = "potions-transformation";
+	public static final String ID = "transformation";
 	
 	public NostrumTransformationEffect() {
 		super(EffectType.NEUTRAL, 0xFF000000);

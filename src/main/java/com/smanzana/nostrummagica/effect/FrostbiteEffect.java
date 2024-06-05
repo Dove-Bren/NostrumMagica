@@ -36,7 +36,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class FrostbiteEffect extends Effect {
 
-	public static final String ID = "potions-frostbite";
+	public static final String ID = "frostbite";
 	protected static IParticleData SnowParticle = null; 
 	
 	public FrostbiteEffect() {

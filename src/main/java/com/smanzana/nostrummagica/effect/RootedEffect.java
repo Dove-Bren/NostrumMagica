@@ -20,7 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class RootedEffect extends Effect {
 
-	public static final String ID = "potions-rooted";
+	public static final String ID = "rooted";
 	
 	public RootedEffect() {
 		super(EffectType.HARMFUL, (new Color(100, 60, 25)).getRGB());

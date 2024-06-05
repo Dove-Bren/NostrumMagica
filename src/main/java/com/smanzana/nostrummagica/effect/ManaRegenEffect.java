@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ManaRegenEffect extends Effect {
 
-	public static final String ID = "potions-mana-regen";
+	public static final String ID = "mana-regen";
 	
 	public ManaRegenEffect() {
 		super(EffectType.BENEFICIAL, 0xFFBB6DFF);

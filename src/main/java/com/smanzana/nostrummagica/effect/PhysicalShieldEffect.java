@@ -20,7 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class PhysicalShieldEffect extends Effect {
 
-	public static final String ID = "potions-shieldp";
+	public static final String ID = "shieldp";
 	
 	public PhysicalShieldEffect() {
 		super(EffectType.BENEFICIAL, 0xFF80805D);
