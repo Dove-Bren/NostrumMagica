@@ -944,6 +944,7 @@
 	"info.requirement.element": "%1$s %2$s element",
 	"info.requirement.research": "Researched %1$s",
 	"info.requirement.alteration": "Mastery of the %1$s alteration",
+	"info.requirement.skill": "The %1$s skill",
 	
 	"stat.nostrummagica.mana.totalspent": "Mana Spent",
 	"stat.nostrummagica.mana.maxreserved": "Max Mana Reserved",
@@ -1535,7 +1536,7 @@
 	"skill.nostrummagica.wind.novice": "Wind Novice Training",
 	"skill.nostrummagica.wind.novice.desc": "Boosts potency of wind effects by 20%%.",
 	"skill.nostrummagica.wind.adept": "Wind Adept Training",
-	"skill.nostrummagica.wind.adept.desc": "Turns the 'Projectile' shape into a sharp disk, piercing entities.",
+	"skill.nostrummagica.wind.adept.desc": "Unlocks the 'Cutter' shape, which is a projectile that piercing entities and blocks.",
 	"skill.nostrummagica.wind.master": "Wind Master Training",
 	"skill.nostrummagica.wind.master.desc": "Regain mana based on how fast you're moving. Teleportation doesn't work for this effect.",
 	

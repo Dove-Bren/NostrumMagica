@@ -3,12 +3,13 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
+import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.petcommand.api.PetFuncs;
 
@@ -32,7 +33,7 @@ import net.minecraft.world.World;
  */
 public class ProjectileShape extends SpellShape {
 	
-	public class ProjectileShapeInstance extends SpellShapeInstance {
+	public class ProjectileShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
 		private final World world;
 		private final Vector3d pos;
@@ -72,8 +73,7 @@ public class ProjectileShape extends SpellShape {
 				public void run() {
 					EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
 							getState().getSelf(),
-							world,
-							pos.x, pos.y, pos.z,
+							pos,
 							dir,
 							5.0f, PROJECTILE_RANGE);
 					
@@ -110,10 +110,12 @@ public class ProjectileShape extends SpellShape {
 			});
 		}
 		
+		@Override
 		public void onProjectileHit(BlockPos pos) {
 			getState().trigger(null, world, Lists.newArrayList(pos));
 		}
 		
+		@Override
 		public void onProjectileHit(Entity entity) {
 			if (entity == null) {
 				onProjectileHit(new BlockPos(this.pos));
@@ -125,9 +127,10 @@ public class ProjectileShape extends SpellShape {
 			}
 		}
 		
-		public void onFizzle(BlockPos lastPos) {
+		@Override
+		public void onProjectileEnd(Vector3d lastPos) {
 			if (atMax)
-				onProjectileHit(lastPos);
+				onProjectileHit(new BlockPos(lastPos));
 			else
 				getState().triggerFail();
 		}

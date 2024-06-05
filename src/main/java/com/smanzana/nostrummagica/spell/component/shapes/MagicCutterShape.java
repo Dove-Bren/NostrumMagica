@@ -3,18 +3,16 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
+import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerShape;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -34,25 +32,20 @@ import net.minecraftforge.common.util.Lazy;
  */
 public class MagicCutterShape extends SpellShape {
 
-	public static class MagicCutterShapeInstance extends SpellShapeInstance implements ISpellSaucerShape {
+	public static class MagicCutterShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
 		private final World world;
 		private final Vector3d pos;
 		private final float pitch;
 		private final float yaw;
-		private final boolean piercing;
 		private final SpellCharacteristics characteristics;
 		
-		private int trips;
-		
-		public MagicCutterShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean piercing, int trips, SpellCharacteristics characteristics) {
+		public MagicCutterShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
-			this.piercing = piercing;
-			this.trips = trips;
 			this.characteristics = characteristics;
 		}
 		
@@ -75,12 +68,12 @@ public class MagicCutterShape extends SpellShape {
 
 				@Override
 				public void run() {
-					EntitySpellSaucer projectile = new EntityChakramSpellSaucer(NostrumEntityTypes.chakramSpellSaucer, self, 
-							getState().getSelf(),
+					EntitySpellSaucer projectile = new EntityChakramSpellSaucer(self, 
 							world,
-							pos.x, pos.y, pos.z,
+							getState().getSelf(),
+							pos,
 							dir,
-							5.0f, piercing ? PROJECTILE_RANGE/2 : PROJECTILE_RANGE, piercing, trips);
+							5.0f, PROJECTILE_RANGE);
 					
 					world.addEntity(projectile);
 				}
@@ -90,7 +83,7 @@ public class MagicCutterShape extends SpellShape {
 
 		@Override
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, world, Lists.newArrayList(pos), piercing); /// TODO only force split if piercing
+			getState().trigger(null, world, Lists.newArrayList(pos), true);
 		}
 		
 		@Override
@@ -101,13 +94,18 @@ public class MagicCutterShape extends SpellShape {
 			else if (NostrumMagica.resolveLivingEntity(entity) == null) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null, piercing);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null, true);
 			}
 		}
 
 		@Override
 		public EMagicElement getElement() {
 			return characteristics.getElement();
+		}
+
+		@Override
+		public void onProjectileEnd(Vector3d pos) {
+			;
 		}
 	}
 	
@@ -125,17 +123,9 @@ public class MagicCutterShape extends SpellShape {
 	
 	@Override
 	public MagicCutterShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		// We use param's flip to indicate whether we should be piercing or not
-		boolean piercing = false;
-		if (params != null)
-			piercing = params.flip;
-		int trips = 1;
-		if (params != null)
-			trips = Math.max(1, (int) params.level);
-		
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new MagicCutterShapeInstance(state, world, pos, pitch, yaw, piercing, trips, characteristics);
+		return new MagicCutterShapeInstance(state, world, pos, pitch, yaw, characteristics);
 	}
 	
 	@Override
@@ -160,25 +150,25 @@ public class MagicCutterShape extends SpellShape {
 
 	@Override
 	public boolean supportsBoolean() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public float[] supportedFloats() {
-		return new float[] { 1f, 2f, 5f};
+		return null;
 	}
 
-	public static NonNullList<ItemStack> costs = null;
 	@Override
 	public NonNullList<ItemStack> supportedFloatCosts() {
-		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
-				ItemStack.EMPTY,
-				new ItemStack(Blocks.REDSTONE_BLOCK),
-				new ItemStack(Blocks.OBSIDIAN)
-			);
-		}
-		return costs;
+//		if (costs == null) {
+//			costs = NonNullList.from(ItemStack.EMPTY,
+//				ItemStack.EMPTY,
+//				new ItemStack(Blocks.REDSTONE_BLOCK),
+//				new ItemStack(Blocks.OBSIDIAN)
+//			);
+//		}
+//		return costs;
+		return null;
 	}
 
 	@Override

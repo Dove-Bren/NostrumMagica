@@ -1070,6 +1070,17 @@ public class PlayerListener {
 				entity.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 15, 0));
 			}
 		}
+		
+		// Wind gives extra mana regen when moving
+		if (attr.hasSkill(NostrumSkills.Wind_Master) && entity.ticksExisted % 10 == 0) {
+			double distance = entity.getPositionVec().distanceTo(getLastTickPos(entity));
+			if (distance > 0.1 && distance < 3) {
+				final int mult = Math.min(3, 1 + (int) (distance / .3));
+				for (int i = 0; i < mult; i++) {
+					regenMana(entity);
+				}
+			}
+		}
 	}
 	
 	private void regenMana(PlayerEntity player) {

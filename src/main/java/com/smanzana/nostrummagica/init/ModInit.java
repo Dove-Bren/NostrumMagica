@@ -50,13 +50,13 @@ import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.MagicCharm;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
-import com.smanzana.nostrummagica.item.armor.MagicArmorBase;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
+import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.MagicArmorBase;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 import com.smanzana.nostrummagica.loot.NostrumLoot;
@@ -70,13 +70,14 @@ import com.smanzana.nostrummagica.progression.requirement.ElementMasteryRequirem
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.requirement.ResearchRequirement;
 import com.smanzana.nostrummagica.progression.requirement.ShapeMasteryRequirement;
+import com.smanzana.nostrummagica.progression.requirement.SkillRequirement;
 import com.smanzana.nostrummagica.progression.requirement.StatRequirement;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.progression.reward.AttributeReward;
-import com.smanzana.nostrummagica.progression.reward.IReward;
 import com.smanzana.nostrummagica.progression.reward.AttributeReward.AwardType;
+import com.smanzana.nostrummagica.progression.reward.IReward;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
@@ -93,9 +94,9 @@ import com.smanzana.nostrummagica.ritual.outcome.OutcomePotionEffect;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeRecall;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeReviveSoulboundPet;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnEntity;
+import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnEntity.IEntityFactory;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeTeleportObelisk;
-import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnEntity.IEntityFactory;
 import com.smanzana.nostrummagica.serializer.ArcaneWolfElementalTypeSerializer;
 import com.smanzana.nostrummagica.serializer.DragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.serializer.FloatArraySerializer;
@@ -112,6 +113,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.stat.PlayerStat;
@@ -268,6 +270,20 @@ public class ModInit {
 
 		// Shape Runes
 		for (SpellShape shape: SpellShape.getAllShapes()) {
+			if (shape == NostrumSpellShapes.Cutter) {
+				recipe = RitualRecipe.createTier3("rune." + shape.getShapeKey().toLowerCase(),
+						SpellRune.getRune(shape), null,
+						new ReagentType[] {
+								ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.SPIDER_SILK },
+						Ingredient.fromTag(NostrumTags.Items.MagicToken),
+						new Ingredient[] { Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromStacks(shape.getCraftItem()), Ingredient.EMPTY,
+								Ingredient.fromTag(Tags.Items.NUGGETS_GOLD) },
+						IRequirement.AND(new SkillRequirement(NostrumSkills.Wind_Adept),
+								new ResearchRequirement("spellrunes")),
+						new OutcomeSpawnItem(SpellRune.getRune(shape)));
+				registry.register(recipe);
+				continue;
+			}
 			recipe = RitualRecipe.createTier3("rune." + shape.getShapeKey().toLowerCase(),
 					SpellRune.getRune(shape), null,
 					new ReagentType[] {

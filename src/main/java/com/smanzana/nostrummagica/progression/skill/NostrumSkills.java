@@ -159,7 +159,7 @@ public class NostrumSkills {
 			x = -2;
 			y = -1;
 			Wind_Novice = new HiddenSkill(ID_WIND_NOVICE, Category_Element_Wind, null, () -> SpellRune.getRune(EMagicElement.WIND), x, y, new ElementMasteryRequirement(EMagicElement.WIND, EElementalMastery.NOVICE));
-			Wind_Adept = new HiddenSkill(ID_WIND_ADEPT, Category_Element_Wind, ID_WIND_NOVICE, () -> SpellRune.getRune(NostrumSpellShapes.Ring), x, y-1, new ElementMasteryRequirement(EMagicElement.WIND, EElementalMastery.ADEPT));
+			Wind_Adept = new HiddenSkill(ID_WIND_ADEPT, Category_Element_Wind, ID_WIND_NOVICE, () -> SpellRune.getRune(NostrumSpellShapes.Cutter), x, y-1, new ElementMasteryRequirement(EMagicElement.WIND, EElementalMastery.ADEPT));
 			Wind_Master = new HiddenSkill(ID_WIND_MASTER, Category_Element_Wind, ID_WIND_ADEPT, () -> new ItemStack(NostrumItems.magicCharmWind), x, y-2, new ElementMasteryRequirement(EMagicElement.WIND, EElementalMastery.MASTER));
 			
 			x = -3;

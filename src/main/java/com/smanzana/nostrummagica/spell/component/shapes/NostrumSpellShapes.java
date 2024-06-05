@@ -16,7 +16,7 @@ public class NostrumSpellShapes {
 	public static final BeamShape Beam = new BeamShape();
 	public static final BurstShape Burst = new BurstShape();
 	public static final ChainShape Chain = new ChainShape();
-	//public static final MagicCutterShape Cutter = new MagicCutterShape();
+	public static final MagicCutterShape Cutter = new MagicCutterShape();
 	public static final MagicCyclerShape Cycler = new MagicCyclerShape();
 	public static final DelayShape Delay = new DelayShape();
 	public static final FieldShape Field = new FieldShape();
@@ -41,7 +41,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(Beam);
 		event.getRegistry().register(Burst);
 		event.getRegistry().register(Chain);
-		//event.getRegistry().register(Cutter);
+		event.getRegistry().register(Cutter);
 		event.getRegistry().register(Cycler);
 		event.getRegistry().register(Delay);
 		event.getRegistry().register(Field);

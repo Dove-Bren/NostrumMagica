@@ -3,15 +3,14 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
+import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
 import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer.ISpellSaucerShape;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -32,7 +31,7 @@ import net.minecraftforge.common.util.Lazy;
  */
 public class MagicCyclerShape extends SpellShape {
 	
-	public static class MagicCyclerShapeInstance extends SpellShapeInstance implements ISpellSaucerShape {
+	public static class MagicCyclerShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
 		private final World world;
 		private final Vector3d pos;
@@ -55,8 +54,8 @@ public class MagicCyclerShape extends SpellShape {
 
 				@Override
 				public void run() {
-					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(NostrumEntityTypes.cyclerSpellSaucer, MagicCyclerShapeInstance.this,
-							getState().getSelf(),
+					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(getState().getSelf().world, getState().getSelf(),
+							MagicCyclerShapeInstance.this,
 							5.0f, (int) duration * 20, onBlocks, false);
 					
 					world.addEntity(projectile);
@@ -86,6 +85,11 @@ public class MagicCyclerShape extends SpellShape {
 		@Override
 		public EMagicElement getElement() {
 			return characteristics.getElement();
+		}
+
+		@Override
+		public void onProjectileEnd(Vector3d pos) {
+			;
 		}
 	}
 	

@@ -1,169 +1,141 @@
 package com.smanzana.nostrummagica.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.annotation.Nullable;
-
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.MysticAnchor;
-import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
-import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.util.Entities;
-
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.DamagingProjectileEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.NetworkHooks;
 
-public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
+/**
+ * Spell projectile that by default doesn't die on impact and instead keeps track of who it's
+ * impacted already to avoid duplicates
+ * @author Skyler
+ *
+ */
+public abstract class EntitySpellSaucer extends EntitySpellProjectile {
 	
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(EntitySpellSaucer.class, MagicElementDataSerializer.instance);
+	protected int hitCooldown;
 	
-	public static interface ISpellSaucerShape {
-
-		public void onProjectileHit(BlockPos pos);
-		
-		public void onProjectileHit(Entity entity);
-		
-		public EMagicElement getElement();
-		
-	}
-	
-	protected LivingEntity shootingEntity;
-	protected ISpellSaucerShape trigger;
-	
-	protected float speed;
-	protected int ticksInAir;
-	
-	// TODO support not hitting blocks
-	private Set<LivingEntity> hitEntities;
-	private Set<Vector> hitBlocks;
+	private final Map<Entity, Integer> hitEntities;
+	private final Map<BlockPos, Integer> hitBlocks;
 	
 	protected EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, World world) {
 		super(type, world);
-		this.hitEntities = new HashSet<>();
-		this.hitBlocks = new HashSet<>();
+		this.hitEntities = new HashMap<>();
+		this.hitBlocks = new HashMap<>();
 	}
 	
-	public EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, World world, LivingEntity shooter, ISpellSaucerShape trigger, float speed) {
-		this(type, world);
-        this.speed = speed;
-        this.shootingEntity = shooter;
-        this.trigger = trigger;
-        this.setElement(trigger.getElement());
+	protected EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, ISpellProjectileShape trigger, World world, LivingEntity shooter, float speed, double maxDistance, int hitCooldown) {
+		super(type, trigger, shooter, speed, maxDistance);
+		this.hitEntities = new HashMap<>();
+		this.hitBlocks = new HashMap<>();
+		this.hitCooldown = hitCooldown;
 	}
 	
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public boolean isInRangeToRenderDist(double distance) {
-		return distance <= 64 * 64 * 64;
+	protected EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, ISpellProjectileShape trigger,
+			World world, LivingEntity shooter,
+			Vector3d origin, Vector3d direction,
+			float speedFactor, double maxDistance, int hitCooldown) {
+		super(type, trigger, world, shooter, origin, direction, speedFactor, maxDistance);
+		this.hitEntities = new HashMap<>();
+		this.hitBlocks = new HashMap<>();
+		this.hitCooldown = hitCooldown;
+	}
+	
+	protected EntitySpellSaucer(EntityType<? extends EntitySpellSaucer> type, ISpellProjectileShape trigger, World world, LivingEntity shooter, float speed, double maxDistance) {
+		this(type, trigger, world, shooter, speed, maxDistance, -1);
 	}
 	
 	@Override
 	public void tick() {
 		super.tick();
-		ticksInAir++;
 		
-		if (this.ticksExisted % 5 == 0 && world.isRemote) {
-			this.world.addParticle(ParticleTypes.CRIT,
-					getPosX() - .5 + rand.nextFloat(), getPosY(), getPosZ() - .5 + rand.nextFloat(), 0, 0, 0);
-		}
+//		if (this.ticksExisted % 5 == 0 && world.isRemote) {
+//			this.world.addParticle(ParticleTypes.CRIT,
+//					getPosX() - .5 + rand.nextFloat(), getPosY(), getPosZ() - .5 + rand.nextFloat(), 0, 0, 0);
+//		}
 	}
 	
-	protected void addHit(LivingEntity entity) {
-		this.hitEntities.add(entity);
+	protected void addHit(Entity entity) {
+		this.hitEntities.put(entity, this.ticksExisted);
 	}
 	
-	protected boolean hasBeenHit(LivingEntity entity) {
-		return this.hitEntities.contains(entity);
+	// -1 cooldown means EVER
+	protected boolean hasBeenHit(Entity entity, int cooldown) {
+		Integer hitTickCount = hitEntities.get(entity);
+		return hitTickCount != null &&
+				(cooldown == -1 || this.ticksExisted - hitTickCount < cooldown);
 	}
 	
-	protected void addHit(Vector pos) {
-		this.hitBlocks.add(pos.copy());
+	protected void addHit(BlockPos pos) {
+		this.hitBlocks.put(pos.toImmutable(), this.ticksExisted);
 	}
 	
-	protected boolean hasBeenHit(Vector pos) {
-		return this.hitBlocks.contains(pos);
-	}
-
-	protected void onImpact(RayTraceResult result) {
-		if (world.isRemote)
-			return;
-		
-		if (result.getType() == RayTraceResult.Type.MISS) {
-			; // Do nothing
-		} else if (result.getType() == RayTraceResult.Type.BLOCK) {
-			BlockPos pos = ((BlockRayTraceResult) result).getPos();
-			boolean dieOnImpact = this.dieOnImpact(pos);
-			boolean canImpact = this.canImpact(pos);
-			Vector vec = new Vector().set((int) result.getHitVec().x, (int) result.getHitVec().y, (int) result.getHitVec().z);
-			if (canImpact && (dieOnImpact || !this.hasBeenHit(vec))) {
-				trigger.onProjectileHit(pos);
-				
-				// Proc mystic anchors if we hit one
-				if (world.isAirBlock(pos)) pos = pos.down();
-				BlockState state = world.getBlockState(pos);
-				if (state.getBlock() instanceof MysticAnchor) {
-					state.onEntityCollision(world, pos, this);
-				}
-				
-				if (dieOnImpact) {
-					this.remove();
-				} else {
-					this.addHit(vec);
-				}
-			}
-		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
-			Entity entityHit = ((EntityRayTraceResult) result).getEntity();
-			if (entityHit instanceof EntitySpellSaucer || null == NostrumMagica.resolveLivingEntity(entityHit)) {
-				
-			} else if (!entityHit.equals(shootingEntity) && !shootingEntity.isRidingOrBeingRiddenBy(entityHit)) {
-				LivingEntity living = NostrumMagica.resolveLivingEntity(entityHit);
-				boolean dieOnImpact = this.dieOnImpact(living);
-				boolean canImpact = this.canImpact(living);
-				if (canImpact && (dieOnImpact || !this.hasBeenHit(living))) {
-					trigger.onProjectileHit(entityHit);
-					
-					if (dieOnImpact) {
-						this.remove();
-					} else {
-						this.addHit(living);
-					}
-				}
-			}
-		}
-	}
-	
-	protected void shoot(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
-		this.ticksExisted = 0;
+	// -1 cooldown means EVER
+	protected boolean hasBeenHit(BlockPos pos, int cooldown) {
+		Integer hitTickCount = hitBlocks.get(pos);
+		return hitTickCount != null &&
+				(cooldown == -1 || this.ticksExisted - hitTickCount < cooldown);
 	}
 
 	@Override
+	protected void onImpact(RayTraceResult result) {
+		super.onImpact(result);
+	}
+	
+	@Override
+	public boolean canImpact(BlockPos pos) {
+		return !hasBeenHit(pos, hitCooldown);
+	}
+	
+	@Override
+	public boolean canImpact(Entity entity) {
+		return !hasBeenHit(entity, hitCooldown);
+	}
+	
+	@Override
+	protected void doImpact(BlockPos pos) {
+		super.doImpact(pos);
+		this.addHit(pos);
+	}
+	
+	@Override
+	protected void doImpact(Entity entity) {
+		super.doImpact(entity);
+		this.addHit(entity);
+	}
+	
+	@Override
+	public boolean dieOnImpact(BlockPos pos) {
+		return false;
+	}
+	
+	@Override
+	public boolean dieOnImpact(Entity entity) {
+		return false;
+	}
+	
+//	protected void shoot(double xStart, double yStart, double zStart, double xTo, double yTo, double zTo, float velocity, float inaccuracy) {
+//		this.ticksExisted = 0;
+//	}
+
+	@Override
 	public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
-		this.shoot(getPosX(), getPosY(), getPosZ(), x, y, z, velocity, inaccuracy);
+		super.shoot(x, y, z, velocity, inaccuracy);
+		//this.shoot(getPosX(), getPosY(), getPosZ(), x, y, z, velocity, inaccuracy);
 	}
 
 	@Override
 	protected void registerData() {
 		super.registerData();
-		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+		//this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	@Override
@@ -171,22 +143,22 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 		return false; // This makes us not save and persist!!
 	}
 
-	@Override
-	public void readAdditional(CompoundNBT compound) {
-		this.speed = compound.getFloat("speed");
-		if (compound.hasUniqueId("shooterID")) {
-			UUID uuid = compound.getUniqueId("shooterID");
-			this.shootingEntity = Entities.FindLiving(world, uuid);
-		} else {
-			this.shootingEntity = null;
-		}
-	}
-
-	@Override
-	public void writeAdditional(CompoundNBT compound) {
-		compound.putFloat("speed", this.speed);
-		compound.putUniqueId("shooterID", shootingEntity.getUniqueID());
-	}
+//	@Override
+//	public void readAdditional(CompoundNBT compound) {
+//		this.speed = compound.getFloat("speed");
+//		if (compound.hasUniqueId("shooterID")) {
+//			UUID uuid = compound.getUniqueId("shooterID");
+//			this.shootingEntity = Entities.FindLiving(world, uuid);
+//		} else {
+//			this.shootingEntity = null;
+//		}
+//	}
+//
+//	@Override
+//	public void writeAdditional(CompoundNBT compound) {
+//		compound.putFloat("speed", this.speed);
+//		compound.putUniqueId("shooterID", shootingEntity.getUniqueID());
+//	}
 	
 	@Override
 	public boolean canBeCollidedWith() {
@@ -196,130 +168,5 @@ public abstract class EntitySpellSaucer extends DamagingProjectileEntity {
 	@Override
 	public float getCollisionBorderSize() {
 		return 1f;
-	}
-	
-	public boolean dieOnImpact(BlockPos pos) {
-		return true;
-	}
-	
-	public boolean dieOnImpact(LivingEntity entity) {
-		return true;
-	}
-	
-	public boolean canImpact(BlockPos pos) {
-		return true;
-	}
-	
-	public boolean canImpact(LivingEntity entity) {
-		return true;
-	}
-
-	@Override
-	public IPacket<?> createSpawnPacket() {
-		return NetworkHooks.getEntitySpawningPacket(this);
-	}
-	
-	public static final class Vector {
-		public double x;
-		public double y;
-		public double z;
-		
-		public Vector() {
-			
-		}
-		
-		public Vector set(double x, double y, double z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			
-			return this;
-		}
-		
-		public Vector set(Vector3d vec) {
-			this.set(vec.x, vec.y, vec.z);
-			
-			return this;
-		}
-		
-		public Vector subtract(Vector3d vec) {
-			this.x -= vec.x;
-			this.y -= vec.y;
-			this.z -= vec.z;
-			
-			return this;
-		}
-		
-		public Vector subtract(Vector vec) {
-			this.x -= vec.x;
-			this.y -= vec.y;
-			this.z -= vec.z;
-			
-			return this;
-		}
-		
-		public double getMagnitude() {
-			double length = Math.sqrt(x*x + y*y);
-			length = Math.sqrt(length*length + z*z);
-			
-			return length;
-		}
-		
-		public Vector normalize() {
-			double length = this.getMagnitude();
-			this.x /= length;
-			this.y /= length;
-			this.z /= length;
-			
-			return this;
-		}
-		
-		public Vector scale(double amount) {
-			this.x *= amount;
-			this.y *= amount;
-			this.z *= amount;
-			
-			return this;
-		}
-		
-		public Vector setMagnitude(double magnitude) {
-			this.normalize();
-			this.scale(magnitude);
-			
-			return this;
-		}
-		
-		public Vector copy() {
-			return new Vector().set(x, y, z);
-		}
-		
-		@Override
-		public boolean equals(Object other) {
-			return other.hashCode() == this.hashCode();
-		}
-		
-		@Override
-		public int hashCode() {
-			return (int) (Math.round(x * 1000)
-					+ Math.round(y * 1000) * 13397
-					+ Math.round(z * 1000) * 68329);
-		}
-	}
-	
-	public @Nullable LivingEntity getShooter() {
-		return this.shootingEntity;
-	}
-	
-	@Override
-	protected boolean isFireballFiery() {
-		return false;
-	}
-	
-	public void setElement(EMagicElement element) {
-		this.dataManager.set(ELEMENT, element);
-	}
-	
-	public EMagicElement getElement() {
-		return this.dataManager.get(ELEMENT);
 	}
 }

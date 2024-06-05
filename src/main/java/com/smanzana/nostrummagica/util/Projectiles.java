@@ -20,7 +20,9 @@ public class Projectiles {
 			if (shooter != null && shooter instanceof LivingEntity)
 				source = (LivingEntity) shooter;
 		} else if (projectile instanceof EntitySpellSaucer) {
-			source = ((EntitySpellSaucer) projectile).getShooter();
+			shooter = ((EntitySpellSaucer) projectile).getShooter();
+			if (shooter != null && shooter instanceof LivingEntity)
+				source = (LivingEntity) shooter;
 		}
 		
 		return source;
