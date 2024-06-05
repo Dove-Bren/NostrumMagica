@@ -880,6 +880,14 @@ public class SpellAction {
 				}
 			}
 			
+			float damage = 5; // Default for lightning
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Lightning_Adept)) {
+				damage += 1;
+			}
+			
+			damage = (damage * efficiency);
+			
 			BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(block);
 			Random rand = (caster == null ? new Random() : caster.getRNG());
 			for (int i = 0; i < count; i++) {
@@ -900,10 +908,13 @@ public class SpellAction {
 					}
 				}
 				
-				((ServerWorld) world).addEntity(
-					(new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5))
-					.setEntityToIgnore(caster)
-					);
+				NostrumTameLightning bolt = new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5);
+				bolt.setEntityToIgnore(caster);
+				bolt.setDamage(damage);
+				
+				((ServerWorld) world).addEntity(bolt);
+				
+				
 			}
 
 			resultBuilder.applied |= true;

@@ -1084,6 +1084,10 @@ public class PlayerListener {
 	}
 	
 	private void regenMana(PlayerEntity player) {
+		regenMana(player, 1);
+	} 
+	
+	private void regenMana(PlayerEntity player, int base) {
 		// Called 2 times a second
 		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
 		
@@ -1214,6 +1218,22 @@ public class PlayerListener {
 			}
 			
 			e.setCanceled(true);
+		}
+		
+		if (!e.isCanceled() && e.getEntity() instanceof LivingEntity) {
+			// If any players nearby have fire master skill, they can regain mana
+			for (Entity ent : e.getEntity().getEntityWorld().getEntitiesInAABBexcluding(e.getEntity(), e.getEntity().getBoundingBox().grow(10), (ent) -> true)) {
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
+				if (ent instanceof PlayerEntity && attr != null && attr.hasSkill(NostrumSkills.Lightning_Master)) {
+					final LivingEntity source = (LivingEntity) e.getEntity();
+					regenMana((PlayerEntity) ent, 10);
+					NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
+							5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
+							40, 0,
+							ent.getEntityId()
+							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
+				}
+			}
 		}
 		
 	}
