@@ -689,7 +689,7 @@ public class Spell {
 		case FIRE:
 			return new SpellAction().cursedFire(elementCount).name("cursed_fire");
 		case ICE:
-			return new SpellAction().cursedIce(elementCount).name("cursedice");
+			return new SpellAction().mysticWater(elementCount, elementCount * 2, 20 * 60).name("mystic_water");
 		case LIGHTNING:
 			return new SpellAction().lightning().name("lightningbolt");
 		case WIND:

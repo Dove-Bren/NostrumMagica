@@ -360,6 +360,8 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticSpellTable, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.runeLibrary, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedFire, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumFluids.mysticWater, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticWaterBlock, RenderType.getTranslucent());
 	}
 	
 	private static final void registerItemModelProperties() {

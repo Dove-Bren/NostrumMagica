@@ -385,6 +385,8 @@
 	"effect.nostrummagica.spellboost_wind": "Wind Spellboost",
 	"effect.nostrummagica.spellboost_lightning": "Lightning Spellboost",
 	"effect.nostrummagica.spellboost_ender": "Ender Spellboost",
+	
+	"effect.nostrummagica.mystic_water": "Mystic Water",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 
@@ -1098,10 +1100,10 @@
     "effect.grow.desc": "Grows plants and animals.",
     "effect.phase.name": "Phase",
     "effect.phase.desc": "Causes the target to teleport randomly. When not cast on a target, calls forth ender entities.",
-    "effect.cursedfire.name": "Cursed Fire",
-    "effect.cursedfire.desc": "Spawns cursed fire, which does 1.5 + .5 regular fire damage per level when stood on and applies a mining fatigue effect.",
-    "effect.cursedice.name": "Cursed Ice",
-    "effect.cursedice.desc": "Summons a block of Cursed Ice.",
+    "effect.cursed_fire.name": "Cursed Fire",
+    "effect.cursed_fire.desc": "Spawns cursed fire, which does 1.5 + .5 regular fire damage per level when stood on and applies a mining fatigue effect.",
+    "effect.mystic_water.name": "Mystic Water",
+    "effect.mystic_water.desc": "When cast on a block, conjures an unmoving body of mystic water. When cast on an entity, grants the Mystic Water effect which instantly douses flames and provides healing for 2 points per level when needed.",
     "effect.lightningbolt.name": "Summon Lightning",
     "effect.lightningbolt.desc": "Calls forth a bolt of lightning.",
     "effect.magicwall.name": "Magic Wall",

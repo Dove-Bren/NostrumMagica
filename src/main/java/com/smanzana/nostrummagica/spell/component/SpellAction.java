@@ -1613,22 +1613,72 @@ public class SpellAction {
 		
 	}
 
-	private static class CursedIce implements SpellEffect {
+//	private static class CursedIce implements SpellEffect {
+//		
+//		private int level;
+//		
+//		public CursedIce(int level) {
+//			this.level = level;
+//		}
+//
+//		@Override
+//		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+//			apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency, resultBuilder);
+//		}
+//
+//		@Override
+//		public void apply(LivingEntity caster, World world, BlockPos block, float efficiency, SpellActionResult resultBuilder) {
+//			world.setBlockState(block, NostrumBlocks.cursedIce.getState(level));
+//			NostrumMagicaSounds.DAMAGE_ICE.play(world, block.getX(), block.getY(), block.getZ());
+//			resultBuilder.applied |= true;
+//		}
+//		
+//		@Override
+//		public boolean affectsBlocks() {
+//			return true;
+//		}
+//		
+//		@Override
+//		public boolean affectsEntities() {
+//			return false;
+//		}
+//	}
+
+	private static class MysticWater implements SpellEffect {
 		
-		private int level;
+		private final int waterLevel;
+		private final int healAmt;
+		private final int effectDuration;
 		
-		public CursedIce(int level) {
-			this.level = level;
+		public MysticWater(int level, int effectHealAmt, int effectDuration) {
+			this.waterLevel = level;
+			this.healAmt = effectHealAmt;
+			this.effectDuration = effectDuration;
 		}
 
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency, resultBuilder);
+			// Apply status here instead of using a StatusEffect so that we can scale the amplitude, too
+			float amp = healAmt * efficiency;
+			
+			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Master)) {
+				amp *= 2;
+			}
+			
+			entity.addPotionEffect(new EffectInstance(NostrumEffects.mysticWater, (int) (effectDuration * efficiency), (int) amp));
+			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+			resultBuilder.applied |= true;
+			
+			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Adept)) {
+				if (NostrumMagica.rand.nextBoolean()) {
+					entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
+				}
+			}
 		}
 
 		@Override
 		public void apply(LivingEntity caster, World world, BlockPos block, float efficiency, SpellActionResult resultBuilder) {
-			world.setBlockState(block, NostrumBlocks.cursedIce.getState(level));
+			world.setBlockState(block, NostrumBlocks.mysticWaterBlock.getDefaultState());//.getState(level));
 			NostrumMagicaSounds.DAMAGE_ICE.play(world, block.getX(), block.getY(), block.getZ());
 			resultBuilder.applied |= true;
 		}
@@ -1640,7 +1690,7 @@ public class SpellAction {
 		
 		@Override
 		public boolean affectsEntities() {
-			return false;
+			return true;
 		}
 	}
 
@@ -2335,8 +2385,8 @@ public class SpellAction {
 //		return this;
 //	}
 	
-	public SpellAction cursedIce(int level) {
-		effects.add(new CursedIce(level));
+	public SpellAction mysticWater(int level, int effectHealAmt, int effectDuration) {
+		effects.add(new MysticWater(level, effectHealAmt, effectDuration));
 		return this;
 	}
 	

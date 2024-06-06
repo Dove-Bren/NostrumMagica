@@ -20,6 +20,7 @@ public class NostrumFluids {
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE_FLOWING) public static FluidPoisonWater poisonWaterFlowing;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE) public static FluidPoisonWater unbreakablePoisonWater;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE_FLOWING) public static FluidPoisonWater unbreakablePoisonWaterFlowing;
+	@ObjectHolder(FluidMysticWater.ID) public static FluidMysticWater mysticWater;
 	
 	@SubscribeEvent
     public static void registerFluidBlocks(RegistryEvent.Register<Fluid> event) {
@@ -29,6 +30,7 @@ public class NostrumFluids {
 		registry.register(new FluidPoisonWater.Flowing(false).setRegistryName(FluidPoisonWater.ID_BREAKABLE_FLOWING));
 		registry.register(new FluidPoisonWater.Source(true).setRegistryName(FluidPoisonWater.ID_UNBREAKABLE));
 		registry.register(new FluidPoisonWater.Flowing(true).setRegistryName(FluidPoisonWater.ID_UNBREAKABLE_FLOWING));
+		registry.register(new FluidMysticWater().setRegistryName(FluidMysticWater.ID));
     }
     
     @SubscribeEvent
