@@ -1580,6 +1580,7 @@
     "modification.aura.bool.name":"Hit Allies",
     "modification.aura.float.name":"Radius",
     "modification.ring.name":"Effect Radius",
+	"modification.touch.bool.name": "Fizzle On Air",
 
     "modification.level.flip": "Trigger When Above",
 	

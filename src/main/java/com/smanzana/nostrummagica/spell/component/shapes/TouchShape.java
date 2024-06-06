@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.util.RayTrace;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
@@ -43,8 +44,14 @@ public class TouchShape extends InstantShape {
 		
 		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
 		
-		if (trace == null) {
-			return new TriggerData(null, null, null);
+		if (trace == null || trace.getType() == RayTraceResult.Type.MISS) {
+			final boolean ignoreAirHits = params.flip;
+			if (ignoreAirHits) {
+				return new TriggerData(null, null, null);
+			} else {
+				// Project where we reached and return there
+				return new TriggerData(null, world, Lists.newArrayList(new BlockPos(RayTrace.directionFromAngles(pitch, yaw).scale(TOUCH_RANGE).add(pos))));
+			}
 		}
 		
 		if (trace.getType() == RayTraceResult.Type.ENTITY
@@ -73,12 +80,12 @@ public class TouchShape extends InstantShape {
 
 	@Override
 	public boolean supportsBoolean() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String supportedBooleanName() {
-		return null;
+		return  I18n.format("modification.touch.bool.name");
 	}
 
 	@Override
