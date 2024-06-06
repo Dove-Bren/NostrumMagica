@@ -132,7 +132,7 @@ public class ProjectileShape extends SpellShape {
 			if (atMax)
 				onProjectileHit(new BlockPos(lastPos));
 			else
-				getState().triggerFail();
+				getState().triggerFail(world, lastPos);
 		}
 		
 		public EMagicElement getElement() {

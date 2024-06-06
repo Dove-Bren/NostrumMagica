@@ -1709,9 +1709,11 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, World world, BlockPos block, float efficiency, SpellActionResult resultBuilder) {
-			world.setBlockState(block, NostrumBlocks.cursedFire.GetWithLevel(level));
-			NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
-			resultBuilder.applied |= true;
+			final BlockState state = NostrumBlocks.cursedFire.GetWithLevel(level);
+			if (state.isValidPosition(world, block) && world.setBlockState(block, state)) {
+				NostrumMagicaSounds.DAMAGE_FIRE.play(world, block.getX(), block.getY(), block.getZ());
+				resultBuilder.applied |= true;
+			}
 		}
 		
 		@Override

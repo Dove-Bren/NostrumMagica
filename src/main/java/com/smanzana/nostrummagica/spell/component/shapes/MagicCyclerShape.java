@@ -89,7 +89,7 @@ public class MagicCyclerShape extends SpellShape {
 
 		@Override
 		public void onProjectileEnd(Vector3d pos) {
-			;
+			getState().triggerFail(world, pos);
 		}
 	}
 	

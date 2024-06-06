@@ -34,12 +34,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants.NBT;
 
 /**
@@ -132,7 +134,7 @@ public class Spell {
 						}
 					} else {
 						// Last shape affected no entities or locations. Fizzle
-						this.triggerFail();
+						this.triggerFail(caster.world, caster.getPositionVec());
 					}
 									
 				}
@@ -174,8 +176,13 @@ public class Spell {
 		/**
 		 * Called when triggers fail to be triggered and have failed.
 		 */
-		public void triggerFail() {
-			//NostrumMagicaSounds.CAST_FAIL.play();
+		public void triggerFail(World world, Vector3d pos) {
+			doFailEffect(world, pos);
+		}
+		
+		protected void doFailEffect(World world, Vector3d pos) {
+			NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX(), pos.getY(), pos.getZ());
+			((ServerWorld) world).spawnParticle(ParticleTypes.SMOKE, pos.getX(), pos.getY(), pos.getZ(), 10, 0, 0, 0, .05);
 		}
 		
 		protected float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base) {
@@ -240,6 +247,7 @@ public class Spell {
 		
 		private void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
 			boolean first = true;
+			boolean anySuccess = false;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			float damageTotal = 0f;
 			final Map<LivingEntity, EMagicElement> totalAffectedEntities = new HashMap<>();
@@ -268,6 +276,7 @@ public class Spell {
 							affectedEnts.add(targ);
 							totalAffectedEntities.put(targ, part.getElement());
 							damageTotal += result.damage;
+							anySuccess = true;
 						}
 					}
 				} else if (positions != null && !positions.isEmpty()) {
@@ -276,6 +285,7 @@ public class Spell {
 						SpellActionResult result = action.apply(caster, world, pos, efficiency); 
 						if (result.applied) {
 							affectedPos.add(pos);
+							anySuccess = true;
 						}
 					}
 				} else {
@@ -316,10 +326,24 @@ public class Spell {
 				first = false;
 			}
 			
-			if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
-				for (Entry<LivingEntity, EMagicElement> entry : totalAffectedEntities.entrySet()) {
-					final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
-					entry.getKey().addPotionEffect(new EffectInstance(effect, 20 * 5, 0));
+			if (anySuccess) {
+				if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
+					for (Entry<LivingEntity, EMagicElement> entry : totalAffectedEntities.entrySet()) {
+						final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
+						entry.getKey().addPotionEffect(new EffectInstance(effect, 20 * 5, 0));
+					}
+				}
+			} else {
+				// Do an effect so it's clearer to caster that there was no effect at any tried location/entity.
+				// Mirror "ents, then if not positions" from above.
+				if (targets != null && !targets.isEmpty()) {
+					for (LivingEntity targ : targets) {
+						doFailEffect(targ.world, targ.getPositionVec().add(0, .2 + targ.getHeight(), 0));
+					}
+				} else if (positions != null && !positions.isEmpty()) {
+					for (BlockPos pos : positions) {
+						doFailEffect(world, new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5));
+					}
 				}
 			}
 			
