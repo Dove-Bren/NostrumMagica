@@ -45,8 +45,8 @@ import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmuteResult;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.HarvestUtil;
-import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.HarvestUtil.ITreeWalker;
+import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.block.Block;
@@ -87,6 +87,8 @@ import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.Tags;
@@ -2029,10 +2031,12 @@ public class SpellAction {
 	}
 	
 	private List<SpellEffect> effects;
-	private String nameKey;
+	private TextComponent name;
+	private TextComponent desc;
 	
 	public SpellAction() {
 		effects = new ArrayList<>(2);
+		this.name("unknown");
 	}
 	
 	/**
@@ -2418,11 +2422,16 @@ public class SpellAction {
 	}
 	
 	public SpellAction name(String key) {
-		this.nameKey = key;
+		this.name = new TranslationTextComponent("spelleffect." + key + ".name");
+		this.desc = new TranslationTextComponent("spelleffect." + key + ".desc");
 		return this;
 	}
 	
-	public String getName() {
-		return this.nameKey;
+	public TextComponent getName() {
+		return this.name;
+	}
+	
+	public TextComponent getDescription() {
+		return this.desc;
 	}
 }

@@ -1345,8 +1345,8 @@ public class SpellCreationGui {
 								: effect.getElementCount() <= 2 ? " II"
 								: " III";
 						
-						name = I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
-						desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+						name = action.getName().getString() + suffix;
+						desc = action.getDescription().getString();
 					}
 					
 					int len = fontRenderer.getStringWidth(name);

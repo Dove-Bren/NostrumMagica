@@ -42,6 +42,6 @@ public class SpellKnowledgeRequirement implements IRequirement{
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		SpellAction action = Spell.solveAction(alteration, element, 1);
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.spellknowledge", 
-				new TranslationTextComponent("effect." + action.getName() + ".name").mergeStyle(TextFormatting.DARK_PURPLE)));
+				action.getName().mergeStyle(TextFormatting.DARK_PURPLE)));
 	}
 }

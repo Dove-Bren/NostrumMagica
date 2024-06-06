@@ -578,8 +578,8 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				SpellAction action = getAction(element, alteration);
 				
 				if (attr.hasKnowledge(element, alteration)) {
-					name = I18n.format("effect." + action.getName() + ".name", (Object[]) null);
-					desc = I18n.format("effect." + action.getName() + ".desc", (Object[]) null);
+					name = action.getName().getString();
+					desc = action.getDescription().getString();
 					unlocked = true;
 				} else {
 					name = "???";
