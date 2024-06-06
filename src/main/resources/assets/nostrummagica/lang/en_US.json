@@ -387,6 +387,7 @@
 	"effect.nostrummagica.spellboost_ender": "Ender Spellboost",
 	
 	"effect.nostrummagica.mystic_water": "Mystic Water",
+	"effect.nostrummagica.mystic_air": "Mystic Air",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 
@@ -1106,8 +1107,8 @@
     "effect.mystic_water.desc": "When cast on a block, conjures an unmoving body of mystic water. When cast on an entity, grants the Mystic Water effect which instantly douses flames and provides healing for 2 points per level when needed.",
     "effect.lightningbolt.name": "Summon Lightning",
     "effect.lightningbolt.desc": "Calls forth a bolt of lightning.",
-    "effect.magicwall.name": "Magic Wall",
-    "effect.magicwall.desc": "Creates a temporary magic wall. What the wall allows through depends on the potency of the effect.",
+    "effect.mystic_air.name": "Mystic Air",
+    "effect.mystic_air.desc": "When cast on a block, creates a temporary magic wall. What the wall allows through depends on the potency of the effect. When cast on an entity, grants the Mystic Air effect which prevents drowning and can reduce fall damage.",
     "effect.summon.fire.name": "Summon Fire Golem",
     "effect.summon.fire.desc": "Summons a bound Fire Golem.",
     "effect.summon.ice.name": "Summon Ice Golem",

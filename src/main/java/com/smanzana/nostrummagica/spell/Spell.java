@@ -717,7 +717,7 @@ public class Spell {
 		case LIGHTNING:
 			return new SpellAction().lightning().name("lightningbolt");
 		case WIND:
-			return new SpellAction().wall(elementCount).name("magicwall");
+			return new SpellAction().wall(elementCount).name("mystic_air");
 		}
 		
 		return null;

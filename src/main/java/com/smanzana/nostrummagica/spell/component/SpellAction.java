@@ -1583,7 +1583,12 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			apply(caster, entity.world, entity.getPosition().add(0, 1, 0), efficiency, resultBuilder);
+			// Apply mystic air.
+			// Doing in here instead of a status effect so that wall doesn't get created if used on an entity
+			final int duration = (int) (20 * 60 * efficiency);
+			final int amp = (int) (level * efficiency) - 1; // amp 0 is 1
+			entity.addPotionEffect(new EffectInstance(NostrumEffects.mysticAir, duration, amp));
+			resultBuilder.applied |= true;
 		}
 
 		@Override
@@ -1608,7 +1613,7 @@ public class SpellAction {
 		
 		@Override
 		public boolean affectsEntities() {
-			return false;
+			return true;
 		}
 		
 	}
@@ -1646,12 +1651,12 @@ public class SpellAction {
 
 	private static class MysticWater implements SpellEffect {
 		
-		private final int waterLevel;
+		//private final int waterLevel;
 		private final int healAmt;
 		private final int effectDuration;
 		
 		public MysticWater(int level, int effectHealAmt, int effectDuration) {
-			this.waterLevel = level;
+			//this.waterLevel = level;
 			this.healAmt = effectHealAmt;
 			this.effectDuration = effectDuration;
 		}
