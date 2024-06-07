@@ -29,6 +29,8 @@ public class NostrumRenderTypes {
 	public static final RenderType PROGRESSION_DOOR_LOCK;
 	public static final RenderType LOCKEDCHEST_LOCK;
 	public static final RenderType LOCKEDCHEST_CHAIN;
+	public static final RenderType SPELLSHAPE_QUADS;
+	public static final RenderType SPELLSHAPE_LINES;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -65,9 +67,28 @@ public class NostrumRenderTypes {
 	
 	protected static final RenderState.FogState NO_FOG = new RenderState.FogState("no_fog", () -> {}, () -> {});
 	
-    
-    @SuppressWarnings("deprecation")
     private static final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
+    	//setupGlintTexturing(0.16F);
+		RenderSystem.matrixMode(GL11.GL_TEXTURE);
+		RenderSystem.pushMatrix();
+		RenderSystem.loadIdentity();
+		final long ms = Util.milliTime();
+		final long ticks = ms / (1000/20); // whole ticks
+		final long remain = ms % (1000/20); // partial ticks in ms
+		
+		// old formula for xoffset was "0 + (ageInTicks + partialTicks) * .001"
+		// So we wanted to shift .001 unit for every tick
+		
+		final float offset = (.001f * ticks) + (.000001f * remain);
+		RenderSystem.translatef(offset, 0f, 0f);
+		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+    }, () -> {
+    	RenderSystem.matrixMode(GL11.GL_TEXTURE);
+    	RenderSystem.popMatrix();
+    	RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+    });
+    
+    private static final RenderState.TexturingState SPELLSHAPE_TEXTURING = new RenderState.TexturingState("spellshape_glint", () -> {
     	//setupGlintTexturing(0.16F);
 		RenderSystem.matrixMode(GL11.GL_TEXTURE);
 		RenderSystem.pushMatrix();
@@ -113,6 +134,18 @@ public class NostrumRenderTypes {
 				// depth test?
 			.build(false);
 		MANA_ARMOR = RenderType.makeType(Name("manaarmor"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 128, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE, true, false))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
+				.texturing(SPELLSHAPE_TEXTURING)
+				// depth test?
+			.build(false);
+		SPELLSHAPE_QUADS = RenderType.makeType(Name("spellshape"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
+		SPELLSHAPE_LINES = RenderType.makeType(Name("spellshape"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(ModelSwitchTrigger.TEXT, false, true))

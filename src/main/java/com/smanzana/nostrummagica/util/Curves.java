@@ -78,6 +78,24 @@ public final class Curves {
 				center.y + (float) (Math.sin(progress * .5 * Math.PI) * radius));
 	}
 	
+	protected static double getMortarVerticalVelocity(Vector3d diff, double startHVelocity, double gravity) {
+		// Distance of a projectile is hVel * timeAirborn. Solve for how long we want to be airborn.
+		final double hDist = Vector3d.ZERO.distanceTo(new Vector3d(diff.x, 0, diff.z));
+		final double desiredTime = hDist / startHVelocity;
+		
+		// y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
+		// shifting to be "0 = " for quad equation, this is
+		//  (y0 - y) + v0 * t - (1/2) * g * (t^2)
+		// y0 - y is -diff.y
+		//
+		// Solving for v0 is
+		// -v0 = ( (-diff.y) - (1/2) * g * (t^2) ) / t
+		// which is
+		// -v0 =  ((-diff.y) / t) - (1/2) * g * t
+		
+		return -((-diff.y / desiredTime) - (.5 * gravity * desiredTime));
+	}
+	
 	/**
 	 * Get what starting motion should be to shoot a projectile with gravity starting at start and ending at end.
 	 * @param start
@@ -95,21 +113,7 @@ public final class Curves {
 		
 		final Vector3d diff = end.subtract(start);
 		
-		// Distance of a projectile is hVel * timeAirborn. Solve for how long we want to be airborn.
-		final double hDist = Vector3d.ZERO.distanceTo(new Vector3d(diff.x, 0, diff.z));
-		final double desiredTime = hDist / startHVelocity;
-		
-		// y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
-		// shifting to be "0 = " for quad equation, this is
-		//  (y0 - y) + v0 * t - (1/2) * g * (t^2)
-		// y0 - y is -diff.y
-		//
-		// Solving for v0 is
-		// -v0 = ( (-diff.y) - (1/2) * g * (t^2) ) / t
-		// which is
-		// -v0 =  ((-diff.y) / t) - (1/2) * g * t
-		
-		final double vVel = -((-diff.y / desiredTime) - (.5 * gravity * desiredTime));
+		final double vVel = getMortarVerticalVelocity(diff, startHVelocity, gravity);
 		
 		// Break hVel into x and z
 		return (new Vector3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
@@ -122,6 +126,53 @@ public final class Curves {
 		final double pos = (-b + sqrt) / (2 *a);
 		final double neg = (-b - sqrt) / (2 *a);
 		return new Vector2f((float) pos, (float) neg);
+	}
+	
+	public static interface ICurve3d {
+		public Vector3d getPosition(float progress);
+	}
+	
+	public static class Bezier implements ICurve3d {
+		public final Vector3d[] points;
+		public Bezier(Vector3d ...points) {
+			this.points = points;
+		}
+		
+		@Override
+		public Vector3d getPosition(float progress) {
+			return Curves.bezier(progress, this.points);
+		}
+	}
+	
+	public static class Mortar implements ICurve3d {
+		public final double startHVelocity;
+		public final Vector3d diff;
+		public final double gravity;
+		
+		private final double startingYVel;
+		
+		public Mortar(double startHVelocity, Vector3d diff, double gravity) {
+			super();
+			this.startHVelocity = startHVelocity;
+			this.diff = diff;
+			if (gravity < 0) {
+				gravity = -gravity; // should be magnitude of pull down
+			}
+			this.gravity = gravity;
+			this.startingYVel = getMortarVerticalVelocity(diff, startHVelocity, gravity);
+		}
+
+		@Override
+		public Vector3d getPosition(float progress) {
+			// X and Z are easy as it's just linear interpolation based on progress.
+			final double x = this.diff.getX() * progress;
+			final double z = this.diff.getZ() * progress;
+			
+			// Y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
+			final double y = 0 + (this.startingYVel * progress) - (.5 * gravity * (progress * progress));
+			return new Vector3d(x, y, z);
+		}
+		
 	}
 	
 }

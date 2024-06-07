@@ -33,6 +33,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.gui.mirror.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
+import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
@@ -99,9 +100,11 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingInfo;
 	private KeyBinding bindingBladeCast;
 	private KeyBinding bindingHUD;
+	private KeyBinding bindingShapeHelp;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 	private OutlineRenderer outlineRenderer;
+	private SpellShapeRenderer spellshapeRenderer;
 	
 	public ClientProxy() {
 		super();
@@ -109,6 +112,7 @@ public class ClientProxy extends CommonProxy {
 		this.overlayRenderer = new OverlayRenderer();
 		this.effectRenderer = ClientEffectRenderer.instance();
 		this.outlineRenderer = new OutlineRenderer();
+		this.spellshapeRenderer = new SpellShapeRenderer(this.outlineRenderer);
 		
 		MinecraftForge.EVENT_BUS.register(this); // For client join welcome message
 	}
@@ -132,6 +136,8 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
 		bindingHUD = new KeyBinding("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingHUD);
+		bindingShapeHelp = new KeyBinding("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_F, "key.nostrummagica.desc");
+		ClientRegistry.registerKeyBinding(bindingShapeHelp);
 	}
 	
 	public KeyBinding getBindingCast1() {
@@ -219,6 +225,8 @@ public class ClientProxy extends CommonProxy {
 			
 		} else if (bindingHUD.isPressed()) {
 			this.overlayRenderer.toggleHUD();
+		} else if (bindingShapeHelp.isPressed()) {
+			this.spellshapeRenderer.toggle();
 		}
 	}
 	
@@ -999,9 +1007,5 @@ public class ClientProxy extends CommonProxy {
 
 	public void doManaWiggle(int wiggleCount) {
 		this.overlayRenderer.startManaWiggle(wiggleCount);
-	}
-	
-	public OutlineRenderer getOutlineRenderer() {
-		return this.outlineRenderer;
 	}
 }

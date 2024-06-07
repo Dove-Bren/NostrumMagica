@@ -30,8 +30,6 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierG
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.client.render.OutlineRenderer;
-import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
@@ -189,8 +187,6 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private Entity lastHighlightEnt = null;
-	
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
 		Minecraft mc = Minecraft.getInstance();
@@ -256,16 +252,6 @@ public class OverlayRenderer extends AbstractGui {
 					Entity highlightEnt = RayTrace.entFromRaytrace(result);
 					if (highlightEnt != null) {
 						renderCrosshairTargetOverlay(matrixStackIn, player, window);
-					}
-					if (highlightEnt != lastHighlightEnt) {
-						OutlineRenderer outliner = ((ClientProxy) NostrumMagica.instance.proxy).getOutlineRenderer();
-						if (lastHighlightEnt != null) {
-							outliner.remove(lastHighlightEnt);
-						}
-						if (highlightEnt != null) {
-							outliner.add(highlightEnt, new Outline(1f, 0f, 1f, 1f));
-						}
-						lastHighlightEnt = highlightEnt;
 					}
 				}
 			}
