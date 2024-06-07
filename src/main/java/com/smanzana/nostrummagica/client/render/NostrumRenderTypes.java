@@ -53,7 +53,6 @@ public class NostrumRenderTypes {
 	private static final RenderState.CullState NO_CULL = new RenderState.CullState(false);
     
 	//private static final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
-    //final RenderState.DepthTestState NO_DEPTH_TEST = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
     
 	private static final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
 	private static final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
@@ -63,6 +62,9 @@ public class NostrumRenderTypes {
 	
 	private static final RenderState.AlphaState DEFAULT_ALPHA = new RenderState.AlphaState(0.003921569F);
 	private static final RenderState.AlphaState CUTOUT_ALPHA = new RenderState.AlphaState(.5f);
+	
+	protected static final RenderState.FogState NO_FOG = new RenderState.FogState("no_fog", () -> {}, () -> {});
+	
     
     @SuppressWarnings("deprecation")
     private static final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {

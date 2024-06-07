@@ -30,6 +30,8 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierG
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.render.OutlineRenderer;
+import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
@@ -187,6 +189,8 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
+	private Entity lastHighlightEnt = null;
+	
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
 		Minecraft mc = Minecraft.getInstance();
@@ -249,8 +253,19 @@ public class OverlayRenderer extends AbstractGui {
 								}
 						
 					}, .5);
-					if (result != null && RayTrace.entFromRaytrace(result) != null) {
+					Entity highlightEnt = RayTrace.entFromRaytrace(result);
+					if (highlightEnt != null) {
 						renderCrosshairTargetOverlay(matrixStackIn, player, window);
+					}
+					if (highlightEnt != lastHighlightEnt) {
+						OutlineRenderer outliner = ((ClientProxy) NostrumMagica.instance.proxy).getOutlineRenderer();
+						if (lastHighlightEnt != null) {
+							outliner.remove(lastHighlightEnt);
+						}
+						if (highlightEnt != null) {
+							outliner.add(highlightEnt, new Outline(1f, 0f, 1f, 1f));
+						}
+						lastHighlightEnt = highlightEnt;
 					}
 				}
 			}
@@ -1270,23 +1285,11 @@ public class OverlayRenderer extends AbstractGui {
 		if (!renderRecurseMarker) {
 			final LivingEntity entity = event.getEntity();
 			final MatrixStack matrixStackIn = event.getMatrixStack();
+			
 			//final float partialTicks = event.getPartialRenderTick();
 			renderRecurseMarker = true;
 			{
 				renderRoots(matrixStackIn, entity);
-				
-//				// If selected entity, render with outline
-//				if (MinecraftForgeClient.getRenderPass() == 0)
-//				if (((ClientProxy) NostrumMagica.instance.proxy).getCurrentPet() == entity) {
-//					
-////					GlStateManager.depthFunc(GL11.GL_ALWAYS); //519
-////					//event.getRenderer().setRenderOutlines(true);
-////					final float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
-////					event.getRenderer().doRender(entity, event.getX(), event.getY(), event.getZ(), yaw, partialTicks);
-////					event.getRenderer().setRenderOutlines(false);
-//					
-//					//RenderFuncs.renderEntityOutline(entity, partialTicks); Want this to work so we can color and stuff :(
-//				}
 			}
 			renderRecurseMarker = false;
 		}

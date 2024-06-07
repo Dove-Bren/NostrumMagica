@@ -32,13 +32,14 @@ import com.smanzana.nostrummagica.client.gui.TomeWorkshopScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.gui.mirror.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
+import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
 import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
 import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
-import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -100,12 +101,14 @@ public class ClientProxy extends CommonProxy {
 	private KeyBinding bindingHUD;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
+	private OutlineRenderer outlineRenderer;
 	
 	public ClientProxy() {
 		super();
 		
 		this.overlayRenderer = new OverlayRenderer();
 		this.effectRenderer = ClientEffectRenderer.instance();
+		this.outlineRenderer = new OutlineRenderer();
 		
 		MinecraftForge.EVENT_BUS.register(this); // For client join welcome message
 	}
@@ -996,5 +999,9 @@ public class ClientProxy extends CommonProxy {
 
 	public void doManaWiggle(int wiggleCount) {
 		this.overlayRenderer.startManaWiggle(wiggleCount);
+	}
+	
+	public OutlineRenderer getOutlineRenderer() {
+		return this.outlineRenderer;
 	}
 }
