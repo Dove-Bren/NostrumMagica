@@ -463,6 +463,10 @@ public class Spell {
 	}
 	
 	public void cast(LivingEntity caster, float efficiency) {
+		if (!caster.getServer().isOnExecutionThread()) {
+			throw new IllegalStateException("Can't cast spell on a thread other than the game thread");
+		}
+		
 		SpellState state = new SpellState(this, caster, efficiency);
 		Spell.onCast(caster, this);
 		state.trigger(Lists.newArrayList(caster), null, null);

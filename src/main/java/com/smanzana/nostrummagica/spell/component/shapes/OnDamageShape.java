@@ -71,10 +71,9 @@ public class OnDamageShape extends SpellShape {
 							null
 							);
 					
-					entity.world.getServer().runAsync(() -> {
-						this.trigger(data);
-						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
-					});
+					this.trigger(data);
+					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
+					
 					expired = true;
 				}
 			} else if (type == Event.TIME) {

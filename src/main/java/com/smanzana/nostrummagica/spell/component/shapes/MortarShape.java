@@ -79,76 +79,71 @@ public class MortarShape extends SpellShape {
 			}
 
 			
-			caster.getServer().runAsync(new Runnable() {
+			// If we have entity target, set that as dest. Otherwise, raytrace
+			final Vector3d dest;
+			if (target != null) {
+				dest = target.getPositionVec();
+			} else {
+				RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
+					if (getState().getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
+						return false;
+					}
+					
+					return true;
+				}, .5);
+				
+				if (mop.getType() == RayTraceResult.Type.ENTITY) {
+					dest = RayTrace.entFromRaytrace(mop).getPositionVec();
+				} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
+					dest = mop.getHitVec();
+				} else {
+					dest = dir.scale(MaxHDist);
+				}
+			}
 			
-				@Override
-				public void run() {
-					
-					// If we have entity target, set that as dest. Otherwise, raytrace
-					final Vector3d dest;
-					if (target != null) {
-						dest = target.getPositionVec();
-					} else {
-						RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
-							if (getState().getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
-								return false;
-							}
-							
-							return true;
-						}, .5);
-						
-						if (mop.getType() == RayTraceResult.Type.ENTITY) {
-							dest = RayTrace.entFromRaytrace(mop).getPositionVec();
-						} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
-							dest = mop.getHitVec();
-						} else {
-							dest = dir.scale(MaxHDist);
-						}
+			// Figure out angle to hit destination from source. Ignore blocks and stuff
+			final Vector3d startVelocity;
+			final Vector3d startPos;
+			if (MortarShapeInstance.this.noArc) {
+				// Drop from above
+				// Try not to start in the ceiling
+				BlockPos.Mutable cursor = new BlockPos.Mutable();
+				cursor.setPos(dest.x, dest.y + 3, dest.z); // start 3 above; best we can do
+				
+				for (int i = 0; i < 7; i++) {
+					cursor.move(Direction.UP);
+					BlockState state = world.getBlockState(cursor);
+					if (!(state.getBlock() instanceof DungeonAir) && !world.isAirBlock(cursor)) {
+						// can't go here. Go back down and bail
+						cursor.move(Direction.DOWN);
+						break;
 					}
-					
-					// Figure out angle to hit destination from source. Ignore blocks and stuff
-					final Vector3d startVelocity;
-					final Vector3d startPos;
-					if (MortarShapeInstance.this.noArc) {
-						// Drop from above
-						// Try not to start in the ceiling
-						BlockPos.Mutable cursor = new BlockPos.Mutable();
-						cursor.setPos(dest.x, dest.y + 3, dest.z); // start 3 above; best we can do
-						
-						for (int i = 0; i < 7; i++) {
-							cursor.move(Direction.UP);
-							BlockState state = world.getBlockState(cursor);
-							if (!(state.getBlock() instanceof DungeonAir) && !world.isAirBlock(cursor)) {
-								// can't go here. Go back down and bail
-								cursor.move(Direction.DOWN);
-								break;
-							}
-						}
-						
-						startPos = new Vector3d(dest.x, cursor.getY(), dest.z);
-						startVelocity = new Vector3d(0, -.25, 0);
-					} else {
-						startPos = pos;
-						startVelocity = Curves.getMortarArcVelocity(pos, dest, HVel, OverworldGravity);
-					}
-					
-					EntitySpellMortar projectile = new EntitySpellMortar(NostrumEntityTypes.spellMortar, MortarShapeInstance.this,
-							getState().getSelf(),
-							world,
-							startPos,
-							startVelocity,
-							1.0f, OverworldGravity);
-					
-					projectile.setFilter((ent) -> {
-						
-						if (ent == null) {
-							return false;
-						}
-						
-						if (ent == getState().getSelf()) {
-							return false;
-						}
-						
+				}
+				
+				startPos = new Vector3d(dest.x, cursor.getY(), dest.z);
+				startVelocity = new Vector3d(0, -.25, 0);
+			} else {
+				startPos = pos;
+				startVelocity = Curves.getMortarArcVelocity(pos, dest, HVel, OverworldGravity);
+			}
+			
+			EntitySpellMortar projectile = new EntitySpellMortar(NostrumEntityTypes.spellMortar, MortarShapeInstance.this,
+					getState().getSelf(),
+					world,
+					startPos,
+					startVelocity,
+					1.0f, OverworldGravity);
+			
+			projectile.setFilter((ent) -> {
+				
+				if (ent == null) {
+					return false;
+				}
+				
+				if (ent == getState().getSelf()) {
+					return false;
+				}
+				
 //						if (!hitAllies) {
 //							if (ent instanceof IEntityTameable) {
 //								if (getState().getSelf().getUniqueID().equals(((IEntityTameable) ent).getOwnerId())) {
@@ -162,19 +157,15 @@ public class MortarShape extends SpellShape {
 //								}
 //							}
 //							
-						if (Projectiles.getShooter(ent) == getState().getSelf()) {
-							return false;
-						}
-//						}
-						
-						return true;
-					});
-					
-					world.addEntity(projectile);
-			
+				if (Projectiles.getShooter(ent) == getState().getSelf()) {
+					return false;
 				}
-			
+//						}
+				
+				return true;
 			});
+			
+			world.addEntity(projectile);
 		}
 		
 		public void onProjectileHit(BlockPos pos) {

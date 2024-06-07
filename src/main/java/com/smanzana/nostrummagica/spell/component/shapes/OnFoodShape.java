@@ -84,13 +84,12 @@ public class OnFoodShape extends SpellShape {
 							null
 							);
 					
-					this.entity.world.getServer().runAsync(() -> {
-						this.trigger(data);
-						NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
-								new SpellComponentWrapper(NostrumSpellShapes.OnFood),
-								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
-						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
-					});
+					this.trigger(data);
+					NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
+							new SpellComponentWrapper(NostrumSpellShapes.OnFood),
+							this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
+					
 					expired = true;
 				}
 			} else if (type == Event.TIME) {

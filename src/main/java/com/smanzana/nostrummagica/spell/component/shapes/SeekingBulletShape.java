@@ -78,73 +78,23 @@ public class SeekingBulletShape extends SpellShape {
 			
 			final SeekingBulletShapeInstance self = this;
 			
-			caster.getServer().runAsync(new Runnable() {
-
-				@Override
-				public void run() {
-					if (target == null) {
-						// Ray trace
-						RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MAX_DIST, (ent) -> {
-							if (getState().getSelf() == ent) {
+			if (target == null) {
+				// Ray trace
+				RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MAX_DIST, (ent) -> {
+					if (getState().getSelf() == ent) {
+						return false;
+					}
+					
+					if (ent != null) {
+						
+						if (ignoreAllies) {
+							// Too strong?
+							LivingEntity living = NostrumMagica.resolveLivingEntity(ent);
+							if (living != null
+									&& NostrumMagica.IsSameTeam(getState().getSelf(), living)) {
 								return false;
 							}
 							
-							if (ent != null) {
-								
-								if (ignoreAllies) {
-									// Too strong?
-									LivingEntity living = NostrumMagica.resolveLivingEntity(ent);
-									if (living != null
-											&& NostrumMagica.IsSameTeam(getState().getSelf(), living)) {
-										return false;
-									}
-									
-									if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
-										return false; // We own the target
-									}
-									if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
-										return false; // ent owns us
-									}
-								}
-							}
-							
-							return true;
-						}, .5);
-						
-						target = RayTrace.livingFromRaytrace(mop);
-					}
-					
-					// Get axis from where target is
-					Direction.Axis axis = Direction.Axis.Y;
-					Vector3d forwardDir = dir;
-					if (target != null) {
-						Vector3d vec = target.getPositionVec().subtract(caster.getPositionVec());
-						forwardDir = vec.normalize();
-						axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
-					}
-					
-					Vector3d startMotion;
-					
-					// For players, start with motion ortho to forward
-					if (getState().getSelf() instanceof PlayerEntity) {
-						startMotion = forwardDir
-								.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
-								.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
-					}
-					// For non-players, fire mostly up
-					else {
-						startMotion = (new Vector3d(0, 1, 0)).normalize()
-								.rotateYaw(360f * NostrumMagica.rand.nextFloat());
-					}
-					
-					startMotion = startMotion.scale(.4);
-					
-					EntitySpellBullet bullet = new EntitySpellBullet(NostrumEntityTypes.spellBullet, self, getState().getSelf(), target, axis);
-					bullet.setMotion(startMotion);
-					//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
-					
-					bullet.setFilter((ent) -> {
-						if (ent != null && getState().getSelf() != ent) {
 							if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
 								return false; // We own the target
 							}
@@ -152,15 +102,57 @@ public class SeekingBulletShape extends SpellShape {
 								return false; // ent owns us
 							}
 						}
-						
-						return true;
-					});
+					}
 					
-					world.addEntity(bullet);
+					return true;
+				}, .5);
+				
+				target = RayTrace.livingFromRaytrace(mop);
+			}
 			
+			// Get axis from where target is
+			Direction.Axis axis = Direction.Axis.Y;
+			Vector3d forwardDir = dir;
+			if (target != null) {
+				Vector3d vec = target.getPositionVec().subtract(caster.getPositionVec());
+				forwardDir = vec.normalize();
+				axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
+			}
+			
+			Vector3d startMotion;
+			
+			// For players, start with motion ortho to forward
+			if (getState().getSelf() instanceof PlayerEntity) {
+				startMotion = forwardDir
+						.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
+						.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
+			}
+			// For non-players, fire mostly up
+			else {
+				startMotion = (new Vector3d(0, 1, 0)).normalize()
+						.rotateYaw(360f * NostrumMagica.rand.nextFloat());
+			}
+			
+			startMotion = startMotion.scale(.4);
+			
+			EntitySpellBullet bullet = new EntitySpellBullet(NostrumEntityTypes.spellBullet, self, getState().getSelf(), target, axis);
+			bullet.setMotion(startMotion);
+			//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
+			
+			bullet.setFilter((ent) -> {
+				if (ent != null && getState().getSelf() != ent) {
+					if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
+						return false; // We own the target
+					}
+					if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
+						return false; // ent owns us
+					}
 				}
-			
+				
+				return true;
 			});
+			
+			world.addEntity(bullet);
 		}
 		
 		public void onProjectileHit(BlockPos pos) {

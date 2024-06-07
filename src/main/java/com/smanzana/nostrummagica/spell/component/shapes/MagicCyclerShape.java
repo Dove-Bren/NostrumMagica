@@ -50,19 +50,11 @@ public class MagicCyclerShape extends SpellShape {
 		
 		@Override
 		public void spawn(LivingEntity caster) {
-			caster.getServer().runAsync(new Runnable() {
-
-				@Override
-				public void run() {
-					EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(getState().getSelf().world, getState().getSelf(),
-							MagicCyclerShapeInstance.this,
-							5.0f, (int) duration * 20, onBlocks, false);
-					
-					world.addEntity(projectile);
+			EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(getState().getSelf().world, getState().getSelf(),
+					MagicCyclerShapeInstance.this,
+					5.0f, (int) duration * 20, onBlocks, false);
 			
-				}
-			
-			});
+			world.addEntity(projectile);
 		}
 
 		@Override

@@ -62,23 +62,14 @@ public class MagicCutterShape extends SpellShape {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 			
-			final MagicCutterShapeInstance self = this;
+			EntitySpellSaucer projectile = new EntityChakramSpellSaucer(this, 
+					world,
+					getState().getSelf(),
+					pos,
+					dir,
+					5.0f, PROJECTILE_RANGE);
 			
-			caster.getServer().runAsync(new Runnable() {
-
-				@Override
-				public void run() {
-					EntitySpellSaucer projectile = new EntityChakramSpellSaucer(self, 
-							world,
-							getState().getSelf(),
-							pos,
-							dir,
-							5.0f, PROJECTILE_RANGE);
-					
-					world.addEntity(projectile);
-				}
-			
-			});
+			world.addEntity(projectile);
 		}
 
 		@Override

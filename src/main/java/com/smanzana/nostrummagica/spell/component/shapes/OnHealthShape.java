@@ -79,13 +79,12 @@ public class OnHealthShape extends SpellShape {
 							null
 							);
 					
-					this.entity.world.getServer().runAsync(() -> {
-						this.trigger(data);
-						NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
-								new SpellComponentWrapper(NostrumSpellShapes.OnHealth),
-								this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
-						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
-					});
+					this.trigger(data);
+					NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
+							new SpellComponentWrapper(NostrumSpellShapes.OnHealth),
+							this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
+					
 					expired = true;
 				}
 			} else if (type == Event.TIME) {

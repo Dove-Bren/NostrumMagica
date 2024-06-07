@@ -67,47 +67,39 @@ public class ProjectileShape extends SpellShape {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 			
-			caster.getServer().runAsync(new Runnable() {
-
-				@Override
-				public void run() {
-					EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
-							getState().getSelf(),
-							pos,
-							dir,
-							5.0f, PROJECTILE_RANGE);
+				EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
+						getState().getSelf(),
+						pos,
+						dir,
+						5.0f, PROJECTILE_RANGE);
+				
+				projectile.setFilter((ent) -> {
 					
-					projectile.setFilter((ent) -> {
+					if (ent == null) {
+						return false;
+					}
+					
+					if (ent == getState().getSelf()) {
+						return false;
+					}
+					
+					if (!hitAllies) {
+						if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
+							return false; // We own the target
+						}
+						if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
+							return false; // ent owns us
+						}
 						
-						if (ent == null) {
+						if (Projectiles.getShooter(ent) == getState().getSelf()) {
 							return false;
 						}
-						
-						if (ent == getState().getSelf()) {
-							return false;
-						}
-						
-						if (!hitAllies) {
-							if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
-								return false; // We own the target
-							}
-							if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
-								return false; // ent owns us
-							}
-							
-							if (Projectiles.getShooter(ent) == getState().getSelf()) {
-								return false;
-							}
-						}
-						
-						return true;
-					});
+					}
 					
-					world.addEntity(projectile);
-			
-				}
-			
-			});
+					return true;
+				});
+				
+				world.addEntity(projectile);
 		}
 		
 		@Override
