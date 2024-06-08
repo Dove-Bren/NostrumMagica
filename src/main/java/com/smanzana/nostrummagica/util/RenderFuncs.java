@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -33,6 +34,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -575,6 +577,87 @@ public final class RenderFuncs {
 				}
 			}
 		}
+	}
+	
+	public static final void renderLine(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, Vector3d end,
+			//float u1, float v1, float u2, float v2,
+			int combinedOverlayIn, int combinedLightIn,
+			float red, float green, float blue, float alpha) {
+		renderLine(matrixStackIn, buffer, start, end, 1f,
+				combinedOverlayIn, combinedLightIn,
+				red, green, blue, alpha);
+	}
+	
+	public static final void renderLine(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, Vector3d end,
+			//float u1, float v1, float u2, float v2,
+			float width,
+			int combinedOverlayIn, int combinedLightIn,
+			float red, float green, float blue, float alpha) {
+		
+		final Vector3d diff = end.subtract(start);
+		
+		matrixStackIn.push();
+		matrixStackIn.translate(start.getX(), start.getY(), start.getZ());
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		RenderSystem.lineWidth(width);
+		buffer.pos(transform, 0, 0, 0).color(red, green, blue, alpha).tex(0, 0).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+		buffer.pos(transform, (float) diff.getX(), (float) diff.getY(), (float) diff.getZ()).color(red, green, blue, alpha).tex(1, 1).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+		RenderSystem.lineWidth(1f);
+		matrixStackIn.pop();
+	}
+	
+	public static final void renderCurve(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+			//float u1, float v1, float u2, float v2,
+			int combinedOverlayIn, int combinedLightIn,
+			float red, float green, float blue, float alpha) {
+		Vector3d last = curve.getPosition(0f);
+
+		matrixStackIn.push();
+		matrixStackIn.translate(start.getX(), start.getY(), start.getZ());
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		for (int i = 1; i <= segments; i++) {
+			final float nextProg = ((float) i / (float) segments);
+			Vector3d next = curve.getPosition(nextProg);
+			
+			buffer.pos(transform, (float) last.getX(), (float) last.getY(), (float) last.getZ()).color(red, green, blue, alpha).tex(0, 0).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) next.getX(), (float) next.getY(), (float) next.getZ()).color(red, green, blue, alpha).tex(1, 1).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			
+			last = next;
+		}
+		matrixStackIn.pop();
+	}
+	
+	public static final void renderRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+			float width, float texOffsetProg,
+			int combinedOverlayIn, int combinedLightIn,
+			float red, float green, float blue, float alpha) {
+		
+		Vector3d last = curve.getPosition(0f);
+		//float lastV = lowV; 
+
+		matrixStackIn.push();
+		matrixStackIn.translate(start.getX(), start.getY(), start.getZ());
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		for (int i = 1; i <= segments; i++) {
+			final float nextProg = ((float) i / (float) segments);
+			final Vector3d next = curve.getPosition(nextProg);
+			final Vector3d segmentDiff = next.subtract(last);
+			final Vector3d side = segmentDiff.normalize().rotateYaw(-90f).scale(width/2);
+			//final float nextV = lastV == lowV ? highV : lowV;
+			
+			buffer.pos(transform, (float) (last.getX() - side.getX()), (float) (last.getY() - side.getY()), (float) (last.getZ() - side.getZ())).color(red, green, blue, alpha).tex(0, 1 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) (last.getX() + side.getX()), (float) (last.getY() + side.getY()), (float) (last.getZ() + side.getZ())).color(red, green, blue, alpha).tex(1, 1 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			
+			buffer.pos(transform, (float) (next.getX() + side.getX()), (float) (next.getY() + side.getY()), (float) (next.getZ() + side.getZ())).color(red, green, blue, alpha).tex(1, 0 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) (next.getX() - side.getX()), (float) (next.getY() - side.getY()), (float) (next.getZ() - side.getZ())).color(red, green, blue, alpha).tex(0, 0 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			
+			last = next;
+			//lastV = nextV;
+		}
+		matrixStackIn.pop();
 	}
 	
 	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, Entity entityIn, String info, FontRenderer fonter, int packedLightIn, float yOffsetExtra, ActiveRenderInfo renderInfo) {

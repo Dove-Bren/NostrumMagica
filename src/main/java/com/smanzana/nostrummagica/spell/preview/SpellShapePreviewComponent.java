@@ -100,18 +100,18 @@ public abstract class SpellShapePreviewComponent {
 	
 	public static class AoELine extends Line {
 		
-		protected final double width;
+		protected final float width;
 		
-		protected AoELine(Type<? extends AoELine> type, Vector3d start, Vector3d end, double width) {
+		protected AoELine(Type<? extends AoELine> type, Vector3d start, Vector3d end, float width) {
 			super(type, start, end);
 			this.width = width;
 		}
 		
-		public AoELine(Vector3d start, Vector3d end, double width) {
+		public AoELine(Vector3d start, Vector3d end, float width) {
 			this(AOE_LINE, start, end, width);
 		}
 		
-		public double getWidth() {
+		public float getWidth() {
 			return this.width;
 		}
 	}

@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.render;
 
+import java.util.OptionalDouble;
+
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -30,6 +32,7 @@ public class NostrumRenderTypes {
 	public static final RenderType LOCKEDCHEST_LOCK;
 	public static final RenderType LOCKEDCHEST_CHAIN;
 	public static final RenderType SPELLSHAPE_QUADS;
+	public static final RenderType SPELLSHAPE_ORB_CHAIN;
 	public static final RenderType SPELLSHAPE_LINES;
 	
 	private static final String Name(String suffix) {
@@ -65,7 +68,9 @@ public class NostrumRenderTypes {
 	private static final RenderState.AlphaState DEFAULT_ALPHA = new RenderState.AlphaState(0.003921569F);
 	private static final RenderState.AlphaState CUTOUT_ALPHA = new RenderState.AlphaState(.5f);
 	
-	protected static final RenderState.FogState NO_FOG = new RenderState.FogState("no_fog", () -> {}, () -> {});
+	//private static final RenderState.FogState NO_FOG = new RenderState.FogState("no_fog", () -> {}, () -> {});
+	
+	private static final RenderState.LineState LINE_3 = new RenderState.LineState(OptionalDouble.of(3f));
 	
     private static final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
     	//setupGlintTexturing(0.16F);
@@ -136,7 +141,7 @@ public class NostrumRenderTypes {
 		MANA_ARMOR = RenderType.makeType(Name("manaarmor"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 128, glState);
 		
 		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE, true, false))
+				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_BLOCK, true, false))
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(NO_LIGHTING)
 				.layer(VIEW_OFFSET_Z_LAYERING)
@@ -145,7 +150,30 @@ public class NostrumRenderTypes {
 				// depth test?
 			.build(false);
 		SPELLSHAPE_QUADS = RenderType.makeType(Name("spellshape"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
-		SPELLSHAPE_LINES = RenderType.makeType(Name("spellshape"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
+				.cull(NO_CULL)
+				//.texturing(SPELLSHAPE_TEXTURING)
+				// depth test?
+			.build(false);
+		SPELLSHAPE_ORB_CHAIN = RenderType.makeType(Name("spellshape_chain"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
+				.texturing(SPELLSHAPE_TEXTURING)
+				.line(LINE_3)
+				// depth test?
+			.build(false);
+		SPELLSHAPE_LINES = RenderType.makeType(Name("spellshape_lines"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(ModelSwitchTrigger.TEXT, false, true))

@@ -9,6 +9,8 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.util.Curves;
@@ -82,9 +84,13 @@ public class MortarShape extends SpellShape {
 			// If we have entity target, set that as dest. Otherwise, raytrace
 			final Vector3d dest;
 			if (target != null) {
-				dest = target.getPositionVec();
+				dest = target.getPositionVec().add(0, target.getHeight()/2, 0);
 			} else {
 				RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
+					if (!(ent instanceof LivingEntity)) {
+						return false;
+					}
+					
 					if (getState().getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
 						return false;
 					}
@@ -93,11 +99,14 @@ public class MortarShape extends SpellShape {
 				}, .5);
 				
 				if (mop.getType() == RayTraceResult.Type.ENTITY) {
-					dest = RayTrace.entFromRaytrace(mop).getPositionVec();
+					final LivingEntity hitEntity = RayTrace.livingFromRaytrace(mop);
+					dest = hitEntity.getPositionVec().add(0, hitEntity.getHeight()/2, 0);
 				} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
-					dest = mop.getHitVec();
+					Vector3d actual = mop.getHitVec();
+					dest = new Vector3d(Math.floor(actual.x) + .5, Math.floor(actual.y) + .5, Math.floor(actual.z) + .5);
 				} else {
-					dest = dir.scale(MaxHDist);
+					Vector3d actual = pos.add(dir.scale(MaxHDist));
+					dest = new Vector3d(Math.floor(actual.x) + .5, Math.floor(actual.y) + .5, Math.floor(actual.z) + .5);
 				}
 			}
 			
@@ -271,8 +280,68 @@ public class MortarShape extends SpellShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		int unused; // Revisit
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
+		
+		// Do a little more work of getting a good vector for things
+		// that aren't players
+		final Vector3d dir;
+		final LivingEntity target;
+		if (state.getSelf() instanceof MobEntity && ((MobEntity) state.getSelf()).getAttackTarget() != null) {
+			MobEntity ent = (MobEntity) state.getSelf()  ;
+			target = ent.getAttackTarget(); // We already know target
+			dir = null;
+		} else {
+			target = null; // Solve for target on main thread with raytrace
+			dir = Projectiles.getVectorForRotation(pitch, yaw);
+		}
+
+		
+		// If we have entity target, set that as dest. Otherwise, raytrace
+		boolean success = false;
+		final Vector3d dest;
+		if (target != null) {
+			dest = target.getPositionVec();
+			success = true;
+		} else {
+			RayTraceResult mop = RayTrace.raytraceApprox(world, state.getSelf(), pos, dir, MaxHDist, (ent) -> {
+				if (!(ent instanceof LivingEntity)) {
+					return false;
+				}
+				if (state.getSelf() == NostrumMagica.resolveLivingEntity(ent)) {
+					return false;
+				}
+				
+				return true;
+			}, .5);
+			
+			if (mop.getType() == RayTraceResult.Type.ENTITY) {
+				final LivingEntity hit = RayTrace.livingFromRaytrace(mop);
+				dest = hit.getPositionVec().add(0, hit.getHeight() / 2, 0);
+				state.trigger(Lists.newArrayList(hit), null, null);
+				success = true;
+			} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
+				dest = Vector3d.copyCentered(new BlockPos(mop.getHitVec()));
+				state.trigger(null, world, Lists.newArrayList(new BlockPos(dest)));
+				success = true;
+			} else {
+				dest = Vector3d.copyCentered(new BlockPos(pos.add(dir.scale(MaxHDist))));
+				// Don't 'trigger' at spot because we'll probably keep flying through it and not hit there
+				//state.trigger(null, world, Lists.newArrayList(new BlockPos(dest)));
+				success = false;
+			}
+		}
+		
+		if (dir != null) {
+			// Offset so curve isn't in line with player vision
+			pos = pos.add(dir.normalize().rotateYaw(90f));
+		}
+		builder.add(new SpellShapePreviewComponent.Curve(pos, null, new Curves.Mortar(MortarShapeInstance.HVel, dest.subtract(pos), OverworldGravity)));
+		return success;
 	}
 	
 }

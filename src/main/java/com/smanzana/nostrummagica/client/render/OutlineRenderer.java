@@ -70,7 +70,7 @@ public class OutlineRenderer {
 		Iterator<Entity> it = this.outlineEntities.keySet().iterator();
 		while (it.hasNext()) {
 			Entity ent = it.next();
-			if (!ent.isAlive()) {
+			if (ent == null || !ent.isAlive()) {
 				it.remove();
 			}
 		}

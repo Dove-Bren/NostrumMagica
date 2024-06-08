@@ -184,6 +184,7 @@ public class ClientInit {
     	ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
 		proxy.initKeybinds();
     	proxy.initDefaultEffects();
+    	registerSpellShapeRenderers();
 	}
 	
 	// Subscribed to game bus in #clientSetup
@@ -480,5 +481,11 @@ public class ClientInit {
 			ModelResourceLocation loc = BlockModelShapes.getModelLocation(state);
 			registry.put(loc, new MimicBlockBakedModel(registry.get(loc))); // Put a new mimic model wrapped around the default one
 		}
+	}
+	
+	private static final void registerSpellShapeRenderers() {
+//		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BLOCKPOS, () -> {
+//			
+//		});
 	}
 }

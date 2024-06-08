@@ -256,12 +256,15 @@ public class ProjectileShape extends SpellShape {
 		if (properties != null)
 			hitAllies = properties.flip;
 		
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, dir, (float) PROJECTILE_RANGE, new ProjectileFilter(state, hitAllies));
 		if (trace.getType() == RayTraceResult.Type.BLOCK) {
-			builder.add(new SpellShapePreviewComponent.Position(RayTrace.blockPosFromResult(trace)));
+			builder.add(new SpellShapePreviewComponent.Line(pos.add(0, -.25, 0), Vector3d.copyCentered(RayTrace.blockPosFromResult(trace))));
+			state.trigger(null, world, Lists.newArrayList(RayTrace.blockPosFromResult(trace)));
 			return true;
-		} else if (trace.getType() == RayTraceResult.Type.ENTITY) {
-			builder.add(new SpellShapePreviewComponent.Ent(RayTrace.livingFromRaytrace(trace)));
+		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null) {
+			//builder.add(new SpellShapePreviewComponent.Ent(RayTrace.livingFromRaytrace(trace)));
+			state.trigger(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), null, null);
 			return true;
 		} else {
 			return false;

@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.client.resources.I18n;
@@ -126,6 +127,11 @@ public class TouchShape extends InstantShape {
 	@Override
 	public int getManaCost() {
 		return 10;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
 	}
 
 }

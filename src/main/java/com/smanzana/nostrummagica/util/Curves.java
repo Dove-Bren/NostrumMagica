@@ -150,6 +150,7 @@ public final class Curves {
 		public final double gravity;
 		
 		private final double startingYVel;
+		private final double flightTime;
 		
 		public Mortar(double startHVelocity, Vector3d diff, double gravity) {
 			super();
@@ -160,6 +161,9 @@ public final class Curves {
 			}
 			this.gravity = gravity;
 			this.startingYVel = getMortarVerticalVelocity(diff, startHVelocity, gravity);
+			
+			final double hDist = Vector3d.ZERO.distanceTo(new Vector3d(diff.x, 0, diff.z));
+			this.flightTime = hDist / startHVelocity;
 		}
 
 		@Override
@@ -169,7 +173,8 @@ public final class Curves {
 			final double z = this.diff.getZ() * progress;
 			
 			// Y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
-			final double y = 0 + (this.startingYVel * progress) - (.5 * gravity * (progress * progress));
+			final double time = flightTime * progress;
+			final double y = 0 + (this.startingYVel * time) - (.5 * gravity * (time * time));
 			return new Vector3d(x, y, z);
 		}
 		

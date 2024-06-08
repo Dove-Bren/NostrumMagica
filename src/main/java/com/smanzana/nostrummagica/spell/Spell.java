@@ -984,27 +984,30 @@ public class Spell {
 			return true;
 		}
 		
-		return false;
+		return true; // Affects caster
 	}
 	
-	public @Nullable SpellShapePreview getPreview(LivingEntity caster) {
+	public @Nullable SpellShapePreview getPreview(LivingEntity caster, float partialTicks) {
 		if (!getSpellShapeParts().isEmpty()) {
 			SpellShapePreview preview = new SpellShapePreview();
-			PreviewState previewState = new PreviewState(this, caster, preview);
+			PreviewState previewState = new PreviewState(this, caster, preview, partialTicks);
 			previewState.trigger(Lists.newArrayList(caster), null, null);
 			return preview;
 		}
 		
-		return null;
+		// Affects caster
+		return new SpellShapePreview().add(new SpellShapePreviewComponent.Ent(caster));
 	}
 	
 	private static final class PreviewState extends SpellState {
 		
 		private final SpellShapePreview previewBuilder;
+		private final float partialTicks;
 		
-		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder) {
+		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder, float partialTicks) {
 			super(spell, caster, 1f);
 			this.previewBuilder = previewBuilder;
+			this.partialTicks = partialTicks;
 		}
 		
 		@Override
@@ -1014,6 +1017,18 @@ public class Spell {
 		
 		@Override
 		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit) {
+			//if (this.getIndex() != 1) {
+			{
+				if (targets != null && !targets.isEmpty()) {
+					for (LivingEntity targ : targets) {
+						this.previewBuilder.add(new SpellShapePreviewComponent.Ent(targ));
+					}
+				} else if (locations != null && !locations.isEmpty()) {
+					for (BlockPos pos : locations) {
+						this.previewBuilder.add(new SpellShapePreviewComponent.Position(pos));
+					}
+				}
+			}
 			super.trigger(targets, world, locations, forceSplit);
 		}
 
@@ -1023,19 +1038,14 @@ public class Spell {
 			// Doing this may recurse into triggering this state, but that's alright.
 			// Automatically add the target/targetPos to the preview if provided, though.
 			
-			if (targ != null) {
-				this.previewBuilder.add(new SpellShapePreviewComponent.Ent(targ));
-			} else if (targpos != null) {
-				this.previewBuilder.add(new SpellShapePreviewComponent.Position(targpos));
-			}
-			
 			Vector3d pos;
 			if (world == null)
 				world = targ.world;
-			if (targ == null)
+			if (targ == null) {
 				pos = new Vector3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
-			else
-				pos = targ.getPositionVec();
+			} else {
+				pos = targ.getEyePosition(partialTicks).add(0, -targ.getEyeHeight(), 0);
+			}
 			
 			shape.getShape().addToPreview(previewBuilder, this, world, pos,
 					(targ == null ? -90.0f : targ.rotationPitch),
@@ -1050,7 +1060,7 @@ public class Spell {
 
 		@Override
 		protected PreviewState split() {
-			PreviewState spawn = new PreviewState(spell, caster, this.previewBuilder);
+			PreviewState spawn = new PreviewState(spell, caster, this.previewBuilder, partialTicks);
 			spawn.index = this.index;
 			
 			return spawn;
