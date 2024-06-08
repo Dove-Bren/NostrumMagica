@@ -9,6 +9,8 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
@@ -189,7 +191,13 @@ public class MagicCyclerShape extends SpellShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		int unused; // Revisit
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		float radius = (float) (EntityCyclerSpellSaucer.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
+		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radius));
+		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
 	}
 }

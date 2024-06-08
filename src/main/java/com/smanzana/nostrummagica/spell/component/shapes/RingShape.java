@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
@@ -178,8 +180,14 @@ public class RingShape extends BurstShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		int unused; // Revisit
-		return false;
+		return true;
+	}
+	
+	@Override
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		float radiusEnts = Math.max(supportedFloats()[0], properties.level) + INNER_RADIUS;
+		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radiusEnts));
+		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) INNER_RADIUS));
 	}
 
 }

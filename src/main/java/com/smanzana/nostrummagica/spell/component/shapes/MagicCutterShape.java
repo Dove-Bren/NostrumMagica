@@ -11,7 +11,10 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Projectiles;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -21,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
@@ -151,14 +155,6 @@ public class MagicCutterShape extends SpellShape {
 
 	@Override
 	public NonNullList<ItemStack> supportedFloatCosts() {
-//		if (costs == null) {
-//			costs = NonNullList.from(ItemStack.EMPTY,
-//				ItemStack.EMPTY,
-//				new ItemStack(Blocks.REDSTONE_BLOCK),
-//				new ItemStack(Blocks.OBSIDIAN)
-//			);
-//		}
-//		return costs;
 		return null;
 	}
 
@@ -194,7 +190,36 @@ public class MagicCutterShape extends SpellShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		int unused; // Revisit
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final Vector3d dir;
+		final LivingEntity self = state.getSelf();
+		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
+			MobEntity ent = (MobEntity) self  ;
+			dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
+					.subtract(self.getPosX(), self.getPosY() + self.getEyeHeight(), self.getPosZ());
+		} else {
+			dir = Projectiles.getVectorForRotation(pitch, yaw);
+		}
+		
+		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
+		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, dir, (float) PROJECTILE_RANGE, new RayTrace.OtherLiving(state.getSelf()));
+		if (trace.getType() == RayTraceResult.Type.BLOCK) {
+			builder.add(new SpellShapePreviewComponent.Line(pos.add(0, -.25, 0), Vector3d.copyCentered(RayTrace.blockPosFromResult(trace))));
+			state.trigger(null, world, Lists.newArrayList(RayTrace.blockPosFromResult(trace)));
+			return true;
+		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null) {
+			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
+			builder.add(new SpellShapePreviewComponent.Line(pos.add(0, -.25, 0), living.getPositionVec().add(0, living.getHeight() / 2, 0)));
+			state.trigger(Lists.newArrayList(living), null, null);
+			return true;
+		} else {
+			final Vector3d dest = pos.add(dir.normalize().scale(PROJECTILE_RANGE));
+			builder.add(new SpellShapePreviewComponent.Line(pos.add(0, -.25, 0), new Vector3d((int) dest.getX() + .5, (int) dest.getY() + .5, (int) dest.getZ() + .5)));
+			return true;
+		}
 	}
 }

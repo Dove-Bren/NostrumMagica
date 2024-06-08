@@ -10,6 +10,8 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -160,6 +162,22 @@ public class BurstShape extends InstantShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, true);
+	}
+	
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		float radiusEnts = Math.max(supportedFloats()[0], properties.level);
+		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radiusEnts));
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		this.addRangeRings(builder, state, world, pos, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
+	}
+	
+	@Override
+	protected boolean previewBlockHits(SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		return false;
 	}
 
 }

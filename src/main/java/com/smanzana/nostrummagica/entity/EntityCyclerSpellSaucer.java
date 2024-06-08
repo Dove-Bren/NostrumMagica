@@ -26,7 +26,8 @@ import net.minecraft.world.World;
 public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 	
 	public static final String ID = "entity_internal_spellsaucer_cycler";
-	static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);
+	protected static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);
+	public static final double CYCLER_RADIUS = 1;
 	
 	protected static final DataParameter<Optional<UUID>> SHOOTER = EntityDataManager.<Optional<UUID>>createKey(EntityCyclerSpellSaucer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	
@@ -98,7 +99,7 @@ public class EntityCyclerSpellSaucer extends EntitySpellSaucer {
 			float progress = (((float) (this.ticksExisted % ticksAround)) + partialTicks) / (float) ticksAround;
 			double radians = progress * 2D * Math.PI;
 			
-			final double rotateDist = 1D; 
+			final double rotateDist = CYCLER_RADIUS; 
 			x = Math.cos(radians) * rotateDist;
 			z = Math.sin(radians) * rotateDist;
 		} else {

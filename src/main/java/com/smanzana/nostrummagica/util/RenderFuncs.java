@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.util;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 import org.lwjgl.opengl.GL11;
 
@@ -41,7 +42,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
-@SuppressWarnings("deprecation")
 public final class RenderFuncs {
 	
 	public static final Random RenderRandom(Random existing) {
@@ -603,7 +603,7 @@ public final class RenderFuncs {
 		RenderSystem.lineWidth(width);
 		buffer.pos(transform, 0, 0, 0).color(red, green, blue, alpha).tex(0, 0).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
 		buffer.pos(transform, (float) diff.getX(), (float) diff.getY(), (float) diff.getZ()).color(red, green, blue, alpha).tex(1, 1).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
-		RenderSystem.lineWidth(1f);
+		//RenderSystem.lineWidth(1f);
 		matrixStackIn.pop();
 	}
 	
@@ -629,8 +629,30 @@ public final class RenderFuncs {
 		matrixStackIn.pop();
 	}
 	
-	public static final void renderRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+	public static final void renderHorizontalRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
 			float width, float texOffsetProg,
+			int combinedOverlayIn, int combinedLightIn,
+			float red, float green, float blue, float alpha) {
+		
+		Function<Vector3d, Vector3d> widthMapper = (segmentDiff) -> segmentDiff.mul(1, 0, 1).normalize().scale(width/2).rotateYaw(-90f);
+		
+		renderRibbon(matrixStackIn, buffer, start, curve, segments, widthMapper, texOffsetProg,
+				combinedOverlayIn, combinedLightIn, red, green, blue, alpha);
+	}
+	
+	public static final void renderVerticalRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+			float width, float texOffsetProg,
+			int combinedOverlayIn, int combinedLightIn,
+			float red, float green, float blue, float alpha) {
+		
+		Function<Vector3d, Vector3d> widthMapper = (segmentDiff) -> new Vector3d(0, width/2, 0);
+		
+		renderRibbon(matrixStackIn, buffer, start, curve, segments, widthMapper, texOffsetProg,
+				combinedOverlayIn, combinedLightIn, red, green, blue, alpha);
+	}
+	
+	public static final void renderRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+			Function<Vector3d, Vector3d> widthSupplier, float texOffsetProg,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
 		
@@ -645,14 +667,14 @@ public final class RenderFuncs {
 			final float nextProg = ((float) i / (float) segments);
 			final Vector3d next = curve.getPosition(nextProg);
 			final Vector3d segmentDiff = next.subtract(last);
-			final Vector3d side = segmentDiff.normalize().rotateYaw(-90f).scale(width/2);
+			final Vector3d widthOffset = widthSupplier.apply(segmentDiff);
 			//final float nextV = lastV == lowV ? highV : lowV;
 			
-			buffer.pos(transform, (float) (last.getX() - side.getX()), (float) (last.getY() - side.getY()), (float) (last.getZ() - side.getZ())).color(red, green, blue, alpha).tex(0, 1 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
-			buffer.pos(transform, (float) (last.getX() + side.getX()), (float) (last.getY() + side.getY()), (float) (last.getZ() + side.getZ())).color(red, green, blue, alpha).tex(1, 1 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) (last.getX() - widthOffset.getX()), (float) (last.getY() - widthOffset.getY()), (float) (last.getZ() - widthOffset.getZ())).color(red, green, blue, alpha).tex(0, 1 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) (last.getX() + widthOffset.getX()), (float) (last.getY() + widthOffset.getY()), (float) (last.getZ() + widthOffset.getZ())).color(red, green, blue, alpha).tex(1, 1 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
 			
-			buffer.pos(transform, (float) (next.getX() + side.getX()), (float) (next.getY() + side.getY()), (float) (next.getZ() + side.getZ())).color(red, green, blue, alpha).tex(1, 0 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
-			buffer.pos(transform, (float) (next.getX() - side.getX()), (float) (next.getY() - side.getY()), (float) (next.getZ() - side.getZ())).color(red, green, blue, alpha).tex(0, 0 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) (next.getX() + widthOffset.getX()), (float) (next.getY() + widthOffset.getY()), (float) (next.getZ() + widthOffset.getZ())).color(red, green, blue, alpha).tex(1, 0 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+			buffer.pos(transform, (float) (next.getX() - widthOffset.getX()), (float) (next.getY() - widthOffset.getY()), (float) (next.getZ() - widthOffset.getZ())).color(red, green, blue, alpha).tex(0, 0 + texOffsetProg).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
 			
 			last = next;
 			//lastV = nextV;

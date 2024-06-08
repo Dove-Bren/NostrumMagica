@@ -8,24 +8,19 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.item.ISpellContainerItem;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
-import com.smanzana.nostrummagica.util.Curves.ICurve3d;
-import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -47,69 +42,17 @@ public class SpellShapeRenderer {
 		this.outliner = outliner;
 		this.outlinedEntities = new ArrayList<>();
 		enabled = false;
+
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.ENTITY, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final Entity ent = comp.getEntity();
+			this.addEntity(ent, DEFAULT_OUTLINE);
+		});
 	}
 	
 	public void toggle() {
 		this.enabled = !enabled;
 		if (!this.enabled) {
 			clearOutlines();
-		}
-		
-		else { // TESTING CODE: move to ClientInit#registerSpellShapeRenderers
-			
-			SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BLOCKPOS, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-				final BlockPos pos = comp.getPos();
-				
-				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
-				final int combinedLight = 15728880;
-				final int combinedOverlay = OverlayTexture.NO_OVERLAY;
-				
-				matrixStackIn.push();
-				matrixStackIn.translate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
-				RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
-				matrixStackIn.pop();
-			});
-
-			SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.ENTITY, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-				final Entity ent = comp.getEntity();
-				this.addEntity(ent, DEFAULT_OUTLINE);
-			});
-
-			SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.LINE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-				final Vector3d start = comp.getStart();
-				final Vector3d end = comp.getEnd();
-				final int combinedLight = 15728880;
-				final int combinedOverlay = OverlayTexture.NO_OVERLAY;
-				
-				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
-				RenderFuncs.renderLine(matrixStackIn, buffer, start, end, 10, combinedOverlay, combinedLight, red, green, blue, alpha);
-			});
-
-			SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.AOE_LINE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-				final Vector3d start = comp.getStart();
-				final Vector3d end = comp.getEnd();
-				final float width = comp.getWidth();
-				final int combinedLight = 15728880;
-				final int combinedOverlay = OverlayTexture.NO_OVERLAY;
-				
-				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
-				RenderFuncs.renderLine(matrixStackIn, buffer, start, end, width, combinedOverlay, combinedLight, red, green, blue, alpha);
-			});
-
-			SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.CURVE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-				final Vector3d start = comp.getStart();
-				final ICurve3d curve = comp.getCurve();
-				final int combinedLight = 0;
-				final int combinedOverlay = OverlayTexture.NO_OVERLAY;
-				
-//				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
-//				RenderFuncs.renderCurve(matrixStackIn, buffer, start, curve, 50, combinedOverlay, combinedLight, red, green, blue, alpha);
-				
-				final float prog = (float) (System.currentTimeMillis() % 500) / 500f;
-				
-				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
-				RenderFuncs.renderRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
-			});
 		}
 	}
 	
@@ -179,7 +122,7 @@ public class SpellShapeRenderer {
 	protected <T extends SpellShapePreviewComponent> void renderComponent(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float partialTicks, T comp, float red, float green, float blue, float alpha) {
 		ISpellShapeComponentRenderer<T> renderer = GetRenderer(comp);
 		if (renderer != null) {
-			renderer.render(matrixStackIn, bufferIn, partialTicks, comp, 1f, 0f, 1f, .6f);
+			renderer.render(matrixStackIn, bufferIn, partialTicks, comp, 1f, 0f, 1f, .3f);
 		}
 	}
 	

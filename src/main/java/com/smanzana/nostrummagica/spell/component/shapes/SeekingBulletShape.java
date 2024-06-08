@@ -9,11 +9,10 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
@@ -285,7 +284,7 @@ public class SeekingBulletShape extends SpellShape {
 		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, properties.flip);
 		if (target != null) {
-			builder.add(new SpellShapePreviewComponent.Ent(target));
+			state.trigger(Lists.newArrayList(target), null, null);
 			return true;
 		} else {
 			return false;

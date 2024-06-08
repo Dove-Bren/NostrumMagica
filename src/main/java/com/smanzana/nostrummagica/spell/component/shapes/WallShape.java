@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -8,6 +11,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -230,7 +234,54 @@ public class WallShape extends AreaShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		int unused; // Revisit
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final float radius = Math.max(supportedFloats()[0], properties.level);
+		//final boolean ignoreBlocks = properties.flip;
+		
+		// Get N/S or E/W from target positions
+		final double dz = Math.abs(state.getCaster().getPosZ() - pos.z);
+		final double dx = Math.abs(state.getCaster().getPosX() - pos.x);
+		final boolean northsouth = dz < dx;
+		
+		// Blindly guess if trigger put us in a wall but above us isn't that t he player
+		// wants us up one
+		BlockPos blockPos = new BlockPos(pos);
+		if (!world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up())) {
+			pos = pos.add(0, 1, 0);
+		}
+		
+		// Regardless of ignoreBlocks, display as a set of block positions. Either we'll affect the blocks there, or only affect ents that go there.
+		final int minBlockX;
+		final int maxBlockX;
+		final int minBlockZ;
+		final int maxBlockZ;
+		if (northsouth) {
+			minBlockX = (int) Math.floor(pos.x);
+			maxBlockX = (int) Math.floor(pos.x);
+			minBlockZ = (int) Math.floor(Math.floor(pos.z) - radius);
+			maxBlockZ = (int) Math.floor(Math.floor(pos.z) + radius);
+		} else {
+			minBlockX = (int) Math.floor(Math.floor(pos.x) - radius);
+			maxBlockX = (int) Math.floor(Math.floor(pos.x) + radius);
+			minBlockZ = (int) Math.floor(pos.z);
+			maxBlockZ = (int) Math.floor(pos.z);
+		}
+		
+		//this.minPos = new BlockPos(minBlockX, pos.y, minBlockZ);
+		//this.maxPos = new BlockPos(maxBlockX, pos.y + BLOCK_HEIGHT, maxBlockZ);
+		List<BlockPos> positions = new ArrayList<>();
+		for (int x = minBlockX; x <= maxBlockX; x++)
+		for (int y = (int) pos.y; y < (int) pos.y + WallShapeInstance.BLOCK_HEIGHT; y++)
+		for (int z = minBlockZ; z <= maxBlockZ; z++) {
+			// should trigger?
+			positions.add(new BlockPos(x, y, z));
+		}
+		state.trigger(null, world, positions);
+		
+		return true;
 	}
 }

@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -15,6 +17,8 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Entities;
 
@@ -23,6 +27,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -254,7 +259,6 @@ public class AuraShape extends AreaShape {
 
 	@Override
 	public boolean shouldTrace(SpellShapePartProperties params) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	
@@ -265,7 +269,21 @@ public class AuraShape extends AreaShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		int unused; // Revisit
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final float range = Math.max(supportedFloats()[0], properties.level);
+		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), range));
+		
+		List<LivingEntity> ents = world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(pos).grow(range + 1), (ent) -> 
+			ent instanceof LivingEntity && pos.distanceTo(ent.getPositionVec()) <= range
+		).stream().map(ent -> (LivingEntity) ent).collect(Collectors.toList());
+		if (ents != null && !ents.isEmpty()) {
+			state.trigger(ents, null, null);
+		}
+		
+		return !ents.isEmpty();
 	}
 }

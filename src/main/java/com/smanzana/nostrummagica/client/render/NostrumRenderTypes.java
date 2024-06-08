@@ -34,6 +34,7 @@ public class NostrumRenderTypes {
 	public static final RenderType SPELLSHAPE_QUADS;
 	public static final RenderType SPELLSHAPE_ORB_CHAIN;
 	public static final RenderType SPELLSHAPE_LINES;
+	public static final RenderType SPELLSHAPE_LINES_THICK;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -71,6 +72,7 @@ public class NostrumRenderTypes {
 	//private static final RenderState.FogState NO_FOG = new RenderState.FogState("no_fog", () -> {}, () -> {});
 	
 	private static final RenderState.LineState LINE_3 = new RenderState.LineState(OptionalDouble.of(3f));
+	private static final RenderState.LineState LINE_10 = new RenderState.LineState(OptionalDouble.of(10f));
 	
     private static final RenderState.TexturingState MANAARMOR_GLINT = new RenderState.TexturingState("nostrum_manaarmor_glint", () -> {
     	//setupGlintTexturing(0.16F);
@@ -164,7 +166,7 @@ public class NostrumRenderTypes {
 		SPELLSHAPE_ORB_CHAIN = RenderType.makeType(Name("spellshape_chain"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
 		
 		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
+				//.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(NO_LIGHTING)
 				.layer(VIEW_OFFSET_Z_LAYERING)
@@ -174,6 +176,18 @@ public class NostrumRenderTypes {
 				// depth test?
 			.build(false);
 		SPELLSHAPE_LINES = RenderType.makeType(Name("spellshape_lines"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
+		
+		glState = RenderType.State.getBuilder()
+				//.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.layer(VIEW_OFFSET_Z_LAYERING)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
+				.texturing(SPELLSHAPE_TEXTURING)
+				.line(LINE_10)
+				// depth test?
+			.build(false);
+		SPELLSHAPE_LINES_THICK = RenderType.makeType(Name("spellshape_lines_thick"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
 		
 		glState = RenderType.State.getBuilder()
 				.texture(new RenderState.TextureState(ModelSwitchTrigger.TEXT, false, true))

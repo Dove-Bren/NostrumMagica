@@ -7,10 +7,12 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.entity.LivingEntity;
@@ -49,11 +51,11 @@ public class BeamShape extends InstantShape {
 		// Cast from eyes
 		pos = pos.add(0, state.getCaster().getEyeHeight(), 0);
 		
-		Collection<RayTraceResult> traces = RayTrace.allInPath(world, state.getSelf(), pos, pitch, yaw, BEAM_RANGE, new RayTrace.OtherLiving(state.getCaster()));
+		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
+		final Vector3d end = pos.add(dir.normalize().scale(BEAM_RANGE));
+		Collection<RayTraceResult> traces = RayTrace.allInPath(world, state.getSelf(), pos, end, new RayTrace.OtherLiving(state.getCaster()));
 		List<LivingEntity> targs = null;
 		List<BlockPos> blocks = null;
-		
-		Vector3d end = null;
 		
 		if (traces != null && !traces.isEmpty()) {
 			targs = new LinkedList<>();
@@ -71,16 +73,14 @@ public class BeamShape extends InstantShape {
 					targs.add(RayTrace.livingFromRaytrace(trace));
 				} else {
 					blocks.add(new BlockPos(trace.getHitVec().x, trace.getHitVec().y, trace.getHitVec().z));
-					end = trace.getHitVec();
 				}
 			}
 		}
 		
-		if (end == null)
-			end = pos.add(RayTrace.directionFromAngles(pitch, yaw).normalize().scale(BEAM_RANGE));
-		
-		NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
-				null, pos, null, end, null, false, 0);
+		if (!state.isPreview()) {
+			NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
+					null, pos, null, end, null, false, 0);
+		}
 		
 		return new TriggerData(targs, world, blocks);
 	}
@@ -148,6 +148,15 @@ public class BeamShape extends InstantShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, true);
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final Vector3d from = pos.add(0, state.getCaster().getEyeHeight(), 0);
+		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
+		final Vector3d maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
+		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vector3d.fromPitchYaw(pitch, yaw+90).scale(.1f)), maxDist, 3f));
+		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
 	}
 
 }

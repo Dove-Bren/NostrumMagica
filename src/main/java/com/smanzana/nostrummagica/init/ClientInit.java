@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.init;
 
 import java.util.Map;
 
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.MimicBlock;
@@ -27,6 +28,8 @@ import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
+import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
 import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRed;
@@ -89,8 +92,12 @@ import com.smanzana.nostrummagica.item.equipment.SoulDagger;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spellcraft.pattern.NostrumSpellCraftPatterns;
 import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.util.Curves;
+import com.smanzana.nostrummagica.util.Curves.ICurve3d;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -109,12 +116,14 @@ import net.minecraft.client.renderer.entity.LightningBoltRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -484,8 +493,70 @@ public class ClientInit {
 	}
 	
 	private static final void registerSpellShapeRenderers() {
-//		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BLOCKPOS, () -> {
-//			
-//		});
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BLOCKPOS, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final BlockPos pos = comp.getPos();
+			
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
+			final int combinedLight = 15728880;
+			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+			
+			matrixStackIn.push();
+			matrixStackIn.translate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
+			matrixStackIn.pop();
+		});
+		
+		// ENT done in renderer itself
+
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.LINE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final Vector3d start = comp.getStart();
+			final Vector3d end = comp.getEnd();
+			final int combinedLight = 15728880;
+			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+			
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
+			RenderFuncs.renderLine(matrixStackIn, buffer, start, end, 10, combinedOverlay, combinedLight, red, green, blue, alpha);
+		});
+
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.AOE_LINE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final Vector3d start = comp.getStart();
+			final Vector3d end = comp.getEnd();
+			final float width = comp.getWidth();
+			final int combinedLight = 15728880;
+			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+			
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES_THICK);
+			RenderFuncs.renderLine(matrixStackIn, buffer, start, end, width, combinedOverlay, combinedLight, red, green, blue, alpha);
+		});
+
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.CURVE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final Vector3d start = comp.getStart();
+			final ICurve3d curve = comp.getCurve();
+			final int combinedLight = 15728880;
+			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+			
+//			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
+//			RenderFuncs.renderCurve(matrixStackIn, buffer, start, curve, 50, combinedOverlay, combinedLight, red, green, blue, alpha);
+			
+			final float period =  500f;
+			final float prog = (float) (System.currentTimeMillis() % (double) period) / period;
+			
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
+			RenderFuncs.renderHorizontalRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
+		});
+
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.DISK, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final Vector3d start = comp.getStart();
+			final float radius = comp.getRadius();
+			final int combinedLight = 15728880;
+			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+			
+			final float period =  500f;
+			final float prog = (float) (System.currentTimeMillis() % (double) period) / period;
+			
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
+			final ICurve3d curve = new Curves.FlatEllipse(radius, radius);
+			RenderFuncs.renderVerticalRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
+		});
 	}
 }

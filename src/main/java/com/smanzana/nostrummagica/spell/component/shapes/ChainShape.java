@@ -2,16 +2,20 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -20,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -35,10 +40,24 @@ public class ChainShape extends InstantShape {
 		this(ID);
 	}
 	
-	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		List<LivingEntity> ret = new ArrayList<>();
+	protected static class ChainTriggerData extends TriggerData {
+
+		private final Map<LivingEntity, List<LivingEntity>> links;
 		
+		public ChainTriggerData(List<LivingEntity> targets, World world, List<BlockPos> pos, Map<LivingEntity, List<LivingEntity>> links) {
+			super(targets, world, pos);
+			this.links = links;
+		}
+		
+		public Map<LivingEntity, List<LivingEntity>> getLinks() {
+			return links;
+		}
+	}
+	
+	@Override
+	protected ChainTriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		List<LivingEntity> ret = new ArrayList<>();
+		Map<LivingEntity, List<LivingEntity>> links = new HashMap<>();
 		LivingEntity target = state.getSelf();
 		
 		double radius = 7.0;
@@ -106,12 +125,18 @@ public class ChainShape extends InstantShape {
 					continue;
 				}
 				
+				// More expensive seen check if already in next list
+				if (next.contains(living)) {
+					continue;
+				}
+				
 				// Eligible!
 				next.add(living);
+				links.computeIfAbsent(center, (k) -> new ArrayList<>()).add(living);
 			}
 		}
 		
-		return new TriggerData(ret, world, null);
+		return new ChainTriggerData(ret, world, null, links);
 	}
 
 	@Override
@@ -186,6 +211,32 @@ public class ChainShape extends InstantShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, false);
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		// Add link links between all links that wind up showing up
+		ChainTriggerData data = this.getTargetData(state, world, pos, pitch, yaw, properties, characteristics);
+		if (data.targets != null) {
+			for (LivingEntity source : data.targets) {
+				for (LivingEntity target : data.targets) {
+					if (source == target) {
+						continue;
+					}
+					
+					final List<LivingEntity> affected = data.links.get(source);
+					if (affected != null && affected.contains(target)) {
+						final Vector3d sourcePos = source.getPositionVec().add(0, source.getHeight() / 2, 0);
+						final Vector3d targetPos = target.getPositionVec().add(0, target.getHeight() / 2, 0);
+						builder.add(new SpellShapePreviewComponent.Line(sourcePos, targetPos));
+					}
+				}
+			}
+		}
+		
+		// This part copied from parent
+		state.trigger(data.targets, data.world, data.pos);
+		return (data.targets != null && !data.targets.isEmpty()) || (data.pos != null && !data.pos.isEmpty());
 	}
 
 }

@@ -1,10 +1,11 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
+import java.util.List;
+
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -73,22 +74,23 @@ public abstract class InstantShape extends SpellShape {
 		return true;
 	}
 	
+	protected boolean previewBlockHits(SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		return true;
+	}
+	
+	protected boolean previewEntityHits(SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		return true;
+	}
+	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		TriggerData data = this.getTargetData(state, world, pos, pitch, yaw, properties, characteristics);
-		if (data.targets != null && !data.targets.isEmpty()) {
-			for (LivingEntity targ : data.targets) {
-				builder.add(new SpellShapePreviewComponent.Ent(targ));
-			}
-			return true;
-		} else if (data.pos != null && !data.pos.isEmpty()) {
-			for (BlockPos targPos : data.pos) {
-				builder.add(new SpellShapePreviewComponent.Position(targPos));
-			}
-			return true;
-		} else {
-			return false;
-		}
+		
+		List<LivingEntity> entityHits = (this.previewEntityHits(properties, characteristics) ? data.targets : null);
+		List<BlockPos> blockHits = (this.previewBlockHits(properties, characteristics) ? data.pos : null);
+		
+		state.trigger(entityHits, data.world, blockHits);
+		return (entityHits != null && !entityHits.isEmpty()) || (blockHits != null && !blockHits.isEmpty());
 	}
 	
 }

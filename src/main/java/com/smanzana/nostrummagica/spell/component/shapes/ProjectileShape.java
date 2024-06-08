@@ -263,10 +263,13 @@ public class ProjectileShape extends SpellShape {
 			state.trigger(null, world, Lists.newArrayList(RayTrace.blockPosFromResult(trace)));
 			return true;
 		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null) {
-			//builder.add(new SpellShapePreviewComponent.Ent(RayTrace.livingFromRaytrace(trace)));
-			state.trigger(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), null, null);
+			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
+			builder.add(new SpellShapePreviewComponent.Line(pos.add(0, -.25, 0), living.getPositionVec().add(0, living.getHeight() / 2, 0)));
+			state.trigger(Lists.newArrayList(living), null, null);
 			return true;
 		} else {
+			//final Vector3d dest = pos.add(dir.normalize().scale(PROJECTILE_RANGE));
+			//builder.add(new SpellShapePreviewComponent.Line(pos.add(0, -.25, 0), new Vector3d((int) dest.getX() + .5, (int) dest.getY() + .5, (int) dest.getZ() + .5)));
 			return false;
 		}
 	}

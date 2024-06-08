@@ -180,4 +180,24 @@ public final class Curves {
 		
 	}
 	
+	public static class FlatEllipse implements ICurve3d {
+		
+		public final double radiusX;
+		public final double radiusZ;
+		
+		public FlatEllipse(double radiusX, double radiusZ) {
+			this.radiusX = radiusX;
+			this.radiusZ = radiusZ;
+		}
+
+		@Override
+		public Vector3d getPosition(float progress) {
+			return new Vector3d(
+					Math.cos(Math.PI * 2 * progress) * radiusX,
+					0,
+					Math.sin(Math.PI * 2 * progress) * radiusZ
+					);
+		}
+	}
+	
 }

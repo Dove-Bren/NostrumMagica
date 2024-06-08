@@ -22,6 +22,7 @@ public abstract class SpellShapePreviewComponent {
 	public static final Type<Line> LINE = new Type<>(NostrumMagica.Loc("spellshape.preview.line"));
 	public static final Type<AoELine> AOE_LINE = new Type<>(NostrumMagica.Loc("spellshape.preview.aoeline"));
 	public static final Type<Curve> CURVE = new Type<>(NostrumMagica.Loc("spellshape.preview.curve"));
+	public static final Type<Disk> DISK = new Type<>(NostrumMagica.Loc("spellshape.preview.disk"));
 	
 	protected final Type<? extends SpellShapePreviewComponent> type;
 	
@@ -131,6 +132,30 @@ public abstract class SpellShapePreviewComponent {
 		
 		public ICurve3d getCurve() {
 			return this.curve;
+		}
+	}
+	
+	public static class Disk extends SpellShapePreviewComponent {
+
+		protected final Vector3d start;
+		protected final float radius;
+		
+		protected Disk(Type<? extends Disk> type, Vector3d start, float radius) {
+			super(type);
+			this.start = start;
+			this.radius = radius;
+		}
+		
+		public Disk(Vector3d start, float radius) {
+			this(DISK, start, radius);
+		}
+		
+		public Vector3d getStart() {
+			return this.start;
+		}
+		
+		public float getRadius() {
+			return this.radius;
 		}
 	}
 }
