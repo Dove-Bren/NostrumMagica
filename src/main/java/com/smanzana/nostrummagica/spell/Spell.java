@@ -91,11 +91,11 @@ public class Spell {
 					this.finish(targets, world, locations);
 				} else {
 					if (index > 0) {
-						if (locations != null && !locations.isEmpty()) {
+						if (targets != null && !targets.isEmpty()) {
+							playContinueEffect(targets.get(0));
+						} else if (locations != null && !locations.isEmpty()) {
 							Vector3d where = Vector3d.copyCentered(locations.get(0));
-							NostrumMagicaSounds.CAST_CONTINUE.play(world, where.getX(), where.getY(), where.getZ());
-						} else if (targets != null && !targets.isEmpty()) {
-							NostrumMagicaSounds.CAST_CONTINUE.play(targets.get(0));
+							playContinueEffect(world, where);
 						}
 					}
 					
@@ -139,6 +139,14 @@ public class Spell {
 									
 				}
 			}
+		}
+		
+		protected void playContinueEffect(World world, Vector3d where) {
+			NostrumMagicaSounds.CAST_CONTINUE.play(world, where.getX(), where.getY(), where.getZ());
+		}
+		
+		protected void playContinueEffect(LivingEntity at) {
+			NostrumMagicaSounds.CAST_CONTINUE.play(at);
 		}
 		
 		private void spawnShape(SpellShapePart shape, LivingEntity targ, World world, BlockPos targpos) {
