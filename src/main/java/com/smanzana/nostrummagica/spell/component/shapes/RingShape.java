@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -42,7 +42,7 @@ public class RingShape extends BurstShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
 		this.spawnShapeEffect(state.getCaster(), null, world, pos, param, characteristics);
 		
@@ -172,6 +172,12 @@ public class RingShape extends BurstShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, true);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
+		return false;
 	}
 
 }

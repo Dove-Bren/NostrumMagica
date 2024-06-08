@@ -44,10 +44,10 @@ public class CommandForceBind {
 		
 		ItemStack offhand = player.getHeldItemOffhand();
 		if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)
-				|| SpellScroll.getSpell(offhand) == null) {
+				|| SpellScroll.GetSpell(offhand) == null) {
 			context.getSource().sendFeedback(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
 		} else {
-			Spell spell = SpellScroll.getSpell(offhand);
+			Spell spell = SpellScroll.GetSpell(offhand);
 			if (SpellTome.hasRoom(stack, spell)) {
 				SpellTome.addSpell(stack, spell);
 			} else {

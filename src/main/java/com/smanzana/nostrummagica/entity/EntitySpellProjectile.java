@@ -1,8 +1,9 @@
 package com.smanzana.nostrummagica.entity;
 
+import java.util.function.Predicate;
+
 import javax.annotation.Nullable;
 
-import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.block.MysticAnchor;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;

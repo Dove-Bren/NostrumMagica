@@ -36,7 +36,7 @@ public class ScrollScreen extends Screen {
 	private final SpellIcon icon;
 	
 	public ScrollScreen(@Nonnull ItemStack scroll) {
-		this(SpellScroll.getSpell(scroll));
+		this(SpellScroll.GetSpell(scroll));
 	}
 	
 	public ScrollScreen(Spell spellIn) {

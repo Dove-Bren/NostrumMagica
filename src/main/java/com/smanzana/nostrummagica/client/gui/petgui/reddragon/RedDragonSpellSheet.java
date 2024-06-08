@@ -335,7 +335,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				}
 				
 				if (scroll.getItem() instanceof SpellScroll) {
-					Spell spell = SpellScroll.getSpell(scroll);
+					Spell spell = SpellScroll.GetSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
@@ -354,7 +354,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				}
 				
 				if (scroll.getItem() instanceof SpellScroll) {
-					Spell spell = SpellScroll.getSpell(scroll);
+					Spell spell = SpellScroll.GetSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
@@ -373,7 +373,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				}
 				
 				if (scroll.getItem() instanceof SpellScroll) {
-					Spell spell = SpellScroll.getSpell(scroll);
+					Spell spell = SpellScroll.GetSpell(scroll);
 					if (spell != null) {
 						final SpellIcon icon = SpellIcon.get(spell.getIconIndex());
 						icon.render(mc, matrixStackIn, x + i * (rowHMargin + cellWidth), y, innerCellWidth, innerCellWidth, 1f, 1f, 1f, alpha);
@@ -695,7 +695,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				return false;
 			}
 			
-			if (SpellScroll.getSpell(stack) == null) {
+			if (SpellScroll.GetSpell(stack) == null) {
 				return false;
 			}
 			

@@ -8,10 +8,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -83,9 +84,9 @@ public abstract class SpellShape {
 	}
 	
 	public static abstract class SpellShapeInstance {
-		private SpellState state; // The state to trigger
+		private ISpellState state; // The state to trigger
 		
-		public SpellShapeInstance(SpellState state) {
+		public SpellShapeInstance(ISpellState state) {
 			this.state = state;
 		}
 				
@@ -97,7 +98,7 @@ public abstract class SpellShape {
 			state.trigger(data.targets, data.world, data.pos, forceSplit);
 		}
 		
-		protected SpellState getState() {
+		protected ISpellState getState() {
 			return state;
 		}
 		
@@ -146,7 +147,7 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return
 	 */
-	public abstract SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
+	public abstract SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
 	
 //	public void perform(SpellAction action,
 //						SpellPartProperties param,
@@ -289,6 +290,32 @@ public abstract class SpellShape {
 	 */
 	public double getTraceRange(SpellShapePartProperties params) {
 		return 0;
+	}
+	
+	/**
+	 * Whether this shape supports previewing.
+	 * If this returns true, addToPreview should add any preview materials in #addToPreview().
+	 * @param params
+	 * @return
+	 */
+	public abstract boolean supportsPreview(SpellShapePartProperties params);
+	
+	/**
+	 * Add information about how this shape is expected to work if cast with the given arguments.
+	 * This is intended to preview the actual shape of the spell instantly. Shapes that take time to actually run
+	 * (like a projectile that is spawned and flies) should approximate the behavior.
+	 * @param builder
+	 * @param state
+	 * @param world
+	 * @param pos
+	 * @param pitch
+	 * @param yaw
+	 * @param properties
+	 * @param characteristics
+	 * @return whether to continue with the spell (return true), or if the spell is expected to fizzle here (return false)
+	 */
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		return false;
 	}
 	
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {

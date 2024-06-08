@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
@@ -27,7 +28,7 @@ public class AIShape extends InstantShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(com.smanzana.nostrummagica.spell.Spell.SpellState state, World world,
+	protected TriggerData getTargetData(com.smanzana.nostrummagica.spell.Spell.ISpellState state, World world,
 			Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
 		if (state.getCaster() instanceof MobEntity) {
@@ -88,6 +89,18 @@ public class AIShape extends InstantShape {
 
 	@Override
 	public boolean shouldTrace(SpellShapePartProperties params) {
+		return false;
+	}
+
+	@Override
+	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
+			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
 		return false;
 	}
 }

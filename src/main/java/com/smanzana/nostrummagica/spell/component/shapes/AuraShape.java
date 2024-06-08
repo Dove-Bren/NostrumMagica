@@ -12,9 +12,9 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Entities;
 
@@ -51,7 +51,7 @@ public class AuraShape extends AreaShape {
 		private boolean dead;
 		private final Map<LivingEntity, Integer> affected;
 		
-		public AuraTriggerInstance(SpellState state, World world, LivingEntity entity, float radius, boolean includeAllies, SpellCharacteristics characteristics) {
+		public AuraTriggerInstance(ISpellState state, World world, LivingEntity entity, float radius, boolean includeAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.radius = radius;
 			this.origin = entity;
@@ -186,7 +186,7 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new AuraTriggerInstance(state, world, state.getSelf(),
 				Math.max(supportedFloats()[0], params.level),
 				params.flip,
@@ -261,5 +261,11 @@ public class AuraShape extends AreaShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, false);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
+		return false;
 	}
 }

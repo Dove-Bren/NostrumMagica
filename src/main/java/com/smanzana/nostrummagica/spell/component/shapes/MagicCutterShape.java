@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -40,7 +40,7 @@ public class MagicCutterShape extends SpellShape {
 		private final float yaw;
 		private final SpellCharacteristics characteristics;
 		
-		public MagicCutterShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics) {
+		public MagicCutterShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -113,7 +113,7 @@ public class MagicCutterShape extends SpellShape {
 	}
 	
 	@Override
-	public MagicCutterShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MagicCutterShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new MagicCutterShapeInstance(state, world, pos, pitch, yaw, characteristics);
@@ -190,5 +190,11 @@ public class MagicCutterShape extends SpellShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, true);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
+		return false;
 	}
 }

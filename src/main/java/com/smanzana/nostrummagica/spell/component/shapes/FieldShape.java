@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -33,7 +33,7 @@ public class FieldShape extends AreaShape {
 		private final float radius;
 		private final SpellCharacteristics characteristics;
 		
-		public FieldShapeInstance(SpellState state, World world, Vector3d pos, float radius, boolean continuous, SpellCharacteristics characteristics) {
+		public FieldShapeInstance(ISpellState state, World world, Vector3d pos, float radius, boolean continuous, SpellCharacteristics characteristics) {
 			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, true, characteristics);
 			this.radius = radius;
 			this.origin = pos;
@@ -126,7 +126,7 @@ public class FieldShape extends AreaShape {
 	}
 
 	@Override
-	public FieldShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
+	public FieldShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		// Blindly guess if trigger put us in a wall but above us isn't that t he player
 		// wants us up one
@@ -196,6 +196,12 @@ public class FieldShape extends AreaShape {
 
 	@Override
 	public boolean shouldTrace(SpellShapePartProperties params) {
+		return false;
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
 		return false;
 	}
 

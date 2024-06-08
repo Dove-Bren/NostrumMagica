@@ -42,7 +42,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 				|| scroll.isEmpty())
 			return false;
 		
-		Spell spell = SpellScroll.getSpell(scroll);
+		Spell spell = SpellScroll.GetSpell(scroll);
 		if (spell == null) {
 			if (!player.world.isRemote) {
 				player.sendMessage(new StringTextComponent("The scroll is missing it's spell..."), Util.DUMMY_UUID);

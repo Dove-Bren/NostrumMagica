@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
+import java.util.function.Predicate;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
@@ -7,10 +9,13 @@ import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileS
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Projectiles;
+import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.client.resources.I18n;
@@ -21,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -43,7 +49,7 @@ public class ProjectileShape extends SpellShape {
 		private final boolean hitAllies;
 		private final SpellCharacteristics characteristics;
 		
-		public ProjectileShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean atMax, boolean hitAllies, SpellCharacteristics characteristics) {
+		public ProjectileShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean atMax, boolean hitAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -67,39 +73,15 @@ public class ProjectileShape extends SpellShape {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 			
-				EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
-						getState().getSelf(),
-						pos,
-						dir,
-						5.0f, PROJECTILE_RANGE);
-				
-				projectile.setFilter((ent) -> {
-					
-					if (ent == null) {
-						return false;
-					}
-					
-					if (ent == getState().getSelf()) {
-						return false;
-					}
-					
-					if (!hitAllies) {
-						if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
-							return false; // We own the target
-						}
-						if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
-							return false; // ent owns us
-						}
-						
-						if (Projectiles.getShooter(ent) == getState().getSelf()) {
-							return false;
-						}
-					}
-					
-					return true;
-				});
-				
-				world.addEntity(projectile);
+			EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
+					getState().getSelf(),
+					pos,
+					dir,
+					5.0f, PROJECTILE_RANGE);
+			
+			projectile.setFilter(new ProjectileFilter(this.getState(), hitAllies));
+			
+			world.addEntity(projectile);
 		}
 		
 		@Override
@@ -136,6 +118,43 @@ public class ProjectileShape extends SpellShape {
 	private static final String ID = "projectile";
 	private static final double PROJECTILE_RANGE = 30.0;
 	
+	private static final class ProjectileFilter implements Predicate<Entity> {
+
+		private final ISpellState state;
+		private final boolean hitAllies;
+		
+		public ProjectileFilter(ISpellState state, boolean hitAllies) {
+			this.state = state;
+			this.hitAllies = hitAllies;
+		}
+		
+		@Override
+		public boolean test(Entity ent) {
+			if (ent == null) {
+				return false;
+			}
+			
+			if (ent == state.getSelf()) {
+				return false;
+			}
+			
+			if (!hitAllies) {
+				if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(state.getSelf())) {
+					return false; // We own the target
+				}
+				if (PetFuncs.GetOwner(state.getSelf()) != null && PetFuncs.GetOwner(state.getSelf()).equals(ent)) {
+					return false; // ent owns us
+				}
+				
+				if (Projectiles.getShooter(ent) == state.getSelf()) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+	}
+	
 	public ProjectileShape() {
 		super(ID);
 	}
@@ -146,7 +165,7 @@ public class ProjectileShape extends SpellShape {
 	}
 
 	@Override
-	public ProjectileShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public ProjectileShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean atMax = false; // legacy
 		boolean hitAllies = false;
 		
@@ -213,6 +232,40 @@ public class ProjectileShape extends SpellShape {
 	@Override
 	public double getTraceRange(SpellShapePartProperties params) {
 		return PROJECTILE_RANGE;
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		boolean hitAllies = false;
+		final Vector3d dir;
+		final LivingEntity self = state.getSelf();
+		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
+			MobEntity ent = (MobEntity) self  ;
+			dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
+					.subtract(self.getPosX(), self.getPosY() + self.getEyeHeight(), self.getPosZ());
+		} else {
+			dir = Projectiles.getVectorForRotation(pitch, yaw);
+		}
+		
+		// We use param's flip to indicate whether allies should be hit
+		if (properties != null)
+			hitAllies = properties.flip;
+		
+		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, dir, (float) PROJECTILE_RANGE, new ProjectileFilter(state, hitAllies));
+		if (trace.getType() == RayTraceResult.Type.BLOCK) {
+			builder.add(new SpellShapePreviewComponent.Position(RayTrace.blockPosFromResult(trace)));
+			return true;
+		} else if (trace.getType() == RayTraceResult.Type.ENTITY) {
+			builder.add(new SpellShapePreviewComponent.Ent(RayTrace.livingFromRaytrace(trace)));
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 }

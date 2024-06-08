@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
@@ -39,7 +39,7 @@ public class MagicCyclerShape extends SpellShape {
 		private final float duration;
 		private final SpellCharacteristics characteristics;
 		
-		public MagicCyclerShapeInstance(SpellState state, World world, Vector3d pos, boolean onBlocks, float duration, SpellCharacteristics characteristics) {
+		public MagicCyclerShapeInstance(ISpellState state, World world, Vector3d pos, boolean onBlocks, float duration, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -98,7 +98,7 @@ public class MagicCyclerShape extends SpellShape {
 	}
 	
 	@Override
-	public MagicCyclerShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MagicCyclerShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// We use param's flip to indicate whether we should interact with blocks
 		boolean onBlocks = false;
 		if (params != null)
@@ -185,5 +185,11 @@ public class MagicCyclerShape extends SpellShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(true, true, params.flip);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
+		return false;
 	}
 }

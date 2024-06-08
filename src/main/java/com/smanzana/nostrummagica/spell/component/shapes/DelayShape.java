@@ -6,9 +6,11 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
@@ -30,7 +32,7 @@ public class DelayShape extends SpellShape {
 
 		private final int delayTicks;
 		
-		public DelayShapeInstance(SpellState state, int delayTicks, SpellCharacteristics characteristics) {
+		public DelayShapeInstance(ISpellState state, int delayTicks, SpellCharacteristics characteristics) {
 			super(state);
 			this.delayTicks = delayTicks;
 		}
@@ -66,7 +68,7 @@ public class DelayShape extends SpellShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new DelayShapeInstance(state, Math.max(20 * (int) supportedFloats()[0], (int) params.level), characteristics);
 	}
 	
@@ -138,6 +140,17 @@ public class DelayShape extends SpellShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(false, true, false);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
+		return true;
 	}
 	
 }

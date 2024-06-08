@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 
 import net.minecraft.block.Blocks;
@@ -31,7 +31,7 @@ public class ProximityShape extends SpellShape {
 		private boolean set;
 		private boolean dead;
 		
-		public ProximityShapeInstance(SpellState state, World world,
+		public ProximityShapeInstance(ISpellState state, World world,
 				Vector3d pos, float range, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
@@ -100,7 +100,7 @@ public class ProximityShape extends SpellShape {
 	}
 
 	@Override
-	public ProximityShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
+	public ProximityShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new ProximityShapeInstance(state, world, pos,
 				Math.max(supportedFloats()[0], params.level), characteristics);
@@ -163,5 +163,10 @@ public class ProximityShape extends SpellShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(false, true, false);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		return false;
 	}
 }

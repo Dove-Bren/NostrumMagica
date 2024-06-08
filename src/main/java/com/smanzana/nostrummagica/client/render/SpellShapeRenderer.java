@@ -10,12 +10,15 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
+import com.smanzana.nostrummagica.item.ISpellContainerItem;
+import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -64,7 +67,25 @@ public class SpellShapeRenderer {
 		MatrixStack matrixStackIn = event.getMatrixStack();
 		
 		// Figure out if we should show a preview
-		SpellShapePreview preview = player.randomUnused1 == 0 ? null : new SpellShapePreview();
+		SpellShapePreview preview = null;
+		
+		ItemStack held = player.getHeldItemMainhand();
+		if (!held.isEmpty() && held.getItem() instanceof ISpellContainerItem) {
+			Spell spell = ((ISpellContainerItem) held.getItem()).getSpell(held);
+			if (spell != null && spell.supportsPreview()) {
+				preview = spell.getPreview(player);
+			}
+		}
+		
+		if (preview == null) {
+			held = player.getHeldItemOffhand();
+			if (!held.isEmpty() && held.getItem() instanceof ISpellContainerItem) {
+				Spell spell = ((ISpellContainerItem) held.getItem()).getSpell(held);
+				if (spell != null && spell.supportsPreview()) {
+					preview = spell.getPreview(player);
+				}
+			}
+		}
 		
 		if (preview != null) {
 			for (SpellShapePreviewComponent comp : preview.getComponents()) {

@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.util.RayTrace;
 
@@ -45,7 +45,7 @@ public class BeamShape extends InstantShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Cast from eyes
 		pos = pos.add(0, state.getCaster().getEyeHeight(), 0);
 		

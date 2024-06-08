@@ -152,7 +152,7 @@ public class ModificationTableGui {
 						}
 					} else if (!stack.isEmpty() && stack.getItem() instanceof SpellScroll) {
 						// Shouldn't be null since we disallow null in the slot... but let's just be safe. This is UI code.
-						Spell spell = SpellScroll.getSpell(stack);
+						Spell spell = SpellScroll.GetSpell(stack);
 						if (spell != null) {
 							floatIndex = spell.getIconIndex();							
 						}
@@ -338,10 +338,10 @@ public class ModificationTableGui {
 				
 				
 				inputSlot.setRequired(required);
-				isValid = (SpellScroll.getSpell(inventory.getMainSlot()) != null);
+				isValid = (SpellScroll.GetSpell(inventory.getMainSlot()) != null);
 				
 				if (isValid) { // and therefore, spell is not null
-					int cur = SpellScroll.getSpell(inventory.getMainSlot()).getIconIndex();
+					int cur = SpellScroll.GetSpell(inventory.getMainSlot()).getIconIndex();
 					hasChange = cur != (int) this.floatIndex;
 				}
 				
@@ -377,8 +377,8 @@ public class ModificationTableGui {
 					// Allow removal if we actually have a spell
 					isValid = CasterWandItem.GetSpell(stack) != null;
 				} else if (inputItem.getItem() instanceof SpellScroll
-						&& SpellScroll.getSpell(inputItem) != null) {
-					isValid = CasterWandItem.CanStoreSpell(stack, SpellScroll.getSpell(inputItem));
+						&& SpellScroll.GetSpell(inputItem) != null) {
+					isValid = CasterWandItem.CanStoreSpell(stack, SpellScroll.GetSpell(inputItem));
 				}
 				
 				// Show scroll if nothing's in the wand
@@ -558,8 +558,8 @@ public class ModificationTableGui {
 						} else {
 							info = TextUtils.GetTranslatedList("modification.caster_wand.remove");
 						}
-					} else if (input.getItem() instanceof SpellScroll && SpellScroll.getSpell(input) != null) {
-						final Spell scrollSpell = SpellScroll.getSpell(input);
+					} else if (input.getItem() instanceof SpellScroll && SpellScroll.GetSpell(input) != null) {
+						final Spell scrollSpell = SpellScroll.GetSpell(input);
 						if (CasterWandItem.GetSpell(wand) == null) {
 							info = TextUtils.GetTranslatedList("modification.caster_wand.addspell", scrollSpell.getName());
 						} else {

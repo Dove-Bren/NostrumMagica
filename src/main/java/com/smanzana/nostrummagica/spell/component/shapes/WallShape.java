@@ -5,9 +5,9 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -41,7 +41,7 @@ public class WallShape extends AreaShape {
 		private double minZ;
 		private double maxZ;
 		
-		public WallShapeInstance(SpellState state, World world, Vector3d pos, boolean northsouth, float radius, boolean ignoreBlocks, SpellCharacteristics characteristics) {
+		public WallShapeInstance(ISpellState state, World world, Vector3d pos, boolean northsouth, float radius, boolean ignoreBlocks, SpellCharacteristics characteristics) {
 			super(state, world, new Vector3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, radius + .75f, true, !ignoreBlocks, characteristics);
 			this.radius = radius;
 			this.northsouth = northsouth;
@@ -156,7 +156,7 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public WallShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw,
+	public WallShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
 			SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Get N/S or E/W from target positions
 		final double dz = Math.abs(state.getCaster().getPosZ() - pos.z);
@@ -225,6 +225,12 @@ public class WallShape extends AreaShape {
 
 	@Override
 	public boolean shouldTrace(SpellShapePartProperties params) {
+		return false;
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
 		return false;
 	}
 }

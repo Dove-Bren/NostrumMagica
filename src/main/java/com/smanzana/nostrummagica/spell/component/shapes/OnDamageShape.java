@@ -13,9 +13,11 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -44,7 +46,7 @@ public class OnDamageShape extends SpellShape {
 		private int duration;
 		private boolean expired;
 		
-		public OnDamageShapeInstance(SpellState state, LivingEntity entity, int duration, SpellCharacteristics characteristics) {
+		public OnDamageShapeInstance(ISpellState state, LivingEntity entity, int duration, SpellCharacteristics characteristics) {
 			super(state);
 			this.entity = entity;
 			this.duration = duration == 0 ? 20 : duration;
@@ -114,7 +116,7 @@ public class OnDamageShape extends SpellShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new OnDamageShapeInstance(state, state.getSelf(), (int) params.level, characteristics);
 	}
 	
@@ -186,6 +188,17 @@ public class OnDamageShape extends SpellShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(false, true, false);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
+		return true;
 	}
 	
 }

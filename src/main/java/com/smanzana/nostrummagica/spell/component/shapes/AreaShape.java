@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -44,7 +44,7 @@ public abstract class AreaShape extends SpellShape {
 		private boolean dead;
 		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
-		public AreaShapeInstance(SpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround, SpellCharacteristics characteristics) {
+		public AreaShapeInstance(ISpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;

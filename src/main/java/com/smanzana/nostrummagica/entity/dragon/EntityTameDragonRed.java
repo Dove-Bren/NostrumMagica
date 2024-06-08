@@ -305,7 +305,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
-					spells[i] = SpellScroll.getSpell(scrolls.get(i));
+					spells[i] = SpellScroll.GetSpell(scrolls.get(i));
 				}
 				
 				return spells;
@@ -346,7 +346,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
-					spells[i] = SpellScroll.getSpell(scrolls.get(i));
+					spells[i] = SpellScroll.GetSpell(scrolls.get(i));
 				}
 				
 				return spells;
@@ -387,7 +387,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				
 				for (int i = 0; i < spells.length; i++) {
 					// We odn't check for null here cause we sanitize input on placement
-					spells[i] = SpellScroll.getSpell(scrolls.get(i));
+					spells[i] = SpellScroll.GetSpell(scrolls.get(i));
 				}
 				
 				return spells;
@@ -2257,7 +2257,7 @@ public class EntityTameDragonRed extends EntityDragonRedBase implements ITameabl
 				return false;
 			}
 			
-			if (SpellScroll.getSpell(stack) == null) {
+			if (SpellScroll.GetSpell(stack) == null) {
 				return false;
 			}
 			

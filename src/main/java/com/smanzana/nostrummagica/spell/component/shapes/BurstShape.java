@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -36,7 +36,7 @@ public class BurstShape extends InstantShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
 		this.spawnShapeEffect(state.getCaster(), null, world, pos, param, characteristics);
 		

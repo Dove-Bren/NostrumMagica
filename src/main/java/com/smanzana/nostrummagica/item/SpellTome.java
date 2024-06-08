@@ -977,7 +977,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (tome.isEmpty() || scroll.isEmpty())
 			return false;
 		
-		Spell spell = SpellScroll.getSpell(scroll);
+		Spell spell = SpellScroll.GetSpell(scroll);
 		if (spell == null)
 			return false;
 		

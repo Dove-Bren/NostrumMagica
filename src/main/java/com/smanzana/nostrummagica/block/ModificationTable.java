@@ -107,7 +107,7 @@ public class ModificationTable extends Block {
 		
 		return item instanceof SpellTome
 				//|| item instanceof SpellRune
-				|| (item instanceof SpellScroll && SpellScroll.getSpell(stack) != null)
+				|| (item instanceof SpellScroll && SpellScroll.GetSpell(stack) != null)
 				|| item instanceof WarlockSword
 				|| item instanceof CasterWandItem;
 	}

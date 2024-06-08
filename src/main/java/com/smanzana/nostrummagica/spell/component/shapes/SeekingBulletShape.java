@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.EntitySpellBullet;
@@ -9,7 +11,9 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
@@ -50,9 +54,7 @@ public class SeekingBulletShape extends SpellShape {
 		private final boolean ignoreAllies;
 		private final SpellCharacteristics characteristics;
 		
-		private LivingEntity target;
-		
-		public SeekingBulletShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean ignoreAllies, SpellCharacteristics characteristics) {
+		public SeekingBulletShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean ignoreAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -64,57 +66,15 @@ public class SeekingBulletShape extends SpellShape {
 		
 		@Override
 		public void spawn(LivingEntity caster) {
-			// Do a little more work of getting a good vector for things
-			// that aren't players
-			final Vector3d dir;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
-				MobEntity ent = (MobEntity) caster  ;
-				target = ent.getAttackTarget(); // We already know target
-				dir = null;
-			} else {
-				target = null; // Solve for target on main thread with raytrace
-				dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
-			}
-			
-			final SeekingBulletShapeInstance self = this;
-			
-			if (target == null) {
-				// Ray trace
-				RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MAX_DIST, (ent) -> {
-					if (getState().getSelf() == ent) {
-						return false;
-					}
-					
-					if (ent != null) {
-						
-						if (ignoreAllies) {
-							// Too strong?
-							LivingEntity living = NostrumMagica.resolveLivingEntity(ent);
-							if (living != null
-									&& NostrumMagica.IsSameTeam(getState().getSelf(), living)) {
-								return false;
-							}
-							
-							if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(getState().getSelf())) {
-								return false; // We own the target
-							}
-							if (PetFuncs.GetOwner(getState().getSelf()) != null && PetFuncs.GetOwner(getState().getSelf()).equals(ent)) {
-								return false; // ent owns us
-							}
-						}
-					}
-					
-					return true;
-				}, .5);
-				
-				target = RayTrace.livingFromRaytrace(mop);
-			}
+			final Vector3d start = this.getState().getSelf().getEyePosition(0f);
+			final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
+			LivingEntity target = FindTarget(this.getState().getSelf(), start, dir, this.ignoreAllies);
 			
 			// Get axis from where target is
 			Direction.Axis axis = Direction.Axis.Y;
 			Vector3d forwardDir = dir;
 			if (target != null) {
-				Vector3d vec = target.getPositionVec().subtract(caster.getPositionVec());
+				Vector3d vec = target.getPositionVec().subtract(getState().getSelf().getPositionVec());
 				forwardDir = vec.normalize();
 				axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 			}
@@ -135,7 +95,7 @@ public class SeekingBulletShape extends SpellShape {
 			
 			startMotion = startMotion.scale(.4);
 			
-			EntitySpellBullet bullet = new EntitySpellBullet(NostrumEntityTypes.spellBullet, self, getState().getSelf(), target, axis);
+			EntitySpellBullet bullet = new EntitySpellBullet(NostrumEntityTypes.spellBullet, this, getState().getSelf(), target, axis);
 			bullet.setMotion(startMotion);
 			//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 			
@@ -175,6 +135,52 @@ public class SeekingBulletShape extends SpellShape {
 			return this.characteristics.getElement();
 		}
 	}
+	
+	protected static final @Nullable LivingEntity FindTarget(LivingEntity self, Vector3d start, Vector3d direction, boolean ignoreAllies) {
+		// Do a little more work of getting a good vector for things
+		// that aren't players
+		LivingEntity target;
+		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
+			MobEntity ent = (MobEntity) self;
+			target = ent.getAttackTarget(); // We already know target
+		} else {
+			target = null; // Solve for target with raytrace
+		}
+		
+		if (target == null && start != null && direction != null) {
+			// Ray trace
+			RayTraceResult mop = RayTrace.raytraceApprox(self.world, self, start, direction, MAX_DIST, (ent) -> {
+				if (self == ent) {
+					return false;
+				}
+				
+				if (ent != null) {
+					
+					if (ignoreAllies) {
+						// Too strong?
+						LivingEntity living = NostrumMagica.resolveLivingEntity(ent);
+						if (living != null
+								&& NostrumMagica.IsSameTeam(self, living)) {
+							return false;
+						}
+						
+						if (PetFuncs.GetOwner(ent) != null && PetFuncs.GetOwner(ent).equals(self)) {
+							return false; // We own the target
+						}
+						if (PetFuncs.GetOwner(self) != null && PetFuncs.GetOwner(self).equals(ent)) {
+							return false; // ent owns us
+						}
+					}
+				}
+				
+				return true;
+			}, .5);
+			
+			target = RayTrace.livingFromRaytrace(mop);
+		}
+		
+		return target;
+	}
 
 	private static final String ID = "bullet";
 	
@@ -188,7 +194,7 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public SpellShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Add direction
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		return new SeekingBulletShapeInstance(state, world, pos, pitch, yaw, params.flip, characteristics);
@@ -266,6 +272,24 @@ public class SeekingBulletShape extends SpellShape {
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
 		return new SpellShapeAttributes(false, true, false);
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final Vector3d start = state.getSelf().getEyePosition(0f);
+		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
+		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, properties.flip);
+		if (target != null) {
+			builder.add(new SpellShapePreviewComponent.Ent(target));
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 }

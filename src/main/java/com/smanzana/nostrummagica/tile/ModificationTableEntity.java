@@ -203,7 +203,7 @@ public class ModificationTableEntity extends TileEntity implements IInventory {
 			this.setInventorySlotContents(1, ItemStack.EMPTY);
 			SpellRune.setPieceParam(stack, new SpellShapePartProperties(valF, valB));
 		} else if (stack.getItem() instanceof SpellScroll) {
-			Spell spell = SpellScroll.getSpell(stack);
+			Spell spell = SpellScroll.GetSpell(stack);
 			if (spell != null) {
 				spell.setIcon((int) valF);
 				this.setInventorySlotContents(1, ItemStack.EMPTY);
@@ -216,7 +216,7 @@ public class ModificationTableEntity extends TileEntity implements IInventory {
 			
 			// Make sure if we're going to try and put a spell in that it's not empty
 			if (!this.getInputSlot().isEmpty()) {
-				if (SpellScroll.getSpell(getInputSlot()) == null) {
+				if (SpellScroll.GetSpell(getInputSlot()) == null) {
 					return;
 				}
 			}
@@ -225,7 +225,7 @@ public class ModificationTableEntity extends TileEntity implements IInventory {
 			if (this.getInputSlot().isEmpty()) {
 				scrollSpell = null;
 			} else {
-				scrollSpell = SpellScroll.getSpell(this.getInputSlot());
+				scrollSpell = SpellScroll.GetSpell(this.getInputSlot());
 			}
 			if (scrollSpell == null || CasterWandItem.CanStoreSpell(stack, scrollSpell)) {
 				CasterWandItem.SetSpell(stack, scrollSpell);

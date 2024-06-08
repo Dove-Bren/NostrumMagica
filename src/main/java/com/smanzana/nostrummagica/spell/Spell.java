@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -26,6 +27,8 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape.SpellShapeInstance;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 
@@ -53,12 +56,25 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class Spell {
 	
-	public static class SpellState {
-		private final Spell spell;
-		private final float efficiency;
-		private final LivingEntity caster;
+	public static interface ISpellState {
+		public LivingEntity getSelf();
+		public LivingEntity getCaster();
+		
+		public boolean isPreview();
+		// May not be supported if isPreview() is true
+		public void triggerFail(World world, Vector3d pos);
+		public default void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations) {
+			this.trigger(targets, world, locations, false);
+		}
+		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit);
+	}
+	
+	public static class SpellState implements ISpellState {
+		protected final Spell spell;
+		protected final float efficiency;
+		protected final LivingEntity caster;
 
-		private int index;
+		protected int index;
 		private LivingEntity self;
 		private SpellShapeInstance shapeInstance;
 		
@@ -69,15 +85,16 @@ public class Spell {
 			this.spell = spell;
 		}
 		
-		/**
-		 * Callback given to spawned shapes.
-		 * Indicates the current shape has been done and the spell
-		 * should move forward
-		 */
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations) {
-			this.trigger(targets, world, locations, false);
+		public int getIndex() {
+			return index;
 		}
 		
+		@Override
+		public boolean isPreview() {
+			return false;
+		}
+		
+		@Override
 		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit) {
 			//for each target (if more than one), break into multiple spellstates
 			// persist index++ and set self, then start doing shapes or do ending effect
@@ -149,7 +166,7 @@ public class Spell {
 			NostrumMagicaSounds.CAST_CONTINUE.play(at);
 		}
 		
-		private void spawnShape(SpellShapePart shape, LivingEntity targ, World world, BlockPos targpos) {
+		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, BlockPos targpos) {
 			// instantiate trigger in world
 			Vector3d pos;
 			if (world == null)
@@ -166,26 +183,11 @@ public class Spell {
 			this.shapeInstance.spawn(caster);
 		}
 		
-		private SpellState split() {
+		protected SpellState split() {
 			SpellState spawn = new SpellState(spell, caster, this.efficiency);
 			spawn.index = this.index;
 			
 			return spawn;
-		}
-
-		public LivingEntity getSelf() {
-			return self;
-		}
-
-		public LivingEntity getCaster() {
-			return caster;
-		}
-
-		/**
-		 * Called when triggers fail to be triggered and have failed.
-		 */
-		public void triggerFail(World world, Vector3d pos) {
-			doFailEffect(world, pos);
 		}
 		
 		protected void doFailEffect(World world, Vector3d pos) {
@@ -253,7 +255,7 @@ public class Spell {
 			return bonus;
 		}
 		
-		private void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
+		protected void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
 			boolean first = true;
 			boolean anySuccess = false;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -364,6 +366,24 @@ public class Spell {
 					// Per element damage calculated by damage listener
 				});
 			}
+		}
+
+		@Override
+		public LivingEntity getSelf() {
+			return self;
+		}
+
+		@Override
+		public LivingEntity getCaster() {
+			return caster;
+		}
+
+		/**
+		 * Called when triggers fail to be triggered and have failed.
+		 */
+		@Override
+		public void triggerFail(World world, Vector3d pos) {
+			doFailEffect(world, pos);
 		}
 	}
 
@@ -952,5 +972,103 @@ public class Spell {
 		}
 		
 		return 0;
+	}
+	
+	public boolean supportsPreview() {
+		if (!getSpellShapeParts().isEmpty()) {
+			for (SpellShapePart shapePart : this.getSpellShapeParts()) {
+				if (!shapePart.getShape().supportsPreview(shapePart.getProperties())) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public @Nullable SpellShapePreview getPreview(LivingEntity caster) {
+		if (!getSpellShapeParts().isEmpty()) {
+			SpellShapePreview preview = new SpellShapePreview();
+			PreviewState previewState = new PreviewState(this, caster, preview);
+			previewState.trigger(Lists.newArrayList(caster), null, null);
+			return preview;
+		}
+		
+		return null;
+	}
+	
+	private static final class PreviewState extends SpellState {
+		
+		private final SpellShapePreview previewBuilder;
+		
+		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder) {
+			super(spell, caster, 1f);
+			this.previewBuilder = previewBuilder;
+		}
+		
+		@Override
+		public boolean isPreview() {
+			return true;
+		}
+		
+		@Override
+		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit) {
+			super.trigger(targets, world, locations, forceSplit);
+		}
+
+		@Override
+		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, BlockPos targpos) {
+			// For every spawned shape, we should get their special preview parts.
+			// Doing this may recurse into triggering this state, but that's alright.
+			// Automatically add the target/targetPos to the preview if provided, though.
+			
+			if (targ != null) {
+				this.previewBuilder.add(new SpellShapePreviewComponent.Ent(targ));
+			} else if (targpos != null) {
+				this.previewBuilder.add(new SpellShapePreviewComponent.Position(targpos));
+			}
+			
+			Vector3d pos;
+			if (world == null)
+				world = targ.world;
+			if (targ == null)
+				pos = new Vector3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
+			else
+				pos = targ.getPositionVec();
+			
+			shape.getShape().addToPreview(previewBuilder, this, world, pos,
+					(targ == null ? -90.0f : targ.rotationPitch),
+					(targ == null ? 0.0f : targ.rotationYaw),
+					shape.getProperties(), this.spell.getCharacteristics());
+		}
+		
+		@Override
+		protected void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
+			// Final affected targets or positions for this state
+		}
+
+		@Override
+		protected PreviewState split() {
+			PreviewState spawn = new PreviewState(spell, caster, this.previewBuilder);
+			spawn.index = this.index;
+			
+			return spawn;
+		}
+
+		@Override
+		protected void doFailEffect(World world, Vector3d pos) {
+			;
+		}
+
+		@Override
+		protected void playContinueEffect(World world, Vector3d where) {
+			;
+		}
+
+		@Override
+		protected void playContinueEffect(LivingEntity at) {
+			;
+		}
 	}
 }

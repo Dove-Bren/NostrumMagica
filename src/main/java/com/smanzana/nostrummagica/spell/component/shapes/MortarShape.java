@@ -8,9 +8,9 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.SpellState;
 import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -52,7 +52,7 @@ public class MortarShape extends SpellShape {
 		private final boolean noArc;
 		private final SpellCharacteristics characteristics;
 		
-		public MortarShapeInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, boolean noArc, SpellCharacteristics characteristics) {
+		public MortarShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean noArc, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -201,7 +201,7 @@ public class MortarShape extends SpellShape {
 	}
 
 	@Override
-	public MortarShapeInstance createInstance(SpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MortarShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean noArc = false;
 		
 		// We use param's flip to indicate whether to drop from the sky or not
@@ -267,6 +267,12 @@ public class MortarShape extends SpellShape {
 	@Override
 	public double getTraceRange(SpellShapePartProperties params) {
 		return MaxHDist;
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapePartProperties params) {
+		int unused; // Revisit
+		return false;
 	}
 	
 }
