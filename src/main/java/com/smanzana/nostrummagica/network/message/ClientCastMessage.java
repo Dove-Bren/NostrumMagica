@@ -54,13 +54,13 @@ public class ClientCastMessage {
 				if (!tome.isEmpty() && tome.getItem() instanceof SpellTome
 						&& SpellTome.getTomeID(tome) == tomeID) {
 					// Casting from a tome.
-					success = SpellCasting.AttemptToolCast(spell, sp, tome);
+					success = SpellCasting.AttemptToolCast(spell, sp, tome).succeeded;
 				} else {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					success = false;
 				}
 			} else {
-				success = SpellCasting.AttemptScrollCast(spell, sp);
+				success = SpellCasting.AttemptScrollCast(spell, sp).succeeded;
 			}
 
 			// Whether it failed or not, sync attributes to client.

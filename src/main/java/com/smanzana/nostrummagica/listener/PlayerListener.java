@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
+import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -269,7 +270,6 @@ public class PlayerListener {
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		tickCount = 0;
-		Spell.registerCastListener(this::onSpellCast);
 	}
 	
 	public void clearAll() {
@@ -1419,9 +1419,9 @@ public class PlayerListener {
 
 	protected Map<LivingEntity, Spell> lastSpell = new HashMap<>();
 	
-	//@SubscribeEvent
-	public void onSpellCast(LivingEntity caster, Spell spell) {
-		lastSpell.put(caster, spell);
+	@SubscribeEvent
+	public void onSpellCast(SpellCastEvent.Post event) {
+		lastSpell.put(event.getCaster(), event.getSpell());
 	}
 	
 	public @Nullable Spell getLastSpell(LivingEntity caster) {
@@ -1430,6 +1430,6 @@ public class PlayerListener {
 	
 	@OnlyIn(Dist.CLIENT)
 	public void overrideLastSpell(LivingEntity caster, Spell spell) {
-		onSpellCast(caster, spell);
+		lastSpell.put(caster, spell);
 	}
 }

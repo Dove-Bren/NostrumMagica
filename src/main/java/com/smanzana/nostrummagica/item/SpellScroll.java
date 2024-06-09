@@ -11,7 +11,9 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellRequestMessage;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
+import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -29,7 +31,9 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, ISpellContainerItem {
 
@@ -39,6 +43,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	
 	public SpellScroll() {
 		super(NostrumItems.PropUnstackable().rarity(Rarity.UNCOMMON).maxDamage(100));
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {
@@ -77,17 +82,17 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		if (spell == null)
 			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
 		
-		if (SpellCasting.AttemptScrollCast(spell, playerIn)) {
+		SpellCastResult result = SpellCasting.AttemptScrollCast(spell, playerIn);
+		if (result.succeeded) {
 			if (!playerIn.isCreative()) {
 				ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, GetSpell(itemStackIn)));
 			}
+			
+			// Set cooldown directly even though event handler will have already set it.
+			// Using a scroll has more cooldown than noticing other spells being cast.
+			playerIn.getCooldownTracker().setCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
 		}
 
-//		if (worldIn.isRemote) {
-//			NetworkHandler.sendToServer(
-//	    			new ClientCastMessage(spell, true, 0));
-//		}
-		
 		if (itemStackIn.getDamage() > itemStackIn.getMaxDamage() // Old way, I think never happens?
 				|| itemStackIn.isEmpty()) {
 			// Going to break
@@ -228,5 +233,16 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	@Override
 	public Spell getSpell(ItemStack stack) {
 		return GetSpell(stack);
+	}
+	
+	@SubscribeEvent
+	public void onSpellCast(SpellCastEvent.Post event) {
+		// Notice and respond any time any spell is cast to it's cooldown.
+		// Note that our r-click handler will actually replace this result with a larger one if it's a scroll that
+		// cast the spell.
+		final SpellCastResult result = event.getCastResult();
+		if (result.caster != null && result.caster instanceof PlayerEntity) {
+			((PlayerEntity) result.caster).getCooldownTracker().setCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(result));
+		}
 	}
 }

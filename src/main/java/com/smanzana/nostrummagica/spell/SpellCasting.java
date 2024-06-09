@@ -28,34 +28,69 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.MinecraftForge;
 
 public class SpellCasting {
 	
-	public static final boolean AttemptScrollCast(Spell spell, LivingEntity entity) {
+	public static final class SpellCastResult {
+		public final boolean succeeded;
+		public final Spell spell;
+		public final LivingEntity caster;
+		public final SpellCastSummary summary;
+		
+		protected SpellCastResult(boolean succeeded, Spell spell, LivingEntity caster, SpellCastSummary summary) {
+			this.succeeded = succeeded;
+			this.spell = spell;
+			this.caster = caster;
+			this.summary = summary;
+		}
+		
+		protected static final SpellCastResult fail(Spell spell, LivingEntity caster) {
+			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true)));
+		}
+		
+		protected static final SpellCastResult fail(Spell spell, LivingEntity caster, SpellCastSummary summary) {
+			return new SpellCastResult(false, spell, caster, summary);
+		}
+	}
+	
+	public static final SpellCastResult AttemptScrollCast(Spell spell, LivingEntity entity) {
 		return AttemptCast(spell, entity, ItemStack.EMPTY, true, false);
 	}
 	
-	public static final boolean AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
+	public static final SpellCastResult AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
 		final boolean freeCast = entity instanceof PlayerEntity
 				? ((PlayerEntity) entity).isCreative()
 				: false;
 		return AttemptCast(spell, entity, tool, freeCast, false);
 	}
 	
-	public static final boolean CheckToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
+	public static final SpellCastResult CheckToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
 		final boolean freeCast = entity instanceof PlayerEntity
 				? ((PlayerEntity) entity).isCreative()
 				: false;
 		return AttemptCast(spell, entity, tool, freeCast, true);
 	}
+	
+	private static final SpellCastResult EmitCastPostEvent(SpellCastResult result) {
+		MinecraftForge.EVENT_BUS.post(new SpellCastEvent.Post(result.spell, result.caster, result));
+		return result;
+	}
 
-	protected static final boolean AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, boolean freeCast, boolean checking) {
+	protected static final SpellCastResult AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, boolean freeCast, boolean checking) {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(entity);
 		@Nullable PlayerEntity playerCast = (entity instanceof PlayerEntity) ? (PlayerEntity) entity : null;
 		
+		final SpellCastEvent.Pre event = new SpellCastEvent.Pre(spell, entity);
+		if (MinecraftForge.EVENT_BUS.post(event)) {
+			NostrumMagica.logger.debug("Spell cast cancelled");
+		} else {
+			spell = event.getSpell();
+		}
+		
 		if (att == null) {
 			NostrumMagica.logger.warn("Could not look up entity magic wrapper");
-			return false;
+			return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
 		}
 		
 		// Check that the player can cast this (if it's not creative)
@@ -66,7 +101,7 @@ public class SpellCasting {
 				for (ITextComponent problem : problems) {
 					entity.sendMessage(problem, Util.DUMMY_UUID);
 				}
-				return false;
+				return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
 			}
 		}
 		
@@ -143,7 +178,7 @@ public class SpellCasting {
 			}
 			
 			if (mana < cost) {
-				return false;
+				return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
 			}
 			
 			reagents = CalculateRequiredReagents(spell, entity, summary);
@@ -154,7 +189,7 @@ public class SpellCasting {
 					int count = NostrumMagica.getReagentCount(playerCast, row.getKey());
 					if (count < row.getValue()) {
 						playerCast.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.DUMMY_UUID);
-						return false;
+						return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
 					}
 				}
 				
@@ -188,7 +223,7 @@ public class SpellCasting {
 				}
 				
 				if (cost > 0) {
-					return false;
+					return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
 				}
 			} else {
 				int avail = att.getMana();
@@ -221,7 +256,7 @@ public class SpellCasting {
 //				}
 				
 				if (cost > 0) {
-					return false;
+					return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
 				}
 			}
 		}
@@ -245,13 +280,22 @@ public class SpellCasting {
 			}
 		}
 		
-		return true;
+		return EmitCastPostEvent(new SpellCastResult(true, spell, entity, summary));
 	}
 	
 	public static final int CalculateEffectiveSpellWeight(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
 		final int base = spell.getWeight();
 		final int bonus = summary.getWeightDiscount();
 		return Math.max(0, base - bonus);
+	}
+	
+	public static final int CalculateSpellCooldown(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
+		final int weight = CalculateEffectiveSpellWeight(spell, caster, summary);
+		return 10 + (10 * (weight + 1));
+	}
+	
+	public static final int CalculateSpellCooldown(SpellCastResult result) {
+		return CalculateSpellCooldown(result.spell, result.caster, result.summary);
 	}
 	
 	private static final Map<ReagentType, Integer> NoReagentCost;

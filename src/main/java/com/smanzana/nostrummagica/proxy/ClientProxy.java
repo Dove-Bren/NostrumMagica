@@ -136,7 +136,7 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
 		bindingHUD = new KeyBinding("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingHUD);
-		bindingShapeHelp = new KeyBinding("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
+		bindingShapeHelp = new KeyBinding("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingShapeHelp);
 	}
 	
@@ -250,7 +250,7 @@ public class ClientProxy extends CommonProxy {
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
 		if (!tome.isEmpty()) {
-			if (SpellCasting.CheckToolCast(spell, player, tome)) {
+			if (SpellCasting.CheckToolCast(spell, player, tome).succeeded) {
 				NetworkHandler.sendToServer(
 		    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
 				NostrumMagica.playerListener.overrideLastSpell(player, spell);

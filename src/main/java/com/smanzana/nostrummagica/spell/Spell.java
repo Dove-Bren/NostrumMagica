@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.spell;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -496,7 +495,6 @@ public class Spell {
 		}
 		
 		SpellState state = new SpellState(this, caster, efficiency);
-		Spell.onCast(caster, this);
 		state.trigger(Lists.newArrayList(caster), null, null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
@@ -865,25 +863,6 @@ public class Spell {
 
 	public boolean isEmpty() {
 		return parts.isEmpty();
-	}
-	
-	public static interface ICastListener {
-		
-		public void onCast(LivingEntity entity, Spell spell);
-	}
-	
-	private static List<ICastListener> castListeners = new LinkedList<>();
-	public static void registerCastListener(ICastListener listener) {
-		castListeners.add(listener);
-	}
-	
-	private static void onCast(LivingEntity entity, Spell spell) {
-		if (castListeners.isEmpty())
-			return;
-		
-		for (ICastListener l : castListeners) {
-			l.onCast(entity, spell);
-		}
 	}
 	
 	public int getComponentCount() {

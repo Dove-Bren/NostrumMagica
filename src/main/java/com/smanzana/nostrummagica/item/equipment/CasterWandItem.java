@@ -237,7 +237,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		@Nullable Spell spell = this.getSpell(stack);
 		if (spell != null) {
 			if (worldIn.isRemote()) {
-				if (SpellCasting.CheckToolCast(spell, playerIn, stack)) {
+				if (SpellCasting.CheckToolCast(spell, playerIn, stack).succeeded) {
 					ItemStacks.damageItem(stack, playerIn, hand, 1);
 				} else {
 					for (int i = 0; i < 15; i++) {
@@ -254,7 +254,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 					((ClientProxy) NostrumMagica.instance.proxy).doManaWiggle(2);
 				}
 			} else {
-				if (SpellCasting.AttemptToolCast(spell, playerIn, stack)) {
+				if (SpellCasting.AttemptToolCast(spell, playerIn, stack).succeeded) {
 					ItemStacks.damageItem(stack, playerIn, hand, 1);
 					if (playerIn instanceof PlayerEntity) {
 						NostrumMagica.instance.proxy.sendMana((PlayerEntity) playerIn);
