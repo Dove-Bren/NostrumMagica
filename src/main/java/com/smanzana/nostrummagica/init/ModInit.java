@@ -32,6 +32,7 @@ import com.smanzana.nostrummagica.command.CommandReloadSkills;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSetManaArmor;
+import com.smanzana.nostrummagica.command.CommandSetTier;
 import com.smanzana.nostrummagica.command.CommandSpawnDungeon;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
@@ -1940,6 +1941,7 @@ public class ModInit {
 		CommandAllPatterns.register(dispatcher);
 		CommandReloadQuests.register(dispatcher);
 		CommandReloadSkills.register(dispatcher);
+		CommandSetTier.register(dispatcher);
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

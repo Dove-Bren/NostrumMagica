@@ -122,4 +122,13 @@ public enum EMagicElement {
 	public static EMagicElement getRandom(Random rand) {
 		return EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
 	}
+	
+	public static String[] GetNames() {
+		String[] names = new String[values().length];
+		int i = 0;
+		for (EMagicElement elem : values()) {
+			names[i++] = elem.getName();
+		}
+		return names;
+	}
 }

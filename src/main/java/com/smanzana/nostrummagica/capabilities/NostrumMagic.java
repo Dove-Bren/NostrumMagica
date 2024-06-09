@@ -23,8 +23,8 @@ import com.smanzana.nostrummagica.network.message.LoreMessage;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -83,11 +83,12 @@ public class NostrumMagic implements INostrumMagic {
 		}
 	}
 	
-	private boolean unlocked;
+	private EMagicTier tier;
 	private int level;
 	private float xp;
 	private float maxxp;
 	private int skillPoints;
+	private Map<EMagicElement, Integer> elementalSkillPoints;
 	private int researchPoints;
 	private int mana;
 	//private int maxMana; // We calculate max instead of storing it
@@ -123,7 +124,7 @@ public class NostrumMagic implements INostrumMagic {
 	private LivingEntity entity;
 	
 	public NostrumMagic() {
-		unlocked = false;
+		tier = EMagicTier.LOCKED;
 		//familiars = new ArrayList<>();
 		loreLevels = new HashMap<>();
 		spellCRCs = new HashSet<>();
@@ -139,6 +140,7 @@ public class NostrumMagic implements INostrumMagic {
 		sorceryPortalPos = null;
 		savedRespawnInfo = null;
 		enhancedTeleport = false;
+		elementalSkillPoints = new EnumMap<>(EMagicElement.class);
 		transmuteKnowledge = new HashMap<>();
 		skills = new HashSet<>();
 		
@@ -150,13 +152,13 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public boolean isUnlocked() {
-		return unlocked;
+		return this.getTier() != EMagicTier.LOCKED;
 	}
 
 	@Override
 	public void unlock() {
-		if (!unlocked) {
-			unlocked = true;
+		if (!isUnlocked()) {
+			tier = EMagicTier.MANI;
 			level = 1;
 			xp = 0;
 			baseMaxMana = LevelCurves.maxMana(1);
@@ -176,12 +178,20 @@ public class NostrumMagic implements INostrumMagic {
 			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
 	}
+
+	@Override
+	public EMagicTier getTier() {
+		return this.tier;
+	}
+
+	@Override
+	public void setTier(EMagicTier tier) {
+		this.tier = tier;
+	}
 	
 	private void levelup() {
 
 		level++;
-		this.addSkillPoint();
-		this.addSkillPoint();
 		this.addSkillPoint();
 		this.addResearchPoint();
 		this.addResearchPoint();
@@ -239,6 +249,21 @@ public class NostrumMagic implements INostrumMagic {
 	public void takeSkillPoint() {
 		if (this.skillPoints > 0)
 			this.skillPoints--;
+	}
+	
+	@Override
+	public int getElementalSkillPoints(EMagicElement element) {
+		return this.elementalSkillPoints.getOrDefault(element, 0);
+	}
+
+	@Override
+	public void addElementalSkillPoint(EMagicElement element) {
+		this.elementalSkillPoints.merge(element, 1, Integer::sum);
+	}
+
+	@Override
+	public void takeElementalSkillPoint(EMagicElement element) {
+		this.elementalSkillPoints.put(element, Math.max(0, this.getElementalSkillPoints(element) - 1));
 	}
 	
 	@Override
@@ -478,7 +503,7 @@ public class NostrumMagic implements INostrumMagic {
 			}
 			
 			// Old and unneeded?
-			doUnlockCheck();
+			//doUnlockCheck();
 		}
 		
 		return true;
@@ -498,17 +523,17 @@ public class NostrumMagic implements INostrumMagic {
 	public void addShape(SpellShape shape) {
 		shapes.add(shape);
 		
-		doUnlockCheck();
+		//doUnlockCheck();
 	}
 
 	@Override
 	public void unlockAlteration(EAlteration alteration) {
 		alterations.put(alteration, Boolean.TRUE);
-		doUnlockCheck();
+		//doUnlockCheck();
 	}
 	
 	private void doUnlockCheck() {
-		if (this.unlocked)
+		if (this.isUnlocked())
 			return;
 		
 		// Unlock (ritual of discovery) if at least one shape and trigger
@@ -540,9 +565,9 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void deserialize(boolean unlocked, int level, float xp, int skillpoints, int researchpoints,
+	public void deserialize(EMagicTier tier, int level, float xp, int skillpoints, int researchpoints,
 			int mana, int reservedMana) {
-		this.unlocked = unlocked;
+		this.tier = tier;
 		this.level = level;
 		this.xp = xp;
 		this.maxxp = LevelCurves.maxXP(this.level);
@@ -602,6 +627,16 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
+	public Map<EMagicElement, Integer> getElementalSkillPointsMap() {
+		return this.elementalSkillPoints;
+	}
+	
+	@Override
+	public void setElementalSkillPointMap(Map<EMagicElement, Integer> map) {
+		this.elementalSkillPoints = map;
+	}
+	
+	@Override
 	public void setTransmuteKnowledge(Map<TransmuteKnowledge, Boolean> map) {
 		this.transmuteKnowledge = new HashMap<>(map);
 	}
@@ -614,7 +649,7 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void copy(INostrumMagic cap) {
 		System.out.println("Overriding stats from" + this.mana + " to " + cap.getMana() + " mana");
-		this.deserialize(cap.isUnlocked(), cap.getLevel(), cap.getXP(),
+		this.deserialize(cap.getTier(), cap.getLevel(), cap.getXP(),
 				cap.getSkillPoints(), cap.getResearchPoints(),
 				cap.getMana(), cap.getReservedMana()
 				);

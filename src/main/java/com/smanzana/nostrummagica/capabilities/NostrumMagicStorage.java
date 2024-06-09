@@ -1,22 +1,26 @@
 package com.smanzana.nostrummagica.capabilities;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import com.smanzana.nostrummagica.capabilities.INostrumMagic.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
+import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.StringNBT;
@@ -32,10 +36,11 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 
-	private static final String NBT_UNLOCKED = "unlocked";
+	private static final String NBT_TIER = "tier";
 	private static final String NBT_LEVEL = "level";
 	private static final String NBT_XP = "xp";
 	private static final String NBT_SKILLPOINTS = "skillpoints";
+	private static final String NBT_ELEMENTAL_SKILLPOINTS = "elemental_skillpoints";
 	private static final String NBT_RESEARCHPOINTS = "researchpoints";
 	private static final String NBT_MANA = "mana";
 	private static final String NBT_RESERVED_MANA = "reserved_mana";
@@ -83,13 +88,15 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	public INBT writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side) {
 		CompoundNBT nbt = new CompoundNBT();
 		
-		nbt.putBoolean(NBT_UNLOCKED, instance.isUnlocked());
+		nbt.putString(NBT_TIER, instance.getTier().name().toLowerCase());
 		nbt.putInt(NBT_LEVEL, instance.getLevel());
 		nbt.putFloat(NBT_XP, instance.getXP());
 		nbt.putInt(NBT_SKILLPOINTS, instance.getSkillPoints());
 		nbt.putInt(NBT_RESEARCHPOINTS, instance.getResearchPoints());
 		nbt.putInt(NBT_MANA, instance.getMana());
 		nbt.putInt(NBT_RESERVED_MANA, instance.getReservedMana());
+		
+		nbt.put(NBT_ELEMENTAL_SKILLPOINTS, NetUtils.ToNBT(instance.getElementalSkillPointsMap(), IntNBT::valueOf));
 		
 		CompoundNBT compound = new CompoundNBT();
 		{
@@ -292,7 +299,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	@Override
 	public void readNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side, INBT nbt) {
 		CompoundNBT tag = (CompoundNBT) nbt;
-		instance.deserialize(tag.getBoolean(NBT_UNLOCKED),
+		EMagicTier tier = EMagicTier.LOCKED;
+		try {
+			tier = EMagicTier.valueOf(tag.getString(NBT_TIER).toUpperCase());
+		} catch (Exception e) {
+			tier = EMagicTier.LOCKED;
+		}
+		instance.deserialize(
+			tier,
 			tag.getInt(NBT_LEVEL),
 			tag.getFloat(NBT_XP),
 			tag.getInt(NBT_SKILLPOINTS),
@@ -300,6 +314,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			tag.getInt(NBT_MANA),
 			tag.getInt(NBT_RESERVED_MANA)
 			);
+		
+		Map<EMagicElement, Integer> elementalSkillPoints = new EnumMap<>(EMagicElement.class);
+		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntNBT) p).getInt());
+		instance.setElementalSkillPointMap(elementalSkillPoints);
 			
 		// LORE
 		CompoundNBT compound = tag.getCompound(NBT_LORELEVELS);

@@ -62,6 +62,14 @@ public interface INostrumMagic {
 		}
 	}
 	
+	public static enum EMagicTier {
+		LOCKED,
+		MANI,
+		KANI,
+		VANI,
+		LANI,
+	}
+	
 	// Unlock
 	public boolean isUnlocked();
 	public void unlock();
@@ -72,10 +80,16 @@ public interface INostrumMagic {
 	public float getMaxXP();
 	public void addXP(float xp);
 	public void setLevel(int level);
+	public EMagicTier getTier();
+	public void setTier(EMagicTier tier);
 	
 	public int getSkillPoints();
 	public void addSkillPoint();
 	public void takeSkillPoint();
+	
+	public int getElementalSkillPoints(EMagicElement element);
+	public void addElementalSkillPoint(EMagicElement element);
+	public void takeElementalSkillPoint(EMagicElement element);
 	
 	public int getResearchPoints();
 	public void addResearchPoint();
@@ -152,7 +166,7 @@ public interface INostrumMagic {
 	
 	// Serialization/Deserialization. Do not call.
 	public void deserialize(
-			boolean unlocked,
+			EMagicTier tier,
 			int level,
 			float xp,
 			int skillpoints,
@@ -171,6 +185,7 @@ public interface INostrumMagic {
 	public Map<UUID, Float> getManaCostModifiers();
 	public Map<UUID, Float> getManaRegenModifiers();
 	public Map<TransmuteKnowledge, Boolean> getTransmuteKnowledge();
+	public Map<EMagicElement, Integer> getElementalSkillPointsMap();
 	public void deserializeLore(String key, Integer level);
 	public void deserializeSpells(String crc);
 	public void setModifierMaps(Map<UUID, Float> modifiers_mana,
@@ -178,6 +193,7 @@ public interface INostrumMagic {
 			Map<UUID, Float> modifiers_cost,
 			Map<UUID, Float> modifiers_regen);
 	public void setTransmuteKnowledge(Map<TransmuteKnowledge, Boolean> map);
+	public void setElementalSkillPointMap(Map<EMagicElement, Integer> map);
 	
 	// Copy fields out of
 	public void copy(INostrumMagic cap);
