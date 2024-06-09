@@ -61,9 +61,9 @@ public class TouchShape extends InstantShape {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), world, null);
 		} else if (trace.getType() == RayTraceResult.Type.BLOCK) {
-			Vector3d vec = trace.getHitVec();
+			BlockPos hitPos = RayTrace.blockPosFromResult(trace);
 			return new TriggerData(null, world,
-					Lists.newArrayList(new BlockPos(Math.floor(vec.x), Math.floor(vec.y), Math.floor(vec.z))));
+					Lists.newArrayList(hitPos));
 		} else {
 			return new TriggerData(null, null, null);
 		}

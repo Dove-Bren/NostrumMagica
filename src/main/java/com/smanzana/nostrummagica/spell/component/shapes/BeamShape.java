@@ -72,7 +72,7 @@ public class BeamShape extends InstantShape {
 						&& RayTrace.livingFromRaytrace(trace) != null) {
 					targs.add(RayTrace.livingFromRaytrace(trace));
 				} else {
-					blocks.add(new BlockPos(trace.getHitVec().x, trace.getHitVec().y, trace.getHitVec().z));
+					blocks.add(RayTrace.blockPosFromResult(trace));
 				}
 			}
 		}

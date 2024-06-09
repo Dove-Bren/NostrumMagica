@@ -102,8 +102,7 @@ public class MortarShape extends SpellShape {
 					final LivingEntity hitEntity = RayTrace.livingFromRaytrace(mop);
 					dest = hitEntity.getPositionVec().add(0, hitEntity.getHeight()/2, 0);
 				} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
-					Vector3d actual = mop.getHitVec();
-					dest = new Vector3d(Math.floor(actual.x) + .5, Math.floor(actual.y) + .5, Math.floor(actual.z) + .5);
+					dest = Vector3d.copyCentered(RayTrace.blockPosFromResult(mop));
 				} else {
 					Vector3d actual = pos.add(dir.scale(MaxHDist));
 					dest = new Vector3d(Math.floor(actual.x) + .5, Math.floor(actual.y) + .5, Math.floor(actual.z) + .5);
@@ -117,7 +116,7 @@ public class MortarShape extends SpellShape {
 				// Drop from above
 				// Try not to start in the ceiling
 				BlockPos.Mutable cursor = new BlockPos.Mutable();
-				cursor.setPos(dest.x, dest.y + 3, dest.z); // start 3 above; best we can do
+				cursor.setPos(dest.x, dest.y + 2, dest.z); // start 2 (+1) above; best we can do
 				
 				for (int i = 0; i < 7; i++) {
 					cursor.move(Direction.UP);
@@ -285,6 +284,12 @@ public class MortarShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		boolean noArc = false;
+		
+		// We use param's flip to indicate whether to drop from the sky or not
+		if (properties != null)
+			noArc = properties.flip;
+		
 		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
 		
 		// Do a little more work of getting a good vector for things
@@ -325,7 +330,7 @@ public class MortarShape extends SpellShape {
 				state.trigger(Lists.newArrayList(hit), null, null);
 				success = true;
 			} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
-				dest = Vector3d.copyCentered(new BlockPos(mop.getHitVec()));
+				dest = Vector3d.copyCentered(RayTrace.blockPosFromResult(mop));
 				state.trigger(null, world, Lists.newArrayList(new BlockPos(dest)));
 				success = true;
 			} else {
@@ -336,11 +341,31 @@ public class MortarShape extends SpellShape {
 			}
 		}
 		
-		if (dir != null) {
-			// Offset so curve isn't in line with player vision
-			pos = pos.add(dir.normalize().rotateYaw(90f));
+		if (noArc) {
+			// Drop from above
+			// Try not to start in the ceiling
+			BlockPos.Mutable cursor = new BlockPos.Mutable();
+			cursor.setPos(dest.x, dest.y + 2, dest.z); // start 2 (+1) above; best we can do
+			
+			for (int i = 0; i < 7; i++) {
+				cursor.move(Direction.UP);
+				BlockState blockstate = world.getBlockState(cursor);
+				if (!(blockstate.getBlock() instanceof DungeonAir) && !world.isAirBlock(cursor)) {
+					// can't go here. Go back down and bail
+					cursor.move(Direction.DOWN);
+					break;
+				}
+			}
+			
+			Vector3d startPos = new Vector3d(dest.x, cursor.getY(), dest.z);
+			builder.add(new SpellShapePreviewComponent.Line(startPos, dest));
+		} else {
+			if (dir != null) {
+				// Offset so curve isn't in line with player vision
+				pos = pos.add(dir.normalize().rotateYaw(90f));
+			}
+			builder.add(new SpellShapePreviewComponent.Curve(pos, null, new Curves.Mortar(MortarShapeInstance.HVel, dest.subtract(pos), OverworldGravity)));
 		}
-		builder.add(new SpellShapePreviewComponent.Curve(pos, null, new Curves.Mortar(MortarShapeInstance.HVel, dest.subtract(pos), OverworldGravity)));
 		return success;
 	}
 	
