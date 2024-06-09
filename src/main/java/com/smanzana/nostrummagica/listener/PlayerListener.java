@@ -46,6 +46,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
+import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -791,17 +792,10 @@ public class PlayerListener {
 			
 		}
 		
-		if (event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().world.isRemote) {
-			//  TODO test this! Does this work now?
-//			// Scan for baubles, since Baubles doesn't call onUnequip when you die....
-//			if (NostrumMagica.instance.curios.isEnabled() && !event.getEntityLiving().world.getGameRules().getBoolean("keepInventory")) {
-//				NostrumMagica.instance.curios.forEachCurio(event.getEntityLiving(), (stack) -> {
-//					if (stack.getItem() instanceof INostrumCurio) {
-//						((INostrumCurio) stack.getItem()).onUnequipped(stack, event.getEntityLiving());
-//					}
-//					return false;
-//				});
-//			}
+		if (event.getEntityLiving() instanceof PlayerEntity) {
+			// Make sure to do on both sides
+			NostrumMagica.instance.getSpellCooldownTracker(event.getEntityLiving().world)
+				.clearCooldowns((PlayerEntity) event.getEntityLiving());
 		}
 	}
 	
@@ -1136,6 +1130,12 @@ public class PlayerListener {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getPlayer());
 		if (attr != null)
 			attr.clearFamiliars();
+		
+		if (event.getEntityLiving() instanceof PlayerEntity) {
+			// Make sure to do on both sides
+			NostrumMagica.instance.getSpellCooldownTracker(event.getEntityLiving().world)
+				.clearCooldowns(event.getPlayer());
+		}
 	}
 	
 //	@SubscribeEvent
@@ -1422,6 +1422,14 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onSpellCast(SpellCastEvent.Post event) {
 		lastSpell.put(event.getCaster(), event.getSpell());
+		
+		// Let this be the thing that updates spell cooldowns
+		if (event.getCastResult().succeeded && event.getCaster() instanceof PlayerEntity && !event.getCaster().world.isRemote()) {
+			final int cooldown = SpellCasting.CalculateSpellCooldown(event.getCastResult());
+			final int globalCooldown = SpellCasting.CalculateGlobalSpellCooldown(event.getCastResult());
+			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().world).setSpellCooldown((PlayerEntity) event.getCaster(), event.getSpell(), cooldown);
+			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().world).setGlobalCooldown((PlayerEntity) event.getCaster(), globalCooldown);
+		}
 	}
 	
 	public @Nullable Spell getLastSpell(LivingEntity caster) {

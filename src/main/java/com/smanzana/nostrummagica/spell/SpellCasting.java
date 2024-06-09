@@ -105,6 +105,11 @@ public class SpellCasting {
 			}
 		}
 		
+		if (NostrumMagica.instance.getSpellCooldownTracker(entity.world).hasCooldown(playerCast, spell)) {
+			NostrumMagica.logger.warn("Received spell cast while spell in cooldown: " + entity);
+			return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
+		}
+		
 		// Cast it!
 		boolean seen = att.wasSpellDone(spell);
 		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen));
@@ -291,11 +296,20 @@ public class SpellCasting {
 	
 	public static final int CalculateSpellCooldown(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
 		final int weight = CalculateEffectiveSpellWeight(spell, caster, summary);
-		return 10 + (10 * (weight + 1));
+		return 20 * (weight + 1);
 	}
 	
 	public static final int CalculateSpellCooldown(SpellCastResult result) {
 		return CalculateSpellCooldown(result.spell, result.caster, result.summary);
+	}
+	
+	public static final int CalculateGlobalSpellCooldown(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
+		final int weight = CalculateEffectiveSpellWeight(spell, caster, summary);
+		return 10 + (5 * weight);
+	}
+	
+	public static final int CalculateGlobalSpellCooldown(SpellCastResult result) {
+		return CalculateGlobalSpellCooldown(result.spell, result.caster, result.summary);
 	}
 	
 	private static final Map<ReagentType, Integer> NoReagentCost;

@@ -53,6 +53,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
 import com.smanzana.nostrummagica.spell.SpellRegistry;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
@@ -112,6 +113,10 @@ public class NostrumMagica {
 	public static PlayerStatListener statListener;
 	public static MagicEffectProxy magicEffectProxy;
 	public static ManaArmorListener manaArmorListener;
+	
+	// Better way to do this?
+	private static SpellCooldownTracker server_spellCooldownTracker;
+	private static SpellCooldownTracker client_spellCooldownTracker;
 
 	// Cached references that have sketchy access rules. See uses in this file.
 	private static SpellRegistry spellRegistry;
@@ -939,6 +944,20 @@ public class NostrumMagica {
 		}
 
 		return success;
+	}
+	
+	public SpellCooldownTracker getSpellCooldownTracker(World world) {
+		if (world.isRemote()) {
+			if (client_spellCooldownTracker == null) {
+				client_spellCooldownTracker = new SpellCooldownTracker();
+			}
+			return client_spellCooldownTracker;
+		} else {
+			if (server_spellCooldownTracker == null) {
+				server_spellCooldownTracker = new SpellCooldownTracker();
+			}
+			return server_spellCooldownTracker;
+		}
 	}
 	
 	public static final @Nonnull ResourceLocation Loc(String path) {

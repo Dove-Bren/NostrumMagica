@@ -47,6 +47,7 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCooldownTracker.SpellCooldown;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -558,6 +559,14 @@ public class OverlayRenderer extends AbstractGui {
 			}
 			
 			// Fade if can't cast it?
+			
+			// Show cooldown
+			final SpellCooldown cooldown = NostrumMagica.instance.getSpellCooldownTracker(mc.player.world).getSpellCooldown(mc.player, spell);
+			if (cooldown != null && cooldown.endTicks > mc.player.ticksExisted) {
+				final float prog = (float) (mc.player.ticksExisted - cooldown.startTicks) / (cooldown.endTicks - cooldown.startTicks);
+				final int progPixels = (int) ((height-2) * prog);
+				RenderFuncs.drawRect(matrixStackIn, 1, 1 + progPixels, width-1, height-1, 0xDDDDDDDD);
+			}
 		}
 	}
 	

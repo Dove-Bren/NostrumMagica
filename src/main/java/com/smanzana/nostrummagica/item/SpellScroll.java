@@ -241,8 +241,20 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		// Note that our r-click handler will actually replace this result with a larger one if it's a scroll that
 		// cast the spell.
 		final SpellCastResult result = event.getCastResult();
-		if (result.caster != null && result.caster instanceof PlayerEntity) {
-			((PlayerEntity) result.caster).getCooldownTracker().setCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(result));
+		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity) {
+			// Vulnerability: vanilla's tracker only returns us progress which means we can't REALLY check if our new
+			// cooldown time is going to be less than what's already there.
+			// If we blindly PUT, player's can get around long cooldowns by casting a short-cooldown spell after
+			// a long one.
+			// If we only put when there is no cooldown, player's can cast a short cooldown spell and then use it as immunity
+			// if they cast a long-cooldown spell before then.
+			// That seems like the harder thing to do, so opt to let that happen. Try to guess though at 25% of remaining as a
+			// good time to let it be overriden.
+			
+			final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
+			if (((PlayerEntity) result.caster).getCooldownTracker().getCooldown(this.getItem(), 0f) <= .25f) {
+				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(this.getItem(), cooldownTicks);
+			}
 		}
 	}
 }
