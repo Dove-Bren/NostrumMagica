@@ -1,5 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.mirror;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +10,7 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -15,7 +19,10 @@ import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseSkillMessage;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
+import com.smanzana.nostrummagica.progression.skill.SkillCategory;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -44,7 +51,9 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	
 	private final ITextComponent name;
 	private final ItemStack icon;
+	private final Map<SkillCategory, SkillCategoryButton> skillTabs;
 	private final Map<Skill, SkillButton> buttons;
+	private SkillCategory activeCategory;
 	
 	private PlayerEntity player;
 	private INostrumMagic attr;
@@ -55,6 +64,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		name = new TranslationTextComponent("mirror.tab.skill.name");
 		icon = new ItemStack(NostrumItems.spellTomeCombat, 1);
 		buttons = new HashMap<>();
+		this.skillTabs = new HashMap<>();
 	}
 	
 	@Override
@@ -84,18 +94,45 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		this.height = height;
 		
 		buttons.clear();
+		skillTabs.clear();
+		Map<SkillCategory, List<Skill>> categories = new HashMap<>();
+		
 		final Rectangle2d bounds = new Rectangle2d(guiLeft, guiTop, width, height);
 		for (Skill skill : Skill.allSkills()) {
-			final int buttonX = guiLeft + (width/2) + (skill.getPlotX() * GRID_SCALE);
-			final int buttonY = guiTop + (height/2) + (-skill.getPlotY() * GRID_SCALE);
+			final int buttonWidth = POS_BUTTON_WIDTH;
+			final int buttonHeight = POS_BUTTON_HEIGHT;
+			final int buttonX = guiLeft + (width/2) + (skill.getPlotX() * GRID_SCALE) - (buttonWidth / 2);
+			final int buttonY = guiTop + (height/2) + (-skill.getPlotY() * GRID_SCALE) - (buttonHeight / 2);
 			
 			SkillButton button = new SkillButton(this, skill,
 					buttonX, buttonY,
-					POS_BUTTON_WIDTH, POS_BUTTON_HEIGHT);
+					buttonWidth, buttonHeight);
 			button.setBounds(bounds);
 			parent.addWidget(button);
 			buttons.put(skill, button);
+			
+			categories.computeIfAbsent(skill.getCategory(), (s) -> new ArrayList<>()).add(skill);
 		}
+		
+		// Create category buttons
+		List<SkillCategory> categoryTypes = Lists.newArrayList(categories.keySet());
+		Collections.sort(categoryTypes, (l, r) -> {
+			// Make magica be first, like research
+			if (l == NostrumSkills.Category_Magica) {
+				return -1;
+			}
+			if (r == NostrumSkills.Category_Magica) {
+				return 1;
+			}
+			return l.getID().getPath().compareTo(r.getID().getPath());
+		});
+		for (SkillCategory category : categoryTypes) {
+			SkillCategoryButton categoryButton = new SkillCategoryButton(this, category);
+			categoryButton.setChildren(categories.get(category));
+			parent.addMinorTab(categoryButton);
+			skillTabs.put(category, categoryButton);
+		}
+		
 		
 		setButtonPositions();
 		
@@ -131,16 +168,39 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 				0xFF000000, 0xFF000000,
 				0x40000000, 0x40000000);
 		
-		matrixStackIn.translate(0, 8, 0);
 		
-		String str = "Skillpoints: " + attr.getSkillPoints();
-		int strWidth = font.getStringWidth(str);
-		matrixStackIn.push();
-		matrixStackIn.scale(.75f, .75f, 1f);
-		font.drawString(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
-		matrixStackIn.pop();
+		final EMagicElement activeElement = this.activeCategory.getSkillpointType();
+		if (activeElement == null) {
+			matrixStackIn.translate(0, 8, 0);
+			String str = "Skillpoints: " + attr.getSkillPoints();
+			int strWidth = font.getStringWidth(str);
+			matrixStackIn.push();
+			matrixStackIn.scale(.75f, .75f, 1f);
+			font.drawString(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
+			matrixStackIn.pop();
+		} else {
+			matrixStackIn.translate(0, 4, 0);
+			String str = "Skillpoints: " + attr.getElementalSkillPoints(activeElement);
+			int strWidth = font.getStringWidth(str);
+			matrixStackIn.push();
+			matrixStackIn.scale(.75f, .75f, 1f);
+			font.drawString(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
+			matrixStackIn.pop();
+			matrixStackIn.translate(0, font.FONT_HEIGHT, 0);
+			
+			{
+				final int xp = attr.getElementXP(activeElement);
+				final int maxXP = attr.getElementMaxXP(activeElement);
+				
+				final int barWidth = 64;
+				final int barHeight = 3;
+				final int x = Math.round(((float) xp / (float) maxXP) * (float) barWidth);
+				RenderFuncs.drawRect(matrixStackIn, - (barWidth/2), 0, + (barWidth / 2), 2 + barHeight, 0xFF555555);
+				RenderFuncs.drawRect(matrixStackIn, - (barWidth/2) + 1, 0 + 1, (barWidth / 2) - 1, 1 + barHeight, 0xFF000000);
+				RenderFuncs.drawRect(matrixStackIn, - (barWidth/2) + 1, 0 + 1, - (barWidth/2) + 1 + x, 1 + barHeight, 0xFFFFFF00);
+			}
+		}
 		
-		matrixStackIn.translate(0, font.FONT_HEIGHT, 0);
 		
 		matrixStackIn.pop();
 	}
@@ -157,13 +217,21 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	
 	protected void setButtonPositions() {
 		for (SkillButton button : buttons.values()) {
-			final int offsetX = button.getStartingX() - (width / 2);
-			final int offsetY = button.getStartingY() - (height / 2);
+			final int offsetX = button.getStartingX() - ((width) / 2);
+			final int offsetY = button.getStartingY() - ((height) / 2);
 			
 			
 			final int scaledX = (width/2) + (int) ((offsetX + this.getPanX()) * this.getPanScale());
 			final int scaledY = (height/2) + (int) ((offsetY + this.getPanY()) * this.getPanScale());
 			button.setPosition(scaledX, scaledY);
+		}
+	}
+	
+	protected boolean hasSkillPointsFor(Skill skill) {
+		if (skill.getCategory().getSkillpointType() == null) {
+			return attr.getSkillPoints() > 0;
+		} else {
+			return attr.getElementalSkillPoints(skill.getCategory().getSkillpointType()) > 0;
 		}
 	}
 	
@@ -173,7 +241,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		final Skill skill = button.skill;
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		if (button.state == SkillState.AVAILABLE && attr != null && attr.getSkillPoints() > 0) {
+		if (button.state == SkillState.AVAILABLE && attr != null && hasSkillPointsFor(skill)) {
 			// do on client too for instant feedback
 			attr.addSkill(skill);
 			
@@ -183,6 +251,11 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			
 			button.updateState();
 		}
+	}
+	
+	protected void onCategoryButton(SkillCategory category) {
+		this.activeCategory = category;
+		this.resetPan();
 	}
 	
 	protected static enum SkillState {
@@ -212,7 +285,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		protected void updateState() {
 			if (subscreen.attr.hasSkill(skill)) {
 				this.state = SkillState.OWNED;
-			} else if (!skill.isHidden(subscreen.player) && subscreen.attr.getSkillPoints() > 0) {
+			} else if (!skill.isHidden(subscreen.player) && subscreen.hasSkillPointsFor(skill)) {
 				this.state = SkillState.AVAILABLE;
 			} else {
 				this.state = SkillState.UNAVAILABLE;
@@ -364,7 +437,59 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		public boolean isHidden() {
-			return skill.isHidden(subscreen.player) || !skill.meetsRequirements(subscreen.player);
+			return skill.getCategory() != subscreen.activeCategory
+					|| skill.isHidden(subscreen.player)
+					|| !skill.meetsRequirements(subscreen.player);
+		}
+	}
+	
+	private static final class SkillCategoryButton implements IMirrorMinorTab {
+		
+		protected final SkillCategory category;
+		private final ITextComponent name;
+		private final List<Skill> children;
+		
+		public SkillCategoryButton(MirrorSkillSubscreen subscreen, SkillCategory category) {
+			this.category = category;
+			this.name = category.getName();
+			this.children = new ArrayList<>(32);
+		}
+
+		@Override
+		public void onClick(IMirrorScreen parent, IMirrorSubscreen subscreenIn) {
+			MirrorSkillSubscreen subscreen = ((MirrorSkillSubscreen) subscreenIn);
+			subscreen.onCategoryButton(this.category);
+		}
+
+		@Override
+		public ITextComponent getName() {
+			return name;
+		}
+
+		@Override
+		public void renderTab(IMirrorScreen parent, IMirrorSubscreen subscreen, MatrixStack matrixStackIn, int width, int height) {
+			RenderFuncs.RenderGUIItem(category.getIcon(), matrixStackIn, (width - 16) / 2, (height - 16) / 2);
+		}
+
+		@Override
+		public boolean isVisible(IMirrorScreen parent, IMirrorSubscreen subscreenIn) {
+			MirrorSkillSubscreen subscreen = (MirrorSkillSubscreen) subscreenIn;
+			for (Skill child : children) {
+				if (!child.isHidden(subscreen.player) && child.meetsRequirements(subscreen.player)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public void setChildren(Collection<Skill> children) {
+			this.children.clear();
+			this.children.addAll(children);
+		}
+
+		@Override
+		public boolean hasNewEntry(IMirrorScreen parent, IMirrorSubscreen subscreen) {
+			return false;
 		}
 	}
 	

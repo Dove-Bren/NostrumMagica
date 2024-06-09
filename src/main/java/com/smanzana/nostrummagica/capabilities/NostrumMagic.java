@@ -83,12 +83,32 @@ public class NostrumMagic implements INostrumMagic {
 		}
 	}
 	
+	public static class ElementCurves {
+	
+		private static final int growth = 100;
+		private static final int base = 50;
+		
+		public static int maxXP(int level) {
+			return base + (growth * (level - 1));
+		}
+		
+		public static int elementalSkillLevel(int xp) {
+			if (xp < base) {
+				return 1;
+			}
+			
+			xp -= base;
+			return 2 + xp / growth;
+		}
+	}
+	
 	private EMagicTier tier;
 	private int level;
 	private float xp;
 	private float maxxp;
 	private int skillPoints;
 	private Map<EMagicElement, Integer> elementalSkillPoints;
+	private Map<EMagicElement, Integer> elementalXP;
 	private int researchPoints;
 	private int mana;
 	//private int maxMana; // We calculate max instead of storing it
@@ -143,6 +163,7 @@ public class NostrumMagic implements INostrumMagic {
 		elementalSkillPoints = new EnumMap<>(EMagicElement.class);
 		transmuteKnowledge = new HashMap<>();
 		skills = new HashSet<>();
+		elementalXP = new EnumMap<>(EMagicElement.class);
 		
 		modMana = new HashMap<>();
 		modManaFlat = new HashMap<>();
@@ -670,6 +691,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.transmuteKnowledge = cap.getTransmuteKnowledge();
 		this.setModifierMaps(cap.getManaModifiers(), cap.getManaBonusModifiers(), cap.getManaCostModifiers(), cap.getManaRegenModifiers());
 		this.skills.clear(); this.skills.addAll(cap.getSkills());
+		this.elementalXP.clear(); this.elementalXP.putAll(cap.getElementalXPMap());
 	}
 	
 	@Override
@@ -1012,4 +1034,40 @@ public class NostrumMagic implements INostrumMagic {
 	public void addSkill(Skill skill) {
 		skills.add(skill);
 	}
+
+	@Override
+	public int getElementXP(EMagicElement element) {
+		return this.elementalXP.getOrDefault(element, 0);
+	}
+
+	@Override
+	public int getElementMaxXP(EMagicElement element) {
+		final int effectiveLevel = ElementCurves.elementalSkillLevel(this.getElementXP(element));
+		return ElementCurves.maxXP(effectiveLevel);
+	}
+
+	@Override
+	public void addElementXP(EMagicElement element, int xp) {
+		final int oldXP = this.getElementXP(element);
+		final int newXP = xp + oldXP;
+		this.elementalXP.put(element, newXP);
+		int oldLvl = ElementCurves.elementalSkillLevel(newXP - xp);
+		int newLvl = ElementCurves.elementalSkillLevel(newXP);
+		if (oldLvl < newLvl) {
+			for (int i = 0; i < (newLvl - oldLvl); i++) {
+				this.addElementalSkillPoint(element);
+			}
+		}
+	}
+
+	@Override
+	public Map<EMagicElement, Integer> getElementalXPMap() {
+		return elementalXP;
+	}
+
+	@Override
+	public void setElementalXPMap(Map<EMagicElement, Integer> map) {
+		this.elementalXP = map;
+	}
+	
 }

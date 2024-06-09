@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.progression.skill.Skill;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -32,8 +33,23 @@ public class ClientPurchaseSkillMessage {
 				return;
 			}
 			
-			if (!att.hasSkill(message.skill) && !message.skill.isHidden(sp) && message.skill.meetsRequirements(sp) && att.getSkillPoints() > 0) {
-				att.takeSkillPoint();
+			if (!att.hasSkill(message.skill) && !message.skill.isHidden(sp) && message.skill.meetsRequirements(sp)) {
+				EMagicElement skillPointType = message.skill.getCategory().getSkillpointType();
+				if (skillPointType == null) {
+					if (att.getSkillPoints() <= 0) {
+						return;
+					}
+				} else {
+					if (att.getElementalSkillPoints(skillPointType) <= 0) {
+						return;
+					}
+				}
+				
+				if (skillPointType == null) {
+					att.takeSkillPoint();
+				} else {
+					att.takeElementalSkillPoint(skillPointType);
+				}
 				message.skill.addToPlayer(sp);
 			}
 			

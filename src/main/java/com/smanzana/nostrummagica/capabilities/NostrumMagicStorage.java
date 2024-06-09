@@ -41,6 +41,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_XP = "xp";
 	private static final String NBT_SKILLPOINTS = "skillpoints";
 	private static final String NBT_ELEMENTAL_SKILLPOINTS = "elemental_skillpoints";
+	private static final String NBT_ELEMENTAL_XP = "elemental_xp";
 	private static final String NBT_RESEARCHPOINTS = "researchpoints";
 	private static final String NBT_MANA = "mana";
 	private static final String NBT_RESERVED_MANA = "reserved_mana";
@@ -97,6 +98,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.putInt(NBT_RESERVED_MANA, instance.getReservedMana());
 		
 		nbt.put(NBT_ELEMENTAL_SKILLPOINTS, NetUtils.ToNBT(instance.getElementalSkillPointsMap(), IntNBT::valueOf));
+		nbt.put(NBT_ELEMENTAL_XP, NetUtils.ToNBT(instance.getElementalXPMap(), IntNBT::valueOf));
 		
 		CompoundNBT compound = new CompoundNBT();
 		{
@@ -318,6 +320,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		Map<EMagicElement, Integer> elementalSkillPoints = new EnumMap<>(EMagicElement.class);
 		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntNBT) p).getInt());
 		instance.setElementalSkillPointMap(elementalSkillPoints);
+		
+		Map<EMagicElement, Integer> elementalXP = new EnumMap<>(EMagicElement.class);
+		NetUtils.FromNBT(elementalXP, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_XP), (p) -> ((IntNBT) p).getInt());
+		instance.setElementalXPMap(elementalXP);
 			
 		// LORE
 		CompoundNBT compound = tag.getCompound(NBT_LORELEVELS);

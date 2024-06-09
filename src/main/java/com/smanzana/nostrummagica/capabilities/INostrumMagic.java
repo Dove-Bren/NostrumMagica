@@ -13,8 +13,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
@@ -23,6 +23,8 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public interface INostrumMagic {
@@ -68,6 +70,23 @@ public interface INostrumMagic {
 		KANI,
 		VANI,
 		LANI,
+		;
+		
+		private EMagicTier() {
+			
+		}
+		
+		public boolean isGreaterOrEqual(EMagicTier tier) {
+			return this.ordinal() >= tier.ordinal();
+		}
+		
+		public String getRawName() {
+			return getName().getString();
+		}
+		
+		public TextComponent getName() {
+			return new TranslationTextComponent("tier." + this.name().toLowerCase() + ".name");
+		}
 	}
 	
 	// Unlock
@@ -90,6 +109,10 @@ public interface INostrumMagic {
 	public int getElementalSkillPoints(EMagicElement element);
 	public void addElementalSkillPoint(EMagicElement element);
 	public void takeElementalSkillPoint(EMagicElement element);
+	
+	public int getElementXP(EMagicElement element);
+	public int getElementMaxXP(EMagicElement element);
+	public void addElementXP(EMagicElement element, int xp);
 	
 	public int getResearchPoints();
 	public void addResearchPoint();
@@ -186,6 +209,7 @@ public interface INostrumMagic {
 	public Map<UUID, Float> getManaRegenModifiers();
 	public Map<TransmuteKnowledge, Boolean> getTransmuteKnowledge();
 	public Map<EMagicElement, Integer> getElementalSkillPointsMap();
+	public Map<EMagicElement, Integer> getElementalXPMap();
 	public void deserializeLore(String key, Integer level);
 	public void deserializeSpells(String crc);
 	public void setModifierMaps(Map<UUID, Float> modifiers_mana,
@@ -194,6 +218,7 @@ public interface INostrumMagic {
 			Map<UUID, Float> modifiers_regen);
 	public void setTransmuteKnowledge(Map<TransmuteKnowledge, Boolean> map);
 	public void setElementalSkillPointMap(Map<EMagicElement, Integer> map);
+	public void setElementalXPMap(Map<EMagicElement, Integer> map);
 	
 	// Copy fields out of
 	public void copy(INostrumMagic cap);

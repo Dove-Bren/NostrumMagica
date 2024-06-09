@@ -936,6 +936,12 @@
 	"pages.desc": "A spell page is a custom loadout of spells",
     "modifier.name": "Modifier",
     "modifier.desc": "Modifiers are used to add additional tome pages to spell tomes, adding new enhancements.",
+	
+	"tier.locked.name": "Non-Magic",
+	"tier.mani.name": "Mani",
+	"tier.kani.name": "Kani",
+	"tier.vani.name": "Vani",
+	"tier.lani.name": "Lani",
 
     "info.quest.accept": "Click to Complete",
     "info.research.purchase": "Click to Purchase",
@@ -950,6 +956,7 @@
 	"info.requirement.research": "Researched %1$s",
 	"info.requirement.alteration": "Mastery of the %1$s alteration",
 	"info.requirement.skill": "The %1$s skill",
+	"info.requirement.tier": "%1$s tier",
 	
 	"stat.nostrummagica.mana.totalspent": "Mana Spent",
 	"stat.nostrummagica.mana.maxreserved": "Max Mana Reserved",
@@ -1486,6 +1493,15 @@
     "quest.maxdmg6.name": "Clever Caster VI",
     "quest.maxdmg7.name": "Clever Caster VII",
 	
+	"skill.category.nostrummagica.magica": "Core Skills",
+	"skill.category.nostrummagica.physical": "Physical Skills",
+	"skill.category.nostrummagica.fire": "Fire Skills",
+	"skill.category.nostrummagica.ice": "Ice Skills",
+	"skill.category.nostrummagica.earth": "Earth Skills",
+	"skill.category.nostrummagica.wind": "Wind Skills",
+	"skill.category.nostrummagica.lightning": "Lightning Skills",
+	"skill.category.nostrummagica.ender": "Ender Skills",
+	
 	"skill.nostrummagica.spellcraft.twoshapes": "Dual Shapes",
 	"skill.nostrummagica.spellcraft.twoshapes.desc": "Allows use of two shapes in a single spell.",
 	"skill.nostrummagica.spellcraft.element_building": "Elemental Cooperation",
@@ -1551,7 +1567,7 @@
 	"skill.nostrummagica.lightning.adept": "Lightning Adept Training",
 	"skill.nostrummagica.lightning.adept.desc": "Adds 1 damage to lightning spell damage and conjured lightning bolts.",
 	"skill.nostrummagica.lightning.master": "Lightning Master Training",
-	"skill.nostrummagica.lightning.master.desc": "Restores mana upon being struck by lightning.",
+	"skill.nostrummagica.lightning.master.desc": "Restores mana when nearby entities are struck by lightning.",
 	
 	"skill.nostrummagica.ender.novice": "Ender Novice Training",
 	"skill.nostrummagica.ender.novice.desc": "Boosts potency of ender effects by 20%%.",

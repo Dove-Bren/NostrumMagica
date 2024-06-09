@@ -206,7 +206,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			font.drawStringWithShadow(matrixStackIn, xp, -strWidth, 0, colorKey);
 			matrixStackIn.translate(0, font.FONT_HEIGHT + 2, 0);
 			
-			final String tier = attr.getTier().name().substring(0, 1) + attr.getTier().name().toLowerCase().substring(1) + " Tier";
+			final String tier = attr.getTier().getRawName() + " Tier";
 			strWidth = font.getStringWidth(tier) / 2;
 			font.drawStringWithShadow(matrixStackIn, tier, -strWidth, 0, colorKey);
 		}
