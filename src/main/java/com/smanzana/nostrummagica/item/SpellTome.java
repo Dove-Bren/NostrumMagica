@@ -54,7 +54,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay, ISpellCastingTool {
+public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay, ISpellCastingTool, ISpellContainerItem {
 	
 	public static enum TomeStyle {
 		NOVICE, // Blue and simple
@@ -1032,5 +1032,36 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (caster instanceof PlayerEntity) {
 			SpellTome.doSpecialCastEffects(stack, (PlayerEntity) caster);
 		}
+	}
+
+	@Override
+	public Spell getSpell(ItemStack stack) {
+		// If the last spell a player cast is in this time, return that.
+		// Otherwise return first spell on the page they're on.
+		@Nullable Spell ret = null;
+		@Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		if (player != null) {
+			@Nullable Spell lastSpell = NostrumMagica.playerListener.getLastSpell(player);
+			if (lastSpell != null) {
+				List<Spell> library = getSpellLibrary(stack);
+				if (library != null && library.stream().anyMatch((s) -> s.getRegistryID() == lastSpell.getRegistryID())) {
+					ret = lastSpell;
+				}
+			}
+		}
+		
+		if (ret == null) {
+			Spell[] pageSpells = getSpellsInCurrentPage(stack);
+			if (pageSpells != null) {
+				for (int i = 0; i < pageSpells.length; i++) {
+					if (pageSpells[i] != null) {
+						ret = pageSpells[i];
+						break;
+					}
+				}
+			}
+		}
+		
+		return ret;
 	}
 }

@@ -136,7 +136,7 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
 		bindingHUD = new KeyBinding("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingHUD);
-		bindingShapeHelp = new KeyBinding("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_F, "key.nostrummagica.desc");
+		bindingShapeHelp = new KeyBinding("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingShapeHelp);
 	}
 	
@@ -253,6 +253,7 @@ public class ClientProxy extends CommonProxy {
 			if (SpellCasting.CheckToolCast(spell, player, tome)) {
 				NetworkHandler.sendToServer(
 		    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
+				NostrumMagica.playerListener.overrideLastSpell(player, spell);
 			} else {
 				for (int i = 0; i < 15; i++) {
 					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;

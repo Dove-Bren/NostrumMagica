@@ -43,6 +43,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
@@ -69,6 +70,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -266,6 +269,7 @@ public class PlayerListener {
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		tickCount = 0;
+		Spell.registerCastListener(this::onSpellCast);
 	}
 	
 	public void clearAll() {
@@ -1411,5 +1415,21 @@ public class PlayerListener {
 				}
 			}
 		}
+	}
+
+	protected Map<LivingEntity, Spell> lastSpell = new HashMap<>();
+	
+	//@SubscribeEvent
+	public void onSpellCast(LivingEntity caster, Spell spell) {
+		lastSpell.put(caster, spell);
+	}
+	
+	public @Nullable Spell getLastSpell(LivingEntity caster) {
+		return lastSpell.get(caster);
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	public void overrideLastSpell(LivingEntity caster, Spell spell) {
+		onSpellCast(caster, spell);
 	}
 }
