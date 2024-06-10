@@ -263,6 +263,9 @@ public class NostrumItems {
 	@ObjectHolder(NostrumResourceItem.ID_EVIL_THISTLE) public static NostrumResourceItem resourceEvilThistle;
 	@ObjectHolder(NostrumResourceItem.ID_DRAGON_WING) public static NostrumResourceItem resourceDragonWing;
 	@ObjectHolder(NostrumResourceItem.ID_SEEKING_GEM) public static NostrumResourceItem resourceSeekingGem;
+	@ObjectHolder(NostrumResourceItem.ID_SKILL_OOZE) public static NostrumResourceItem resourceSkillOoze;
+	@ObjectHolder(NostrumResourceItem.ID_SKILL_PENDANT) public static NostrumResourceItem resourceSkillPendant;
+	@ObjectHolder(NostrumResourceItem.ID_SKILL_FLUTE) public static NostrumResourceItem resourceSkillFlute;
 	@ObjectHolder(NostrumResourceCrystal.ID_CRYSTAL_SMALL) public static NostrumResourceCrystal crystalSmall;
 	@ObjectHolder(NostrumResourceCrystal.ID_CRYSTAL_MEDIUM) public static NostrumResourceCrystal crystalMedium;
 	@ObjectHolder(NostrumResourceCrystal.ID_CRYSTAL_LARGE) public static NostrumResourceCrystal crystalLarge;
@@ -270,9 +273,6 @@ public class NostrumItems {
 	@ObjectHolder(NostrumRoseItem.ID_ELDRICH_ROSE) public static NostrumRoseItem roseEldrich;
 	@ObjectHolder(NostrumRoseItem.ID_PALE_ROSE) public static NostrumRoseItem rosePale;
 	@ObjectHolder(NostrumSkillItem.ID_SKILL_MIRROR) public static NostrumSkillItem.Mirror skillMirror;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_OOZE) public static NostrumSkillItem.Ooze skillOoze;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_PENDANT) public static NostrumSkillItem.Pendant skillPendant;
-	@ObjectHolder(NostrumSkillItem.ID_SKILL_FLUTE) public static NostrumSkillItem.Flute skillFlute;
 	@ObjectHolder(NostrumSkillItem.ID_SKILL_ENDER_PIN) public static NostrumSkillItem.EnderPin skillEnderPin;
 	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_SMALL) public static NostrumSkillItem.SmallScroll skillScrollSmall;
 	@ObjectHolder(NostrumSkillItem.ID_SKILL_SCROLL_LARGE) public static NostrumSkillItem.LargeScroll skillScrollLarge;
@@ -563,6 +563,9 @@ public class NostrumItems {
     	register(registry, new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_EVIL_THISTLE));
     	register(registry, new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_DRAGON_WING));
     	register(registry, new NostrumResourceItem().setRegistryName(NostrumResourceItem.ID_SEEKING_GEM));
+    	register(registry, new NostrumResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(NostrumResourceItem.ID_SKILL_OOZE));
+    	register(registry, new NostrumResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(NostrumResourceItem.ID_SKILL_PENDANT));
+    	register(registry, new NostrumResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(NostrumResourceItem.ID_SKILL_FLUTE));
     	register(registry, new NostrumResourceCrystal(NostrumBlocks.maniCrystalBlock, PropBase()).setRegistryName(NostrumResourceCrystal.ID_CRYSTAL_SMALL));
     	register(registry, new NostrumResourceCrystal(NostrumBlocks.kaniCrystalBlock, PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(NostrumResourceCrystal.ID_CRYSTAL_MEDIUM));
     	register(registry, new NostrumResourceCrystal(NostrumBlocks.vaniCrystalBlock, PropBase().rarity(Rarity.RARE)).setRegistryName(NostrumResourceCrystal.ID_CRYSTAL_LARGE));
@@ -570,9 +573,6 @@ public class NostrumItems {
     	register(registry, new NostrumRoseItem().setRegistryName(NostrumRoseItem.ID_ELDRICH_ROSE));
     	register(registry, new NostrumRoseItem().setRegistryName(NostrumRoseItem.ID_PALE_ROSE));
     	register(registry, new NostrumSkillItem.Mirror().setRegistryName(NostrumSkillItem.ID_SKILL_MIRROR));
-    	register(registry, new NostrumSkillItem.Ooze().setRegistryName(NostrumSkillItem.ID_SKILL_OOZE));
-    	register(registry, new NostrumSkillItem.Pendant().setRegistryName(NostrumSkillItem.ID_SKILL_PENDANT));
-    	register(registry, new NostrumSkillItem.Flute().setRegistryName(NostrumSkillItem.ID_SKILL_FLUTE));
     	register(registry, new NostrumSkillItem.EnderPin().setRegistryName(NostrumSkillItem.ID_SKILL_ENDER_PIN));
     	register(registry, new NostrumSkillItem.SmallScroll().setRegistryName(NostrumSkillItem.ID_SKILL_SCROLL_SMALL));
     	register(registry, new NostrumSkillItem.LargeScroll().setRegistryName(NostrumSkillItem.ID_SKILL_SCROLL_LARGE));

@@ -32,9 +32,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 
 	public static final String ID_SKILL_MIRROR = "primordial_mirror";
-	public static final String ID_SKILL_OOZE = "essential_ooze";
-	public static final String ID_SKILL_PENDANT = "eldrich_pendant";
-	public static final String ID_SKILL_FLUTE = "living_flute";
 	public static final String ID_SKILL_ENDER_PIN = "ender_pin";
 	public static final String ID_SKILL_SCROLL_SMALL = "research_scroll_small";
 	public static final String ID_SKILL_SCROLL_LARGE = "research_scroll_large";
@@ -121,42 +118,6 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 				attr.addSkillPoint();
 				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_MIRROR), Util.DUMMY_UUID);
 				return true;
-			});
-		}
-	}
-	
-	public static class Ooze extends NostrumSkillItem {
-		public Ooze() {
-			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
-				int unused;
-				return false;
-//				attr.addControl();
-//				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_OOZE), Util.DUMMY_UUID);
-//				return true;
-			});
-		}
-	}
-	
-	public static class Pendant extends NostrumSkillItem {
-		public Pendant() {
-			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
-				int unused;
-				return false;
-//				attr.addTech();
-//				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_PENDANT), Util.DUMMY_UUID);
-//				return true;
-			});
-		}
-	}
-	
-	public static class Flute extends NostrumSkillItem {
-		public Flute() {
-			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
-				int unused;
-				return false;
-//				attr.addFinesse();
-//				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_FLUTE), Util.DUMMY_UUID);
-//				return true;
 			});
 		}
 	}

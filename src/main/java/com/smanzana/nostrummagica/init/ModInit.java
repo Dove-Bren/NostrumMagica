@@ -680,66 +680,25 @@ public class ModInit {
 							new OutcomeSpawnItem(MagicCharm.getCharm(element, 8))));
 		}
 
-		// Mirror from wing
+		// Skill mirror
 		registry
 				.register(RitualRecipe.createTier3("form_primordial_mirror",
 						new ItemStack(NostrumItems.skillMirror), null,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 								ReagentType.SPIDER_SILK },
 						Ingredient.fromTag(Tags.Items.GLASS_PANES),
-						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
-								Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
+						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.SkillItemOoze),
+								Ingredient.fromTag(NostrumTags.Items.SkillItemPendant),
 								Ingredient.fromTag(NostrumTags.Items.DragonWing),
-								Ingredient.fromTag(NostrumTags.Items.CrystalMedium)
+								Ingredient.fromTag(NostrumTags.Items.SkillItemFlute)
 								},
-						new ResearchRequirement("stat_items_wing"),
+						new ResearchRequirement("stat_items"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
-
-		// Mirror from roses
-		registry
-				.register(RitualRecipe.createTier3("form_primordial_mirror_blood", "form_primordial_mirror", 
-						new ItemStack(NostrumItems.skillMirror), null,
-						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
-								ReagentType.SPIDER_SILK },
-						Ingredient.fromTag(Tags.Items.GLASS_PANES),
-						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.RoseBlood),
-								Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
-								Ingredient.fromTag(NostrumTags.Items.RoseBlood),
-								Ingredient.fromTag(NostrumTags.Items.RoseBlood)
-								},
-						new ResearchRequirement("stat_items_adv"),
-						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
-		registry
-		.register(RitualRecipe.createTier3("form_primordial_mirror_pale", "form_primordial_mirror",
-				new ItemStack(NostrumItems.skillMirror), null,
-				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
-						ReagentType.SPIDER_SILK },
-				Ingredient.fromTag(Tags.Items.GLASS_PANES),
-				new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.RosePale),
-						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
-						Ingredient.fromTag(NostrumTags.Items.RosePale),
-						Ingredient.fromTag(NostrumTags.Items.RosePale)
-						},
-				new ResearchRequirement("stat_items_adv"),
-				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
-		registry
-		.register(RitualRecipe.createTier3("form_primordial_mirror_eldrich", "form_primordial_mirror", 
-				new ItemStack(NostrumItems.skillMirror), null,
-				new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
-						ReagentType.SPIDER_SILK },
-				Ingredient.fromTag(Tags.Items.GLASS_PANES),
-				new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.RoseEldrich),
-						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
-						Ingredient.fromTag(NostrumTags.Items.RoseEldrich),
-						Ingredient.fromTag(NostrumTags.Items.RoseEldrich)
-						},
-				new ResearchRequirement("stat_items_adv"),
-				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 
 		// Ooze
 		registry
 				.register(RitualRecipe.createTier3("form_essential_ooze",
-						new ItemStack(NostrumItems.skillOoze), null,
+						new ItemStack(NostrumItems.resourceSkillOoze), null,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK },
 						Ingredient.fromTag(Tags.Items.SLIMEBALLS),
 						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
@@ -747,12 +706,12 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.RosePale),
 								Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
 						new ResearchRequirement("stat_items"),
-						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillOoze))));
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSkillOoze))));
 
 		// Flute
 		registry
 				.register(RitualRecipe
-						.createTier3("form_living_flute", new ItemStack(NostrumItems.skillFlute), null,
+						.createTier3("form_living_flute", new ItemStack(NostrumItems.resourceSkillFlute), null,
 								new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
 										ReagentType.SPIDER_SILK },
 								Ingredient.fromItems(Items.SUGAR_CANE),
@@ -761,11 +720,11 @@ public class ModInit {
 										Ingredient.fromTag(NostrumTags.Items.RoseBlood),
 										Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
 								new ResearchRequirement("stat_items"),
-								new OutcomeSpawnItem(new ItemStack(NostrumItems.skillFlute))));
+								new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSkillFlute))));
 
 		// Pendant
 		registry.register(RitualRecipe.createTier3("form_eldrich_pendant",
-				new ItemStack(NostrumItems.skillPendant), null,
+				new ItemStack(NostrumItems.resourceSkillPendant), null,
 				new ReagentType[] {
 						ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK },
 				Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
@@ -774,7 +733,7 @@ public class ModInit {
 						Ingredient.fromTag(NostrumTags.Items.RoseEldrich),
 						Ingredient.fromTag(NostrumTags.Items.CrystalMedium) },
 				new ResearchRequirement("stat_items"),
-				new OutcomeSpawnItem(new ItemStack(NostrumItems.skillPendant))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSkillPendant))));
 
 		// Ender pin
 		registry
@@ -1836,20 +1795,22 @@ public class ModInit {
 		NostrumResearch.startBuilding().hiddenParent("vani").lore(NostrumItems.roseBlood)
 				.reference("ritual::form_essential_ooze", "ritual.form_essential_ooze.name")
 				.reference("ritual::form_living_flute", "ritual.form_living_flute.name")
-				.reference("ritual::form_eldrich_pendant", "ritual.form_eldrich_pendant.name").build("stat_items",
+				.reference("ritual::form_eldrich_pendant", "ritual.form_eldrich_pendant.name")
+				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
+				.build("stat_items",
 						NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, -2, -1, true,
-						new ItemStack(NostrumItems.skillPendant));
+						new ItemStack(NostrumItems.resourceSkillPendant));
 
-		NostrumResearch.startBuilding().parent("stat_items")
-				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
-				.build("stat_items_adv", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 0, true,
-						new ItemStack(NostrumItems.skillMirror));
-
-		NostrumResearch.startBuilding().parent("stat_items_adv").lore(NostrumItems.dragonEggFragment)
-				.lore(NostrumItems.skillPendant)
-				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
-				.build("stat_items_wing", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 1, true,
-						new ItemStack(NostrumItems.resourceDragonWing));
+//		NostrumResearch.startBuilding().parent("stat_items")
+//				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
+//				.build("stat_items_adv", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 0, true,
+//						new ItemStack(NostrumItems.skillMirror));
+//
+//		NostrumResearch.startBuilding().parent("stat_items_adv").lore(NostrumItems.dragonEggFragment)
+//				.lore(NostrumItems.resourceSkillPendant)
+//				.reference("ritual::form_primordial_mirror", "ritual.form_primordial_mirror.name")
+//				.build("stat_items_wing", NostrumResearchTab.ADVANCED_MAGICA, Size.NORMAL, -2, 1, true,
+//						new ItemStack(NostrumItems.resourceDragonWing));
 
 		NostrumResearch.startBuilding().parent("stat_items").hiddenParent("sorceryportal")
 				.reference("ritual::ender_pin", "ritual.ender_pin.name").build("ender_pin",

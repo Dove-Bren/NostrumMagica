@@ -145,9 +145,9 @@ public class PortingUtil {
 		id = "nostrummagica:skillitem";
 		{
 			submap.put(0, NostrumItems.skillMirror);
-			submap.put(1, NostrumItems.skillOoze);
-			submap.put(2, NostrumItems.skillPendant);
-			submap.put(3, NostrumItems.skillFlute);
+			submap.put(1, NostrumItems.resourceSkillOoze);
+			submap.put(2, NostrumItems.resourceSkillPendant);
+			submap.put(3, NostrumItems.resourceSkillFlute);
 			submap.put(4, NostrumItems.resourceDragonWing);
 			submap.put(5, NostrumItems.skillEnderPin);
 			submap.put(6, NostrumItems.skillScrollSmall);
