@@ -19,10 +19,13 @@ import com.smanzana.nostrummagica.item.ISpellContainerItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
+import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
@@ -47,7 +50,9 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, ISpellContainerItem, IRaytraceOverlay, ISpellCastingTool {
 
@@ -59,6 +64,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	
 	public CasterWandItem() {
 		super(ItemTier.WOOD, 2, -2.4F, NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(300));
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@Override
@@ -256,10 +262,6 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 			} else {
 				if (SpellCasting.AttemptToolCast(spell, playerIn, stack).succeeded) {
 					ItemStacks.damageItem(stack, playerIn, hand, 1);
-					if (playerIn instanceof PlayerEntity) {
-						NostrumMagica.instance.proxy.sendMana((PlayerEntity) playerIn);
-						((PlayerEntity) playerIn).getCooldownTracker().setCooldown(stack.getItem(), 20);
-					}
 				}
 			}
 		}
@@ -273,7 +275,23 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	public void onFinishCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
-		;
+		if (caster instanceof PlayerEntity) {
+			NostrumMagica.instance.proxy.sendMana((PlayerEntity) caster);
+			((PlayerEntity) caster).getCooldownTracker().setCooldown(stack.getItem(), 20);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onSpellCast(SpellCastEvent.Post event) {
+		// Notice and respond any time any spell is cast.
+		// Note that our spell caster handler will have put in a smaller one already, so this will replace it.
+		final SpellCastResult result = event.getCastResult();
+		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && NostrumMagica.getMagicWrapper(result.caster) != null) {
+			if (!NostrumMagica.getMagicWrapper(result.caster).hasSkill(NostrumSkills.Spellcasting_ToolCooldown)) {
+				final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
+				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(this.getItem(), cooldownTicks);
+			}
+		}
 	}
 
 }

@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -414,7 +415,7 @@ public class SpellCreationGui {
 			}
 			
 			List<ITextComponent> problems = new ArrayList<>();
-			if (!NostrumMagica.canCast(spell, this.context.magic, problems)) {
+			if (!getCraftContext().magic.hasSkill(NostrumSkills.Spellcraft_Proxy) && !NostrumMagica.canCast(spell, this.context.magic, problems)) {
 				this.spellErrorStrings.add(new StringTextComponent("You could not cast this spell:"));
 				for (ITextComponent problem : problems) {
 					this.spellErrorStrings.add(problem);

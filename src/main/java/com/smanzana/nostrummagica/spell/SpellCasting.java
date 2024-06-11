@@ -305,7 +305,13 @@ public class SpellCasting {
 	
 	public static final int CalculateGlobalSpellCooldown(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
 		final int weight = CalculateEffectiveSpellWeight(spell, caster, summary);
-		return 10 + (5 * weight);
+		int base = 40;
+		if (caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
+			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Spellcasting_CooldownReduc)) {
+				base = 10;
+			}
+		}
+		return base + (5 * weight);
 	}
 	
 	public static final int CalculateGlobalSpellCooldown(SpellCastResult result) {

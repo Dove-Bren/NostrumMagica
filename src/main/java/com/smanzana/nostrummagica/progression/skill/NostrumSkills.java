@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.progression.skill;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.progression.requirement.ElementMasteryRequirement;
+import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -29,6 +31,9 @@ public class NostrumSkills {
 	private static final ResourceLocation ID_SPELLCRAFT_ELEMWEIGHT = NostrumMagica.Loc("spellcraft.elemweight");
 	private static final ResourceLocation ID_SPELLCRAFT_MANADISCOUNT1 = NostrumMagica.Loc("spellcraft.manadiscount1");
 	private static final ResourceLocation ID_SPELLCRAFT_MANADISCOUNT2 = NostrumMagica.Loc("spellcraft.manadiscount2");
+	private static final ResourceLocation ID_SPELLCRAFT_INFOPANEL = NostrumMagica.Loc("spellcraft.infopanel");
+	private static final ResourceLocation ID_SPELLCRAFT_ALTERATIONS = NostrumMagica.Loc("spellcraft.alterations");
+	private static final ResourceLocation ID_SPELLCRAFT_PROXY = NostrumMagica.Loc("spellcraft.proxy");
 
 	private static final ResourceLocation ID_SPELLCAST_ELEMFREE = NostrumMagica.Loc("spellcast.elemfree");
 	private static final ResourceLocation ID_SPELLCAST_ELEMWEIGHT = NostrumMagica.Loc("spellcast.elemweight");
@@ -36,6 +41,10 @@ public class NostrumSkills {
 	private static final ResourceLocation ID_SPELLCAST_ELEMLINGER = NostrumMagica.Loc("spellcast.elemlinger");
 	private static final ResourceLocation ID_SPELLCAST_WEIGHT1 = NostrumMagica.Loc("spellcast.weight1");
 	private static final ResourceLocation ID_SPELLCAST_POTENCY1 = NostrumMagica.Loc("spellcast.potency1");
+	private static final ResourceLocation ID_SPELLCAST_SCROLLSANITY = NostrumMagica.Loc("spellcast.scrollsanity");
+	private static final ResourceLocation ID_SPELLCAST_SCROLLEFFICIENCY = NostrumMagica.Loc("spellcast.scrollefficiency");
+	private static final ResourceLocation ID_SPELLCAST_TOOLCOOLDOWN = NostrumMagica.Loc("spellcast.toolcooldown");
+	private static final ResourceLocation ID_SPELLCAST_COOLDOWNREDUC = NostrumMagica.Loc("spellcast.cooldownreduc");
 	
 	private static final ResourceLocation ID_PHYSICAL_NOVICE = NostrumMagica.Loc("physical.novice");
 	private static final ResourceLocation ID_PHYSICAL_ADEPT = NostrumMagica.Loc("physical.adept");
@@ -71,6 +80,9 @@ public class NostrumSkills {
 	public static /*final*/ Skill Spellcraft_ElemWeight;
 	public static /*final*/ Skill Spellcraft_ManaDiscount1;
 	public static /*final*/ Skill Spellcraft_ManaDiscount2;
+	public static /*final*/ Skill Spellcraft_Infopanel;
+	public static /*final*/ Skill Spellcraft_Alterations;
+	public static /*final*/ Skill Spellcraft_Proxy;
 
 	public static /*final*/ Skill Spellcasting_ElemFree;
 	public static /*final*/ Skill Spellcasting_ElemWeight;
@@ -78,6 +90,10 @@ public class NostrumSkills {
 	public static /*final*/ Skill Spellcasting_Potency1;
 	public static /*final*/ Skill Spellcasting_ElemMana;
 	public static /*final*/ Skill Spellcasting_ElemLinger;
+	public static /*final*/ Skill Spellcasting_ScrollSanity;
+	public static /*final*/ Skill Spellcasting_ScrollEfficiency;
+	public static /*final*/ Skill Spellcasting_ToolCooldown;
+	public static /*final*/ Skill Spellcasting_CooldownReduc;
 	
 	public static /*final*/ Skill Physical_Novice;
 	public static /*final*/ Skill Physical_Adept;
@@ -110,22 +126,36 @@ public class NostrumSkills {
 	public static void init() {
 		Skill.ClearSkills();
 		int x = -1;
-		int y = 1;
-		Spellcraft_TwoShapes = new Skill(ID_SPELLCRAFT_TWOSHAPES, Category_Magica, null, () -> SpellRune.getRune(NostrumSpellShapes.Touch), x, y);
-		Spellcraft_ElemBuilding = new Skill(ID_SPELLCRAFT_ELEMBUILDING, Category_Magica, ID_SPELLCRAFT_TWOSHAPES, () -> SpellRune.getRune(EMagicElement.ICE), x-1, y+1);
-		Spellcraft_ElemWeight = new Skill(ID_SPELLCRAFT_ELEMWEIGHT, Category_Magica, ID_SPELLCRAFT_ELEMBUILDING, () -> new ItemStack(Items.FEATHER), x-2, y+1);
-		Spellcraft_Weight1 = new Skill(ID_SPELLCRAFT_WEIGHT1, Category_Magica, ID_SPELLCRAFT_TWOSHAPES, () -> new ItemStack(NostrumItems.masteryOrb), x-1, y-1);
+		int y = 0;
+		Spellcraft_Alterations = new Skill(ID_SPELLCRAFT_ALTERATIONS, Category_Magica, null, () ->SpellRune.getRune(EAlteration.INFLICT), x, y);
+		Spellcraft_TwoShapes = new Skill(ID_SPELLCRAFT_TWOSHAPES, Category_Magica, ID_SPELLCRAFT_ALTERATIONS, () -> SpellRune.getRune(NostrumSpellShapes.Touch), x-1, y);
+		Spellcraft_Proxy = new Skill(ID_SPELLCRAFT_PROXY, Category_Magica, ID_SPELLCRAFT_TWOSHAPES, () -> new ItemStack(NostrumBlocks.mysticSpellTable), x-2, y);
+		//
+		Spellcraft_Infopanel = new Skill(ID_SPELLCRAFT_INFOPANEL, Category_Magica, ID_SPELLCRAFT_ALTERATIONS, () -> new ItemStack(Items.PAPER), x-1, y+1);
+		Spellcraft_ElemBuilding = new Skill(ID_SPELLCRAFT_ELEMBUILDING, Category_Magica, ID_SPELLCRAFT_INFOPANEL, () -> SpellRune.getRune(EMagicElement.ICE), x-2, y+1);
+		//
+		Spellcraft_Weight1 = new Skill(ID_SPELLCRAFT_WEIGHT1, Category_Magica, ID_SPELLCRAFT_ALTERATIONS, () -> new ItemStack(Items.FEATHER), x-1, y-1);
+		Spellcraft_ElemWeight = new Skill(ID_SPELLCRAFT_ELEMWEIGHT, Category_Magica, ID_SPELLCRAFT_WEIGHT1, () -> new ItemStack(NostrumItems.masteryOrb), x-2, y-2);
 		Spellcraft_ManaDiscount1 = new Skill(ID_SPELLCRAFT_MANADISCOUNT1, Category_Magica, ID_SPELLCRAFT_WEIGHT1, () -> new ItemStack(Items.BOOK), x-2, y-1);
 		Spellcraft_ManaDiscount2 = new Skill(ID_SPELLCRAFT_MANADISCOUNT2, Category_Magica, ID_SPELLCRAFT_MANADISCOUNT1, () -> new ItemStack(Items.WRITABLE_BOOK), x-3, y-1);
 		
 		x = 1;
-		y = 1;
-		Spellcasting_ElemFree = new Skill(ID_SPELLCAST_ELEMFREE, Category_Magica, null, () -> new ItemStack(NostrumItems.mageStaff), x, y+0);
-		Spellcasting_ElemWeight = new Skill(ID_SPELLCAST_ELEMWEIGHT, Category_Magica, ID_SPELLCAST_ELEMFREE, () -> new ItemStack(NostrumItems.crystalSmall), x+1, y+1);
-		Spellcasting_Weight1 = new Skill(ID_SPELLCAST_WEIGHT1, Category_Magica, ID_SPELLCAST_ELEMWEIGHT, () -> new ItemStack(NostrumItems.reagentSpiderSilk), x+2, y+1);
-		Spellcasting_Potency1 = new Skill(ID_SPELLCAST_POTENCY1, Category_Magica, ID_SPELLCAST_ELEMWEIGHT, () -> new ItemStack(NostrumItems.infusedGemUnattuned), x+2, y);
-		Spellcasting_ElemMana = new Skill(ID_SPELLCAST_ELEMMANA, Category_Magica, ID_SPELLCAST_ELEMFREE, () -> new ItemStack(NostrumItems.spellScroll), x+1, y-1);
-		Spellcasting_ElemLinger = new Skill(ID_SPELLCAST_ELEMLINGER, Category_Magica, ID_SPELLCAST_ELEMMANA, () -> new ItemStack(NostrumItems.thanosStaff), x+2, y-1);
+		y = 0;
+		Spellcasting_ScrollSanity = new Skill(ID_SPELLCAST_SCROLLSANITY, Category_Magica, null, () -> new ItemStack(NostrumItems.spellScroll), x, y+0);
+		Spellcasting_ElemFree = new Skill(ID_SPELLCAST_ELEMFREE, Category_Magica, ID_SPELLCAST_SCROLLSANITY, () -> new ItemStack(NostrumItems.mageStaff), x+1, y+0);
+		Spellcasting_ElemLinger = new Skill(ID_SPELLCAST_ELEMLINGER, Category_Magica, ID_SPELLCAST_ELEMFREE, () -> new ItemStack(NostrumItems.thanosStaff), x+2, y+0);
+		//
+		Spellcasting_ScrollEfficiency = new Skill(ID_SPELLCAST_SCROLLEFFICIENCY, Category_Magica, ID_SPELLCAST_SCROLLSANITY, () -> new ItemStack(NostrumItems.blankScroll), x+1, y+2);
+		//
+		Spellcasting_CooldownReduc = new Skill(ID_SPELLCAST_COOLDOWNREDUC, Category_Magica, ID_SPELLCAST_SCROLLSANITY, () -> new ItemStack(Items.CLOCK), x+1, y+1);
+		Spellcasting_ToolCooldown = new Skill(ID_SPELLCAST_TOOLCOOLDOWN, Category_Magica, ID_SPELLCAST_COOLDOWNREDUC, () -> new ItemStack(NostrumItems.casterWand), x+2, y+1);
+		//
+		Spellcasting_Potency1 = new Skill(ID_SPELLCAST_POTENCY1, Category_Magica, ID_SPELLCAST_SCROLLSANITY, () -> new ItemStack(NostrumItems.infusedGemUnattuned), x+1, y-1);
+		Spellcasting_ElemWeight = new Skill(ID_SPELLCAST_ELEMWEIGHT, Category_Magica, ID_SPELLCAST_POTENCY1, () -> new ItemStack(NostrumItems.crystalSmall), x+2, y-1);
+		Spellcasting_Weight1 = new Skill(ID_SPELLCAST_WEIGHT1, Category_Magica, ID_SPELLCAST_ELEMWEIGHT, () -> new ItemStack(NostrumItems.reagentSpiderSilk), x+3, y-1);
+		Spellcasting_ElemMana = new Skill(ID_SPELLCAST_ELEMMANA, Category_Magica, ID_SPELLCAST_POTENCY1, () -> new ItemStack(NostrumItems.infusedGemFire), x+2, y-2);
+		
+		
 		
 		x = 0;
 		y = 1;

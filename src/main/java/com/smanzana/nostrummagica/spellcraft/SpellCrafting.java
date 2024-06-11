@@ -49,6 +49,10 @@ public class SpellCrafting {
 			if (SpellRune.isElement(stack)) {
 				foundElement = true;
 			} else if (SpellRune.isAlteration(stack)) {
+				if (!context.magic.hasSkill(NostrumSkills.Spellcraft_Alterations)) {
+					errorsOut.add("You lack the skill to use alteration runes");
+					valid = false;
+				}
 				if (!foundElement) {
 					errorsOut.add("Alteration in slot " + (i - (startIdx-1)) + " should have elements before it");
 					valid = false;

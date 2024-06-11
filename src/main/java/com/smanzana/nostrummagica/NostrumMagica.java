@@ -640,7 +640,7 @@ public class NostrumMagica {
 		for (EMagicElement elem : neededMasteries.keySet()) {
 			@Nullable EElementalMastery neededMastery = neededMasteries.get(elem);
 			
-			if (neededMastery.isGreaterOrEqual(EElementalMastery.NOVICE)
+			if (neededMastery == EElementalMastery.NOVICE
 					&& attr.hasSkill(NostrumSkills.Spellcasting_ElemFree)) {
 				neededMastery = null;
 			}

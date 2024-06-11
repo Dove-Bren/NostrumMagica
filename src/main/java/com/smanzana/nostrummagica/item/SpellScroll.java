@@ -3,13 +3,16 @@ package com.smanzana.nostrummagica.item;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellRequestMessage;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
@@ -178,8 +181,23 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	}
 	
 	protected int getCastDurabilityCost(PlayerEntity caster, Spell spell) {
-		// Let player skills/stats reduce this!
-		return 5;
+		// By default, cost durability-1 of the scroll so that it has exactly 2 casts.
+		// With skill, take a constant base here (5).
+		// With another skill, take less constant.
+		@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+		if (attr != null) {
+			if (attr.hasSkill(NostrumSkills.Spellcasting_ScrollSanity)) {
+				int base = 5;
+				if (attr.hasSkill(NostrumSkills.Spellcasting_ScrollEfficiency)) {
+					base = 1;
+				}
+				return base;
+			}
+		}
+		
+		// Base case: take all but one durability
+		final int max = GetMaxUses(spell);
+		return max-1;
 	}
 
 	@Override

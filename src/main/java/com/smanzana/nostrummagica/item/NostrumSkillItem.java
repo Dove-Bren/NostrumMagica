@@ -114,7 +114,7 @@ public abstract class NostrumSkillItem extends Item implements ILoreTagged {
 	
 	public static class Mirror extends NostrumSkillItem {
 		public Mirror() {
-			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
+			super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC), (player, attr, stack) -> {
 				attr.addSkillPoint();
 				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_MIRROR), Util.DUMMY_UUID);
 				return true;

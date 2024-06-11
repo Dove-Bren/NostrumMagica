@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
@@ -315,7 +316,7 @@ public class MysticSpellCraftGui {
 		
 		private TextFieldWidget nameField;
 		private @Nullable SimpleInventoryWidget extraInventoryWidget;
-		private InfoPanel infoPanelWidget;
+		private @Nullable InfoPanel infoPanelWidget;
 		private List<Rectangle2d> extraAreas;
 		
 		private Vector3i[] runeSlots;
@@ -385,15 +386,17 @@ public class MysticSpellCraftGui {
 			}
 			
 			// Info panel
-			this.infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
-			this.infoPanelWidget.setContent(this::renderSpellPanel);
-			this.addButton(infoPanelWidget);
-			extraAreas.add(new Rectangle2d(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
-			{
-				// Weight status
-				infoPanelWidget.addChild(new WeightStatus(this,
-						horizontalMargin + POS_WEIGHTBAR_HOFFSET + (POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4, verticalMargin + POS_WEIGHTBAR_VOFFSET,
-						POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+			if (NostrumMagica.getMagicWrapper(getContainer().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
+				this.infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
+				this.infoPanelWidget.setContent(this::renderSpellPanel);
+				this.addButton(infoPanelWidget);
+				extraAreas.add(new Rectangle2d(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
+				{
+					// Weight status
+					infoPanelWidget.addChild(new WeightStatus(this,
+							horizontalMargin + POS_WEIGHTBAR_HOFFSET + (POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4, verticalMargin + POS_WEIGHTBAR_VOFFSET,
+							POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+				}
 			}
 			
 			// Status icon
@@ -418,24 +421,26 @@ public class MysticSpellCraftGui {
 				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getContainer().extraInventory.y, this.getContainer().extraInventory.width, this.getContainer().extraInventory.height));
 			}
 			
-			Vector3i[] belowSlots = new Vector3i[runeSlots.length];
-			for (int i = 0; i < runeSlots.length; i++) {
-				belowSlots[i] = new Vector3i(
-						runeSlots[i].getX(),
-						runeSlots[i].getY() + POS_SLOT_RUNES_WIDTH + 1,
-						runeSlots[i].getZ()
-					);
-			}
-			SpellPartBar partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH, (part, matrix, mouseX, mouseY) -> {
-				if (part == null) {
-					infoPanelWidget.setContent(this::renderSpellPanel);
-				} else {
-					this.infoPanelWidget.setContent((matrixStackIn, width, height, partialTicks) -> {
-						this.renderSpellPartPanel(part, matrixStackIn, width, height, partialTicks);
-					});
+			if (infoPanelWidget != null) {
+				Vector3i[] belowSlots = new Vector3i[runeSlots.length];
+				for (int i = 0; i < runeSlots.length; i++) {
+					belowSlots[i] = new Vector3i(
+							runeSlots[i].getX(),
+							runeSlots[i].getY() + POS_SLOT_RUNES_WIDTH + 1,
+							runeSlots[i].getZ()
+						);
 				}
-			});
-			this.addButton(partBarWidget);
+				SpellPartBar partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH, (part, matrix, mouseX, mouseY) -> {
+					if (part == null) {
+						infoPanelWidget.setContent(this::renderSpellPanel);
+					} else {
+						this.infoPanelWidget.setContent((matrixStackIn, width, height, partialTicks) -> {
+							this.renderSpellPartPanel(part, matrixStackIn, width, height, partialTicks);
+						});
+					}
+				});
+				this.addButton(partBarWidget);
+			}
 
 			this.getContainer().validate();
 		}
@@ -547,7 +552,7 @@ public class MysticSpellCraftGui {
 			}
 			
 			// Decide whether to show summary, part info, or modifier info
-			if (this.hoveredSlot != null && this.hoveredSlot instanceof RuneSlot) {
+			if (this.hoveredSlot != null && this.hoveredSlot instanceof RuneSlot && infoPanelWidget != null) {
 				int highlightedRuneIdx = ((RuneSlot) this.hoveredSlot).getSlotIndex() - getContainer().inventory.getRuneSlotStartingIndex();
 				final @Nullable ISpellCraftModifier modifier;
 				if (pattern != null && pattern.hasModifier(context, highlightedRuneIdx)) {

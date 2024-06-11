@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.tile.BasicSpellTableEntity;
@@ -202,8 +203,8 @@ public class BasicSpellCraftGui {
 		
 		protected TextFieldWidget nameField;
 		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
-		protected SpellPartBar partBarWidget;
-		protected InfoPanel infoPanelWidget;
+		protected @Nullable SpellPartBar partBarWidget;
+		protected @Nullable InfoPanel infoPanelWidget;
 		protected List<Rectangle2d> extraAreas;
 		
 		private Vector3i[] runeSlots;
@@ -272,15 +273,17 @@ public class BasicSpellCraftGui {
 			}
 			
 			// Info panel
-			infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
-			infoPanelWidget.setContent(this::renderSpellPanel);
-			this.addButton(infoPanelWidget);
-			extraAreas.add(new Rectangle2d(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
-			{
-				// Weight status
-				infoPanelWidget.addChild(new WeightStatus(this,
-						horizontalMargin + POS_WEIGHTBAR_HOFFSET + ((POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4), verticalMargin + POS_WEIGHTBAR_VOFFSET,
-						POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+			if (NostrumMagica.getMagicWrapper(getContainer().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
+				infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
+				infoPanelWidget.setContent(this::renderSpellPanel);
+				this.addButton(infoPanelWidget);
+				extraAreas.add(new Rectangle2d(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
+				{
+					// Weight status
+					infoPanelWidget.addChild(new WeightStatus(this,
+							horizontalMargin + POS_WEIGHTBAR_HOFFSET + ((POS_INFOPANEL_WIDTH-POS_WEIGHTBAR_WIDTH) / 4), verticalMargin + POS_WEIGHTBAR_VOFFSET,
+							POS_WEIGHTBAR_WIDTH, POS_WEIGHTBAR_HEIGHT));
+				}
 			}
 			
 			// Status icon
@@ -297,24 +300,26 @@ public class BasicSpellCraftGui {
 				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getContainer().extraInventory.y, this.getContainer().extraInventory.width, this.getContainer().extraInventory.height));
 			}
 			
-			Vector3i[] belowSlots = new Vector3i[runeSlots.length];
-			for (int i = 0; i < runeSlots.length; i++) {
-				belowSlots[i] = new Vector3i(
-						runeSlots[i].getX(),
-						runeSlots[i].getY() + POS_SLOT_RUNES_WIDTH + 1,
-						runeSlots[i].getZ()
-					);
-			}
-			this.partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH, (part, matrix, mouseX, mouseY) -> {
-				if (part == null) {
-					infoPanelWidget.setContent(this::renderSpellPanel);
-				} else {
-					this.infoPanelWidget.setContent((matrixStackIn, width, height, partialTicks) -> {
-						this.renderSpellPartPanel(part, matrixStackIn, width, height, partialTicks);
-					});
+			if (infoPanelWidget != null) {
+				Vector3i[] belowSlots = new Vector3i[runeSlots.length];
+				for (int i = 0; i < runeSlots.length; i++) {
+					belowSlots[i] = new Vector3i(
+							runeSlots[i].getX(),
+							runeSlots[i].getY() + POS_SLOT_RUNES_WIDTH + 1,
+							runeSlots[i].getZ()
+						);
 				}
-			});
-			this.addButton(partBarWidget);
+				this.partBarWidget = new SpellPartBar(this, belowSlots, POS_SLOT_RUNES_WIDTH, (part, matrix, mouseX, mouseY) -> {
+					if (part == null) {
+						infoPanelWidget.setContent(this::renderSpellPanel);
+					} else {
+						this.infoPanelWidget.setContent((matrixStackIn, width, height, partialTicks) -> {
+							this.renderSpellPartPanel(part, matrixStackIn, width, height, partialTicks);
+						});
+					}
+				});
+				this.addButton(partBarWidget);
+			}
 
 			this.getContainer().validate();
 		}
