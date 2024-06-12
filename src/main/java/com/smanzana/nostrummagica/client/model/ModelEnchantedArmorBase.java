@@ -119,7 +119,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 				// Lie about texture size to get more resolution on tassels
 				tasselRight.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.setTextureOffset(66 / 3, 48 / 3);
-				tasselRight.addBox(0 + (-7F), 0 + (12F), 0 + (-2F), 1, 5, 4, scale);
+				tasselRight.addBox(0 + (-6F), 0 + (12F), 0 + (-2F), 1, 5, 4, scale);
 //				tasselRight.offsetX = (-7F/16F);
 //				tasselRight.offsetY = (12F/16F);
 //				tasselRight.offsetZ = (-2F/16F);
@@ -130,7 +130,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 				tasselLeft.setTextureSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.setTextureOffset(66 / 3, 48 / 3);
 				tasselLeft.mirror = true;
-				tasselLeft.addBox(0 + (6F/16F), 0 + (12F), 0 + (-2F), 1, 5, 4, scale);
+				tasselLeft.addBox(0 + (5F), 0 + (12F), 0 + (-2F), 1, 5, 4, scale);
 //				tasselLeft.offsetX = (6F/16F);
 //				tasselLeft.offsetY = (12F/16F);
 //				tasselLeft.offsetZ = (-2F/16F);
