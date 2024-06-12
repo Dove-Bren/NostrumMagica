@@ -653,6 +653,7 @@ public class NostrumMagic implements INostrumMagic {
 		this.setModifierMaps(cap.getManaModifiers(), cap.getManaBonusModifiers(), cap.getManaCostModifiers(), cap.getManaRegenModifiers());
 		this.skills.clear(); this.skills.addAll(cap.getSkills());
 		this.elementalXP.clear(); this.elementalXP.putAll(cap.getElementalXPMap());
+		this.elementalSkillPoints.clear(); this.elementalSkillPoints.putAll(cap.getElementalSkillPointsMap());
 	}
 	
 	@Override

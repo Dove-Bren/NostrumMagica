@@ -1,16 +1,25 @@
 package com.smanzana.nostrummagica.effect;
 
+import java.util.List;
+
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -44,6 +53,54 @@ public class SublimationEffect extends Effect {
 		// Maybe if fire resistance is present, make sure we're doing some damage?
 	}
 	
+	protected static void onSublimationDamage(LivingEntity target) {
+		// Look for nearby spread-enablers
+		boolean spread = false;
+		Entity spreadingEnt = null;
+		List<Entity> nearbyEnts = target.getEntityWorld().getEntitiesInAABBexcluding(target, target.getEntity().getBoundingBox().grow(10), e -> true);
+		for (Entity ent : nearbyEnts) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
+			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Corrupt) && NostrumMagica.rand.nextBoolean()) {
+				spread = true;
+				spreadingEnt = ent;
+				break;
+			}
+		}
+		
+		// Spread
+		if (spread) {
+			final EffectInstance effect = target.getActivePotionEffect(NostrumEffects.sublimation);
+			for (Entity ent : nearbyEnts) {
+				if (!(ent instanceof LivingEntity)) {
+					continue;
+				}
+				
+				if (ent == spreadingEnt || (spreadingEnt instanceof LivingEntity && NostrumMagica.IsSameTeam((LivingEntity) spreadingEnt, (LivingEntity) ent))) {
+					continue;
+				}
+				
+				if (ent == target) {
+					continue;
+				}
+				
+				((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.sublimation, effect.getDuration(), effect.getAmplifier()));
+				
+				NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
+						10, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+						40, 10,
+						ent.getEntityId()
+						).color(0xFFEC6D8E).dieOnTarget(true));
+			}
+			
+			NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
+					50, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+					30, 10,
+					new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
+					).color(0xFFEC6D8E).gravity(true));
+			NostrumMagicaSounds.DAMAGE_FIRE.play(target);
+		}
+	}
+	
 	private static boolean recurseCheck = false;
 	protected static void handleFireAttack(LivingEntity entity, DamageSource source, float amt, int amp) {
 		//NostrumMagica.logger.debug(amt + " - got fire damage");
@@ -55,6 +112,7 @@ public class SublimationEffect extends Effect {
 			//NostrumMagica.logger.debug(addDmg + " - doing fire bonus");
 			entity.hurtResistantTime = 0;
 			entity.attackEntityFrom(DamageSource.MAGIC, addDmg);
+			onSublimationDamage(entity);
 			
 			recurseCheck = false;
 		}
@@ -63,6 +121,7 @@ public class SublimationEffect extends Effect {
 	protected static void handleRainTick(LivingEntity entity, int amp) {
 		//NostrumMagica.logger.debug("1.0 - doing rain tick");
 		entity.attackEntityFrom(DamageSource.DROWN, 1f);
+		onSublimationDamage(entity);
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)

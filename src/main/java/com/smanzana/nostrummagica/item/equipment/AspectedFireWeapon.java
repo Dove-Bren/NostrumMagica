@@ -1,11 +1,14 @@
 package com.smanzana.nostrummagica.item.equipment;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -17,6 +20,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SeekingBulletShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -145,16 +149,32 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	}
 	
 	protected boolean castOn(LivingEntity caster, LivingEntity target) {
-		
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.FIRE, MagicArmor.Type.TRUE) == 4;
+		final boolean hasSkill = attr.hasSkill(NostrumSkills.Fire_Weapon);
 		
-		target.addPotionEffect(new EffectInstance(NostrumEffects.soulDrain, 20 * 5, 0));
 		if (hasBonus) {
 			caster.addPotionEffect(new EffectInstance(NostrumEffects.soulVampire, 20 * 5, 0));
-			target.setFire(1);
-			target.forceFireTicks(105);
 		}
 		
+		final List<LivingEntity> targets;
+		if (hasSkill) {
+			targets = target.getEntityWorld().getEntitiesInAABBexcluding(null, target.getBoundingBox().grow(5), (e) -> e instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) e, caster))
+					.stream().map((e) -> (LivingEntity) e).collect(Collectors.toList());
+					
+		} else {
+			targets = Lists.newArrayList(target);
+		}
+		
+		for (LivingEntity targ : targets) {
+			targ.addPotionEffect(new EffectInstance(NostrumEffects.soulDrain, 20 * 5, 0));
+			if (hasBonus) {
+				targ.setFire(1);
+				targ.forceFireTicks(105);
+			}
+		}
+		
+		// Only do line effect to initial target even with AoE skill
 		doCastEffect(caster, target);
 		return true;
 	}

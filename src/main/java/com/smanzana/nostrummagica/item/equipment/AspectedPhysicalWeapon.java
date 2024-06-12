@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -14,6 +15,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
@@ -175,11 +177,16 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	}
 	
 	protected static void doBlock(LivingEntity blocker) {
+		final INostrumMagic attr = NostrumMagica.getMagicWrapper(blocker);
 		final boolean hasBonus = MagicArmor.GetSetCount(blocker, EMagicElement.PHYSICAL, MagicArmor.Type.TRUE) == 4;
+		final boolean hasSkill = attr != null && attr.hasSkill(NostrumSkills.Physical_Weapon);
 		blocker.addPotionEffect(new EffectInstance(NostrumEffects.rendStrike, 1 * 20, 0));
 		
 		if (hasBonus) {
 			blocker.addPotionEffect(new EffectInstance(NostrumEffects.steelSkin, 3 * 20, 0));
+			if (hasSkill) {
+				blocker.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, 10 * 20, 0));
+			}
 		}
 	}
 	
