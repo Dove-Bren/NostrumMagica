@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.command;
 import java.util.LinkedList;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -22,13 +23,27 @@ public class CommandWriteRoom {
 		dispatcher.register(
 				Commands.literal("writeroom")
 					.requires(s -> s.hasPermissionLevel(2))
-					.then(Commands.argument("name", StringArgumentType.greedyString())	
+					.then(Commands.argument("name", StringArgumentType.greedyString())
+						.then(Commands.argument("weight", IntegerArgumentType.integer(1))
+							.then(Commands.argument("cost", IntegerArgumentType.integer(1))
+								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"), IntegerArgumentType.getInteger(ctx, "weight"), IntegerArgumentType.getInteger(ctx, "cost")))
+								)
+							.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"), IntegerArgumentType.getInteger(ctx, "weight")))
+							)
 						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name")))
 						)
 				);
 	}
 	
 	private static final int execute(CommandContext<CommandSource> context, final String name) throws CommandSyntaxException {
+		return execute(context, name, 1);
+	}
+	
+	private static final int execute(CommandContext<CommandSource> context, final String name, final int weight) throws CommandSyntaxException {
+		return execute(context, name, weight, 1);
+	}
+	
+	private static final int execute(CommandContext<CommandSource> context, final String name, final int weight, final int cost) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
 		if (!player.isCreative()) {
@@ -50,7 +65,7 @@ public class CommandWriteRoom {
 				PositionCrystal.getBlockPosition(offhand),
 				true);
 		
-		if (DungeonRoomRegistry.instance().writeRoomAsFile(blueprint, name, 1, new LinkedList<>())) {
+		if (DungeonRoomRegistry.instance().writeRoomAsFile(blueprint, name, weight, cost, new LinkedList<>())) {
 			context.getSource().sendFeedback(new StringTextComponent("Room written!"), true);
 		} else {
 			context.getSource().sendFeedback(new StringTextComponent("An error was encountered while writing the room"), true);

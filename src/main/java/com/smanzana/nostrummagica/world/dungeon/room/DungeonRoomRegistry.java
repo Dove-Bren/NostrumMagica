@@ -27,14 +27,16 @@ import net.minecraftforge.common.util.Constants.NBT;
 public class DungeonRoomRegistry {
 	
 	public static final class DungeonRoomRecord {
-		public String name;
-		public RoomBlueprint blueprint;
-		protected int weight;
+		public final String name;
+		public final RoomBlueprint blueprint;
+		protected final int weight;
+		protected final int cost;
 		
-		public DungeonRoomRecord(String name, RoomBlueprint blueprint, int weight) {
+		public DungeonRoomRecord(String name, RoomBlueprint blueprint, int weight, int cost) {
 			this.blueprint = blueprint;
 			this.weight = weight;
 			this.name = name;
+			this.cost = cost;
 		}
 		
 		@Override
@@ -109,8 +111,8 @@ public class DungeonRoomRegistry {
 		list.add(record);
 	}
 	
-	public void register(String name, RoomBlueprint blueprint, int weight, List<String> tags) {
-		DungeonRoomRecord record = new DungeonRoomRecord(name, blueprint, weight);
+	public void register(String name, RoomBlueprint blueprint, int weight, int cost, List<String> tags) {
+		DungeonRoomRecord record = new DungeonRoomRecord(name, blueprint, weight, cost);
 		add(INTERNAL_ALL_NAME, record);
 		for (String tag : tags) {
 			add(tag, record);
@@ -191,11 +193,13 @@ public class DungeonRoomRegistry {
 	private static final String NBT_TAGS = "tags";
 	private static final String NBT_WEIGHT = "weight";
 	private static final String NBT_NAME = "name";
+	private static final String NBT_COST = "cost";
 	
-	protected static final CompoundNBT toNBT(CompoundNBT blueprintTag, String name, int weight, List<String> tags) {
+	protected static final CompoundNBT toNBT(CompoundNBT blueprintTag, String name, int weight, int cost, List<String> tags) {
 		CompoundNBT nbt = new CompoundNBT();
 		nbt.putString(NBT_NAME, name);
 		nbt.putInt(NBT_WEIGHT, weight);
+		nbt.putInt(NBT_COST, cost);
 		nbt.put(NBT_BLUEPRINT, blueprintTag);
 		
 		ListNBT list = new ListNBT();
@@ -215,6 +219,8 @@ public class DungeonRoomRegistry {
 			return null;
 		}
 		
+		int cost = nbt.contains(NBT_COST) ? nbt.getInt(NBT_COST) : 1;
+		
 		RoomBlueprint blueprint = RoomBlueprint.fromNBT(nbt.getCompound(NBT_BLUEPRINT));
 		if (blueprint == null) {
 			return null;
@@ -231,7 +237,7 @@ public class DungeonRoomRegistry {
 		}
 		
 		if (doRegister) {
-			this.register(name, blueprint, weight, tags);
+			this.register(name, blueprint, weight, cost, tags);
 		}
 		
 		// For version bumping
@@ -614,11 +620,11 @@ public class DungeonRoomRegistry {
 		NostrumMagica.logger.info("Loaded " + count + " room overrides (" + (((double)(System.currentTimeMillis() - startTime) / 1000D)) + " seconds)");
 	}
 	
-	private final boolean writeRoomAsFileInternal(File saveFile, CompoundNBT blueprintTag, String name, int weight, List<String> tags) {
+	private final boolean writeRoomAsFileInternal(File saveFile, CompoundNBT blueprintTag, String name, int weight, int cost, List<String> tags) {
 		boolean success = true;
 		
 		try {
-			CompressedStreamTools.writeCompressed(toNBT(blueprintTag, name, weight, tags), new FileOutputStream(saveFile));
+			CompressedStreamTools.writeCompressed(toNBT(blueprintTag, name, weight, cost, tags), new FileOutputStream(saveFile));
 			//CompressedStreamTools.safeWrite(toNBT(blueprintTag, name, weight, tags), saveFile);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -631,7 +637,7 @@ public class DungeonRoomRegistry {
 		return success;
 	}
 	
-	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, List<String> tags) {
+	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, int cost, List<String> tags) {
 		boolean success = true;
 		String path = null;
 		
@@ -655,14 +661,14 @@ public class DungeonRoomRegistry {
 				}
 				
 				File outFile = new File(baseDir, fileName);
-				success = writeRoomAsFileInternal(outFile, nbt, name, weight, tags);
+				success = writeRoomAsFileInternal(outFile, nbt, name, weight, cost, tags);
 				path = outFile.getPath();
 			}
 		} else {
 			File outFile = new File(this.roomSaveFolder, name + "." + ROOM_COMPRESSED_EXT);
 			success = writeRoomAsFileInternal(outFile,
 					blueprint.toNBT(),
-					name, weight, tags);
+					name, weight, cost, tags);
 			path = outFile.getPath();
 		}
 		

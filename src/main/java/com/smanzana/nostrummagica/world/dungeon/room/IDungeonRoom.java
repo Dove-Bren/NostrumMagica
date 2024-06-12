@@ -51,6 +51,13 @@ public interface IDungeonRoom {
 	 */
 	public int getDifficulty();
 	
+	/**
+	 * Return the relative cost for the room. 1 is the default.
+	 * Rooms with more content should cost more to make the paths be the same relative content depth.
+	 * @return
+	 */
+	public default int getRoomCost() { return 1; }
+	
 	//public boolean hasPuzzle();
 	
 	public boolean supportsDoor();

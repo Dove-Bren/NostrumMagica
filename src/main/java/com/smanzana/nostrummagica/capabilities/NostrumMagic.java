@@ -37,7 +37,6 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -522,9 +521,6 @@ public class NostrumMagic implements INostrumMagic {
 				PlayerEntity player = (PlayerEntity) this.entity;
 				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.DUMMY_UUID);
 			}
-			
-			// Old and unneeded?
-			//doUnlockCheck();
 		}
 		
 		return true;
@@ -543,48 +539,13 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void addShape(SpellShape shape) {
 		shapes.add(shape);
-		
-		//doUnlockCheck();
 	}
 
 	@Override
 	public void unlockAlteration(EAlteration alteration) {
 		alterations.put(alteration, Boolean.TRUE);
-		//doUnlockCheck();
 	}
 	
-	private void doUnlockCheck() {
-		if (this.isUnlocked())
-			return;
-		
-		// Unlock (ritual of discovery) if at least one shape and trigger
-		// and an element have been 'discovered'.
-		
-		int unused; // Revisit this process now that there are no triggers
-		if (shapes.isEmpty())
-			return;
-		
-		boolean found = false;
-		for (EMagicElement e : EMagicElement.values()) {
-			if (this.getElementalMastery(e) != null && this.getElementalMastery(e).isGreaterOrEqual(EElementalMastery.NOVICE)) {
-				found = true;
-				break;
-			}
-		}
-		
-		if (!found)
-			return;
-		
-		unlock();
-		// TODO effects
-		if (this.entity != null && !this.entity.world.isRemote
-				&& this.entity instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) this.entity;
-			player.sendMessage(new StringTextComponent("Magic Unlocked"), Util.DUMMY_UUID);
-		}
-		
-	}
-
 	@Override
 	public void deserialize(EMagicTier tier, int level, float xp, int skillpoints, int researchpoints,
 			int mana, int reservedMana) {

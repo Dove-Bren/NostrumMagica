@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -177,9 +178,10 @@ public class NostrumDungeon {
 			return new ArrayList<>();
 		}
 		
+		DungeonGenerationContext context = new DungeonGenerationContext(this, rand);
 		Path startPath = new Path(new DungeonRoomInstance(start, this.starting, false)); // Note: false means starting won't ever have key
 		
-		startPath.generateChildren(rand, pathLen + rand.nextInt(pathRand), ending);
+		startPath.generateChildren(context, pathLen + rand.nextInt(pathRand), ending);
 		
 		return startPath.getInstances();
 	}
@@ -243,6 +245,18 @@ public class NostrumDungeon {
 //			path.spawn(world, last, inEnd);
 //		}
 		
+	}
+	
+	protected static class DungeonGenerationContext {
+		public final NostrumDungeon dungeon;
+		public final List<MutableBoundingBox> boundingBoxes;
+		public final Random rand;
+		
+		public DungeonGenerationContext(NostrumDungeon dungeon, Random rand) {
+			this.dungeon = dungeon;
+			this.rand = rand;
+			boundingBoxes = new ArrayList<>(32);
+		}
 	}
 	
 	public static class DungeonRoomInstance {
@@ -329,6 +343,17 @@ public class NostrumDungeon {
 		}
 	}
 	
+	// Checks if the provided room overlaps any existing bounds if it were to be spawned
+	protected static boolean CheckRoomBounds(IDungeonRoom room, DungeonExitPoint entry, DungeonGenerationContext context) {
+		MutableBoundingBox bounds = room.getBounds(entry);
+		for (MutableBoundingBox box : context.boundingBoxes) {
+			if (bounds.intersectsWith(box)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	private class Path {
 		
 		private List<Path> children;
@@ -400,28 +425,48 @@ public class NostrumDungeon {
 //			return null;
 //		}
 		
-		protected @Nonnull IDungeonRoom pickRandomContRoom(Random rand) {
-			return contRooms.get(rand.nextInt(contRooms.size()));
+		protected @Nonnull IDungeonRoom pickRandomContRoom(DungeonGenerationContext context, DungeonExitPoint entry, int remaining) {
+			List<IDungeonRoom> eligibleRooms = contRooms.stream().filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
+			if (eligibleRooms.isEmpty()) {
+				NostrumMagica.logger.warn("Failed to find a room that fit. Picking a random one.");
+				return contRooms.get(rand.nextInt(contRooms.size()));
+			}
+			return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomEndRoom(Random rand) {
+		protected @Nonnull IDungeonRoom pickRandomEndRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
 			if (endRooms.isEmpty()) {
 				return rooms.get(rand.nextInt(rooms.size()));
 			} else {
-				return endRooms.get(rand.nextInt(endRooms.size()));
+				List<IDungeonRoom> eligibleRooms = endRooms.stream().filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
+				if (eligibleRooms.isEmpty()) {
+					NostrumMagica.logger.warn("Failed to find a room that fit. Picking a random one.");
+					return endRooms.get(rand.nextInt(endRooms.size()));
+				}
+				return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 			}
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomKeyRoom(Random rand) {
-			return keyRooms.get(rand.nextInt(keyRooms.size()));
+		protected @Nonnull IDungeonRoom pickRandomKeyRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
+			List<IDungeonRoom> eligibleRooms = keyRooms.stream().filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
+			if (eligibleRooms.isEmpty()) {
+				NostrumMagica.logger.warn("Failed to find a room that fit. Picking a random one.");
+				return keyRooms.get(rand.nextInt(keyRooms.size()));
+			}
+			return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomDoorRoom(Random rand) {
-			return doorRooms.get(rand.nextInt(doorRooms.size()));
+		protected @Nonnull IDungeonRoom pickRandomDoorRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
+			List<IDungeonRoom> eligibleRooms = doorRooms.stream().filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
+			if (eligibleRooms.isEmpty()) {
+				NostrumMagica.logger.warn("Failed to find a room that fit. Picking a random one.");
+				return doorRooms.get(rand.nextInt(doorRooms.size()));
+			}
+			return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 		}
 		
 		// Fill out this path, including a room for this node and spawning any children that are needed.
-		protected void generate(Random rand, int remaining, DungeonExitPoint entry, IDungeonRoom ending) {
+		protected void generate(DungeonGenerationContext context, int remaining, DungeonExitPoint entry, IDungeonRoom ending) {
 			Validate.isTrue(this.myRoom == null); // If room is already set, only generate children!
 			
 			/*
@@ -432,14 +477,14 @@ public class NostrumDungeon {
 			 * 2) If we have a door or key, roll to spawn that. If we have both,
 			 *    roll for key first. Otherwise place regular >0 door room.
 			 */
-			if (remaining == 0) {
+			if (remaining <= 0) {
 				// Terminal
 				if (ending != null) {
 					this.myRoom = new DungeonRoomInstance(entry, ending, false);
 				} else if (this.hasKey) {
-					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(rand), true);
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true);
 				} else {
-					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(rand), false);
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(context, entry), false);
 				}
 			} else {
 				// If we have door or key, try those first
@@ -448,26 +493,26 @@ public class NostrumDungeon {
 				myRoom = null;
 				if (hasKey) {
 					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(rand), true);
+						myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true);
 						hasKey = false;
 					}
 				} else if (hasDoor) {
 					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						myRoom = new DungeonRoomInstance(entry, pickRandomDoorRoom(rand), false);
+						myRoom = new DungeonRoomInstance(entry, pickRandomDoorRoom(context, entry), false);
 						hasDoor = false;
 					}
 				}
 				
 				if (myRoom == null) {
-					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(rand), false);
+					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(context, entry, remaining), false);
 				}
 				
-				this.generateChildren(rand, remaining - 1, ending);
+				this.generateChildren(context, remaining - (myRoom.template.getRoomCost()), ending);
 			}
 		}
 		
 		// Fill out this path's children
-		protected void generateChildren(Random rand, int remaining, IDungeonRoom ending) {
+		protected void generateChildren(DungeonGenerationContext context, int remaining, IDungeonRoom ending) {
 			// Select a subpath to have the ending
 			int keyI = -1;
 			int doorI = -1;
@@ -498,7 +543,7 @@ public class NostrumDungeon {
 				}
 				
 				// TODO evaluate making 'remaining' be random to be like 1-remaining
-				path.generate(rand, remaining, door, inEnd);
+				path.generate(context, remaining, door, inEnd);
 				keyI -= 1;
 				doorI -= 1;
 				this.children.add(path);
