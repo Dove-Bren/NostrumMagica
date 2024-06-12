@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
@@ -39,6 +40,9 @@ public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntit
 		
 		// Before this was disabling lighting...
 		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(textLoc));
+		
+		// Recompute lighting for block above
+		combinedLightIn = WorldRenderer.getCombinedLight(tileEntityIn.getWorld(), tileEntityIn.getPos().up());
 		
 		matrixStackIn.push();
 		matrixStackIn.translate(.5, 1.25, .5);
