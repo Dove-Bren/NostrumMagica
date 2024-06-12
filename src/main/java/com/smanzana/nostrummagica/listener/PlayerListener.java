@@ -794,7 +794,6 @@ public class PlayerListener {
 		}
 		
 		if (event.getEntityLiving() instanceof PlayerEntity) {
-			// Make sure to do on both sides
 			NostrumMagica.instance.getSpellCooldownTracker(event.getEntityLiving().world)
 				.clearCooldowns((PlayerEntity) event.getEntityLiving());
 		}
@@ -1425,7 +1424,7 @@ public class PlayerListener {
 		lastSpell.put(event.getCaster(), event.getSpell());
 		
 		// Let this be the thing that updates spell cooldowns
-		if (event.getCastResult().succeeded && event.getCaster() instanceof PlayerEntity && !event.getCaster().world.isRemote()) {
+		if (event.getCastResult().succeeded && event.getCaster() instanceof PlayerEntity && !event.getCaster().world.isRemote() && !event.getCaster().getShouldBeDead()) {
 			final int cooldown = SpellCasting.CalculateSpellCooldown(event.getCastResult());
 			final int globalCooldown = SpellCasting.CalculateGlobalSpellCooldown(event.getCastResult());
 			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().world).setSpellCooldown((PlayerEntity) event.getCaster(), event.getSpell(), cooldown);

@@ -770,7 +770,14 @@ public class Spell {
 		case FIRE:
 			return new SpellAction().status(NostrumEffects.sublimation, duration, amp).name("sublimation");
 		case ICE:
-			return new SpellAction().status(NostrumEffects.healResist, duration, amp).name("healresist");
+			return new SpellAction().status(NostrumEffects.healResist, duration, (caster, target, eff) -> {
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Corrupt)) {
+					return amp + 3;
+				} else {
+					return amp;
+				}
+			}).name("healresist");
 		case LIGHTNING:
 			return new SpellAction().status(NostrumEffects.magicRend, duration, amp).name("magicrend");
 		case WIND:

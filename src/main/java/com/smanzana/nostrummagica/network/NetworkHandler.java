@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.message.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.network.message.SpellCooldownMessage;
+import com.smanzana.nostrummagica.network.message.SpellCooldownResetMessage;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
 import com.smanzana.nostrummagica.network.message.SpellCraftingCapabilitySyncMessage;
 import com.smanzana.nostrummagica.network.message.SpellDebugMessage;
@@ -111,6 +112,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, ClientPurchaseSkillMessage.class, ClientPurchaseSkillMessage::encode, ClientPurchaseSkillMessage::decode, ClientPurchaseSkillMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellCooldownMessage.class, SpellCooldownMessage::encode, SpellCooldownMessage::decode, SpellCooldownMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellGlobalCooldownMessage.class, SpellGlobalCooldownMessage::encode, SpellGlobalCooldownMessage::decode, SpellGlobalCooldownMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellCooldownResetMessage.class, SpellCooldownResetMessage::encode, SpellCooldownResetMessage::decode, SpellCooldownResetMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),

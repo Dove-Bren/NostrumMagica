@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCooldownMessage;
+import com.smanzana.nostrummagica.network.message.SpellCooldownResetMessage;
 import com.smanzana.nostrummagica.network.message.SpellGlobalCooldownMessage;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -93,6 +94,9 @@ public class SpellCooldownTracker {
 	
 	public void clearCooldowns(PlayerEntity player) {
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).clear();
+		if (!player.world.isRemote()) {
+			NetworkHandler.sendTo(new SpellCooldownResetMessage(), (ServerPlayerEntity) player);
+		}
 	}
 	
 	public static final class Cooldowns {

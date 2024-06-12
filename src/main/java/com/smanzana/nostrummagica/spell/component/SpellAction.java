@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
@@ -182,7 +183,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class DamageEffect extends NegativeSpellEffect {
+	private static class DamageEffect extends NegativeSpellEffect {
 		private float amount;
 		private EMagicElement element;
 		
@@ -243,7 +244,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class HealEffect implements SpellEffect {
+	private static class HealEffect implements SpellEffect {
 		private float amount;
 		
 		public HealEffect(float amount) {
@@ -306,7 +307,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class HealFoodEffect implements SpellEffect {
+	private static class HealFoodEffect implements SpellEffect {
 		private int amount;
 		
 		public HealFoodEffect(int amount) {
@@ -351,7 +352,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class HealManaEffect implements SpellEffect {
+	private static class HealManaEffect implements SpellEffect {
 		private int amount;
 		
 		public HealManaEffect(int amount) {
@@ -389,10 +390,10 @@ public class SpellAction {
 		}
 	}
 	
-	private class StatusEffect extends NegativeSpellEffect {
-		private Effect effect;
-		private int duration;
-		private int amp;
+	private static class StatusEffect extends NegativeSpellEffect {
+		protected final Effect effect;
+		protected final int duration;
+		protected final int amp;
 		
 		public StatusEffect(Effect effect, int duration, int amp) {
 			this.effect = effect;
@@ -405,9 +406,13 @@ public class SpellAction {
 			return this.effect.getEffectType() == EffectType.HARMFUL;
 		}
 		
+		protected @Nonnull EffectInstance makeEffect(LivingEntity caster, LivingEntity target, float efficiency, SpellActionResult resultBuilder) {
+			return new EffectInstance(effect, (int) (duration * efficiency), amp);
+		}
+		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			entity.addPotionEffect(new EffectInstance(effect, (int) (duration * efficiency), amp));
+			entity.addPotionEffect(this.makeEffect(caster, entity, efficiency, resultBuilder));
 			
 			if (effect.getEffectType() == EffectType.HARMFUL) {
 				caster.setLastAttackedEntity(entity);
@@ -437,7 +442,7 @@ public class SpellAction {
 		}
 	}
 	
-	private class DispelEffect implements SpellEffect {
+	private static class DispelEffect implements SpellEffect {
 		private int number; // -1 to clear all
 		
 		public DispelEffect(int number) {
@@ -476,6 +481,25 @@ public class SpellAction {
 		@Override
 		public boolean affectsEntities() {
 			return true;
+		}
+	}
+	
+	public static interface IAmpProvider {
+		public int getAmplifier(LivingEntity caster, LivingEntity target, float efficiency);
+	}
+	
+	private static class AmplifiedStatusEffect extends StatusEffect {
+		
+		protected final IAmpProvider amplifierSupplier;
+
+		public AmplifiedStatusEffect(Effect effect, int duration, IAmpProvider amplifier) {
+			super(effect, duration, 0);
+			this.amplifierSupplier = amplifier;
+		}
+		
+		@Override
+		protected @Nonnull EffectInstance makeEffect(LivingEntity caster, LivingEntity target, float efficiency, SpellActionResult resultBuilder) {
+			return new EffectInstance(effect, (int) (duration * efficiency), this.amplifierSupplier.getAmplifier(caster, target, efficiency));
 		}
 	}
 	
@@ -2298,6 +2322,11 @@ public class SpellAction {
 	
 	public SpellAction status(Effect effect, int duration, int amplitude) {
 		effects.add(new StatusEffect(effect, duration, amplitude));
+		return this;
+	}
+	
+	public SpellAction status(Effect effect, int duration, IAmpProvider amplitude) {
+		effects.add(new AmplifiedStatusEffect(effect, duration, amplitude));
 		return this;
 	}
 	

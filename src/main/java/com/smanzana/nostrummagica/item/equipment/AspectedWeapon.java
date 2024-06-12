@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.IReactiveEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
@@ -31,6 +32,7 @@ import com.smanzana.nostrummagica.util.RayTrace;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -509,6 +511,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	protected static void spawnIceCloud(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
@@ -524,6 +527,21 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				worldIn.setBlockState(pos, Blocks.ICE.getDefaultState());
 			}
 		});
+		final boolean hasHeal = attr != null && attr.hasSkill(NostrumSkills.Ice_Weapon);
+		final boolean hasHealBoost = attr != null && attr.hasSkill(NostrumSkills.Ice_Master);
+		final boolean hasHealShield = attr != null && attr.hasSkill(NostrumSkills.Ice_Adept);
+		if (hasHeal) {
+			cloud.addEffect((World w, Entity ent) -> {
+				if (ent instanceof LivingEntity && NostrumMagica.IsSameTeam(caster, (LivingEntity) ent)) {
+					((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
+					((LivingEntity) ent).removeActivePotionEffect(NostrumEffects.frostbite);
+					
+					if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
+						((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
+					}
+				}
+			});
+		}
 		cloud.setVerticleStepping(true);
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();

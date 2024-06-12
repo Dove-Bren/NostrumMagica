@@ -259,7 +259,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		// Note that our r-click handler will actually replace this result with a larger one if it's a scroll that
 		// cast the spell.
 		final SpellCastResult result = event.getCastResult();
-		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity) {
+		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && !result.caster.getShouldBeDead()) {
 			// Vulnerability: vanilla's tracker only returns us progress which means we can't REALLY check if our new
 			// cooldown time is going to be less than what's already there.
 			// If we blindly PUT, player's can get around long cooldowns by casting a short-cooldown spell after

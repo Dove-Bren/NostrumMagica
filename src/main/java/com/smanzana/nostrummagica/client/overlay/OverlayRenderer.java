@@ -563,7 +563,7 @@ public class OverlayRenderer extends AbstractGui {
 			// Show cooldown
 			final SpellCooldown cooldown = NostrumMagica.instance.getSpellCooldownTracker(mc.player.world).getSpellCooldown(mc.player, spell);
 			if (cooldown != null && cooldown.endTicks > mc.player.ticksExisted) {
-				final float prog = (float) (mc.player.ticksExisted - cooldown.startTicks) / (cooldown.endTicks - cooldown.startTicks);
+				final float prog = Math.max(0f, (float) (mc.player.ticksExisted - cooldown.startTicks) / (cooldown.endTicks - cooldown.startTicks));
 				final int progPixels = (int) ((height-2) * prog);
 				RenderFuncs.drawRect(matrixStackIn, 1, 1 + progPixels, width-1, height-1, 0xDDDDDDDD);
 			}
