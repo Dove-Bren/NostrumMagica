@@ -1902,7 +1902,13 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder) {
-			apply(caster, entity.world, entity.getPosition().add(0, -1, 0), eff, resultBuilder);
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Earth_Corrupt)) {
+				entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, (int) (15 * eff) * 20, level-1));
+				resultBuilder.applied = true;
+			} else {
+				apply(caster, entity.world, entity.getPosition().add(0, -1, 0), eff, resultBuilder);
+			}
 		}
 		
 		protected boolean isTool(@Nullable PlayerEntity player, ItemStack stack) {

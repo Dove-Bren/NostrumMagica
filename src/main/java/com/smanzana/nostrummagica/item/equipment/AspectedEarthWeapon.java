@@ -3,9 +3,13 @@ package com.smanzana.nostrummagica.item.equipment;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Multimap;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.MineBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
@@ -13,6 +17,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
@@ -158,16 +163,29 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
+		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(context.getPlayer());
 		final ItemStack held = context.getItem();
 		final boolean hasBonus = MagicArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, MagicArmor.Type.TRUE) == 4;
+		final boolean canUpgrade = attr != null && attr.hasSkill(NostrumSkills.Earth_Weapon);
+		final int manaCost = 20;
 		
-		if (context.getPlayer().isSneaking() && hasBonus) {
+		if (context.getPlayer().isSneaking() && hasBonus && attr.getMana() >= manaCost) {
 			if (!context.getWorld().isRemote()) {
+				if (canUpgrade && context.getWorld().getBlockState(context.getPos()).getBlock() instanceof MineBlock) {
+					BlockState state = context.getWorld().getBlockState(context.getPos());
+					if (state.get(MineBlock.LEVEL) < 3) {
+						context.getWorld().setBlockState(context.getPos(), state.with(MineBlock.LEVEL, state.get(MineBlock.LEVEL) + 1));
+						doMineEffect(context.getPlayer(), context.getWorld(), context.getPos());
+						attr.addMana(-manaCost);
+						NostrumMagica.instance.proxy.sendMana(context.getPlayer());
+					}
+				} else if (context.getWorld().isAirBlock(context.getPos().offset(context.getFace()))) {
 				BlockPos pos = context.getPos().offset(context.getFace());
-				if (context.getWorld().isAirBlock(pos)) {
 					if (makeMine(context.getWorld(), context.getPlayer(), pos, context.getFace().getOpposite())) {
 						ItemStacks.damageItem(held, context.getPlayer(), context.getHand(), 1);
 						doMineEffect(context.getPlayer(), context.getWorld(), context.getPos());
+						attr.addMana(-manaCost);
+						NostrumMagica.instance.proxy.sendMana(context.getPlayer());
 					}
 				}
 			}

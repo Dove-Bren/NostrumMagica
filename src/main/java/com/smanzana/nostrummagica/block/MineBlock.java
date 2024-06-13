@@ -18,6 +18,7 @@ import net.minecraft.entity.projectile.EvokerFangsEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -44,6 +45,7 @@ public class MineBlock extends Block {
 	private static final VoxelShape MINE_AABB_WEST = Block.makeCuboidShape(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MIN + AABB_WIDTH, AABB_MAX, AABB_MAX);
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
+	public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 3);
 	
 	public MineBlock() {
 		super(Block.Properties.create(Material.CARPET)
@@ -54,12 +56,12 @@ public class MineBlock extends Block {
 				.notSolid()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP));
+		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(LEVEL, 0));
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
+		builder.add(FACING, LEVEL);
 	}
 	
 	@Override
@@ -98,7 +100,7 @@ public class MineBlock extends Block {
 		
 		// If player mined with Earth Pike, do full mine effect
 		if (!stack.isEmpty() && stack.getItem() instanceof AspectedEarthWeapon && !worldIn.isRemote()) {
-			doHarvestEffect(worldIn, player, pos, state.get(FACING), stack);
+			doHarvestEffect(worldIn, player, pos, state.get(FACING), state.get(LEVEL), stack);
 		}
 	}
 	
@@ -106,22 +108,105 @@ public class MineBlock extends Block {
 	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		if (!worldIn.isRemote()) {
 			if (entityIn instanceof LivingEntity) {
-				doEntityEffect(worldIn, (LivingEntity) entityIn, pos);
+				doEntityEffect(worldIn, (LivingEntity) entityIn, state.get(LEVEL), pos);
 				worldIn.destroyBlock(pos, false);
 			}
 		}
 	}
 	
-	protected void doHarvestEffect(World world, PlayerEntity player, BlockPos pos, Direction face, ItemStack stack) {
-		HarvestUtil.WalkVein(world, pos.offset(face), (walkWorld, walkPos, depth, state) -> {
-			//world.destroyBlock(walkPos, true);
-			((ServerPlayerEntity) player).interactionManager.tryHarvestBlock(walkPos);
-			return true;
-		});
+	protected void doHarvestEffect(World world, PlayerEntity player, BlockPos pos, Direction face, int level, ItemStack stack) {
+		if (level == 0) {
+			HarvestUtil.WalkVein(world, pos.offset(face), (walkWorld, walkPos, depth, state) -> {
+				//world.destroyBlock(walkPos, true);
+				((ServerPlayerEntity) player).interactionManager.tryHarvestBlock(walkPos);
+				return true;
+			});
+		} else {
+			// Do a set shape instead
+			final int hRange; // left/right of face 
+			final int vRange; // up/down of face (offset by 1)
+			final int dRange; // near/far of face
+			if (level == 1) {
+				// Small box
+				hRange = 3;
+				vRange = 3;
+				dRange = 3;
+			} else if (level == 2) {
+				// Large box
+				hRange = 5;
+				vRange = 5;
+				dRange = 5;
+			} else /*if (level == 3)*/ {
+				// Deep box
+				hRange = 3;
+				vRange = 3;
+				dRange = 10;
+			}
+			
+			int xMin = -1;
+			int xMax = 1;
+			int yMin = -1;
+			int yMax = 1;
+			int zMin = 0;
+			int zMax = 10;
+			switch (face) {
+			case NORTH:
+			default:
+				xMin = -(hRange/2);
+				xMax = hRange/2;
+				yMin = -1;
+				yMax = -1 + (vRange-1);
+				zMin = -(dRange-1);
+				zMax = 0;
+				break;
+			case EAST:
+				zMin = -(hRange/2);
+				zMax = hRange/2;
+				yMin = -1;
+				yMax = -1 + (vRange-1);
+				xMin = 0;
+				xMax = (dRange-1);
+				break;
+			case SOUTH:
+				xMin = -(hRange/2);
+				xMax = hRange/2;
+				yMin = -1;
+				yMax = -1 + (vRange-1);
+				zMin = 0;
+				zMax = (dRange-1);
+				break;
+			case WEST:
+				zMin = -(hRange/2);
+				zMax = hRange/2;
+				yMin = -1;
+				yMax = -1 + (vRange-1);
+				xMin = -(dRange-1);
+				xMax = 0;
+				break;
+			case DOWN:
+			case UP:
+				// depth is +/- y
+				// x and z are arbitrary
+				yMin = (face == Direction.DOWN ? -(dRange-1) : 0);
+				yMax = (face == Direction.UP ? 0 : (dRange-1));
+				xMin = -(hRange/2);
+				xMax = hRange/2;
+				zMin = -(vRange/2);
+				zMax = (vRange/2);
+				break;
+			}
+			
+			final BlockPos start = pos.toImmutable().offset(face);
+			for (int x = xMin; x <= xMax; x++)
+			for (int y = yMin; y <= yMax; y++)
+			for (int z = zMin; z <= zMax; z++) {
+				((ServerPlayerEntity) player).interactionManager.tryHarvestBlock(start.add(x, y, z));
+			}
+		}
 	}
 
-	protected void doEntityEffect(World world, LivingEntity entity, BlockPos pos) {
-		entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, 20 * 10));
+	protected void doEntityEffect(World world, LivingEntity entity, int level, BlockPos pos) {
+		entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, 20 * 10, level / 2));
 		EvokerFangsEntity fangs = new EvokerFangsEntity(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5, 0, 0, null);
 		world.addEntity(fangs);
 	}

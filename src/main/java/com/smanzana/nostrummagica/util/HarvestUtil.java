@@ -300,17 +300,6 @@ public class HarvestUtil {
 //		return false;
 //	}
 	
-	private static boolean canVeinMine(BlockState state) {
-		return state != null && (
-				Tags.Blocks.ORES.contains(state.getBlock())
-					|| Tags.Blocks.STONE.contains(state.getBlock())
-				);
-	}
-	
-	private static boolean matchesVein(BlockState original, BlockState state) {
-		return state.getBlock() == original.getBlock();
-	}
-	
 	public static interface IVeinWalker {
 		/**
 		 * Visit a part of the vein.
@@ -320,6 +309,17 @@ public class HarvestUtil {
 		 * @return true to keep walking or false to stop
 		 */
 		public boolean visit(World world, BlockPos pos, int depth, BlockState state);
+		
+		public default boolean canVeinMine(World world, BlockPos pos, BlockState state) {
+			return state != null && (
+					Tags.Blocks.ORES.contains(state.getBlock())
+						|| Tags.Blocks.STONE.contains(state.getBlock())
+					);
+		}
+		
+		public default boolean matchesVein(World world, BlockPos pos, BlockState state, BlockState original) {
+			return state.getBlock() == original.getBlock();
+		}
 	}
 	
 	private static final int MAX_VEIN = 20;
@@ -359,7 +359,7 @@ public class HarvestUtil {
 			}
 			
 			BlockState state = world.getBlockState(visit.pos);
-			boolean isVein = canVeinMine(state) && matchesVein(startingState, state);
+			boolean isVein = walker.canVeinMine(world, visit.pos, state) && walker.matchesVein(world, visit.pos, state, startingState);
 			if (isVein) {
 				if (walker.visit(world, visit.pos, visit.depth, world.getBlockState(visit.pos))) {
 					next.add(new NextNode(visit.pos.east(), visit.depth+1));

@@ -1,0 +1,7 @@
+{
+    "parent": "nostrummagica:block/mine_block",
+    "textures": {
+        "all": "nostrummagica:block/mine_hole_1",
+        "particle": "nostrummagica:block/mine_hole_1"
+    }
+}

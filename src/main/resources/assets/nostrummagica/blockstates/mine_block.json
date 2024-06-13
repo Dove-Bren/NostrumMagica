@@ -1,10 +1,28 @@
 {
     "variants": {
-		"facing=north": { "model": "nostrummagica:block/mine_block", "x": 90, "y":180},
-		"facing=east": { "model": "nostrummagica:block/mine_block", "x": 90, "y": 270},
-		"facing=south": { "model": "nostrummagica:block/mine_block", "x": 90, "y": 0},
-		"facing=west": { "model": "nostrummagica:block/mine_block", "x": 90, "y": 90},
-		"facing=down": { "model": "nostrummagica:block/mine_block" },
-		"facing=up": { "model": "nostrummagica:block/mine_block", "x": 180}
+		"facing=north,level=0": { "model": "nostrummagica:block/mine_block", "x": 90, "y":180},
+		"facing=north,level=1": { "model": "nostrummagica:block/mine_block_1", "x": 90, "y":180},
+		"facing=north,level=2": { "model": "nostrummagica:block/mine_block_2", "x": 90, "y":180},
+		"facing=north,level=3": { "model": "nostrummagica:block/mine_block_3", "x": 90, "y":180},
+		"facing=east,level=0": { "model": "nostrummagica:block/mine_block", "x": 90, "y": 270},
+		"facing=east,level=1": { "model": "nostrummagica:block/mine_block_1", "x": 90, "y": 270},
+		"facing=east,level=2": { "model": "nostrummagica:block/mine_block_2", "x": 90, "y": 270},
+		"facing=east,level=3": { "model": "nostrummagica:block/mine_block_3", "x": 90, "y": 270},
+		"facing=south,level=0": { "model": "nostrummagica:block/mine_block", "x": 90, "y": 0},
+		"facing=south,level=1": { "model": "nostrummagica:block/mine_block_1", "x": 90, "y": 0},
+		"facing=south,level=2": { "model": "nostrummagica:block/mine_block_2", "x": 90, "y": 0},
+		"facing=south,level=3": { "model": "nostrummagica:block/mine_block_3", "x": 90, "y": 0},
+		"facing=west,level=0": { "model": "nostrummagica:block/mine_block", "x": 90, "y": 90},
+		"facing=west,level=1": { "model": "nostrummagica:block/mine_block_1", "x": 90, "y": 90},
+		"facing=west,level=2": { "model": "nostrummagica:block/mine_block_2", "x": 90, "y": 90},
+		"facing=west,level=3": { "model": "nostrummagica:block/mine_block_3", "x": 90, "y": 90},
+		"facing=down,level=0": { "model": "nostrummagica:block/mine_block" },
+		"facing=down,level=1": { "model": "nostrummagica:block/mine_block_1" },
+		"facing=down,level=2": { "model": "nostrummagica:block/mine_block_2" },
+		"facing=down,level=3": { "model": "nostrummagica:block/mine_block_3" },
+		"facing=up,level=0": { "model": "nostrummagica:block/mine_block", "x": 180},
+		"facing=up,level=1": { "model": "nostrummagica:block/mine_block_1", "x": 180},
+		"facing=up,level=2": { "model": "nostrummagica:block/mine_block_2", "x": 180},
+		"facing=up,level=3": { "model": "nostrummagica:block/mine_block_3", "x": 180}
     }
 }
