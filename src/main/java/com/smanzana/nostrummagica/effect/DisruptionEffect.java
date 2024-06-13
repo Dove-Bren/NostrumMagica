@@ -3,8 +3,15 @@ package com.smanzana.nostrummagica.effect;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierManager;
@@ -65,17 +72,37 @@ public class DisruptionEffect extends Effect {
 		if (event.getEntity() instanceof PlayerEntity && ((PlayerEntity) event.getEntity()).isCreative()) {
 			return;
 		}
-		final LivingEntity ent = (LivingEntity) event.getEntity();
+		final LivingEntity living = (LivingEntity) event.getEntity();
 		
-		EffectInstance effect = ent.getActivePotionEffect(NostrumEffects.disruption);
+		final @Nullable LivingEntity cause;
+		if (event instanceof NostrumTeleportEvent) {
+			cause = ((NostrumTeleportEvent) event).getCausingEntity();
+		} else {
+			cause = null;
+		}
+		
+		EffectInstance effect = living.getActivePotionEffect(NostrumEffects.disruption);
 		if (effect != null && effect.getDuration() > 0) {
-			NostrumMagicaSounds.CAST_FAIL.play(ent.world, ent.getPosX(), ent.getPosY(), ent.getPosZ());
-			event.setCanceled(true);
+			NostrumMagicaSounds.CAST_FAIL.play(living.world, living.getPosX(), living.getPosY(), living.getPosZ());
+			boolean damaged = false;
 			
-			if (effect.getAmplifier() > 0 && canDamage(ent)) {
+			@Nullable INostrumMagic causeAttr = cause == null ? null : NostrumMagica.getMagicWrapper(cause);
+			if (causeAttr != null && causeAttr.hasSkill(NostrumSkills.Ender_Corrupt)) {
+				// Do additional damage and don't cancel
+				living.attackEntityFrom(new MagicDamageSource(cause, EMagicElement.ENDER), 4f + effect.getAmplifier());
+				damaged = true;
+			} else {
+				event.setCanceled(true);
+			}
+			
+			if (effect.getAmplifier() > 0 && canDamage(living)) {
 				// Damage, too
-				ent.attackEntityFrom(DamageSource.DROWN, effect.getAmplifier());
-				markDamaged(ent);
+				living.attackEntityFrom(DamageSource.DROWN, effect.getAmplifier());
+				damaged = true;
+			}
+			
+			if (damaged) {
+				markDamaged(living);
 			}
 		}
 	}

@@ -7,10 +7,12 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
@@ -18,6 +20,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -187,14 +190,18 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	protected void consumeBall(LivingEntity caster, EntityEnderRodBall ball) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4;
+		final boolean hasShield = attr != null && attr.hasSkill(NostrumSkills.Ender_Weapon);
 		if (hasBonus) {
+			int hurtCount = 0;
 			for (LivingEntity ent : Entities.GetEntities((ServerWorld) caster.world, (e) -> {
 				return e != null
 						&& !NostrumMagica.IsSameTeam(e, caster)
 						&& e.getDistance(ball) <= 5;
 			})) {
 				doConsumeDamage(caster, ent);
+				hurtCount++;
 			}
 			
 			NostrumParticles.GLOW_ORB.spawn(ball.world, new SpawnParams(
@@ -202,6 +209,23 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 					ball.getPosX(), ball.getPosY() + ball.getHeight() / 2, ball.getPosZ(), .25, 50, 20,
 					new Vector3d(0, .1, 0), new Vector3d(.25, .05, .25)
 					).color(EMagicElement.ENDER.getColor()).gravity(true));
+			
+			if (hasShield && hurtCount > 0) {
+				// Apply effects if not present
+				final EffectInstance activePhysical = caster.getActivePotionEffect(NostrumEffects.physicalShield);
+				final EffectInstance activeMagic = caster.getActivePotionEffect(NostrumEffects.magicShield);
+				if (activePhysical == null || activePhysical.getDuration() < 15 * 20) {
+					caster.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 15 * 20, 0));
+				}
+				if (activeMagic == null || activeMagic.getDuration() < 15 * 20) {
+					caster.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, 15 * 20, 0));
+				}
+				
+				// Actually set amount
+				final float shieldAmt = 2f * hurtCount;
+				NostrumMagica.magicEffectProxy.applyPhysicalShield(caster, shieldAmt);
+				NostrumMagica.magicEffectProxy.applyMagicalShield(caster, shieldAmt);
+			}
 		}
 		
 		ball.remove();
