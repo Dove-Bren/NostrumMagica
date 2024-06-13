@@ -4,12 +4,14 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -86,7 +88,6 @@ public class FrostbiteEffect extends Effect {
 				cloud.setVerticleStepping(false);
 				cloud.setDuration(0);
 				cloud.setWaitTime(interval); // Turn off vanilla effects completely by putting all time in 'wait'
-				final EffectInstance effect = new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2);
 				cloud.setParticleData(ParticleTypes.ENTITY_EFFECT);
 				cloud.setColor(Integer.valueOf(PotionUtils.getPotionColorFromEffectList(Lists.newArrayList(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2)))));
 				cloud.setIgnoreRadius(true);
@@ -94,17 +95,29 @@ public class FrostbiteEffect extends Effect {
 				cloud.setCustomParticleYOffset(2f);
 				cloud.setCustomParticleFrequency(.4f);
 				//cloud.addEffect();
-				cloud.addEffect(new IAreaEntityEffect() {
-					@Override
-					public void apply(World world, Entity ent) {
-						if (effect.doesShowParticles()) {
-							effect.getEffectName();
-						}
-						if (ent instanceof LivingEntity) {
+				final boolean hasHeal = attr != null && attr.hasSkill(NostrumSkills.Ice_Weapon);
+				final boolean hasHealBoost = attr != null && attr.hasSkill(NostrumSkills.Ice_Master);
+				final boolean hasHealShield = attr != null && attr.hasSkill(NostrumSkills.Ice_Adept);
+				cloud.addEffect((World world, Entity ent) -> {
+					if (ent != entity) {
+						if (hasHeal && ent instanceof LivingEntity && NostrumMagica.IsSameTeam(entity, (LivingEntity) ent)) {
+							((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
+							((LivingEntity) ent).removeActivePotionEffect(NostrumEffects.frostbite);
+							
+							if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
+								((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
+							}
+							NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
+									10, ent.getPosX(), ent.getPosY() + ent.getHeight()/2, ent.getPosZ(), 4,
+									30, 10,
+									ent.getEntityId()
+									).color(this.getLiquidColor()).dieOnTarget(true));
+						} else if (ent instanceof LivingEntity) {
 							((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2));
 						}
 					}
-				});
+				}
+				);
 				cloud.addEffect(new IAreaLocationEffect() {
 					@Override
 					public void apply(World world, BlockPos pos) {

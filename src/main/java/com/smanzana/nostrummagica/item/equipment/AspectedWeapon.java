@@ -11,6 +11,7 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityAreaEffect;
@@ -540,15 +541,16 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	protected static void spawnIceCloud(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
+		final int blizzardCount = MagicArmor.GetSetCount(caster, EMagicElement.ICE, MagicArmor.Type.TRUE);
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
+		cloud.setColor(NostrumEffects.frostbite.getLiquidColor());
 		cloud.setWaitTime(5);
 		cloud.setRadius(0.5f);
 		cloud.setRadiusPerTick((1f + typeScale(weaponType) * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
-		cloud.setDuration((int) (20 * (3 + typeScale(weaponType) * .5f))); // 3 seconds + a half a second per extra level
-		cloud.addEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 10));
+		cloud.setDuration((int) (20 * (3 + (typeScale(weaponType) * .5f) + (blizzardCount == 4 ? 6 : 0)))); // 3 seconds + a half a second per extra level
 		cloud.addEffect((IAreaLocationEffect)(worldIn, pos) -> {
 			BlockState state = worldIn.getBlockState(pos);
 			if (state.getMaterial() == Material.WATER
@@ -559,18 +561,23 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		final boolean hasHeal = attr != null && attr.hasSkill(NostrumSkills.Ice_Weapon);
 		final boolean hasHealBoost = attr != null && attr.hasSkill(NostrumSkills.Ice_Master);
 		final boolean hasHealShield = attr != null && attr.hasSkill(NostrumSkills.Ice_Adept);
-		if (hasHeal) {
-			cloud.addEffect((World w, Entity ent) -> {
-				if (ent instanceof LivingEntity && NostrumMagica.IsSameTeam(caster, (LivingEntity) ent)) {
-					((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
-					((LivingEntity) ent).removeActivePotionEffect(NostrumEffects.frostbite);
-					
-					if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
-						((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
-					}
+		cloud.addEffect((World w, Entity ent) -> {
+			if (hasHeal && ent != caster && ent instanceof LivingEntity && NostrumMagica.IsSameTeam(caster, (LivingEntity) ent)) {
+				((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
+				((LivingEntity) ent).removeActivePotionEffect(NostrumEffects.frostbite);
+				
+				if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
+					((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
 				}
-			});
-		}
+				NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
+						10, ent.getPosX(), ent.getPosY() + ent.getHeight()/2, ent.getPosZ(), 4,
+						30, 10,
+						ent.getEntityId()
+						).color(NostrumEffects.frostbite.getLiquidColor()).dieOnTarget(true));
+			} else if (ent instanceof LivingEntity) {
+				((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 10));
+			}
+		});
 		cloud.setVerticleStepping(true);
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();

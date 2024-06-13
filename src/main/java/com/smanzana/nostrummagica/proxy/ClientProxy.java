@@ -237,7 +237,7 @@ public class ClientProxy extends CommonProxy {
 	private void doCast(int castSlot) {
 		final PlayerEntity player = getPlayer();
 		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
-		if (castSlot < 0 || spells.length == 0 || spells.length <= castSlot) {
+		if (castSlot < 0 || spells == null || spells.length == 0 || spells.length <= castSlot) {
 			return;
 		}
 		
