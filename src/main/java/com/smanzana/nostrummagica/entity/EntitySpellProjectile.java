@@ -139,7 +139,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 	}
 	
 	public boolean canImpact(Entity entity) {
-		return true;
+		return this.shootingEntity == null || ((!entity.equals(shootingEntity) && !shootingEntity.isRidingOrBeingRiddenBy(entity)));
 	}
 	
 	protected void doImpact(Entity entity) {
@@ -157,6 +157,20 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 		}
 	}
 	
+	protected void doClientEffect() {
+		int color = getElement().getColor();
+		color = (0x19000000) | (color & 0x00FFFFFF);
+		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+				2,
+				getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
+				new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+			).color(color));
+	}
+	
+	protected void onProjectileDeath() {
+		
+	}
+	
 	@Override
 	public void tick() {
 		super.tick();
@@ -170,16 +184,11 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 			// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 			if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
 				trigger.onProjectileEnd(this.getPositionVec());
+				this.onProjectileDeath();
 				this.remove();
 			}
 		} else {
-			int color = getElement().getColor();
-			color = (0x19000000) | (color & 0x00FFFFFF);
-			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-					2,
-					getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
-					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
-				).color(color));
+			doClientEffect();
 		}
 	}
 
@@ -196,6 +205,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 			if (canImpact) {
 				this.doImpact(pos);
 				if (this.dieOnImpact(pos)) {
+					this.onProjectileDeath();
 					this.remove();
 					return;
 				}
@@ -204,11 +214,12 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 			Entity entityHit = ((EntityRayTraceResult) result).getEntity();
 			if (entityHit instanceof EntitySpellProjectile) {
 				; // Just don't hit other projectiles
-			} else if (!entityHit.equals(shootingEntity) && !shootingEntity.isRidingOrBeingRiddenBy(entityHit)) {
+			} else {
 				boolean canImpact = this.canImpact(entityHit);
 				if (canImpact) {
 					this.doImpact(entityHit);
 					if (this.dieOnImpact(entityHit)) {
+						this.onProjectileDeath();
 						this.remove();
 					}
 				}
@@ -248,5 +259,10 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 	
 	public @Nullable Entity getShooter() {
 		return super.func_234616_v_();
+	}
+	
+	@Override
+	protected boolean func_230298_a_(Entity entity) {
+		return this.canImpact(entity);
 	}
 }

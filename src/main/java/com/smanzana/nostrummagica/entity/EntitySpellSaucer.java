@@ -96,7 +96,7 @@ public abstract class EntitySpellSaucer extends EntitySpellProjectile {
 	
 	@Override
 	public boolean canImpact(Entity entity) {
-		return !hasBeenHit(entity, hitCooldown);
+		return super.canImpact(entity) && !hasBeenHit(entity, hitCooldown);
 	}
 	
 	@Override

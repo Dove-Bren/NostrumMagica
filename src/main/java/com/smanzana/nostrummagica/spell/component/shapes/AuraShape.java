@@ -143,7 +143,7 @@ public class AuraShape extends AreaShape {
 								null,
 								null
 								);
-						this.trigger(data, true);
+						this.trigger(data, 1f, true);
 					}
 				}
 				

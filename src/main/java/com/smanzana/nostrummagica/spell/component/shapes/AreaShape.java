@@ -98,7 +98,7 @@ public abstract class AreaShape extends SpellShape {
 							world,
 							list
 							);
-					this.trigger(data, true);
+					this.trigger(data, 1f, true);
 				}
 				
 				aliveCycles++;
@@ -119,7 +119,7 @@ public abstract class AreaShape extends SpellShape {
 							null,
 							null
 							);
-					this.trigger(data, true);
+					this.trigger(data, 1f, true);
 				}
 			}
 			return false;

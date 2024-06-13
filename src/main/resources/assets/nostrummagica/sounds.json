@@ -183,6 +183,18 @@
 			"nostrummagica:spell/heavy_strike"
 		]
 	},
+	"spell.bubble_pop":
+	{
+		"sounds": [
+			"nostrummagica:spell/bubble_pop"
+		]
+	},
+	"spell.bubble_spray":
+	{
+		"sounds": [
+			"nostrummagica:spell/bubble_spray"
+		]
+	},
     
     "player.levelup":
     {

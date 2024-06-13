@@ -63,15 +63,15 @@ public class Spell {
 		// May not be supported if isPreview() is true
 		public void triggerFail(World world, Vector3d pos);
 		public default void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations) {
-			this.trigger(targets, world, locations, false);
+			this.trigger(targets, world, locations, 1f, false);
 		}
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit);
+		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, float stageEfficiency, boolean forceSplit);
 	}
 	
 	public static class SpellState implements ISpellState {
 		protected final Spell spell;
-		protected final float efficiency;
 		protected final LivingEntity caster;
+		protected float efficiency;
 
 		protected int index;
 		private LivingEntity self;
@@ -94,14 +94,15 @@ public class Spell {
 		}
 		
 		@Override
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit) {
+		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, float stageEfficiency, boolean forceSplit) {
 			//for each target (if more than one), break into multiple spellstates
 			// persist index++ and set self, then start doing shapes or do ending effect
 			
 			// If being forced to split, dupe state right now and continue on that
 			if (forceSplit) {
-				this.split().trigger(targets, world, locations, false);
+				this.split().trigger(targets, world, locations, stageEfficiency, false);
 			} else {
+				this.efficiency *= stageEfficiency;
 				index++;
 				if (index >= spell.shapes.size()) {
 					this.finish(targets, world, locations);
@@ -265,7 +266,7 @@ public class Spell {
 				float efficiency = this.efficiency + (part.getPotency() - 1f);
 				
 				// Apply part-specific bonuses that don't matter on targets here
-				efficiency += getCasterEfficiencyBonus(caster, part, action, efficiency);
+				efficiency *= 1f + getCasterEfficiencyBonus(caster, part, action, efficiency);
 				
 				if (attr != null && attr.isUnlocked()) {
 					attr.setKnowledge(part.getElement(), part.getAlteration());
@@ -278,7 +279,7 @@ public class Spell {
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
 						// Apply per-target bonuses
-						float perEfficiency = efficiency + getTargetEfficiencyBonus(caster, targ, part, action, efficiency);
+						float perEfficiency = efficiency * (1f + getTargetEfficiencyBonus(caster, targ, part, action, efficiency));
 						
 						SpellActionResult result = action.apply(caster, targ, perEfficiency); 
 						if (result.applied) {
@@ -1016,7 +1017,7 @@ public class Spell {
 		}
 		
 		@Override
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, boolean forceSplit) {
+		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, float stageEfficiency, boolean forceSplit) {
 			//if (this.getIndex() != 1) {
 			{
 				if (targets != null && !targets.isEmpty()) {
@@ -1029,7 +1030,7 @@ public class Spell {
 					}
 				}
 			}
-			super.trigger(targets, world, locations, forceSplit);
+			super.trigger(targets, world, locations, stageEfficiency, forceSplit);
 		}
 
 		@Override

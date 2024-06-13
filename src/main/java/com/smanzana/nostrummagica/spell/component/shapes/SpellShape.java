@@ -91,11 +91,11 @@ public abstract class SpellShape {
 		}
 				
 		protected void trigger(TriggerData data) {
-			trigger(data, false);
+			trigger(data, 1f, false);
 		}
 		
-		protected void trigger(TriggerData data, boolean forceSplit) {
-			state.trigger(data.targets, data.world, data.pos, forceSplit);
+		protected void trigger(TriggerData data, float stageEfficiency, boolean forceSplit) {
+			state.trigger(data.targets, data.world, data.pos, stageEfficiency, forceSplit);
 		}
 		
 		protected ISpellState getState() {

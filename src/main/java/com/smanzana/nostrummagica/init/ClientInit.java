@@ -46,6 +46,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBody;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBramble;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossLeaf;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderSpellBubble;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellBullet;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellMortar;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellProjectile;
@@ -308,6 +309,7 @@ public class ClientInit {
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossBody, (manager) -> new RenderPlantBossBody(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.enderRodBall, (manager) -> new RenderEnderRodBall(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.areaEffect, (manager) -> new AreaEffectCloudRenderer(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellBubble, (manager) -> new RenderSpellBubble(manager, 1f));
 	}
 	
 	@SubscribeEvent

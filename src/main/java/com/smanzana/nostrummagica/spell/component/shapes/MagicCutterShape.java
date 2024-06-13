@@ -78,7 +78,7 @@ public class MagicCutterShape extends SpellShape {
 
 		@Override
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, world, Lists.newArrayList(pos), true);
+			getState().trigger(null, world, Lists.newArrayList(pos), 1f, true);
 		}
 		
 		@Override
@@ -89,7 +89,7 @@ public class MagicCutterShape extends SpellShape {
 			else if (NostrumMagica.resolveLivingEntity(entity) == null) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null, true);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null, 1f, true);
 			}
 		}
 

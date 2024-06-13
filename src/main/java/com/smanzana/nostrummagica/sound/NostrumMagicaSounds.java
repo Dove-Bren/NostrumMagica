@@ -70,6 +70,8 @@ public enum NostrumMagicaSounds {
 	BAUBLE_EQUIP("item.bauble.equip", SoundCategory.PLAYERS),
 	TICK("ambient.tick", SoundCategory.BLOCKS),
 	TOCK("ambient.tock", SoundCategory.BLOCKS),
+	BUBBLE_SPRAY("spell.bubble_spray", SoundCategory.AMBIENT),
+	BUBBLE_POP("spell.bubble_pop", SoundCategory.AMBIENT),
 	;
 	
 	private ResourceLocation resource;

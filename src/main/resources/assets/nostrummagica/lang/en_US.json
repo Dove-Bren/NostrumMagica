@@ -101,6 +101,7 @@
     "item.nostrummagica.rune_shape_aura": "Aura Rune",
 	"item.nostrummagica.rune_shape_self": "Self Rune",
 	"item.nostrummagica.rune_shape_ring": "Ring Rune",
+	"item.nostrummagica.rune_shape_bubblespray": "Bubble Spray Rune",
 
     "item.nostrummagica.crystal_small": "Mani Crystal",
     "item.nostrummagica.crystal_medium": "Kani Crystal",
@@ -485,6 +486,7 @@
     "entity.nostrummagica.entity_arcane_wolf": "Arcane Wolf",
     "entity.nostrummagica.entity_plant_boss": "Thistle Lord",
 	"entity.nostrummagica.entity_ender_rod_ball": "Ender Gravity Ball",
+	"entity.nostrummagica.spell_bubble": "Spell Bubble",
 
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 
@@ -1168,6 +1170,7 @@
 	"shape.vortex_blade.desc": "Creates a magical blade that circles the caster and applies its effects to any entities it hits.",
 	"shape.wall.desc": "Erects a magical wall that applies its effects to any entities and blocks inside it.",
 	"shape.cutter.desc": "Fires a projectile that pierces blocks and entities, applying effects to each it passes.",
+	"shape.bubblespray.desc": "Sprays several spell bubbles, which inflict a weakened version of the spell when they are collided with.",
 
     "ritual.buff.luck.name": "Ritual of Luck",
     "ritual.buff.luck.desc.name": "Gives the Luck I|Effect lasts for 2 minutes",
@@ -1311,6 +1314,7 @@
     "ritual.rune.feet.name": "At Feet Rune",
     "ritual.rune.aura.name": "Aura Rune",
     "ritual.rune.ring.name": "Ring Rune",
+	"ritual.rune.bubblespray.name": "Bubble Spray Rune",
 
     "ritual.charm.fire.name": "Fire Charm",
     "ritual.charm.ice.name": "Ice Charm",
@@ -1642,6 +1646,7 @@
     "modification.aura.float.name":"Radius",
     "modification.ring.name":"Effect Radius",
 	"modification.touch.bool.name": "Fizzle On Air",
+	"modification.bubblespray.name": "Range",
 
     "modification.level.flip": "Trigger When Above",
 	

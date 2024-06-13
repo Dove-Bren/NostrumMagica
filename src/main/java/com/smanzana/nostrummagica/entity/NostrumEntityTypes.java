@@ -80,6 +80,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(EntityAreaEffect.ID) public static EntityType<EntityAreaEffect> areaEffect;
 	@ObjectHolder(EntityKeySwitchTrigger.ID) public static EntityType<EntityKeySwitchTrigger> keySwitchTrigger;
 	@ObjectHolder(EntityEnderRodBall.ID) public static EntityType<EntityEnderRodBall> enderRodBall;
+	@ObjectHolder(EntitySpellBubble.ID) public static EntityType<EntitySpellBubble> spellBubble;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -248,6 +249,10 @@ public class NostrumEntityTypes {
 				.size(1.5f, 1.5f)
 				.setTrackingRange(128).setUpdateInterval(5).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityEnderRodBall.ID));
+		registry.register(EntityType.Builder.<EntitySpellBubble>create(EntitySpellBubble::new, EntityClassification.MISC)
+    			.size(0.125F, 0.125F)
+    			.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
+    		.build("").setRegistryName(EntitySpellBubble.ID));
 	}
 	
 	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
