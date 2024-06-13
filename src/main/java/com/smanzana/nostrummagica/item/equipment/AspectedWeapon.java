@@ -726,6 +726,27 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		if (entity instanceof PlayerEntity) {
 			NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 		}
+		
+		if (attr.hasSkill(NostrumSkills.Lightning_Weapon)) {
+			// Explode magic rend
+			// Spread
+			for (Entity ent : entity.getEntityWorld().getEntitiesInAABBexcluding(entity, entity.getBoundingBox().grow(5), (ent) -> ent instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) ent, entity))) {
+				((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicRend, 20 * 15, 0));
+				
+				NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
+						10, entity.getPosX(), entity.getPosY() + entity.getHeight()/2, entity.getPosZ(), 0,
+						40, 10,
+						ent.getEntityId()
+						).color(NostrumEffects.magicRend.getLiquidColor()).dieOnTarget(true));
+			}
+			
+			NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
+					50, entity.getPosX(), entity.getPosY() + entity.getHeight()/2, entity.getPosZ(), 0,
+					30, 10,
+					new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
+					).color(NostrumEffects.magicRend.getLiquidColor()).gravity(true));
+			//NostrumMagicaSounds.MELT_METAL.play(event.getEntityLiving());
+		}
 		return true;
 	}
 	

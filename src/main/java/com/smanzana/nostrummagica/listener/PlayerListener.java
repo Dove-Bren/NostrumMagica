@@ -1231,17 +1231,28 @@ public class PlayerListener {
 		}
 		
 		if (!e.isCanceled() && e.getEntity() instanceof LivingEntity) {
-			// If any players nearby have fire master skill, they can regain mana
+			// If any players nearby have lightning master skill, they can regain mana
 			for (Entity ent : e.getEntity().getEntityWorld().getEntitiesInAABBexcluding(e.getEntity(), e.getEntity().getBoundingBox().grow(10), (ent) -> true)) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
-				if (ent instanceof PlayerEntity && attr != null && attr.hasSkill(NostrumSkills.Lightning_Master)) {
+				if (ent instanceof PlayerEntity && attr != null) {
+					int mana = 0;
 					final LivingEntity source = (LivingEntity) e.getEntity();
-					regenMana((PlayerEntity) ent, 5);
-					NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
-							5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
-							40, 0,
-							ent.getEntityId()
-							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
+					if (attr.hasSkill(NostrumSkills.Lightning_Master)) {
+						mana += 5;
+					}
+					
+					if (attr.hasSkill(NostrumSkills.Lightning_Corrupt) && ((LivingEntity) e.getEntity()).getActivePotionEffect(NostrumEffects.magicRend) != null) {
+						mana += 5;
+					}
+					
+					if (mana > 0) {
+						regenMana((PlayerEntity) ent, mana);
+						NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
+								5, source.getPosX(), source.getPosY() + .75, source.getPosZ(), 0,
+								40, 0,
+								ent.getEntityId()
+								).color(1f, .4f, .8f, 1f).dieOnTarget(true));
+					}
 				}
 			}
 		}
