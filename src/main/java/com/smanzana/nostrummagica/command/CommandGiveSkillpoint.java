@@ -11,7 +11,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.server.command.EnumArgument;
@@ -23,7 +22,6 @@ public class CommandGiveSkillpoint {
 				Commands.literal("nostrumskillpoint")
 					.requires(s -> s.hasPermissionLevel(2))
 						.then(Commands.argument("element", EnumArgument.enumArgument(EMagicElement.class))
-								.suggests((ctx, sb) -> ISuggestionProvider.suggest(EMagicElement.GetNames(), sb))
 								.executes(ctx -> execute(ctx, ctx.getArgument("element", EMagicElement.class)))
 						)
 					.executes(ctx -> execute(ctx))

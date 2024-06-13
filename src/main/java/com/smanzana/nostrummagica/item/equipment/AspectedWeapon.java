@@ -106,6 +106,8 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	public static final String ID_LIGHTNING_ADEPT = ID_PREFIX + "lightning_" + ID_SUFFIX_ADEPT;
 	public static final String ID_LIGHTNING_MASTER = ID_PREFIX + "lightning_" + ID_SUFFIX_MASTER;
 	
+	private static final int WIND_COST = 15;
+	
 
 	public static boolean isWeaponElement(EMagicElement element) {
 		switch (element) {
@@ -356,8 +358,35 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		return item;
 	}
 	
+//	@Override
+//	public UseAction getUseAction(ItemStack stack) {
+//		if (hasWindPropel(stack)) {
+//			return UseAction.BOW;
+//		}
+//		return super.getUseAction(stack);
+//	}
+//	
+//	@Override
+//	public int getUseDuration(ItemStack stack) {
+//		// How long to let the player keep 'using' it.
+//		if (hasWindPropel(stack)) {
+//			// We set it high so they can hold it forever.
+//			// This value is copied from the bow.
+//			return 270000;
+//		}
+//		return super.getUseDuration(stack);
+//	}
+//	
+//	@Override
+//	public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
+//		if (player instanceof PlayerEntity && isWindPropel(stack, (PlayerEntity) player)) {
+//			doPropelTick(stack, (PlayerEntity) player);
+//		}
+//	}
+	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		Vector3d dir = playerIn.getLookVec();
 		dir = dir.add(0, -dir.y, 0).normalize();
 		
@@ -394,15 +423,16 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		} else if (element == EMagicElement.WIND) {
-			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-				if (playerIn.isSneaking()) {
-					if (!worldIn.isRemote) {
-						spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
-						ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
-					}
-					playerIn.resetCooldown();
-					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			if (playerIn.getCooledAttackStrength(0.5F) > .95 && playerIn.isSneaking()) {
+				if (!worldIn.isRemote) {
+					spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
+					ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 				}
+				playerIn.resetCooldown();
+				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			} else if (isWindPropel(itemStackIn, playerIn)) {
+				doPropel(itemStackIn,  playerIn);
+				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 			}
 			
 		} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4) {
@@ -418,7 +448,6 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
-					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isRemote) {
 							final float maxDist = 50;
@@ -781,5 +810,35 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					.dieOnTarget(false)
 					.setTargetBehavior(TargetBehavior.ORBIT)
 			);
+	}
+	
+	protected static boolean isWindPropel(ItemStack stack, PlayerEntity player) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		return hasWindPropel(stack) && attr != null && attr.hasSkill(NostrumSkills.Wind_Weapon) && attr.getMana() >= WIND_COST;
+	}
+	
+	protected static boolean hasWindPropel(ItemStack stack) {
+		AspectedWeapon weapon = (AspectedWeapon) stack.getItem();
+		return weapon.element == EMagicElement.WIND && weapon.type == Type.MASTER;
+	}
+	
+	private static SpellAction propelAction = new SpellAction().propel(1);
+	
+	protected static void doPropel(ItemStack stack, PlayerEntity player) {
+		if (isWindPropel(stack, player)) {
+			// Adjust velocity, ignoring downward velocity so players can use it to move even when falling down fast
+			Vector3d motion = player.getMotion();
+			if (motion.y < 0) {
+				motion = new Vector3d(motion.x, 0, motion.z);
+			}
+			if (motion.length() < 1.0 || player.isElytraFlying()) {
+				propelAction.apply(player, player, 1f);
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+				attr.addMana(-WIND_COST);
+				NostrumMagica.instance.proxy.sendMana(player);
+			}
+		} else {
+			player.stopActiveHand();
+		}
 	}
 }

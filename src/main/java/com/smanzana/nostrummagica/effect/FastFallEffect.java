@@ -39,7 +39,6 @@ public class FastFallEffect extends Effect {
 			entity.setMotion(motion.x, y, motion.z);
 			//entity.velocityChanged = true;
 		}
-		
 	}
 	
 	@Override

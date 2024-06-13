@@ -781,7 +781,21 @@ public class Spell {
 		case LIGHTNING:
 			return new SpellAction().status(NostrumEffects.magicRend, duration, amp).name("magicrend");
 		case WIND:
-			return new SpellAction().status(NostrumEffects.fastFall, duration, amp).name("fastfall");
+			return new SpellAction().status(NostrumEffects.fastFall, duration, amp, (caster, target, eff) -> {
+				// With the corrupt skill, don't apply fastfall to friendlies
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Wind_Corrupt)) {
+					return !NostrumMagica.IsSameTeam(caster, target);
+				}
+				return true;
+			}).status(Effects.SLOW_FALLING, duration, amp, (caster, target, eff) -> {
+				// With the corrupt skill, apply slowfall to friendlies
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Wind_Corrupt)) {
+					return NostrumMagica.IsSameTeam(caster, target);
+				}
+				return false;
+			}).name("fastfall");
 		}
 		
 		return null;

@@ -488,6 +488,10 @@ public class SpellAction {
 		public int getAmplifier(LivingEntity caster, LivingEntity target, float efficiency);
 	}
 	
+	public static interface IOptionalEffectFilter {
+		public boolean test(LivingEntity caster, LivingEntity target, float efficiency);
+	}
+	
 	private static class AmplifiedStatusEffect extends StatusEffect {
 		
 		protected final IAmpProvider amplifierSupplier;
@@ -500,6 +504,22 @@ public class SpellAction {
 		@Override
 		protected @Nonnull EffectInstance makeEffect(LivingEntity caster, LivingEntity target, float efficiency, SpellActionResult resultBuilder) {
 			return new EffectInstance(effect, (int) (duration * efficiency), this.amplifierSupplier.getAmplifier(caster, target, efficiency));
+		}
+	}
+	
+	private static class OptionalStatusEffect extends StatusEffect {
+		protected final IOptionalEffectFilter predicate;
+		
+		public OptionalStatusEffect(Effect effect, int duration, int amplifier, IOptionalEffectFilter predicate) {
+			super(effect, duration, amplifier);
+			this.predicate = predicate;
+		}
+		
+		@Override
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+			if (this.predicate.test(caster, entity, efficiency)) {
+				super.applyEffect(caster, entity, efficiency, resultBuilder);
+			}
 		}
 	}
 	
@@ -1219,7 +1239,11 @@ public class SpellAction {
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
 
 			Vector3d force = entity.getLookVec().add(0, 0.15, 0).normalize();
-			float scale = 1f * (.5f * (level + 1)) * (float) (Math.max(0.0, Math.min(2.0, 1.0 - Math.log(efficiency))));
+			float scale = 1f * (.5f * (level + 1)) * efficiency;
+			
+			if (entity.isElytraFlying()) {
+				scale *= .5f;
+			}
 			
 			force = new Vector3d(force.x * scale, force.y * scale, force.z * scale);
 			
@@ -2333,6 +2357,11 @@ public class SpellAction {
 	
 	public SpellAction status(Effect effect, int duration, IAmpProvider amplitude) {
 		effects.add(new AmplifiedStatusEffect(effect, duration, amplitude));
+		return this;
+	}
+	
+	public SpellAction status(Effect effect, int duration, int amplitude, IOptionalEffectFilter filter) {
+		effects.add(new OptionalStatusEffect(effect, duration, amplitude, filter));
 		return this;
 	}
 	
