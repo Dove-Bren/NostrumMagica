@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.MagicWall;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.effect.ElementalEnchantEffect;
@@ -1627,7 +1628,7 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos pos = location.hitBlockPos;
-			if (!world.isAirBlock(pos)) {
+			if (!world.isAirBlock(pos) && !(world.getBlockState(pos).getBlock() instanceof MagicWall)) {
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos);
 			} else {
 				NostrumMagicaSounds.DAMAGE_WIND.play(world, pos);
