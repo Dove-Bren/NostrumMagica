@@ -51,15 +51,16 @@ public class FieldShape extends AreaShape {
 		
 		@Override
 		protected boolean isInArea(LivingEntity entity) {
-			return origin.distanceTo(new Vector3d(entity.getPosX(), origin.y, entity.getPosZ())) <= radius; // compare against our y for horizontal distance.
+			return Math.abs(entity.getPosY() - origin.getY()) < 1
+					&& origin.distanceTo(new Vector3d(entity.getPosX(), origin.y, entity.getPosZ())) <= radius; // compare against our y for horizontal distance.
 			// .75 wiggle room in listener means you can't be way below.
 		}
 
 		@Override
 		protected boolean isInArea(World world, BlockPos pos) {
-			return (Math.abs((Math.floor(origin.x) + .5) - (pos.getX() + .5))
-					+ Math.abs(origin.y - pos.getY())
-					+ Math.abs((Math.floor(origin.z) + .5) - (pos.getZ() + .5))) < radius;
+			return pos.getY() == origin.getY() &&
+					(Math.abs((Math.floor(origin.x) + .5) - (pos.getX() + .5))
+					+ Math.abs((Math.floor(origin.z) + .5) - (pos.getZ() + .5))) <= radius;
 		}
 
 		@Override
