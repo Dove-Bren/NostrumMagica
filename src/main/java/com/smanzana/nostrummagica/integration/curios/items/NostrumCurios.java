@@ -70,25 +70,25 @@ public class NostrumCurios {
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RIBBON_SMALL)
 				.attrID(attrIDSmallRibbon)
 				.requiresMagic()
-				.manaBonus(100)
+				.manaBonus(50)
 				.setRegistryName(NostrumCurio.ID_RIBBON_SMALL));
 		
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RIBBON_MEDIUM)
 				.attrID(attrIDMediumRibbon)
 				.requiresMagic()
-				.manaBonus(250)
+				.manaBonus(100)
 				.setRegistryName(NostrumCurio.ID_RIBBON_MEDIUM));
 		
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RIBBON_LARGE)
 				.attrID(attrIDLargeRibbon)
 				.requiresMagic()
-				.manaBonus(600)
+				.manaBonus(200)
 				.setRegistryName(NostrumCurio.ID_RIBBON_LARGE));
 		
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RIBBON_FIERCE)
 				.attrID(attrIDFierceRibbon)
 				.requiresMagic()
-				.manaBonus(1000)
+				.manaBonus(350)
 				.manaRegenModifier(-.75f)
 				.setRegistryName(NostrumCurio.ID_RIBBON_FIERCE));
 		
