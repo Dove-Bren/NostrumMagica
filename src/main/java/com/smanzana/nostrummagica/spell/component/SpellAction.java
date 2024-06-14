@@ -1723,7 +1723,7 @@ public class SpellAction {
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			final BlockState state = NostrumBlocks.cursedFire.GetWithLevel(level);
 			final BlockPos pos = location.hitBlockPos;
-			if (state.isValidPosition(location.world, pos) && location.world.setBlockState(pos, state)) {
+			if (location.world.getBlockState(pos).getMaterial().isReplaceable() && state.isValidPosition(location.world, pos) && location.world.setBlockState(pos, state)) {
 				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world, pos);
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
