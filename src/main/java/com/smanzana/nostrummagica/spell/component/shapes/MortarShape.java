@@ -199,6 +199,11 @@ public class MortarShape extends SpellShape {
 	public MortarShape() {
 		super(ID);
 	}
+	
+	protected boolean getNoArc(SpellShapePartProperties properties) {
+		// We use param's flip to indicate whether to drop from the sky or not
+		return properties != null && properties.flip;
+	}
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
@@ -207,13 +212,7 @@ public class MortarShape extends SpellShape {
 
 	@Override
 	public MortarShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		boolean noArc = false;
-		
-		// We use param's flip to indicate whether to drop from the sky or not
-		if (params != null)
-			noArc = params.flip;
-		
-		// Add direction
+		boolean noArc = getNoArc(params);
 		return new MortarShapeInstance(state, world, location.shooterPosition, pitch, yaw, noArc, characteristics);
 	}
 
@@ -280,11 +279,7 @@ public class MortarShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		boolean noArc = false;
-		
-		// We use param's flip to indicate whether to drop from the sky or not
-		if (properties != null)
-			noArc = properties.flip;
+		boolean noArc = getNoArc(properties);
 		
 		// Do a little more work of getting a good vector for things
 		// that aren't players

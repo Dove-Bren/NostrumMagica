@@ -40,6 +40,10 @@ public class TouchShape extends InstantShape {
 		super(key);
 	}
 	
+	protected boolean getIgnoreAirHits(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
+	
 	protected float getTouchRange(ISpellState state, SpellShapePartProperties params) {
 		if (state.getSelf() instanceof PlayerEntity) {
 			return getTouchRange((PlayerEntity) state.getSelf(), params);
@@ -60,7 +64,7 @@ public class TouchShape extends InstantShape {
 		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), location.shooterPosition, pitch, yaw, range, new RayTrace.OtherLiving(state.getCaster()));
 		
 		if (trace == null || trace.getType() == RayTraceResult.Type.MISS) {
-			final boolean ignoreAirHits = params.flip;
+			final boolean ignoreAirHits = getIgnoreAirHits(params);
 			if (ignoreAirHits) {
 				return new TriggerData(null, null, null);
 			} else {

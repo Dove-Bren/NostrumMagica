@@ -119,7 +119,6 @@ public class MagicCutterShape extends SpellShape {
 	
 	@Override
 	public MagicCutterShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		// Add direction
 		return new MagicCutterShapeInstance(state, world, location.shooterPosition, pitch, yaw, characteristics);
 	}
 	

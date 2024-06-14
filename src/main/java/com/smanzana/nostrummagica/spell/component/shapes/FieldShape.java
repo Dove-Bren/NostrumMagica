@@ -123,6 +123,14 @@ public class FieldShape extends AreaShape {
 	public FieldShape() {
 		this(ID);
 	}
+	
+	protected float getRadius(SpellShapePartProperties properties) {
+		return Math.max(supportedFloats()[0], properties.level);
+	}
+	
+	protected boolean getContinuous(SpellShapePartProperties properties) {
+		return !properties.flip;
+	}
 
 	@Override
 	public String getDisplayName() {
@@ -133,7 +141,7 @@ public class FieldShape extends AreaShape {
 	public FieldShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
 			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		return new FieldShapeInstance(state, world, location.hitPosition,
-				Math.max(supportedFloats()[0], properties.level), !properties.flip, characteristics);
+				getRadius(properties), getContinuous(properties), characteristics);
 	}
 
 	@Override
@@ -175,7 +183,7 @@ public class FieldShape extends AreaShape {
 				new ItemStack(Items.DRAGON_BREATH),
 				new ItemStack(Blocks.EMERALD_BLOCK),
 				new ItemStack(Blocks.DIAMOND_BLOCK),
-				new ItemStack(NostrumItems.crystalLarge, 1)
+				new ItemStack(NostrumItems.crystalMedium, 1)
 				);
 		}
 		return costs;
@@ -183,7 +191,8 @@ public class FieldShape extends AreaShape {
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 100;
+		final float radius = getRadius(properties);
+		return 45 + 5 * (int) (radius / .5f);
 	}
 
 	@Override
@@ -203,7 +212,7 @@ public class FieldShape extends AreaShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		float radius = Math.max(supportedFloats()[0], properties.level) - .25f;
+		final float radius = getRadius(properties) - .25f;
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
 	}

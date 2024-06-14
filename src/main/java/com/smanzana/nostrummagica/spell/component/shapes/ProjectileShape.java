@@ -161,6 +161,11 @@ public class ProjectileShape extends SpellShape {
 		super(ID);
 	}
 	
+	protected boolean getHitsAllies(SpellShapePartProperties properties) {
+		// We use param's flip to indicate whether allies should be hit
+		return properties != null && properties.flip;
+	}
+	
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
 		return 30;
@@ -169,13 +174,7 @@ public class ProjectileShape extends SpellShape {
 	@Override
 	public ProjectileShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean atMax = false; // legacy
-		boolean hitAllies = false;
-		
-		// We use param's flip to indicate whether allies should be hit
-		if (params != null)
-			hitAllies = params.flip;
-		
-		// Add direction
+		boolean hitAllies = getHitsAllies(params);
 		return new ProjectileShapeInstance(state, world, location.shooterPosition, pitch, yaw, atMax, hitAllies, characteristics);
 	}
 
@@ -242,7 +241,7 @@ public class ProjectileShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		boolean hitAllies = false;
+		final boolean hitAllies = getHitsAllies(properties);
 		final Vector3d dir;
 		final LivingEntity self = state.getSelf();
 		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
@@ -252,10 +251,6 @@ public class ProjectileShape extends SpellShape {
 		} else {
 			dir = Projectiles.getVectorForRotation(pitch, yaw);
 		}
-		
-		// We use param's flip to indicate whether allies should be hit
-		if (properties != null)
-			hitAllies = properties.flip;
 		
 		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, new ProjectileFilter(state, hitAllies));
 		if (trace.getType() == RayTraceResult.Type.BLOCK) {

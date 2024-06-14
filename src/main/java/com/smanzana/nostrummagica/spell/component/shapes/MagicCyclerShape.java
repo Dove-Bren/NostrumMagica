@@ -100,20 +100,23 @@ public class MagicCyclerShape extends SpellShape {
 		this(ID);
 	}
 	
+	protected float getDurationSecs(SpellShapePartProperties properties) {
+		//Float param is duration param
+		if (properties == null || properties.level == 0) {
+			return supportedFloats()[0];
+		}
+		return properties.level;
+	}
+	
+	protected boolean getHitsBlocks(SpellShapePartProperties properties) {
+		// We use param's flip to indicate whether we should interact with blocks
+		return properties.flip;
+	}
+	
 	@Override
 	public MagicCyclerShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		// We use param's flip to indicate whether we should interact with blocks
-		boolean onBlocks = false;
-		if (params != null)
-			onBlocks = params.flip;
-		
-		// Float param is duration param
-		float duration = this.supportedFloats()[0];
-		if (params != null && params.level != 0f)
-			duration = params.level;
-			
-		
-		// Add direction
+		boolean onBlocks = getHitsBlocks(params);
+		float duration = this.getDurationSecs(params);
 		return new MagicCyclerShapeInstance(state, world, location.shooterPosition, onBlocks, duration, characteristics);
 	}
 	

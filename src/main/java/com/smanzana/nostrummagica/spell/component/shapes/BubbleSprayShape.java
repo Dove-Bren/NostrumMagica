@@ -123,6 +123,10 @@ public class BubbleSprayShape extends SpellShape {
 		super(ID);
 	}
 	
+	protected float getRangeMod(SpellShapePartProperties properties) {
+		return Math.max(1f, properties.level);
+	}
+	
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
 		return 30;
@@ -130,9 +134,7 @@ public class BubbleSprayShape extends SpellShape {
 
 	@Override
 	public BubbleSprayShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		// Range is the float param
-		final float rangeMod = Math.max(1f, params.level);
-		
+		final float rangeMod = getRangeMod(params);
 		return new BubbleSprayShapeInstance(state, world, location.shooterPosition, pitch, yaw, rangeMod, characteristics);
 	}
 
@@ -193,7 +195,7 @@ public class BubbleSprayShape extends SpellShape {
 	
 	@Override
 	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
-		return SPRAY_RANGE_BASE * Math.max(1f, params.level);
+		return SPRAY_RANGE_BASE * this.getRangeMod(params);
 	}
 	
 	@Override

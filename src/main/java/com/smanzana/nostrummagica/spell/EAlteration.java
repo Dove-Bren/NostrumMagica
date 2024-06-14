@@ -13,15 +13,15 @@ import net.minecraft.util.ResourceLocation;
 
 public enum EAlteration {
 
-	INFLICT("Inflict", 10, 1, ReagentType.GRAVE_DUST),
-	RESIST("Resist", 30, 1, ReagentType.CRYSTABLOOM),
-	SUPPORT("Support", 15, 1, ReagentType.GINSENG),
-	GROWTH("Growth", 25, 1, ReagentType.SKY_ASH),
-	ENCHANT("Enchant", 40, 1, ReagentType.BLACK_PEARL),
-	CONJURE("Conjure", 30, 1, ReagentType.MANDRAKE_ROOT),
-	SUMMON("Summon", 50, 2, ReagentType.MANI_DUST),
-	RUIN("Ruin", 30, 2, ReagentType.SPIDER_SILK),
-	CORRUPT("Corrupt", 45, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
+	INFLICT("Inflict", 5, 1, ReagentType.GRAVE_DUST),
+	RESIST("Resist", 10, 1, ReagentType.CRYSTABLOOM),
+	SUPPORT("Support", 10, 1, ReagentType.GINSENG),
+	GROWTH("Growth", 15, 1, ReagentType.SKY_ASH),
+	ENCHANT("Enchant", 15, 1, ReagentType.BLACK_PEARL),
+	CONJURE("Conjure", 20, 1, ReagentType.MANDRAKE_ROOT),
+	SUMMON("Summon", 30, 2, ReagentType.MANI_DUST),
+	RUIN("Ruin", 15, 2, ReagentType.SPIDER_SILK),
+	CORRUPT("Corrupt", 15, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
 	;
 	
 	private final ResourceLocation glyph;

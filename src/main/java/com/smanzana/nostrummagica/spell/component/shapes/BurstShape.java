@@ -39,6 +39,10 @@ public class BurstShape extends InstantShape {
 		this(ID);
 	}
 	
+	protected float getRadius(SpellShapePartProperties properties) {
+		return Math.max(supportedFloats()[0], properties.level);
+	}
+	
 	@Override
 	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
@@ -48,7 +52,7 @@ public class BurstShape extends InstantShape {
 		
 		List<LivingEntity> ret = new ArrayList<>();
 		
-		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + .5;
+		double radiusEnts = getRadius(param) + .5;
 		final Vector3d center = location.hitPosition;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
@@ -66,7 +70,7 @@ public class BurstShape extends InstantShape {
 		
 		List<SpellLocation> list = new ArrayList<>();
 		
-		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level)));
+		final int radiusBlocks = Math.round(Math.max(2.0f, getRadius(param)));
 		
 		final BlockPos centerBlock = location.hitBlockPos;
 		if (radiusBlocks == 0) {
@@ -154,7 +158,8 @@ public class BurstShape extends InstantShape {
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 40;
+		final float radius = getRadius(properties);
+		return 30 + (radius > 5f ? 10 : 0);
 	}
 
 	@Override
@@ -168,8 +173,8 @@ public class BurstShape extends InstantShape {
 	}
 	
 	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		float radiusEnts = Math.max(supportedFloats()[0], properties.level);
-		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radiusEnts));
+		final float radius = getRadius(properties);
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 	}
 	
 	@Override

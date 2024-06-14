@@ -126,10 +126,18 @@ public class OnManaShape extends SpellShape {
 		this(ID);
 	}
 	
+	protected int getLevel(SpellShapePartProperties properties) {
+		return Math.max((int) supportedFloats()[0], (int) properties.level);
+	}
+	
+	protected boolean getOnAbove(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
+	
 	@Override
 	public ManaShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new ManaShapeInstance(state, state.getCaster(),
-				Math.max((int) supportedFloats()[0], (int) params.level), params.flip, 300, characteristics);
+				getLevel(params), getOnAbove(params), 300, characteristics);
 	}
 	
 	@Override

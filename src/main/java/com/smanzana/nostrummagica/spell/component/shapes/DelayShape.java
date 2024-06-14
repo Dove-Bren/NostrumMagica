@@ -68,9 +68,13 @@ public class DelayShape extends SpellShape {
 		this(ID);
 	}
 	
+	protected int getDelaySecs(SpellShapePartProperties properties) {
+		return Math.max((int) supportedFloats()[0], (int) properties.level);
+	}
+	
 	@Override
 	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new DelayShapeInstance(state, Math.max(20 * (int) supportedFloats()[0], (int) params.level), characteristics);
+		return new DelayShapeInstance(state, 20 * getDelaySecs(params), characteristics);
 	}
 	
 	@Override
@@ -125,7 +129,7 @@ public class DelayShape extends SpellShape {
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 20;
+		return 10;
 	}
 
 	@Override

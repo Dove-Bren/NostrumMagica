@@ -45,6 +45,10 @@ public class RingShape extends BurstShape {
 		this(ID);
 	}
 	
+	protected float getRadius(SpellShapePartProperties properties) {
+		return Math.max(supportedFloats()[0], properties.level);
+	}
+	
 	@Override
 	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
@@ -54,7 +58,7 @@ public class RingShape extends BurstShape {
 		
 		List<LivingEntity> ret = new ArrayList<>();
 		
-		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + INNER_RADIUS + .5;
+		double radiusEnts = getRadius(param) + INNER_RADIUS + .5;
 		final Vector3d centerPos = location.hitPosition;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
@@ -79,7 +83,7 @@ public class RingShape extends BurstShape {
 		
 		List<SpellLocation> list = new ArrayList<>();
 		
-		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level + INNER_RADIUS)));
+		final int radiusBlocks = Math.round(Math.max(2.0f, getRadius(param) + INNER_RADIUS));
 		
 		final BlockPos center = location.hitBlockPos;
 		if (radiusBlocks == 0) {
@@ -188,7 +192,7 @@ public class RingShape extends BurstShape {
 	
 	@Override
 	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		float radiusEnts = Math.max(supportedFloats()[0], properties.level) + INNER_RADIUS;
+		float radiusEnts = getRadius(properties) + INNER_RADIUS;
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radiusEnts));
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) INNER_RADIUS));
 	}

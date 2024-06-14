@@ -187,16 +187,19 @@ public class SeekingBulletShape extends SpellShape {
 	public SeekingBulletShape() {
 		super(ID);
 	}
+	
+	protected boolean getIgnoresAllies(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 50;
+		return 35;
 	}
 
 	@Override
 	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		// Add direction
-		return new SeekingBulletShapeInstance(state, world, location.shooterPosition, pitch, yaw, params.flip, characteristics);
+		return new SeekingBulletShapeInstance(state, world, location.shooterPosition, pitch, yaw, getIgnoresAllies(params), characteristics);
 	}
 
 	// Copied from vanilla entity class
@@ -282,7 +285,7 @@ public class SeekingBulletShape extends SpellShape {
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d start = state.getSelf().getEyePosition(0f);
 		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
-		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, properties.flip);
+		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, getIgnoresAllies(properties));
 		if (target != null) {
 			state.trigger(Lists.newArrayList(target), null, null);
 			return true;

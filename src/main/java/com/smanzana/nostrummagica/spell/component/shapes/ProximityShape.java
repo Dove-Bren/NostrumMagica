@@ -11,6 +11,8 @@ import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -89,9 +91,13 @@ public class ProximityShape extends SpellShape {
 		super(ID);
 	}
 	
+	protected float getRange(SpellShapePartProperties properties) {
+		return Math.max(supportedFloats()[0], properties.level);
+	}
+	
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 30;
+		return 20;
 	}
 
 	@Override
@@ -105,7 +111,7 @@ public class ProximityShape extends SpellShape {
 	public ProximityShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
 			SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new ProximityShapeInstance(state, world, location.hitPosition,
-				Math.max(supportedFloats()[0], params.level), characteristics);
+				getRange(params), characteristics);
 	}
 
 	@Override
@@ -169,6 +175,13 @@ public class ProximityShape extends SpellShape {
 
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		final float radius = getRange(properties);
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
+		return true;
 	}
 }

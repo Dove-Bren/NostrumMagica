@@ -115,9 +115,13 @@ public class OnDamageShape extends SpellShape {
 		this(ID);
 	}
 	
+	protected int getDurationSecs(SpellShapePartProperties properties) {
+		return (int) properties.level;
+	}
+	
 	@Override
 	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new OnDamageShapeInstance(state, state.getSelf(), (int) params.level, characteristics);
+		return new OnDamageShapeInstance(state, state.getSelf(), getDurationSecs(params), characteristics);
 	}
 	
 	@Override

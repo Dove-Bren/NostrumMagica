@@ -192,11 +192,19 @@ public class AuraShape extends AreaShape {
 		this(ID);
 	}
 	
+	protected float getRadius(SpellShapePartProperties properties) {
+		return Math.max(supportedFloats()[0], properties.level);
+	}
+	
+	protected boolean includeAllies(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
+	
 	@Override
 	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new AuraTriggerInstance(state, world, state.getSelf(),
-				Math.max(supportedFloats()[0], params.level),
-				params.flip,
+				getRadius(params),
+				includeAllies(params),
 				characteristics);
 	}
 
@@ -233,7 +241,7 @@ public class AuraShape extends AreaShape {
 				ItemStack.EMPTY,
 				new ItemStack(Items.DRAGON_BREATH),
 				new ItemStack(NostrumItems.resourceSpriteCore, 1),
-				new ItemStack(NostrumItems.crystalMedium, 1)
+				new ItemStack(NostrumItems.crystalLarge, 1)
 				);
 		}
 		return costs;
@@ -251,12 +259,14 @@ public class AuraShape extends AreaShape {
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 300;
+		final float range = getRadius(properties);
+		return 50 + 100 * ((int) range / 5); // 50, 50, 150, 250
 	}
 
 	@Override
 	public int getWeight(SpellShapePartProperties properties) {
-		return 3;
+		final float range = getRadius(properties);
+		return range < 5 ? 2 : 3;
 	}
 
 	@Override
@@ -276,7 +286,7 @@ public class AuraShape extends AreaShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		final float range = Math.max(supportedFloats()[0], properties.level);
+		final float range = this.getRadius(getDefaultProperties());
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		
 		List<LivingEntity> ents = world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(location.hitPosition).grow(range + 1), (ent) -> 

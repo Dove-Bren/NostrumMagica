@@ -42,6 +42,14 @@ public class ChainShape extends InstantShape {
 		this(ID);
 	}
 	
+	protected int getMaxArcs(SpellShapePartProperties properties) {
+		return Math.max((int) supportedFloats()[0], (int) properties.level);
+	}
+	
+	protected boolean getTeamLock(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
+	
 	protected static class ChainTriggerData extends TriggerData {
 
 		private final Map<LivingEntity, List<LivingEntity>> links;
@@ -66,8 +74,8 @@ public class ChainShape extends InstantShape {
 		if (world == null)
 			world = target.world;
 		
-		int arc = Math.max((int) supportedFloats()[0], (int) params.level) + 1; // +1 to include center
-		final boolean teamLock = params.flip;
+		int arc = getMaxArcs(params) + 1; // +1 to include center
+		final boolean teamLock = getTeamLock(params);
 		
 		final Set<Entity> seen = new HashSet<>();
 		final List<LivingEntity> next = new ArrayList<>(arc * 2);
