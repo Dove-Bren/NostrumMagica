@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -268,8 +269,12 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+			final boolean extra = Screen.hasShiftDown();
 			tooltip.add(new StringTextComponent("Alteration").mergeStyle(TextFormatting.AQUA));
-			tooltip.add(new StringTextComponent("Weight " + alteration.getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
+			if (extra) {
+				tooltip.add(new StringTextComponent("Weight " + alteration.getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new StringTextComponent(alteration.getCost() + " Mana").mergeStyle(TextFormatting.GREEN));
+			}
 		}
 
 		@Override
@@ -307,12 +312,16 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+			final boolean extra = Screen.hasShiftDown();
 			SpellShapePartProperties params = getPieceShapeParam(stack);
 			tooltip.add(new StringTextComponent("Shape").mergeStyle(TextFormatting.DARK_RED));
 			if (shape.getAttributes(params).terminal) {
 				tooltip.add(new StringTextComponent("Terminal Shape").mergeStyle(TextFormatting.GRAY));
 			}
-			tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).mergeStyle(TextFormatting.DARK_PURPLE));
+			if (extra) {
+				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).mergeStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").mergeStyle(TextFormatting.GREEN));
+			}
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			if (comp.getShape().supportsBoolean() && params.flip) {
 				tooltip.add(new StringTextComponent(comp.getShape().supportedBooleanName() + ": On"));
