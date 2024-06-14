@@ -28,7 +28,7 @@ public class SpellUtils {
 				
 				spell.addPart(new SpellShapePart(shape, param));
 			} else if (o instanceof EMagicElement) {
-				EMagicElement element = (EMagicElement) objects[++i];
+				EMagicElement element = (EMagicElement) o;
 				Integer level = (Integer) objects[++i];
 				EAlteration alt = (EAlteration) objects[++i];
 				

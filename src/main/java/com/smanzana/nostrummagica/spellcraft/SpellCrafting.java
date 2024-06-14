@@ -203,7 +203,7 @@ public class SpellCrafting {
 	
 	protected static int CalculateManaCost(SpellCraftContext context, List<SpellCraftPart> parts) {
 		// Rolling multiplier makes it more expensive for one long spell vs many small
-		// (rate of 1.1x)
+		// (rate of 1.25x)
 		int cost = 0;
 		float multiplier = 1f;
 		
