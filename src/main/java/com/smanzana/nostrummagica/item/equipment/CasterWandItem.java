@@ -209,7 +209,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 			return false;
 		}
 		
-		return spell.shouldTrace();
+		return spell.shouldTrace(player);
 	}
 	
 	@Override
@@ -219,7 +219,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 			return 0;
 		}
 		
-		return spell.getTraceRange();
+		return spell.getTraceRange(player);
 	}
 	
 	@Override

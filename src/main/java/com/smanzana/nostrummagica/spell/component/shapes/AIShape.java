@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.vector.Vector3d;
@@ -88,7 +89,7 @@ public class AIShape extends InstantShape {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
 		return false;
 	}
 

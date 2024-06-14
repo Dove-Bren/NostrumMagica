@@ -259,12 +259,12 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
 		return MAX_DIST;
 	}
 	

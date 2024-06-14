@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
@@ -86,7 +87,7 @@ public class SelfShape extends InstantShape {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
 		return false;
 	}
 

@@ -3,13 +3,14 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
@@ -17,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -27,7 +29,7 @@ import net.minecraftforge.common.util.Lazy;
 public class TouchShape extends InstantShape {
 
 	public static final String ID = "touch";
-	public static final float TOUCH_RANGE = 3.0f;
+	public static final float AI_TOUCH_RANGE = 3.0f;
 	
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
@@ -38,12 +40,26 @@ public class TouchShape extends InstantShape {
 	protected TouchShape(String key) {
 		super(key);
 	}
+	
+	protected float getTouchRange(ISpellState state, SpellShapePartProperties params) {
+		if (state.getSelf() instanceof PlayerEntity) {
+			return getTouchRange((PlayerEntity) state.getSelf(), params);
+		} else {
+			return AI_TOUCH_RANGE;
+		}
+	}
+	
+	protected float getTouchRange(PlayerEntity player, SpellShapePartProperties params) {
+		// This copied from PlayerController#getBlockReachDistance
+		return (float) player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + (player.isCreative() ? 0 : -.5f);
+	}
 
 	@Override
 	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		pos = pos.add(0, state.getSelf().getEyeHeight(), 0);
+		final float range = getTouchRange(state, params);
 		
-		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, pitch, yaw, TOUCH_RANGE, new RayTrace.OtherLiving(state.getCaster()));
+		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), pos, pitch, yaw, range, new RayTrace.OtherLiving(state.getCaster()));
 		
 		if (trace == null || trace.getType() == RayTraceResult.Type.MISS) {
 			final boolean ignoreAirHits = params.flip;
@@ -51,7 +67,7 @@ public class TouchShape extends InstantShape {
 				return new TriggerData(null, null, null);
 			} else {
 				// Project where we reached and return there
-				return new TriggerData(null, world, Lists.newArrayList(new BlockPos(RayTrace.directionFromAngles(pitch, yaw).scale(TOUCH_RANGE).add(pos))));
+				return new TriggerData(null, world, Lists.newArrayList(new BlockPos(RayTrace.directionFromAngles(pitch, yaw).scale(range).add(pos))));
 			}
 		}
 		
@@ -110,13 +126,13 @@ public class TouchShape extends InstantShape {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(SpellShapePartProperties params) {
-		return TOUCH_RANGE;
+	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+		return getTouchRange(player, params);
 	}
 
 	@Override

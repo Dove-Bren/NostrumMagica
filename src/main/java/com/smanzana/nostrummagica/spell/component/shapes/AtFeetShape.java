@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.vector.Vector3d;
@@ -87,7 +88,7 @@ public class AtFeetShape extends InstantShape {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
 		return false;
 	}
 

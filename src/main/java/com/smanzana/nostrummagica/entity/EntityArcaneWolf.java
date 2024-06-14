@@ -334,7 +334,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 				(Spell.CreateAISpell("WolfFireBite")).addPart(new SpellShapePart(NostrumSpellShapes.Touch)).addPart(new SpellEffectPart(EMagicElement.FIRE, 2, EAlteration.RUIN)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 1),
 				(wolf, target) -> {
-					return wolf.getDistance(target) <= TouchShape.TOUCH_RANGE;
+					return wolf.getDistance(target) <= TouchShape.AI_TOUCH_RANGE;
 				}),
 		MAGIC_BOOST("magicboost", WolfSpellTargetGroup.ALLY, 20,
 				(Spell.CreateAISpell("WolfMagicBoost")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.FIRE, 1, EAlteration.SUPPORT)),

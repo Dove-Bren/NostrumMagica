@@ -1001,7 +1001,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		for (Spell spell : spells) {
-			if (spell != null && spell.shouldTrace()) {
+			if (spell != null && spell.shouldTrace(player)) {
 				return true;
 			}
 		}
@@ -1014,8 +1014,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		double largest = 0;
 		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		for (Spell spell : spells) {
-			if (spell != null && spell.shouldTrace()) {
-				largest = Math.max(largest, spell.getTraceRange());
+			if (spell != null && spell.shouldTrace(player)) {
+				largest = Math.max(largest, spell.getTraceRange(player));
 			}
 		}
 		

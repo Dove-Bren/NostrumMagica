@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -279,16 +280,18 @@ public abstract class SpellShape {
 	/**
 	 * Whether spells that start with this shape should request tracing when players have
 	 * the spell selected.
+	 * @param player TODO
 	 * @return
 	 */
-	public abstract boolean shouldTrace(SpellShapePartProperties params);
+	public abstract boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params);
 	
 	/**
-	 * if {@link #shouldTrace(SpellPartProperties)} is true, how far to trace
+	 * if {@link #shouldTrace(PlayerEntity, SpellPartProperties)} is true, how far to trace
+	 * @param player TODO
 	 * @param params
 	 * @return
 	 */
-	public double getTraceRange(SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
 		return 0;
 	}
 	

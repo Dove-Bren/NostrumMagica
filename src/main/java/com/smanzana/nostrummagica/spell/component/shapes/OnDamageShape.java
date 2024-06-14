@@ -181,7 +181,7 @@ public class OnDamageShape extends SpellShape {
 	}
 
 	@Override
-	public boolean shouldTrace(SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
 		return false;
 	}
 	

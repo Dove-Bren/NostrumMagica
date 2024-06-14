@@ -234,7 +234,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	@Override
 	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
 		Spell spell = GetSpell(stack);
-		return spell == null ? false : spell.shouldTrace();
+		return spell == null ? false : spell.shouldTrace(player);
 	}
 	
 	@Override
@@ -245,7 +245,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	@Override
 	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
 		Spell spell = GetSpell(stack);
-		return spell == null ? 0 : spell.getTraceRange();
+		return spell == null ? 0 : spell.getTraceRange(player);
 	}
 
 	@Override

@@ -957,19 +957,19 @@ public class Spell {
 	 * For example, seeking bullet needs the player to be looking at an enemy to select who to go after.
 	 * @return
 	 */
-	public boolean shouldTrace() {
+	public boolean shouldTrace(PlayerEntity player) {
 		if (!getSpellShapeParts().isEmpty()) {
 			SpellShapePart firstShape = getSpellShapeParts().get(0);
-			return firstShape.getShape().shouldTrace(firstShape.getProperties());
+			return firstShape.getShape().shouldTrace(player, firstShape.getProperties());
 		}
 		
 		return false;
 	}
 	
-	public double getTraceRange() {
+	public double getTraceRange(PlayerEntity player) {
 		if (!getSpellShapeParts().isEmpty()) {
 			SpellShapePart firstShape = getSpellShapeParts().get(0);
-			return firstShape.getShape().getTraceRange(firstShape.getProperties());
+			return firstShape.getShape().getTraceRange(player, firstShape.getProperties());
 		}
 		
 		return 0;

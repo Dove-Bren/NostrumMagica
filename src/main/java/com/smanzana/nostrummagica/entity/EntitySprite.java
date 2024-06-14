@@ -97,7 +97,7 @@ public class EntitySprite extends CreatureEntity implements ILoreSupplier, IElem
     	int priority = 1;
     	this.goalSelector.addGoal(priority++, new EntitySpellAttackTask<EntitySprite>(this, 20, 4, true, (sprite) -> {
     		return sprite.isAngry() && sprite.getAttackTarget() != null
-    				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchShape.TOUCH_RANGE * TouchShape.TOUCH_RANGE;
+    				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchShape.AI_TOUCH_RANGE * TouchShape.AI_TOUCH_RANGE;
     	}, EARTH_ZAP));
         this.goalSelector.addGoal(priority++, new SwimGoal(this));
         this.goalSelector.addGoal(priority++, new EntityAIFollowEntityGeneric<EntitySprite>(this, 1D, 2f, 4f, false, null) {
