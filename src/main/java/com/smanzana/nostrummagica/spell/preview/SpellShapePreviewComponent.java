@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.spell.preview;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 
 public abstract class SpellShapePreviewComponent {
@@ -36,19 +36,19 @@ public abstract class SpellShapePreviewComponent {
 	
 	public static class Position extends SpellShapePreviewComponent {
 
-		protected final BlockPos blockPos;
+		protected final SpellLocation location;
 		
-		protected Position(Type<? extends Position> type, BlockPos pos) {
+		protected Position(Type<? extends Position> type, SpellLocation location) {
 			super(type);
-			this.blockPos = pos.toImmutable();
+			this.location = location;
 		}
 		
-		public Position(BlockPos pos) {
-			this(BLOCKPOS, pos);
+		public Position(SpellLocation location) {
+			this(BLOCKPOS, location);
 		}
 		
-		public BlockPos getPos() {
-			return this.blockPos;
+		public SpellLocation getLocation() {
+			return this.location;
 		}
 	}
 	

@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
@@ -53,8 +54,8 @@ public class WallShape extends AreaShape {
 		
 		private MutableBoundingBox bounds;
 		
-		public WallShapeInstance(ISpellState state, World world, Vector3d pos, WallFacing facing, float radius, boolean ignoreBlocks, SpellCharacteristics characteristics) {
-			super(state, world, new Vector3d(Math.floor(pos.x) + .5, pos.y, Math.floor(pos.z) + .5), TICK_RATE, NUM_TICKS, 2*radius, true, !ignoreBlocks, characteristics);
+		public WallShapeInstance(ISpellState state, World world, SpellLocation location, WallFacing facing, float radius, boolean ignoreBlocks, SpellCharacteristics characteristics) {
+			super(state, world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, !ignoreBlocks, characteristics);
 			this.radius = radius;
 			this.facing = facing;
 			this.characteristics = characteristics;
@@ -222,18 +223,12 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public WallShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
+	public WallShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
 			SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		BlockPos blockPos = new BlockPos(pos);
-		WallFacing facing = MakeFacing(state.getCaster(), pos, pitch, yaw, !world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up()));
+		// Determine facing based on actual hit position, but use selected pos (where we're looking) to determine if it's grounded
+		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !world.isAirBlock(location.selectedBlockPos) && world.isAirBlock(location.selectedBlockPos.up()));
 		
-		// Blindly guess if trigger put us in a wall but above us isn't that t he player
-		// wants us up one
-		if (facing.grounded) {
-			pos = pos.add(0, 1, 0);
-		}
-		
-		return new WallShapeInstance(state, world, pos,
+		return new WallShapeInstance(state, world, location,
 				facing, Math.max(supportedFloats()[0], params.level), params.flip, characteristics);
 	}
 
@@ -297,26 +292,19 @@ public class WallShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float radius = Math.max(supportedFloats()[0], properties.level);
 		
-		BlockPos blockPos = new BlockPos(pos);
-		WallFacing facing = MakeFacing(state.getCaster(), pos, pitch, yaw, !world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up()));
+		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
+		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !world.isAirBlock(location.selectedBlockPos) && world.isAirBlock(location.selectedBlockPos.up()));
+		MutableBoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
 		
-		// Blindly guess if trigger put us in a wall but above us isn't that t he player
-		// wants us up one
-		if (facing.grounded) {
-			pos = pos.add(0, 1, 0);
-		}
-		
-		MutableBoundingBox bounds = MakeBounds(new BlockPos(pos), facing, radius);
-		
-		List<BlockPos> positions = new ArrayList<>();
+		List<SpellLocation> positions = new ArrayList<>();
 		for (int x = bounds.minX; x <= bounds.maxX; x++)
 		for (int y = bounds.minY; y <= bounds.maxY; y++)
 		for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
 			// should trigger?
-			positions.add(new BlockPos(x, y, z));
+			positions.add(new SpellLocation(new BlockPos(x, y, z)));
 		}
 		state.trigger(null, world, positions);
 		

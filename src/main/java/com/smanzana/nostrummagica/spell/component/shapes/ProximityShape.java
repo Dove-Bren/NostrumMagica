@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 
@@ -101,9 +102,9 @@ public class ProximityShape extends SpellShape {
 	}
 
 	@Override
-	public ProximityShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
+	public ProximityShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
 			SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new ProximityShapeInstance(state, world, pos,
+		return new ProximityShapeInstance(state, world, location.hitPosition,
 				Math.max(supportedFloats()[0], params.level), characteristics);
 	}
 

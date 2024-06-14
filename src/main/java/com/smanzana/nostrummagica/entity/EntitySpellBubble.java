@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -62,29 +63,35 @@ public class EntitySpellBubble extends EntitySpellProjectile {
 	protected void registerData() {
 		super.registerData();
 	}
-	
+
+	@Override
 	protected boolean dieOnImpact(BlockPos pos) {
 		return true;
 	}
-	
+
+	@Override
 	protected boolean dieOnImpact(Entity entity) {
 		return true;
 	}
-	
+
+	@Override
 	public boolean canImpact(BlockPos pos) {
 		return true;
 	}
-	
+
+	@Override
 	public boolean canImpact(Entity entity) {
 		return true;
 	}
-	
+
+	@Override
 	protected void doImpact(Entity entity) {
 		trigger.onProjectileHit(entity);
 	}
 	
-	protected void doImpact(BlockPos pos) {
-		trigger.onProjectileHit(pos);
+	@Override
+	protected void doImpact(SpellLocation location) {
+		trigger.onProjectileHit(location);
 	}
 	
 	@Override

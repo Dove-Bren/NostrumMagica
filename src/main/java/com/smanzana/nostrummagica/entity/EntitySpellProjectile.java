@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -35,7 +36,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 	
 	public static interface ISpellProjectileShape {
 
-		public void onProjectileHit(BlockPos pos);
+		public void onProjectileHit(SpellLocation location);
 		
 		public void onProjectileHit(Entity entity);
 		
@@ -146,14 +147,14 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 		trigger.onProjectileHit(entity);
 	}
 	
-	protected void doImpact(BlockPos pos) {
-		trigger.onProjectileHit(pos);
+	protected void doImpact(SpellLocation location) {
+		trigger.onProjectileHit(location);
 		
 		// Proc mystic anchors if we hit one
-		if (world.isAirBlock(pos)) pos = pos.down();
-		BlockState state = world.getBlockState(pos);
+		final BlockPos selectedPos = location.selectedBlockPos;
+		BlockState state = world.getBlockState(selectedPos);
 		if (state.getBlock() instanceof MysticAnchor) {
-			state.onEntityCollision(world, pos, this);
+			state.onEntityCollision(world, selectedPos, this);
 		}
 	}
 	
@@ -203,7 +204,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 			BlockPos pos = ((BlockRayTraceResult) result).getPos();
 			boolean canImpact = this.canImpact(pos);
 			if (canImpact) {
-				this.doImpact(pos);
+				this.doImpact(new SpellLocation(result));
 				if (this.dieOnImpact(pos)) {
 					this.onProjectileDeath();
 					this.remove();

@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -115,7 +116,7 @@ public class SeekingBulletShape extends SpellShape {
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, world, Lists.newArrayList(pos));
+			getState().trigger(null, world, Lists.newArrayList(new SpellLocation(pos)));
 		}
 		
 		public void onProjectileHit(Entity entity) {
@@ -193,10 +194,9 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Add direction
-		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new SeekingBulletShapeInstance(state, world, pos, pitch, yaw, params.flip, characteristics);
+		return new SeekingBulletShapeInstance(state, world, location.shooterPosition, pitch, yaw, params.flip, characteristics);
 	}
 
 	// Copied from vanilla entity class
@@ -279,7 +279,7 @@ public class SeekingBulletShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d start = state.getSelf().getEyePosition(0f);
 		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, properties.flip);

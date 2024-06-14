@@ -93,6 +93,7 @@ import com.smanzana.nostrummagica.item.equipment.SoulDagger;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spellcraft.pattern.NostrumSpellCraftPatterns;
 import com.smanzana.nostrummagica.tile.NostrumTileEntities;
@@ -496,16 +497,38 @@ public class ClientInit {
 	
 	private static final void registerSpellShapeRenderers() {
 		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BLOCKPOS, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-			final BlockPos pos = comp.getPos();
+			final SpellLocation location = comp.getLocation();
+			final BlockPos selected = location.selectedBlockPos;
+			final BlockPos hit = location.hitBlockPos;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
 			final int combinedLight = 15728880;
 			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 			
-			matrixStackIn.push();
-			matrixStackIn.translate(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
-			RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
-			matrixStackIn.pop();
+			
+			
+			if (!selected.equals(hit)) {
+				// Actual selected as outline
+				IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
+				matrixStackIn.push();
+				matrixStackIn.translate(selected.getX() + .5, selected.getY() + .5, selected.getZ() + .5);
+				matrixStackIn.scale(1.005f, 1.005f, 1.005f);
+				RenderFuncs.drawUnitCubeOutline(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
+				matrixStackIn.pop();
+				
+				// Hit as small cube
+				buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
+				matrixStackIn.push();
+				matrixStackIn.translate(hit.getX() + .5, hit.getY() + .5, hit.getZ() + .5);
+				matrixStackIn.scale(.5f, .5f, .5f);
+				RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
+				matrixStackIn.pop();
+			} else {
+				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
+				matrixStackIn.push();
+				matrixStackIn.translate(selected.getX() + .5, selected.getY() + .5, selected.getZ() + .5);
+				RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
+				matrixStackIn.pop();
+			}
 		});
 		
 		// ENT done in renderer itself

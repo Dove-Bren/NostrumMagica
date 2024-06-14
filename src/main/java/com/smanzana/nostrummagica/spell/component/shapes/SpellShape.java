@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
@@ -18,8 +19,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
@@ -96,7 +95,7 @@ public abstract class SpellShape {
 		}
 		
 		protected void trigger(TriggerData data, float stageEfficiency, boolean forceSplit) {
-			state.trigger(data.targets, data.world, data.pos, stageEfficiency, forceSplit);
+			state.trigger(data.targets, data.world, data.locations, stageEfficiency, forceSplit);
 		}
 		
 		protected ISpellState getState() {
@@ -115,11 +114,11 @@ public abstract class SpellShape {
 	protected static class TriggerData {
 		public final List<LivingEntity> targets;
 		public final World world;
-		public final List<BlockPos> pos;
+		public final List<SpellLocation> locations;
 		
-		public TriggerData(List<LivingEntity> targets, World world, List<BlockPos> pos) {
+		public TriggerData(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
 			this.targets = targets;
-			this.pos = pos;
+			this.locations = locations;
 			this.world = world;
 		}
 	}
@@ -141,82 +140,35 @@ public abstract class SpellShape {
 	 * For exaple, get ready to spawn a projectile to fly through the air that will eventually 'trigger' the next part of the spell.
 	 * @param state
 	 * @param world
-	 * @param pos
+	 * @param location
 	 * @param pitch
 	 * @param yaw
 	 * @param properties
 	 * @param characteristics
 	 * @return
 	 */
-	public abstract SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
-	
-//	public void perform(SpellAction action,
-//						SpellPartProperties param,
-//						LivingEntity target,
-//						World world,
-//						BlockPos pos,
-//						float efficiency,
-//						List<LivingEntity> affectedEnts,
-//						List<BlockPos> affectedPos) {
-//		
-//		if (target != null && (world == null || pos == null)) {
-//			world = target.world;
-//			Vector3d vec = target.getPositionVec();
-//			pos = new BlockPos(vec.x, vec.y, vec.z);
-//		}
-//		
-//		List<LivingEntity> entTargets = getTargets(param, target, world, pos);
-//		if (entTargets != null && !entTargets.isEmpty())
-//		for (LivingEntity ent : entTargets) {
-//			if (ent != null) {
-//				if (action.apply(ent, efficiency)) {
-//					affectedEnts.add(ent);
-//				}
-//			}
-//		}
-//		
-//		List<BlockPos> blockTargets = getTargetLocations(param, target, world, pos);
-//		if (blockTargets != null && !blockTargets.isEmpty())
-//		for (BlockPos bp : blockTargets) {
-//			if (bp != null) {
-//				if (action.apply(world, bp, efficiency)) {
-//					affectedPos.add(bp);
-//				}
-//			}
-//		}
-//	}
+	public abstract SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
 	
 	/**
 	 * Possibly spawn visual fx for this shape
 	 * @param world
-	 * @param pos
+	 * @param location
 	 * @param harmful Whether the effects of the spell this shape is being cast as part of appear to be harmful
 	 */
 	protected void spawnShapeEffect(LivingEntity caster,
-			@Nullable LivingEntity target, World world, Vector3d pos,
+			@Nullable LivingEntity target, World world, SpellLocation location,
 			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		
-		spawnDefaultShapeEffect(caster, target, world, pos, properties, characteristics);
-//		
-//		
-//		// One more for the shape itself
-//		final @Nullable LivingEntity centerEnt = (targets == null || targets.isEmpty() ? null : targets.get(0));
-//		final @Nullable BlockPos centerBP = (positions == null || positions.isEmpty() ? null : positions.get(0));
-//		if (centerEnt != null || centerBP != null) {
-//			final Vector3d centerPos = (centerEnt == null ? new Vector3d(centerBP.getX() + .5, centerBP.getY(), centerBP.getZ() + .5) : centerEnt.getPositionVec().add(0, centerEnt.getHeight() / 2, 0));
-//			final float p= (shape.supportedFloats() == null || shape.supportedFloats().length == 0 ? 0 : (
-//					param.level == 0f ? shape.supportedFloats()[0] : param.level));
-//			
-//		}
+		spawnDefaultShapeEffect(caster, target, world, location, properties, characteristics);
 	}
 	
 	protected final void spawnDefaultShapeEffect(LivingEntity caster,
-			@Nullable LivingEntity target, World world, Vector3d pos,
+			@Nullable LivingEntity target, World world, SpellLocation location,
 			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float p = (supportedFloats() == null || supportedFloats().length == 0 ? 0 : (
 				properties.level == 0f ? supportedFloats()[0] : properties.level));
 		NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
-				caster, null, target, pos,
+				caster, null, target, location.hitPosition,
 				new SpellComponentWrapper(characteristics.element), characteristics.harmful, p);
 	}
 	
@@ -310,14 +262,14 @@ public abstract class SpellShape {
 	 * @param builder
 	 * @param state
 	 * @param world
-	 * @param pos
+	 * @param location
 	 * @param pitch
 	 * @param yaw
 	 * @param properties
 	 * @param characteristics
 	 * @return whether to continue with the spell (return true), or if the spell is expected to fizzle here (return false)
 	 */
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		return false;
 	}
 	

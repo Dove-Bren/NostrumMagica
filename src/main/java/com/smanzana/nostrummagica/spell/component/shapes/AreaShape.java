@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 
@@ -84,13 +85,13 @@ public abstract class AreaShape extends SpellShape {
 				if (affectsGround && aliveCycles % GROUND_TICK_CYCLES == 0) {
 					// check all blocks in -radius,-radius,-radius <-> radius,radius,radius
 					BlockPos.Mutable cursor = new BlockPos.Mutable();
-					List<BlockPos> list = Lists.newArrayList();
+					List<SpellLocation> list = Lists.newArrayList();
 					for (int i = -(int)radiusHint; i <= radiusHint; i++)
 					for (int j = -(int)radiusHint; j <= radiusHint; j++)
 					for (int k = -(int)radiusHint; k <= radiusHint; k++) {
 						cursor.setPos(pos.x + i, pos.y + j, pos.z + k);
 						if (this.isInArea(world, cursor)) {
-							list.add(cursor.toImmutable());
+							list.add(new SpellLocation(cursor.toImmutable()));
 						}
 					}
 					TriggerData data = new TriggerData(

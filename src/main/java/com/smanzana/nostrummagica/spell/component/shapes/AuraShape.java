@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
@@ -192,7 +193,7 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new AuraTriggerInstance(state, world, state.getSelf(),
 				Math.max(supportedFloats()[0], params.level),
 				params.flip,
@@ -274,12 +275,12 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float range = Math.max(supportedFloats()[0], properties.level);
-		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), range));
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		
-		List<LivingEntity> ents = world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(pos).grow(range + 1), (ent) -> 
-			ent instanceof LivingEntity && pos.distanceTo(ent.getPositionVec()) <= range
+		List<LivingEntity> ents = world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(location.hitPosition).grow(range + 1), (ent) -> 
+			ent instanceof LivingEntity && location.hitPosition.distanceTo(ent.getPositionVec()) <= range
 		).stream().map(ent -> (LivingEntity) ent).collect(Collectors.toList());
 		if (ents != null && !ents.isEmpty()) {
 			state.trigger(ents, null, null);

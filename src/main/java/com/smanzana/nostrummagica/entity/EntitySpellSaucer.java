@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smanzana.nostrummagica.spell.SpellLocation;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -100,9 +102,9 @@ public abstract class EntitySpellSaucer extends EntitySpellProjectile {
 	}
 	
 	@Override
-	protected void doImpact(BlockPos pos) {
-		super.doImpact(pos);
-		this.addHit(pos);
+	protected void doImpact(SpellLocation location) {
+		super.doImpact(location);
+		this.addHit(location.selectedBlockPos);
 	}
 	
 	@Override

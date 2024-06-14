@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
@@ -39,36 +40,37 @@ public class BurstShape extends InstantShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
-			this.spawnShapeEffect(state.getCaster(), null, world, pos, param, characteristics);
+			this.spawnShapeEffect(state.getCaster(), null, world, location, param, characteristics);
 		}
 		
 		List<LivingEntity> ret = new ArrayList<>();
 		
 		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + .5;
+		final Vector3d center = location.hitPosition;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
-				new AxisAlignedBB(pos.getX() - radiusEnts,
-							pos.getY() - radiusEnts,
-							pos.getZ() - radiusEnts,
-							pos.getX() + radiusEnts,
-							pos.getY() + radiusEnts,
-							pos.getZ() + radiusEnts))) {
+				new AxisAlignedBB(center.getX() - radiusEnts,
+						center.getY() - radiusEnts,
+						center.getZ() - radiusEnts,
+						center.getX() + radiusEnts,
+						center.getY() + radiusEnts,
+						center.getZ() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 			if (living != null)
-				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(pos.getX(), pos.getY(), pos.getZ()))) <= radiusEnts)
+				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(center.getX(), center.getY(), center.getZ()))) <= radiusEnts)
 					ret.add(living);
 		}
 		
-		List<BlockPos> list = new ArrayList<>();
+		List<SpellLocation> list = new ArrayList<>();
 		
 		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level)));
 		
-		final BlockPos center = new BlockPos(pos);
+		final BlockPos centerBlock = location.hitBlockPos;
 		if (radiusBlocks == 0) {
-			list.add(center);
+			list.add(new SpellLocation(centerBlock));
 		} else {
 			for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
 				// x loop. I is offset of x
@@ -77,10 +79,10 @@ public class BurstShape extends InstantShape {
 					int yRadius = innerRadius - Math.abs(j);
 					// 0 means just that cell. Otherwise, +- n
 					if (yRadius == 0) {
-						list.add(center.add(i, j, 0));
+						list.add(new SpellLocation(centerBlock.add(i, j, 0)));
 					} else {
 						for (int k = -yRadius; k <= yRadius; k++) {
-							list.add(center.add(i, j, k));
+							list.add(new SpellLocation(centerBlock.add(i, j, k)));
 						}
 					}
 				}
@@ -165,15 +167,15 @@ public class BurstShape extends InstantShape {
 		return new SpellShapeAttributes(true, true, true);
 	}
 	
-	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		float radiusEnts = Math.max(supportedFloats()[0], properties.level);
-		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radiusEnts));
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radiusEnts));
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		this.addRangeRings(builder, state, world, pos, pitch, yaw, properties, characteristics);
-		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		this.addRangeRings(builder, state, world, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
 	}
 	
 	@Override

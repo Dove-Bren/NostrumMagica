@@ -9,10 +9,11 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
-import com.smanzana.nostrummagica.spell.SpellCharacteristics;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
@@ -22,7 +23,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
@@ -61,17 +61,17 @@ public class MagicCyclerShape extends SpellShape {
 		}
 
 		@Override
-		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, world, Lists.newArrayList(pos)); /// TODO only force split if piercing
+		public void onProjectileHit(SpellLocation location) {
+			getState().trigger(null, world, Lists.newArrayList(location), 1f, true);
 		}
 		
 		@Override
 		public void onProjectileHit(Entity entity) {
 			if (entity == null) {
-				onProjectileHit(new BlockPos(this.pos));
+				onProjectileHit(new SpellLocation(this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(entity.getPosition());
+				onProjectileHit(new SpellLocation(entity.getPosition()));
 			} else {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
 			}
@@ -84,7 +84,7 @@ public class MagicCyclerShape extends SpellShape {
 
 		@Override
 		public void onProjectileEnd(Vector3d pos) {
-			getState().triggerFail(world, pos);
+			getState().triggerFail(world, new SpellLocation(pos));
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class MagicCyclerShape extends SpellShape {
 	}
 	
 	@Override
-	public MagicCyclerShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MagicCyclerShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// We use param's flip to indicate whether we should interact with blocks
 		boolean onBlocks = false;
 		if (params != null)
@@ -114,8 +114,7 @@ public class MagicCyclerShape extends SpellShape {
 			
 		
 		// Add direction
-		pos = new Vector3d(pos.x, pos.y + state.getSelf().getEyeHeight(), pos.z);
-		return new MagicCyclerShapeInstance(state, world, pos, onBlocks, duration, characteristics);
+		return new MagicCyclerShapeInstance(state, world, location.shooterPosition, onBlocks, duration, characteristics);
 	}
 	
 	@Override
@@ -196,9 +195,9 @@ public class MagicCyclerShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		float radius = (float) (EntityCyclerSpellSaucer.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
-		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radius));
-		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
+		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
 	}
 }

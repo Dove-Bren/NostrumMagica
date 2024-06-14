@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
@@ -45,43 +46,44 @@ public class RingShape extends BurstShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
-			this.spawnShapeEffect(state.getCaster(), null, world, pos, param, characteristics);
+			this.spawnShapeEffect(state.getCaster(), null, world, location, param, characteristics);
 		}
 		
 		List<LivingEntity> ret = new ArrayList<>();
 		
 		double radiusEnts = Math.max(supportedFloats()[0], (double) param.level) + INNER_RADIUS + .5;
+		final Vector3d centerPos = location.hitPosition;
 		
 		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
-				new AxisAlignedBB(pos.getX() - radiusEnts,
-							pos.getY() - radiusEnts,
-							pos.getZ() - radiusEnts,
-							pos.getX() + radiusEnts,
-							pos.getY() + radiusEnts,
-							pos.getZ() + radiusEnts))) {
+				new AxisAlignedBB(centerPos.getX() - radiusEnts,
+						centerPos.getY() - radiusEnts,
+						centerPos.getZ() - radiusEnts,
+						centerPos.getX() + radiusEnts,
+						centerPos.getY() + radiusEnts,
+						centerPos.getZ() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 			if (living != null) {
-				final Vector3d diff = entity.getPositionVec().subtract(pos);
+				final Vector3d diff = entity.getPositionVec().subtract(centerPos);
 				final double distFlat = Math.sqrt(Math.abs(Math.pow(diff.getX(), 2)) + Math.abs(Math.pow(diff.getZ(), 2)));
 				if (distFlat <= radiusEnts
 						&& distFlat >= INNER_RADIUS
-						&& Math.abs(entity.getPosY() - pos.getY()) <= (INNER_RADIUS + .5) // Flatter than a sphere
+						&& Math.abs(entity.getPosY() - centerPos.getY()) <= (INNER_RADIUS + .5) // Flatter than a sphere
 					) {
 					ret.add(living);
 				}
 			}
 		}
 		
-		List<BlockPos> list = new ArrayList<>();
+		List<SpellLocation> list = new ArrayList<>();
 		
 		final int radiusBlocks = Math.round(Math.abs(Math.max(2.0f, param.level + INNER_RADIUS)));
 		
-		final BlockPos center = new BlockPos(pos);
+		final BlockPos center = location.hitBlockPos;
 		if (radiusBlocks == 0) {
-			list.add(center);
+			list.add(new SpellLocation(center));
 		} else {
 			for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
 				// x loop. I is offset of x
@@ -95,7 +97,7 @@ public class RingShape extends BurstShape {
 					
 					int yRadius = 1;
 					for (int k = -yRadius; k <= yRadius; k++) {
-						list.add(center.add(i, k, j));
+						list.add(new SpellLocation(center.add(i, k, j)));
 					}
 				}
 				
@@ -185,10 +187,10 @@ public class RingShape extends BurstShape {
 	}
 	
 	@Override
-	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		float radiusEnts = Math.max(supportedFloats()[0], properties.level) + INNER_RADIUS;
-		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radiusEnts));
-		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) INNER_RADIUS));
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radiusEnts));
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) INNER_RADIUS));
 	}
 
 }

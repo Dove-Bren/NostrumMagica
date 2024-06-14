@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
@@ -129,16 +130,9 @@ public class FieldShape extends AreaShape {
 	}
 
 	@Override
-	public FieldShapeInstance createInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw,
+	public FieldShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
 			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		// Blindly guess if trigger put us in a wall but above us isn't that t he player
-		// wants us up one
-		BlockPos blockPos = new BlockPos(pos);
-		if (!world.isAirBlock(blockPos) && world.isAirBlock(blockPos.up())) {
-			pos = pos.add(0, 1, 0);
-		}
-		
-		return new FieldShapeInstance(state, world, pos,
+		return new FieldShapeInstance(state, world, location.hitPosition,
 				Math.max(supportedFloats()[0], properties.level), !properties.flip, characteristics);
 	}
 
@@ -208,10 +202,10 @@ public class FieldShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		float radius = Math.max(supportedFloats()[0], properties.level) - .25f;
-		builder.add(new SpellShapePreviewComponent.Disk(pos.add(0, .5, 0), (float) radius));
-		return super.addToPreview(builder, state, world, pos, pitch, yaw, properties, characteristics);
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
+		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
 	}
 
 }

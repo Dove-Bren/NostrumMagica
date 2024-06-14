@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -109,6 +110,10 @@ public enum NostrumMagicaSounds {
 	
 	public void play(World world, double x, double y, double z) {
 		play(null, world, x, y, z);
+	}
+	
+	public void play(World world, BlockPos pos) {
+		play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 	}
 	
 	public void playClient(Entity at) {

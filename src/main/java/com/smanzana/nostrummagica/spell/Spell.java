@@ -61,14 +61,14 @@ public class Spell {
 		
 		public boolean isPreview();
 		// May not be supported if isPreview() is true
-		public void triggerFail(World world, Vector3d pos);
-		public default void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations) {
+		public void triggerFail(World world, SpellLocation pos);
+		public default void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
 			this.trigger(targets, world, locations, 1f, false);
 		}
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, float stageEfficiency, boolean forceSplit);
+		public void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit);
 	}
 	
-	public static class SpellState implements ISpellState {
+	protected static class SpellState implements ISpellState {
 		protected final Spell spell;
 		protected final LivingEntity caster;
 		protected float efficiency;
@@ -94,7 +94,7 @@ public class Spell {
 		}
 		
 		@Override
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, float stageEfficiency, boolean forceSplit) {
+		public void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit) {
 			//for each target (if more than one), break into multiple spellstates
 			// persist index++ and set self, then start doing shapes or do ending effect
 			
@@ -111,8 +111,7 @@ public class Spell {
 						if (targets != null && !targets.isEmpty()) {
 							playContinueEffect(targets.get(0));
 						} else if (locations != null && !locations.isEmpty()) {
-							Vector3d where = Vector3d.copyCentered(locations.get(0));
-							playContinueEffect(world, where);
+							playContinueEffect(world, locations.get(0).hitPosition);
 						}
 					}
 					
@@ -143,7 +142,7 @@ public class Spell {
 							spawnShape(shape, null, world, locations.get(0));
 						} else {
 							index--; // Make splits have same trigger as we're performing now
-							for (BlockPos targ : locations) {
+							for (SpellLocation targ : locations) {
 								SpellState sub = split();
 								sub.trigger(null, world, Lists.newArrayList(targ));
 							}
@@ -151,7 +150,7 @@ public class Spell {
 						}
 					} else {
 						// Last shape affected no entities or locations. Fizzle
-						this.triggerFail(caster.world, caster.getPositionVec());
+						this.triggerFail(caster.world, new SpellLocation(caster));
 					}
 									
 				}
@@ -166,17 +165,16 @@ public class Spell {
 			NostrumMagicaSounds.CAST_CONTINUE.play(at);
 		}
 		
-		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, BlockPos targpos) {
+		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, SpellLocation location) {
 			// instantiate trigger in world
-			Vector3d pos;
 			if (world == null)
 				world = targ.world;
-			if (targ == null)
-				pos = new Vector3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
-			else
-				pos = targ.getPositionVec();
 			
-			this.shapeInstance = shape.getShape().createInstance(this, world, pos,
+			if (location == null) {
+				location = new SpellLocation(targ);
+			}
+			
+			this.shapeInstance = shape.getShape().createInstance(this, world, location,
 					(targ == null ? -90.0f : targ.rotationPitch),
 					(targ == null ? 0.0f : targ.rotationYaw),
 					shape.getProperties(), spell.getCharacteristics());
@@ -255,7 +253,7 @@ public class Spell {
 			return bonus;
 		}
 		
-		protected void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
+		protected void finish(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
 			boolean first = true;
 			boolean anySuccess = false;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -289,12 +287,14 @@ public class Spell {
 							anySuccess = true;
 						}
 					}
-				} else if (positions != null && !positions.isEmpty()) {
+				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
-					for (BlockPos pos : positions) {
+					for (SpellLocation pos : locations) {
 						SpellActionResult result = action.apply(caster, world, pos, efficiency); 
 						if (result.applied) {
-							affectedPos.add(pos);
+							if (result.affectedPos != null) {
+								affectedPos.add(result.affectedPos);
+							}
 							anySuccess = true;
 						}
 					}
@@ -350,9 +350,9 @@ public class Spell {
 					for (LivingEntity targ : targets) {
 						doFailEffect(targ.world, targ.getPositionVec().add(0, .2 + targ.getHeight(), 0));
 					}
-				} else if (positions != null && !positions.isEmpty()) {
-					for (BlockPos pos : positions) {
-						doFailEffect(world, new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5));
+				} else if (locations != null && !locations.isEmpty()) {
+					for (SpellLocation pos : locations) {
+						doFailEffect(world, pos.hitPosition);
 					}
 				}
 			}
@@ -382,8 +382,88 @@ public class Spell {
 		 * Called when triggers fail to be triggered and have failed.
 		 */
 		@Override
-		public void triggerFail(World world, Vector3d pos) {
-			doFailEffect(world, pos);
+		public void triggerFail(World world, SpellLocation pos) {
+			doFailEffect(world, pos.hitPosition);
+		}
+	}
+	
+	protected static final class PreviewState extends SpellState {
+		
+		private final SpellShapePreview previewBuilder;
+		private final float partialTicks;
+		
+		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder, float partialTicks) {
+			super(spell, caster, 1f);
+			this.previewBuilder = previewBuilder;
+			this.partialTicks = partialTicks;
+		}
+		
+		@Override
+		public boolean isPreview() {
+			return true;
+		}
+		
+		@Override
+		public void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit) {
+			//if (this.getIndex() != 1) {
+			{
+				if (targets != null && !targets.isEmpty()) {
+					for (LivingEntity targ : targets) {
+						this.previewBuilder.add(new SpellShapePreviewComponent.Ent(targ));
+					}
+				} else if (locations != null && !locations.isEmpty()) {
+					for (SpellLocation pos : locations) {
+						this.previewBuilder.add(new SpellShapePreviewComponent.Position(pos));
+					}
+				}
+			}
+			super.trigger(targets, world, locations, stageEfficiency, forceSplit);
+		}
+
+		@Override
+		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, SpellLocation location) {
+			// For every spawned shape, we should get their special preview parts.
+			// Doing this may recurse into triggering this state, but that's alright.
+			// Automatically add the target/targetPos to the preview if provided, though.
+			
+			if (world == null)
+				world = targ.world;
+			if (location == null) {
+				location = new SpellLocation(targ, this.partialTicks);
+			}
+			
+			shape.getShape().addToPreview(previewBuilder, this, world, location,
+					(targ == null ? -90.0f : targ.rotationPitch),
+					(targ == null ? 0.0f : targ.rotationYaw),
+					shape.getProperties(), this.spell.getCharacteristics());
+		}
+		
+		@Override
+		protected void finish(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
+			// Final affected targets or positions for this state
+		}
+
+		@Override
+		protected PreviewState split() {
+			PreviewState spawn = new PreviewState(spell, caster, this.previewBuilder, partialTicks);
+			spawn.index = this.index;
+			
+			return spawn;
+		}
+
+		@Override
+		protected void doFailEffect(World world, Vector3d pos) {
+			;
+		}
+
+		@Override
+		protected void playContinueEffect(World world, Vector3d where) {
+			;
+		}
+
+		@Override
+		protected void playContinueEffect(LivingEntity at) {
+			;
 		}
 	}
 
@@ -998,88 +1078,5 @@ public class Spell {
 		
 		// Affects caster
 		return new SpellShapePreview().add(new SpellShapePreviewComponent.Ent(caster));
-	}
-	
-	private static final class PreviewState extends SpellState {
-		
-		private final SpellShapePreview previewBuilder;
-		private final float partialTicks;
-		
-		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder, float partialTicks) {
-			super(spell, caster, 1f);
-			this.previewBuilder = previewBuilder;
-			this.partialTicks = partialTicks;
-		}
-		
-		@Override
-		public boolean isPreview() {
-			return true;
-		}
-		
-		@Override
-		public void trigger(List<LivingEntity> targets, World world, List<BlockPos> locations, float stageEfficiency, boolean forceSplit) {
-			//if (this.getIndex() != 1) {
-			{
-				if (targets != null && !targets.isEmpty()) {
-					for (LivingEntity targ : targets) {
-						this.previewBuilder.add(new SpellShapePreviewComponent.Ent(targ));
-					}
-				} else if (locations != null && !locations.isEmpty()) {
-					for (BlockPos pos : locations) {
-						this.previewBuilder.add(new SpellShapePreviewComponent.Position(pos));
-					}
-				}
-			}
-			super.trigger(targets, world, locations, stageEfficiency, forceSplit);
-		}
-
-		@Override
-		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, BlockPos targpos) {
-			// For every spawned shape, we should get their special preview parts.
-			// Doing this may recurse into triggering this state, but that's alright.
-			// Automatically add the target/targetPos to the preview if provided, though.
-			
-			Vector3d pos;
-			if (world == null)
-				world = targ.world;
-			if (targ == null) {
-				pos = new Vector3d(targpos.getX() + .5, targpos.getY(), targpos.getZ() + .5);
-			} else {
-				pos = targ.getEyePosition(partialTicks).add(0, -targ.getEyeHeight(), 0);
-			}
-			
-			shape.getShape().addToPreview(previewBuilder, this, world, pos,
-					(targ == null ? -90.0f : targ.rotationPitch),
-					(targ == null ? 0.0f : targ.rotationYaw),
-					shape.getProperties(), this.spell.getCharacteristics());
-		}
-		
-		@Override
-		protected void finish(List<LivingEntity> targets, World world, List<BlockPos> positions) {
-			// Final affected targets or positions for this state
-		}
-
-		@Override
-		protected PreviewState split() {
-			PreviewState spawn = new PreviewState(spell, caster, this.previewBuilder, partialTicks);
-			spawn.index = this.index;
-			
-			return spawn;
-		}
-
-		@Override
-		protected void doFailEffect(World world, Vector3d pos) {
-			;
-		}
-
-		@Override
-		protected void playContinueEffect(World world, Vector3d where) {
-			;
-		}
-
-		@Override
-		protected void playContinueEffect(LivingEntity at) {
-			;
-		}
 	}
 }
