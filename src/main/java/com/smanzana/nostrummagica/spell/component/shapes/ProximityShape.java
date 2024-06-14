@@ -90,7 +90,7 @@ public class ProximityShape extends SpellShape {
 	}
 	
 	@Override
-	public int getManaCost() {
+	public int getManaCost(SpellShapePartProperties properties) {
 		return 30;
 	}
 
@@ -153,7 +153,7 @@ public class ProximityShape extends SpellShape {
 	}
 	
 	@Override
-	public int getWeight() {
+	public int getWeight(SpellShapePartProperties properties) {
 		return 1;
 	}
 

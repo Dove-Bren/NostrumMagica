@@ -111,7 +111,7 @@ public class CursedFireBlock extends FireBlock {
 	
 	@Override
 	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return super.isValidPosition(state, worldIn, pos);
+		return super.isValidPosition(state, worldIn, pos) || worldIn.getBlockState(pos.down()).getBlock() == this;
 	}
 
 }

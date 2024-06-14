@@ -219,15 +219,17 @@ public abstract class SpellShape {
 	
 	/**
 	 * How much using this shape should cost
+	 * @param properties TODO
 	 * @return
 	 */
-	public abstract int getManaCost();
+	public abstract int getManaCost(SpellShapePartProperties properties);
 	
 	/**
 	 * Return the weight cost of this shape. Should be 0+.
+	 * @param properties TODO
 	 * @return
 	 */
-	public abstract int getWeight();
+	public abstract int getWeight(SpellShapePartProperties properties);
 
 	/**
 	 * Whether spells that start with this shape should request tracing when players have

@@ -191,7 +191,7 @@ public class ChainShape extends InstantShape {
 	}
 	
 	@Override
-	public int getWeight() {
+	public int getWeight(SpellShapePartProperties properties) {
 		return 1;
 	}
 
@@ -201,7 +201,7 @@ public class ChainShape extends InstantShape {
 	}
 
 	@Override
-	public int getManaCost() {
+	public int getManaCost(SpellShapePartProperties properties) {
 		return 35;
 	}
 

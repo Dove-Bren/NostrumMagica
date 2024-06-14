@@ -16,11 +16,13 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.vector.Vector3d;
@@ -50,22 +52,70 @@ public class WallShape extends AreaShape {
 
 		private final WallFacing facing;
 		private final float radius;
+		private final boolean lingering;
 		private final SpellCharacteristics characteristics;
+		private final SpellLocation instantLocation;
 		
 		private MutableBoundingBox bounds;
 		
-		public WallShapeInstance(ISpellState state, World world, SpellLocation location, WallFacing facing, float radius, boolean ignoreBlocks, SpellCharacteristics characteristics) {
-			super(state, world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, !ignoreBlocks, characteristics);
+		public WallShapeInstance(ISpellState state, World world, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellCharacteristics characteristics) {
+			super(state, world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, true, characteristics);
 			this.radius = radius;
 			this.facing = facing;
 			this.characteristics = characteristics;
+			this.lingering = lingering;
+			this.instantLocation = location;
 		}
 		
 		@Override
 		public void spawn(LivingEntity caster) {
 			// Figure out bounds
 			this.bounds = MakeBounds(new BlockPos(this.pos), facing, radius);
-			super.spawn(caster); // Inits listening and stuff
+			
+			// If lingering, do regular Area spawning registering listeners etc.
+			if (lingering) {
+				super.spawn(caster); // Inits listening and stuff
+			} else {
+				// Figure out all affected now
+				doInstantCheck();
+			}
+		}
+		
+		protected void doInstantCheck() {
+			final ISpellState state = this.getState();
+			
+			if (!state.isPreview()) {
+				//this.spawnShapeEffect(state.getCaster(), null, world, instantLocation, param, characteristics);
+			}
+			
+			List<LivingEntity> ret = new ArrayList<>();
+			
+			final Vector3d center = new Vector3d(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
+			final float radiusEnts = this.radius + .5f;
+			
+			for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
+					new AxisAlignedBB(center.getX() - radiusEnts,
+							center.getY() - radiusEnts,
+							center.getZ() - radiusEnts,
+							center.getX() + radiusEnts,
+							center.getY() + radiusEnts,
+							center.getZ() + radiusEnts))) {
+				LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
+				if (living != null) {
+					if (this.isInArea(living)) {
+						ret.add(living);
+					}
+				}
+			}
+			
+			List<SpellLocation> positions = new ArrayList<>();
+			for (int x = bounds.minX; x <= bounds.maxX; x++)
+			for (int y = bounds.minY; y <= bounds.maxY; y++)
+			for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
+				positions.add(new SpellLocation(new BlockPos(x, y, z)));
+			}
+			
+			state.trigger(ret, world, positions, 1f, true);
 		}
 		
 		@Override
@@ -210,9 +260,18 @@ public class WallShape extends AreaShape {
 		super(ID);
 	}
 	
+	protected boolean isLingering(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
+	
+	protected float wallRadius(SpellShapePartProperties properties) {
+		return Math.max(supportedFloats()[0], properties.level);
+	}
+	
 	@Override
-	public int getManaCost() {
-		return 50;
+	public int getManaCost(SpellShapePartProperties properties) {
+		final boolean isLingering = this.isLingering(properties);
+		return isLingering ? 50 : 30;
 	}
 
 	@Override
@@ -227,9 +286,11 @@ public class WallShape extends AreaShape {
 			SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Determine facing based on actual hit position, but use selected pos (where we're looking) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !world.isAirBlock(location.selectedBlockPos) && world.isAirBlock(location.selectedBlockPos.up()));
+		final boolean isLingering = isLingering(params);
+		final float radius = wallRadius(params);
 		
 		return new WallShapeInstance(state, world, location,
-				facing, Math.max(supportedFloats()[0], params.level), params.flip, characteristics);
+				facing, radius, isLingering, characteristics);
 	}
 
 	@Override
@@ -277,8 +338,9 @@ public class WallShape extends AreaShape {
 	}
 	
 	@Override
-	public int getWeight() {
-		return 2;
+	public int getWeight(SpellShapePartProperties properties) {
+		final boolean isLingering = this.isLingering(properties);
+		return isLingering ? 2 : 1;
 	}
 
 	@Override
@@ -293,7 +355,7 @@ public class WallShape extends AreaShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		final float radius = Math.max(supportedFloats()[0], properties.level);
+		final float radius = wallRadius(properties);
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !world.isAirBlock(location.selectedBlockPos) && world.isAirBlock(location.selectedBlockPos.up()));

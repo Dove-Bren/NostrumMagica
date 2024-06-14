@@ -171,12 +171,12 @@ public class OnDamageShape extends SpellShape {
 	}
 
 	@Override
-	public int getManaCost() {
+	public int getManaCost(SpellShapePartProperties properties) {
 		return 30;
 	}
 
 	@Override
-	public int getWeight() {
+	public int getWeight(SpellShapePartProperties properties) {
 		return 1;
 	}
 

@@ -1146,7 +1146,7 @@
 	"spelleffect.magicrend.name": "Magic Rend",
 	"spelleffect.magicrend.desc": "Reduces the target's resistance to magic.",
 	"spelleffect.fastfall.name": "Fast Fall",
-	"spelleffect.fastfall.desc": "Makes the target fall quickly, taking them more susceptible to fall damage.",
+	"spelleffect.fastfall.desc": "Makes the target fall quickly, making them more susceptible to fall damage.",
 	
 	"shape.ai.desc": "Targets the entity's current attack target. Not intended for player use.",
 	"shape.aura.desc": "Continuously applies effects to all nearby entities.",
@@ -1636,7 +1636,7 @@
     "modification.vortex_blade.bool.name":"Hit Blocks",
     "modification.vortex_blade.float.name":"Duration (Seconds)",
     "modification.projectile.bool":"Hit Allies",
-    "modification.wall.bool.name":"Ignore Blocks",
+    "modification.wall.bool.name":"Linger",
     "modification.wall.float.name":"Radius",
     "modification.seeking_bullet.bool.name":"Ignore Allies",
     "modification.mortar.bool.name":"Arcless",

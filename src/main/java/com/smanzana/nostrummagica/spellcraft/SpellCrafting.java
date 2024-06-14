@@ -158,7 +158,7 @@ public class SpellCrafting {
 	}
 	
 	protected static final int CalculateManaCost(SpellCraftContext context, SpellShapePart part, float multiplier) {
-		float cost = multiplier * (float) part.getShape().getManaCost();
+		float cost = multiplier * (float) part.getShape().getManaCost(part.getProperties());
 		return (int) Math.ceil(cost);
 	}
 	
@@ -221,13 +221,13 @@ public class SpellCrafting {
 		return CalculateManaCost(context, parts);
 	}
 	
-	public static final int CalculateWeight(SpellCraftContext context, SpellShape shape) {
+	public static final int CalculateWeight(SpellCraftContext context, SpellShape shape, SpellShapePartProperties properties) {
 		// Shapes report their own weight
-		return shape.getWeight();
+		return shape.getWeight(properties);
 	}
 	
 	public static final int CalculateWeight(SpellCraftContext context, SpellShapePart part) {
-		return CalculateWeight(context, part.getShape());
+		return CalculateWeight(context, part.getShape(), part.getProperties());
 	}
 	
 	public static final int CalculateWeight(SpellCraftContext context, EMagicElement element, int elementCount, @Nullable EAlteration alteration) {
