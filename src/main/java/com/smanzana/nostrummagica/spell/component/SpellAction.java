@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.Candle;
 import com.smanzana.nostrummagica.block.MagicWall;
+import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.effect.ElementalEnchantEffect;
@@ -1653,12 +1654,12 @@ public class SpellAction {
 
 	private static class MysticWater implements SpellEffect {
 		
-		//private final int waterLevel;
+		private final int waterLevel;
 		private final int healAmt;
 		private final int effectDuration;
 		
 		public MysticWater(int level, int effectHealAmt, int effectDuration) {
-			//this.waterLevel = level;
+			this.waterLevel = level;
 			this.healAmt = effectHealAmt;
 			this.effectDuration = effectDuration;
 		}
@@ -1686,8 +1687,8 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos pos = location.hitBlockPos;
-			if (world.isAirBlock(pos)) {
-				world.setBlockState(pos, NostrumBlocks.mysticWaterBlock.getDefaultState());//.getState(level));
+			if (world.isAirBlock(pos) || world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
+				world.setBlockState(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
 				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos);
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = pos;

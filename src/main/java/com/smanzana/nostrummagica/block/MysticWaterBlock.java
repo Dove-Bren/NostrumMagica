@@ -35,6 +35,7 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 
 	public static final String ID = "mystic_water_block";
 	public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL_0_15;
+	public static final IntegerProperty POWER = IntegerProperty.create("power", 0, 2);
 	
 	private final Supplier<? extends FluidMysticWater> fluidSupplier;
 	private FluidMysticWater fluidCache = null;
@@ -44,15 +45,18 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 				.doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()
 				);
 		this.fluidSupplier = supplier;
-		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0));
+		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0).with(POWER, 0));
 	}
 	
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
 		super.fillStateContainer(builder);
-		builder.add(LEVEL);
+		builder.add(LEVEL, POWER);
 	}
 	
+	public BlockState getStateWithPower(int power) {
+		return this.getDefaultState().with(POWER, Math.max(0, Math.min(2, power)));
+	}
 	
 	protected FluidMysticWater getFluid() {
 		if (this.fluidCache == null) {

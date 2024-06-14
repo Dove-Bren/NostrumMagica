@@ -20,6 +20,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -106,6 +107,11 @@ public class CursedFireBlock extends FireBlock {
 	
 	public BlockState GetWithLevel(int level) {
 		return this.getDefaultState().with(LEVEL, Math.max(0, Math.min(2, level)));
+	}
+	
+	@Override
+	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		return super.isValidPosition(state, worldIn, pos);
 	}
 
 }

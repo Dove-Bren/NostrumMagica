@@ -10,7 +10,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
@@ -41,6 +40,7 @@ public class FluidMysticWater extends Fluid {
 
 	public static final String ID = "mystic_water";
 	public static final IntegerProperty LEVEL_1_8 = BlockStateProperties.LEVEL_1_8;
+	public static final IntegerProperty POWER = MysticWaterBlock.POWER;
 	
 	protected final FluidAttributes.Builder attributesBuilder;
 	
@@ -53,7 +53,7 @@ public class FluidMysticWater extends Fluid {
                 .overlay(new ResourceLocation("minecraft:block/water_overlay"))
                 .sound(SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY)
                 );
-		this.setDefaultState(this.getDefaultState().with(LEVEL_1_8, 8));
+		this.setDefaultState(this.getDefaultState().with(LEVEL_1_8, 8).with(POWER, 0));
 	}
 	
 	protected FluidMysticWater(FluidAttributes.Builder builder) {
@@ -65,7 +65,7 @@ public class FluidMysticWater extends Fluid {
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Fluid, FluidState> builder) {
 		super.fillStateContainer(builder);
-		builder.add(LEVEL_1_8);
+		builder.add(LEVEL_1_8, POWER);
 	}
 	
 	@Override
@@ -93,23 +93,24 @@ public class FluidMysticWater extends Fluid {
 	
 	@Override
 	public BlockState getBlockState(FluidState state) {
-		Block block = NostrumBlocks.mysticWaterBlock;
-		//state.isSource() ? 0 : 8 - Math.min(state.getLevel(), 8) + (state.get(FALLING) ? 8 : 0);
+		MysticWaterBlock block = NostrumBlocks.mysticWaterBlock;
 		int level = (8 - Math.min(state.getLevel(), 8)) * 2;
-		return block.getDefaultState().with(MysticWaterBlock.LEVEL, Integer.valueOf(level));
+		int power = state.get(POWER);
+		return block.getStateWithPower(power).with(MysticWaterBlock.LEVEL, Integer.valueOf(level));
 	}
 	
 	public FluidState getFluidState(BlockState state) {
 		int blockLevel = state.get(MysticWaterBlock.LEVEL);
-		return getFluidStateForLevel(blockLevel);
+		int power = state.get(MysticWaterBlock.POWER);
+		return getFluidStateForLevel(power, blockLevel);
 	}
 	
-	protected FluidState getFluidStateForLevel(int blockLevel) {
+	protected FluidState getFluidStateForLevel(int power, int blockLevel) {
 		// Block level is the inverse of fluid level, * 2.
 		// BlockLevel = f(x) = (8 - FluidLevel) * 2;
 		// FluidLevel = 8 - (BlockLevel / 2)
 		int fluidLevel = 8 - (blockLevel / 2);
-		return this.getDefaultState().with(LEVEL_1_8, fluidLevel); 
+		return this.getDefaultState().with(POWER, power).with(LEVEL_1_8, fluidLevel); 
 	}
 	
 	@Override
@@ -119,13 +120,29 @@ public class FluidMysticWater extends Fluid {
 	
 	@Override
 	public int getTickRate(IWorldReader p_205569_1_) {
-		return 20 * 2; // Same as water?
+		return (20 * 2);
+	}
+	
+	protected boolean shouldDry(World worldIn, BlockPos pos, FluidState state) {
+		// power 0 should dry up every tick
+		// power 1 should dry up every OTHER tick
+		// power 2 should never dry up
+		final int power = state.get(POWER);
+		if (power >= 2) {
+			return false;
+		} else if (power == 1) {
+			// Figure out if it's the second tick by looking at worl tick time
+			final int rate = getTickRate(worldIn);
+			return (worldIn.getGameTime() % (rate * 2) >= rate); 
+		} else {
+			return true;
+		}
 	}
 	
 	@Override
 	public void tick(World worldIn, BlockPos pos, FluidState state) {
 		// Slowly dry up
-		if (!blockAboveIsWater(state, worldIn, pos)) {
+		if (!blockAboveIsWater(state, worldIn, pos) && shouldDry(worldIn, pos, state)) {
 			final int newLevel = this.getLevel(state) - 1;
 			if (newLevel <= 0) {
 				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 11);
