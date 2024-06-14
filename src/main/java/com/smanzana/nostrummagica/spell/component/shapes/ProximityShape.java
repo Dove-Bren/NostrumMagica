@@ -76,7 +76,6 @@ public class ProximityShape extends SpellShape {
 			// Else we've already been set. Just BOOM
 			TriggerData data = new TriggerData(
 					Lists.newArrayList(entity),
-					null,
 					null
 					);
 			this.trigger(data);
@@ -108,9 +107,9 @@ public class ProximityShape extends SpellShape {
 	}
 
 	@Override
-	public ProximityShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
-			SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new ProximityShapeInstance(state, world, location.hitPosition,
+	public ProximityShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params,
+			SpellCharacteristics characteristics) {
+		return new ProximityShapeInstance(state, location.world, location.hitPosition,
 				getRange(params), characteristics);
 	}
 
@@ -179,7 +178,7 @@ public class ProximityShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRange(properties);
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 		return true;

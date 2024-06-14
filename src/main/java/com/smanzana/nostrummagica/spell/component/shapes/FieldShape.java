@@ -138,9 +138,9 @@ public class FieldShape extends AreaShape {
 	}
 
 	@Override
-	public FieldShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
-			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		return new FieldShapeInstance(state, world, location.hitPosition,
+	public FieldShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties,
+			SpellCharacteristics characteristics) {
+		return new FieldShapeInstance(state, location.world, location.hitPosition,
 				getRadius(properties), getContinuous(properties), characteristics);
 	}
 
@@ -211,10 +211,10 @@ public class FieldShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRadius(properties) - .25f;
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
-		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 
 }

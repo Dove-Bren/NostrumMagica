@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 
@@ -58,18 +57,18 @@ public class TouchShape extends InstantShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		final float range = getTouchRange(state, params);
 		
-		RayTraceResult trace = RayTrace.raytrace(world, state.getSelf(), location.shooterPosition, pitch, yaw, range, new RayTrace.OtherLiving(state.getCaster()));
+		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, new RayTrace.OtherLiving(state.getCaster()));
 		
 		if (trace == null || trace.getType() == RayTraceResult.Type.MISS) {
 			final boolean ignoreAirHits = getIgnoreAirHits(params);
 			if (ignoreAirHits) {
-				return new TriggerData(null, null, null);
+				return new TriggerData(null, null);
 			} else {
 				// Project where we reached and return there
-				return new TriggerData(null, world, Lists.newArrayList(new SpellLocation(RayTrace.directionFromAngles(pitch, yaw).scale(range).add(location.shooterPosition))));
+				return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, RayTrace.directionFromAngles(pitch, yaw).scale(range).add(location.shooterPosition))));
 			}
 		}
 		
@@ -77,12 +76,11 @@ public class TouchShape extends InstantShape {
 				&& null != RayTrace.livingFromRaytrace(trace)
 				&& !RayTrace.livingFromRaytrace(trace).isEntityEqual(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
-			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), world, null);
+			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), null);
 		} else if (trace.getType() == RayTraceResult.Type.BLOCK) {
-			return new TriggerData(null, world,
-					Lists.newArrayList(new SpellLocation(trace)));
+			return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 		} else {
-			return new TriggerData(null, null, null);
+			return new TriggerData(null, null);
 		}
 	}
 
@@ -147,8 +145,8 @@ public class TouchShape extends InstantShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 
 }

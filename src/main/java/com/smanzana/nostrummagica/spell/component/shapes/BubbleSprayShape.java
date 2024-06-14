@@ -90,24 +90,24 @@ public class BubbleSprayShape extends SpellShape {
 		
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, world, Lists.newArrayList(location), .125f, true);
+			getState().trigger(null, Lists.newArrayList(location), .125f, true);
 		}
 		
 		@Override
 		public void onProjectileHit(Entity entity) {
 			if (entity == null) {
-				onProjectileHit(new SpellLocation(this.pos));
+				onProjectileHit(new SpellLocation(this.world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null, .125f, true);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, .125f, true);
 			}
 		}
 		
 		@Override
 		public void onProjectileEnd(Vector3d lastPos) {
-			getState().triggerFail(world, new SpellLocation(lastPos));
+			getState().triggerFail(new SpellLocation(world, lastPos));
 		}
 		
 		public EMagicElement getElement() {
@@ -133,9 +133,9 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public BubbleSprayShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public BubbleSprayShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		final float rangeMod = getRangeMod(params);
-		return new BubbleSprayShapeInstance(state, world, location.shooterPosition, pitch, yaw, rangeMod, characteristics);
+		return new BubbleSprayShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, rangeMod, characteristics);
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class BubbleSprayShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		return true;
 	}
 	

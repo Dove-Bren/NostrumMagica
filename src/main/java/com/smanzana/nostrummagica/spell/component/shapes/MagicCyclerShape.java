@@ -62,18 +62,18 @@ public class MagicCyclerShape extends SpellShape {
 
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, world, Lists.newArrayList(location), 1f, true);
+			getState().trigger(null, Lists.newArrayList(location), 1f, true);
 		}
 		
 		@Override
 		public void onProjectileHit(Entity entity) {
 			if (entity == null) {
-				onProjectileHit(new SpellLocation(this.pos));
+				onProjectileHit(new SpellLocation(world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
 		}
 
@@ -84,7 +84,7 @@ public class MagicCyclerShape extends SpellShape {
 
 		@Override
 		public void onProjectileEnd(Vector3d pos) {
-			getState().triggerFail(world, new SpellLocation(pos));
+			getState().triggerFail(new SpellLocation(world, pos));
 		}
 	}
 	
@@ -114,10 +114,10 @@ public class MagicCyclerShape extends SpellShape {
 	}
 	
 	@Override
-	public MagicCyclerShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MagicCyclerShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean onBlocks = getHitsBlocks(params);
 		float duration = this.getDurationSecs(params);
-		return new MagicCyclerShapeInstance(state, world, location.shooterPosition, onBlocks, duration, characteristics);
+		return new MagicCyclerShapeInstance(state, location.world, location.shooterPosition, onBlocks, duration, characteristics);
 	}
 	
 	@Override
@@ -198,9 +198,9 @@ public class MagicCyclerShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		float radius = (float) (EntityCyclerSpellSaucer.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
-		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 }

@@ -204,7 +204,7 @@ public class EntitySpellProjectile extends DamagingProjectileEntity {
 			BlockPos pos = ((BlockRayTraceResult) result).getPos();
 			boolean canImpact = this.canImpact(pos);
 			if (canImpact) {
-				this.doImpact(new SpellLocation(result));
+				this.doImpact(new SpellLocation(world, result));
 				if (this.dieOnImpact(pos)) {
 					this.onProjectileDeath();
 					this.remove();

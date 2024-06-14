@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,6 +20,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  *
  */
 public class SpellLocation {
+	public final World world;
+	
 	/**
 	 * These represent the block selected by the shape. For example, the block collided with
 	 * by a projectile or contained in an AoE.
@@ -39,7 +42,8 @@ public class SpellLocation {
 	 */
 	public final Vector3d shooterPosition;
 	
-	public SpellLocation(Vector3d hitPosition, BlockPos hitBlockPos, BlockPos selectedBlockPos, Vector3d shooterPosition) {
+	public SpellLocation(World world, Vector3d hitPosition, BlockPos hitBlockPos, BlockPos selectedBlockPos, Vector3d shooterPosition) {
+		this.world = world;
 		this.hitPosition = hitPosition;
 		this.hitBlockPos = hitBlockPos;
 		this.selectedBlockPos = selectedBlockPos;
@@ -51,8 +55,8 @@ public class SpellLocation {
 	 * @param selectedPosition
 	 * @param selectedBlockPos
 	 */
-	public SpellLocation(Vector3d hitPosition, BlockPos hitBlockPos, Vector3d shooterPosition) {
-		this(hitPosition, hitBlockPos, hitBlockPos, shooterPosition);
+	public SpellLocation(World world, Vector3d hitPosition, BlockPos hitBlockPos, Vector3d shooterPosition) {
+		this(world, hitPosition, hitBlockPos, hitBlockPos, shooterPosition);
 	}
 	
 	/**
@@ -60,25 +64,25 @@ public class SpellLocation {
 	 * @param selectedPosition
 	 * @param selectedBlockPos
 	 */
-	public SpellLocation(Vector3d selectedPosition, BlockPos selectedBlockPos) {
-		this(selectedPosition, selectedBlockPos, selectedPosition);
+	public SpellLocation(World world, Vector3d selectedPosition, BlockPos selectedBlockPos) {
+		this(world, selectedPosition, selectedBlockPos, selectedPosition);
 	}
 	
-	public SpellLocation(BlockPos isolatedBlockPos) {
-		this(Vector3d.copyCentered(isolatedBlockPos), isolatedBlockPos);
+	public SpellLocation(World world, BlockPos isolatedBlockPos) {
+		this(world, Vector3d.copyCentered(isolatedBlockPos), isolatedBlockPos);
 	}
 	
-	public SpellLocation(Vector3d isolatedPos) {
-		this(isolatedPos, new BlockPos(isolatedPos));
+	public SpellLocation(World world, Vector3d isolatedPos) {
+		this(world, isolatedPos, new BlockPos(isolatedPos));
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public SpellLocation(LivingEntity entity, float partialTicks) {
-		this(entity.func_242282_l(partialTicks), new BlockPos(entity.func_242282_l(partialTicks)), entity.getEyePosition(partialTicks));
+		this(entity.getEntityWorld(), entity.func_242282_l(partialTicks), new BlockPos(entity.func_242282_l(partialTicks)), entity.getEyePosition(partialTicks));
 	}
 	
 	public SpellLocation(LivingEntity entity) {
-		this(entity.getPositionVec(), new BlockPos(entity.getPositionVec()), entity.getPositionVec().add(0, entity.getEyeHeight(), 0));
+		this(entity.getEntityWorld(), entity.getPositionVec(), new BlockPos(entity.getPositionVec()), entity.getPositionVec().add(0, entity.getEyeHeight(), 0));
 	}
 	
 	
@@ -96,8 +100,8 @@ public class SpellLocation {
 				);
 	}
 	
-	public SpellLocation(BlockRayTraceResult rayTrace) {
-		this(
+	public SpellLocation(World world, BlockRayTraceResult rayTrace) {
+		this(world,
 			rayTrace.getHitVec(),
 			GetHitPos(rayTrace.getHitVec(), rayTrace.getPos()),
 			rayTrace.getPos(),
@@ -105,8 +109,8 @@ public class SpellLocation {
 		);
 	}
 	
-	public SpellLocation(RayTraceResult rayTrace) {
-		this((BlockRayTraceResult) rayTrace); // Kinda lame
+	public SpellLocation(World world, RayTraceResult rayTrace) {
+		this(world, (BlockRayTraceResult) rayTrace); // Kinda lame
 	}
 	
 }

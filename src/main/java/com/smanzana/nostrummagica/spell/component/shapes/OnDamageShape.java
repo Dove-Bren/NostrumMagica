@@ -29,7 +29,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -69,7 +68,6 @@ public class OnDamageShape extends SpellShape {
 				if (!expired) {
 					TriggerData data = new TriggerData(
 							Lists.newArrayList(entity),
-							null,
 							null
 							);
 					
@@ -120,7 +118,7 @@ public class OnDamageShape extends SpellShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new OnDamageShapeInstance(state, state.getSelf(), getDurationSecs(params), characteristics);
 	}
 	
@@ -200,7 +198,7 @@ public class OnDamageShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
 		return true;
 	}

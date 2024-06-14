@@ -58,8 +58,8 @@ public class WallShape extends AreaShape {
 		
 		private MutableBoundingBox bounds;
 		
-		public WallShapeInstance(ISpellState state, World world, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellCharacteristics characteristics) {
-			super(state, world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, true, characteristics);
+		public WallShapeInstance(ISpellState state, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellCharacteristics characteristics) {
+			super(state, location.world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, true, characteristics);
 			this.radius = radius;
 			this.facing = facing;
 			this.characteristics = characteristics;
@@ -112,10 +112,10 @@ public class WallShape extends AreaShape {
 			for (int x = bounds.minX; x <= bounds.maxX; x++)
 			for (int y = bounds.minY; y <= bounds.maxY; y++)
 			for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
-				positions.add(new SpellLocation(new BlockPos(x, y, z)));
+				positions.add(new SpellLocation(world, new BlockPos(x, y, z)));
 			}
 			
-			state.trigger(ret, world, positions, 1f, true);
+			state.trigger(ret, positions, 1f, true);
 		}
 		
 		@Override
@@ -282,14 +282,14 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public WallShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
-			SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public WallShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params,
+			SpellCharacteristics characteristics) {
 		// Determine facing based on actual hit position, but use selected pos (where we're looking) to determine if it's grounded
-		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !world.isAirBlock(location.selectedBlockPos) && world.isAirBlock(location.selectedBlockPos.up()));
+		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
 		final boolean isLingering = isLingering(params);
 		final float radius = wallRadius(params);
 		
-		return new WallShapeInstance(state, world, location,
+		return new WallShapeInstance(state, location,
 				facing, radius, isLingering, characteristics);
 	}
 
@@ -354,11 +354,11 @@ public class WallShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float radius = wallRadius(properties);
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
-		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !world.isAirBlock(location.selectedBlockPos) && world.isAirBlock(location.selectedBlockPos.up()));
+		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
 		MutableBoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
 		
 		List<SpellLocation> positions = new ArrayList<>();
@@ -366,9 +366,9 @@ public class WallShape extends AreaShape {
 		for (int y = bounds.minY; y <= bounds.maxY; y++)
 		for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
 			// should trigger?
-			positions.add(new SpellLocation(new BlockPos(x, y, z)));
+			positions.add(new SpellLocation(location.world, new BlockPos(x, y, z)));
 		}
-		state.trigger(null, world, positions);
+		state.trigger(null, positions);
 		
 		return true;
 	}

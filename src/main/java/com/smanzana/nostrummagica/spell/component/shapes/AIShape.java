@@ -12,7 +12,6 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
 
 /**
  * Instantly affects the entity being targetted (attacktarget) by the caster.
@@ -29,13 +28,13 @@ public class AIShape extends InstantShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world,
-			SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location,
+			float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
 		if (state.getCaster() instanceof MobEntity) {
 			target = ((MobEntity) state.getCaster()).getAttackTarget();
 		}
-		return new TriggerData(Lists.newArrayList(target), world, null);
+		return new TriggerData(Lists.newArrayList(target), null);
 	}
 	
 	@Override
@@ -94,8 +93,8 @@ public class AIShape extends InstantShape {
 	}
 
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw,
-			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties,
+			SpellCharacteristics characteristics) {
 		// TODO Auto-generated method stub
 		return null;
 	}

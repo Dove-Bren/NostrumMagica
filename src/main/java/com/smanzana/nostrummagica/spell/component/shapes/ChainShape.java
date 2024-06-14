@@ -55,7 +55,7 @@ public class ChainShape extends InstantShape {
 		private final Map<LivingEntity, List<LivingEntity>> links;
 		
 		public ChainTriggerData(List<LivingEntity> targets, World world, List<SpellLocation> locations, Map<LivingEntity, List<LivingEntity>> links) {
-			super(targets, world, locations);
+			super(targets, locations);
 			this.links = links;
 		}
 		
@@ -65,12 +65,13 @@ public class ChainShape extends InstantShape {
 	}
 	
 	@Override
-	protected ChainTriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected ChainTriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		List<LivingEntity> ret = new ArrayList<>();
 		Map<LivingEntity, List<LivingEntity>> links = new HashMap<>();
 		LivingEntity target = state.getSelf();
 		
 		double radius = 7.0;
+		World world = location.world;
 		if (world == null)
 			world = target.world;
 		
@@ -224,9 +225,9 @@ public class ChainShape extends InstantShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		// Add link links between all links that wind up showing up
-		ChainTriggerData data = this.getTargetData(state, world, location, pitch, yaw, properties, characteristics);
+		ChainTriggerData data = this.getTargetData(state, location, pitch, yaw, properties, characteristics);
 		if (data.targets != null) {
 			final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
 			for (LivingEntity source : data.targets) {
@@ -246,7 +247,7 @@ public class ChainShape extends InstantShape {
 		}
 		
 		// This part copied from parent
-		state.trigger(data.targets, data.world, data.locations);
+		state.trigger(data.targets, data.locations);
 		return (data.targets != null && !data.targets.isEmpty()) || (data.locations != null && !data.locations.isEmpty());
 	}
 

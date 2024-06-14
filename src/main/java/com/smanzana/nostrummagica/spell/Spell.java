@@ -40,7 +40,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -61,11 +60,11 @@ public class Spell {
 		
 		public boolean isPreview();
 		// May not be supported if isPreview() is true
-		public void triggerFail(World world, SpellLocation pos);
-		public default void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
-			this.trigger(targets, world, locations, 1f, false);
+		public void triggerFail(SpellLocation pos);
+		public default void trigger(List<LivingEntity> targets, List<SpellLocation> locations) {
+			this.trigger(targets, locations, 1f, false);
 		}
-		public void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit);
+		public void trigger(List<LivingEntity> targets, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit);
 	}
 	
 	protected static class SpellState implements ISpellState {
@@ -94,24 +93,24 @@ public class Spell {
 		}
 		
 		@Override
-		public void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit) {
+		public void trigger(List<LivingEntity> targets, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit) {
 			//for each target (if more than one), break into multiple spellstates
 			// persist index++ and set self, then start doing shapes or do ending effect
 			
 			// If being forced to split, dupe state right now and continue on that
 			if (forceSplit) {
-				this.split().trigger(targets, world, locations, stageEfficiency, false);
+				this.split().trigger(targets, locations, stageEfficiency, false);
 			} else {
 				this.efficiency *= stageEfficiency;
 				index++;
 				if (index >= spell.shapes.size()) {
-					this.finish(targets, world, locations);
+					this.finish(targets, locations);
 				} else {
 					if (index > 0) {
 						if (targets != null && !targets.isEmpty()) {
 							playContinueEffect(targets.get(0));
 						} else if (locations != null && !locations.isEmpty()) {
-							playContinueEffect(world, locations.get(0).hitPosition);
+							playContinueEffect(locations.get(0).world, locations.get(0).hitPosition);
 						}
 					}
 					
@@ -132,25 +131,25 @@ public class Spell {
 							for (int i = 0; i < targets.size(); i++) {
 								LivingEntity targ = targets.get(i);
 								SpellState sub = split();
-								sub.trigger(Lists.newArrayList(targ), world, null);
+								sub.trigger(Lists.newArrayList(targ), null);
 							}
 							index++;
 						}
 					} else if (locations != null && !locations.isEmpty()) {
 						if (locations.size() == 1) {
 							// Base case here, too. Instantiate trigger!!!!
-							spawnShape(shape, null, world, locations.get(0));
+							spawnShape(shape, null, locations.get(0).world, locations.get(0));
 						} else {
 							index--; // Make splits have same trigger as we're performing now
 							for (SpellLocation targ : locations) {
 								SpellState sub = split();
-								sub.trigger(null, world, Lists.newArrayList(targ));
+								sub.trigger(null, Lists.newArrayList(targ));
 							}
 							index++;
 						}
 					} else {
 						// Last shape affected no entities or locations. Fizzle
-						this.triggerFail(caster.world, new SpellLocation(caster));
+						this.triggerFail(new SpellLocation(caster));
 					}
 									
 				}
@@ -174,10 +173,10 @@ public class Spell {
 				location = new SpellLocation(targ);
 			}
 			
-			this.shapeInstance = shape.getShape().createInstance(this, world, location,
-					(targ == null ? -90.0f : targ.rotationPitch),
+			this.shapeInstance = shape.getShape().createInstance(this, location, (targ == null ? -90.0f : targ.rotationPitch),
 					(targ == null ? 0.0f : targ.rotationYaw),
-					shape.getProperties(), spell.getCharacteristics());
+					shape.getProperties(),
+					spell.getCharacteristics());
 			this.shapeInstance.spawn(caster);
 		}
 		
@@ -253,7 +252,7 @@ public class Spell {
 			return bonus;
 		}
 		
-		protected void finish(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
+		protected void finish(List<LivingEntity> targets, List<SpellLocation> locations) {
 			boolean first = true;
 			boolean anySuccess = false;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -272,7 +271,7 @@ public class Spell {
 				
 				// Track what entities/positions actually have an affect applied to them
 				final List<LivingEntity> affectedEnts = new ArrayList<>();
-				final List<BlockPos> affectedPos = new ArrayList<>();
+				final List<SpellLocation> affectedPos = new ArrayList<>();
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
@@ -290,7 +289,7 @@ public class Spell {
 				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
 					for (SpellLocation pos : locations) {
-						SpellActionResult result = action.apply(caster, world, pos, efficiency); 
+						SpellActionResult result = action.apply(caster, pos, efficiency); 
 						if (result.applied) {
 							if (result.affectedPos != null) {
 								affectedPos.add(result.affectedPos);
@@ -314,21 +313,21 @@ public class Spell {
 						else
 							comp = new SpellComponentWrapper(part.getAlteration());
 						
-						NostrumMagica.instance.proxy.spawnEffect(world, comp,
+						NostrumMagica.instance.proxy.spawnEffect(affected.world, comp,
 								caster, null, affected, null,
 								new SpellComponentWrapper(part.getElement()), harmful, 0);
 					}
 					
 					if (!affectedPos.isEmpty())
-					for (BlockPos affectPos : affectedPos) {
+					for (SpellLocation affectPos : affectedPos) {
 						SpellComponentWrapper comp;
 						if (part.getAlteration() == null)
 							comp = new SpellComponentWrapper(part.getElement());
 						else
 							comp = new SpellComponentWrapper(part.getAlteration());
 						
-						NostrumMagica.instance.proxy.spawnEffect(world, comp,
-								caster, null, null, new Vector3d(affectPos.getX() + .5, affectPos.getY(), affectPos.getZ() + .5),
+						NostrumMagica.instance.proxy.spawnEffect(affectPos.world, comp,
+								caster, null, null, new Vector3d(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5),
 								new SpellComponentWrapper(part.getElement()), harmful, 0);
 					}
 				}
@@ -352,7 +351,7 @@ public class Spell {
 					}
 				} else if (locations != null && !locations.isEmpty()) {
 					for (SpellLocation pos : locations) {
-						doFailEffect(world, pos.hitPosition);
+						doFailEffect(pos.world, pos.hitPosition);
 					}
 				}
 			}
@@ -382,8 +381,8 @@ public class Spell {
 		 * Called when triggers fail to be triggered and have failed.
 		 */
 		@Override
-		public void triggerFail(World world, SpellLocation pos) {
-			doFailEffect(world, pos.hitPosition);
+		public void triggerFail(SpellLocation pos) {
+			doFailEffect(pos.world, pos.hitPosition);
 		}
 	}
 	
@@ -404,7 +403,7 @@ public class Spell {
 		}
 		
 		@Override
-		public void trigger(List<LivingEntity> targets, World world, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit) {
+		public void trigger(List<LivingEntity> targets, List<SpellLocation> locations, float stageEfficiency, boolean forceSplit) {
 			//if (this.getIndex() != 1) {
 			{
 				if (targets != null && !targets.isEmpty()) {
@@ -417,7 +416,7 @@ public class Spell {
 					}
 				}
 			}
-			super.trigger(targets, world, locations, stageEfficiency, forceSplit);
+			super.trigger(targets, locations, stageEfficiency, forceSplit);
 		}
 
 		@Override
@@ -432,14 +431,14 @@ public class Spell {
 				location = new SpellLocation(targ, this.partialTicks);
 			}
 			
-			shape.getShape().addToPreview(previewBuilder, this, world, location,
-					(targ == null ? -90.0f : targ.rotationPitch),
+			shape.getShape().addToPreview(previewBuilder, this, location, (targ == null ? -90.0f : targ.rotationPitch),
 					(targ == null ? 0.0f : targ.rotationYaw),
-					shape.getProperties(), this.spell.getCharacteristics());
+					shape.getProperties(),
+					this.spell.getCharacteristics());
 		}
 		
 		@Override
-		protected void finish(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
+		protected void finish(List<LivingEntity> targets, List<SpellLocation> locations) {
 			// Final affected targets or positions for this state
 		}
 
@@ -576,7 +575,7 @@ public class Spell {
 		}
 		
 		SpellState state = new SpellState(this, caster, efficiency);
-		state.trigger(Lists.newArrayList(caster), null, null);
+		state.trigger(Lists.newArrayList(caster), null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
 		if (caster instanceof PlayerEntity) {
@@ -1072,7 +1071,7 @@ public class Spell {
 		if (!getSpellShapeParts().isEmpty()) {
 			SpellShapePreview preview = new SpellShapePreview();
 			PreviewState previewState = new PreviewState(this, caster, preview, partialTicks);
-			previewState.trigger(Lists.newArrayList(caster), null, null);
+			previewState.trigger(Lists.newArrayList(caster), null);
 			return preview;
 		}
 		

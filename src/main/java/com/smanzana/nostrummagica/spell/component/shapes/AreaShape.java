@@ -91,12 +91,11 @@ public abstract class AreaShape extends SpellShape {
 					for (int k = -(int)radiusHint; k <= radiusHint; k++) {
 						cursor.setPos(pos.x + i, pos.y + j, pos.z + k);
 						if (this.isInArea(world, cursor)) {
-							list.add(new SpellLocation(cursor.toImmutable()));
+							list.add(new SpellLocation(world, cursor.toImmutable()));
 						}
 					}
 					TriggerData data = new TriggerData(
 							null,
-							world,
 							list
 							);
 					this.trigger(data, 1f, true);
@@ -117,7 +116,6 @@ public abstract class AreaShape extends SpellShape {
 				if (visitEntity(entity)) {
 					TriggerData data = new TriggerData(
 							Lists.newArrayList(entity),
-							null,
 							null
 							);
 					this.trigger(data, 1f, true);

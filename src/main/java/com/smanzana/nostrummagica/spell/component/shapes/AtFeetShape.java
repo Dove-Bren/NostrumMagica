@@ -14,7 +14,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -38,8 +37,8 @@ public class AtFeetShape extends InstantShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new TriggerData(null, world, Lists.newArrayList(new SpellLocation(state.getSelf().getPosition().down())));
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, state.getSelf().getPosition().down())));
 	}
 
 	@Override
@@ -108,8 +107,8 @@ public class AtFeetShape extends InstantShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		builder.add(new SpellShapePreviewComponent.Position(new SpellLocation(state.getSelf().getPosition().down())));
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		builder.add(new SpellShapePreviewComponent.Position(new SpellLocation(location.world, state.getSelf().getPosition().down())));
 		return true;
 	}
 }

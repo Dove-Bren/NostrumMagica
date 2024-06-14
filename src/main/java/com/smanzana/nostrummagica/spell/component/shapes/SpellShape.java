@@ -19,7 +19,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -95,7 +94,7 @@ public abstract class SpellShape {
 		}
 		
 		protected void trigger(TriggerData data, float stageEfficiency, boolean forceSplit) {
-			state.trigger(data.targets, data.world, data.locations, stageEfficiency, forceSplit);
+			state.trigger(data.targets, data.locations, stageEfficiency, forceSplit);
 		}
 		
 		protected ISpellState getState() {
@@ -113,13 +112,11 @@ public abstract class SpellShape {
 	
 	protected static class TriggerData {
 		public final List<LivingEntity> targets;
-		public final World world;
 		public final List<SpellLocation> locations;
 		
-		public TriggerData(List<LivingEntity> targets, World world, List<SpellLocation> locations) {
+		public TriggerData(List<LivingEntity> targets, List<SpellLocation> locations) {
 			this.targets = targets;
 			this.locations = locations;
-			this.world = world;
 		}
 	}
 	
@@ -139,7 +136,6 @@ public abstract class SpellShape {
 	 * Spawn an instance to perform this spell shape's action.
 	 * For exaple, get ready to spawn a projectile to fly through the air that will eventually 'trigger' the next part of the spell.
 	 * @param state
-	 * @param world
 	 * @param location
 	 * @param pitch
 	 * @param yaw
@@ -147,27 +143,26 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return
 	 */
-	public abstract SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
+	public abstract SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
 	
 	/**
 	 * Possibly spawn visual fx for this shape
-	 * @param world
 	 * @param location
 	 * @param harmful Whether the effects of the spell this shape is being cast as part of appear to be harmful
 	 */
 	protected void spawnShapeEffect(LivingEntity caster,
-			@Nullable LivingEntity target, World world, SpellLocation location,
-			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+			@Nullable LivingEntity target, SpellLocation location, SpellShapePartProperties properties,
+			SpellCharacteristics characteristics) {
 		
-		spawnDefaultShapeEffect(caster, target, world, location, properties, characteristics);
+		spawnDefaultShapeEffect(caster, target, location, properties, characteristics);
 	}
 	
 	protected final void spawnDefaultShapeEffect(LivingEntity caster,
-			@Nullable LivingEntity target, World world, SpellLocation location,
-			SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+			@Nullable LivingEntity target, SpellLocation location, SpellShapePartProperties properties,
+			SpellCharacteristics characteristics) {
 		final float p = (supportedFloats() == null || supportedFloats().length == 0 ? 0 : (
 				properties.level == 0f ? supportedFloats()[0] : properties.level));
-		NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
+		NostrumMagica.instance.proxy.spawnEffect(location.world, new SpellComponentWrapper(this),
 				caster, null, target, location.hitPosition,
 				new SpellComponentWrapper(characteristics.element), characteristics.harmful, p);
 	}
@@ -263,7 +258,6 @@ public abstract class SpellShape {
 	 * (like a projectile that is spawned and flies) should approximate the behavior.
 	 * @param builder
 	 * @param state
-	 * @param world
 	 * @param location
 	 * @param pitch
 	 * @param yaw
@@ -271,7 +265,7 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return whether to continue with the spell (return true), or if the spell is expected to fizzle here (return false)
 	 */
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		return false;
 	}
 	

@@ -9,7 +9,6 @@ import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.World;
 
 /**
  * Shape that can immediately be resolved.
@@ -22,17 +21,15 @@ public abstract class InstantShape extends SpellShape {
 	public static class InstantShapeInstance extends SpellShapeInstance {
 
 		private final InstantShape shape;
-		private final World world;
 		private final SpellLocation location;
 		private final float pitch;
 		private final float yaw;
 		private final SpellShapePartProperties params;
 		private final SpellCharacteristics characteristics;
 		
-		public InstantShapeInstance(InstantShape shape, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		public InstantShapeInstance(InstantShape shape, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 			super(state);
 			this.shape = shape;
-			this.world = world;
 			this.location = location;
 			this.pitch = pitch;
 			this.yaw = yaw;
@@ -43,7 +40,7 @@ public abstract class InstantShape extends SpellShape {
 		@Override
 		public void spawn(LivingEntity caster) {
 			// We are instant! Whoo!
-			TriggerData data = shape.getTargetData(this.getState(), world, location, pitch, yaw, params, this.characteristics);
+			TriggerData data = shape.getTargetData(this.getState(), location, pitch, yaw, params, this.characteristics);
 			this.trigger(data);
 		}
 	}
@@ -53,8 +50,8 @@ public abstract class InstantShape extends SpellShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new InstantShapeInstance(this, state, world, location, pitch, yaw, params, characteristics);
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new InstantShapeInstance(this, state, location, pitch, yaw, params, characteristics);
 	}
 	
 	/**
@@ -66,7 +63,7 @@ public abstract class InstantShape extends SpellShape {
 	 * @param caster
 	 * @return
 	 */
-	protected abstract TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics);
+	protected abstract TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics);
 	
 	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
@@ -82,13 +79,13 @@ public abstract class InstantShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		TriggerData data = this.getTargetData(state, world, location, pitch, yaw, properties, characteristics);
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		TriggerData data = this.getTargetData(state, location, pitch, yaw, properties, characteristics);
 		
 		List<LivingEntity> entityHits = (this.previewEntityHits(properties, characteristics) ? data.targets : null);
 		List<SpellLocation> blockHits = (this.previewBlockHits(properties, characteristics) ? data.locations : null);
 		
-		state.trigger(entityHits, data.world, blockHits);
+		state.trigger(entityHits, blockHits);
 		return (entityHits != null && !entityHits.isEmpty()) || (blockHits != null && !blockHits.isEmpty());
 	}
 	

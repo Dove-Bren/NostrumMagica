@@ -25,7 +25,6 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
 
 public class BurstShape extends InstantShape {
 
@@ -44,10 +43,10 @@ public class BurstShape extends InstantShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
-			this.spawnShapeEffect(state.getCaster(), null, world, location, param, characteristics);
+			this.spawnShapeEffect(state.getCaster(), null, location, param, characteristics);
 		}
 		
 		List<LivingEntity> ret = new ArrayList<>();
@@ -55,7 +54,7 @@ public class BurstShape extends InstantShape {
 		double radiusEnts = getRadius(param) + .5;
 		final Vector3d center = location.hitPosition;
 		
-		for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
+		for (Entity entity : location.world.getEntitiesWithinAABBExcludingEntity(null, 
 				new AxisAlignedBB(center.getX() - radiusEnts,
 						center.getY() - radiusEnts,
 						center.getZ() - radiusEnts,
@@ -74,7 +73,7 @@ public class BurstShape extends InstantShape {
 		
 		final BlockPos centerBlock = location.hitBlockPos;
 		if (radiusBlocks == 0) {
-			list.add(new SpellLocation(centerBlock));
+			list.add(new SpellLocation(location.world, centerBlock));
 		} else {
 			for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
 				// x loop. I is offset of x
@@ -83,10 +82,10 @@ public class BurstShape extends InstantShape {
 					int yRadius = innerRadius - Math.abs(j);
 					// 0 means just that cell. Otherwise, +- n
 					if (yRadius == 0) {
-						list.add(new SpellLocation(centerBlock.add(i, j, 0)));
+						list.add(new SpellLocation(location.world, centerBlock.add(i, j, 0)));
 					} else {
 						for (int k = -yRadius; k <= yRadius; k++) {
-							list.add(new SpellLocation(centerBlock.add(i, j, k)));
+							list.add(new SpellLocation(location.world, centerBlock.add(i, j, k)));
 						}
 					}
 				}
@@ -94,7 +93,7 @@ public class BurstShape extends InstantShape {
 			}
 		}
 		
-		return new TriggerData(ret, world, list);
+		return new TriggerData(ret, list);
 	}
 
 	@Override
@@ -172,15 +171,15 @@ public class BurstShape extends InstantShape {
 		return new SpellShapeAttributes(true, true, true);
 	}
 	
-	protected void addRangeRings(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRadius(properties);
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		this.addRangeRings(builder, state, world, location, pitch, yaw, properties, characteristics);
-		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+		this.addRangeRings(builder, state, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 	
 	@Override

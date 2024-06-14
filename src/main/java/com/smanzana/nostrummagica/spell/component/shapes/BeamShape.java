@@ -23,7 +23,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -48,12 +47,12 @@ public class BeamShape extends InstantShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		// Cast from eyes
 		final Vector3d start = location.shooterPosition;
 		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
 		final Vector3d end = start.add(dir.normalize().scale(BEAM_RANGE));
-		Collection<RayTraceResult> traces = RayTrace.allInPath(world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()));
+		Collection<RayTraceResult> traces = RayTrace.allInPath(location.world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()));
 		List<LivingEntity> targs = null;
 		List<SpellLocation> blocks = null;
 		
@@ -72,17 +71,17 @@ public class BeamShape extends InstantShape {
 						&& RayTrace.livingFromRaytrace(trace) != null) {
 					targs.add(RayTrace.livingFromRaytrace(trace));
 				} else {
-					blocks.add(new SpellLocation(trace));
+					blocks.add(new SpellLocation(location.world, trace));
 				}
 			}
 		}
 		
 		if (!state.isPreview()) {
-			NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(this),
+			NostrumMagica.instance.proxy.spawnEffect(location.world, new SpellComponentWrapper(this),
 					null, start, null, end, null, false, 0);
 		}
 		
-		return new TriggerData(targs, world, blocks);
+		return new TriggerData(targs, blocks);
 	}
 
 	@Override
@@ -151,12 +150,12 @@ public class BeamShape extends InstantShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d from = location.shooterPosition;
 		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
 		final Vector3d maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
 		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vector3d.fromPitchYaw(pitch, yaw+90).scale(.1f)), maxDist, 3f));
-		return super.addToPreview(builder, state, world, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 
 }

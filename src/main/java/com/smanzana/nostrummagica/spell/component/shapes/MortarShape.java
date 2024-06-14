@@ -167,18 +167,18 @@ public class MortarShape extends SpellShape {
 		
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, world, Lists.newArrayList(location));
+			getState().trigger(null, Lists.newArrayList(location));
 		}
 		
 		@Override
 		public void onProjectileHit(Entity entity) {
 			if (entity == null) {
-				onProjectileHit(new SpellLocation(this.pos));
+				onProjectileHit(new SpellLocation(world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
 		}
 		
@@ -190,7 +190,7 @@ public class MortarShape extends SpellShape {
 
 		@Override
 		public void onProjectileEnd(Vector3d pos) {
-			getState().triggerFail(world, new SpellLocation(pos));
+			getState().triggerFail(new SpellLocation(world, pos));
 		}
 	}
 
@@ -211,9 +211,9 @@ public class MortarShape extends SpellShape {
 	}
 
 	@Override
-	public MortarShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MortarShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(params);
-		return new MortarShapeInstance(state, world, location.shooterPosition, pitch, yaw, noArc, characteristics);
+		return new MortarShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, noArc, characteristics);
 	}
 
 	@Override
@@ -278,7 +278,7 @@ public class MortarShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(properties);
 		
 		// Do a little more work of getting a good vector for things
@@ -302,7 +302,7 @@ public class MortarShape extends SpellShape {
 			dest = target.getPositionVec();
 			success = true;
 		} else {
-			RayTraceResult mop = RayTrace.raytraceApprox(world, state.getSelf(), location.shooterPosition, dir, MaxHDist, (ent) -> {
+			RayTraceResult mop = RayTrace.raytraceApprox(location.world, state.getSelf(), location.shooterPosition, dir, MaxHDist, (ent) -> {
 				if (!(ent instanceof LivingEntity)) {
 					return false;
 				}
@@ -316,11 +316,11 @@ public class MortarShape extends SpellShape {
 			if (mop.getType() == RayTraceResult.Type.ENTITY) {
 				final LivingEntity hit = RayTrace.livingFromRaytrace(mop);
 				dest = hit.getPositionVec().add(0, hit.getHeight() / 2, 0);
-				state.trigger(Lists.newArrayList(hit), null, null);
+				state.trigger(Lists.newArrayList(hit), null);
 				success = true;
 			} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
 				dest = mop.getHitVec();
-				state.trigger(null, world, Lists.newArrayList(new SpellLocation(mop)));
+				state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, mop)));
 				success = true;
 			} else {
 				dest = Vector3d.copyCentered(new BlockPos(location.shooterPosition.add(dir.scale(MaxHDist))));
@@ -338,8 +338,8 @@ public class MortarShape extends SpellShape {
 			
 			for (int i = 0; i < 7; i++) {
 				cursor.move(Direction.UP);
-				BlockState blockstate = world.getBlockState(cursor);
-				if (!(blockstate.getBlock() instanceof DungeonAir) && !world.isAirBlock(cursor)) {
+				BlockState blockstate = location.world.getBlockState(cursor);
+				if (!(blockstate.getBlock() instanceof DungeonAir) && !location.world.isAirBlock(cursor)) {
 					// can't go here. Go back down and bail
 					cursor.move(Direction.DOWN);
 					break;

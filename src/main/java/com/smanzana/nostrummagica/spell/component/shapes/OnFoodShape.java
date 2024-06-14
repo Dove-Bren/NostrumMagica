@@ -30,7 +30,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -82,7 +81,6 @@ public class OnFoodShape extends SpellShape {
 				if (!expired) {
 					TriggerData data = new TriggerData(
 							Lists.newArrayList(this.getState().getSelf()),
-							null,
 							null
 							);
 					
@@ -140,7 +138,7 @@ public class OnFoodShape extends SpellShape {
 	}
 	
 	@Override
-	public FoodShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public FoodShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
 		return new FoodShapeInstance(state, state.getCaster(),
 				getLevel(params), getOnAbove(params), 300, characteristics);
 	}
@@ -220,7 +218,7 @@ public class OnFoodShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
 		return true;
 	}

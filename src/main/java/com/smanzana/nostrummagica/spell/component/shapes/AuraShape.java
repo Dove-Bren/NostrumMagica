@@ -58,11 +58,11 @@ public class AuraShape extends AreaShape {
 		private boolean dead;
 		private final Map<LivingEntity, Integer> affected;
 		
-		public AuraTriggerInstance(ISpellState state, World world, LivingEntity entity, float radius, boolean includeAllies, SpellCharacteristics characteristics) {
+		public AuraTriggerInstance(ISpellState state, LivingEntity entity, float radius, boolean includeAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.radius = radius;
 			this.origin = entity;
-			this.world = world;
+			this.world = entity.getEntityWorld();
 			this.includeAllies = includeAllies;
 			this.characteristics = characteristics;
 			
@@ -142,7 +142,6 @@ public class AuraShape extends AreaShape {
 					if (visitEntity(e)) {
 						TriggerData data = new TriggerData(
 								Lists.newArrayList(e),
-								null,
 								null
 								);
 						this.trigger(data, 1f, true);
@@ -201,8 +200,8 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new AuraTriggerInstance(state, world, state.getSelf(),
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new AuraTriggerInstance(state, state.getSelf(),
 				getRadius(params),
 				includeAllies(params),
 				characteristics);
@@ -285,15 +284,15 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float range = this.getRadius(getDefaultProperties());
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		
-		List<LivingEntity> ents = world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(location.hitPosition).grow(range + 1), (ent) -> 
+		List<LivingEntity> ents = location.world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(location.hitPosition).grow(range + 1), (ent) -> 
 			ent instanceof LivingEntity && location.hitPosition.distanceTo(ent.getPositionVec()) <= range
 		).stream().map(ent -> (LivingEntity) ent).collect(Collectors.toList());
 		if (ents != null && !ents.isEmpty()) {
-			state.trigger(ents, null, null);
+			state.trigger(ents, null);
 		}
 		
 		return !ents.isEmpty();

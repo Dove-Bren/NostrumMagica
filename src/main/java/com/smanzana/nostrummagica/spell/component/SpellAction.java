@@ -137,7 +137,7 @@ public class SpellAction {
 		public boolean applied;
 		public float damage;
 		public float heals;
-		public BlockPos affectedPos;
+		public SpellLocation affectedPos;
 		
 		private SpellActionResult() {
 			this.applied = false;
@@ -149,7 +149,7 @@ public class SpellAction {
 	
 	private static interface SpellEffect {
 		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder);
-		public void apply(LivingEntity caster, World world, SpellLocation location, float eff, SpellActionResult resultBuilder);
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder);
 		
 		public default boolean isHarmful() {
 			return false;
@@ -239,7 +239,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -297,7 +297,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -342,7 +342,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -380,7 +380,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -432,7 +432,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -474,7 +474,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -642,7 +642,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Do nothing
 		}
 		
@@ -668,19 +668,19 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			apply(caster, entity.world, new SpellLocation(entity), efficiency, resultBuilder);
+			apply(caster, new SpellLocation(entity), efficiency, resultBuilder);
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
 			Vector3d center = Vector3d.copyCentered(location.hitBlockPos); // idr why I wanted it centered in the block?
-			NostrumMagicaSounds.DAMAGE_WIND.play(world, center.x, center.y, center.z);
+			NostrumMagicaSounds.DAMAGE_WIND.play(location.world, center.x, center.y, center.z);
 			
 			boolean any = false;
-			for (Entity e : world.getEntitiesWithinAABBExcludingEntity(null, 
+			for (Entity e : location.world.getEntitiesWithinAABBExcludingEntity(null, 
 					new AxisAlignedBB(center.x - range, center.y - range, center.z - range, center.x + range, center.y + range, center.z + range)
 					)) {
 				double dist = e.getPositionVec().distanceTo(center); 
@@ -721,7 +721,7 @@ public class SpellAction {
 			}
 			
 			resultBuilder.applied |= any;
-			resultBuilder.affectedPos = location.hitBlockPos;
+			resultBuilder.affectedPos = new SpellLocation(location.world, location.hitBlockPos);
 		}
 		
 		@Override
@@ -795,15 +795,15 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
-			Block block = world.getBlockState(location.selectedBlockPos).getBlock();
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+			Block block = location.world.getBlockState(location.selectedBlockPos).getBlock();
 			TransmuteResult<Block> result = Transmutation.GetTransmutationResult(block, level);
 			if (!result.valid) {
-				NostrumMagicaSounds.CAST_FAIL.play(world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
+				NostrumMagicaSounds.CAST_FAIL.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
 				return;
 			}
 			
-			NostrumMagicaSounds.CAST_CONTINUE.play(world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
+			NostrumMagicaSounds.CAST_CONTINUE.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
 
 			// Award knowledge
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -813,9 +813,9 @@ public class SpellAction {
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) caster);
 			}
 			
-			world.setBlockState(location.selectedBlockPos, result.output.getDefaultState());
+			location.world.setBlockState(location.selectedBlockPos, result.output.getDefaultState());
 			resultBuilder.applied |= true;
-			resultBuilder.affectedPos = location.selectedBlockPos;
+			resultBuilder.affectedPos = new SpellLocation(location.world, location.selectedBlockPos);
 		}
 		
 		@Override
@@ -855,26 +855,26 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos applyPos = location.hitBlockPos;
-			BlockState state = world.getBlockState(applyPos);
+			BlockState state = location.world.getBlockState(applyPos);
 			if (state != null && state.getBlock() instanceof Candle) {
-				Candle.light(world, applyPos, state);
-				NostrumMagicaSounds.DAMAGE_FIRE.play(world,
+				Candle.light(location.world, applyPos, state);
+				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world,
 						applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 				resultBuilder.applied |= true;
 			}
 			
-			if (DimensionUtils.IsSorceryDim(world)) {
+			if (DimensionUtils.IsSorceryDim(location.world)) {
 				return;
 			}
 			
-			if (world.isAirBlock(applyPos)) {
-				world.setBlockState(applyPos, Blocks.FIRE.getDefaultState());
-				NostrumMagicaSounds.DAMAGE_FIRE.play(world,
+			if (location.world.isAirBlock(applyPos)) {
+				location.world.setBlockState(applyPos, Blocks.FIRE.getDefaultState());
+				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world,
 						applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 				resultBuilder.applied |= true;
-				resultBuilder.affectedPos = applyPos;
+				resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
 			}
 			return;
 		}
@@ -901,11 +901,11 @@ public class SpellAction {
 			entity.setRevengeTarget(caster);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
-			apply(caster, entity.world, new SpellLocation(entity), efficiency, resultBuilder);
+			apply(caster, new SpellLocation(entity), efficiency, resultBuilder);
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			
 			int count = 1;
 			
@@ -949,22 +949,22 @@ public class SpellAction {
 					
 					// Find surface
 					int dist = 0;
-					while (dist++ < 4 && !world.isAirBlock(cursor)) {
+					while (dist++ < 4 && !location.world.isAirBlock(cursor)) {
 						cursor.setY(cursor.getY() + 1);
 					}
 				}
 				
-				NostrumTameLightning bolt = new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5);
+				NostrumTameLightning bolt = new NostrumTameLightning(NostrumEntityTypes.tameLightning, location.world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5);
 				bolt.setEntityToIgnore(caster);
 				bolt.setDamage(damage);
 				
-				((ServerWorld) world).addEntity(bolt);
+				((ServerWorld) location.world).addEntity(bolt);
 				
 				
 			}
 
 			resultBuilder.applied |= true;
-			resultBuilder.affectedPos = applyPos;
+			resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
 		}
 		
 		@Override
@@ -1016,11 +1016,11 @@ public class SpellAction {
 				pos = center;
 			} while (false);
 			
-			apply(caster, world, new SpellLocation(pos), efficiency, resultBuilder);
+			apply(caster, new SpellLocation(world, pos), efficiency, resultBuilder);
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			final BlockPos applyPos = location.hitBlockPos;
 			
 			// For non-player entities, just spawn some new golems.
@@ -1033,9 +1033,9 @@ public class SpellAction {
 				NostrumMagica.getMagicWrapper(caster).clearFamiliars();
 				caster.removeActivePotionEffect(NostrumEffects.familiar);
 				for (int i = 0; i < power; i++) {
-					EntityGolem golem = spawnGolem(world);
+					EntityGolem golem = spawnGolem(location.world);
 					golem.setPosition(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
-					world.addEntity(golem);
+					location.world.addEntity(golem);
 					golem.setOwnerId(caster.getUniqueID());
 					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 				}
@@ -1075,17 +1075,17 @@ public class SpellAction {
 				// Just summon some new golems
 				final int time = (int) (20f * (15f * efficiency));
 				for (int i = 0; i < power; i++) {
-					EntityGolem golem = spawnGolem(world);
+					EntityGolem golem = spawnGolem(location.world);
 					golem.setPosition(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 					golem.setExpiresAfterTicks(time);
-					world.addEntity(golem);
+					location.world.addEntity(golem);
 				}
 			}
 			
-			NostrumMagicaSounds.CAST_CONTINUE.play(world,
+			NostrumMagicaSounds.CAST_CONTINUE.play(location.world,
 					applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 			resultBuilder.applied |= true;
-			resultBuilder.affectedPos = applyPos;
+			resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
 		}
 		
 		private EntityGolem spawnGolem(World world) {
@@ -1206,15 +1206,15 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
-			BlockPos pos = adjustPosition(world, location.hitBlockPos);
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+			BlockPos pos = adjustPosition(location.world, location.hitBlockPos);
 			
 			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, pos.getX() + .5, pos.getY(), pos.getZ() + .5, caster);
 			if (!event.isCanceled()) {
 				caster.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 				caster.fallDistance = 0;
 				resultBuilder.applied |= true;
-				resultBuilder.affectedPos = pos;
+				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 				NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
 			}
 		}
@@ -1258,7 +1258,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return; // Doesn't mean anything
 		}
 		
@@ -1338,7 +1338,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			// Summon an entity
 			int count = 1;
 			for (int i = 1; i < level; i++)
@@ -1348,23 +1348,23 @@ public class SpellAction {
 			for (int i = 0; i < count; i++) {
 				Entity entity;
 				if (NostrumMagica.rand.nextFloat() <= .1f) {
-					entity = new ItemEntity(world,
+					entity = new ItemEntity(location.world,
 							location.hitPosition.x, location.hitPosition.y + .1, location.hitPosition.z,
 							new ItemStack(Items.ENDER_PEARL));
 				} else if (NostrumMagica.rand.nextFloat() <= .3) {
-					entity = EntityType.ENDERMAN.create(world);
+					entity = EntityType.ENDERMAN.create(location.world);
 				} else {
-					entity = EntityType.ENDERMITE.create(world);
+					entity = EntityType.ENDERMITE.create(location.world);
 				}
 				
 				entity.setPosition(location.hitPosition.x, location.hitPosition.y + .1, location.hitPosition.z);
 				
-				world.addEntity(entity);
+				location.world.addEntity(entity);
 			}
 			
-			NostrumMagicaSounds.DAMAGE_ENDER.play(world, location.hitPosition.x, location.hitPosition.y, location.hitPosition.z);
+			NostrumMagicaSounds.DAMAGE_ENDER.play(location.world, location.hitPosition.x, location.hitPosition.y, location.hitPosition.z);
 			resultBuilder.applied |= true;
-			resultBuilder.affectedPos = location.hitBlockPos;
+			resultBuilder.affectedPos = new SpellLocation(location.world, location.hitBlockPos);
 		}
 		
 		@Override
@@ -1466,7 +1466,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return;
 		}
 		
@@ -1501,20 +1501,20 @@ public class SpellAction {
 
 		@SuppressWarnings("deprecation")
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			// Since farmland is smaller than a block, standing on it means the block below you (at feet trigger) is
 			// the block below the farmland. So try and step up if we're in that specific case.
 			BlockPos pos = location.selectedBlockPos;
 			
-			if (world.getBlockState(pos.up()).getBlock() instanceof FarmlandBlock) {
+			if (location.world.getBlockState(pos.up()).getBlock() instanceof FarmlandBlock) {
 				pos = pos.up();
 			}
 			
-			if (world.getBlockState(pos).getBlock() instanceof FarmlandBlock) {
+			if (location.world.getBlockState(pos).getBlock() instanceof FarmlandBlock) {
 				pos = pos.up();
 			}
 			
-			if (world.isAirBlock(pos)) {
+			if (location.world.isAirBlock(pos)) {
 				return;
 			}
 			
@@ -1522,11 +1522,11 @@ public class SpellAction {
 			boolean worked = false;
 			for (int i = 0; i < count; i++) {
 				if (caster instanceof PlayerEntity) {
-					if (!BoneMealItem.applyBonemeal(junk, world, pos, (PlayerEntity)caster)) {
+					if (!BoneMealItem.applyBonemeal(junk, location.world, pos, (PlayerEntity)caster)) {
 						break;
 					}
 				} else {
-					if (!BoneMealItem.applyBonemeal(junk, world, pos)) {
+					if (!BoneMealItem.applyBonemeal(junk, location.world, pos)) {
 						break;
 					}
 				}
@@ -1534,12 +1534,12 @@ public class SpellAction {
 			}
 			
 			if (worked) {
-				NostrumMagicaSounds.STATUS_BUFF2.play(world, pos); // TODO this and fire both movep osition up which is bad
+				NostrumMagicaSounds.STATUS_BUFF2.play(location.world, pos); // TODO this and fire both movep osition up which is bad
 			}
 			
 			resultBuilder.applied |= worked;
 			if (worked) {
-				resultBuilder.affectedPos = pos;
+				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 			}
 		}
 		
@@ -1592,7 +1592,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			return;
 		}
 		
@@ -1627,15 +1627,15 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos pos = location.hitBlockPos;
-			if (!world.isAirBlock(pos) && !(world.getBlockState(pos).getBlock() instanceof MagicWall)) {
-				NostrumMagicaSounds.CAST_FAIL.play(world, pos);
+			if (!location.world.isAirBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWall)) {
+				NostrumMagicaSounds.CAST_FAIL.play(location.world, pos);
 			} else {
-				NostrumMagicaSounds.DAMAGE_WIND.play(world, pos);
-				world.setBlockState(pos, NostrumBlocks.magicWall.getState(level));
+				NostrumMagicaSounds.DAMAGE_WIND.play(location.world, pos);
+				location.world.setBlockState(pos, NostrumBlocks.magicWall.getState(level));
 				resultBuilder.applied |= true;
-				resultBuilder.affectedPos = pos;
+				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 			}
 				
 		}
@@ -1685,13 +1685,13 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos pos = location.hitBlockPos;
-			if (world.isAirBlock(pos) || world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
-				world.setBlockState(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
-				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos);
+			if (location.world.isAirBlock(pos) || location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
+				location.world.setBlockState(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
+				NostrumMagicaSounds.DAMAGE_ICE.play(location.world, pos);
 				resultBuilder.applied |= true;
-				resultBuilder.affectedPos = pos;
+				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 			}
 		}
 		
@@ -1716,17 +1716,17 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			apply(caster, entity.world, new SpellLocation(entity), efficiency, resultBuilder);
+			apply(caster, new SpellLocation(entity), efficiency, resultBuilder);
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			final BlockState state = NostrumBlocks.cursedFire.GetWithLevel(level);
 			final BlockPos pos = location.hitBlockPos;
-			if (state.isValidPosition(world, pos) && world.setBlockState(pos, state)) {
-				NostrumMagicaSounds.DAMAGE_FIRE.play(world, pos);
+			if (state.isValidPosition(location.world, pos) && location.world.setBlockState(pos, state)) {
+				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world, pos);
 				resultBuilder.applied |= true;
-				resultBuilder.affectedPos = pos;
+				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 			}
 		}
 		
@@ -1751,7 +1751,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder) {
-			apply(caster, entity.world, new SpellLocation(entity.getPosition().add(0, -1, 0)), eff, resultBuilder);
+			apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder);
 		}
 		
 		protected boolean isTool(@Nullable PlayerEntity player, ItemStack stack) {
@@ -1771,16 +1771,16 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float eff, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder) {
 			final BlockPos pos = location.selectedBlockPos;
-			if (world.isAirBlock(pos))
+			if (location.world.isAirBlock(pos))
 				return;
 			
-			if (DimensionUtils.IsSorceryDim(world)) {
+			if (DimensionUtils.IsSorceryDim(location.world)) {
 				return;
 			}
 			
-			BlockState state = world.getBlockState(pos);
+			BlockState state = location.world.getBlockState(pos);
 			if (state == null || state.getMaterial().isLiquid())
 				return;
 			
@@ -1792,14 +1792,14 @@ public class SpellAction {
 			}
 			
 			boolean usePickaxe = (level >= 3);
-			float hardness = state.getBlockHardness(world, pos);
+			float hardness = state.getBlockHardness(location.world, pos);
 			
 			if (hardness >= 100f || hardness < 0f)
 				return;
 			
 			if (caster instanceof ServerPlayerEntity) {
 				// This checks item harvest level >:(
-//				if (!state.getBlock().canHarvestBlock(world, block, (PlayerEntity) caster)) {
+//				if (!state.getBlock().canHarvestBlock(location.world, block, (PlayerEntity) caster)) {
 //					return false;
 //				}
 				
@@ -1817,14 +1817,14 @@ public class SpellAction {
 				if (usePickaxe) {
 					((ServerPlayerEntity) caster).interactionManager.tryHarvestBlock(pos);
 				} else {
-					world.destroyBlock(pos, true);
+					location.world.destroyBlock(pos, true);
 				}
 			} else {
-				world.destroyBlock(pos, true);
+				location.world.destroyBlock(pos, true);
 			}
 			
 			resultBuilder.applied |= true;
-			resultBuilder.affectedPos = pos;
+			resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 		}
 		
 		@Override
@@ -1857,7 +1857,7 @@ public class SpellAction {
 				entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, (int) (15 * eff) * 20, level-1));
 				resultBuilder.applied = true;
 			} else {
-				apply(caster, entity.world, new SpellLocation(entity.getPosition().add(0, -1, 0)), eff, resultBuilder);
+				apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder);
 			}
 		}
 		
@@ -1957,20 +1957,20 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, World world, SpellLocation location, float eff, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder) {
 			final BlockPos pos = location.selectedBlockPos;
-			if (world.isAirBlock(pos))
+			if (location.world.isAirBlock(pos))
 				return;
 			
-			if (DimensionUtils.IsSorceryDim(world)) {
+			if (DimensionUtils.IsSorceryDim(location.world)) {
 				return;
 			}
 			
-			BlockState state = world.getBlockState(pos);
+			BlockState state = location.world.getBlockState(pos);
 			if (state == null || state.getMaterial().isLiquid())
 				return;
 			
-			float hardness = state.getBlockHardness(world, pos);
+			float hardness = state.getBlockHardness(location.world, pos);
 			
 			if (hardness >= 100f || hardness < 0f)
 				return; // unbreakable?
@@ -1989,19 +1989,19 @@ public class SpellAction {
 			final boolean spread = level >= 2;
 			
 			if (HarvestUtil.canHarvestCrop(state)) {
-				if (harvestCrop(caster, world, pos, tool, spread)) {
+				if (harvestCrop(caster, location.world, pos, tool, spread)) {
 					resultBuilder.applied = true;
-					resultBuilder.affectedPos = pos;
+					resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 				}
 			} else if (HarvestUtil.canHarvestTree(state)) {
-				if (harvestTree(caster, world, pos, tool, spread)) {
+				if (harvestTree(caster, location.world, pos, tool, spread)) {
 					resultBuilder.applied = true;
-					resultBuilder.affectedPos = pos;
+					resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 				}
-			} else if (HarvestUtil.canHarvestCrop(world.getBlockState(pos.up()))) {
-				if (harvestCrop(caster, world, pos.up(), tool, spread)) {
+			} else if (HarvestUtil.canHarvestCrop(location.world.getBlockState(pos.up()))) {
+				if (harvestCrop(caster, location.world, pos.up(), tool, spread)) {
 					resultBuilder.applied = true;
-					resultBuilder.affectedPos = pos.up();
+					resultBuilder.affectedPos = new SpellLocation(location.world, pos.up());
 				}
 			} else {
 				;
@@ -2052,9 +2052,7 @@ public class SpellAction {
 				if (!entity.getServer().isOnExecutionThread()) { // TODO I think?
 					throw new RuntimeException("Wrong thread for spell effects!");
 				}
-				//entity.getServer().runAsync(() -> {
 				effect.apply(source, ent, summary.getEfficiency(), result);
-				//});
 			}
 		}
 		
@@ -2064,43 +2062,28 @@ public class SpellAction {
 	/**
 	 * Apply the contained effect(s) at the provided location.
 	 * Returns whether the location was affected
-	 * @param world
 	 * @param location
 	 * @param efficiency
 	 * @return
 	 */
-	public SpellActionResult apply(LivingEntity source, World world, SpellLocation location, float efficiency) {
-		if (world.isRemote)
+	public SpellActionResult apply(LivingEntity source, SpellLocation location, float efficiency) {
+		if (location.world.isRemote)
 			return SpellActionResult.FAIL;
 		SpellActionResult result = new SpellActionResult();
 		for (SpellEffect e : effects) {
 			final SpellEffect effect = e;
 			
-			if (!world.getServer().isOnExecutionThread()) {
+			if (!location.world.getServer().isOnExecutionThread()) {
 				throw new RuntimeException("Wrong thread for spell effects!");
 			}
 			
 			//world.getMinecraftServer().runAsync(() -> {
-				effect.apply(source, world, location, efficiency, result);
+				effect.apply(source, location, efficiency, result);
 			//});
 		}
 		
 		return result;
 	}
-	
-//	/**
-//	 * Check and return whether any obviously harmful effects are in this action
-//	 * @return
-//	 */
-//	public boolean isHarmful() {
-//		for (SpellEffect e : effects) {
-//			if (e instanceof NegativeSpellEffect && ((NegativeSpellEffect) e).isHarmful()) {
-//				return true;
-//			}
-//		}
-//		
-//		return false;
-//	}
 	
 	public SpellActionProperties getProperties() {
 		return new SpellActionProperties(this);

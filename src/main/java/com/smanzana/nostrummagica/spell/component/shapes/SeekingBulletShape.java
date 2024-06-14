@@ -116,7 +116,7 @@ public class SeekingBulletShape extends SpellShape {
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, world, Lists.newArrayList(new SpellLocation(pos)));
+			getState().trigger(null, Lists.newArrayList(new SpellLocation(world, pos)));
 		}
 		
 		public void onProjectileHit(Entity entity) {
@@ -126,7 +126,7 @@ public class SeekingBulletShape extends SpellShape {
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(entity.getPosition());
 			} else {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
 		}
 		
@@ -198,8 +198,8 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
-		return new SeekingBulletShapeInstance(state, world, location.shooterPosition, pitch, yaw, getIgnoresAllies(params), characteristics);
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		return new SeekingBulletShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, getIgnoresAllies(params), characteristics);
 	}
 
 	// Copied from vanilla entity class
@@ -282,12 +282,12 @@ public class SeekingBulletShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, World world, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d start = state.getSelf().getEyePosition(0f);
 		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, getIgnoresAllies(properties));
 		if (target != null) {
-			state.trigger(Lists.newArrayList(target), null, null);
+			state.trigger(Lists.newArrayList(target), null);
 			return true;
 		} else {
 			return false;
