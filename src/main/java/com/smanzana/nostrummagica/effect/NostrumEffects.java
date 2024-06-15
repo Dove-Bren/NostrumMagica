@@ -54,6 +54,7 @@ public class NostrumEffects {
 	@ObjectHolder(ElementalSpellBoostEffect.ID_WIND) public static ElementalSpellBoostEffect spellBoostWind;
 	@ObjectHolder(MysticWaterEffect.ID) public static MysticWaterEffect mysticWater;
 	@ObjectHolder(MysticAirEffect.ID) public static MysticAirEffect mysticAir;
+	@ObjectHolder(CursedFireEffect.ID) public static CursedFireEffect cursedFire;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -99,5 +100,6 @@ public class NostrumEffects {
     	registry.register(new ElementalSpellBoostEffect(EMagicElement.WIND).setRegistryName(ElementalSpellBoostEffect.ID_WIND));
     	registry.register(new MysticWaterEffect().setRegistryName(MysticWaterEffect.ID));
     	registry.register(new MysticAirEffect().setRegistryName(MysticAirEffect.ID));
+    	registry.register(new CursedFireEffect().setRegistryName(CursedFireEffect.ID));
     }
 }

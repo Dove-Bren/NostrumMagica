@@ -2,6 +2,10 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.effect.NostrumEffects;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -13,7 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.DamageSource;
@@ -85,13 +88,20 @@ public class CursedFireBlock extends FireBlock {
 			
 			entityIn.attackEntityFrom(DamageSource.IN_FIRE, getDirectDamage(state, worldIn, pos, entityIn));
 		}
-		
-		if (entityIn instanceof LivingEntity) {
-			((LivingEntity) entityIn).addPotionEffect(new EffectInstance(
-					Effects.MINING_FATIGUE,
-					20 * 15,
-					0
-					));
+			
+		if (!worldIn.isRemote()) {
+			if (entityIn instanceof LivingEntity) {
+				LivingEntity living = (LivingEntity) entityIn;
+				@Nullable EffectInstance instance = living.getActivePotionEffect(NostrumEffects.cursedFire);
+				final int duration = 20 * 1200;
+				if (instance == null || instance.getDuration() < (int) (duration * .8f)) {
+					living.addPotionEffect(new EffectInstance(
+							NostrumEffects.cursedFire,
+							duration,
+							0
+							));
+				}
+			}
 		}
 	}
 	

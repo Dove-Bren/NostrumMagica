@@ -53,34 +53,6 @@ public final class RenderFuncs {
 		return RenderRandom(new Random());
 	}
 	
-	//private static final BlockPos.Mutable cursor = new BlockPos.Mutable(); // If there are ever threads at play, this will not work
-	
-	// Could redo these if needed
-//	public static final void RenderBlockOutline(PlayerEntity player, World world, Vector3d pos, BlockState blockState, float partialTicks) {
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-//		GlStateManager.lineWidth(2.0F);
-//		GlStateManager.disableTexture();
-//		GlStateManager.depthMask(false);
-//
-//		if (blockState.getMaterial() != Material.AIR) {
-//			double d0 = player.lastTickPosX + (player.getPosX() - player.lastTickPosX) * (double)partialTicks;
-//			double d1 = player.lastTickPosY + (player.getPosY() - player.lastTickPosY) * (double)partialTicks;
-//			double d2 = player.lastTickPosZ + (player.getPosZ() - player.lastTickPosZ) * (double)partialTicks;
-//			
-//			WorldRenderer.drawVoxelShapeParts(blockState.getShape(world, new BlockPos(pos), ISelectionContext.forEntity(player)), -d0, -d1, -d2, 0.0F, 0.0F, 0.0F, 0.4F);
-//			
-//		}
-//
-//		GlStateManager.depthMask(true);
-//		GlStateManager.enableTexture();
-//		GlStateManager.disableBlend();
-//	}
-//	
-//	public static final void RenderBlockOutline(PlayerEntity player, World world, BlockPos pos, BlockState blockState, float partialTicks) {
-//		RenderBlockOutline(player, world, new Vector3d(pos), blockState, partialTicks);
-//	}
-	
 	public static void RenderModelWithColorNoBatch(MatrixStack stack, IBakedModel model, int color, int combinedLight, int combinedOverlay) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
@@ -96,6 +68,7 @@ public final class RenderFuncs {
 	}
 	
 	private static final Random RenderModelRandom = new Random();
+	public static final int BrightPackedLight = 15728880;
 	
 	public static void RenderModel(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int combinedLight, int combinedOverlay, float red, float green, float blue, float alpha) {
 		RenderModel(stack.getLast(), buffer, model, combinedLight, combinedOverlay, red, green, blue, alpha);
@@ -125,70 +98,9 @@ public final class RenderFuncs {
 		 Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(state, stack, bufferIn, combinedLightIn, combinedOverlayIn, EmptyModelData.INSTANCE);
 	}
 
-	public static final void renderEntityOutline(Entity e, float partialTicks) {
-		if (!e.world.isRemote) {
-			return;
-		}
-		
-		e.setGlowing(true); // Best we can do?
-		
-//		RenderGlobal global = getCachedRenderGlobal();
-//		
-//		if (global == null || cachedRenderGlobal_outlineFrameBuffer == null) {
-//			e.setGlowing(true);
-//			return; // Best we can do?
-//		}
-		
-//		final Minecraft mc = Minecraft.getInstance();
-//		
-//		GlStateManager.depthFunc(519);
-//		GlStateManager.disableFog();
-//		GlStateManager.color4f(1f, 1f, 0f, 1f);
-//		
-//		try {
-//			final RenderManager renderManager = ObfuscationReflectionHelper.getPrivateValue(RenderGlobal.class, global, "field_175010_j"); // "renderManager"
-//			
-//			//this.entityOutlineFramebuffer.bindFramebuffer(false);
-//			((Framebuffer)(cachedRenderGlobal_outlineFrameBuffer.get(global))).bindFramebuffer(false);
-//			RenderHelper.disableStandardItemLighting();
-//			//this.renderManager.setRenderOutlines(true);
-//			renderManager.setRenderOutlines(true);
-//			
-//			//this.renderManager.renderEntityStatic(list1.get(j), partialTicks, false);
-//			renderManager.renderEntityStatic(e, partialTicks, false);
-//			
-//			//this.renderManager.setRenderOutlines(false);
-//			renderManager.setRenderOutlines(false);
-//			RenderHelper.enableStandardItemLighting();
-//			GlStateManager.depthMask(false);
-//			//this.entityOutlineShader.render(partialTicks);
-//			((ShaderGroup)cachedRenderGlobal_outlineShader.get(global)).render(partialTicks);
-//			
-//			ObfuscationReflectionHelper.setPrivateValue(RenderGlobal.class, global, true, "field_184386_ad"); // entityOutlinesRendered
-//			
-//		} catch (Exception exception) {
-//			System.out.print(".");
-//		}
-//		
-//		GlStateManager.enableLighting();
-//		GlStateManager.depthMask(true);
-////		GlStateManager.enableFog();
-//		GlStateManager.enableBlend();
-//		GlStateManager.enableColorMaterial();
-//		GlStateManager.depthFunc(515);
-//		GlStateManager.enableDepth();
-//		GlStateManager.enableAlphaTest();
-//
-//		mc.getFramebuffer().bindFramebuffer(false);
-//		global.renderEntityOutlineFramebuffer();
-//		mc.getFramebuffer().bindFramebuffer(false);
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-	}
-	
 	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix) {
 		// light and overlay constants taken from ItemRenderer and GameRenderer
-		final int combinedLight = 15728880;
+		final int combinedLight = BrightPackedLight;
 		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 		
 		IRenderTypeBuffer.Impl typebuffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
@@ -261,7 +173,7 @@ public final class RenderFuncs {
 	}
 	
 	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
-		final int combinedLight = 15728880;
+		final int combinedLight = BrightPackedLight;
 		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 		drawScaledCustomSizeModalRect(matrixStackIn, buffer, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, combinedLight, combinedOverlay, red, green, blue, alpha);
 	}
@@ -811,6 +723,42 @@ public final class RenderFuncs {
 			stack.rotate(Vector3f.YP.rotationDegrees(renderInfo.getYaw() + 180.0F));
 		}
 		return stack;
+	}
+
+	public static void renderDiamond(MatrixStack matrixStackIn, IVertexBuilder bufferIn, float width, float height, int packedLightIn,
+			int packedOverlayIn, float red, float green, float blue, float alpha) {
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		final Vector3f[] normals = {new Vector3f(0.5774f, -0.5774f, 0.5774f), new Vector3f(-0.5774f, -0.5774f, 0.5774f), new Vector3f(-0.5774f, -0.5774f, -0.5774f), new Vector3f(0.5774f, -0.5774f, -0.5774f)};
+		
+		
+		for (int i = 0; i < 4; i++) {
+			double angle = (2*Math.PI) * ((double) i / (double) 4);
+			
+			final float vx1 = (float) (Math.cos(angle) * width);
+			final float vy1 = (float) (Math.sin(angle) * height);
+			final float u1 = (vx1 + (width)) / (width * 2);
+			final float v1 = (vy1 + (height)) / (height * 2);
+			final Vector3f n1 = normals[i];
+			
+			angle = (2*Math.PI) * ((double) ((i+1)%4) / (double) 4);
+			
+			final float vx2 = (float) (Math.cos(angle) * width);
+			final float vy2 = (float) (Math.sin(angle) * height);
+			final float u2 = (vx2 + (width)) / (width * 2);
+			final float v2 = (vy2 + (height)) / (height * 2);
+			final Vector3f n2 = normals[(i+1)%4];
+			
+			// For znegative, add in ZN, HIGH ANGLE, LOW ANGLE
+			bufferIn.pos(transform, 0, 0, -width).color(red, green, blue, alpha).tex(.5f, .5f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n1.getX(), n1.getY(), n1.getZ()).endVertex();
+			bufferIn.pos(transform, vx2, vy2, 0).color(red, green, blue, alpha).tex(u2, v2).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n1.getX(), n1.getY(), n1.getZ()).endVertex();
+			bufferIn.pos(transform, vx1, vy1, 0).color(red, green, blue, alpha).tex(u1, v1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n1.getX(), n1.getY(), n1.getZ()).endVertex();
+			
+			// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
+			bufferIn.pos(transform, 0, 0, width).color(red, green, blue, alpha).tex(.5f, .5f).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
+			bufferIn.pos(transform, vx1, vy1, 0).color(red, green, blue, alpha).tex(u1, v1).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
+			bufferIn.pos(transform, vx2, vy2, 0).color(red, green, blue, alpha).tex(u2, v2).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, n2.getX(), n2.getY(), n2.getZ()).endVertex();
+		}
 	}
 	
 }

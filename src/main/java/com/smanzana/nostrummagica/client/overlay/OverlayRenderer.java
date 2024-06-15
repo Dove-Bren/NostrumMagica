@@ -30,10 +30,13 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierG
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.render.effect.CursedFireEffectRenderer;
+import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -62,6 +65,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -184,6 +188,11 @@ public class OverlayRenderer extends AbstractGui {
 					}
 				}
 				
+			}
+		} else if (event.getType() == ElementType.ALL) {
+			// Before everything.
+			if (player.getActivePotionEffect(NostrumEffects.cursedFire) != null) {
+				renderCursedFireOverlay(event.getMatrixStack(), player, window);
 			}
 		}
 	}
@@ -1105,6 +1114,28 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.pop();
 	}
 	
+	private void renderCursedFireOverlay(MatrixStack matrixStackIn, PlayerEntity player, MainWindow window) {
+		final Minecraft mc = Minecraft.getInstance();
+		final float width = window.getScaledWidth() / 2;
+		
+		matrixStackIn.push();
+		matrixStackIn.translate(window.getScaledWidth()*.2f, window.getScaledHeight() * .95f, -500);
+		
+		matrixStackIn.push();
+		matrixStackIn.scale(width, width, 1);
+		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.getRenderTypeBuffers().getBufferSource(), CursedFireEffectRenderer.TEX_FIRE_0.getSprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
+		matrixStackIn.pop();
+		
+		matrixStackIn.push();
+		matrixStackIn.translate(window.getScaledWidth()*.6f, 0, 0);
+		matrixStackIn.scale(width, width, 1);
+		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.getRenderTypeBuffers().getBufferSource(), CursedFireEffectRenderer.TEX_FIRE_1.getSprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
+		matrixStackIn.pop();
+		
+		mc.getRenderTypeBuffers().getBufferSource().finish();
+		matrixStackIn.pop();
+	}
+	
 	public void startManaWiggle(int wiggleCount) {
 		this.wiggleIndex = 12 * wiggleCount;
 	}
@@ -1270,6 +1301,17 @@ public class OverlayRenderer extends AbstractGui {
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .0f, .8f));
 				ClientEffectRenderer.instance().addEffect(effect);
 			}
+		}
+	}
+	
+	private static final Map<LivingRenderer<?, ?>, Boolean> LivingInjectedSet = new WeakHashMap<>();
+	
+	@SubscribeEvent
+	public <T extends LivingEntity, M extends EntityModel<T>> void onEntityRender(RenderLivingEvent.Pre<T, M> event) {
+		final LivingRenderer<T, M> renderer = event.getRenderer();
+		if (!LivingInjectedSet.containsKey(renderer)) {
+			LivingInjectedSet.put(renderer, true);
+			renderer.addLayer(new EntityEffectLayer<T, M>(renderer));
 		}
 	}
 	

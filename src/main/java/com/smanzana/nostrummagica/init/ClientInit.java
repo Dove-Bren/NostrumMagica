@@ -28,8 +28,12 @@ import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.render.IEffectRenderer;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
+import com.smanzana.nostrummagica.client.render.effect.CursedFireEffectRenderer;
+import com.smanzana.nostrummagica.client.render.effect.EffectBubbleRenderer;
+import com.smanzana.nostrummagica.client.render.effect.EffectGemRenderer;
 import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRed;
@@ -65,6 +69,7 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRe
 import com.smanzana.nostrummagica.client.render.tile.TileEntitySymbolRenderer;
 import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
 import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -123,6 +128,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Effect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -196,6 +202,7 @@ public class ClientInit {
 		proxy.initKeybinds();
     	proxy.initDefaultEffects();
     	registerSpellShapeRenderers();
+    	registerEffectRenderers();
 	}
 	
 	// Subscribed to game bus in #clientSetup
@@ -583,5 +590,37 @@ public class ClientInit {
 			final ICurve3d curve = new Curves.FlatEllipse(radius, radius);
 			RenderFuncs.renderVerticalRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
 		});
+	}
+	
+	private static final void registerEffectRenderers() {
+		IEffectRenderer.RegisterRenderer(NostrumEffects.cursedFire, new CursedFireEffectRenderer());
+		registerEffectBubbleRenderer(NostrumEffects.mysticWater);
+		registerEffectBubbleRenderer(NostrumEffects.mysticAir);
+		registerEffectBubbleRenderer(NostrumEffects.lootLuck);
+		registerEffectBubbleRenderer(NostrumEffects.rend);
+		registerEffectBubbleRenderer(NostrumEffects.magicRend);
+		registerEffectBubbleRenderer(NostrumEffects.magicShield);
+		registerEffectBubbleRenderer(NostrumEffects.physicalShield);
+		registerEffectBubbleRenderer(NostrumEffects.soulDrain);
+		registerEffectBubbleRenderer(NostrumEffects.sublimation);
+		registerEffectBubbleRenderer(NostrumEffects.disruption);
+		registerEffectBubbleRenderer(NostrumEffects.healResist);
+
+		registerEffectGemRenderer(NostrumEffects.spellBoostEarth);
+		registerEffectGemRenderer(NostrumEffects.spellBoostEnder);
+		registerEffectGemRenderer(NostrumEffects.spellBoostFire);
+		registerEffectGemRenderer(NostrumEffects.spellBoostIce);
+		registerEffectGemRenderer(NostrumEffects.spellBoostLightning);
+		registerEffectGemRenderer(NostrumEffects.spellBoostPhysical);
+		registerEffectGemRenderer(NostrumEffects.spellBoostWind);
+		
+	}
+	
+	private static final void registerEffectBubbleRenderer(Effect effect) {
+		IEffectRenderer.RegisterRenderer(effect, new EffectBubbleRenderer(effect));
+	}
+	
+	private static final void registerEffectGemRenderer(Effect effect) {
+		IEffectRenderer.RegisterRenderer(effect, new EffectGemRenderer(effect));
 	}
 }

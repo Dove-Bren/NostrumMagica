@@ -180,7 +180,7 @@ public class ProximityShape extends SpellShape {
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRange(properties);
-		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), radius/2));
 		return true;
 	}
 }

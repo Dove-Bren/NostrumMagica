@@ -71,6 +71,8 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
@@ -1045,6 +1047,17 @@ public class PlayerListener {
 			}
 		} else if (event.phase == Phase.END) {
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
+				// Do cursed fire check
+				world.getEntities()
+					.filter(e -> e instanceof LivingEntity) // should be fast
+					.map(e -> (LivingEntity) e)
+					.filter(e -> e.getActivePotionEffect(NostrumEffects.cursedFire) != null) // faster than checking world's blockstate?
+					.filter(e -> e.isInWaterRainOrBubbleColumn())
+					.forEach(e -> {
+						e.removePotionEffect(NostrumEffects.cursedFire);
+						world.playSound(null, e.getPosX(), e.getPosY(), e.getPosZ(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.NEUTRAL, 1f, 1f);
+					});
+				
 				if (world.getPlayers().isEmpty()) {
 					continue;
 				}
