@@ -40,6 +40,8 @@ import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.message.VanillaEffectSyncMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -88,6 +90,10 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.PotionColorCalculationEvent;
+import net.minecraftforge.event.entity.living.PotionEvent.PotionAddedEvent;
+import net.minecraftforge.event.entity.living.PotionEvent.PotionExpiryEvent;
+import net.minecraftforge.event.entity.living.PotionEvent.PotionRemoveEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
@@ -1456,5 +1462,88 @@ public class PlayerListener {
 	@OnlyIn(Dist.CLIENT)
 	public void overrideLastSpell(LivingEntity caster, Spell spell) {
 		lastSpell.put(caster, spell);
+	}
+	
+	@SubscribeEvent
+	public void onEntityEffect(PotionColorCalculationEvent event) {
+		// Called any time effects change or cache needs refreshing!
+		;
+	}
+	
+	@SubscribeEvent(priority=EventPriority.LOWEST)
+	public void onEntityEffectAdded(PotionAddedEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		if (event.getEntityLiving() instanceof PlayerEntity) {
+			// Automatically handled
+			return;
+		}
+		
+		final LivingEntity ent = event.getEntityLiving();
+		if (ent.world.isRemote()) {
+			return;
+		}
+		
+		final @Nullable EffectInstance oldEffect = event.getOldPotionEffect();
+		final EffectInstance newEffect = event.getPotionEffect();
+		
+		// Simulate merge. Copied in essence from LivingEntity#addPotionEffect()
+		final EffectInstance mergedEffect;
+		if (oldEffect == null) {
+			mergedEffect = newEffect;
+		} else {
+			EffectInstance oldCopy = new EffectInstance(oldEffect);
+			if (oldCopy.combine(newEffect)) {
+				mergedEffect = oldCopy;
+			} else {
+				mergedEffect = null;
+			}
+		}
+		
+		if (mergedEffect != null) {
+			NetworkHandler.sendToAllTracking(new VanillaEffectSyncMessage(ent, mergedEffect), ent);
+		}
+	}
+	
+	@SubscribeEvent(priority=EventPriority.LOWEST)
+	public void onEntityEffectRemoved(PotionRemoveEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		if (event.getEntityLiving() instanceof PlayerEntity) {
+			// Automatically handled
+			return;
+		}
+
+		final LivingEntity ent = event.getEntityLiving();
+		if (ent.world.isRemote()) {
+			return;
+		}
+		
+		final EffectInstance removedEffect = event.getPotionEffect();
+		if (removedEffect != null) {
+			NetworkHandler.sendToAllTracking(new VanillaEffectSyncMessage(ent.getEntityId(), removedEffect.getPotion()), ent);
+		}
+	}
+	
+	@SubscribeEvent(priority=EventPriority.LOWEST)
+	public void onEntityEffectRemoved(PotionExpiryEvent event) {
+		if (event.getEntityLiving() instanceof PlayerEntity) {
+			// Automatically handled
+			return;
+		}
+
+		final LivingEntity ent = event.getEntityLiving();
+		if (ent.world.isRemote()) {
+			return;
+		}
+		
+		final EffectInstance removedEffect = event.getPotionEffect();
+		if (removedEffect != null) {
+			NetworkHandler.sendToAllTracking(new VanillaEffectSyncMessage(ent.getEntityId(), removedEffect.getPotion()), ent);
+		}
 	}
 }

@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeSlotModifyMessage;
 import com.smanzana.nostrummagica.network.message.StatRequestMessage;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
+import com.smanzana.nostrummagica.network.message.VanillaEffectSyncMessage;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -113,6 +114,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellCooldownMessage.class, SpellCooldownMessage::encode, SpellCooldownMessage::decode, SpellCooldownMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellGlobalCooldownMessage.class, SpellGlobalCooldownMessage::encode, SpellGlobalCooldownMessage::decode, SpellGlobalCooldownMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellCooldownResetMessage.class, SpellCooldownResetMessage::encode, SpellCooldownResetMessage::decode, SpellCooldownResetMessage::handle);
+		syncChannel.registerMessage(discriminator++, VanillaEffectSyncMessage.class, VanillaEffectSyncMessage::encode, VanillaEffectSyncMessage::decode, VanillaEffectSyncMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
