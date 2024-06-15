@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.ProgressionDoor;
+import com.smanzana.nostrummagica.block.dungeon.ProgressionDoor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 

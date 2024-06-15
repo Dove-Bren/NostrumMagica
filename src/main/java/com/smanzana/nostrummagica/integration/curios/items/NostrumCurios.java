@@ -49,7 +49,7 @@ public class NostrumCurios {
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.creativeTab)
+				.group(NostrumMagica.equipmentTab)
 				;
 	}
 	

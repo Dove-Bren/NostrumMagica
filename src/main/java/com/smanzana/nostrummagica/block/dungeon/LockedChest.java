@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.tile.LockedChestEntity;
 

@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
+import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
+import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.item.armor.MagicArmorBase;
 import com.smanzana.nostrummagica.item.armor.MagicEarthArmor;
@@ -17,8 +19,6 @@ import com.smanzana.nostrummagica.item.armor.MagicIceArmor;
 import com.smanzana.nostrummagica.item.armor.MagicLightningArmor;
 import com.smanzana.nostrummagica.item.armor.MagicPhysicalArmor;
 import com.smanzana.nostrummagica.item.armor.MagicWindArmor;
-import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
-import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.item.equipment.AspectedEarthWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
@@ -342,8 +342,14 @@ public class NostrumItems {
 				.maxStackSize(1);
 	}
 	
+	public static Item.Properties PropEquipmentBase() {
+		return new Item.Properties()
+				.group(NostrumMagica.equipmentTab);
+	}
+	
 	public static Item.Properties PropEquipment() {
-		return PropUnstackable()
+		return PropEquipmentBase()
+				.maxStackSize(1)
 				;
 	}
 	
@@ -354,6 +360,21 @@ public class NostrumItems {
 	
 	public static Item.Properties PropTomeUnstackable() {
 		return PropTomeBase()
+				.maxStackSize(1);
+	}
+	
+	public static Item.Properties PropRuneBase() {
+		return new Item.Properties()
+				.group(NostrumMagica.runeTab);
+	}
+	
+	public static Item.Properties PropDungeonBase() {
+		return new Item.Properties()
+				.group(NostrumMagica.dungeonTab);
+	}
+	
+	public static Item.Properties PropDungeonUnstackable() {
+		return PropDungeonBase()
 				.maxStackSize(1);
 	}
 	

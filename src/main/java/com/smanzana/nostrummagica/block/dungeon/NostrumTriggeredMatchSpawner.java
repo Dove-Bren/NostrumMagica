@@ -1,5 +1,6 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
+import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.tile.TriggeredMatchSpawnerTileEntity;
 
 import net.minecraft.block.BlockState;

@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.spell.EAlteration;

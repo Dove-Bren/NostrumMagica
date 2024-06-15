@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.tile;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.LockedChest;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.dungeon.LockedChest;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;

@@ -47,7 +47,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	protected static final String ID_PREFIX = "rune_";
 	
 	protected SpellRune() {
-		super(NostrumItems.PropBase());
+		super(NostrumItems.PropRuneBase());
 	}
 	
 	public abstract SpellComponentWrapper getComponent();

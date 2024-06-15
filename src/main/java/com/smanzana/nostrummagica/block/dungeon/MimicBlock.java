@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.Optional;
 import java.util.function.Supplier;

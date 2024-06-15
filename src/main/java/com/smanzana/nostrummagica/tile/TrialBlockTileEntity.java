@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.tile;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.TrialBlock;
+import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;

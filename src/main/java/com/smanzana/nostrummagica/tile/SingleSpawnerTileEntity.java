@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.ITickableTileEntity;

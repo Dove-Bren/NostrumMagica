@@ -7,8 +7,8 @@ import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.block.MimicBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;

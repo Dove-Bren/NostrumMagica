@@ -21,7 +21,7 @@ public class ChalkItem extends Item implements ILoreTagged {
 	public static final String ID = "nostrum_chalk";
 
 	public ChalkItem() {
-		super(NostrumItems.PropEquipment().maxDamage(25));
+		super(NostrumItems.PropUnstackable().maxDamage(25));
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {

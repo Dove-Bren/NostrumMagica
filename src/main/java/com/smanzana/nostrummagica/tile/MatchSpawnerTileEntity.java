@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.NostrumMatchSpawner;
+import com.smanzana.nostrummagica.block.dungeon.NostrumMatchSpawner;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.WorldUtil;

@@ -1,9 +1,10 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.List;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TriggerRepeaterEntity;

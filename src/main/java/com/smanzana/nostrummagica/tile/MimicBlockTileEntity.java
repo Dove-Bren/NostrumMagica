@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.block.MimicBlock;
+import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.ServerPlayerEntity;

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.tile;
 
-import com.smanzana.nostrummagica.block.MimicBlock.MimicBlockData;
+import com.smanzana.nostrummagica.block.dungeon.MimicBlock.MimicBlockData;
 
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntityType;

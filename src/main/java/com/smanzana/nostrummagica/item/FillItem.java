@@ -43,7 +43,7 @@ public class FillItem extends Item {
 	private @Nullable BlockState fillStateCache;
 	
 	public FillItem(Supplier<BlockState> fillStateSupplier, boolean onlyDown) {
-		super(NostrumItems.PropUnstackable());
+		super(NostrumItems.PropDungeonUnstackable());
 		this.fillStateSupplier = fillStateSupplier;
 		this.onlyDown = onlyDown;
 		this.fillStateCache = null;

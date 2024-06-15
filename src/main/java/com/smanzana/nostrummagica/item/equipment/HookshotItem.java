@@ -74,7 +74,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	protected final HookshotType type;
 
 	public HookshotItem(HookshotType type) {
-		super(NostrumItems.PropUnstackable().rarity(type.rarity));
+		super(NostrumItems.PropEquipment().rarity(type.rarity));
 		this.type = type;
 	}
 	

@@ -39,7 +39,7 @@ public class WorldKeyItem extends Item {
 	private static final String NBT_KEY_ID = "key";
 
 	public WorldKeyItem() {
-		super(NostrumItems.PropUnstackable());
+		super(NostrumItems.PropDungeonUnstackable());
 	}
 	
 	@Override

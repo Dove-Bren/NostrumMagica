@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 

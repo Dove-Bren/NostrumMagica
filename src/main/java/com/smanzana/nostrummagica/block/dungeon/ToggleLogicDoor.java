@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

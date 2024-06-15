@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy;
@@ -56,6 +57,7 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
 import com.smanzana.nostrummagica.spell.SpellRegistry;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
@@ -107,7 +109,10 @@ public class NostrumMagica {
 	public final MusicaProxy musica;
 
 	public static ItemGroup creativeTab;
+	public static ItemGroup equipmentTab;
 	public static ItemGroup enhancementTab;
+	public static ItemGroup runeTab;
+	public static ItemGroup dungeonTab;
 	public static Logger logger = LogManager.getLogger(MODID);
 	public static PlayerListener playerListener;
 	public static PlayerStatListener statListener;
@@ -150,11 +155,36 @@ public class NostrumMagica {
 				return new ItemStack(NostrumItems.spellTomeNovice);
 			}
 		};
+		
+		NostrumMagica.equipmentTab = new ItemGroup(MODID + "_equipment") {
+			@Override
+			@OnlyIn(Dist.CLIENT)
+			public ItemStack createIcon() {
+				return new ItemStack(NostrumItems.mageStaff);
+			}
+		};
+		
 		NostrumMagica.enhancementTab = new ItemGroup(MODID + "_enhancements") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ItemStack createIcon() {
 				return new ItemStack(NostrumItems.spellTomePage);
+			}
+		};
+
+		NostrumMagica.runeTab = new ItemGroup(MODID + "_runes") {
+			@Override
+			@OnlyIn(Dist.CLIENT)
+			public ItemStack createIcon() {
+				return SpellRune.getRune(NostrumSpellShapes.Touch);
+			}
+		};
+		
+		NostrumMagica.dungeonTab = new ItemGroup(MODID + "_dungeon") {
+			@Override
+			@OnlyIn(Dist.CLIENT)
+			public ItemStack createIcon() {
+				return new ItemStack(NostrumItems.worldKey);
 			}
 		};
 

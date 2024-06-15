@@ -33,7 +33,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	public static final String ID = "reagent_bag";
 	
 	public ReagentBag() {
-		super(NostrumItems.PropUnstackable());
+		super(NostrumItems.PropEquipment());
 	}
 	
 	public static int getReagentCount(ItemStack bag, ReagentType type) {

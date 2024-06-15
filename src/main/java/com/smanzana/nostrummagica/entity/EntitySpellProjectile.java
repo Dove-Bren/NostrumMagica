@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.block.MysticAnchor;
+import com.smanzana.nostrummagica.block.dungeon.MysticAnchor;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;

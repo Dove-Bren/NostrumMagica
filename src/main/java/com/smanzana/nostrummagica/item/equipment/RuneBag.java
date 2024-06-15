@@ -32,7 +32,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	public static final String ID = "rune_bag";
 	
 	public RuneBag() {
-		super(NostrumItems.PropUnstackable());
+		super(NostrumItems.PropEquipment());
 	}
 	
 	public static void setItem(ItemStack bag, @Nonnull ItemStack item, int pos) {

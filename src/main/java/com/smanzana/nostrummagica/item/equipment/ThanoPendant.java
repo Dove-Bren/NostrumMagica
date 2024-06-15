@@ -36,7 +36,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 	private static final int MAX_THANOS_XP = 5 * THANOS_XP_PER;
 	
 	public ThanoPendant() {
-		super(NostrumItems.PropUnstackable()
+		super(NostrumItems.PropEquipment()
 				.rarity(Rarity.UNCOMMON)
 				.maxDamage(MAX_THANOS_XP / THANOS_XP_PER));
 	}

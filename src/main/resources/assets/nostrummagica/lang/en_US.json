@@ -492,7 +492,10 @@
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 
     "itemGroup.nostrummagica": "Nostrum Magica",
+    "itemGroup.nostrummagica_equipment": "Nostrum Equipment",
     "itemGroup.nostrummagica_enhancements": "Nostrum Enhancements",
+    "itemGroup.nostrummagica_runes": "Nostrum Runes",
+    "itemGroup.nostrummagica_dungeon": "Nostrum Dungeon",
 	
 	"container.nostrummagica.putter.name": "Putter",
 	"container.nostrummagica.active_hopper.name": "Active Hopper",

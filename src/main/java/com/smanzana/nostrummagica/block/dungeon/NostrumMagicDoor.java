@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.HashSet;
 import java.util.LinkedList;

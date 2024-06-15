@@ -12,9 +12,9 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.block.DungeonBlock;
 import com.smanzana.nostrummagica.block.PoisonWaterBlock;
 import com.smanzana.nostrummagica.block.TeleportRune;
+import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.AggroTable;

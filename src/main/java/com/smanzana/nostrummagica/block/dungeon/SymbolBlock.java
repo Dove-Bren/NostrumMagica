@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.block;
+package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tile.SymbolTileEntity;
