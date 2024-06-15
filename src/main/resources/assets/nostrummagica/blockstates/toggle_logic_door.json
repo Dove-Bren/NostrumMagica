@@ -1,19 +1,19 @@
 {
     "variants": {
-		"facing=north,master=true,toggled=false": { "model": "nostrummagica:block/logic_door" },
-		"facing=north,master=false,toggled=false": { "model": "nostrummagica:block/logic_door" },
+		"facing=north,master=true,toggled=false": { "model": "nostrummagica:block/logic_door_bars" },
+		"facing=north,master=false,toggled=false": { "model": "nostrummagica:block/logic_door_bars" },
 		"facing=north,master=true,toggled=true": { "model": "nostrummagica:block/none" },
 		"facing=north,master=false,toggled=true": { "model": "nostrummagica:block/none" },
-		"facing=south,master=true,toggled=false": { "model": "nostrummagica:block/logic_door" },
-		"facing=south,master=false,toggled=false": { "model": "nostrummagica:block/logic_door" },
+		"facing=south,master=true,toggled=false": { "model": "nostrummagica:block/logic_door_bars" },
+		"facing=south,master=false,toggled=false": { "model": "nostrummagica:block/logic_door_bars" },
 		"facing=south,master=true,toggled=true": { "model": "nostrummagica:block/none" },
 		"facing=south,master=false,toggled=true": { "model": "nostrummagica:block/none" },
-		"facing=east,master=true,toggled=false": { "model": "nostrummagica:block/logic_door", "y":90},
-		"facing=east,master=false,toggled=false": { "model": "nostrummagica:block/logic_door", "y":90},
+		"facing=east,master=true,toggled=false": { "model": "nostrummagica:block/logic_door_bars", "y":90},
+		"facing=east,master=false,toggled=false": { "model": "nostrummagica:block/logic_door_bars", "y":90},
 		"facing=east,master=true,toggled=true": { "model": "nostrummagica:block/none", "y":90},
 		"facing=east,master=false,toggled=true": { "model": "nostrummagica:block/none", "y":90},
-		"facing=west,master=true,toggled=false": { "model": "nostrummagica:block/logic_door", "y":90},
-		"facing=west,master=false,toggled=false": { "model": "nostrummagica:block/logic_door", "y":90},
+		"facing=west,master=true,toggled=false": { "model": "nostrummagica:block/logic_door_bars", "y":90},
+		"facing=west,master=false,toggled=false": { "model": "nostrummagica:block/logic_door_bars", "y":90},
 		"facing=west,master=true,toggled=true": { "model": "nostrummagica:block/none", "y":90},
 		"facing=west,master=false,toggled=true": { "model": "nostrummagica:block/none", "y":90}
 	}

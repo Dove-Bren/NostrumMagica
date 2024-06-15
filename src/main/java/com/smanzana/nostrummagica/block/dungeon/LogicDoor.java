@@ -2,7 +2,10 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResultType;
@@ -15,8 +18,16 @@ public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
 
 	public static final String ID = "logic_door";
 	
+	protected LogicDoor(Block.Properties props) {
+		super(props);
+	}
+	
 	public LogicDoor() {
-		super();
+		this(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.sound(SoundType.STONE)
+				);
 	}
 	
 	@Override

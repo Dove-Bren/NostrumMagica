@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
@@ -25,7 +27,12 @@ public class ToggleLogicDoor extends LogicDoor {
 	protected static final BooleanProperty TOGGLED = BooleanProperty.create("toggled");
 	
 	public ToggleLogicDoor() {
-		super();
+		super(Block.Properties.create(Material.ROCK)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.sound(SoundType.STONE)
+				.notSolid()
+				);
 		
 		this.setDefaultState(this.getDefaultState().with(TOGGLED, false));
 	}

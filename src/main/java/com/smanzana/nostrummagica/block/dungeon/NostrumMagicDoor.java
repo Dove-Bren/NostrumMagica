@@ -45,7 +45,7 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 				);
 	}
 	
-	public NostrumMagicDoor(Block.Properties properties) {
+	protected NostrumMagicDoor(Block.Properties properties) {
 		super(properties);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false).with(HORIZONTAL_FACING, Direction.NORTH));

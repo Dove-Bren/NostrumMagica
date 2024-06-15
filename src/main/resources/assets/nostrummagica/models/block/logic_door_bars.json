@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/logic_door",
+    "textures": {
+        "all": "nostrummagica:block/metal_door_bars"
+    }
+}

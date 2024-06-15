@@ -382,6 +382,7 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedFire, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumFluids.mysticWater, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticWaterBlock, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.toggleDoor, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

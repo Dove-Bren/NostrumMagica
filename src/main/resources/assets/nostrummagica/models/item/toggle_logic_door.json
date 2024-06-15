@@ -1,5 +1,5 @@
 {
-    "parent":"nostrummagica:block/logic_door",
+    "parent":"nostrummagica:block/logic_door_bars",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],
