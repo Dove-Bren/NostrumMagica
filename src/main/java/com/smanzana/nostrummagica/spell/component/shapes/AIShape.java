@@ -93,13 +93,6 @@ public class AIShape extends InstantShape {
 	}
 
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties,
-			SpellCharacteristics characteristics) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean supportsPreview(SpellShapePartProperties params) {
 		return false;
 	}

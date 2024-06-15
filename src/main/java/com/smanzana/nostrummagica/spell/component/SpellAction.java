@@ -259,7 +259,8 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
 			float base = this.amount;
-			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Master)) {
+			final INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Ice_Master)) {
 				base *= 2;
 			}
 			
@@ -285,7 +286,7 @@ public class SpellAction {
 				}
 				resultBuilder.heals += base * efficiency;
 				
-				if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Adept)) {
+				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 					if (NostrumMagica.rand.nextBoolean()) {
 						entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
 					}
@@ -1668,8 +1669,8 @@ public class SpellAction {
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
 			// Apply status here instead of using a StatusEffect so that we can scale the amplitude, too
 			float amp = healAmt * efficiency;
-			
-			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Master)) {
+			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Ice_Master)) {
 				amp *= 2;
 			}
 			
@@ -1677,7 +1678,7 @@ public class SpellAction {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			resultBuilder.applied |= true;
 			
-			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Ice_Adept)) {
+			if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 				if (NostrumMagica.rand.nextBoolean()) {
 					entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
 				}
@@ -2109,7 +2110,8 @@ public class SpellAction {
 				}
 				
 				// Note that the physical master skill includes using some of this
-				if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Physical_Master)) {
+				final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Physical_Master)) {
 					amt -= (int) ((float) extra * .8f);
 				} else {
 					amt -= extra;

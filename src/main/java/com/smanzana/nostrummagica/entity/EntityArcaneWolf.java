@@ -1083,7 +1083,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void setManaRegen(float regen) {
-		dataManager.set(ATTRIBUTE_MANA_REGEN, Math.max(.01f, regen));
+		dataManager.set(ATTRIBUTE_MANA_REGEN, Math.max(1f, regen));
 	}
 	
 	protected void addManaRegen(float diff) {
