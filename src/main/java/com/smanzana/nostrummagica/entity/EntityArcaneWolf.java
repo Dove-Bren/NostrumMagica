@@ -481,7 +481,6 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
     protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(EntityArcaneWolf.class, DataSerializers.FLOAT);
     protected static final DataParameter<Float> ATTRIBUTE_MANA_REGEN  = EntityDataManager.<Float>createKey(EntityArcaneWolf.class, DataSerializers.FLOAT);
     
-    protected static final DataParameter<Float> SYNCED_MAX_HEALTH  = EntityDataManager.<Float>createKey(EntityArcaneWolf.class, DataSerializers.FLOAT);
     protected static final DataParameter<Integer> MANA  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
     protected static final DataParameter<Integer> MAX_MANA  = EntityDataManager.<Integer>createKey(EntityArcaneWolf.class, DataSerializers.VARINT);
     protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(EntityArcaneWolf.class, PetJobSerializer.GetInstance());
@@ -538,7 +537,6 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		dataManager.register(ATTRIBUTE_LEVEL, 0);
 		dataManager.register(ATTRIBUTE_BOND, 0f);
 		dataManager.register(ATTRIBUTE_MANA_REGEN, 1f);
-		dataManager.register(SYNCED_MAX_HEALTH, 50f);
 		dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
 		dataManager.register(MANA, 0);
 		dataManager.register(MAX_MANA, 100);
@@ -562,17 +560,17 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 	
 	@Override
 	public void setTamed(boolean tamed) {
-		// Parent resets max health. Reset after that
+		// Parent resets max health. Reset health and max health after that
+		final float maxHealth = this.getMaxHealth();
+		final float health = this.getHealth();
 		super.setTamed(tamed);
-		setMaxHealth(dataManager.get(SYNCED_MAX_HEALTH));
+		setMaxHealth(maxHealth);
+		setHealth(health);
 	}
 	
 	@Override
 	public void notifyDataManagerChange(DataParameter<?> key) {
 		super.notifyDataManagerChange(key);
-		if (key == SYNCED_MAX_HEALTH) {
-			setMaxHealth(this.dataManager.get(SYNCED_MAX_HEALTH).floatValue());
-		}
 	}
 	
 	@Override
@@ -735,7 +733,7 @@ public class EntityArcaneWolf extends WolfEntity implements ITameableEntity, IEn
 		}
 		return null;
 	}
-
+	
 	@Override
 	public void baseTick() {
 		super.baseTick();
