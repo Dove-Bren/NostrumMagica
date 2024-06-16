@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -44,12 +46,21 @@ public class SpellCraftPatternAutoRenderer implements ISpellCraftPatternRenderer
 	}
 
 	@Override
-	public void drawPatternIcon(MatrixStack matrixStackIn, SpellCraftPattern pattern, SpellCraftContext context,
-			int width, int height, float red, float green, float blue, float alpha) {
+	public void drawPatternIconInGui(MatrixStack matrixStackIn, SpellCraftPattern pattern, int width,
+			int height, float red, float green, float blue, float alpha) {
 		ResourceLocation texture = getTexture(pattern.getRegistryName());
 		
 		Minecraft.getInstance().getTextureManager().bindTexture(texture);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, 32, 32, width, height, 32, 32, red, green, blue, alpha);
+	}
+
+	@Override
+	public void drawPatternIcon(MatrixStack matrixStackIn, SpellCraftPattern pattern, IRenderTypeBuffer bufferIn, int width,
+			int height, float red, float green, float blue, float alpha) {
+		ResourceLocation texture = getTexture(pattern.getRegistryName());
+		
+		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(texture));
+		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, 32, 32, width, height, 32, 32, red, green, blue, alpha);
 	}
 
 }

@@ -920,7 +920,7 @@ public class SpellCreationGui {
 					if (renderer != null) {
 						matrixStackIn.push();
 						matrixStackIn.translate(x + 1, y + 1, 0);
-						renderer.drawPatternIcon(matrixStackIn, pattern, gui.getContainer().getCraftContext(), this.width-2, this.height-2, 1f, 1f, 1f, 1f);
+						renderer.drawPatternIconInGui(matrixStackIn, pattern, this.width-2, this.height-2, 1f, 1f, 1f, 1f);
 						matrixStackIn.pop();
 					}
 					

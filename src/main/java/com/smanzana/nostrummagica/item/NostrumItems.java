@@ -320,7 +320,8 @@ public class NostrumItems {
 	@ObjectHolder(AspectedPhysicalWeapon.ID) public static AspectedPhysicalWeapon deepMetalAxe;
 	@ObjectHolder(AspectedEarthWeapon.ID) public static AspectedEarthWeapon earthPike;
 	@ObjectHolder(AspectedEnderWeapon.ID) public static AspectedEnderWeapon enderRod;
-	@ObjectHolder(CasterWandItem.ID) public static CasterWandItem casterWand; 
+	@ObjectHolder(CasterWandItem.ID) public static CasterWandItem casterWand;
+	@ObjectHolder(SpellPatternTome.ID) public static SpellPatternTome spellPatternTome;
 	
 	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -643,6 +644,7 @@ public class NostrumItems {
     	register(registry, new AspectedEarthWeapon().setRegistryName(AspectedEarthWeapon.ID));
     	register(registry, new AspectedEnderWeapon().setRegistryName(AspectedEnderWeapon.ID));
     	register(registry, new CasterWandItem().setRegistryName(CasterWandItem.ID));
+    	register(registry, new SpellPatternTome(PropUnstackable().rarity(Rarity.EPIC)).setRegistryName(SpellPatternTome.ID));
     	
     	// Generate and register spell runes
     	{

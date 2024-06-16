@@ -342,6 +342,7 @@
 	"item.nostrummagica.sword_physical": "Deep Metal Axe",
 	"item.nostrummagica.sword_ender": "Ender Rod",
 	"item.nostrummagica.caster_wand": "Caster Wand",
+	"item.nostrummagica.pattern_tome": "Spell Pattern Tome",
 	
 	"curios.identifier.pendant": "Pendant",
 
@@ -669,6 +670,9 @@
 	"info.trial.none": "You have nothing left to master for this element",
 	"info.trial.weak": "You must gain more knowledge of the element before you can undertake this trial",
 	"info.trial.already_have": "You are already undergoing the Adept trial for this element",
+	"info.pattern.learn": "You have learned the %1$s pattern!",
+	"info.pattern.already_know": "You already know the %1$s pattern!",
+	"info.pattern.usage": "Use to learn the %1$s pattern!",
 	
 	"mastery.unknown.name": "Unknown",
 	"mastery.novice.name": "Novice",

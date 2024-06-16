@@ -59,6 +59,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderTameDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderWillo;
 import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
+import com.smanzana.nostrummagica.client.render.item.SpellPatternTomeRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
@@ -246,6 +247,8 @@ public class ClientInit {
 		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
 			ModelLoader.addSpecialModel(loc);
 		}
+		
+		ModelLoader.addSpecialModel(SpellPatternTomeRenderer.BASE_MODEL);
 	}
 	
 	@SubscribeEvent
