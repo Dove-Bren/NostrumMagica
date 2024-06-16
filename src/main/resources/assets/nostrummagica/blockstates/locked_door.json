@@ -1,0 +1,12 @@
+{
+	"variants": {
+		"facing=north,unlockable=false": { "model": "nostrummagica:block/locked_door" },
+		"facing=east,unlockable=false": { "model": "nostrummagica:block/locked_door", "y": 90 },
+		"facing=south,unlockable=false": { "model": "nostrummagica:block/locked_door", "y": 180 },
+		"facing=west,unlockable=false": { "model": "nostrummagica:block/locked_door", "y": 270 },
+		"facing=north,unlockable=true": { "model": "nostrummagica:block/locked_door" },
+		"facing=east,unlockable=true": { "model": "nostrummagica:block/locked_door", "y": 90 },
+		"facing=south,unlockable=true": { "model": "nostrummagica:block/locked_door", "y": 180 },
+		"facing=west,unlockable=true": { "model": "nostrummagica:block/locked_door", "y": 270 }
+	}
+}

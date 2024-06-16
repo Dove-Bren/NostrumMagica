@@ -62,6 +62,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedDoorRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityManaArmorerRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
@@ -170,6 +171,7 @@ public class ClientInit {
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ProgressionDoorTileEntityType, TileEntityProgressionDoorRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ManaArmorerTileEntityType, TileEntityManaArmorerRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedChestEntityType, TileEntityLockedChestRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedDoorType, TileEntityLockedDoorRenderer::new);
 		
 		ScreenManager.registerFactory(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);

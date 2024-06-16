@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.block.dungeon.DungeonBars;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedChest;
+import com.smanzana.nostrummagica.block.dungeon.LockedDoor;
 import com.smanzana.nostrummagica.block.dungeon.LogicDoor;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicOnesidedBlock;
@@ -104,6 +105,7 @@ public class NostrumBlocks {
 	@ObjectHolder(RuneLibraryBlock.ID) public static RuneLibraryBlock runeLibrary;
 	@ObjectHolder(CursedFireBlock.ID) public static CursedFireBlock cursedFire;
 	@ObjectHolder(MysticWaterBlock.ID) public static MysticWaterBlock mysticWaterBlock;
+	@ObjectHolder(LockedDoor.ID) public static LockedDoor lockedDoor;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -179,6 +181,7 @@ public class NostrumBlocks {
     	registerBlockItem(advancedSpellTable, advancedSpellTable.getRegistryName(), registry);
     	registerBlockItem(mysticSpellTable, mysticSpellTable.getRegistryName(), registry);
     	registerBlockItem(runeLibrary, runeLibrary.getRegistryName(), registry);
+    	registerBlockItem(lockedDoor, lockedDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -259,6 +262,7 @@ public class NostrumBlocks {
     	registerBlock(new RuneLibraryBlock(), RuneLibraryBlock.ID, registry);
     	registerBlock(new CursedFireBlock(), CursedFireBlock.ID, registry);
     	registerBlock(new MysticWaterBlock(() -> NostrumFluids.mysticWater), MysticWaterBlock.ID, registry);
+    	registerBlock(new LockedDoor(), LockedDoor.ID, registry);
     }
     
 }

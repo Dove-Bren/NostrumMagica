@@ -96,28 +96,28 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-115f - majorWiggle));
-		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
 		matrixStackIn.pop();
 
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-30f - minorWiggle));
-		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
 		matrixStackIn.pop();
 
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(30f + minorWiggle)); // Is this faster than pushing and popping matrix?
-		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
 		matrixStackIn.pop();
 
 		matrixStackIn.push();
 		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(115f + majorWiggle)); // Is this faster than pushing and popping matrix?
-		renderChain(te, matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
+		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
 		matrixStackIn.pop();
 
 		matrixStackIn.pop();
 	}
 	
-	protected void renderChain(LockedChestEntity te, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, double ticks, float armLen, int points, float linkWidth) {
+	public static void renderChain(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, double ticks, float armLen, int points, float linkWidth) {
 		// Two ribbons perpendicular to each other offset by half a v on texture
 			
 		final float colorPeriod = 140;
@@ -159,25 +159,6 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 				buffer.pos(transform, px2, py2 - offY2, pz2 - offZ2).color(1f, 1f, 1f, alpha2).tex(0, v2).lightmap(packedLightIn).endVertex();
 			}
 		}
-//		{
-//			wr.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
-//			
-//			for (int i = 0; i < points; i++) {
-//				final double prog = (((double) i + .5) / (double)points);
-//				final double px = 0;
-//				final double py = armLen * Math.sin(prog * Math.PI); // half circle
-//				final double pz = armLen * Math.cos(prog * Math.PI); //half circle
-//				final double colorDist = Math.min(Math.abs(colorProg - prog), 1 - Math.abs(colorProg - prog));
-//				final float alpha = Math.max(.2f, 1f - 4f *(float) colorDist);
-//				
-//				final double v = (i % 2 == 0 ? 0 : 1);
-//				final double offY = (linkWidth/2) * Math.sin(prog * Math.PI);
-//				final double offZ = (linkWidth/2) * Math.cos(prog * Math.PI);
-//				
-//				wr.pos(px, py - offY, pz - offZ).tex(0, v).color(1f, 1f, 1f, alpha).endVertex();
-//				wr.pos(px, py + offY, pz + offZ).tex(1, v).color(1f, 1f, 1f, alpha).endVertex();
-//			}
-//		}
 	}
 	
 	@Override

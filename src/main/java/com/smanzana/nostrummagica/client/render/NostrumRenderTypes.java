@@ -239,6 +239,7 @@ public class NostrumRenderTypes {
 				.transparency(TRANSLUCENT_TRANSPARENCY)
 				.lightmap(LIGHTMAP_ENABLED)
 				.cull(NO_CULL)
+				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
 			.build(false);
 		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
 	}

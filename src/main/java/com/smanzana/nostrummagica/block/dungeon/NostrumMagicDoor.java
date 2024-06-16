@@ -25,6 +25,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
@@ -239,5 +240,138 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 	public void clearDoor(World world, BlockPos onePos, BlockState state) {
 		destroy(world, onePos, state);
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, onePos.getX(), onePos.getY(), onePos.getZ());
+	}
+	
+	public static final BlockPos FindBottomCenterPos(World world, BlockPos samplePos) {
+		// Master is at TE's pos... but is it the bottom block? And is it in center?
+		final BlockState startState = world.getBlockState(samplePos);
+		final Direction face = startState.get(NostrumMagicDoor.HORIZONTAL_FACING);
+		final Block matchBlock = startState.getBlock();
+		
+		// Find bottom
+		BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(samplePos);
+		cursor.move(Direction.DOWN, 1);
+		
+		while (cursor.getY() >= 0) {
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+			
+			cursor.move(Direction.DOWN);
+		}
+		
+		// Move back to last good position
+		cursor.move(Direction.UP);
+		BlockPos bottomPos = new BlockPos(cursor);
+		
+		// Now discover left and right
+		// Right:
+		while (true) {
+			cursor.move(face.rotateY());
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+		}
+		
+		// Move back
+		cursor.move(face.rotateYCCW());
+		BlockPos rightPos = new BlockPos(cursor);
+		cursor.setPos(bottomPos);
+		
+		// Left
+		while (true) {
+			cursor.move(face.rotateYCCW());
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+		}
+		
+		// Move back
+		cursor.move(face.rotateY());
+		BlockPos leftPos = new BlockPos(cursor);
+		
+		return new BlockPos(
+				.5 * (rightPos.getX() + leftPos.getX()),
+				bottomPos.getY(),
+				.5 * (rightPos.getZ() + leftPos.getZ()));
+	}
+	
+	public static final MutableBoundingBox FindDisplayBounds(World world, BlockPos samplePos) {
+		// Master is at TE's pos... but is it the bottom block? And is it in center?
+		final BlockState startState = world.getBlockState(samplePos);
+		final Direction face = startState.get(NostrumMagicDoor.HORIZONTAL_FACING);
+		final Block matchBlock = startState.getBlock();
+		
+		// Find bottom
+		BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(samplePos);
+		cursor.move(Direction.DOWN, 1);
+		
+		while (cursor.getY() >= 0) {
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+			
+			cursor.move(Direction.DOWN);
+		}
+		
+		// Move back to last good position
+		cursor.move(Direction.UP);
+		BlockPos bottomPos = new BlockPos(cursor);
+		
+		// Now discover left and right
+		// Right:
+		while (true) {
+			cursor.move(face.rotateY());
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+		}
+		
+		// Move back and record
+		cursor.move(face.rotateYCCW());
+		
+		// Find highest at this position
+		while (true) {
+			cursor.move(Direction.UP);
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+		}
+		
+		// Move back and record
+		cursor.move(Direction.DOWN);
+		BlockPos rightTopPos = new BlockPos(cursor);
+		
+		
+		// Left
+		cursor.setPos(bottomPos);
+		while (true) {
+			cursor.move(face.rotateYCCW());
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+		}
+		
+		// Move back and record
+		cursor.move(face.rotateY());
+		
+		// Find highest at this position
+		while (true) {
+			cursor.move(Direction.UP);
+			BlockState state = world.getBlockState(cursor);
+			if (state == null || state.getBlock() != matchBlock)
+				break;
+		}
+		
+		// Move back and record
+		cursor.move(Direction.DOWN);
+		BlockPos leftTopPos = new BlockPos(cursor);
+		
+		final int maxY = Math.min(leftTopPos.getY(), rightTopPos.getY());
+		
+		BlockPos bottomLeft = new BlockPos(leftTopPos.getX(), bottomPos.getY(), leftTopPos.getZ());
+		BlockPos topRight = new BlockPos(rightTopPos.getX(), maxY, rightTopPos.getZ());
+		
+		return new MutableBoundingBox(bottomLeft, topRight); // constructor takes care of min/maxing x and z
 	}
 }

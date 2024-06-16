@@ -47,6 +47,7 @@ public class NostrumTileEntities {
 	private static final String ID_AdvancedSpellTableTileEntity = "spelltable_advanced_te";
 	private static final String ID_MysticSpellTableTileEntity = "spelltable_mystic_te";
 	private static final String ID_RuneLibraryTileEntity = "rune_library_te";
+	private static final String ID_LockedDoor = "locked_door";
 	
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableEntity> SpellTableEntityType;
@@ -82,6 +83,7 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_AdvancedSpellTableTileEntity) public static TileEntityType<AdvancedSpellTableEntity> AdvancedSpellTableType;
 	@ObjectHolder(ID_MysticSpellTableTileEntity) public static TileEntityType<MysticSpellTableEntity> MysticSpellTableType;
 	@ObjectHolder(ID_RuneLibraryTileEntity) public static TileEntityType<RuneLibraryTileEntity> RuneLibraryType;
+	@ObjectHolder(ID_LockedDoor) public static TileEntityType<LockedDoorTileEntity> LockedDoorType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -124,6 +126,7 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(AdvancedSpellTableEntity::new, NostrumBlocks.advancedSpellTable).build(null), ID_AdvancedSpellTableTileEntity);
 		register(registry, TileEntityType.Builder.create(MysticSpellTableEntity::new, NostrumBlocks.mysticSpellTable).build(null), ID_MysticSpellTableTileEntity);
 		register(registry, TileEntityType.Builder.create(RuneLibraryTileEntity::new, NostrumBlocks.runeLibrary).build(null), ID_RuneLibraryTileEntity);
+		register(registry, TileEntityType.Builder.create(LockedDoorTileEntity::new, NostrumBlocks.lockedDoor).build(null), ID_LockedDoor);
 		
     }
 }

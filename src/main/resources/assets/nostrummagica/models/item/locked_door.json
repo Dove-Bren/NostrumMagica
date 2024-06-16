@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/locked_door",
+    "textures": {
+        "all": "nostrummagica:item/locked_door_item"
+    }
+}

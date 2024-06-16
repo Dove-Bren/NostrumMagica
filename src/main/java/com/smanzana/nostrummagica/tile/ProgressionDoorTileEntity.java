@@ -187,54 +187,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private BlockPos bottomStash = null;
 	public BlockPos getBottomCenterPos() {
 		if (bottomStash == null) {
-			// Master is at TE's pos... but is it the bottom block? And is it in center?
-			
-			// Find bottom
-			BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(this.getPos());
-			cursor.move(Direction.DOWN, 1);
-			
-			while (cursor.getY() >= 0) {
-				BlockState state = world.getBlockState(cursor);
-				if (state == null || !(state.getBlock() instanceof ProgressionDoor))
-					break;
-				
-				cursor.move(Direction.DOWN);
-			}
-			
-			// Move back to last good position
-			cursor.move(Direction.UP);
-			BlockPos bottomPos = new BlockPos(cursor);
-			
-			// Now discover left and right
-			// Right:
-			while (true) {
-				cursor.move(getFace().rotateY());
-				BlockState state = world.getBlockState(cursor);
-				if (state == null || !(state.getBlock() instanceof ProgressionDoor))
-					break;
-			}
-			
-			// Move back
-			cursor.move(getFace().rotateYCCW());
-			BlockPos rightPos = new BlockPos(cursor);
-			cursor.setPos(bottomPos);
-			
-			// Left
-			while (true) {
-				cursor.move(getFace().rotateYCCW());
-				BlockState state = world.getBlockState(cursor);
-				if (state == null || !(state.getBlock() instanceof ProgressionDoor))
-					break;
-			}
-			
-			// Move back
-			cursor.move(getFace().rotateY());
-			BlockPos leftPos = new BlockPos(cursor);
-			
-			bottomStash = new BlockPos(
-					.5 * (rightPos.getX() + leftPos.getX()),
-					bottomPos.getY(),
-					.5 * (rightPos.getZ() + leftPos.getZ()));
+			bottomStash = ProgressionDoor.FindBottomCenterPos(getWorld(), getPos());
 		}
 		
 		return bottomStash;
