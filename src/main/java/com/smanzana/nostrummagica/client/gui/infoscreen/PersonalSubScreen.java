@@ -202,21 +202,15 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				StatLabel label;
 				valueOffsetPrimary = valueOffsetDerived = 0;
 				
+				
 				label = new StatLabel("level", drawX, drawY);
 				labels.add(label);
 				valueOffsetPrimary = Math.max(valueOffsetPrimary, label.width);
 				drawY += 15;
-				label = new StatLabel("technique", drawX, drawY);
+				label = new StatLabel("tier", drawX, drawY);
 				labels.add(label);
 				valueOffsetPrimary = Math.max(valueOffsetPrimary, label.width);
 				drawY += 15;
-				label = new StatLabel("finesse", drawX, drawY);
-				labels.add(label);
-				valueOffsetPrimary = Math.max(valueOffsetPrimary, label.width);
-				drawY += 15;
-				label = new StatLabel("control", drawX, drawY);
-				labels.add(label);
-				valueOffsetPrimary = Math.max(valueOffsetPrimary, label.width);
 				
 				drawY = 0;
 				drawX = width - 200;
@@ -233,18 +227,6 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
 				drawY += 15;
 				label = new StatLabel("manaregen", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
-				label = new StatLabel("maxcomponents", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
-//				label = new StatLabel("maxtriggers", drawX, drawY);
-//				labels.add(label);
-//				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-//				drawY += 15;
-				label = new StatLabel("maxelements", drawX, drawY);
 				labels.add(label);
 				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
 				drawY += 15;
@@ -266,6 +248,10 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			drawX = x + 20 + valueOffsetPrimary;
 			text = String.format("%2d", attr.getLevel());
 			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+			drawY += 15;
+			
+			//text = String.format("%d", attr.getTier().getName());
+			mc.fontRenderer.func_243248_b(matrixStackIn, attr.getTier().getName(), drawX, drawY, color);
 			drawY += 15;
 			
 			//text = String.format("3.1%f%%", );

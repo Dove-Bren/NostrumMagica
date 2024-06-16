@@ -949,6 +949,7 @@
     "modifier.name": "Modifier",
     "modifier.desc": "Modifiers are used to add additional tome pages to spell tomes, adding new enhancements.",
 	
+	"tier.name": "Tier",
 	"tier.locked.name": "Non-Magic",
 	"tier.mani.name": "Mani",
 	"tier.kani.name": "Kani",

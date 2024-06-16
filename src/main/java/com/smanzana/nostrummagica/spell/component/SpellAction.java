@@ -2181,11 +2181,11 @@ public class SpellAction {
 				flamy = false;
 			}
 			
-			if (element == EMagicElement.FIRE && magic.hasSkill(NostrumSkills.Fire_Adept)) {
+			if (element == EMagicElement.FIRE && magic != null && magic.hasSkill(NostrumSkills.Fire_Adept)) {
 				base += 2;
 			}
 			
-			if (element == EMagicElement.EARTH && magic.hasSkill(NostrumSkills.Earth_Adept)) {
+			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
 				EffectInstance strength = caster.getActivePotionEffect(Effects.STRENGTH);
 				if (strength != null) {
 					// Matches strength attribute boost

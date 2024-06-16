@@ -15,7 +15,7 @@ import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SymbolBlock extends Block {
+public abstract class SymbolBlock extends Block {
 	
 	public static final String ID = "symbol_block";
 	
@@ -30,21 +30,6 @@ public class SymbolBlock extends Block {
 	public SymbolBlock(Block.Properties builder) {
 		super(builder);
 	}
-	
-//	@Override
-//	public boolean isOpaqueCube(BlockState state) {
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isFullCube(BlockState state) {
-//        return false;
-//    }
-//	
-//	@Override
-//	public boolean isSideSolid(BlockState state, IBlockAccess worldIn, BlockPos pos, Direction side) {
-//		return false;
-//	}
 	
 	@Override
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
@@ -67,12 +52,6 @@ public class SymbolBlock extends Block {
 		SymbolTileEntity ent = new SymbolTileEntity(1.0f);
 		return ent;
 	}
-	
-//	@Override
-//	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) { broke();
-//		super.breakBlock(world, pos, state);
-//        world.removeTileEntity(pos);
-//	}
 	
 	public void setInWorld(IWorld world, BlockPos pos, SpellComponentWrapper component) {
 		world.setBlockState(pos, this.getDefaultState(), 3);

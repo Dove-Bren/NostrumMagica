@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.block.dungeon.NostrumTriggeredMatchSpawner;
 import com.smanzana.nostrummagica.block.dungeon.ProgressionDoor;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
-import com.smanzana.nostrummagica.block.dungeon.SymbolBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
 import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggerRepeater;
@@ -87,7 +86,6 @@ public class NostrumBlocks {
 	@ObjectHolder(MasterSpellTable.ID) public static MasterSpellTable spellTable;
 	@ObjectHolder(SwitchBlock.ID) public static SwitchBlock switchBlock;
 	@ObjectHolder(TeleportationPortal.ID) public static TeleportationPortal teleportationPortal;
-	@ObjectHolder(SymbolBlock.ID) public static SymbolBlock symbolBlock;
 	@ObjectHolder(TeleportRune.ID) public static TeleportRune teleportRune;
 	@ObjectHolder(TemporaryTeleportationPortal.ID) public static TemporaryTeleportationPortal temporaryTeleportationPortal;
 	@ObjectHolder(RuneShaper.ID) public static RuneShaper runeShaper;
@@ -168,7 +166,6 @@ public class NostrumBlocks {
     	registerBlockItem(spellTable, spellTable.getRegistryName(), registry);
     	registerBlockItem(switchBlock, switchBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	//registerBlockItem(teleportationPortal, teleportationPortal.getRegistryName(), registry);
-    	registerBlockItem(symbolBlock, symbolBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(teleportRune, teleportRune.getRegistryName(), registry);
     	//registerBlockItem(temporaryTeleportationPortal, temporaryTeleportationPortal.getRegistryName(), registry);
     	registerBlockItem(runeShaper, runeShaper.getRegistryName(), registry);
@@ -244,7 +241,6 @@ public class NostrumBlocks {
     	registerBlock(new MasterSpellTable(), MasterSpellTable.ID, registry);
     	registerBlock(new SwitchBlock(), SwitchBlock.ID, registry);
     	registerBlock(new TeleportationPortal(), TeleportationPortal.ID, registry);
-    	registerBlock(new SymbolBlock(), SymbolBlock.ID, registry);
     	registerBlock(new TeleportRune(), TeleportRune.ID, registry);
     	registerBlock(new TemporaryTeleportationPortal(), TemporaryTeleportationPortal.ID, registry);
     	registerBlock(new RuneShaper(), RuneShaper.ID, registry);
