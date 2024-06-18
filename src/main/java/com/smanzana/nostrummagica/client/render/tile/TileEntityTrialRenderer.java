@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
-import com.smanzana.nostrummagica.tile.SymbolTileEntity;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.tile.TrialBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -15,25 +15,19 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class TileEntitySymbolRenderer extends TileEntityRenderer<SymbolTileEntity> {
+public class TileEntityTrialRenderer extends TileEntityRenderer<TrialBlockTileEntity> {
 
-	public TileEntitySymbolRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityTrialRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(SymbolTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+	public void render(TrialBlockTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		// Get the model from the tile entity
-		SpellComponentWrapper comp = tileEntityIn.getComponent();
-		SpellComponentIcon icon;
-		if (comp.isShape())
-			icon = SpellComponentIcon.get(comp.getShape());
-		else if (comp.isAlteration())
-			icon = SpellComponentIcon.get(comp.getAlteration());
-		else
-			icon = SpellComponentIcon.get(comp.getElement());
+		EMagicElement element = tileEntityIn.getElement();
+		SpellComponentIcon icon = SpellComponentIcon.get(element);
 		ResourceLocation textLoc = icon.getModelLocation();
 		float rot = 2.0f * (float)((double) tileEntityIn.getWorld().getGameTime() / 2.5);
 		float scale = tileEntityIn.getScale();

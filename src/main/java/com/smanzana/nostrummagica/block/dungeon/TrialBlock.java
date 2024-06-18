@@ -8,13 +8,13 @@ import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.MasteryOrb;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tile.TrialBlockTileEntity;
 import com.smanzana.nostrummagica.trial.WorldTrial;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -33,13 +33,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TrialBlock extends SymbolBlock {
+public class TrialBlock extends Block {
 	
 	public static final String ID = "trial_block";
 	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
 	
 	public TrialBlock() {
-		super();
+		super(Block.Properties.create(Material.BARRIER)
+				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.noDrops()
+				.setLightLevel((state) -> 16)
+				);
 	}
 	
 //	@Override
@@ -94,8 +98,7 @@ public class TrialBlock extends SymbolBlock {
 		
 		// code for map building
 		if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem) {
-			SpellComponentWrapper comp = new SpellComponentWrapper(InfusedGemItem.GetElement(heldItem));
-			trialEntity.setComponent(comp);
+			trialEntity.setElement(InfusedGemItem.GetElement(heldItem));
 			return ActionResultType.SUCCESS;
 		}
 		

@@ -10,9 +10,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.NostrumTameLightning;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.trial.CombatTrial;
 
 import net.minecraft.block.BlockState;
@@ -20,28 +19,43 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 
-public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableTileEntity {
+public class TrialBlockTileEntity extends TileEntity implements ITickableTileEntity {
+	
+	private static final String NBT_ELEMENT = "element";
 	
 	private @Nullable CombatTrial activeTrial;
 	private @Nullable PlayerEntity activeTrialPlayer;
+	private EMagicElement element;
+	private float scale;
 	
 	// Tracks ticks after a trial is started, used for delaying startup and effects
 	private int trialTicks;
 	
 	public TrialBlockTileEntity() {
 		super(NostrumTileEntities.TrialBlockEntityType);
-		//setComponent(new SpellComponentWrapper(EMagicElement.PHYSICAL));
 		setScale(1f);
 		
 		activeTrial = null;
 		activeTrialPlayer = null;
 		trialTicks = 0;
+		element = EMagicElement.PHYSICAL;
+	}
+	
+	public float getScale() {
+		return scale;
+	}
+	
+	protected void setScale(float scale) {
+		this.scale = scale;
 	}
 	
 	@Override
@@ -49,26 +63,22 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 		return super.getMaxRenderDistanceSquared();
 	}
 	
-	@Override
-	public void setComponent(SpellComponentWrapper wrapper) {
-		if (wrapper.isElement()) {
-			stopTrial(false);
-			super.setComponent(wrapper);
-			dirty();
-		}
-		// Reject non-elements
+	public void setElement(EMagicElement element) {
+		stopTrial(false);
+		this.element = element;
+		dirty();
 	}
 	
 	// Ease of use
 	public EMagicElement getElement() {
-		return this.getComponent().getElement();
+		return element;
 	}
 	
 	@Override
 	public CompoundNBT write(CompoundNBT nbt) {
 		nbt = super.write(nbt);
 		
-		; // Anything to persist?
+		nbt.put(NBT_ELEMENT, this.getElement().toNBT());
 		
 		return nbt;
 	}
@@ -77,7 +87,7 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 	public void read(BlockState state, CompoundNBT nbt) {
 		super.read(state, nbt);
 		
-		;
+		this.element = EMagicElement.FromNBT(nbt.get(NBT_ELEMENT));
 	}
 	
 	protected CombatTrial findTrial(EMagicElement element, @Nullable PlayerEntity starter) {
@@ -86,7 +96,7 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 	
 	public void startTrial(@Nullable PlayerEntity starter) {
 		if (!world.isRemote()) {
-			this.startTrial(findTrial(this.getComponent().getElement(), starter), starter);
+			this.startTrial(findTrial(this.getElement(), starter), starter);
 		}
 	}
 	
@@ -231,6 +241,27 @@ public class TrialBlockTileEntity extends SymbolTileEntity implements ITickableT
 			}
 		}
 		
+	}
+	
+	@Override
+	public SUpdateTileEntityPacket getUpdatePacket() {
+		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+	}
+
+	@Override
+	public CompoundNBT getUpdateTag() {
+		return this.write(new CompoundNBT());
+	}
+	
+	@Override
+	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+		super.onDataPacket(net, pkt);
+		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+	}
+	
+	protected void dirty() {
+		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
+		markDirty();
 	}
 	
 }

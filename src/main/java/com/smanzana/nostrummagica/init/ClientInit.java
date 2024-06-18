@@ -69,7 +69,7 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityManaArmorerRender
 import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
-import com.smanzana.nostrummagica.client.render.tile.TileEntitySymbolRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityTrialRenderer;
 import com.smanzana.nostrummagica.command.CommandDebugEffect;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -162,7 +162,7 @@ public class ClientInit {
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
 		//ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntitySymbolRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntityTrialRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.CandleTileEntityType, TileEntityCandleRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.AltarTileEntityType, TileEntityAltarRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.NostrumObeliskEntityType, TileEntityObeliskRenderer::new);
