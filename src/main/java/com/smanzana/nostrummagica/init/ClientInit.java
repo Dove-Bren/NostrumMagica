@@ -50,6 +50,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBody;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBramble;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossLeaf;
 import com.smanzana.nostrummagica.client.render.entity.RenderShadowDragonRed;
+import com.smanzana.nostrummagica.client.render.entity.RenderShrineTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellBubble;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellBullet;
 import com.smanzana.nostrummagica.client.render.entity.RenderSpellMortar;
@@ -160,7 +161,7 @@ public class ClientInit {
 
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
+		//ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntitySymbolRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.CandleTileEntityType, TileEntityCandleRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.AltarTileEntityType, TileEntityAltarRenderer::new);
@@ -323,6 +324,9 @@ public class ClientInit {
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.enderRodBall, (manager) -> new RenderEnderRodBall(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.areaEffect, (manager) -> new AreaEffectCloudRenderer(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellBubble, (manager) -> new RenderSpellBubble(manager, 1f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.elementShrine, (manager) -> new RenderShrineTrigger.Element(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.shapeShrine, (manager) -> new RenderShrineTrigger.Shape(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.alterationShrine, (manager) -> new RenderShrineTrigger.Alteration(manager));
 	}
 	
 	@SubscribeEvent

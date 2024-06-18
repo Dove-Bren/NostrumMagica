@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
@@ -77,6 +79,20 @@ public enum EAlteration {
 			craftItem = craftItemSupplier.get();
 		}
 		return craftItem;
+	}
+	
+	public INBT toNBT() {
+		return StringNBT.valueOf(this.name().toLowerCase());
+	}
+	
+	public static final EAlteration FromNBT(INBT nbt) {
+		EAlteration alteration = EAlteration.INFLICT;
+		try {
+			alteration = EAlteration.valueOf(((StringNBT) nbt).getString().toUpperCase());
+		} catch (Exception e) {
+			;
+		}
+		return alteration;
 	}
 	
 }

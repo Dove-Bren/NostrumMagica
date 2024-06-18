@@ -4,6 +4,8 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -130,5 +132,19 @@ public enum EMagicElement {
 			names[i++] = elem.getName();
 		}
 		return names;
+	}
+	
+	public INBT toNBT() {
+		return StringNBT.valueOf(this.name().toLowerCase());
+	}
+	
+	public static final EMagicElement FromNBT(INBT nbt) {
+		EMagicElement element = EMagicElement.PHYSICAL;
+		try {
+			element = EMagicElement.valueOf(((StringNBT) nbt).getString().toUpperCase());
+		} catch (Exception e) {
+			;
+		}
+		return element;
 	}
 }

@@ -80,7 +80,9 @@ public class NostrumBlocks {
 	@ObjectHolder(PoisonWaterBlock.ID_UNBREAKABLE) public static PoisonWaterBlock unbreakablePoisonWaterBlock;
 	@ObjectHolder(ProgressionDoor.ID) public static ProgressionDoor progressionDoor;
 	@ObjectHolder(PutterBlock.ID) public static PutterBlock putterBlock;
-	@ObjectHolder(ShrineBlock.ID) public static ShrineBlock shrineBlock;
+	@ObjectHolder(ShrineBlock.ID_ELEMENT) public static ShrineBlock.Element elementShrineBlock;
+	@ObjectHolder(ShrineBlock.ID_SHAPE) public static ShrineBlock.Shape shapeShrineBlock;
+	@ObjectHolder(ShrineBlock.ID_ALTERATION) public static ShrineBlock.Alteration alterationShrineBlock;
 	@ObjectHolder(SorceryPortal.ID) public static SorceryPortal sorceryPortal;
 	@ObjectHolder(SorceryPortalSpawner.ID) public static SorceryPortalSpawner sorceryPortalSpawner;
 	@ObjectHolder(MasterSpellTable.ID) public static MasterSpellTable spellTable;
@@ -235,7 +237,9 @@ public class NostrumBlocks {
     	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.unbreakablePoisonWater;}, true), PoisonWaterBlock.ID_UNBREAKABLE, registry);
     	registerBlock(new ProgressionDoor(), ProgressionDoor.ID, registry);
     	registerBlock(new PutterBlock(), PutterBlock.ID, registry);
-    	registerBlock(new ShrineBlock(), ShrineBlock.ID, registry);
+    	registerBlock(new ShrineBlock.Element(), ShrineBlock.ID_ELEMENT, registry);
+    	registerBlock(new ShrineBlock.Shape(), ShrineBlock.ID_SHAPE, registry);
+    	registerBlock(new ShrineBlock.Alteration(), ShrineBlock.ID_ALTERATION, registry);
     	registerBlock(new SorceryPortal(), SorceryPortal.ID, registry);
     	registerBlock(new SorceryPortalSpawner(), SorceryPortalSpawner.ID, registry);
     	registerBlock(new MasterSpellTable(), MasterSpellTable.ID, registry);

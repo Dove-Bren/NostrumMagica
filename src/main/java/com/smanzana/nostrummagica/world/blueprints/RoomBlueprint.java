@@ -334,7 +334,7 @@ public class RoomBlueprint {
 		private static final void InitOldTENames() {
 			OldTENameMap_1_12_2.put("nostrum_altar_te", TileEntityType.getId(NostrumTileEntities.AltarTileEntityType).toString());
 			OldTENameMap_1_12_2.put("nostrum_mob_spawner_te", TileEntityType.getId(NostrumTileEntities.SingleSpawnerTileEntityType).toString());
-			OldTENameMap_1_12_2.put("nostrum_symbol_te", TileEntityType.getId(NostrumTileEntities.SymbolTileEntityType).toString());
+			//OldTENameMap_1_12_2.put("nostrum_symbol_te", TileEntityType.getId(NostrumTileEntities.SymbolTileEntityType).toString());
 			OldTENameMap_1_12_2.put("progression_door", TileEntityType.getId(NostrumTileEntities.ProgressionDoorTileEntityType).toString());
 			OldTENameMap_1_12_2.put("sorcery_portal", TileEntityType.getId(NostrumTileEntities.SorceryPortalTileEntityType).toString());
 			OldTENameMap_1_12_2.put("switch_block_tile_entity", TileEntityType.getId(NostrumTileEntities.SwitchBlockTileEntityType).toString());

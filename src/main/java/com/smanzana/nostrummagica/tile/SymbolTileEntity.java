@@ -15,6 +15,8 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class SymbolTileEntity extends TileEntity {
 	
+	private int unused; // unused now?
+	
 	private EMagicElement element;
 	private EAlteration alteration;
 	private SpellShape shape;
@@ -27,7 +29,7 @@ public class SymbolTileEntity extends TileEntity {
 	}
 	
 	public SymbolTileEntity() {
-		this(NostrumTileEntities.SymbolTileEntityType);
+		this(null);
 	}
 	
 	public SymbolTileEntity(float scale) {

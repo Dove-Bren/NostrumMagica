@@ -18,7 +18,6 @@ public class NostrumTileEntities {
 	private static final String ID_SingleSpawnerTileEntity = "nostrum_mob_spawner_te";
 	private static final String ID_MatchSpawnerTileEntity = "nostrum_mob_spawner_trigger_te";
 	private static final String ID_TriggeredMatchSpawnerTileEntity = "triggered_match_spawner_te";
-	private static final String ID_SymbolTileEntity = "nostrum_symbol_te";
 	private static final String ID_AltarTileEntity = "nostrum_altar_te";
 	private static final String ID_CandleTileEntity = "nostrum_candle_te";
 	private static final String ID_NostrumObeliskEntity = "nostrum_obelisk";
@@ -48,13 +47,15 @@ public class NostrumTileEntities {
 	private static final String ID_MysticSpellTableTileEntity = "spelltable_mystic_te";
 	private static final String ID_RuneLibraryTileEntity = "rune_library_te";
 	private static final String ID_LockedDoor = "locked_door";
+	private static final String ID_ElementShrine = "element_shrine_te";
+	private static final String ID_AlterationShrine = "alteration_shrine_te";
+	private static final String ID_ShapeShrine = "shape_shrine_te";
 	
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableEntity> SpellTableEntityType;
 	@ObjectHolder(ID_SingleSpawnerTileEntity) public static TileEntityType<SingleSpawnerTileEntity> SingleSpawnerTileEntityType;
 	@ObjectHolder(ID_MatchSpawnerTileEntity) public static TileEntityType<MatchSpawnerTileEntity> MatchSpawnerTileEntityType;
 	@ObjectHolder(ID_TriggeredMatchSpawnerTileEntity) public static TileEntityType<TriggeredMatchSpawnerTileEntity> TriggeredMatchSpawnerTileEntityType;
-	@ObjectHolder(ID_SymbolTileEntity) public static TileEntityType<SymbolTileEntity> SymbolTileEntityType;
 	@ObjectHolder(ID_AltarTileEntity) public static TileEntityType<AltarTileEntity> AltarTileEntityType;
 	@ObjectHolder(ID_CandleTileEntity) public static TileEntityType<CandleTileEntity> CandleTileEntityType;
 	@ObjectHolder(ID_NostrumObeliskEntity) public static TileEntityType<NostrumObeliskEntity> NostrumObeliskEntityType;
@@ -84,6 +85,9 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_MysticSpellTableTileEntity) public static TileEntityType<MysticSpellTableEntity> MysticSpellTableType;
 	@ObjectHolder(ID_RuneLibraryTileEntity) public static TileEntityType<RuneLibraryTileEntity> RuneLibraryType;
 	@ObjectHolder(ID_LockedDoor) public static TileEntityType<LockedDoorTileEntity> LockedDoorType;
+	@ObjectHolder(ID_ElementShrine) public static TileEntityType<ShrineTileEntity.Element> ElementShrineTileType;
+	@ObjectHolder(ID_AlterationShrine) public static TileEntityType<ShrineTileEntity.Alteration> AlterationShrineTileType;
+	@ObjectHolder(ID_ShapeShrine) public static TileEntityType<ShrineTileEntity.Shape> ShapeShrineTileType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -97,7 +101,6 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(SingleSpawnerTileEntity::new, NostrumBlocks.singleSpawner).build(null), ID_SingleSpawnerTileEntity);
 		register(registry, TileEntityType.Builder.create(MatchSpawnerTileEntity::new, NostrumBlocks.matchSpawner).build(null), ID_MatchSpawnerTileEntity);
 		register(registry, TileEntityType.Builder.create(TriggeredMatchSpawnerTileEntity::new, NostrumBlocks.triggeredMatchSpawner).build(null), ID_TriggeredMatchSpawnerTileEntity);
-		register(registry, TileEntityType.Builder.create(SymbolTileEntity::new, NostrumBlocks.shrineBlock).build(null), ID_SymbolTileEntity);
 		register(registry, TileEntityType.Builder.create(AltarTileEntity::new, NostrumBlocks.altar).build(null), ID_AltarTileEntity);
 		register(registry, TileEntityType.Builder.create(CandleTileEntity::new, NostrumBlocks.candle).build(null), ID_CandleTileEntity);
 		register(registry, TileEntityType.Builder.create(NostrumObeliskEntity::new, NostrumBlocks.obelisk).build(null), ID_NostrumObeliskEntity);
@@ -127,6 +130,8 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(MysticSpellTableEntity::new, NostrumBlocks.mysticSpellTable).build(null), ID_MysticSpellTableTileEntity);
 		register(registry, TileEntityType.Builder.create(RuneLibraryTileEntity::new, NostrumBlocks.runeLibrary).build(null), ID_RuneLibraryTileEntity);
 		register(registry, TileEntityType.Builder.create(LockedDoorTileEntity::new, NostrumBlocks.lockedDoor).build(null), ID_LockedDoor);
-		
+		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Element::new, NostrumBlocks.elementShrineBlock).build(null), ID_ElementShrine);
+		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Alteration::new, NostrumBlocks.alterationShrineBlock).build(null), ID_AlterationShrine);
+		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Shape::new, NostrumBlocks.shapeShrineBlock).build(null), ID_ShapeShrine);
     }
 }

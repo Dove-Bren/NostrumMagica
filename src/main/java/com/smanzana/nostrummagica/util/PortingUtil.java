@@ -400,9 +400,9 @@ public class PortingUtil {
 		if (id.equalsIgnoreCase(NostrumTileEntities.ProgressionDoorTileEntityType.getRegistryName().toString())) {
 			return fixupProgDoor1_12_2(teTag);
 		}
-		if (id.equalsIgnoreCase(NostrumTileEntities.SymbolTileEntityType.getRegistryName().toString())) {
-			return fixupSymbolEntity1_12_2(teTag);
-		}
+//		if (id.equalsIgnoreCase(NostrumTileEntities.SymbolTileEntityType.getRegistryName().toString())) {
+//			return fixupSymbolEntity1_12_2(teTag);
+//		}
 		
 		// Else no fixup
 		return teTag;

@@ -81,6 +81,9 @@ public class NostrumEntityTypes {
 	@ObjectHolder(EntityKeySwitchTrigger.ID) public static EntityType<EntityKeySwitchTrigger> keySwitchTrigger;
 	@ObjectHolder(EntityEnderRodBall.ID) public static EntityType<EntityEnderRodBall> enderRodBall;
 	@ObjectHolder(EntitySpellBubble.ID) public static EntityType<EntitySpellBubble> spellBubble;
+	@ObjectHolder(EntityShrineTrigger.Element.ID) public static EntityType<EntityShrineTrigger.Element> elementShrine;
+	@ObjectHolder(EntityShrineTrigger.Shape.ID) public static EntityType<EntityShrineTrigger.Shape> shapeShrine;
+	@ObjectHolder(EntityShrineTrigger.Alteration.ID) public static EntityType<EntityShrineTrigger.Alteration> alterationShrine;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -224,6 +227,18 @@ public class NostrumEntityTypes {
 				.size(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EntityKeySwitchTrigger.ID));
+		registry.register(EntityType.Builder.<EntityShrineTrigger.Element>create(EntityShrineTrigger.Element::new, EntityClassification.MISC)
+				.size(.8f, .8f)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityShrineTrigger.Element.ID));
+		registry.register(EntityType.Builder.<EntityShrineTrigger.Shape>create(EntityShrineTrigger.Shape::new, EntityClassification.MISC)
+				.size(.8f, .8f)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityShrineTrigger.Shape.ID));
+		registry.register(EntityType.Builder.<EntityShrineTrigger.Alteration>create(EntityShrineTrigger.Alteration::new, EntityClassification.MISC)
+				.size(.8f, .8f)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(EntityShrineTrigger.Alteration.ID));
 		registry.register(EntityType.Builder.<NostrumTameLightning>create(NostrumTameLightning::new, EntityClassification.MISC)
 				.size(0, 0)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -352,6 +367,9 @@ public class NostrumEntityTypes {
 		// No attributes event.put(chakramSpellSaucer, EntityChakramSpellSaucer.BuildAttributes().create());
 		// No attributes event.put(cyclerSpellSaucer, EntityCyclerSpellSaucer.BuildAttributes().create());
 		event.put(switchTrigger, EntitySwitchTrigger.BuildAttributes().create());
+		event.put(elementShrine, EntityShrineTrigger.Element.BuildAttributes().create());
+		event.put(shapeShrine, EntityShrineTrigger.Shape.BuildAttributes().create());
+		event.put(alterationShrine, EntityShrineTrigger.Alteration.BuildAttributes().create());
 		// No attributes event.put(tameLightning, NostrumTameLightning.BuildAttributes().create());
 		// No attributes event.put(hookShot, EntityHookShot.BuildAttributes().create());
 		// No attributes event.put(spellBullet, EntitySpellBullet.BuildAttributes().create());
