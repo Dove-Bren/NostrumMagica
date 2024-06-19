@@ -41,7 +41,7 @@ public class EmptyChunkGen extends ChunkGenerator {
 	protected final RegistryKey<Biome> biome;
 	
 	public EmptyChunkGen(Registry<Biome> biomes, RegistryKey<Biome> biome) {
-		super(new CheckerboardBiomeProvider(Lists.newArrayList(() ->biomes.getOptionalValue(biome).orElseThrow(() -> new RuntimeException("Could not find nostrum empty biome for empty chunk gen"))), 1),
+		super(new CheckerboardBiomeProvider(Lists.newArrayList(() ->biomes.getOrThrow(biome)), 1),
 				new DimensionStructuresSettings(false));
 		this.biomeRegistry = biomes;
 		this.biome = biome;

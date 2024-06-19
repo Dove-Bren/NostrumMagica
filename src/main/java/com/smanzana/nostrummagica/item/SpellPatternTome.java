@@ -39,7 +39,7 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 	private static final String NBT_PATTERN = "pattern";
 	
 	public SpellPatternTome(Item.Properties properties) {
-		super(properties.setISTER(() -> () -> SpellPatternTomeRenderer.INSTANCE));
+		super(properties.setISTER(() -> SpellPatternTomeRenderer::new));
 	}
 	
 	protected void setPatternID(ItemStack stack, ResourceLocation ID) {

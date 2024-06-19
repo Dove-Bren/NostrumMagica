@@ -64,7 +64,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	
 	public CasterWandItem() {
 		super(ItemTier.WOOD, 2, -2.4F, NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(300));
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(CasterWandItem::onSpellCast);
 	}
 	
 	@Override
@@ -282,14 +282,14 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	}
 	
 	@SubscribeEvent
-	public void onSpellCast(SpellCastEvent.Post event) {
+	public static void onSpellCast(SpellCastEvent.Post event) {
 		// Notice and respond any time any spell is cast.
 		// Note that our spell caster handler will have put in a smaller one already, so this will replace it.
 		final SpellCastResult result = event.getCastResult();
 		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.getShouldBeDead()) {
 			if (!NostrumMagica.getMagicWrapper(result.caster).hasSkill(NostrumSkills.Spellcasting_ToolCooldown)) {
 				final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
-				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(this.getItem(), cooldownTicks);
+				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(NostrumItems.casterWand, cooldownTicks);
 			}
 		}
 	}

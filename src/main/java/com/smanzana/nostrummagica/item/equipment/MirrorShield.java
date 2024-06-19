@@ -44,8 +44,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class MirrorShield extends ShieldItem implements ISpellActionListener, ILoreTagged {
 
 	public static final String ID = "mirror_shield";
-	public static final UUID MOD_ATTACK_UUID = UUID.fromString("522BB274-43321-56AA-20AE-254BBB743ABB");
-	public static final UUID MOD_RESIST_UUID = UUID.fromString("433CC363-43321-56AA-20AE-254BBB743ABB");
+	public static final UUID MOD_ATTACK_UUID = UUID.fromString("cc76c300-4ed7-4428-9c0f-596dd02a9469");
+	public static final UUID MOD_RESIST_UUID = UUID.fromString("433CC363-4321-56AA-20AE-254BBB743ABB");
 	
 	public MirrorShield() {
 		this(NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(750));

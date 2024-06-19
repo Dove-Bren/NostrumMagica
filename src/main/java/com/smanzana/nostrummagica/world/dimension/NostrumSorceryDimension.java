@@ -36,6 +36,7 @@ import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 
 public class NostrumSorceryDimension {
 	
@@ -45,7 +46,7 @@ public class NostrumSorceryDimension {
 	private static final String DIMENSION_WHOLE_TEMPLATE = "sorcery_dungeon";
 	
 	public static final void RegisterListener() {
-		new DimensionListener();
+		DistExecutor.unsafeRunForDist(() -> DimensionClientListener::new, () -> DimensionListener::new);
 	}
 	
 	private static final class DungeonSpawner {
@@ -429,6 +430,13 @@ public class NostrumSorceryDimension {
 					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
 				}
 			}
+		}
+	}
+	
+	public static class DimensionClientListener extends DimensionListener {
+		
+		public DimensionClientListener() {
+			MinecraftForge.EVENT_BUS.register(this);
 		}
 		
 		@SubscribeEvent

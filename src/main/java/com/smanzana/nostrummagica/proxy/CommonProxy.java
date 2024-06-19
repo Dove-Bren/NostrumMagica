@@ -37,6 +37,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -244,5 +245,10 @@ public class CommonProxy {
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {
 		final double MAX_RANGE = 50.0;
 		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimensionKey()));
+	}
+	
+	private int unused;
+	public Item.Properties addISTER(Item.Properties properties, String itemID) {
+		return properties;
 	}
 }

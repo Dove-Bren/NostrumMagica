@@ -34,6 +34,7 @@ import com.smanzana.nostrummagica.client.gui.mirror.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
+import com.smanzana.nostrummagica.client.render.item.SpellPatternTomeRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
@@ -69,6 +70,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.NonNullList;
@@ -1008,5 +1010,10 @@ public class ClientProxy extends CommonProxy {
 
 	public void doManaWiggle(int wiggleCount) {
 		this.overlayRenderer.startManaWiggle(wiggleCount);
+	}
+	
+	@Override
+	public Item.Properties addISTER(Item.Properties properties, String itemID) {
+		return properties.setISTER(() -> SpellPatternTomeRenderer::new);
 	}
 }

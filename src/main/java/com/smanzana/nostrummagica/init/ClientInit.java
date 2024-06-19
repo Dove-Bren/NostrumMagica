@@ -136,6 +136,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockDisplayReader;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -156,7 +157,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
  * @author Skyler
  *
  */
-@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientInit {
 
 	@SubscribeEvent
@@ -632,5 +633,9 @@ public class ClientInit {
 	
 	private static final void registerEffectGemRenderer(Effect effect) {
 		IEffectRenderer.RegisterRenderer(effect, new EffectGemRenderer(effect));
+	}
+	
+	public static final SpellPatternTomeRenderer makeSpellPatternTomeRenderer() {
+		return SpellPatternTomeRenderer.INSTANCE;
 	}
 }

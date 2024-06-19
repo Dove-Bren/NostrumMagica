@@ -46,7 +46,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	
 	public SpellScroll() {
 		super(NostrumItems.PropUnstackable().rarity(Rarity.UNCOMMON).maxDamage(100));
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(SpellScroll::onSpellCast);
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {
@@ -254,7 +254,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	}
 	
 	@SubscribeEvent
-	public void onSpellCast(SpellCastEvent.Post event) {
+	public static void onSpellCast(SpellCastEvent.Post event) {
 		// Notice and respond any time any spell is cast to it's cooldown.
 		// Note that our r-click handler will actually replace this result with a larger one if it's a scroll that
 		// cast the spell.
@@ -270,8 +270,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			// good time to let it be overriden.
 			
 			final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
-			if (((PlayerEntity) result.caster).getCooldownTracker().getCooldown(this.getItem(), 0f) <= .25f) {
-				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(this.getItem(), cooldownTicks);
+			if (((PlayerEntity) result.caster).getCooldownTracker().getCooldown(NostrumItems.spellScroll, 0f) <= .25f) {
+				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(NostrumItems.spellScroll, cooldownTicks);
 			}
 		}
 	}

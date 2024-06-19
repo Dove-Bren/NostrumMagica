@@ -58,6 +58,9 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+	    // Caelus mixins don't work without this
+		property 'mixin.env.disableRefMap', 'true'
+
             mods {
                 nostrummagica {
                     source sourceSets.main
