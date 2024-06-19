@@ -11,10 +11,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
-import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.MagicWallBlock;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
@@ -26,13 +24,11 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.IEnchantableEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.TameLightning;
-import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
-import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
@@ -44,7 +40,9 @@ import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmuteResult;
 import com.smanzana.nostrummagica.util.DimensionUtils;
@@ -61,17 +59,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.EndermanEntity;
-import net.minecraft.entity.monster.EndermiteEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BoneMealItem;
@@ -81,7 +72,6 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -199,7 +189,7 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			float fin = calcDamage(caster, entity, amount * efficiency, element);
+			float fin = SpellDamage.CalculateDamage(caster, entity, amount * efficiency, element);
 			caster.setLastAttackedEntity(entity);
 			entity.setRevengeTarget(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
@@ -2090,172 +2080,8 @@ public class SpellAction {
 		return new SpellActionProperties(this);
 	}
 	
-	protected static final float getPhysicalAttributeBonus(LivingEntity caster) {
-		// Get raw amount
-		if (!caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
-			return 0f;
-		}
-		
-		double amt = caster.getAttributeValue(Attributes.ATTACK_DAMAGE);
-		amt -= 1; // Players always have +1 attack
-		
-		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
-		ItemStack held = caster.getHeldItemMainhand();
-		if (!held.isEmpty()) {
-			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
-			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
-				double extra = 0;
-				for (AttributeModifier mod : heldAttribs.get(Attributes.ATTACK_DAMAGE)) {
-					extra += mod.getAmount();
-				}
-				
-				// Note that the physical master skill includes using some of this
-				final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.hasSkill(NostrumSkills.Physical_Master)) {
-					amt -= (int) ((float) extra * .8f);
-				} else {
-					amt -= extra;
-				}
-			}
-		}
-		
-		return (float) amt;
-	}
-	
-	public static final float calcDamage(LivingEntity caster, LivingEntity target, float base, EMagicElement element) {
-		float amt = 0f;
-		
-		if (target == null)
-			return amt;
-		
-		INostrumMagic magic = NostrumMagica.getMagicWrapper(caster);
-		
-		//System.out.println("Raw: " + base);
-		
-		// Really, I should just make an attribute for magic potency (which could be the same that everyhting else has, too!)
-		// Attribute made. Should rework
-		EffectInstance boostEffect = caster.getActivePotionEffect(NostrumEffects.magicBoost);
-		if (boostEffect != null) {
-			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
-		}
-		boostEffect = caster.getActivePotionEffect(NostrumEffects.lightningCharge);
-		if (boostEffect != null) {
-			base *= 2.0;
-		}
-		
-		if (element == EMagicElement.PHYSICAL) {
-			base += getPhysicalAttributeBonus(caster);
-			base = applyArmor(target, base);
-			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
-			// It still gains power from magic boost (above) AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).
-		} else {
-		
-			final int armor = target.getTotalArmorValue();
-			final boolean undead = target.isEntityUndead();
-			final boolean ender;
-			final boolean light;
-			final boolean flamy;
-			
-			if (target instanceof EndermanEntity || target instanceof EndermiteEntity
-					|| target instanceof DragonEntity) {
-				// Ender status and immunity can be turned off with the disrupt status effect
-				EffectInstance effect = target.getActivePotionEffect(NostrumEffects.disruption);
-				if (effect != null && effect.getDuration() > 0) {
-					ender = false;
-				} else {
-					ender = true;
-				}
-			} else {
-				ender = false;
-			}
-			
-			if (target.getHeight() < 1.5f || target instanceof EndermanEntity || target instanceof ShadowRedDragonEntity) {
-				light = true;
-			} else {
-				light = false;
-			}
-			
-			if (target.isImmuneToFire()) {
-				flamy = true;
-			} else {
-				flamy = false;
-			}
-			
-			if (element == EMagicElement.FIRE && magic != null && magic.hasSkill(NostrumSkills.Fire_Adept)) {
-				base += 2;
-			}
-			
-			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
-				EffectInstance strength = caster.getActivePotionEffect(Effects.STRENGTH);
-				if (strength != null) {
-					// Matches strength attribute boost
-					base += 3 * (strength.getAmplifier() + 1);
-				}
-			}
-			
-			EffectInstance resEffect = target.getActivePotionEffect(NostrumEffects.magicResist);
-			if (resEffect != null) {
-				base *= Math.pow(.75, resEffect.getAmplifier() + 1);
-			}
-			
-			ModifiableAttributeInstance attr = target.getAttribute(NostrumAttributes.magicResist);
-			if (attr != null && attr.getValue() != 0.0D) {
-				base *= Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)));
-			}
-				
-			switch (element) {
-			case ENDER:
-				if (ender) return 0.0f; // does not affect ender
-				base *= 1.2f; // return raw damage (+20%) not affected by armor
-				break;
-			case LIGHTNING:
-				base *= (.75f + ((float) armor / 20f)); // double in power for every 20 armor
-				break;
-			case FIRE:
-				base *= (undead ? 1.5f : (flamy ? .5f : 1f)); // 1.5x damage against undead. Regular otherwise
-				break;
-			case EARTH:
-				//base; // raw damage. Not affected by armor
-				break;
-			case ICE:
-				base *= (undead ? .6f : 1.3f); // More affective against everything except undead
-				if (target.isBurning()) {
-					base *= 2;
-				}
-				break;
-			case WIND:
-				base *= (light ? 1.8f : .8f); // 180% against light (endermen included) enemies
-				break;
-			default:
-				//base;
-				break;
-			}
-		}
-		
-		// Apply armor reductions
-		ModifiableAttributeInstance attr = target.getAttribute(NostrumAttributes.GetReduceAttribute(element));
-		if (attr != null && attr.getValue() != 0.0D) {
-			base -= attr.getValue();
-		}
-		
-		return base;
-	}
-	
-	public static final float applyArmor(LivingEntity target, float damage) {
-            int i = 25 - target.getTotalArmorValue();
-            float f = damage * (float)i;
-            return f / 25.0F;
-	}
-	
 	public static final boolean isEnchantable(ItemStack stack) {
 		Item item = stack.getItem();
-//		if (NostrumTags.Items.InfusedGemVoid.contains(stack.getItem())) {
-//			return true;
-//		} else if (item instanceof EssenceItem && ((EssenceItem) stack.getItem()).getElement() != EMagicElement.PHYSICAL) {
-//			return true;
-//		}
-//		
-//		return false;
 		return !stack.isEmpty() && item instanceof IEnchantableItem && ((IEnchantableItem) item).canEnchant(stack);
 	}
 	

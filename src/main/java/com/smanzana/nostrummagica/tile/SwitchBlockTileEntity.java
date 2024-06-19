@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 

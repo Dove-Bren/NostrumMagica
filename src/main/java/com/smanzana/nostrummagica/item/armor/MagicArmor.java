@@ -46,7 +46,8 @@ import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate.ArmorState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.NonNullEnumMap;
@@ -2503,7 +2504,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 							LivingEntity living = (LivingEntity) entity;
 							entity.hurtResistantTime = 0;
 							entity.attackEntityFrom(new MagicDamageSource(ent, EMagicElement.WIND),
-									SpellAction.calcDamage(ent, living, .25f, EMagicElement.WIND));
+									SpellDamage.CalculateDamage(ent, living, .25f, EMagicElement.WIND));
 							entity.hurtResistantTime = 0;
 							
 //							NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(

@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;

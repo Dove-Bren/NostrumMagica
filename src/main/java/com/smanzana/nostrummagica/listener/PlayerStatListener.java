@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 

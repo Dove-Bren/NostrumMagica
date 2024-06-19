@@ -1,10 +1,12 @@
 package com.smanzana.nostrummagica.effect;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DisplayEffectsScreen;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
@@ -17,6 +19,13 @@ public class MagicResistEffect extends Effect {
 	
 	public MagicResistEffect() {
 		super(EffectType.BENEFICIAL, 0xFFA5359A);
+		this.addAttributesModifier(NostrumAttributes.magicResist, "662c96d6-19d7-4fe8-a6ff-b46befaa16a2", 20.D, AttributeModifier.Operation.ADDITION);
+	}
+	
+	@Override
+	public double getAttributeModifierAmount(int amplifier, AttributeModifier modifier) {
+		// Effect used to be a (... * .75 ^ (amp+1)) on damage.
+		return super.getAttributeModifierAmount(amplifier, modifier);
 	}
 	
 	public boolean isReady(int duration, int amp) {

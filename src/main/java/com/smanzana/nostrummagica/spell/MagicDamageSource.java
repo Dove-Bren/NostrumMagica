@@ -1,6 +1,4 @@
-package com.smanzana.nostrummagica.spell.component;
-
-import com.smanzana.nostrummagica.spell.EMagicElement;
+package com.smanzana.nostrummagica.spell;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

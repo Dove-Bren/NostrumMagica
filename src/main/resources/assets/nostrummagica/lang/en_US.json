@@ -557,6 +557,8 @@
     "attribute.nostrummagica.magic_potency.name.desc": "Bonus to potency of spells including outoging spell damage, healing, and effects",
     "attribute.nostrummagica.mana_regen.name": "Mana Regen",
     "attribute.nostrummagica.mana_regen.name.desc": "Bonus to mana regen",
+	"attribute.nostrummagica.magic_damage.name": "Magic Damage",
+	"attribute.nostrummagica.magic_damage.desc": "Bonus to inflicting magic damage",
 
     "config.nostrummagica.display": "Display Options",
     "config.nostrummagica.display.display_bar": "Mana Bar",
@@ -1075,7 +1077,7 @@
     "spelleffect.dispel.name": "Dispel",
     "spelleffect.dispel.desc": "Removes status effects.",
     "spelleffect.magicresist.name": "Magic Resistance",
-    "spelleffect.magicresist.desc": "Reduces damage from magical attacks.",
+    "spelleffect.magicresist.desc": "Reduces damage from magical attacks by 20% per level.",
     "spelleffect.push.name": "Push",
     "spelleffect.push.desc": "Pushes items and entities away from the target.",
     "spelleffect.lifeboost.name": "Life Boost",

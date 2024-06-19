@@ -9,8 +9,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
-import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -331,7 +331,7 @@ public class MagicEffectProxy {
 			EffectData data = effects.get(id).get(SpecialEffect.MAGIC_BUFF);
 			if (data != null) {
 				target.attackEntityFrom(new MagicDamageSource(living, data.element), 
-						SpellAction.calcDamage(living, target, (float) data.amt, data.element));
+						SpellDamage.CalculateDamage(living, target, (float) data.amt, data.element));
 				target.setInvulnerable(false);
 				target.hurtResistantTime = 0;
 				

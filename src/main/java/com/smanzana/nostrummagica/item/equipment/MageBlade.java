@@ -19,8 +19,8 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
-import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
@@ -208,7 +208,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 				target.setInvulnerable(false);
 				target.hurtResistantTime = 0;
 				target.attackEntityFrom(new MagicDamageSource(attacker, elem), 
-						SpellAction.calcDamage(attacker, target, 4f, elem));
+						SpellDamage.CalculateDamage(attacker, target, 4f, elem));
 				
 				if (!target.world.isRemote()) {
 					doEffect(target, elem);

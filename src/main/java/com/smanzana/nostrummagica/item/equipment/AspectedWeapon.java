@@ -25,7 +25,8 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -637,7 +638,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					LivingEntity living = (LivingEntity) entity;
 					entity.hurtResistantTime = 0;
 					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.WIND),
-							SpellAction.calcDamage(caster, living, .5f, EMagicElement.WIND));
+							SpellDamage.CalculateDamage(caster, living, .5f, EMagicElement.WIND));
 					entity.hurtResistantTime = 0;
 					
 					 NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(

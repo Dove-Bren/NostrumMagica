@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

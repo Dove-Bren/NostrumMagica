@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.effect;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -22,6 +23,7 @@ public class LightningChargeEffect extends Effect {
 	public LightningChargeEffect() {
 		super(EffectType.BENEFICIAL, 0xFFFFF200);
 		this.addAttributesModifier(Attributes.MOVEMENT_SPEED, "3AA5821F-1B8B-4E94-BF6C-7A58449F587B", 0.2D, AttributeModifier.Operation.MULTIPLY_BASE);
+		this.addAttributesModifier(NostrumAttributes.magicDamage, "7e570829-4031-4c7f-ba1d-1948ff102f11", 100.0D, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@Override
