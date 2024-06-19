@@ -53,7 +53,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -71,7 +70,7 @@ public class SpellCreationGui {
 	
 	public static final int MaxNameLength = 20;
 	
-	public static abstract class SpellCreationContainer extends Container {
+	public static abstract class SpellCreationContainer extends net.minecraft.inventory.container.Container {
 		
 		protected static class ScrollSlot extends Slot {
 			
@@ -197,7 +196,7 @@ public class SpellCreationGui {
 		protected final PlayerEntity player;
 		protected final SpellCraftContext context; // Made once for efficiency
 		
-		protected final List<Consumer<@Nullable Spell>> spellListeners;
+		protected final List<Consumer<Spell>> spellListeners;
 		protected boolean hasScroll; // has an acceptable scroll
 		protected boolean spellValid; // grammar checks out
 		protected final List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
@@ -228,7 +227,7 @@ public class SpellCreationGui {
 		
 		public abstract @Nullable SpellCraftPattern getCraftPattern();
 		
-		public void addListener(Consumer<@Nullable Spell> listener) {
+		public void addListener(Consumer<Spell> listener) {
 			this.spellListeners.add(listener);
 		}
 		
@@ -382,7 +381,7 @@ public class SpellCreationGui {
 		}
 		
 		private void alertListeners(@Nullable Spell spell) {
-			for (Consumer<@Nullable Spell> listener : this.spellListeners) {
+			for (Consumer<Spell> listener : this.spellListeners) {
 				listener.accept(spell);
 			}
 		}
@@ -531,7 +530,6 @@ public class SpellCreationGui {
 		}
 	}
 	
-	@OnlyIn(Dist.CLIENT)
 	public static abstract class SpellGui<T extends SpellCreationContainer> extends AutoGuiContainer<T> implements IJEIAwareGuiContainer {
 		
 		private static final ResourceLocation TEXT_UTILS = new ResourceLocation(NostrumMagica.MODID + ":textures/gui/container/spell_create.png");
@@ -1012,7 +1010,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class SpellPartBar extends ParentWidget {
+		protected static class SpellPartBar extends com.smanzana.nostrummagica.client.gui.widget.ParentWidget {
 			
 			public static interface IHoverHandler {
 				public void onHover(@Nullable SpellPartSummary summary, MatrixStack matrixStackIn, int mouseX, int mouseY);
