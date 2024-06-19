@@ -42,6 +42,7 @@ public class Transmutation {
 		
 //		blocks = Sets.newLinkedHashSet();
 		blocks = new ArrayList<>();
+		blocks.add(new BlockTransmutationSource(Blocks.GRASS_BLOCK));
 		blocks.add(new BlockTransmutationSource(Blocks.BOOKSHELF));
 		blocks.add(new BlockTransmutationSource(Blocks.CACTUS));
 		blocks.add(new BlockTransmutationSource(Blocks.COAL_ORE));
@@ -70,6 +71,21 @@ public class Transmutation {
 		blocks.add(new BlockTransmutationSource(Blocks.GRAVEL));
 		blocks.add(new BlockTransmutationSource(Blocks.TERRACOTTA));
 		blocks.add(new BlockTransmutationSource(Blocks.IRON_ORE));
+		blocks.add(new BlockTransmutationSource(Blocks.BLACKSTONE));
+		blocks.add(new BlockTransmutationSource(Blocks.POLISHED_BLACKSTONE));
+		blocks.add(new BlockTransmutationSource(Blocks.NETHER_GOLD_ORE));
+		blocks.add(new BlockTransmutationSource(Blocks.WARPED_PLANKS));
+		blocks.add(new BlockTransmutationSource(Blocks.WARPED_STEM));
+		blocks.add(new BlockTransmutationSource(Blocks.ACACIA_LOG));
+		blocks.add(new BlockTransmutationSource(Blocks.DARK_OAK_LOG));
+		blocks.add(new BlockTransmutationSource(Blocks.SPRUCE_LOG));
+		blocks.add(new BlockTransmutationSource(Blocks.JUNGLE_LOG));
+		blocks.add(new BlockTransmutationSource(Blocks.BIRCH_LOG));
+		blocks.add(new BlockTransmutationSource(Blocks.STRIPPED_OAK_LOG));
+		blocks.add(new BlockTransmutationSource(Blocks.RED_NETHER_BRICKS));
+		blocks.add(new BlockTransmutationSource(Blocks.SOUL_SAND));
+		blocks.add(new BlockTransmutationSource(Blocks.SOUL_SOIL));
+		blocks.add(new BlockTransmutationSource(Blocks.HONEYCOMB_BLOCK));
 		
 
 		items = new ArrayList<>();
@@ -112,6 +128,10 @@ public class Transmutation {
 		items.add(new ItemTransmutationSource(Items.FEATHER));
 		items.add(new ItemTransmutationSource(Items.SPIDER_EYE));
 		items.add(new ItemTransmutationSource(Items.STRING));
+		items.add(new ItemTransmutationSource(Items.GOLD_NUGGET));
+		items.add(new ItemTransmutationSource(Items.IRON_NUGGET));
+		items.add(new ItemTransmutationSource(Items.HONEY_BOTTLE));
+		items.add(new ItemTransmutationSource(Items.HONEYCOMB));
 		
 		for (BlockTransmutationSource blockSource : blocks) {
 			items.add(new ItemTransmutationSource(blockSource.block.asItem()));
