@@ -15,8 +15,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Util;
+import net.minecraft.util.text.Color;
 import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
@@ -38,13 +41,17 @@ public class LoreMessage {
 		Minecraft.getInstance().runAsync(() -> {
 			NostrumMagica.instance.proxy.receiveStatOverrides(message.stats);
 			
-			String name = message.lore.getLoreDisplayName();
-			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-			IFormattableTextComponent comp = new TranslationTextComponent("info.lore.get", name);
+			StringTextComponent loreName = new StringTextComponent("[" + message.lore.getLoreDisplayName() + "]");
 			Style style = Style.EMPTY
 					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("info.screen.goto")))
-					.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandInfoScreenGoto.Command + " " + ILoreTagged.GetInfoKey(message.lore)));
-			comp = comp.setStyle(style);
+					.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + CommandInfoScreenGoto.Command + " \"" + ILoreTagged.GetInfoKey(message.lore) + "\""))
+					.setColor(Color.fromTextFormatting(TextFormatting.LIGHT_PURPLE))
+				;
+					
+			loreName.setStyle(style);
+			
+			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			IFormattableTextComponent comp = new TranslationTextComponent("info.lore.get", loreName);
 			
 			player.sendMessage(comp, Util.DUMMY_UUID);
 			NostrumMagicaSounds.LORE.play(player, player.world, player.getPosX(), player.getPosY(), player.getPosZ());

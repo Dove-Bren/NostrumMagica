@@ -6,7 +6,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -35,21 +37,7 @@ public class CommandInfoScreenGoto {
 			return 1;
 		}
 		
-		int unused; // TODO: Change this to not use a command, since that doesn't work anymore :(
-		
-		//Minecraft.getInstance().displayGuiScreen(new InfoScreen(attr, args[0]));
-		
-//		if (sender instanceof PlayerEntity && ((PlayerEntity) sender).world.isRemote) {
-//			PlayerEntity player = (PlayerEntity) sender;
-//			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-//			if (attr == null) {
-//				context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
-//				return 1;
-//			}
-//			
-//		} else {
-//			sender.sendMessage(new StringTextComponent("This command must be run as a client player"));
-//		}
+		Minecraft.getInstance().displayGuiScreen(new InfoScreen(attr, tag));
 		
 		return 0;
 	}
