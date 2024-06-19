@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -111,7 +112,7 @@ public class SublimationEffect extends Effect {
 			final float addDmg = Math.max(.25f, amt * perc);
 			//NostrumMagica.logger.debug(addDmg + " - doing fire bonus");
 			entity.hurtResistantTime = 0;
-			entity.attackEntityFrom(DamageSource.MAGIC, addDmg);
+			SpellDamage.DamageEntity(entity, EMagicElement.FIRE, addDmg, null);
 			onSublimationDamage(entity);
 			
 			recurseCheck = false;

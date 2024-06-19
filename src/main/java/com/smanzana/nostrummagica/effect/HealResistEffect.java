@@ -49,7 +49,7 @@ public class HealResistEffect extends Effect {
 					final float hurt = (float) ((effect.getAmplifier()+1)-3) / 3f;
 					final float amt = hurt * origAmt;
 					final LivingEntity target = event.getEntityLiving();
-					target.attackEntityFrom(DamageSource.MAGIC, amt);
+					target.attackEntityFrom(DamageSource.MAGIC, amt); // Vanilla magic ; no modification
 					NostrumMagicaSounds.CAST_CONTINUE.play(target);
 					NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
 							50, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,

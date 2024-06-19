@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpawnPredefinedEffectMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;
@@ -97,7 +97,7 @@ public class ArcaneWolfHellGoal extends Goal {
 		wolf.setLastAttackedEntity(target);
 		target.setRevengeTarget(wolf);
 		target.hurtResistantTime = 0;
-		target.attackEntityFrom(new MagicDamageSource(wolf, EMagicElement.FIRE), 4);
+		SpellDamage.DamageEntity(target, EMagicElement.FIRE, 4f, wolf);
 		NostrumMagicaSounds.DAMAGE_FIRE.play(target);
 		
 		// Reset motion; we don't want knockback!

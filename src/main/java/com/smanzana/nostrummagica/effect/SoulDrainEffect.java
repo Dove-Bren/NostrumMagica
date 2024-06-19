@@ -56,7 +56,7 @@ public class SoulDrainEffect extends Effect {
 	
 	protected void doDamage(LivingEntity source, float amt) {
 		source.hurtResistantTime = 0;
-		source.attackEntityFrom(DamageSource.MAGIC, amt);
+		source.attackEntityFrom(DamageSource.MAGIC, amt); // Vanilla magic - no modifications
 	}
 	
 	protected List<LivingEntity> findSoulDestinations(LivingEntity source) {

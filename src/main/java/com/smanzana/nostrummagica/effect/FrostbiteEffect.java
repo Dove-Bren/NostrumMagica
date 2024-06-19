@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -30,7 +31,6 @@ import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.potion.PotionUtils;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -133,7 +133,7 @@ public class FrostbiteEffect extends Effect {
 			}
 		} else {
 			float damage = 1.0f;
-	        entity.attackEntityFrom(DamageSource.MAGIC, damage);
+			SpellDamage.DamageEntity(entity, EMagicElement.ICE, damage, null);
 		}
     }
 	

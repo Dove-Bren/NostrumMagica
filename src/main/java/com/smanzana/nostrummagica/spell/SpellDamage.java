@@ -33,9 +33,9 @@ public class SpellDamage {
 		}
 	}
 
-	protected static final float GetPhysicalAttributeBonus(LivingEntity caster) {
+	protected static final float GetPhysicalAttributeBonus(@Nullable LivingEntity caster) {
 		// Get raw amount
-		if (!caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
+		if (caster == null || !caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
 			return 0f;
 		}
 		
@@ -99,7 +99,7 @@ public class SpellDamage {
 		if (target == null)
 			return amt;
 		
-		final INostrumMagic magic = NostrumMagica.getMagicWrapper(caster);
+		final @Nullable INostrumMagic magic = caster == null ? null : NostrumMagica.getMagicWrapper(caster);
 		
 		LogDamage(0, baseDamage, "Start");
 		final Damage damage = new Damage(baseDamage);
@@ -150,7 +150,7 @@ public class SpellDamage {
 			}
 			
 			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
-				EffectInstance strength = caster.getActivePotionEffect(Effects.STRENGTH);
+				EffectInstance strength = caster == null ? null : caster.getActivePotionEffect(Effects.STRENGTH);
 				if (strength != null) {
 					// Matches strength attribute boost
 					AddDamage(damage, "EarthAdeptStrength", 3 * (strength.getAmplifier() + 1));
@@ -190,7 +190,7 @@ public class SpellDamage {
 		}
 		
 		// Apply boosts and resist
-		ModifiableAttributeInstance attr = caster.getAttribute(NostrumAttributes.magicDamage);
+		ModifiableAttributeInstance attr = caster == null ? null : caster.getAttribute(NostrumAttributes.magicDamage);
 		if (attr != null && attr.getValue() != 0.0D) {
 			MulDamage(damage, "MagicDamageAttribute", Math.max(0, Math.min(100, 1f + (float)(attr.getValue() / 100.0))));
 		}
@@ -213,6 +213,12 @@ public class SpellDamage {
 		
 		LogDamage(damage.base, damage.base, "Result");
 		return damage.base;
+	}
+	
+	public static final float DamageEntity(LivingEntity target, EMagicElement element, float base, @Nullable LivingEntity source) {
+		final float damage = CalculateDamage(source, target, base, element);
+		target.attackEntityFrom(new MagicDamageSource(source, EMagicElement.ENDER), damage);
+		return damage;
 	}
 	
 }

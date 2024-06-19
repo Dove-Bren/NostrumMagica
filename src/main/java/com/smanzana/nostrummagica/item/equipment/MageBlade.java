@@ -207,8 +207,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 			{
 				target.setInvulnerable(false);
 				target.hurtResistantTime = 0;
-				target.attackEntityFrom(new MagicDamageSource(attacker, elem), 
-						SpellDamage.CalculateDamage(attacker, target, 4f, elem));
+				SpellDamage.DamageEntity(target, elem, 4f, attacker);
 				
 				if (!target.world.isRemote()) {
 					doEffect(target, elem);

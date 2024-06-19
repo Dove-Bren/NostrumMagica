@@ -40,7 +40,6 @@ import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.SpellLocation;
@@ -189,12 +188,11 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			float fin = SpellDamage.CalculateDamage(caster, entity, amount * efficiency, element);
 			caster.setLastAttackedEntity(entity);
 			entity.setRevengeTarget(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 			entity.hurtResistantTime = 0;
-			entity.attackEntityFrom(new MagicDamageSource(caster, element), fin);
+			final float fin = SpellDamage.DamageEntity(entity, element, amount * efficiency, caster);
 			
 			NostrumMagicaSounds sound;
 			switch (element) {
@@ -259,8 +257,7 @@ public class SpellAction {
 				entity.setRevengeTarget(caster);
 				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 				entity.hurtResistantTime = 0;
-				entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ICE), base * efficiency);
-				resultBuilder.damage += base * efficiency;
+				resultBuilder.damage += SpellDamage.DamageEntity(entity, EMagicElement.ICE, base * efficiency, caster);
 			} else {
 				entity.heal(base * efficiency);
 				if (entity instanceof TameRedDragonEntity) {
@@ -1131,25 +1128,6 @@ public class SpellAction {
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
 			if (caster == null || entity == null)
 				return;
-			
-			// Can be disabled via disruption effect
-			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.disruption);
-			if (effect != null && effect.getDuration() > 0) {
-				if (effect.getAmplifier() > 0) {
-					// Damage, too
-					entity.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
-				}
-				return;
-			}
-			
-			effect = caster.getActivePotionEffect(NostrumEffects.disruption);
-			if (effect != null && effect.getDuration() > 0) {
-				if (effect.getAmplifier() > 0) {
-					// Damage, too
-					caster.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), effect.getAmplifier());
-				}
-				return;
-			}
 			
 			Vector3d pos = caster.getPositionVec();
 			float pitch = caster.rotationPitch;

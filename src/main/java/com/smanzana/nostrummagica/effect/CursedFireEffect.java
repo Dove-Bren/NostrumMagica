@@ -1,13 +1,14 @@
 package com.smanzana.nostrummagica.effect;
 
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
-import net.minecraft.util.DamageSource;
 
 public class CursedFireEffect extends Effect {
 
@@ -31,7 +32,7 @@ public class CursedFireEffect extends Effect {
 	@Override
 	public void performEffect(LivingEntity entity, int amp) {
 		float damage = 2.0f;
-        entity.attackEntityFrom(DamageSource.MAGIC, damage);
+		SpellDamage.DamageEntity(entity, EMagicElement.FIRE, damage, null);
         NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
     }
 }

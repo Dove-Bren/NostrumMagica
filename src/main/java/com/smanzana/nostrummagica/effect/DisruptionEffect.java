@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifierManager;
@@ -89,7 +89,8 @@ public class DisruptionEffect extends Effect {
 			@Nullable INostrumMagic causeAttr = cause == null ? null : NostrumMagica.getMagicWrapper(cause);
 			if (causeAttr != null && causeAttr.hasSkill(NostrumSkills.Ender_Corrupt)) {
 				// Do additional damage and don't cancel
-				living.attackEntityFrom(new MagicDamageSource(cause, EMagicElement.ENDER), 4f + effect.getAmplifier());
+				living.hurtResistantTime = 0;
+				SpellDamage.DamageEntity(living, EMagicElement.ENDER, 4f + effect.getAmplifier(), cause);
 				damaged = true;
 			} else {
 				event.setCanceled(true);

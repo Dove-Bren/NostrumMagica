@@ -330,8 +330,7 @@ public class MagicEffectProxy {
 			
 			EffectData data = effects.get(id).get(SpecialEffect.MAGIC_BUFF);
 			if (data != null) {
-				target.attackEntityFrom(new MagicDamageSource(living, data.element), 
-						SpellDamage.CalculateDamage(living, target, (float) data.amt, data.element));
+				SpellDamage.DamageEntity(target, data.element, (float) data.amt, living);
 				target.setInvulnerable(false);
 				target.hurtResistantTime = 0;
 				

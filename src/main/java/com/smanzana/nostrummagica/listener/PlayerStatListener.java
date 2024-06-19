@@ -31,7 +31,7 @@ public class PlayerStatListener {
 		if (event.getSource() instanceof MagicDamageSource) {
 			MagicDamageSource source = (MagicDamageSource) event.getSource();
 			if (event.getAmount() > 0f) {
-				if (source.getTrueSource() instanceof PlayerEntity) {
+				if (source.getTrueSource() != null && source.getTrueSource() instanceof PlayerEntity) {
 					PlayerStatTracker.Update((PlayerEntity) source.getTrueSource(), (stats) -> {
 						stats.addMagicDamageDealt(event.getAmount(), source.getElement());
 					});

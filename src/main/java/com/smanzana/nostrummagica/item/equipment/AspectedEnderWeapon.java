@@ -22,7 +22,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.ItemStacks;
@@ -186,7 +186,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	protected void doConsumeDamage(LivingEntity caster, LivingEntity target) {
-		target.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), 2);
+		SpellDamage.DamageEntity(target, EMagicElement.ENDER, 2, caster);
 	}
 	
 	protected void consumeBall(LivingEntity caster, EnderRodBallEntity ball) {
