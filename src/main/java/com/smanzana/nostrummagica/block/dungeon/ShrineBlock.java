@@ -2,36 +2,25 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
-import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.spell.EElementalMastery;
-import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -87,21 +76,6 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	 */
 	protected abstract ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack);
 	
-	public abstract void handleRelease(World world, BlockPos pos, BlockState state, PlayerEntity player);
-	
-	
-	public static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {
-		if (entity.world.isRemote) {
-			return;
-		}
-		
-		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
-			50,
-			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
-			entity.getEntityId()
-			).color(color));
-	}
-	
 	@SuppressWarnings("unchecked")
 	protected @Nullable E getTileEntity(World world, BlockPos pos, BlockState state) {
 		TileEntity te = world.getTileEntity(pos);
@@ -142,32 +116,6 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 			
 			return ActionResultType.PASS;
 		}
-
-		@Override
-		public void handleRelease(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr == null)
-				return;
-			
-			ShrineTileEntity.Element tile = getTileEntity(world, pos, state);
-			if (tile == null) {
-				return;
-			}
-			
-			// Shrine blocks grant novice mastery of their elements
-			final EMagicElement element = tile.getElement();
-			
-			if (attr.getElementalMastery(element) == EElementalMastery.UNKNOWN
-					&& attr.setElementalMastery(element, EElementalMastery.NOVICE)) {
-				// Just learned!
-				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
-				DoEffect(pos, player, color);
-			} else {
-				if (player.world.isRemote) {
-					player.sendMessage(new TranslationTextComponent("info.shrine.seektrial"), Util.DUMMY_UUID);
-				}
-			}
-		}
 	}
 	
 	public static class Shape extends ShrineBlock<ShrineTileEntity.Shape> {
@@ -201,28 +149,6 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 			
 			return ActionResultType.PASS;
 		}
-
-		@Override
-		public void handleRelease(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr == null)
-				return;
-			
-			ShrineTileEntity.Shape tile = getTileEntity(world, pos, state);
-			if (tile == null) {
-				return;
-			}
-			
-			final SpellShape shape = tile.getShape();
-			
-			if (!attr.getShapes().contains(shape)) {
-				attr.addShape(shape);
-				DoEffect(pos, player, 0x8080C0A0);
-				if (player.world.isRemote) {
-					player.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {shape.getDisplayName()}), Util.DUMMY_UUID);
-				}
-			}
-		}
 	}
 	
 	public static class Alteration extends ShrineBlock<ShrineTileEntity.Alteration> {
@@ -255,28 +181,6 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 			}
 			
 			return ActionResultType.PASS;
-		}
-
-		@Override
-		public void handleRelease(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr == null)
-				return;
-			
-			ShrineTileEntity.Alteration tile = getTileEntity(world, pos, state);
-			if (tile == null) {
-				return;
-			}
-			
-			final EAlteration alteration = tile.getAlteration();
-			
-			if (!attr.getAlterations().getOrDefault(alteration, false)) {
-				attr.unlockAlteration(alteration);
-				DoEffect(pos, player, 0x80808ABF);
-				if (player.world.isRemote) {
-					player.sendMessage(new TranslationTextComponent("info.shrine.alteration", alteration.getName()), Util.DUMMY_UUID);
-				}
-			}
 		}
 	}
 }

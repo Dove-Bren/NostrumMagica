@@ -4,13 +4,12 @@ package com.smanzana.nostrummagica.entity;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
-import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
 import net.minecraft.world.World;
 
-public class EntityKeySwitchTrigger extends EntitySwitchTrigger {
+public class EntityKeySwitchTrigger extends EntityTileProxyTrigger<KeySwitchBlockTileEntity> {
 	
 	public static final String ID = "entity_key_switch_trigger";
 	
@@ -23,9 +22,8 @@ public class EntityKeySwitchTrigger extends EntitySwitchTrigger {
 		super.livingTick();
 		
 		if (world != null && world.isRemote() && this.ticksExisted % 5 == 0) {
-			SwitchBlockTileEntity te = getLinkedTileEntity();
-			if (te != null && te instanceof KeySwitchBlockTileEntity) {
-				KeySwitchBlockTileEntity keyEnt = (KeySwitchBlockTileEntity) te;
+			KeySwitchBlockTileEntity keyEnt = getLinkedTileEntity();
+			if (keyEnt != null) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						4, this.getPosX(), getPosY() + 1.25, getPosZ(), 1.25,
 						20, 0,

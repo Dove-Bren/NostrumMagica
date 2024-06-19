@@ -1,11 +1,13 @@
 package com.smanzana.nostrummagica.tile;
 
-import javax.annotation.Nullable;
-
-import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityShrineTrigger;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
@@ -13,74 +15,97 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends TileEntity implements ITickableTileEntity {
+public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends EntityProxiedTileEntity<E> {
 
-	private E triggerEntity;
+	private static final int MAX_HITS = 5;
+	private static final String NBT_HITS = "hits"; // Mostly for communicating to client through regular TE send
+	
+	private int hitCount;
 	
 	protected ShrineTileEntity(TileEntityType<? extends ShrineTileEntity<E>> type) {
 		super(type);
+		hitCount = 0;
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
-	}
-
-	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
-	}
-	
-	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
-	}
-	
-	protected void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
-	}
-	
 	protected abstract E makeTriggerEntity(World world, double x, double y, double z);
 	
-	public @Nullable E getTriggerEntity() {
-		return this.triggerEntity;
+	public int getHitCount() {
+		return this.hitCount;
 	}
 	
-	public void trigger(LivingEntity entity) {
+	public int getMaxHitCount() {
+		return MAX_HITS;
+	}
+	
+	protected void setHitCount(int count) {
+		this.hitCount = count;
+		this.dirty();
+	}
+	
+	protected abstract int getParticleColor();
+	
+	@Override
+	public void trigger(LivingEntity entity, DamageSource source, float damage) {
 		if (entity instanceof PlayerEntity) {
-			// Just defer to block
-			((ShrineBlock<?>) this.getBlockState().getBlock()).handleRelease(this.getWorld(), this.getPos(), this.getBlockState(), (PlayerEntity) entity);
+			final int origHitCount = getHitCount();
+			if (origHitCount+1 >= MAX_HITS) {
+				this.setHitCount(0);
+				this.doReward((PlayerEntity) entity);
+			} else {
+				this.setHitCount(origHitCount+1);
+			}
+			final Vector3d pos = Vector3d.copy(this.getPos()).add(getEntityOffset());
+			final float yOffset = (this.getTriggerEntity() == null ? 0 : this.getTriggerEntity().getHeight()/2f);
+			this.getWorld().playSound(null, pos.getX(), pos.getY() + yOffset, pos.getZ(), SoundEvents.ENTITY_ENDER_DRAGON_HURT, SoundCategory.BLOCKS, 1f, 1f);
+			NostrumParticles.FILLED_ORB.spawn(this.getWorld(), new SpawnParams(30, pos.getX(), pos.getY() + yOffset, pos.getZ(), .3,
+					40, 20, new Vector3d(0, .1, 0), new Vector3d(.1, .05, .1)).gravity(true).color(getParticleColor()));
 		}
 	}
 	
+	protected abstract void doReward(PlayerEntity player);
+	
 	@Override
-	public void tick() {
-		if (world.isRemote) {
+	protected Vector3d getEntityOffset() {
+		return new Vector3d(.5, 1, .5);
+	}
+	
+	@Override
+	public CompoundNBT write(CompoundNBT nbt) {
+		nbt = super.write(nbt);
+		
+		nbt.putInt(NBT_HITS, this.getHitCount());
+		
+		return nbt;
+	}
+	
+	@Override
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
+		
+		this.hitCount = nbt.getInt(NBT_HITS);
+	}
+	
+	protected static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {
+		if (entity.world.isRemote) {
 			return;
 		}
 		
-		// Create entity here if it doesn't exist
-		BlockPos blockUp = pos.up();
-		if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
-				|| triggerEntity.getDistanceSq(blockUp.getX() + .5, blockUp.getY() + 1, blockUp.getZ() + .5) > 1.5) {
-			// Entity is dead OR is too far away
-			if (triggerEntity != null && !triggerEntity.isAlive()) {
-				triggerEntity.remove();
-			}
-			
-			triggerEntity = makeTriggerEntity(this.getWorld(), pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
-			world.addEntity(triggerEntity);
-		}
+		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
+			50,
+			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
+			entity.getEntityId()
+			).color(color));
 	}
 	
 	public static class Element extends ShrineTileEntity<EntityShrineTrigger.Element> {
@@ -127,6 +152,32 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 			ent.setPosition(x, y, z);
 			return ent;
 		}
+
+		@Override
+		protected void doReward(PlayerEntity player) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr == null)
+				return;
+			
+			// Shrine blocks grant novice mastery of their elements
+			final EMagicElement element = getElement();
+			
+			if (attr.getElementalMastery(element) == EElementalMastery.UNKNOWN
+					&& attr.setElementalMastery(element, EElementalMastery.NOVICE)) {
+				// Just learned!
+				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
+				DoEffect(pos, player, color);
+			} else {
+				if (player.world.isRemote) {
+					player.sendMessage(new TranslationTextComponent("info.shrine.seektrial"), Util.DUMMY_UUID);
+				}
+			}
+		}
+
+		@Override
+		protected int getParticleColor() {
+			return getElement().getColor();
+		}
 	}
 	
 	public static class Alteration extends ShrineTileEntity<EntityShrineTrigger.Alteration> {
@@ -172,6 +223,28 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 			EntityShrineTrigger.Alteration ent = new EntityShrineTrigger.Alteration(NostrumEntityTypes.alterationShrine, world);
 			ent.setPosition(x, y, z);
 			return ent;
+		}
+
+		@Override
+		protected void doReward(PlayerEntity player) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr == null)
+				return;
+			
+			final EAlteration alteration = getAlteration();
+			
+			if (!attr.getAlterations().getOrDefault(alteration, false)) {
+				attr.unlockAlteration(alteration);
+				DoEffect(pos, player, 0x80808ABF);
+				if (player.world.isRemote) {
+					player.sendMessage(new TranslationTextComponent("info.shrine.alteration", alteration.getName()), Util.DUMMY_UUID);
+				}
+			}
+		}
+
+		@Override
+		protected int getParticleColor() {
+			return 0xFF808ABF;
 		}
 	}
 	
@@ -223,6 +296,28 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 			EntityShrineTrigger.Shape ent = new EntityShrineTrigger.Shape(NostrumEntityTypes.shapeShrine, world);
 			ent.setPosition(x, y, z);
 			return ent;
+		}
+
+		@Override
+		protected void doReward(PlayerEntity player) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr == null)
+				return;
+			
+			final SpellShape shape = getShape();
+			
+			if (!attr.getShapes().contains(shape)) {
+				attr.addShape(shape);
+				DoEffect(pos, player, 0x8080C0A0);
+				if (player.world.isRemote) {
+					player.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {shape.getDisplayName()}), Util.DUMMY_UUID);
+				}
+			}
+		}
+
+		@Override
+		protected int getParticleColor() {
+			return 0xFF80C0A0;
 		}
 	}
 	

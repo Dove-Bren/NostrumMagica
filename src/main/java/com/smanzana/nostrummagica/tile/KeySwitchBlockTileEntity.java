@@ -6,30 +6,34 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
-import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements IWorldKeyHolder, IUniqueDungeonTileEntity {
+public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<EntityKeySwitchTrigger> implements IWorldKeyHolder, IUniqueDungeonTileEntity {
 	
 	private NostrumWorldKey key;
 	private DyeColor color;
+	private boolean triggered;
 	
 	public KeySwitchBlockTileEntity() {
 		super(NostrumTileEntities.KeySwitchTileEntityType);
 		key = new NostrumWorldKey();
 		color = DyeColor.RED;
+		triggered = false;
 	}
 	
 	public KeySwitchBlockTileEntity(NostrumWorldKey key) {
@@ -39,6 +43,7 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 	
 	private static final String NBT_KEY = "switch_key";
 	private static final String NBT_COLOR = "color";
+	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
 	public CompoundNBT write(CompoundNBT nbt) {
@@ -46,6 +51,7 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 		
 		nbt.put(NBT_KEY, this.key.asNBT());
 		nbt.putString(NBT_COLOR, this.color.name());
+		nbt.putBoolean(NBT_TRIGGERED, this.isTriggered());
 		
 		return nbt;
 	}
@@ -60,6 +66,16 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 		} catch (Exception e) {
 			this.color = DyeColor.RED;
 		}
+		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
+	}
+	
+	public boolean isTriggered() {
+		return this.triggered;
+	}
+	
+	public void setTriggered(boolean triggered) {
+		this.triggered = triggered;
+		this.dirty();
 	}
 	
 	public void setColor(DyeColor color) {
@@ -88,14 +104,19 @@ public class KeySwitchBlockTileEntity extends SwitchBlockTileEntity implements I
 	}
 	
 	@Override
-	protected EntitySwitchTrigger makeTriggerEntity(double x, double y, double z) {
-		EntityKeySwitchTrigger ent = new EntityKeySwitchTrigger(NostrumEntityTypes.keySwitchTrigger, this.world);
+	protected EntityKeySwitchTrigger makeTriggerEntity(World world, double x, double y, double z) {
+		EntityKeySwitchTrigger ent = new EntityKeySwitchTrigger(NostrumEntityTypes.keySwitchTrigger, world);
 		ent.setPosition(x, y, z);
 		return ent;
 	}
 	
 	@Override
-	protected void doTriggerInternal() {
+	public void trigger(LivingEntity entity, DamageSource source, float damage) {
+		if (this.world.isRemote() || this.isTriggered()) {
+			return;
+		}
+		
+		this.setTriggered(true);
 		NostrumMagica.instance.getWorldKeys().addKey(getWorldKey());
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
 

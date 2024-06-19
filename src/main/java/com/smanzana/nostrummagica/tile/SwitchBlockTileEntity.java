@@ -1,11 +1,10 @@
 package com.smanzana.nostrummagica.tile;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
@@ -13,16 +12,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEntity, IOrientedTileEntity {
+public class SwitchBlockTileEntity extends EntityProxiedTileEntity<EntitySwitchTrigger> implements IOrientedTileEntity {
 	
 	public static enum SwitchHitType {
 		ANY,
@@ -42,14 +39,12 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	private BlockPos triggerOffset;
 	private long triggerWorldTicks;
 	private long cooldownTicks;
-	private LivingEntity triggerEntity;
 	
 	protected SwitchBlockTileEntity(TileEntityType<? extends SwitchBlockTileEntity> tileType) {
 		super(tileType);
 		hitType = SwitchHitType.ANY;
 		triggerType = SwitchTriggerType.ONE_TIME;
 		triggerOffset = new BlockPos(0, -2, 0);
-		triggerEntity = null;
 		triggerWorldTicks = 0;
 		cooldownTicks = 0;
 	}
@@ -121,27 +116,6 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		this.cooldownTicks = nbt.getLong(NBT_COOOLDOWN_TICKS);
 	}
 	
-	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
-	}
-
-	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
-	}
-	
-	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
-	}
-	
-	protected void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
-	}
-	
 	public SwitchBlockTileEntity.SwitchHitType getSwitchHitType() {
 		return this.hitType;
 	}
@@ -196,11 +170,6 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		}
 		
 		return 0;
-	}
-	
-	@Nullable
-	public LivingEntity getTriggerEntity() {
-		return this.triggerEntity;
 	}
 	
 	public boolean isTriggered() {
@@ -265,21 +234,10 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 	
 	@Override
 	public void tick() {
+		super.tick();
+		
 		if (world.isRemote) {
 			return;
-		}
-		
-		// Create entity here if it doesn't exist
-		BlockPos blockUp = pos.up();
-		if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
-				|| triggerEntity.getDistanceSq(blockUp.getX() + .5, blockUp.getY(), blockUp.getZ() + .5) > 1.5) {
-			// Entity is dead OR is too far away
-			if (triggerEntity != null && !triggerEntity.isAlive()) {
-				triggerEntity.remove();
-			}
-			
-			triggerEntity = makeTriggerEntity(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
-			world.addEntity(triggerEntity);
 		}
 		
 		// Do tick logic based on type
@@ -297,8 +255,9 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
-	protected EntitySwitchTrigger makeTriggerEntity(double x, double y, double z) {
-		EntitySwitchTrigger ent = new EntitySwitchTrigger(NostrumEntityTypes.switchTrigger, this.world);
+	@Override
+	protected EntitySwitchTrigger makeTriggerEntity(World world, double x, double y, double z) {
+		EntitySwitchTrigger ent = new EntitySwitchTrigger(NostrumEntityTypes.switchTrigger, world);
 		ent.setPosition(x, y, z);
 		return ent;
 	}
@@ -314,8 +273,10 @@ public class SwitchBlockTileEntity extends TileEntity implements ITickableTileEn
 		((ITriggeredBlock) state.getBlock()).trigger(world, triggerPos, state, this.getPos());
 	}
 	
-	public void trigger(boolean isMagic) {
+	@Override
+	public void trigger(LivingEntity entity, DamageSource source, float damage) {
 		if (!this.isTriggered() && !this.world.isRemote()) {
+			final boolean isMagic = (source instanceof MagicDamageSource);
 			if (hitType == SwitchHitType.ANY || isMagic) {
 				this.triggerWorldTicks = world.getGameTime();
 				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);

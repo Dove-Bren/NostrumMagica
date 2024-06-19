@@ -52,7 +52,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 		boolean matches = false;
 		KeySwitchBlockTileEntity te = (KeySwitchBlockTileEntity) entityIn.getLinkedTileEntity();
 		if (te != null) {
-			if (te.getOffset() != null) {
+			if (te.getWorldKey() != null) {
 				NostrumWorldKey key = te.getWorldKey();
 				info = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
 				
