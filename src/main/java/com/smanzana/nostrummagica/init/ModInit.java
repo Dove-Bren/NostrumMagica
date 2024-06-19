@@ -185,7 +185,7 @@ public class ModInit {
     	// because they depend on data and re-fire when data is reloaded?
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onBiomeLoad);
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, ModInit::registerDataReloaders);
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::registerDataReloaders);
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDefaultRituals);
 		
 		preinit();
