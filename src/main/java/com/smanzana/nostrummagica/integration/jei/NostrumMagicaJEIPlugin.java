@@ -204,11 +204,13 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	@Override
 	public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
-		jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
-		//jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
-		
 		this.runtime = jeiRuntime;
 		refreshTransmuteRecipes(null);
+		
+		if (ritualOutcomes != null && !ritualOutcomes.isEmpty()) {
+			jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
+			//jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(RitualOutcomeIngredientType.instance, ritualOutcomes);
+		}
 	}
 	
 	public void refreshTransmuteRecipes(@Nullable PlayerEntity player) {
