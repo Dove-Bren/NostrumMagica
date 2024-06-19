@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
-import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
+import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
+import com.smanzana.nostrummagica.entity.SpellSaucerEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRenderer<T> {
+public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRenderer<T> {
 	
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/magic_saucer");
 	
@@ -29,7 +29,7 @@ public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRender
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(EntitySpellSaucer entity) {
+	public ResourceLocation getEntityTexture(SpellSaucerEntity entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	
@@ -52,7 +52,7 @@ public class RenderMagicSaucer<T extends EntitySpellSaucer> extends EntityRender
 		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
 		matrixStackIn.push();
-		if (!(entityIn instanceof EntityCyclerSpellSaucer)) {
+		if (!(entityIn instanceof CyclerSpellSaucerEntity)) {
 			//matrixStackIn.rotate(Vector3f.XP.rotationDegrees(-90.0F - entityLiving.rotationPitch));
 			matrixStackIn.rotate(Vector3f.XP.rotationDegrees(entityIn.rotationPitch));
 		}

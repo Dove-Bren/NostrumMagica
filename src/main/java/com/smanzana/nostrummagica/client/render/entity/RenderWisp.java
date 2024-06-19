@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.entity.WispEntity;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
@@ -17,23 +17,23 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderWisp extends EntityRenderer<EntityWisp> {
+public class RenderWisp extends EntityRenderer<WispEntity> {
 	
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/orb");
 
-	protected ModelBaked<EntityWisp> orbModel;
+	protected ModelBaked<WispEntity> orbModel;
 	
 	public RenderWisp(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
 		orbModel = new ModelBaked<>(NostrumRenderTypes::GetBlendedEntity, MODEL);
 	}
 	
-	protected int getColor(EntityWisp wisp) {
+	protected int getColor(WispEntity wisp) {
 		final EMagicElement element = (wisp == null ? null : wisp.getElement());
 		return (element == null ? EMagicElement.PHYSICAL : element).getColor();
 	}
 	
-	protected void renderModel(EntityWisp entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
+	protected void renderModel(WispEntity entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha, float partialTicks) {
 		// Render orb twice: one at full transparency, and again larger and more translucent (for a glow)
 		final float ticks = 3 * 20;
@@ -61,7 +61,7 @@ public class RenderWisp extends EntityRenderer<EntityWisp> {
 	}
 	
 	@Override
-	public void render(EntityWisp entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(WispEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final float[] color = ColorUtil.ARGBToColor(getColor(entityIn));
 		IVertexBuilder buffer;
 		final int packedOverlayIn = OverlayTexture.NO_OVERLAY;
@@ -96,7 +96,7 @@ public class RenderWisp extends EntityRenderer<EntityWisp> {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(EntityWisp entity) {
+	public ResourceLocation getEntityTexture(WispEntity entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.entity.EntityTileProxyTrigger;
+import com.smanzana.nostrummagica.entity.TileProxyTriggerEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -16,7 +16,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public abstract class EntityProxiedTileEntity<E extends EntityTileProxyTrigger<?>> extends TileEntity implements ITickableTileEntity {
+public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?>> extends TileEntity implements ITickableTileEntity {
 
 	private E triggerEntity;
 	

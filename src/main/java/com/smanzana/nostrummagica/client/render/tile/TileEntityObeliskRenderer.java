@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ModelUtils;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObeliskEntity> {
+public class TileEntityObeliskRenderer extends TileEntityRenderer<ObeliskTileEntity> {
 
 	protected static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "block/orb_crystal");
 	protected IBakedModel model;
@@ -32,7 +32,7 @@ public class TileEntityObeliskRenderer extends TileEntityRenderer<NostrumObelisk
 	}
 	
 	@Override
-	public void render(NostrumObeliskEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+	public void render(ObeliskTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		if (tileEntityIn.isMaster())

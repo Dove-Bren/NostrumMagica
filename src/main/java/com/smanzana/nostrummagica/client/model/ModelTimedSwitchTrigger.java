@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 
 import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
@@ -74,7 +74,7 @@ public class ModelTimedSwitchTrigger extends ModelSwitchTrigger {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntitySwitchTrigger trigger, float p_78086_2_, float age, float partialTickTime) {
+	public void setLivingAnimations(SwitchTriggerEntity trigger, float p_78086_2_, float age, float partialTickTime) {
 //			
 	}
 }

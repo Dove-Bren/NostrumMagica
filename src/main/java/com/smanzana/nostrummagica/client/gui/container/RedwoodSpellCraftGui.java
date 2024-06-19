@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui.BasicS
 import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui.BasicSpellCraftGuiContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
-import com.smanzana.nostrummagica.tile.BasicSpellTableEntity;
+import com.smanzana.nostrummagica.tile.BasicSpellTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
@@ -39,13 +39,13 @@ public class RedwoodSpellCraftGui {
 		}
 		
 		public static RedwoodContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
-			final BasicSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
+			final BasicSpellTableTileEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
 			@Nullable IInventory extraInventory = te.getExtraInventory();
 			return new RedwoodContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInventory);
 		}
 		
-		public static IPackedContainerProvider Make(BasicSpellTableEntity table) {
+		public static IPackedContainerProvider Make(BasicSpellTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new RedwoodContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {

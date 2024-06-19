@@ -4,15 +4,15 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemFire;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;
 
@@ -131,31 +131,31 @@ public class NostrumSingleSpawner extends Block {
 		
 		switch (type) {
 		case GOLEM_EARTH:
-			entity = new EntityGolemEarth(NostrumEntityTypes.golemEarth, world);
+			entity = new MagicEarthGolemEntity(NostrumEntityTypes.golemEarth, world);
 			break;
 		case GOLEM_ENDER:
-			entity = new EntityGolemEnder(NostrumEntityTypes.golemEnder, world);
+			entity = new MagicEnderGolemEntity(NostrumEntityTypes.golemEnder, world);
 			break;
 		case GOLEM_FIRE:
-			entity = new EntityGolemFire(NostrumEntityTypes.golemFire, world);
+			entity = new MagicFireGolemEntity(NostrumEntityTypes.golemFire, world);
 			break;
 		case GOLEM_ICE:
-			entity = new EntityGolemIce(NostrumEntityTypes.golemIce, world);
+			entity = new MagicIceGolemEntity(NostrumEntityTypes.golemIce, world);
 			break;
 		case GOLEM_LIGHTNING:
-			entity = new EntityGolemLightning(NostrumEntityTypes.golemLightning, world);
+			entity = new MagicLightningGolemEntity(NostrumEntityTypes.golemLightning, world);
 			break;
 		case GOLEM_PHYSICAL:
-			entity = new EntityGolemPhysical(NostrumEntityTypes.golemPhysical, world);
+			entity = new MagicPhysicalGolemEntity(NostrumEntityTypes.golemPhysical, world);
 			break;
 		case GOLEM_WIND:
-			entity = new EntityGolemWind(NostrumEntityTypes.golemWind, world);
+			entity = new MagicWindGolemEntity(NostrumEntityTypes.golemWind, world);
 			break;
 		case DRAGON_RED:
-			entity = new EntityDragonRed(NostrumEntityTypes.dragonRed, world);
+			entity = new RedDragonEntity(NostrumEntityTypes.dragonRed, world);
 			break;
 		case PLANT_BOSS:
-			entity = new EntityPlantBoss(NostrumEntityTypes.plantBoss, world);
+			entity = new PlantBossEntity(NostrumEntityTypes.plantBoss, world);
 			break;
 		}
 		

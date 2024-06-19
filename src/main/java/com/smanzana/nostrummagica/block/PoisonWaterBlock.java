@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.function.Supplier;
 
-import com.smanzana.nostrummagica.fluid.FluidPoisonWater;
+import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -72,7 +72,7 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 				&& entity instanceof LivingEntity) {
 			if (entity.ticksExisted % 10 == 0) {
 				LivingEntity living = (LivingEntity) entity;
-				living.attackEntityFrom(FluidPoisonWater.PoisonWaterDamageSource, .25f);
+				living.attackEntityFrom(PoisonWaterFluid.PoisonWaterDamageSource, .25f);
 			}
 		}
 		

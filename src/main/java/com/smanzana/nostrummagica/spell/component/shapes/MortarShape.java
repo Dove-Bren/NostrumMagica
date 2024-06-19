@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAir;
-import com.smanzana.nostrummagica.entity.EntitySpellMortar;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
+import com.smanzana.nostrummagica.entity.SpellMortarEntity;
+import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -138,7 +138,7 @@ public class MortarShape extends SpellShape {
 				startVelocity = Curves.getMortarArcVelocity(pos, dest, HVel, OverworldGravity);
 			}
 			
-			EntitySpellMortar projectile = new EntitySpellMortar(NostrumEntityTypes.spellMortar, MortarShapeInstance.this,
+			SpellMortarEntity projectile = new SpellMortarEntity(NostrumEntityTypes.spellMortar, MortarShapeInstance.this,
 					getState().getSelf(),
 					world,
 					startPos,

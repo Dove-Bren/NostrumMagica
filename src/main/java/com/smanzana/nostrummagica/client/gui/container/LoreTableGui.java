@@ -6,7 +6,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.tile.LoreTableEntity;
+import com.smanzana.nostrummagica.tile.LoreTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
@@ -51,10 +51,10 @@ public class LoreTableGui {
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected LoreTableEntity table;
+		protected LoreTableTileEntity table;
 		protected Slot inputSlot;
 		
-		public LoreTableContainer(int windowId, PlayerEntity player, IInventory playerInv, LoreTableEntity table) {
+		public LoreTableContainer(int windowId, PlayerEntity player, IInventory playerInv, LoreTableTileEntity table) {
 			super(NostrumContainers.LoreTable, windowId);
 			this.player = player;
 			this.table = table;
@@ -130,7 +130,7 @@ public class LoreTableGui {
 			return new LoreTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf));
 		}
 		
-		public static IPackedContainerProvider Make(LoreTableEntity table) {
+		public static IPackedContainerProvider Make(LoreTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new LoreTableContainer(windowId, playerInv.player, playerInv, table);
 			}, (buffer) -> {

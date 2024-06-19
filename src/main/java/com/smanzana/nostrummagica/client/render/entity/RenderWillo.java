@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
 import com.smanzana.nostrummagica.client.model.ModelWillo;
-import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -18,18 +18,18 @@ import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<EntityWillo>> {
+public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloEntity>> {
 
 	private static final ResourceLocation RES_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/entity/willo.png");
 	
 	private ModelWillo mainModel;
 	
 	public RenderWillo(EntityRendererManager renderManagerIn, float scale) {
-		super(renderManagerIn, new ModelRenderShiv<EntityWillo>(RenderType::getEntityCutoutNoCull), .33f);
+		super(renderManagerIn, new ModelRenderShiv<WilloEntity>(RenderType::getEntityCutoutNoCull), .33f);
 		mainModel = new ModelWillo();
 	}
 	
-	protected void renderFace(EntityWillo entity, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
+	protected void renderFace(WilloEntity entity, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha) {
 		
 		// Choose face based on status
@@ -76,7 +76,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 //		buffer.pos(.5, .5, .01).tex(umax,vmax).normal(.5773f, .5773f, .5773f).endVertex();
 	}
 	
-	protected void renderCube(EntityWillo entity, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
+	protected void renderCube(WilloEntity entity, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha) {
 		final float umin = 0;
 		final float umax = umin + (18f/64f);
@@ -122,7 +122,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 //		buffer.pos(-.5, -.5, .5).tex(umax,vmax).normal(-.5773f, -.5773f, .5773f).endVertex();
 	}
 	
-	public void renderModels(EntityWillo entityIn, float partialTicks, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
+	public void renderModels(WilloEntity entityIn, float partialTicks, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha) {
 		
 		// GlStateManager.color4f(.65f, 1f, .7f, 1f);
@@ -160,7 +160,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 	}
 	
 	@Override
-	public void render(EntityWillo entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(WilloEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		this.entityModel.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
 			// Could pass through bufferIn to allow access to different buffer types, but only need the base one
 			this.renderModels(entityIn, partialTicks, deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha);
@@ -177,7 +177,7 @@ public class RenderWillo extends MobRenderer<EntityWillo, ModelRenderShiv<Entity
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntityWillo entity) {
+	public ResourceLocation getEntityTexture(WilloEntity entity) {
 		return RES_TEXT;
 	}
 	

@@ -24,7 +24,7 @@ import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.tile.ISpellCraftingTileEntity;
-import com.smanzana.nostrummagica.tile.MysticSpellTableEntity;
+import com.smanzana.nostrummagica.tile.MysticSpellTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
@@ -96,7 +96,7 @@ public class MysticSpellCraftGui {
 			this.spellIcon = -1;
 			this.patternIdx = 0;
 			
-			patternChoices = MysticSpellTableEntity.CalculatePatternChoices(crafter, tableInventory, tablePos);
+			patternChoices = MysticSpellTableTileEntity.CalculatePatternChoices(crafter, tableInventory, tablePos);
 			
 			// Scroll slot
 			this.addSlot(new ScrollSlot(this, tableInventory, tableInventory.getScrollSlotIndex(), POS_SLOT_SCROLL_HOFFSET, POS_SLOT_SCROLL_VOFFSET));
@@ -137,13 +137,13 @@ public class MysticSpellCraftGui {
 		}
 		
 		public static final MysticContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
-			final MysticSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
+			final MysticSpellTableTileEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
 			final @Nullable IInventory extraInv = te.getExtraInventory();
 			return new MysticContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInv);
 		}
 		
-		public static IPackedContainerProvider Make(MysticSpellTableEntity table) {
+		public static IPackedContainerProvider Make(MysticSpellTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new MysticContainer(windowId, player, playerInv, ((ISpellCraftingTileEntity) table).getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {

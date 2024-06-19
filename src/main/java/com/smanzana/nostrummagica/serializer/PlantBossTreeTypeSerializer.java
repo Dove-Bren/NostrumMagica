@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.serializer;
 
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossTreeType;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;

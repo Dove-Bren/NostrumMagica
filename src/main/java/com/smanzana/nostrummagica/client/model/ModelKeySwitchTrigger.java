@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
+import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 
-public class ModelKeySwitchTrigger extends EntityModel<EntityKeySwitchTrigger> {
+public class ModelKeySwitchTrigger extends EntityModel<KeySwitchTriggerEntity> {
 	
 	public ModelKeySwitchTrigger() {
 		;
@@ -32,12 +32,12 @@ public class ModelKeySwitchTrigger extends EntityModel<EntityKeySwitchTrigger> {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityKeySwitchTrigger entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
+	public void setLivingAnimations(KeySwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTick);
 	}
 
 	@Override
-	public void setRotationAngles(EntityKeySwitchTrigger entityIn, float limbSwing, float limbSwingAmount,
+	public void setRotationAngles(KeySwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		;
 		

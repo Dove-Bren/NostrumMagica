@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelHookShot;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.entity.EntityHookShot;
+import com.smanzana.nostrummagica.entity.HookShotEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -19,7 +19,7 @@ import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderHookShot extends EntityRenderer<EntityHookShot> {
+public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	
 	public static final ResourceLocation HOOK_TEXTURE = new ResourceLocation(NostrumMagica.MODID, "textures/block/dungeon_dark.png");
 	public static final ResourceLocation CHAIN_TEXTURE = NostrumMagica.Loc("textures/block/spawner.png");
@@ -33,12 +33,12 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntityHookShot entity) {
+	public ResourceLocation getEntityTexture(HookShotEntity entity) {
 		return HOOK_TEXTURE;
 	}
 	
 	@Override
-	public boolean shouldRender(EntityHookShot livingEntity, ClippingHelper camera, double camX, double camY, double camZ) {
+	public boolean shouldRender(HookShotEntity livingEntity, ClippingHelper camera, double camX, double camY, double camZ) {
 		return true;
 	}
 	
@@ -91,7 +91,7 @@ public class RenderHookShot extends EntityRenderer<EntityHookShot> {
 	}
 	
 	@Override
-	public void render(EntityHookShot entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(HookShotEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final float texLen = .2f;
 		final float chainWidth = .1f;
 		final LivingEntity shooter = entity.getCaster();

@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityLux;
-import com.smanzana.nostrummagica.entity.EntitySprite;
-import com.smanzana.nostrummagica.entity.EntityWisp;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
-import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
+import com.smanzana.nostrummagica.entity.KoidEntity;
+import com.smanzana.nostrummagica.entity.LuxEntity;
+import com.smanzana.nostrummagica.entity.SpriteEntity;
+import com.smanzana.nostrummagica.entity.WispEntity;
+import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.TameRedDragonLore;
+import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
 
 import net.minecraft.block.Block;
@@ -93,19 +93,19 @@ public class LoreRegistry {
 //		register(HookshotItem.instance());
 //		register(WarlockSword.instance());
 //		register(DragonSoulItem.instance());
-		register(EntityTameDragonRed.SoulBoundDragonLore.instance());
+		register(TameRedDragonEntity.SoulBoundDragonLore.instance());
 //		register(SoulDagger.instance());
 //		register(ArcaneWolfSoulItem.instance());
 		register(SoulBoundLore.instance());
 		register(WolfTameLore.instance());
 //		register(ParadoxMirrorBlock.instance());
 		
-		register(EntityLux.LuxLoreTag.instance());
-		register(EntityWisp.WispLoreTag.instance());
-		register(EntitySprite.SpriteLoreTag.instance());
-		register(EntityDragonEgg.DragonEggLore.instance());
-		register(EntityGolem.GolemLore.instance());
-		register(EntityKoid.KoidLore.instance());
+		register(LuxEntity.LuxLoreTag.instance());
+		register(WispEntity.WispLoreTag.instance());
+		register(SpriteEntity.SpriteLoreTag.instance());
+		register(DragonEggEntity.DragonEggLore.instance());
+		register(MagicGolemEntity.GolemLore.instance());
+		register(KoidEntity.KoidLore.instance());
 		
 		
 		for (Preset preset : Preset.values()) {

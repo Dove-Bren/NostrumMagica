@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.EntityShrineTrigger;
+import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
@@ -25,7 +25,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends EntityProxiedTileEntity<E> {
+public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends EntityProxiedTileEntity<E> {
 
 	private static final int MAX_HITS = 5;
 	private static final String NBT_HITS = "hits"; // Mostly for communicating to client through regular TE send
@@ -108,7 +108,7 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 			).color(color));
 	}
 	
-	public static class Element extends ShrineTileEntity<EntityShrineTrigger.Element> {
+	public static class Element extends ShrineTileEntity<ShrineTriggerEntity.Element> {
 		
 		private static final String NBT_ELEMENT = "element";
 		
@@ -147,8 +147,8 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 		}
 
 		@Override
-		protected EntityShrineTrigger.Element makeTriggerEntity(World world, double x, double y, double z) {
-			EntityShrineTrigger.Element ent = new EntityShrineTrigger.Element(NostrumEntityTypes.elementShrine, world);
+		protected ShrineTriggerEntity.Element makeTriggerEntity(World world, double x, double y, double z) {
+			ShrineTriggerEntity.Element ent = new ShrineTriggerEntity.Element(NostrumEntityTypes.elementShrine, world);
 			ent.setPosition(x, y, z);
 			return ent;
 		}
@@ -180,7 +180,7 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 		}
 	}
 	
-	public static class Alteration extends ShrineTileEntity<EntityShrineTrigger.Alteration> {
+	public static class Alteration extends ShrineTileEntity<ShrineTriggerEntity.Alteration> {
 		
 		private static final String NBT_ALTERATION = "alteration";
 		
@@ -219,8 +219,8 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 		}
 
 		@Override
-		protected EntityShrineTrigger.Alteration makeTriggerEntity(World world, double x, double y, double z) {
-			EntityShrineTrigger.Alteration ent = new EntityShrineTrigger.Alteration(NostrumEntityTypes.alterationShrine, world);
+		protected ShrineTriggerEntity.Alteration makeTriggerEntity(World world, double x, double y, double z) {
+			ShrineTriggerEntity.Alteration ent = new ShrineTriggerEntity.Alteration(NostrumEntityTypes.alterationShrine, world);
 			ent.setPosition(x, y, z);
 			return ent;
 		}
@@ -248,7 +248,7 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 		}
 	}
 	
-	public static class Shape extends ShrineTileEntity<EntityShrineTrigger.Shape> {
+	public static class Shape extends ShrineTileEntity<ShrineTriggerEntity.Shape> {
 		
 		private static final String NBT_SHAPE = "shape";
 		
@@ -292,8 +292,8 @@ public abstract class ShrineTileEntity<E extends EntityShrineTrigger<?>> extends
 		}
 
 		@Override
-		protected EntityShrineTrigger.Shape makeTriggerEntity(World world, double x, double y, double z) {
-			EntityShrineTrigger.Shape ent = new EntityShrineTrigger.Shape(NostrumEntityTypes.shapeShrine, world);
+		protected ShrineTriggerEntity.Shape makeTriggerEntity(World world, double x, double y, double z) {
+			ShrineTriggerEntity.Shape ent = new ShrineTriggerEntity.Shape(NostrumEntityTypes.shapeShrine, world);
 			ent.setPosition(x, y, z);
 			return ent;
 		}

@@ -2,14 +2,14 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossLeafLimb;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossLeafLimb;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class ModelPlantBossLeaf extends EntityModel<EntityPlantBoss.PlantBossLeafLimb> {
+public class ModelPlantBossLeaf extends EntityModel<PlantBossEntity.PlantBossLeafLimb> {
 	
 	private ModelRenderer main;
 	
@@ -54,7 +54,7 @@ public class ModelPlantBossLeaf extends EntityModel<EntityPlantBoss.PlantBossLea
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityPlantBoss.PlantBossLeafLimb entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(PlantBossEntity.PlantBossLeafLimb entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 

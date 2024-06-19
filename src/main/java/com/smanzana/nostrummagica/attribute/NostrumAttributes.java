@@ -19,24 +19,24 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumAttributes {
 	
-	protected static final String ID_REDUCE_PHYSICAL = AttributeMagicReduction.ID_PREFIX + "physical";
-	protected static final String ID_REDUCE_EARTH = AttributeMagicReduction.ID_PREFIX + "earth";
-	protected static final String ID_REDUCE_ENDER = AttributeMagicReduction.ID_PREFIX + "ender";
-	protected static final String ID_REDUCE_FIRE = AttributeMagicReduction.ID_PREFIX + "fire";
-	protected static final String ID_REDUCE_ICE = AttributeMagicReduction.ID_PREFIX + "ice";
-	protected static final String ID_REDUCE_LIGHTNING = AttributeMagicReduction.ID_PREFIX + "lightning";
-	protected static final String ID_REDUCE_WIND = AttributeMagicReduction.ID_PREFIX + "wind";
+	protected static final String ID_REDUCE_PHYSICAL = MagicReductionAttribute.ID_PREFIX + "physical";
+	protected static final String ID_REDUCE_EARTH = MagicReductionAttribute.ID_PREFIX + "earth";
+	protected static final String ID_REDUCE_ENDER = MagicReductionAttribute.ID_PREFIX + "ender";
+	protected static final String ID_REDUCE_FIRE = MagicReductionAttribute.ID_PREFIX + "fire";
+	protected static final String ID_REDUCE_ICE = MagicReductionAttribute.ID_PREFIX + "ice";
+	protected static final String ID_REDUCE_LIGHTNING = MagicReductionAttribute.ID_PREFIX + "lightning";
+	protected static final String ID_REDUCE_WIND = MagicReductionAttribute.ID_PREFIX + "wind";
 	
-	@ObjectHolder(AttributeMagicPotency.ID) public static AttributeMagicPotency magicPotency;
-	@ObjectHolder(AttributeMagicResist.ID) public static AttributeMagicResist magicResist;
-	@ObjectHolder(AttributeManaRegen.ID) public static AttributeManaRegen manaRegen;
-	@ObjectHolder(ID_REDUCE_PHYSICAL) public static AttributeMagicReduction reducePhysical;
-	@ObjectHolder(ID_REDUCE_EARTH) public static AttributeMagicReduction reduceEarth;
-	@ObjectHolder(ID_REDUCE_ENDER) public static AttributeMagicReduction reduceEnder;
-	@ObjectHolder(ID_REDUCE_FIRE) public static AttributeMagicReduction reduceFire;
-	@ObjectHolder(ID_REDUCE_ICE) public static AttributeMagicReduction reduceIce;
-	@ObjectHolder(ID_REDUCE_LIGHTNING) public static AttributeMagicReduction reduceLightning;
-	@ObjectHolder(ID_REDUCE_WIND) public static AttributeMagicReduction reduceWind;
+	@ObjectHolder(MagicPotencyAttribute.ID) public static MagicPotencyAttribute magicPotency;
+	@ObjectHolder(MagicResistAttribute.ID) public static MagicResistAttribute magicResist;
+	@ObjectHolder(ManaRegenAttribute.ID) public static ManaRegenAttribute manaRegen;
+	@ObjectHolder(ID_REDUCE_PHYSICAL) public static MagicReductionAttribute reducePhysical;
+	@ObjectHolder(ID_REDUCE_EARTH) public static MagicReductionAttribute reduceEarth;
+	@ObjectHolder(ID_REDUCE_ENDER) public static MagicReductionAttribute reduceEnder;
+	@ObjectHolder(ID_REDUCE_FIRE) public static MagicReductionAttribute reduceFire;
+	@ObjectHolder(ID_REDUCE_ICE) public static MagicReductionAttribute reduceIce;
+	@ObjectHolder(ID_REDUCE_LIGHTNING) public static MagicReductionAttribute reduceLightning;
+	@ObjectHolder(ID_REDUCE_WIND) public static MagicReductionAttribute reduceWind;
 	
 	protected static final String makeName(String base) {
 		return "attribute.nostrummagica." + base + ".name";
@@ -52,13 +52,13 @@ public class NostrumAttributes {
 	public static void registerAttributes(RegistryEvent.Register<Attribute> event) {
 		final IForgeRegistry<Attribute> registry = event.getRegistry();
 		
-		makeAndRegister(registry, AttributeMagicResist::new, AttributeMagicResist.ID);
-		makeAndRegister(registry, AttributeMagicPotency::new, AttributeMagicPotency.ID);
-		makeAndRegister(registry, AttributeManaRegen::new, AttributeManaRegen.ID);
+		makeAndRegister(registry, MagicResistAttribute::new, MagicResistAttribute.ID);
+		makeAndRegister(registry, MagicPotencyAttribute::new, MagicPotencyAttribute.ID);
+		makeAndRegister(registry, ManaRegenAttribute::new, ManaRegenAttribute.ID);
 		
 		for (EMagicElement elem : EMagicElement.values()) {
-			final String ID = AttributeMagicReduction.ID_PREFIX + elem.name().toLowerCase();
-			makeAndRegister(registry, (name) -> new AttributeMagicReduction(elem, name), ID);
+			final String ID = MagicReductionAttribute.ID_PREFIX + elem.name().toLowerCase();
+			makeAndRegister(registry, (name) -> new MagicReductionAttribute(elem, name), ID);
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class NostrumAttributes {
 		}
 	}
 	
-	public static AttributeMagicReduction GetReduceAttribute(EMagicElement element) {
+	public static MagicReductionAttribute GetReduceAttribute(EMagicElement element) {
 		switch (element) {
 		case EARTH:
 			return reduceEarth;

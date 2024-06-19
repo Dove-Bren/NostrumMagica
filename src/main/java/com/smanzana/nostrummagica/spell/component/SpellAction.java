@@ -15,28 +15,28 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
-import com.smanzana.nostrummagica.block.Candle;
-import com.smanzana.nostrummagica.block.MagicWall;
+import com.smanzana.nostrummagica.block.CandleBlock;
+import com.smanzana.nostrummagica.block.MagicWallBlock;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.effect.ElementalEnchantEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.IEnchantableEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.NostrumTameLightning;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
-import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.golem.EntityGolem;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemFire;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
+import com.smanzana.nostrummagica.entity.TameLightning;
+import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.IEnchantableItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
@@ -273,13 +273,13 @@ public class SpellAction {
 				resultBuilder.damage += base * efficiency;
 			} else {
 				entity.heal(base * efficiency);
-				if (entity instanceof EntityTameDragonRed) {
-					EntityTameDragonRed dragon = (EntityTameDragonRed) entity;
+				if (entity instanceof TameRedDragonEntity) {
+					TameRedDragonEntity dragon = (TameRedDragonEntity) entity;
 					if (dragon.isTamed() && dragon.getOwner() == caster) {
 						dragon.addBond(1f);
 					}
-				} else if (entity instanceof EntityArcaneWolf) {
-					EntityArcaneWolf wolf = (EntityArcaneWolf) entity;
+				} else if (entity instanceof ArcaneWolfEntity) {
+					ArcaneWolfEntity wolf = (ArcaneWolfEntity) entity;
 					if (wolf.isTamed() && wolf.getOwner() == caster) {
 						wolf.addBond(1f);
 					}
@@ -859,8 +859,8 @@ public class SpellAction {
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos applyPos = location.hitBlockPos;
 			BlockState state = location.world.getBlockState(applyPos);
-			if (state != null && state.getBlock() instanceof Candle) {
-				Candle.light(location.world, applyPos, state);
+			if (state != null && state.getBlock() instanceof CandleBlock) {
+				CandleBlock.light(location.world, applyPos, state);
 				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world,
 						applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 				resultBuilder.applied |= true;
@@ -955,7 +955,7 @@ public class SpellAction {
 					}
 				}
 				
-				NostrumTameLightning bolt = new NostrumTameLightning(NostrumEntityTypes.tameLightning, location.world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5);
+				TameLightning bolt = new TameLightning(NostrumEntityTypes.tameLightning, location.world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5);
 				bolt.setEntityToIgnore(caster);
 				bolt.setDamage(damage);
 				
@@ -1034,7 +1034,7 @@ public class SpellAction {
 				NostrumMagica.getMagicWrapper(caster).clearFamiliars();
 				caster.removeActivePotionEffect(NostrumEffects.familiar);
 				for (int i = 0; i < power; i++) {
-					EntityGolem golem = spawnGolem(location.world);
+					MagicGolemEntity golem = spawnGolem(location.world);
 					golem.setPosition(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 					location.world.addEntity(golem);
 					golem.setOwnerId(caster.getUniqueID());
@@ -1076,7 +1076,7 @@ public class SpellAction {
 				// Just summon some new golems
 				final int time = (int) (20f * (15f * efficiency));
 				for (int i = 0; i < power; i++) {
-					EntityGolem golem = spawnGolem(location.world);
+					MagicGolemEntity golem = spawnGolem(location.world);
 					golem.setPosition(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 					golem.setExpiresAfterTicks(time);
 					location.world.addEntity(golem);
@@ -1089,31 +1089,31 @@ public class SpellAction {
 			resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
 		}
 		
-		private EntityGolem spawnGolem(World world) {
-			EntityGolem golem;
+		private MagicGolemEntity spawnGolem(World world) {
+			MagicGolemEntity golem;
 			
 			switch (element) {
 			case EARTH:
-				golem = new EntityGolemEarth(NostrumEntityTypes.golemEarth, world);
+				golem = new MagicEarthGolemEntity(NostrumEntityTypes.golemEarth, world);
 				break;
 			case ENDER:
-				golem = new EntityGolemEnder(NostrumEntityTypes.golemEnder, world);
+				golem = new MagicEnderGolemEntity(NostrumEntityTypes.golemEnder, world);
 				break;
 			case FIRE:
-				golem = new EntityGolemFire(NostrumEntityTypes.golemFire, world);
+				golem = new MagicFireGolemEntity(NostrumEntityTypes.golemFire, world);
 				break;
 			case ICE:
-				golem = new EntityGolemIce(NostrumEntityTypes.golemIce, world);
+				golem = new MagicIceGolemEntity(NostrumEntityTypes.golemIce, world);
 				break;
 			case LIGHTNING:
-				golem = new EntityGolemLightning(NostrumEntityTypes.golemLightning, world);
+				golem = new MagicLightningGolemEntity(NostrumEntityTypes.golemLightning, world);
 				break;
 			case WIND:
-				golem = new EntityGolemWind(NostrumEntityTypes.golemWind, world);
+				golem = new MagicWindGolemEntity(NostrumEntityTypes.golemWind, world);
 				break;
 			default:
 			case PHYSICAL:
-				golem = new EntityGolemPhysical(NostrumEntityTypes.golemPhysical, world);
+				golem = new MagicPhysicalGolemEntity(NostrumEntityTypes.golemPhysical, world);
 				break;
 			}
 			
@@ -1630,7 +1630,7 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
 			BlockPos pos = location.hitBlockPos;
-			if (!location.world.isAirBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWall)) {
+			if (!location.world.isAirBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWallBlock)) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, pos);
 			} else {
 				NostrumMagicaSounds.DAMAGE_WIND.play(location.world, pos);
@@ -2157,7 +2157,7 @@ public class SpellAction {
 			final boolean flamy;
 			
 			if (target instanceof EndermanEntity || target instanceof EndermiteEntity
-					|| target instanceof EntityDragon) {
+					|| target instanceof DragonEntity) {
 				// Ender status and immunity can be turned off with the disrupt status effect
 				EffectInstance effect = target.getActivePotionEffect(NostrumEffects.disruption);
 				if (effect != null && effect.getDuration() > 0) {
@@ -2169,7 +2169,7 @@ public class SpellAction {
 				ender = false;
 			}
 			
-			if (target.getHeight() < 1.5f || target instanceof EndermanEntity || target instanceof EntityShadowDragonRed) {
+			if (target.getHeight() < 1.5f || target instanceof EndermanEntity || target instanceof ShadowRedDragonEntity) {
 				light = true;
 			} else {
 				light = false;

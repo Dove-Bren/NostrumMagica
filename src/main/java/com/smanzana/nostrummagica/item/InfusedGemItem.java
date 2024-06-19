@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.block.AltarBlock;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -132,7 +132,7 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 			return ActionResultType.PASS;
 		
 		TileEntity te = worldIn.getTileEntity(pos);
-		if (state.getBlock() instanceof Candle) {
+		if (state.getBlock() instanceof CandleBlock) {
 			if (!(te instanceof CandleTileEntity))
 				return ActionResultType.PASS;
 			

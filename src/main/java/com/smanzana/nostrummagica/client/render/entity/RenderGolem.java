@@ -5,13 +5,13 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
-import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderGolem<T extends EntityGolem> extends MobRenderer<T, ModelGolem<T>> {
+public class RenderGolem<T extends MagicGolemEntity> extends MobRenderer<T, ModelGolem<T>> {
 
 	private Map<String, ResourceLocation> texCache;
 	

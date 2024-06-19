@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.ritual.outcome;
 import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.TemporaryTeleportationPortal;
+import com.smanzana.nostrummagica.block.TemporaryTeleportationPortalBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMes
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.entity.item.ItemEntity;
@@ -56,14 +56,14 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		if (!world.isRemote) {
 			if (attr.hasEnhancedTeleport()) {
 				TileEntity te = world.getTileEntity(pos);
-				if (te == null || !(te instanceof NostrumObeliskEntity)) {
+				if (te == null || !(te instanceof ObeliskTileEntity)) {
 					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
 					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"), Util.DUMMY_UUID);
 					return;
 				}
 				
-				NostrumObeliskEntity obelisk = (NostrumObeliskEntity) te;
-				BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, center.up(), 4, true, pos.up(), 20 * 30);
+				ObeliskTileEntity obelisk = (ObeliskTileEntity) te;
+				BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, center.up(), 4, true, pos.up(), 20 * 30);
 				if (portal != null) {
 					obelisk.setOverride(portal, 20 * 30);
 				}

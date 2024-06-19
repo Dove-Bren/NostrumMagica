@@ -11,7 +11,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.ChalkBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
@@ -270,7 +270,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 			extras = null;
 			
 			ReagentType type = null;
-			if (world.getBlockState(center).getBlock() instanceof Candle
+			if (world.getBlockState(center).getBlock() instanceof CandleBlock
 					&& centerTE != null
 					&& centerTE instanceof CandleTileEntity) {
 				CandleTileEntity candle = (CandleTileEntity) centerTE;
@@ -351,13 +351,13 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		// Do cleanup of altars and candles, etc
 		if (recipe.tier == 0) {
 			// candle in center. extinguish
-			Candle.extinguish(world, center, world.getBlockState(center));
+			CandleBlock.extinguish(world, center, world.getBlockState(center));
 		} else {
 			// candles at spots. extinguish.
 			for (int x = -2; x <= 2; x += 4)
 			for (int z = -2; z <= 2; z += 4) {
 				BlockPos pos = center.add(x, 0, z);
-				Candle.extinguish(world, pos, world.getBlockState(pos));
+				CandleBlock.extinguish(world, pos, world.getBlockState(pos));
 			}
 			
 			// Clear off altars also

@@ -21,8 +21,8 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
-import com.smanzana.nostrummagica.attribute.AttributeMagicPotency;
-import com.smanzana.nostrummagica.attribute.AttributeMagicReduction;
+import com.smanzana.nostrummagica.attribute.MagicPotencyAttribute;
+import com.smanzana.nostrummagica.attribute.MagicReductionAttribute;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
@@ -31,8 +31,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
 import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
@@ -1324,7 +1324,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 					
 					// Refresh nearby tornados
 					if (player.isOnGround())
-					for (EntityAreaEffect cloud : world.getEntitiesWithinAABB(EntityAreaEffect.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.getPosX(), player.getPosY(), player.getPosZ()).grow(5), (effect) -> {
+					for (AreaEffectEntity cloud : world.getEntitiesWithinAABB(AreaEffectEntity.class, (new AxisAlignedBB(0, 0, 0, 1, 1, 1)).offset(player.getPosX(), player.getPosY(), player.getPosZ()).grow(5), (effect) -> {
 						// lol
 						return effect != null
 								&& (effect.getCustomParticle() == ParticleTypes.SWEEP_ATTACK || effect.getParticleData() == ParticleTypes.SWEEP_ATTACK);
@@ -1577,7 +1577,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 			for (EMagicElement elem : EMagicElement.values()) {
 				final double reduct = calcMagicSetReduct(slot, element, setCount, elem);
 				if (reduct != 0) {
-					final AttributeMagicReduction inst = NostrumAttributes.GetReduceAttribute(elem);
+					final MagicReductionAttribute inst = NostrumAttributes.GetReduceAttribute(elem);
 					Double cur = map.get(inst);
 					if (cur == null) {
 						cur = 0.0;
@@ -1591,7 +1591,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 
 			final double boost = calcArmorMagicBoost(slot, element, setCount);
 			if (boost != 0) {
-				final AttributeMagicPotency inst = NostrumAttributes.magicPotency;
+				final MagicPotencyAttribute inst = NostrumAttributes.magicPotency;
 				Double cur = map.get(inst);
 				if (cur == null) {
 					cur = 0.0;
@@ -2437,7 +2437,7 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		case WIND_TORNADO:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				consumeWindTornado(ent);
-				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, ent.world, ent.getPosX(), ent.getPosY(), ent.getPosZ());
+				AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, ent.world, ent.getPosX(), ent.getPosY(), ent.getPosZ());
 				cloud.setOwner(ent);
 				
 				cloud.setHeight(5f);

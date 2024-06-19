@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
@@ -11,21 +11,21 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.TextFormatting;
 
-public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
+public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 
-	private EntityTameDragonRed dragon;
+	private TameRedDragonEntity dragon;
 	
-	public RedDragonInfoSheet(EntityTameDragonRed dragon) {
+	public RedDragonInfoSheet(TameRedDragonEntity dragon) {
 		this.dragon = dragon;
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container) {
+	public void hideSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container) {
 		
 	}
 
@@ -207,7 +207,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
 		return "Stats";
 	}
 	
-	public boolean shouldShow(EntityTameDragonRed dragon, IPetContainer<EntityTameDragonRed> container) {
+	public boolean shouldShow(TameRedDragonEntity dragon, IPetContainer<TameRedDragonEntity> container) {
 		return true;
 	}
 

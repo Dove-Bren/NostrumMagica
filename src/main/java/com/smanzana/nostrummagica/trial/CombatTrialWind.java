@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.trial;
 
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.entity.KoidEntity;
+import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
@@ -47,10 +47,10 @@ public class CombatTrialWind extends CombatTrialStaged {
 		public MobEntity provideEntity(World world) {
 			MobEntity ent = super.provideEntity(world);
 			
-			if (ent instanceof EntityWillo) {
-				((EntityWillo) ent).setElement(EMagicElement.PHYSICAL);
-			} else if (ent instanceof EntityKoid) {
-				((EntityKoid) ent).setElement(EMagicElement.PHYSICAL);
+			if (ent instanceof WilloEntity) {
+				((WilloEntity) ent).setElement(EMagicElement.PHYSICAL);
+			} else if (ent instanceof KoidEntity) {
+				((KoidEntity) ent).setElement(EMagicElement.PHYSICAL);
 			} else if (ent instanceof IronGolemEntity) {
 				; // Thought I was going to have to do something but doesn't seem like it
 			}

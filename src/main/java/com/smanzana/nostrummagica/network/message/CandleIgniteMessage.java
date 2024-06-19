@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
@@ -36,11 +36,11 @@ public class CandleIgniteMessage {
 			}
 			
 			BlockState state = player.world.getBlockState(message.pos);
-			if (state == null || !(state.getBlock() instanceof Candle)) {
+			if (state == null || !(state.getBlock() instanceof CandleBlock)) {
 				return;
 			}
 			
-			Candle.setReagent(player.world, message.pos, state, message.type);
+			CandleBlock.setReagent(player.world, message.pos, state, message.type);
 		});
 	}
 	

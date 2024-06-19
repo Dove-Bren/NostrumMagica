@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 import javax.annotation.Nonnull;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragon.DragonEquipmentInventory;
+import com.smanzana.nostrummagica.entity.dragon.DragonEntity.DragonEquipmentInventory;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 import com.smanzana.petcommand.api.client.petgui.sheet.PetInventorySheet;
@@ -15,14 +15,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonRed> {
+public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEntity> {
 	
-	public RedDragonInventorySheet(EntityTameDragonRed dragon) {
+	public RedDragonInventorySheet(TameRedDragonEntity dragon) {
 		super(dragon, dragon.getInventory());
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		super.showSheet(dragon, player, container, width, height, offsetX, offsetY);
 		
 		final int cellWidth = 18;
@@ -85,7 +85,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<EntityTameDragonR
 	}
 
 	@Override
-	public boolean shouldShow(EntityTameDragonRed dragon, IPetContainer<EntityTameDragonRed> container) {
+	public boolean shouldShow(TameRedDragonEntity dragon, IPetContainer<TameRedDragonEntity> container) {
 		return this.pet.canUseInventory();
 	}
 

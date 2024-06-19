@@ -4,19 +4,19 @@ import java.util.Random;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityShadowDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemEarth;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemEnder;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemFire;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemIce;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemLightning;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemPhysical;
-import com.smanzana.nostrummagica.entity.golem.EntityGolemWind;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
+import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
+import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityClassification;
@@ -47,227 +47,227 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumEntityTypes {
 
-	@ObjectHolder(EntityGolemPhysical.ID) public static EntityType<EntityGolemPhysical> golemPhysical;
-	@ObjectHolder(EntityGolemLightning.ID) public static EntityType<EntityGolemLightning> golemLightning;
-	@ObjectHolder(EntityGolemFire.ID) public static EntityType<EntityGolemFire> golemFire;
-	@ObjectHolder(EntityGolemEarth.ID) public static EntityType<EntityGolemEarth> golemEarth;
-	@ObjectHolder(EntityGolemIce.ID) public static EntityType<EntityGolemIce> golemIce;
-	@ObjectHolder(EntityGolemWind.ID) public static EntityType<EntityGolemWind> golemWind;
-	@ObjectHolder(EntityGolemEnder.ID) public static EntityType<EntityGolemEnder> golemEnder;
-	@ObjectHolder(EntityKoid.ID) public static EntityType<EntityKoid> koid;
-	@ObjectHolder(EntityDragonRed.ID) public static EntityType<EntityDragonRed> dragonRed;
-	@ObjectHolder(EntityDragonRed.DragonBodyPart.ID) public static EntityType<EntityDragonRed.DragonBodyPart> dragonRedBodyPart;
-	@ObjectHolder(EntityTameDragonRed.ID) public static EntityType<EntityTameDragonRed> tameDragonRed;
-	@ObjectHolder(EntityShadowDragonRed.ID) public static EntityType<EntityShadowDragonRed> shadowDragonRed;
-	@ObjectHolder(EntityDragonEgg.ID) public static EntityType<EntityDragonEgg> dragonEgg;
-	@ObjectHolder(EntityPlantBoss.ID) public static EntityType<EntityPlantBoss> plantBoss;
-	@ObjectHolder(EntityPlantBoss.PlantBossBody.ID) public static EntityType<EntityPlantBoss.PlantBossBody> plantBossBody;
-	@ObjectHolder(EntityPlantBoss.PlantBossLeafLimb.ID) public static EntityType<EntityPlantBoss.PlantBossLeafLimb> plantBossLeaf;
-	@ObjectHolder(EntityPlantBossBramble.ID) public static EntityType<EntityPlantBossBramble> plantBossBramble;
-	@ObjectHolder(EntitySprite.ID) public static EntityType<EntitySprite> sprite;
-	@ObjectHolder(EntityLux.ID) public static EntityType<EntityLux> lux;
-	@ObjectHolder(EntityWisp.ID) public static EntityType<EntityWisp> wisp;
-	@ObjectHolder(EntityWillo.ID) public static EntityType<EntityWillo> willo;
-	@ObjectHolder(EntityArcaneWolf.ID) public static EntityType<EntityArcaneWolf> arcaneWolf;
-	@ObjectHolder(EntitySpellProjectile.ID) public static EntityType<EntitySpellProjectile> spellProjectile;
-	@ObjectHolder(EntityChakramSpellSaucer.ID) public static EntityType<EntityChakramSpellSaucer> chakramSpellSaucer;
-	@ObjectHolder(EntityCyclerSpellSaucer.ID) public static EntityType<EntityCyclerSpellSaucer> cyclerSpellSaucer;
-	@ObjectHolder(EntitySwitchTrigger.ID) public static EntityType<EntitySwitchTrigger> switchTrigger;
-	@ObjectHolder(NostrumTameLightning.ID) public static EntityType<NostrumTameLightning> tameLightning;
-	@ObjectHolder(EntityHookShot.ID) public static EntityType<EntityHookShot> hookShot;
-	@ObjectHolder(EntitySpellBullet.ID) public static EntityType<EntitySpellBullet> spellBullet;
-	@ObjectHolder(EntitySpellMortar.ID) public static EntityType<EntitySpellMortar> spellMortar;
-	@ObjectHolder(EntityAreaEffect.ID) public static EntityType<EntityAreaEffect> areaEffect;
-	@ObjectHolder(EntityKeySwitchTrigger.ID) public static EntityType<EntityKeySwitchTrigger> keySwitchTrigger;
-	@ObjectHolder(EntityEnderRodBall.ID) public static EntityType<EntityEnderRodBall> enderRodBall;
-	@ObjectHolder(EntitySpellBubble.ID) public static EntityType<EntitySpellBubble> spellBubble;
-	@ObjectHolder(EntityShrineTrigger.Element.ID) public static EntityType<EntityShrineTrigger.Element> elementShrine;
-	@ObjectHolder(EntityShrineTrigger.Shape.ID) public static EntityType<EntityShrineTrigger.Shape> shapeShrine;
-	@ObjectHolder(EntityShrineTrigger.Alteration.ID) public static EntityType<EntityShrineTrigger.Alteration> alterationShrine;
+	@ObjectHolder(MagicPhysicalGolemEntity.ID) public static EntityType<MagicPhysicalGolemEntity> golemPhysical;
+	@ObjectHolder(MagicLightningGolemEntity.ID) public static EntityType<MagicLightningGolemEntity> golemLightning;
+	@ObjectHolder(MagicFireGolemEntity.ID) public static EntityType<MagicFireGolemEntity> golemFire;
+	@ObjectHolder(MagicEarthGolemEntity.ID) public static EntityType<MagicEarthGolemEntity> golemEarth;
+	@ObjectHolder(MagicIceGolemEntity.ID) public static EntityType<MagicIceGolemEntity> golemIce;
+	@ObjectHolder(MagicWindGolemEntity.ID) public static EntityType<MagicWindGolemEntity> golemWind;
+	@ObjectHolder(MagicEnderGolemEntity.ID) public static EntityType<MagicEnderGolemEntity> golemEnder;
+	@ObjectHolder(KoidEntity.ID) public static EntityType<KoidEntity> koid;
+	@ObjectHolder(RedDragonEntity.ID) public static EntityType<RedDragonEntity> dragonRed;
+	@ObjectHolder(RedDragonEntity.DragonBodyPart.ID) public static EntityType<RedDragonEntity.DragonBodyPart> dragonRedBodyPart;
+	@ObjectHolder(TameRedDragonEntity.ID) public static EntityType<TameRedDragonEntity> tameDragonRed;
+	@ObjectHolder(ShadowRedDragonEntity.ID) public static EntityType<ShadowRedDragonEntity> shadowDragonRed;
+	@ObjectHolder(DragonEggEntity.ID) public static EntityType<DragonEggEntity> dragonEgg;
+	@ObjectHolder(PlantBossEntity.ID) public static EntityType<PlantBossEntity> plantBoss;
+	@ObjectHolder(PlantBossEntity.PlantBossBody.ID) public static EntityType<PlantBossEntity.PlantBossBody> plantBossBody;
+	@ObjectHolder(PlantBossEntity.PlantBossLeafLimb.ID) public static EntityType<PlantBossEntity.PlantBossLeafLimb> plantBossLeaf;
+	@ObjectHolder(PlantBossBrambleEntity.ID) public static EntityType<PlantBossBrambleEntity> plantBossBramble;
+	@ObjectHolder(SpriteEntity.ID) public static EntityType<SpriteEntity> sprite;
+	@ObjectHolder(LuxEntity.ID) public static EntityType<LuxEntity> lux;
+	@ObjectHolder(WispEntity.ID) public static EntityType<WispEntity> wisp;
+	@ObjectHolder(WilloEntity.ID) public static EntityType<WilloEntity> willo;
+	@ObjectHolder(ArcaneWolfEntity.ID) public static EntityType<ArcaneWolfEntity> arcaneWolf;
+	@ObjectHolder(SpellProjectileEntity.ID) public static EntityType<SpellProjectileEntity> spellProjectile;
+	@ObjectHolder(ChakramSpellSaucerEntity.ID) public static EntityType<ChakramSpellSaucerEntity> chakramSpellSaucer;
+	@ObjectHolder(CyclerSpellSaucerEntity.ID) public static EntityType<CyclerSpellSaucerEntity> cyclerSpellSaucer;
+	@ObjectHolder(SwitchTriggerEntity.ID) public static EntityType<SwitchTriggerEntity> switchTrigger;
+	@ObjectHolder(TameLightning.ID) public static EntityType<TameLightning> tameLightning;
+	@ObjectHolder(HookShotEntity.ID) public static EntityType<HookShotEntity> hookShot;
+	@ObjectHolder(SpellBulletEntity.ID) public static EntityType<SpellBulletEntity> spellBullet;
+	@ObjectHolder(SpellMortarEntity.ID) public static EntityType<SpellMortarEntity> spellMortar;
+	@ObjectHolder(AreaEffectEntity.ID) public static EntityType<AreaEffectEntity> areaEffect;
+	@ObjectHolder(KeySwitchTriggerEntity.ID) public static EntityType<KeySwitchTriggerEntity> keySwitchTrigger;
+	@ObjectHolder(EnderRodBallEntity.ID) public static EntityType<EnderRodBallEntity> enderRodBall;
+	@ObjectHolder(SpellBubbleEntity.ID) public static EntityType<SpellBubbleEntity> spellBubble;
+	@ObjectHolder(ShrineTriggerEntity.Element.ID) public static EntityType<ShrineTriggerEntity.Element> elementShrine;
+	@ObjectHolder(ShrineTriggerEntity.Shape.ID) public static EntityType<ShrineTriggerEntity.Shape> shapeShrine;
+	@ObjectHolder(ShrineTriggerEntity.Alteration.ID) public static EntityType<ShrineTriggerEntity.Alteration> alterationShrine;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
 		final IForgeRegistry<EntityType<?>> registry = event.getRegistry();
-    	registry.register(EntityType.Builder.<EntityGolemPhysical>create(EntityGolemPhysical::new, EntityClassification.MISC)
+    	registry.register(EntityType.Builder.<MagicPhysicalGolemEntity>create(MagicPhysicalGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemPhysical.ID));
-		registry.register(EntityType.Builder.<EntityGolemLightning>create(EntityGolemLightning::new, EntityClassification.MISC)
+			.build("").setRegistryName(MagicPhysicalGolemEntity.ID));
+		registry.register(EntityType.Builder.<MagicLightningGolemEntity>create(MagicLightningGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemLightning.ID));
-		registry.register(EntityType.Builder.<EntityGolemFire>create(EntityGolemFire::new, EntityClassification.MISC)
+			.build("").setRegistryName(MagicLightningGolemEntity.ID));
+		registry.register(EntityType.Builder.<MagicFireGolemEntity>create(MagicFireGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.immuneToFire()
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemFire.ID));
-		registry.register(EntityType.Builder.<EntityGolemEarth>create(EntityGolemEarth::new, EntityClassification.MISC)
+			.build("").setRegistryName(MagicFireGolemEntity.ID));
+		registry.register(EntityType.Builder.<MagicEarthGolemEntity>create(MagicEarthGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemEarth.ID));
-		registry.register(EntityType.Builder.<EntityGolemIce>create(EntityGolemIce::new, EntityClassification.MISC)
+			.build("").setRegistryName(MagicEarthGolemEntity.ID));
+		registry.register(EntityType.Builder.<MagicIceGolemEntity>create(MagicIceGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemIce.ID));
-		registry.register(EntityType.Builder.<EntityGolemWind>create(EntityGolemWind::new, EntityClassification.MISC)
+			.build("").setRegistryName(MagicIceGolemEntity.ID));
+		registry.register(EntityType.Builder.<MagicWindGolemEntity>create(MagicWindGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemWind.ID));
-		registry.register(EntityType.Builder.<EntityGolemEnder>create(EntityGolemEnder::new, EntityClassification.MISC)
+			.build("").setRegistryName(MagicWindGolemEntity.ID));
+		registry.register(EntityType.Builder.<MagicEnderGolemEntity>create(MagicEnderGolemEntity::new, EntityClassification.MISC)
 				.size(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityGolemEnder.ID));
+			.build("").setRegistryName(MagicEnderGolemEntity.ID));
 		
-		EntityType<EntityKoid> koidType = EntityType.Builder.<EntityKoid>create(EntityKoid::new, EntityClassification.MONSTER)
+		EntityType<KoidEntity> koidType = EntityType.Builder.<KoidEntity>create(KoidEntity::new, EntityClassification.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(0.8F, 1F)
 			.build("");
-		koidType.setRegistryName(EntityKoid.ID);
+		koidType.setRegistryName(KoidEntity.ID);
 		registry.register(koidType);
 		
-		registry.register(EntityType.Builder.<EntityDragonRed>create(EntityDragonRed::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<RedDragonEntity>create(RedDragonEntity::new, EntityClassification.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-				.size(EntityDragonRed.GetBodyWidth(), EntityDragonRed.GetBodyHeight())
+				.size(RedDragonEntity.GetBodyWidth(), RedDragonEntity.GetBodyHeight())
 				.immuneToFire()
-			.build("").setRegistryName(EntityDragonRed.ID));
-		registry.register(EntityType.Builder.<EntityDragonRed.DragonBodyPart>create(EntityDragonRed.DragonBodyPart::new, EntityClassification.MISC)
+			.build("").setRegistryName(RedDragonEntity.ID));
+		registry.register(EntityType.Builder.<RedDragonEntity.DragonBodyPart>create(RedDragonEntity.DragonBodyPart::new, EntityClassification.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-				.size(EntityDragonRed.GetBodyWidth(), EntityDragonRed.GetBodyHeight())
+				.size(RedDragonEntity.GetBodyWidth(), RedDragonEntity.GetBodyHeight())
 				.immuneToFire()
-			.build("").setRegistryName(EntityDragonRed.DragonBodyPart.ID));
+			.build("").setRegistryName(RedDragonEntity.DragonBodyPart.ID));
 		
-		EntityType<EntityTameDragonRed> tameDragonType = EntityType.Builder.<EntityTameDragonRed>create(EntityTameDragonRed::new, EntityClassification.MONSTER)
+		EntityType<TameRedDragonEntity> tameDragonType = EntityType.Builder.<TameRedDragonEntity>create(TameRedDragonEntity::new, EntityClassification.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(6F * .4F, 4.6F * .6F)
 				.immuneToFire()
 			.build("");
-		tameDragonType.setRegistryName(EntityTameDragonRed.ID);
+		tameDragonType.setRegistryName(TameRedDragonEntity.ID);
 		registry.register(tameDragonType);
 		
-		EntityType<EntityShadowDragonRed> shadowRedDragonType = EntityType.Builder.<EntityShadowDragonRed>create(EntityShadowDragonRed::new, EntityClassification.MONSTER)
+		EntityType<ShadowRedDragonEntity> shadowRedDragonType = EntityType.Builder.<ShadowRedDragonEntity>create(ShadowRedDragonEntity::new, EntityClassification.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(4F * .6F, 3F * .6F)
 				.immuneToFire()
 			.build("");
-		shadowRedDragonType.setRegistryName(EntityShadowDragonRed.ID);
+		shadowRedDragonType.setRegistryName(ShadowRedDragonEntity.ID);
 		registry.register(shadowRedDragonType);
 		
-		registry.register(EntityType.Builder.<EntityDragonEgg>create(EntityDragonEgg::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<DragonEggEntity>create(DragonEggEntity::new, EntityClassification.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(.45f, .5f)
-			.build("").setRegistryName(EntityDragonEgg.ID));
-		registry.register(EntityType.Builder.<EntityPlantBoss>create(EntityPlantBoss::new, EntityClassification.MISC)
+			.build("").setRegistryName(DragonEggEntity.ID));
+		registry.register(EntityType.Builder.<PlantBossEntity>create(PlantBossEntity::new, EntityClassification.MISC)
 				.size(7, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityPlantBoss.ID));
-		registry.register(EntityType.Builder.<EntityPlantBoss.PlantBossBody>create(EntityPlantBoss.PlantBossBody::new, EntityClassification.MISC)
+			.build("").setRegistryName(PlantBossEntity.ID));
+		registry.register(EntityType.Builder.<PlantBossEntity.PlantBossBody>create(PlantBossEntity.PlantBossBody::new, EntityClassification.MISC)
 				.size(4.25f /*width 3, but rotates. sqrt(3^2+3^2) = 4.24*/, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityPlantBoss.PlantBossBody.ID));
-		registry.register(EntityType.Builder.<EntityPlantBoss.PlantBossLeafLimb>create(EntityPlantBoss.PlantBossLeafLimb::new, EntityClassification.MISC)
+			.build("").setRegistryName(PlantBossEntity.PlantBossBody.ID));
+		registry.register(EntityType.Builder.<PlantBossEntity.PlantBossLeafLimb>create(PlantBossEntity.PlantBossLeafLimb::new, EntityClassification.MISC)
 				.size(4, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityPlantBoss.PlantBossLeafLimb.ID));
-		registry.register(EntityType.Builder.<EntityPlantBossBramble>create(EntityPlantBossBramble::new, EntityClassification.MISC)
+			.build("").setRegistryName(PlantBossEntity.PlantBossLeafLimb.ID));
+		registry.register(EntityType.Builder.<PlantBossBrambleEntity>create(PlantBossBrambleEntity::new, EntityClassification.MISC)
 				.size(.5f, .75f)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-			.build("").setRegistryName(EntityPlantBossBramble.ID));
+			.build("").setRegistryName(PlantBossBrambleEntity.ID));
 		
-		EntityType<EntitySprite> spriteType = EntityType.Builder.<EntitySprite>create(EntitySprite::new, EntityClassification.MONSTER)
+		EntityType<SpriteEntity> spriteType = EntityType.Builder.<SpriteEntity>create(SpriteEntity::new, EntityClassification.MONSTER)
 				.size(1F, 1.75F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("");
-		spriteType.setRegistryName(EntitySprite.ID);
+		spriteType.setRegistryName(SpriteEntity.ID);
 		
-		EntityType<EntityLux> luxType = EntityType.Builder.<EntityLux>create(EntityLux::new, EntityClassification.CREATURE)
+		EntityType<LuxEntity> luxType = EntityType.Builder.<LuxEntity>create(LuxEntity::new, EntityClassification.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(.5F, .5F)
 			.build("");
-		luxType.setRegistryName(EntityLux.ID);
+		luxType.setRegistryName(LuxEntity.ID);
 		registry.register(luxType);
 		
-		EntityType<EntityWisp> wispType = EntityType.Builder.<EntityWisp>create(EntityWisp::new, EntityClassification.CREATURE)
+		EntityType<WispEntity> wispType = EntityType.Builder.<WispEntity>create(WispEntity::new, EntityClassification.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(.75F, .75F)
 			.build("");
-		wispType.setRegistryName(EntityWisp.ID);
+		wispType.setRegistryName(WispEntity.ID);
 		registry.register(wispType);
 		registry.register(spriteType);
 		
-		EntityType<EntityWillo> willoType = EntityType.Builder.<EntityWillo>create(EntityWillo::new, EntityClassification.MONSTER)
+		EntityType<WilloEntity> willoType = EntityType.Builder.<WilloEntity>create(WilloEntity::new, EntityClassification.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(.75F, .75F)
 			.build("");
-		willoType.setRegistryName(EntityWillo.ID);
+		willoType.setRegistryName(WilloEntity.ID);
 		registry.register(willoType);
 		
-		registry.register(EntityType.Builder.<EntityArcaneWolf>create(EntityArcaneWolf::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ArcaneWolfEntity>create(ArcaneWolfEntity::new, EntityClassification.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.size(0.7F, 0.95F)
-			.build("").setRegistryName(EntityArcaneWolf.ID));
+			.build("").setRegistryName(ArcaneWolfEntity.ID));
 
 		
-    	registry.register(EntityType.Builder.<EntitySpellProjectile>create(EntitySpellProjectile::new, EntityClassification.MISC)
+    	registry.register(EntityType.Builder.<SpellProjectileEntity>create(SpellProjectileEntity::new, EntityClassification.MISC)
     			.size(0.3125F, 0.3125F)
     			.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-    		.build("").setRegistryName(EntitySpellProjectile.ID));
-		registry.register(EntityType.Builder.<EntityChakramSpellSaucer>create(EntityChakramSpellSaucer::new, EntityClassification.MISC)
+    		.build("").setRegistryName(SpellProjectileEntity.ID));
+		registry.register(EntityType.Builder.<ChakramSpellSaucerEntity>create(ChakramSpellSaucerEntity::new, EntityClassification.MISC)
 				.size(1F, .2F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-			.build("").setRegistryName(EntityChakramSpellSaucer.ID));
-		registry.register(EntityType.Builder.<EntityCyclerSpellSaucer>create(EntityCyclerSpellSaucer::new, EntityClassification.MISC)
+			.build("").setRegistryName(ChakramSpellSaucerEntity.ID));
+		registry.register(EntityType.Builder.<CyclerSpellSaucerEntity>create(CyclerSpellSaucerEntity::new, EntityClassification.MISC)
 				.size(1F, .2F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-			.build("").setRegistryName(EntityCyclerSpellSaucer.ID));
-		registry.register(EntityType.Builder.<EntitySwitchTrigger>create(EntitySwitchTrigger::new, EntityClassification.MISC)
+			.build("").setRegistryName(CyclerSpellSaucerEntity.ID));
+		registry.register(EntityType.Builder.<SwitchTriggerEntity>create(SwitchTriggerEntity::new, EntityClassification.MISC)
 				.size(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntitySwitchTrigger.ID));
-		registry.register(EntityType.Builder.<EntityKeySwitchTrigger>create(EntityKeySwitchTrigger::new, EntityClassification.MISC)
+			.build("").setRegistryName(SwitchTriggerEntity.ID));
+		registry.register(EntityType.Builder.<KeySwitchTriggerEntity>create(KeySwitchTriggerEntity::new, EntityClassification.MISC)
 				.size(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityKeySwitchTrigger.ID));
-		registry.register(EntityType.Builder.<EntityShrineTrigger.Element>create(EntityShrineTrigger.Element::new, EntityClassification.MISC)
+			.build("").setRegistryName(KeySwitchTriggerEntity.ID));
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Element>create(ShrineTriggerEntity.Element::new, EntityClassification.MISC)
 				.size(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityShrineTrigger.Element.ID));
-		registry.register(EntityType.Builder.<EntityShrineTrigger.Shape>create(EntityShrineTrigger.Shape::new, EntityClassification.MISC)
+			.build("").setRegistryName(ShrineTriggerEntity.Element.ID));
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Shape>create(ShrineTriggerEntity.Shape::new, EntityClassification.MISC)
 				.size(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityShrineTrigger.Shape.ID));
-		registry.register(EntityType.Builder.<EntityShrineTrigger.Alteration>create(EntityShrineTrigger.Alteration::new, EntityClassification.MISC)
+			.build("").setRegistryName(ShrineTriggerEntity.Shape.ID));
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Alteration>create(ShrineTriggerEntity.Alteration::new, EntityClassification.MISC)
 				.size(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityShrineTrigger.Alteration.ID));
-		registry.register(EntityType.Builder.<NostrumTameLightning>create(NostrumTameLightning::new, EntityClassification.MISC)
+			.build("").setRegistryName(ShrineTriggerEntity.Alteration.ID));
+		registry.register(EntityType.Builder.<TameLightning>create(TameLightning::new, EntityClassification.MISC)
 				.size(0, 0)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(NostrumTameLightning.ID));
-		registry.register(EntityType.Builder.<EntityHookShot>create(EntityHookShot::new, EntityClassification.MISC)
+			.build("").setRegistryName(TameLightning.ID));
+		registry.register(EntityType.Builder.<HookShotEntity>create(HookShotEntity::new, EntityClassification.MISC)
 				.size(.2f, .2f)
 				.immuneToFire()
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-			.build("").setRegistryName(EntityHookShot.ID));
-		registry.register(EntityType.Builder.<EntitySpellBullet>create(EntitySpellBullet::new, EntityClassification.MISC)
+			.build("").setRegistryName(HookShotEntity.ID));
+		registry.register(EntityType.Builder.<SpellBulletEntity>create(SpellBulletEntity::new, EntityClassification.MISC)
 				.size(0.3125F, 0.3125F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-			.build("").setRegistryName(EntitySpellBullet.ID));
-		registry.register(EntityType.Builder.<EntitySpellMortar>create(EntitySpellMortar::new, EntityClassification.MISC)
+			.build("").setRegistryName(SpellBulletEntity.ID));
+		registry.register(EntityType.Builder.<SpellMortarEntity>create(SpellMortarEntity::new, EntityClassification.MISC)
 				.size(0.75F, 0.75F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-			.build("").setRegistryName(EntitySpellMortar.ID));
-		registry.register(EntityType.Builder.<EntityAreaEffect>create(EntityAreaEffect::new, EntityClassification.MISC)
+			.build("").setRegistryName(SpellMortarEntity.ID));
+		registry.register(EntityType.Builder.<AreaEffectEntity>create(AreaEffectEntity::new, EntityClassification.MISC)
 				.size(1f, .25f)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityAreaEffect.ID));
-		registry.register(EntityType.Builder.<EntityEnderRodBall>create(EntityEnderRodBall::new, EntityClassification.MISC)
+			.build("").setRegistryName(AreaEffectEntity.ID));
+		registry.register(EntityType.Builder.<EnderRodBallEntity>create(EnderRodBallEntity::new, EntityClassification.MISC)
 				.size(1.5f, 1.5f)
 				.setTrackingRange(128).setUpdateInterval(5).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(EntityEnderRodBall.ID));
-		registry.register(EntityType.Builder.<EntitySpellBubble>create(EntitySpellBubble::new, EntityClassification.MISC)
+			.build("").setRegistryName(EnderRodBallEntity.ID));
+		registry.register(EntityType.Builder.<SpellBubbleEntity>create(SpellBubbleEntity::new, EntityClassification.MISC)
     			.size(0.125F, 0.125F)
     			.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
-    		.build("").setRegistryName(EntitySpellBubble.ID));
+    		.build("").setRegistryName(SpellBubbleEntity.ID));
 	}
 	
 	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
@@ -280,8 +280,8 @@ public class NostrumEntityTypes {
 		EntitySpawnPlacementRegistry.register(tameDragonRed, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
 		EntitySpawnPlacementRegistry.register(shadowDragonRed, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
 		EntitySpawnPlacementRegistry.register(sprite, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::canSpawnOn);
-		EntitySpawnPlacementRegistry.register(wisp, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWisp::canSpawnExtraCheck);
-		EntitySpawnPlacementRegistry.register(willo, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntityWillo::canSpawnExtraCheck);
+		EntitySpawnPlacementRegistry.register(wisp, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, WispEntity::canSpawnExtraCheck);
+		EntitySpawnPlacementRegistry.register(willo, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, WilloEntity::canSpawnExtraCheck);
 		EntitySpawnPlacementRegistry.register(lux, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING, AnimalEntity::canAnimalSpawn);
 		
 		// Can't mix buses, so manually register spawn handling to the game bus
@@ -341,41 +341,41 @@ public class NostrumEntityTypes {
 	
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
-		event.put(golemPhysical, EntityGolemPhysical.BuildAttributes().create());
-		event.put(golemLightning, EntityGolemLightning.BuildAttributes().create());
-		event.put(golemFire, EntityGolemFire.BuildAttributes().create());
-		event.put(golemEarth, EntityGolemEarth.BuildAttributes().create());
-		event.put(golemIce, EntityGolemIce.BuildAttributes().create());
-		event.put(golemWind, EntityGolemWind.BuildAttributes().create());
-		event.put(golemEnder, EntityGolemEnder.BuildAttributes().create());
-		event.put(koid, EntityKoid.BuildAttributes().create());
-		event.put(dragonRed, EntityDragonRed.BuildAttributes().create());
+		event.put(golemPhysical, MagicPhysicalGolemEntity.BuildAttributes().create());
+		event.put(golemLightning, MagicLightningGolemEntity.BuildAttributes().create());
+		event.put(golemFire, MagicFireGolemEntity.BuildAttributes().create());
+		event.put(golemEarth, MagicEarthGolemEntity.BuildAttributes().create());
+		event.put(golemIce, MagicIceGolemEntity.BuildAttributes().create());
+		event.put(golemWind, MagicWindGolemEntity.BuildAttributes().create());
+		event.put(golemEnder, MagicEnderGolemEntity.BuildAttributes().create());
+		event.put(koid, KoidEntity.BuildAttributes().create());
+		event.put(dragonRed, RedDragonEntity.BuildAttributes().create());
 		// No attributes event.put(dragonRedBodyPart, EntityDragonRed.DragonBodyPart.BuildAttributes().create());
-		event.put(tameDragonRed, EntityTameDragonRed.BuildAttributes().create());
-		event.put(shadowDragonRed, EntityShadowDragonRed.BuildAttributes().create());
-		event.put(dragonEgg, EntityDragonEgg.BuildAttributes().create());
-		event.put(plantBoss, EntityPlantBoss.BuildAttributes().create());
+		event.put(tameDragonRed, TameRedDragonEntity.BuildAttributes().create());
+		event.put(shadowDragonRed, ShadowRedDragonEntity.BuildAttributes().create());
+		event.put(dragonEgg, DragonEggEntity.BuildAttributes().create());
+		event.put(plantBoss, PlantBossEntity.BuildAttributes().create());
 		// No attributes event.put(plantBossBody, EntityPlantBoss.PlantBossBody.BuildAttributes().create());
 		// No attributes event.put(plantBossLeaf, EntityPlantBoss.PlantBossLeafLimb.BuildAttributes().create());
 		// No attributes event.put(plantBossBramble, EntityPlantBossBramble.BuildAttributes().create());
-		event.put(sprite, EntitySprite.BuildAttributes().create());
-		event.put(lux, EntityLux.BuildAttributes().create());
-		event.put(wisp, EntityWisp.BuildAttributes().create());
-		event.put(willo, EntityWillo.BuildAttributes().create());
-		event.put(arcaneWolf, EntityArcaneWolf.BuildAttributes().create());
+		event.put(sprite, SpriteEntity.BuildAttributes().create());
+		event.put(lux, LuxEntity.BuildAttributes().create());
+		event.put(wisp, WispEntity.BuildAttributes().create());
+		event.put(willo, WilloEntity.BuildAttributes().create());
+		event.put(arcaneWolf, ArcaneWolfEntity.BuildAttributes().create());
 		// No attributes event.put(spellProjectile, EntitySpellProjectile.BuildAttributes().create());
 		// No attributes event.put(chakramSpellSaucer, EntityChakramSpellSaucer.BuildAttributes().create());
 		// No attributes event.put(cyclerSpellSaucer, EntityCyclerSpellSaucer.BuildAttributes().create());
-		event.put(switchTrigger, EntitySwitchTrigger.BuildAttributes().create());
-		event.put(elementShrine, EntityShrineTrigger.Element.BuildAttributes().create());
-		event.put(shapeShrine, EntityShrineTrigger.Shape.BuildAttributes().create());
-		event.put(alterationShrine, EntityShrineTrigger.Alteration.BuildAttributes().create());
+		event.put(switchTrigger, SwitchTriggerEntity.BuildAttributes().create());
+		event.put(elementShrine, ShrineTriggerEntity.Element.BuildAttributes().create());
+		event.put(shapeShrine, ShrineTriggerEntity.Shape.BuildAttributes().create());
+		event.put(alterationShrine, ShrineTriggerEntity.Alteration.BuildAttributes().create());
 		// No attributes event.put(tameLightning, NostrumTameLightning.BuildAttributes().create());
 		// No attributes event.put(hookShot, EntityHookShot.BuildAttributes().create());
 		// No attributes event.put(spellBullet, EntitySpellBullet.BuildAttributes().create());
 		// No attributes event.put(spellMortar, EntitySpellMortar.BuildAttributes().create());
 		// No attributes event.put(areaEffect, EntityAreaEffect.BuildAttributes().create());
-		event.put(keySwitchTrigger, EntityKeySwitchTrigger.BuildKeySwitchAttributes().create());
+		event.put(keySwitchTrigger, KeySwitchTriggerEntity.BuildKeySwitchAttributes().create());
 		// No attributes event.put(enderRodBall, EntityEnderRodBall.BuildAttributes().create());
 		
 	}

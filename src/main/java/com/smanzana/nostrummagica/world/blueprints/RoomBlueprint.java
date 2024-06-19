@@ -14,10 +14,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.IDirectionalBlock;
 import com.smanzana.nostrummagica.block.IHorizontalBlock;
-import com.smanzana.nostrummagica.block.ManiCrystal;
+import com.smanzana.nostrummagica.block.ManiCrystalBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicOnesidedBlock;
 import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
@@ -247,18 +247,18 @@ public class RoomBlueprint {
 			SetOldMetaBlockState(NostrumBlocks.logicDoor, 5, NostrumBlocks.logicDoor.getMaster(Direction.NORTH));
 			SetOldMetaBlockState(NostrumBlocks.logicDoor, 6, NostrumBlocks.logicDoor.getSlaveState(Direction.EAST));
 			SetOldMetaBlockState(NostrumBlocks.logicDoor, 7, NostrumBlocks.logicDoor.getMaster(Direction.EAST));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 0, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.DOWN));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 1, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.UP));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 2, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.NORTH));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 3, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.SOUTH));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 4, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.WEST));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 5, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.EAST));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 8, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.DOWN));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 9, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.UP));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 10, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.NORTH));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 11, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.SOUTH));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 12, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.WEST));
-			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 13, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystal.FACING, Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 0, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.DOWN));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 1, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.UP));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 2, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 3, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 4, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 5, NostrumBlocks.kaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.EAST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 8, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.DOWN));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 9, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.UP));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 10, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.NORTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 11, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.SOUTH));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 12, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.WEST));
+			SetOldMetaBlockState(NostrumBlocks.maniCrystalBlock, 13, NostrumBlocks.vaniCrystalBlock.getDefaultState().with(ManiCrystalBlock.FACING, Direction.EAST));
 			// Note: Lying and saying all said unbreakable. Sorcery breakable ones are fine. Some in plant room are 'breakable' on accident.
 			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 3, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicOnesidedBlock.FACING, Direction.SOUTH));
 			SetOldMetaBlockState(NostrumBlocks.mimicDoor, 4, NostrumBlocks.mimicDoorUnbreakable.getDefaultState().with(MimicOnesidedBlock.FACING, Direction.WEST));
@@ -274,10 +274,10 @@ public class RoomBlueprint {
 			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 10, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicOnesidedBlock.FACING, Direction.NORTH));
 			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 12, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicOnesidedBlock.FACING, Direction.WEST));
 			SetOldMetaBlockState(NostrumBlocks.mimicFacade, 13, NostrumBlocks.mimicFacadeUnbreakable.getDefaultState().with(MimicOnesidedBlock.FACING, Direction.EAST));
-			SetOldMetaBlockState(NostrumBlocks.candle, 5, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.NORTH).with(Candle.LIT, true)); // 010 2
-			SetOldMetaBlockState(NostrumBlocks.candle, 7, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.SOUTH).with(Candle.LIT, true)); // 011 3
-			SetOldMetaBlockState(NostrumBlocks.candle, 9, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.WEST).with(Candle.LIT, true)); // 100 4
-			SetOldMetaBlockState(NostrumBlocks.candle, 11, NostrumBlocks.candle.getDefaultState().with(Candle.FACING, Direction.EAST).with(Candle.LIT, true)); // 101 5
+			SetOldMetaBlockState(NostrumBlocks.candle, 5, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.NORTH).with(CandleBlock.LIT, true)); // 010 2
+			SetOldMetaBlockState(NostrumBlocks.candle, 7, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.SOUTH).with(CandleBlock.LIT, true)); // 011 3
+			SetOldMetaBlockState(NostrumBlocks.candle, 9, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.WEST).with(CandleBlock.LIT, true)); // 100 4
+			SetOldMetaBlockState(NostrumBlocks.candle, 11, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.EAST).with(CandleBlock.LIT, true)); // 101 5
 			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 0, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_EARTH));
 			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 1, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_ENDER));
 			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 2, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_FIRE));

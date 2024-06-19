@@ -17,16 +17,16 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportedOtherEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
-import com.smanzana.nostrummagica.block.NostrumPortal;
+import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.mirror.MirrorResearchSubscreen;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.enchantment.EnchantmentManaRecovery;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
+import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTypeCapability;
 import com.smanzana.nostrummagica.item.IReactiveEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
@@ -572,14 +572,14 @@ public class PlayerListener {
 			}
 			
 			// Fire arcane wolves also ignore fire damage
-			if (living instanceof EntityArcaneWolf
-					&& ((EntityArcaneWolf) living).hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+			if (living instanceof ArcaneWolfEntity
+					&& ((ArcaneWolfEntity) living).hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
 				event.setCanceled(true);
 				living.extinguish();
 			}
 			// Same for entities riding the wolf
-			if (living.getRidingEntity() instanceof EntityArcaneWolf
-					&& ((EntityArcaneWolf) living.getRidingEntity()).hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
+			if (living.getRidingEntity() instanceof ArcaneWolfEntity
+					&& ((ArcaneWolfEntity) living.getRidingEntity()).hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
 				event.setCanceled(true);
 				living.extinguish();
 			}
@@ -859,8 +859,8 @@ public class PlayerListener {
 		if (e.getAnimal() instanceof WolfEntity) {
 			PlayerEntity player = e.getTamer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr != null && !attr.hasLore(EntityArcaneWolf.WolfTameLore.instance())) {
-				attr.giveBasicLore(EntityArcaneWolf.WolfTameLore.instance());
+			if (attr != null && !attr.hasLore(ArcaneWolfEntity.WolfTameLore.instance())) {
+				attr.giveBasicLore(ArcaneWolfEntity.WolfTameLore.instance());
 			}
 		}
 	}
@@ -1040,7 +1040,7 @@ public class PlayerListener {
 				}
 			}
 			
-			NostrumPortal.tick();
+			PortalBlock.tick();
 			TeleportRuneTileEntity.tickChargeMap();
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
 				MagicArmor.ServerWorldTick(world);
@@ -1075,7 +1075,7 @@ public class PlayerListener {
 	public void onTick(ClientTickEvent event) {
 		if (event.phase == Phase.START) {
 			if (!Minecraft.getInstance().isIntegratedServerRunning() && Minecraft.getInstance().player != null) {
-				NostrumPortal.tick();
+				PortalBlock.tick();
 				//TeleportRune.tick();
 			}
 		}
@@ -1117,7 +1117,7 @@ public class PlayerListener {
 		float bonus = 0f;
 		
 		for (ItemStack armor : player.getArmorInventoryList()) {
-			int level = EnchantmentHelper.getEnchantmentLevel(EnchantmentManaRecovery.instance(), armor);
+			int level = EnchantmentHelper.getEnchantmentLevel(ManaRecoveryEnchantment.instance(), armor);
 			if (level > 0)
 				bonus += level * .1f;
 		}

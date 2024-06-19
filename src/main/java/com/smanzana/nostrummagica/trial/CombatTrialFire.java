@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.trial;
 
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.entity.KoidEntity;
+import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
@@ -53,10 +53,10 @@ public class CombatTrialFire extends CombatTrialStaged {
 				CompoundNBT customTag = new CompoundNBT();
 				customTag.putInt("Size", 4);
 				ent.readAdditional(customTag);
-			} else if (ent instanceof EntityWillo) {
-				((EntityWillo) ent).setElement(EMagicElement.FIRE);
-			} else if (ent instanceof EntityKoid) {
-				((EntityKoid) ent).setElement(EMagicElement.FIRE);
+			} else if (ent instanceof WilloEntity) {
+				((WilloEntity) ent).setElement(EMagicElement.FIRE);
+			} else if (ent instanceof KoidEntity) {
+				((KoidEntity) ent).setElement(EMagicElement.FIRE);
 			}
 			
 			return ent;

@@ -5,8 +5,8 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.MasteryOrb;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -27,7 +27,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
+public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	
 	protected static enum SlotMode {
 		NONE, // No slots should be shown because all training is done or training is in progress
@@ -71,15 +71,15 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	private static int GUI_GEM_SPARK_WIDTH = 21;
 	private static int GUI_GEM_SPARK_HEIGHT = 21;
 	
-	protected final EntityArcaneWolf pet;
+	protected final ArcaneWolfEntity pet;
 	protected final Inventory localInv;
 	
-	public ArcaneWolfTrainingSheet(EntityArcaneWolf pet) {
+	public ArcaneWolfTrainingSheet(ArcaneWolfEntity pet) {
 		this.pet = pet;
 		localInv = new Inventory(5);
 	}
 	
-	protected SlotMode getSlotMode(EntityArcaneWolf wolf) {
+	protected SlotMode getSlotMode(ArcaneWolfEntity wolf) {
 		if (wolf.getTrainingElement() != null) {
 			return SlotMode.NONE;
 		}
@@ -114,7 +114,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 		return null;
 	}
 	
-	protected boolean canSetInSlot(EntityArcaneWolf wolf, int index, @Nonnull ItemStack stack) {
+	protected boolean canSetInSlot(ArcaneWolfEntity wolf, int index, @Nonnull ItemStack stack) {
 		// Index 0 is the 'center' item if there is one.
 		// 1-5 are four 'outer' slots.
 		if (stack.isEmpty()) {
@@ -159,7 +159,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 		return true;
 	}
 	
-	protected int getSlotX(EntityArcaneWolf wolf, int index, int width) {
+	protected int getSlotX(ArcaneWolfEntity wolf, int index, int width) {
 		final SlotMode mode = getSlotMode(wolf);
 		final int error = -1;
 		final int cellWidth = GUI_SLOT_ICON_WIDTH;
@@ -212,7 +212,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 		}
 	}
 	
-	protected int getSlotY(EntityArcaneWolf wolf, int index, int height) {
+	protected int getSlotY(ArcaneWolfEntity wolf, int index, int height) {
 		final SlotMode mode = getSlotMode(wolf);
 		final int error = -1;
 		final int cellHeight = GUI_SLOT_ICON_HEIGHT;
@@ -264,7 +264,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 		}
 	}
 	
-	protected void onSlotChange(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
+	protected void onSlotChange(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
 		
 		// See if all slots are filled and if we should start training
 		final SlotMode mode = getSlotMode(wolf);
@@ -307,7 +307,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf pet, PlayerEntity player, IPetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity pet, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
 		final int cellWidth = 18;
 		final int invRow = 9;
 		final int invWidth = cellWidth * invRow;
@@ -360,7 +360,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf pet, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(ArcaneWolfEntity pet, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
 		container.dropContainerInventory(localInv);
 		container.clearSlots();
 	}
@@ -603,7 +603,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
+	public boolean shouldShow(ArcaneWolfEntity wolf, IPetContainer<ArcaneWolfEntity> container) {
 		return wolf.canWolfTrain();
 	}
 

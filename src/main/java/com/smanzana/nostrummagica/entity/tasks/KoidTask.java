@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.KoidEntity;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -280,7 +280,7 @@ public class KoidTask extends Goal {
 	private static final Random rand = new Random();
 	private static final double RANGE_SQR = 225.0;
 	
-	private EntityKoid koid;
+	private KoidEntity koid;
 	
 	private boolean hasMelee;
 	private boolean hasRange;
@@ -299,7 +299,7 @@ public class KoidTask extends Goal {
 	private boolean strafeClockwise;
 	private boolean strafeBack;
 	
-	public KoidTask(EntityKoid koid) {
+	public KoidTask(KoidEntity koid) {
 		init();
 		this.koid = koid;
 		

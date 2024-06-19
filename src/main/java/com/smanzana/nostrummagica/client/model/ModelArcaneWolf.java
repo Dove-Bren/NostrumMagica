@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.client.model;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
 import net.minecraft.client.renderer.entity.model.WolfModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.util.math.MathHelper;
 
-public class ModelArcaneWolf extends WolfModel<EntityArcaneWolf> {
+public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 	
 	// Want to use WolfModel's, which used to be public :(
 	protected ModelRenderer head;
@@ -136,7 +136,7 @@ public class ModelArcaneWolf extends WolfModel<EntityArcaneWolf> {
 //	}
 	
 	@Override
-	public void setLivingAnimations(EntityArcaneWolf entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
+	public void setLivingAnimations(ArcaneWolfEntity entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
 		//super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTick);
 		if (entityIn.func_233678_J__() /*isAngry()*/) {
 			this.tail.rotateAngleY = 0.0F;
@@ -182,7 +182,7 @@ public class ModelArcaneWolf extends WolfModel<EntityArcaneWolf> {
 	}
 	
 	@Override
-	public void setRotationAngles(EntityArcaneWolf entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setRotationAngles(ArcaneWolfEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		// Want to just call super, but can't override the fields...
 		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 		this.head.rotateAngleX = headPitch * ((float)Math.PI / 180F);

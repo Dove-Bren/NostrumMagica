@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.network.message;
 
 import java.util.function.Supplier;
 
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -24,8 +24,8 @@ public class ObeliskSelectMessage {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(() -> {
 			TileEntity te = player.world.getTileEntity(message.pos);
-			if (te != null && te instanceof NostrumObeliskEntity) {
-				((NostrumObeliskEntity) te).setTargetIndex(message.index);
+			if (te != null && te instanceof ObeliskTileEntity) {
+				((ObeliskTileEntity) te).setTargetIndex(message.index);
 			}
 		});
 	}

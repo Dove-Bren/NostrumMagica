@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.ArcaneWolfElementalType;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
-import com.smanzana.nostrummagica.entity.EntityKoid;
+import com.smanzana.nostrummagica.entity.KoidEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -15,11 +15,11 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKoid>> {
+public class RenderKoid extends MobRenderer<KoidEntity, ModelRenderShiv<KoidEntity>> {
 	
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
-	protected ModelBaked<EntityKoid> model;
+	protected ModelBaked<KoidEntity> model;
 
 	public RenderKoid(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelRenderShiv<>(), shadowSizeIn);
@@ -28,12 +28,12 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKo
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(EntityKoid entity) {
+	public ResourceLocation getEntityTexture(KoidEntity entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	
 	@Override
-	public void render(EntityKoid entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(KoidEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		this.entityModel.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
 			// Could pass through bufferIn to allow access to different buffer types, but only need the base one
 			this.renderModel(entityIn, deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha, partialTicks);
@@ -41,7 +41,7 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKo
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	
-	protected int getColor(EntityKoid koid) {
+	protected int getColor(KoidEntity koid) {
 		int color = 0x00;
 		
 		switch (koid.getElement()) {
@@ -75,7 +75,7 @@ public class RenderKoid extends MobRenderer<EntityKoid, ModelRenderShiv<EntityKo
 		return color;
 	}
 	
-	protected void renderModel(EntityKoid entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
+	protected void renderModel(KoidEntity entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha, float partialTicks) {
 		float color[] = ColorUtil.ARGBToColor(getColor(entityIn));
 		

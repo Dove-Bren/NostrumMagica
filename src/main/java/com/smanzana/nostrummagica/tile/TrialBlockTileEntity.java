@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.NostrumTameLightning;
+import com.smanzana.nostrummagica.entity.TameLightning;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -196,7 +196,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	
 	protected void spawnStartupWarning() {
 		((ServerWorld) world).addEntity(
-				(new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5))
+				(new TameLightning(NostrumEntityTypes.tameLightning, world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5))
 				);
 	}
 	

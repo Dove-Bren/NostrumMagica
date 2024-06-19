@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
+import com.smanzana.nostrummagica.entity.EnderRodBallEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -166,19 +166,19 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		}
 	}
 	
-	protected @Nullable EntityEnderRodBall findNearestBall(LivingEntity caster) {
+	protected @Nullable EnderRodBallEntity findNearestBall(LivingEntity caster) {
 		ServerWorld world = (ServerWorld) caster.world;
 		List<Entity> balls = world.getEntities(NostrumEntityTypes.enderRodBall, (e) -> {
 			return e != null
-					&& e instanceof EntityEnderRodBall
-					&& caster.equals(((EntityEnderRodBall) e).getOwner());
+					&& e instanceof EnderRodBallEntity
+					&& caster.equals(((EnderRodBallEntity) e).getOwner());
 		});
 		
-		EntityEnderRodBall closest = null;
+		EnderRodBallEntity closest = null;
 		double minDistSq = -1;
 		for (Entity ball : balls) {
 			if (closest == null || ball.getDistanceSq(caster) < minDistSq) {
-				closest = (EntityEnderRodBall) ball;
+				closest = (EnderRodBallEntity) ball;
 				minDistSq = ball.getDistanceSq(caster);
 			}
 		}
@@ -189,7 +189,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		target.attackEntityFrom(new MagicDamageSource(caster, EMagicElement.ENDER), 2);
 	}
 	
-	protected void consumeBall(LivingEntity caster, EntityEnderRodBall ball) {
+	protected void consumeBall(LivingEntity caster, EnderRodBallEntity ball) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4;
 		final boolean hasShield = attr != null && attr.hasSkill(NostrumSkills.Ender_Weapon);
@@ -242,7 +242,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	protected boolean dislocateEntity(LivingEntity caster, LivingEntity target) {
-		@Nullable EntityEnderRodBall ball = findNearestBall(caster);
+		@Nullable EnderRodBallEntity ball = findNearestBall(caster);
 		if (ball != null) {
 			final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4;
 			
@@ -259,7 +259,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	protected boolean dislocateCaster(LivingEntity caster) {
-		@Nullable EntityEnderRodBall ball = findNearestBall(caster);
+		@Nullable EnderRodBallEntity ball = findNearestBall(caster);
 		if (ball != null) {
 			teleportEntity(caster, caster, ball.getPositionVec());
 			consumeBall(caster, ball);
@@ -271,14 +271,14 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	
 	protected boolean castRod(World worldIn, LivingEntity caster) {
 		// Find existing ball and consume it
-		@Nullable EntityEnderRodBall ball = this.findNearestBall(caster);
+		@Nullable EnderRodBallEntity ball = this.findNearestBall(caster);
 		if (ball != null) {
 			this.consumeBall(caster, ball);
 		}
 		
 		// Create a new ball where caster is looking
 		Vector3d pos = this.getCastPosition(caster);
-		ball = new EntityEnderRodBall(NostrumEntityTypes.enderRodBall, worldIn, caster);
+		ball = new EnderRodBallEntity(NostrumEntityTypes.enderRodBall, worldIn, caster);
 		ball.setPosition(pos.x, pos.y, pos.z);
 		worldIn.addEntity(ball);
 		

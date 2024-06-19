@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
-import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.component.MagicDamageSource;
@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SwitchBlockTileEntity extends EntityProxiedTileEntity<EntitySwitchTrigger> implements IOrientedTileEntity {
+public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTriggerEntity> implements IOrientedTileEntity {
 	
 	public static enum SwitchHitType {
 		ANY,
@@ -256,8 +256,8 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<EntitySwitchT
 	}
 	
 	@Override
-	protected EntitySwitchTrigger makeTriggerEntity(World world, double x, double y, double z) {
-		EntitySwitchTrigger ent = new EntitySwitchTrigger(NostrumEntityTypes.switchTrigger, world);
+	protected SwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
+		SwitchTriggerEntity ent = new SwitchTriggerEntity(NostrumEntityTypes.switchTrigger, world);
 		ent.setPosition(x, y, z);
 		return ent;
 	}

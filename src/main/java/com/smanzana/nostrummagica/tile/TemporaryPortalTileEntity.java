@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.NostrumPortal;
+import com.smanzana.nostrummagica.block.PortalBlock;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,7 +40,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	@Override
 	public int getColor() {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (NostrumPortal.getRemainingCharge(player) > 0) {
+		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00400000;
 		}
 		return 0x003030FF;
@@ -67,7 +67,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 		}
 		
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (NostrumPortal.getCooldownTime(player) > 0) {
+		if (PortalBlock.getCooldownTime(player) > 0) {
 			opacity *= 0.5f;
 		}
 		

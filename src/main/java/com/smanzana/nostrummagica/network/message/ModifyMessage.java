@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.tile.ModificationTableEntity;
+import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -38,7 +38,7 @@ public class ModifyMessage {
 				return;
 			}
 			
-			ModificationTableEntity entity = (ModificationTableEntity) TE;
+			ModificationTableTileEntity entity = (ModificationTableTileEntity) TE;
 			
 			entity.modify(message.bool, message.flt);
 		});

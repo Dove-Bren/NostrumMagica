@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
-import com.smanzana.nostrummagica.tile.LockedChestEntity;
+import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -62,7 +62,7 @@ public class LockedChest extends HorizontalBlock {
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote()) {
-			LockedChestEntity chest = (LockedChestEntity) worldIn.getTileEntity(pos);
+			LockedChestTileEntity chest = (LockedChestTileEntity) worldIn.getTileEntity(pos);
 			
 			// Creative players can dye it
 			if (player.isCreative() && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof DyeItem) {
@@ -83,7 +83,7 @@ public class LockedChest extends HorizontalBlock {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new LockedChestEntity();
+		return new LockedChestTileEntity();
 	}
 	
 	@Override
@@ -105,10 +105,10 @@ public class LockedChest extends HorizontalBlock {
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
 		TileEntity ent = world.getTileEntity(pos);
-		if (ent == null || !(ent instanceof LockedChestEntity))
+		if (ent == null || !(ent instanceof LockedChestTileEntity))
 			return;
 		
-		LockedChestEntity table = (LockedChestEntity) ent;
+		LockedChestTileEntity table = (LockedChestTileEntity) ent;
 		for (int i = 0; i < table.getSizeInventory(); i++) {
 			ItemStack item = table.getStackInSlot(i);
 			if (!item.isEmpty()) {

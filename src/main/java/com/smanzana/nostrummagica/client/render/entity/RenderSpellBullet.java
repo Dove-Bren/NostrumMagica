@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySpellBullet;
+import com.smanzana.nostrummagica.entity.SpellBulletEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderSpellBullet extends EntityRenderer<EntitySpellBullet> {
+public class RenderSpellBullet extends EntityRenderer<SpellBulletEntity> {
 	
 	private static final ResourceLocation LOC_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
@@ -28,12 +28,12 @@ public class RenderSpellBullet extends EntityRenderer<EntitySpellBullet> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntitySpellBullet entity) {
+	public ResourceLocation getEntityTexture(SpellBulletEntity entity) {
 		return LOC_TEXT;
 	}
 	
 	@Override
-	public void render(EntitySpellBullet entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(SpellBulletEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		
 		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		

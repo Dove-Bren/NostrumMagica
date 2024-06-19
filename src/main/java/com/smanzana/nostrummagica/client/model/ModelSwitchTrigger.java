@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.client.model;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.util.ResourceLocation;
 
-public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
+public class ModelSwitchTrigger extends EntityModel<SwitchTriggerEntity> {
 	
 	public static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/entity/golem_ice.png");
 	public static final ResourceLocation CAGE_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/block/spawner.png");
@@ -69,12 +69,12 @@ public class ModelSwitchTrigger extends EntityModel<EntitySwitchTrigger> {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntitySwitchTrigger trigger, float p_78086_2_, float age, float partialTickTime) {
+	public void setLivingAnimations(SwitchTriggerEntity trigger, float p_78086_2_, float age, float partialTickTime) {
 		
 	}
 
 	@Override
-	public void setRotationAngles(EntitySwitchTrigger entityIn, float limbSwing, float limbSwingAmount,
+	public void setRotationAngles(SwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.NostrumPortal;
+import com.smanzana.nostrummagica.block.PortalBlock;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SorceryPortalTileEntity extends NostrumPortal.NostrumPortalTileEntityBase  {
+public class SorceryPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 	
 	public SorceryPortalTileEntity() {
 		super(NostrumTileEntities.SorceryPortalTileEntityType);
@@ -17,7 +17,7 @@ public class SorceryPortalTileEntity extends NostrumPortal.NostrumPortalTileEnti
 	@Override
 	public int getColor() {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (NostrumPortal.getRemainingCharge(player) > 0) {
+		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00FF0050;
 		}
 		return 0x00C00050;
@@ -33,7 +33,7 @@ public class SorceryPortalTileEntity extends NostrumPortal.NostrumPortalTileEnti
 	@Override
 	public float getOpacity() {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (NostrumPortal.getCooldownTime(player) > 0) {
+		if (PortalBlock.getCooldownTime(player) > 0) {
 			return 0.5f;
 		}
 		return .9f;

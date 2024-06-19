@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 import java.util.List;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfBondCapability;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfBondCapability;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
@@ -15,21 +15,21 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 
-public class ArcaneWolfBondInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
+public class ArcaneWolfBondInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 
-	private EntityArcaneWolf wolf;
+	private ArcaneWolfEntity wolf;
 	
-	public ArcaneWolfBondInfoSheet(EntityArcaneWolf wolf) {
+	public ArcaneWolfBondInfoSheet(ArcaneWolfEntity wolf) {
 		this.wolf = wolf;
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
 		
 	}
 
@@ -92,7 +92,7 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
+	public boolean shouldShow(ArcaneWolfEntity wolf, IPetContainer<ArcaneWolfEntity> container) {
 		return true; // always show
 	}
 

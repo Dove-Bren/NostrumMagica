@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.tile;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.block.ActiveHopper;
+import com.smanzana.nostrummagica.block.ActiveHopperBlock;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
@@ -177,7 +177,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		if (world != null && !world.isRemote) {
 			this.transferCooldown--;
 			
-			if (!isOnTransferCooldown() && ActiveHopper.GetEnabled(world.getBlockState(pos))) {
+			if (!isOnTransferCooldown() && ActiveHopperBlock.GetEnabled(world.getBlockState(pos))) {
 				this.hopperTick();
 				this.setTransferCooldown(8); // same rate as vanilla
 			}
@@ -255,7 +255,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	
 	private boolean pushItems() {
 		// Inventory we want to push into is in direction FACING
-		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
@@ -350,7 +350,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	
 	private boolean pullItems() {
 		// We want to pull from opposite(FACING)
-		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos)).getOpposite();
+		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos)).getOpposite();
 		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
 		
 		if (te != null) {
@@ -461,7 +461,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	private AxisAlignedBB getCaptureBB(boolean forPull) {
-		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
 		
 		if (direction == Direction.DOWN) {
 			// Down has different collision so do a custom box
@@ -479,7 +479,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 
 	@Override
 	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction side) {
-		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
 		if (side == direction) {
 			// Coming in our output
 			return false;
@@ -490,7 +490,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 
 	@Override
 	public boolean canExtractItem(int index, ItemStack stack, Direction side) {
-		final Direction direction = ActiveHopper.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
 		if (side == direction.getOpposite()) {
 			// pulling from our mouth?
 			return false;

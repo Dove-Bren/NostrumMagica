@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.smanzana.nostrummagica.block.NostrumObelisk;
+import com.smanzana.nostrummagica.block.ObeliskBlock;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -23,7 +23,7 @@ public class CommandSpawnObelisk {
 	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
 		ServerPlayerEntity player = context.getSource().asPlayer();
 		
-		if (!NostrumObelisk.spawnObelisk(player.world,
+		if (!ObeliskBlock.spawnObelisk(player.world,
 				player.getPosition().add(0, -1, 0))) {
 			context.getSource().sendFeedback(new StringTextComponent("Not enough space to spawn an obelisk"), true);
 			return 1;

@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityCyclerSpellSaucer;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
+import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
+import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
+import com.smanzana.nostrummagica.entity.SpellSaucerEntity;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -53,7 +53,7 @@ public class MagicCyclerShape extends SpellShape {
 		
 		@Override
 		public void spawn(LivingEntity caster) {
-			EntitySpellSaucer projectile = new EntityCyclerSpellSaucer(getState().getSelf().world, getState().getSelf(),
+			SpellSaucerEntity projectile = new CyclerSpellSaucerEntity(getState().getSelf().world, getState().getSelf(),
 					MagicCyclerShapeInstance.this,
 					5.0f, (int) duration * 20, onBlocks, false);
 			
@@ -199,7 +199,7 @@ public class MagicCyclerShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		float radius = (float) (EntityCyclerSpellSaucer.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
+		float radius = (float) (CyclerSpellSaucerEntity.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}

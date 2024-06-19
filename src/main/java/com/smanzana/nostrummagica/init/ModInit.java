@@ -41,12 +41,12 @@ import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
-import com.smanzana.nostrummagica.enchantment.EnchantmentManaRecovery;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTameLore;
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityWisp;
+import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
+import com.smanzana.nostrummagica.entity.KoidEntity;
+import com.smanzana.nostrummagica.entity.WispEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.MagicCharm;
@@ -238,7 +238,7 @@ public class ModInit {
 	
 	private static final void init() {
     	LoreRegistry.instance();
-    	EntityTameDragonRed.init();
+    	TameRedDragonEntity.init();
     	
     	CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
@@ -596,7 +596,7 @@ public class ModInit {
 				new ResearchRequirement("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
 					public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem) {
-						EntityKoid koid = new EntityKoid(NostrumEntityTypes.koid, world);
+						KoidEntity koid = new KoidEntity(NostrumEntityTypes.koid, world);
 						koid.setPosition(pos.x, pos.y, pos.z);
 						world.addEntity(koid);
 						koid.setAttackTarget(invoker);
@@ -1553,7 +1553,7 @@ public class ModInit {
 				.reference("ritual::buff.waterbreathing", "ritual.buff.waterbreathing.name")
 				.build("boon", NostrumResearchTab.MAGICA, Size.LARGE, 3, 0, true, new ItemStack(Items.SPLASH_POTION));
 
-		NostrumResearch.startBuilding().parent("rituals").hiddenParent("magic_token").lore(EntityKoid.KoidLore.instance())
+		NostrumResearch.startBuilding().parent("rituals").hiddenParent("magic_token").lore(KoidEntity.KoidLore.instance())
 				.reference("ritual::koid", "ritual.koid.name").build("summonkoids", NostrumResearchTab.MAGICA,
 						Size.NORMAL, 3, 2, true, new ItemStack(NostrumItems.essencePhysical));
 
@@ -1573,7 +1573,7 @@ public class ModInit {
 						new ItemStack(NostrumItems.resourceToken));
 
 		NostrumResearch.startBuilding().hiddenParent("magic_token").lore(NostrumItems.essencePhysical)
-				.lore(EntityKoid.KoidLore.instance()).lore(EntityWisp.WispLoreTag.instance())
+				.lore(KoidEntity.KoidLore.instance()).lore(WispEntity.WispLoreTag.instance())
 				.reference("ritual::essence_seed", "ritual.essence_seed.name").build("essence_seeds",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -3, 0, false, new ItemStack(NostrumItems.reagentSeedEssence));
 
@@ -1670,7 +1670,7 @@ public class ModInit {
 				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true,
 						new ItemStack(MagicArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, MagicArmor.Type.MASTER)));
 
-		NostrumResearch.startBuilding().parent("enchanted_armor").lore(EntityTameDragonRed.TameRedDragonLore.instance())
+		NostrumResearch.startBuilding().parent("enchanted_armor").lore(TameRedDragonEntity.TameRedDragonLore.instance())
 				.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
 				.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -2, 4, true,
 						new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
@@ -1846,7 +1846,7 @@ public class ModInit {
     
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
-    	event.getRegistry().register(EnchantmentManaRecovery.instance());
+    	event.getRegistry().register(ManaRecoveryEnchantment.instance());
     }
     
     @SubscribeEvent

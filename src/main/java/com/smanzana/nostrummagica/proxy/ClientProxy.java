@@ -35,9 +35,9 @@ import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragon;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
+import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellTome;
@@ -57,7 +57,7 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
@@ -210,10 +210,10 @@ public class ClientProxy extends CommonProxy {
 //					NostrumGui.infoscreenID, player.world, 0, 0, 0);
 		} else if (mc.gameSettings.keyBindJump.isPressed()) {
 			PlayerEntity player = mc.player;
-			if (player.isPassenger() && player.getRidingEntity() instanceof EntityTameDragonRed) {
-				((EntityDragon) player.getRidingEntity()).dragonJump();
-			} else if (player.isPassenger() && player.getRidingEntity() instanceof EntityArcaneWolf) {
-				((EntityArcaneWolf) player.getRidingEntity()).wolfJump();
+			if (player.isPassenger() && player.getRidingEntity() instanceof TameRedDragonEntity) {
+				((DragonEntity) player.getRidingEntity()).dragonJump();
+			} else if (player.isPassenger() && player.getRidingEntity() instanceof ArcaneWolfEntity) {
+				((ArcaneWolfEntity) player.getRidingEntity()).wolfJump();
 			}
 		} else if (bindingBladeCast.isPressed()) {
 			PlayerEntity player = mc.player;
@@ -365,7 +365,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void openObeliskScreen(World world, BlockPos pos) {
 		if (world.isRemote()) {
-			NostrumObeliskEntity te = (NostrumObeliskEntity) world.getTileEntity(pos);
+			ObeliskTileEntity te = (ObeliskTileEntity) world.getTileEntity(pos);
 			Minecraft.getInstance().displayGuiScreen(new ObeliskScreen(te));
 		}
 	}

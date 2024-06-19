@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
+import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelDragonEgg extends EntityModel<EntityDragonEgg> {
+public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 
 	private ModelRenderer main;
 	private float coldScale;
@@ -58,7 +58,7 @@ public class ModelDragonEgg extends EntityModel<EntityDragonEgg> {
 	}
 
 	@Override
-	public void setRotationAngles(EntityDragonEgg entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(DragonEggEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

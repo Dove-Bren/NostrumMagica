@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.AltarBlock;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -74,7 +74,7 @@ public class RitualRegistry {
 		// For all candles and altars around the player, check if recipes match
 		BlockState state = world.getBlockState(pos);
 		if (state == null ||
-			(!(state.getBlock() instanceof Candle) && !(state.getBlock() instanceof AltarBlock)))
+			(!(state.getBlock() instanceof CandleBlock) && !(state.getBlock() instanceof AltarBlock)))
 			return false;
 		
 		// else it's an altar or a candle

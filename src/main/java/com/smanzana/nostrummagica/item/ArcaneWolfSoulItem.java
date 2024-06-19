@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.Minecraft;
@@ -72,16 +72,16 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 
 	@Override
 	protected void setWorldID(LivingEntity pet, UUID worldID) {
-		if (pet instanceof EntityArcaneWolf) {
-			((EntityArcaneWolf) pet).setWorldID(worldID);
+		if (pet instanceof ArcaneWolfEntity) {
+			((ArcaneWolfEntity) pet).setWorldID(worldID);
 		}
 	}
 
 	@Override
 	protected void beforePetRespawn(LivingEntity pet, World world, Vector3d pos, ItemStack stack) {
 		// Wolves spawn at 50% health and 0% mana
-		if (pet instanceof EntityArcaneWolf) {
-			EntityArcaneWolf wolf = ((EntityArcaneWolf) pet);
+		if (pet instanceof ArcaneWolfEntity) {
+			ArcaneWolfEntity wolf = ((ArcaneWolfEntity) pet);
 			final int mana = wolf.getMana();
 			final float maxHP = wolf.getMaxHealth();
 			
@@ -102,8 +102,8 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 			return ActionResultType.SUCCESS;
 		}
 		
-		if (target instanceof EntityArcaneWolf) {
-			ItemStack newStack = MakeSoulItem((EntityArcaneWolf) target);
+		if (target instanceof ArcaneWolfEntity) {
+			ItemStack newStack = MakeSoulItem((ArcaneWolfEntity) target);
 			target.entityDropItem(newStack, 1);
 			return ActionResultType.SUCCESS;
 		}
@@ -257,11 +257,11 @@ public class ArcaneWolfSoulItem extends PetSoulItem {
 		return 500; // Could make it dynamic
 	}
 	
-	public static ItemStack MakeSoulItem(EntityArcaneWolf wolf) {
+	public static ItemStack MakeSoulItem(ArcaneWolfEntity wolf) {
 		return MakeSoulItem(wolf, true);
 	}
 	
-	public static ItemStack MakeSoulItem(EntityArcaneWolf wolf, boolean register) {
+	public static ItemStack MakeSoulItem(ArcaneWolfEntity wolf, boolean register) {
 		if (register) {
 			NostrumItems.arcaneWolfSoulItem.setWorldID(wolf, NostrumMagica.instance.getPetSoulRegistry().registerPet(wolf));
 			NostrumMagica.instance.getPetSoulRegistry().snapshotPet(wolf);

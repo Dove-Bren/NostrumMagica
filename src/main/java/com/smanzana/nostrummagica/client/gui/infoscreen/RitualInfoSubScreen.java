@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
@@ -48,7 +48,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		
 		chalk = NostrumBlocks.chalk.getDefaultState();
 		candle = NostrumBlocks.candle.getDefaultState().with(
-				Candle.LIT, true);
+				CandleBlock.LIT, true);
 		altar = NostrumBlocks.altar.getDefaultState();
 		
 		if (I18n.hasKey("ritual." + ritual.getTitleKey() + ".desc")) {

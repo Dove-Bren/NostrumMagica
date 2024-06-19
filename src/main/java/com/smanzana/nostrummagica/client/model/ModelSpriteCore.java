@@ -3,12 +3,12 @@ package com.smanzana.nostrummagica.client.model;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySprite;
+import com.smanzana.nostrummagica.entity.SpriteEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.util.ResourceLocation;
 
-public class ModelSpriteCore extends ModelBaked<EntitySprite> {
+public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	
 	public static final ResourceLocation MODEL_CORE = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core");
 	public static final ResourceLocation MODEL_ARMS = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms");
@@ -50,14 +50,14 @@ public class ModelSpriteCore extends ModelBaked<EntitySprite> {
 	}
 
 	@Override
-	public void setRotationAngles(EntitySprite entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(SpriteEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		
 		final int intervalsPer = 2;
 		float rate = 20f;
 		boolean angry = false;
 		
-		if (entityIn instanceof EntitySprite && ((EntitySprite) entityIn).isAngry()) {
+		if (entityIn instanceof SpriteEntity && ((SpriteEntity) entityIn).isAngry()) {
 			angry = true;
 		}
 		

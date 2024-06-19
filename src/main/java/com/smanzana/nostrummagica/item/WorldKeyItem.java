@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.tile.IWorldKeyHolder;
-import com.smanzana.nostrummagica.tile.LockedChestEntity;
+import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -122,7 +122,7 @@ public class WorldKeyItem extends Item {
 		if (te instanceof ChestTileEntity) {
 			// Convert chests to locked chests
 			final NostrumWorldKey key = this.getKey(stack);
-			if (!LockedChestEntity.LockChest(worldIn, pos, key)) {
+			if (!LockedChestTileEntity.LockChest(worldIn, pos, key)) {
 				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"), Util.DUMMY_UUID);
 			} else {
 				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8)), Util.DUMMY_UUID); 

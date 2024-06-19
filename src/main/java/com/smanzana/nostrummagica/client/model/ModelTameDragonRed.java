@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 
-public class ModelTameDragonRed extends ModelDragonRed<EntityTameDragonRed> {
+public class ModelTameDragonRed extends ModelDragonRed<TameRedDragonEntity> {
 
 	
 	public ModelTameDragonRed() {

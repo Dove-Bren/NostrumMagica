@@ -19,7 +19,7 @@ import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
-import com.smanzana.nostrummagica.tile.BasicSpellTableEntity;
+import com.smanzana.nostrummagica.tile.BasicSpellTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
@@ -125,13 +125,13 @@ public class BasicSpellCraftGui {
 		}
 		
 		public static BasicSpellCraftContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
-			final BasicSpellTableEntity te = ContainerUtil.GetPackedTE(buffer);
+			final BasicSpellTableTileEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
 			final @Nullable IInventory extraInv = te.getExtraInventory();
 			return new BasicSpellCraftContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInv);
 		}
 		
-		public static IPackedContainerProvider Make(BasicSpellTableEntity table) {
+		public static IPackedContainerProvider Make(BasicSpellTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new BasicSpellCraftContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {

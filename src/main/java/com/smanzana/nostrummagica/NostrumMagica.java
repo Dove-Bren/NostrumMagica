@@ -14,8 +14,8 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.smanzana.nostrummagica.block.NostrumPortal;
-import com.smanzana.nostrummagica.block.TemporaryTeleportationPortal;
+import com.smanzana.nostrummagica.block.PortalBlock;
+import com.smanzana.nostrummagica.block.TemporaryTeleportationPortalBlock;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
@@ -845,7 +845,7 @@ public class NostrumMagica {
 		magicEffectProxy.clearAll();
 
 		// Reset portal data so previous saves don't screw you over
-		NostrumPortal.resetTimers();
+		PortalBlock.resetTimers();
 	}
 
 	public static final boolean isBlockLoaded(World world, BlockPos pos) {
@@ -944,10 +944,10 @@ public class NostrumMagica {
 		boolean success = false;
 
 		if (allowPortal && attr != null && attr.hasEnhancedTeleport()) {
-			BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, player.getPosition().up(), 4, true,
+			BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, player.getPosition().up(), 4, true,
 					target, 20 * 30);
 			if (portal != null) {
-				TemporaryTeleportationPortal.spawnNearby(world, target, 4, true, portal, 20 * 30);
+				TemporaryTeleportationPortalBlock.spawnNearby(world, target, 4, true, portal, 20 * 30);
 				success = true;
 			}
 		} else {

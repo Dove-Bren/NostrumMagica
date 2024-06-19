@@ -6,9 +6,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonGambit;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.RedDragonSpellInventory;
+import com.smanzana.nostrummagica.entity.dragon.DragonGambit;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.RedDragonSpellInventory;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -33,7 +33,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
-public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
+public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
 	private static final ResourceLocation DRAGON_ICON_TEXT = NostrumMagica.Loc("textures/gui/container/dragon_gui.png");
 	
@@ -55,16 +55,16 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	private static final int toggleSize = GUI_TEX_TOGGLE_LENGTH;
 	private static final int rowIncr = cellWidth + toggleSize + rowMargin;
 	
-	private EntityTameDragonRed dragon;
+	private TameRedDragonEntity dragon;
 	private RedDragonSpellInventory dragonInv;
 	private IInventory playerInv;
-	private IPetContainer<EntityTameDragonRed> container;
+	private IPetContainer<TameRedDragonEntity> container;
 	private int width;
 	private int height;
 	private int offsetX;
 	private int offsetY;
 	
-	public RedDragonSpellSheet(EntityTameDragonRed dragon) {
+	public RedDragonSpellSheet(TameRedDragonEntity dragon) {
 		this.dragon = dragon;
 	}
 	
@@ -125,7 +125,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		this.container = container;
 		this.dragonInv = this.dragon.getSpellInventory();
 		this.playerInv = player.inventory;
@@ -143,7 +143,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public void hideSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container) {
+	public void hideSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container) {
 		container.clearSlots();
 	}
 	
@@ -208,7 +208,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		matrixStackIn.pop();
 	}
 	
-	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, EntityDragonGambit gambit) {
+	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, DragonGambit gambit) {
 		int texOffsetX = 0;
 		int texOffsetY = 0;
 		if (gambit != null) {
@@ -223,7 +223,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 				toggleSize,	toggleSize, GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
 	}
 	
-	private void drawRow(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, EntityDragonGambit gambits[]) {
+	private void drawRow(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, DragonGambit gambits[]) {
 		
 		final int usedCount = dragonInv.getUsedSlots();
 		final int extraCount = Math.max(0, this.dragon.getMagicMemorySize() - usedCount);
@@ -437,7 +437,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 			matrixStackIn.translate(0, 0, 201);
 			RenderFuncs.drawRect(matrixStackIn, cellX, cellY, cellX + toggleSize, cellY + toggleSize, 0x50FFFFFF);
 			
-			EntityDragonGambit gambit = dragonInv.getAllGambits()[index];
+			DragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
 				GuiUtils.drawHoveringText(matrixStackIn, gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
 			}
@@ -524,7 +524,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		this.container.sendSheetMessageToServer(nbt);
 	}
 	
-	private void sendGambit(int index, EntityDragonGambit gambit) {
+	private void sendGambit(int index, DragonGambit gambit) {
 		CompoundNBT nbt = new CompoundNBT();
 		nbt.putString("type", SheetMessageType.REV_GAMBIT.name());
 		nbt.putInt("index", index);
@@ -532,7 +532,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		this.container.sendSheetMessageToClient(nbt);
 	}
 	
-	private void sendAllGambits(EntityDragonGambit gambits[]) {
+	private void sendAllGambits(DragonGambit gambits[]) {
 		CompoundNBT nbt = new CompoundNBT();
 		nbt.putString("type", SheetMessageType.REV_ALL_GAMBITS.name());
 		
@@ -563,25 +563,25 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		int index = nbt.getInt("index");
 		boolean forward = nbt.getBoolean("forward");
 		
-		EntityDragonGambit gambit = this.dragonInv.getAllGambits()[index];
+		DragonGambit gambit = this.dragonInv.getAllGambits()[index];
 		switch (gambit) {
 		case ALWAYS:
-			gambit = forward ? EntityDragonGambit.HEALTH_CRITICAL : EntityDragonGambit.FREQUENT;
+			gambit = forward ? DragonGambit.HEALTH_CRITICAL : DragonGambit.FREQUENT;
 			break;
 		case HEALTH_CRITICAL:
-			gambit = forward ? EntityDragonGambit.HEALTH_LOW : EntityDragonGambit.ALWAYS;
+			gambit = forward ? DragonGambit.HEALTH_LOW : DragonGambit.ALWAYS;
 			break;
 		case HEALTH_LOW:
-			gambit = forward ? EntityDragonGambit.MANA_LOW : EntityDragonGambit.HEALTH_CRITICAL;
+			gambit = forward ? DragonGambit.MANA_LOW : DragonGambit.HEALTH_CRITICAL;
 			break;
 		case MANA_LOW:
-			gambit = forward ? EntityDragonGambit.OCCASIONAL : EntityDragonGambit.HEALTH_LOW;
+			gambit = forward ? DragonGambit.OCCASIONAL : DragonGambit.HEALTH_LOW;
 			break;
 		case OCCASIONAL:
-			gambit = forward ? EntityDragonGambit.FREQUENT : EntityDragonGambit.MANA_LOW;
+			gambit = forward ? DragonGambit.FREQUENT : DragonGambit.MANA_LOW;
 			break;
 		case FREQUENT:
-			gambit = forward ? EntityDragonGambit.ALWAYS : EntityDragonGambit.OCCASIONAL;
+			gambit = forward ? DragonGambit.ALWAYS : DragonGambit.OCCASIONAL;
 			break;
 		}
 		this.dragonInv.setGambit(index, gambit);
@@ -593,11 +593,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	private void receiveGambit(CompoundNBT nbt) {
 		int index = nbt.getInt("index");
 		String name = nbt.getString("gambit");
-		EntityDragonGambit gambit;
+		DragonGambit gambit;
 		try {
-			gambit = EntityDragonGambit.valueOf(name.toUpperCase());
+			gambit = DragonGambit.valueOf(name.toUpperCase());
 		} catch (Exception e) {
-			gambit = EntityDragonGambit.ALWAYS;
+			gambit = DragonGambit.ALWAYS;
 		}
 		
 		this.dragonInv.setGambit(index, gambit);
@@ -609,11 +609,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		if (list != null) {
 			for (int i = 0; i < dragonInv.getSizeInventory() && i < list.size(); i++) {
 				String name = list.getString(i);
-				EntityDragonGambit gambit;
+				DragonGambit gambit;
 				try {
-					gambit = EntityDragonGambit.valueOf(name.toUpperCase());
+					gambit = DragonGambit.valueOf(name.toUpperCase());
 				} catch (Exception  e) {
-					gambit = EntityDragonGambit.ALWAYS;
+					gambit = DragonGambit.ALWAYS;
 				}
 				
 				dragonInv.setGambit(i, gambit);
@@ -653,7 +653,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 	}
 
 	@Override
-	public boolean shouldShow(EntityTameDragonRed dragon, IPetContainer<EntityTameDragonRed> container) {
+	public boolean shouldShow(TameRedDragonEntity dragon, IPetContainer<TameRedDragonEntity> container) {
 		return this.dragon.canManageSpells();
 	}
 	
@@ -661,11 +661,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<EntityTameDragonRed> {
 		
 		private RedDragonSpellSheet sheet;
 		private int subIndex;
-		private EntityTameDragonRed dragon;
+		private TameRedDragonEntity dragon;
 		private RedDragonSpellInventory inventory;
 		private SpellSlot prev;
 		
-		public SpellSlot(RedDragonSpellSheet sheet, SpellSlot prev, EntityTameDragonRed dragon, RedDragonSpellInventory inventory, int subIndex, int globalIndex, int xPosition, int yPosition) {
+		public SpellSlot(RedDragonSpellSheet sheet, SpellSlot prev, TameRedDragonEntity dragon, RedDragonSpellInventory inventory, int subIndex, int globalIndex, int xPosition, int yPosition) {
 			super(inventory, globalIndex, xPosition, yPosition);
 			
 			this.sheet = sheet;

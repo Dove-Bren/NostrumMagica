@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntityChakramSpellSaucer;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
+import com.smanzana.nostrummagica.entity.ChakramSpellSaucerEntity;
+import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
+import com.smanzana.nostrummagica.entity.SpellSaucerEntity;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -67,7 +67,7 @@ public class MagicCutterShape extends SpellShape {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 			
-			EntitySpellSaucer projectile = new EntityChakramSpellSaucer(this, 
+			SpellSaucerEntity projectile = new ChakramSpellSaucerEntity(this, 
 					world,
 					getState().getSelf(),
 					pos,

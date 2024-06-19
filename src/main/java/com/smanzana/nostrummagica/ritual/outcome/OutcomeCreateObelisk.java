@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.ritual.outcome;
 import java.util.List;
 
 import com.smanzana.nostrummagica.block.AltarBlock;
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.ChalkBlock;
-import com.smanzana.nostrummagica.block.NostrumObelisk;
+import com.smanzana.nostrummagica.block.ObeliskBlock;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
@@ -29,7 +29,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	
 	@Override
 	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
-		if (!NostrumObelisk.canSpawnObelisk(world, center.add(0, -1, 0))) {
+		if (!ObeliskBlock.canSpawnObelisk(world, center.add(0, -1, 0))) {
 			if (!world.isRemote) {
 				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
 			}
@@ -41,7 +41,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
 		// All logic contained in obelisk class
-		if (!NostrumObelisk.spawnObelisk(world, center.add(0, -1, 0))) {
+		if (!ObeliskBlock.spawnObelisk(world, center.add(0, -1, 0))) {
 			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
 		} else if (!world.isRemote) {
 			// clear altar on server
@@ -57,7 +57,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 				BlockPos pos = center.add(i, 0, j);
 				BlockState state = world.getBlockState(pos);
 				if (state != null &&
-						(state.getBlock() instanceof Candle || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {
+						(state.getBlock() instanceof CandleBlock || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {
 					world.destroyBlock(pos, true);
 				}
 			}

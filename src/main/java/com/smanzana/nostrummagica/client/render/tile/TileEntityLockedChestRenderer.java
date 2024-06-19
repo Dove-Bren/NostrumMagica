@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedChest;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
-import com.smanzana.nostrummagica.tile.LockedChestEntity;
+import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 
@@ -21,7 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChestEntity> {
+public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChestTileEntity> {
 	
 	public static final ResourceLocation TEXT_LOCK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/lock_plate.png");
 	public static final ResourceLocation TEXT_CHAINLINK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/chain_link.png");
@@ -30,7 +30,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		super(rendererDispatcherIn);
 	}
 	
-	protected void renderLock(LockedChestEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderLock(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Direction direction = te.getBlockState().get(LockedChest.FACING);
 		float rot = direction.getHorizontalAngle() + 90f;
 		
@@ -73,7 +73,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		matrixStackIn.pop();
 	}
 	
-	protected void renderChains(LockedChestEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderChains(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Direction direction = te.getBlockState().get(LockedChest.FACING);
 		float rot = direction.getHorizontalAngle();
 		
@@ -162,7 +162,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	}
 	
 	@Override
-	public void render(LockedChestEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+	public void render(LockedChestTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		final double ticks = tileEntityIn.getWorld().getGameTime() + partialTicks;

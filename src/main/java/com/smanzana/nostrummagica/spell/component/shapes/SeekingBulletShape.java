@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySpellBullet;
+import com.smanzana.nostrummagica.entity.SpellBulletEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -95,7 +95,7 @@ public class SeekingBulletShape extends SpellShape {
 			
 			startMotion = startMotion.scale(.4);
 			
-			EntitySpellBullet bullet = new EntitySpellBullet(NostrumEntityTypes.spellBullet, this, getState().getSelf(), target, axis);
+			SpellBulletEntity bullet = new SpellBulletEntity(NostrumEntityTypes.spellBullet, this, getState().getSelf(), target, axis);
 			bullet.setMotion(startMotion);
 			//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 			

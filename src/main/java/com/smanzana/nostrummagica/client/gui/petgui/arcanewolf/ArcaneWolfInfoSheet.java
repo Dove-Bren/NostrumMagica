@@ -7,8 +7,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.WolfTypeCapability;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTypeCapability;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
@@ -26,23 +26,23 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
-public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
+public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 
-	private EntityArcaneWolf wolf;
+	private ArcaneWolfEntity wolf;
 	private List<CapabilityTooltip> widgets;
 	
-	public ArcaneWolfInfoSheet(EntityArcaneWolf wolf) {
+	public ArcaneWolfInfoSheet(ArcaneWolfEntity wolf) {
 		this.wolf = wolf;
 		widgets = new ArrayList<>();
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
 		
 	}
 
@@ -271,7 +271,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<EntityArcaneWolf> {
 		return "Stats";
 	}
 	
-	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
+	public boolean shouldShow(ArcaneWolfEntity wolf, IPetContainer<ArcaneWolfEntity> container) {
 		return true;
 	}
 

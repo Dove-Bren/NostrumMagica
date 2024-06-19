@@ -18,7 +18,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.ModificationTable;
+import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAir;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
@@ -1243,7 +1243,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 		
 		// Configurable?
-		if (ModificationTable.IsModifiable(stack)) {
+		if (ModificationTableBlock.IsModifiable(stack)) {
 			matrixStackIn.push();
 			matrixStackIn.translate(event.getX() - 15, event.getY() + event.getHeight() - 8, 500);
 			renderConfigurableIcon(matrixStackIn);

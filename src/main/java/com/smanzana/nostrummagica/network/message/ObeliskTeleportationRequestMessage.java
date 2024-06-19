@@ -5,10 +5,10 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.NostrumObelisk;
+import com.smanzana.nostrummagica.block.ObeliskBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -79,7 +79,7 @@ public class ObeliskTeleportationRequestMessage {
 		}
 		
 		// Validate obelisks
-		if (NostrumObelisk.isValidTarget(world, from, to)) {
+		if (ObeliskBlock.isValidTarget(world, from, to)) {
 			player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.DUMMY_UUID);
 			return false;
 		}
@@ -87,13 +87,13 @@ public class ObeliskTeleportationRequestMessage {
 		// If we were given from, deduct aether
 		if (from != null) {
 			TileEntity te = world.getTileEntity(from);
-			if (te == null || !(te instanceof NostrumObeliskEntity)) {
+			if (te == null || !(te instanceof ObeliskTileEntity)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
 				player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.DUMMY_UUID);
 				return false;
 			}
 			
-			NostrumObeliskEntity obelisk = (NostrumObeliskEntity) te;
+			ObeliskTileEntity obelisk = (ObeliskTileEntity) te;
 			if (!obelisk.deductForTeleport(to)) {
 				NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
 				player.sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"), Util.DUMMY_UUID);

@@ -24,7 +24,7 @@ import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
-import com.smanzana.nostrummagica.tile.SpellTableEntity;
+import com.smanzana.nostrummagica.tile.SpellTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
@@ -107,7 +107,7 @@ public class MasterSpellCreationGui {
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected final SpellTableEntity inventory;
+		protected final SpellTableTileEntity inventory;
 		protected final PlayerEntity player;
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
@@ -118,7 +118,7 @@ public class MasterSpellCreationGui {
 		protected int lastManaCost;
 		protected int lastWeight;
 		
-		public SpellCreationContainer(int windowId, PlayerEntity crafter, PlayerInventory playerInv, SpellTableEntity tableInventory) {
+		public SpellCreationContainer(int windowId, PlayerEntity crafter, PlayerInventory playerInv, SpellTableTileEntity tableInventory) {
 			super(NostrumContainers.SpellCreationMaster, windowId);
 			this.inventory = tableInventory;
 			this.player = crafter;
@@ -228,7 +228,7 @@ public class MasterSpellCreationGui {
 			return true;
 		}
 		
-		public static IPackedContainerProvider Make(SpellTableEntity table) {
+		public static IPackedContainerProvider Make(SpellTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new SpellCreationContainer(windowId, player, playerInv, table);
 			}, (buffer) -> {
@@ -389,7 +389,7 @@ public class MasterSpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, int iconIdx, SpellTableEntity inventory, PlayerEntity crafter,
+		public static Spell craftSpell(String name, int iconIdx, SpellTableTileEntity inventory, PlayerEntity crafter,
 				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
@@ -492,7 +492,7 @@ public class MasterSpellCreationGui {
 	
 	// if take, actually removes. Otherwise, just checks
 	// returns amount needed still. 0 means all that were needed are there
-	private static int takeReagent(SpellTableEntity inventory, ReagentType type, int count, boolean take) {
+	private static int takeReagent(SpellTableTileEntity inventory, ReagentType type, int count, boolean take) {
 		for (int i = inventory.getReagentSlotIndex(); i < inventory.getReagentSlotIndex() + inventory.getReagentSlotCount(); i++) {
 			@Nonnull ItemStack stack = inventory.getStackInSlot(i);
 			if (stack.isEmpty())

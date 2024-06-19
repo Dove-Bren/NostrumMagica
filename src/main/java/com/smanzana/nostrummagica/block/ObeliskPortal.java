@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.block;
 
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.tile.ObeliskPortalTileEntity;
 
 import net.minecraft.block.Block;
@@ -19,7 +19,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class ObeliskPortal extends TeleportationPortal {
+public class ObeliskPortal extends TeleportationPortalBlock {
 	
 	public static final String ID = "obelisk_portal";
 	
@@ -49,8 +49,8 @@ public class ObeliskPortal extends TeleportationPortal {
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
 		TileEntity te = worldIn.getTileEntity(portalPos.down());
-		if (te != null && te instanceof NostrumObeliskEntity) {
-			NostrumObeliskEntity ent = (NostrumObeliskEntity) te;
+		if (te != null && te instanceof ObeliskTileEntity) {
+			ObeliskTileEntity ent = (ObeliskTileEntity) te;
 			if (ent.deductForTeleport(ent.getCurrentTarget())) {
 				super.teleportEntity(worldIn, portalPos, entityIn);
 			} else {
@@ -87,7 +87,7 @@ public class ObeliskPortal extends TeleportationPortal {
 		pos = getMaster(state, pos); // find master
 		
 		BlockState parentState = worldIn.getBlockState(pos.down());
-		if (parentState != null && parentState.getBlock() instanceof NostrumObelisk) {
+		if (parentState != null && parentState.getBlock() instanceof ObeliskBlock) {
 			parentState.getBlock().onBlockActivated(parentState, worldIn, pos.down(), player, handIn, hit);
 		}
 		

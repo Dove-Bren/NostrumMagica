@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
+import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
@@ -23,7 +23,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<EntityKeySwitchTrigger> implements IWorldKeyHolder, IUniqueDungeonTileEntity {
+public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchTriggerEntity> implements IWorldKeyHolder, IUniqueDungeonTileEntity {
 	
 	private NostrumWorldKey key;
 	private DyeColor color;
@@ -104,8 +104,8 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<EntityKeyS
 	}
 	
 	@Override
-	protected EntityKeySwitchTrigger makeTriggerEntity(World world, double x, double y, double z) {
-		EntityKeySwitchTrigger ent = new EntityKeySwitchTrigger(NostrumEntityTypes.keySwitchTrigger, world);
+	protected KeySwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
+		KeySwitchTriggerEntity ent = new KeySwitchTriggerEntity(NostrumEntityTypes.keySwitchTrigger, world);
 		ent.setPosition(x, y, z);
 		return ent;
 	}

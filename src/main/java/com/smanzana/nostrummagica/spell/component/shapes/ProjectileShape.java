@@ -4,8 +4,8 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
+import com.smanzana.nostrummagica.entity.SpellProjectileEntity;
+import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -75,7 +75,7 @@ public class ProjectileShape extends SpellShape {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
 			
-			EntitySpellProjectile projectile = new EntitySpellProjectile(ProjectileShapeInstance.this,
+			SpellProjectileEntity projectile = new SpellProjectileEntity(ProjectileShapeInstance.this,
 					getState().getSelf(),
 					pos,
 					dir,

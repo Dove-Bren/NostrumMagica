@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.serializer;
 
-import com.smanzana.nostrummagica.entity.EntityWillo.WilloStatus;
+import com.smanzana.nostrummagica.entity.WilloEntity.WilloStatus;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;

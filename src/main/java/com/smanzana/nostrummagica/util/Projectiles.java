@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.util;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.entity.EntitySpellSaucer;
+import com.smanzana.nostrummagica.entity.SpellSaucerEntity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -19,8 +19,8 @@ public class Projectiles {
 			shooter = ((ProjectileEntity) projectile).func_234616_v_();// getShooter();
 			if (shooter != null && shooter instanceof LivingEntity)
 				source = (LivingEntity) shooter;
-		} else if (projectile instanceof EntitySpellSaucer) {
-			shooter = ((EntitySpellSaucer) projectile).getShooter();
+		} else if (projectile instanceof SpellSaucerEntity) {
+			shooter = ((SpellSaucerEntity) projectile).getShooter();
 			if (shooter != null && shooter instanceof LivingEntity)
 				source = (LivingEntity) shooter;
 		}

@@ -5,8 +5,8 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBoss;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss.PlantBossTreeType;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossTreeType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
@@ -18,7 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 
-public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShiv<EntityPlantBoss>> {
+public class RenderPlantBoss extends MobRenderer<PlantBossEntity, ModelRenderShiv<PlantBossEntity>> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
@@ -36,12 +36,12 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 	 * @return
 	 */
 	@Override
-	protected float handleRotationFloat(EntityPlantBoss livingBase, float partialTicks) {
+	protected float handleRotationFloat(PlantBossEntity livingBase, float partialTicks) {
 		return super.handleRotationFloat(livingBase, partialTicks);
 	}
 	
 	@Override
-	public void render(EntityPlantBoss entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(PlantBossEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		this.entityModel.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
 			// Could pass through bufferIn to allow access to different buffer types, but only need the base one
 			this.renderModel(entityIn, deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha);
@@ -50,7 +50,7 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	
-	protected void renderTrimming(EntityPlantBoss plant, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
+	protected void renderTrimming(PlantBossEntity plant, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
 			float red, float green, float blue, float alpha) {
 		if (plant.getBody() == null) {
 			return;
@@ -149,7 +149,7 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 		matrixStackIn.pop();
 	}
 	
-	protected void renderHeadTree(EntityPlantBoss plant, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
+	protected void renderHeadTree(PlantBossEntity plant, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn,
 			float red, float green, float blue, float alpha) {
 		if (plant.getBody() == null) {
 			return;
@@ -233,7 +233,7 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 		matrixStackIn.pop();
 	}
 	
-	protected void renderModel(EntityPlantBoss entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
+	protected void renderModel(PlantBossEntity entityIn, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha) {
 		
 		this.mainModel.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
@@ -268,7 +268,7 @@ public class RenderPlantBoss extends MobRenderer<EntityPlantBoss, ModelRenderShi
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(EntityPlantBoss entity) {
+	public ResourceLocation getEntityTexture(PlantBossEntity entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

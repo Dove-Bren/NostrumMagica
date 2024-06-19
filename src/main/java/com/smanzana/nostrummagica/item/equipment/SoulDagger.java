@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.IStabbableEntity;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
@@ -173,7 +173,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 				&& wolf.isOwner(stabber)) {
 			// Wolves get transformed into arcane wolves!
 			wolf.playSound(SoundEvents.ENTITY_WOLF_HOWL, 1f, 1f);
-			EntityArcaneWolf.TransformWolf(wolf, (PlayerEntity) stabber);
+			ArcaneWolfEntity.TransformWolf(wolf, (PlayerEntity) stabber);
 			return true;
 		}
 		

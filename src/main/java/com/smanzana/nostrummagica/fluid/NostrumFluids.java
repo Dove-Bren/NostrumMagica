@@ -16,21 +16,21 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumFluids {
 	
-	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE) public static FluidPoisonWater poisonWater;
-	@ObjectHolder(FluidPoisonWater.ID_BREAKABLE_FLOWING) public static FluidPoisonWater poisonWaterFlowing;
-	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE) public static FluidPoisonWater unbreakablePoisonWater;
-	@ObjectHolder(FluidPoisonWater.ID_UNBREAKABLE_FLOWING) public static FluidPoisonWater unbreakablePoisonWaterFlowing;
-	@ObjectHolder(FluidMysticWater.ID) public static FluidMysticWater mysticWater;
+	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE) public static PoisonWaterFluid poisonWater;
+	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE_FLOWING) public static PoisonWaterFluid poisonWaterFlowing;
+	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE) public static PoisonWaterFluid unbreakablePoisonWater;
+	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE_FLOWING) public static PoisonWaterFluid unbreakablePoisonWaterFlowing;
+	@ObjectHolder(MysticWaterFluid.ID) public static MysticWaterFluid mysticWater;
 	
 	@SubscribeEvent
     public static void registerFluidBlocks(RegistryEvent.Register<Fluid> event) {
 		final IForgeRegistry<Fluid> registry = event.getRegistry();
 
-		registry.register(new FluidPoisonWater.Source(false).setRegistryName(FluidPoisonWater.ID_BREAKABLE));
-		registry.register(new FluidPoisonWater.Flowing(false).setRegistryName(FluidPoisonWater.ID_BREAKABLE_FLOWING));
-		registry.register(new FluidPoisonWater.Source(true).setRegistryName(FluidPoisonWater.ID_UNBREAKABLE));
-		registry.register(new FluidPoisonWater.Flowing(true).setRegistryName(FluidPoisonWater.ID_UNBREAKABLE_FLOWING));
-		registry.register(new FluidMysticWater().setRegistryName(FluidMysticWater.ID));
+		registry.register(new PoisonWaterFluid.Source(false).setRegistryName(PoisonWaterFluid.ID_BREAKABLE));
+		registry.register(new PoisonWaterFluid.Flowing(false).setRegistryName(PoisonWaterFluid.ID_BREAKABLE_FLOWING));
+		registry.register(new PoisonWaterFluid.Source(true).setRegistryName(PoisonWaterFluid.ID_UNBREAKABLE));
+		registry.register(new PoisonWaterFluid.Flowing(true).setRegistryName(PoisonWaterFluid.ID_UNBREAKABLE_FLOWING));
+		registry.register(new MysticWaterFluid().setRegistryName(MysticWaterFluid.ID));
     }
     
     @SubscribeEvent
@@ -38,11 +38,11 @@ public class NostrumFluids {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
     	registry.register(new BucketItem(() -> {return NostrumFluids.poisonWater;}, NostrumItems.PropUnstackable())
-    			.setRegistryName(FluidPoisonWater.ID_BREAKABLE + "_bucket")
+    			.setRegistryName(PoisonWaterFluid.ID_BREAKABLE + "_bucket")
     			);
     	
     	registry.register(new BucketItem(() -> {return NostrumFluids.unbreakablePoisonWater;}, NostrumItems.PropUnstackable())
-    			.setRegistryName(FluidPoisonWater.ID_UNBREAKABLE + "_bucket")
+    			.setRegistryName(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket")
     			);
     }
 }

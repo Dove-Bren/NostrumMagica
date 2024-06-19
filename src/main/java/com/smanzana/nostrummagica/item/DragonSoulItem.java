@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.Minecraft;
@@ -74,16 +74,16 @@ public class DragonSoulItem extends PetSoulItem {
 
 	@Override
 	protected void setWorldID(LivingEntity pet, UUID worldID) {
-		if (pet instanceof EntityTameDragonRed) { // TODO new base class lol
-			((EntityTameDragonRed) pet).setWorldID(worldID);
+		if (pet instanceof TameRedDragonEntity) { // TODO new base class lol
+			((TameRedDragonEntity) pet).setWorldID(worldID);
 		}
 	}
 
 	@Override
 	protected void beforePetRespawn(LivingEntity pet, World world, Vector3d pos, ItemStack stack) {
 		// Dragons spawn at 50% health and 0% mana
-		if (pet instanceof EntityTameDragonRed) { // TODO new base class lol
-			EntityTameDragonRed dragon = ((EntityTameDragonRed) pet);
+		if (pet instanceof TameRedDragonEntity) { // TODO new base class lol
+			TameRedDragonEntity dragon = ((TameRedDragonEntity) pet);
 			final int mana = dragon.getMana();
 			final float maxHP = dragon.getMaxHealth();
 			
@@ -104,8 +104,8 @@ public class DragonSoulItem extends PetSoulItem {
 			return ActionResultType.SUCCESS;
 		}
 		
-		if (target instanceof EntityTameDragonRed) {
-			ItemStack newStack = MakeSoulItem((EntityTameDragonRed) target);
+		if (target instanceof TameRedDragonEntity) {
+			ItemStack newStack = MakeSoulItem((TameRedDragonEntity) target);
 			target.entityDropItem(newStack, 1);
 			return ActionResultType.SUCCESS;
 		}
@@ -259,11 +259,11 @@ public class DragonSoulItem extends PetSoulItem {
 		return 3000; // Could make it dynamic
 	}
 	
-	public static ItemStack MakeSoulItem(EntityTameDragonRed dragon) {
+	public static ItemStack MakeSoulItem(TameRedDragonEntity dragon) {
 		return MakeSoulItem(dragon, true);
 	}
 	
-	public static ItemStack MakeSoulItem(EntityTameDragonRed dragon, boolean register) {
+	public static ItemStack MakeSoulItem(TameRedDragonEntity dragon, boolean register) {
 		if (register) {
 			NostrumItems.dragonSoulItem.setWorldID(dragon, NostrumMagica.instance.getPetSoulRegistry().registerPet(dragon));
 			NostrumMagica.instance.getPetSoulRegistry().snapshotPet(dragon);

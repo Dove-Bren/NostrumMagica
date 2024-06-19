@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.function.Supplier;
 
-import com.smanzana.nostrummagica.fluid.FluidMysticWater;
+import com.smanzana.nostrummagica.fluid.MysticWaterFluid;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -37,10 +37,10 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 	public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL_0_15;
 	public static final IntegerProperty POWER = IntegerProperty.create("power", 0, 2);
 	
-	private final Supplier<? extends FluidMysticWater> fluidSupplier;
-	private FluidMysticWater fluidCache = null;
+	private final Supplier<? extends MysticWaterFluid> fluidSupplier;
+	private MysticWaterFluid fluidCache = null;
 	
-	public MysticWaterBlock(Supplier<? extends FluidMysticWater> supplier) {
+	public MysticWaterBlock(Supplier<? extends MysticWaterFluid> supplier) {
 		super(Block.Properties.create(Material.WATER)
 				.doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()
 				);
@@ -58,7 +58,7 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 		return this.getDefaultState().with(POWER, Math.max(0, Math.min(2, power)));
 	}
 	
-	protected FluidMysticWater getFluid() {
+	protected MysticWaterFluid getFluid() {
 		if (this.fluidCache == null) {
 			this.fluidCache = fluidSupplier.get();
 		}

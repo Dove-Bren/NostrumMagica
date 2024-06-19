@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -79,7 +79,7 @@ public class FrostbiteEffect extends Effect {
 					NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 				}
 				
-				EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ());
+				AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ());
 				cloud.setOwner(entity);
 				cloud.setIgnoreOwner(true);
 				cloud.setRadius(10f);

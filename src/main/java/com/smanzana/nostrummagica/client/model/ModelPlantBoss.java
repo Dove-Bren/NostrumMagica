@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelPlantBoss extends EntityModel<EntityPlantBoss> {
+public class ModelPlantBoss extends EntityModel<PlantBossEntity> {
 	
 	private ModelRenderer body;
 	//private ModelRenderer northFrond; etc
@@ -26,12 +26,12 @@ public class ModelPlantBoss extends EntityModel<EntityPlantBoss> {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityPlantBoss entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(PlantBossEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 
 	@Override
-	public void setRotationAngles(EntityPlantBoss entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(PlantBossEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

@@ -4,8 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonEgg;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -63,7 +63,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 //		dragon.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 //		worldIn.spawnEntityInWorld(dragon);
 		
-		EntityDragonEgg egg = new EntityDragonEgg(NostrumEntityTypes.dragonEgg, worldIn, playerIn, EntityTameDragonRed.rollRandomStats());
+		DragonEggEntity egg = new DragonEggEntity(NostrumEntityTypes.dragonEgg, worldIn, playerIn, TameRedDragonEntity.rollRandomStats());
 		egg.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
 		egg.onInitialSpawn((ServerWorld) worldIn, worldIn.getDifficultyForLocation(pos), SpawnReason.EVENT, null, null);
 		worldIn.addEntity(egg);

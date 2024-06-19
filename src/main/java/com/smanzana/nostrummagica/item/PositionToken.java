@@ -5,12 +5,12 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.NostrumObelisk;
+import com.smanzana.nostrummagica.block.ObeliskBlock;
 import com.smanzana.nostrummagica.block.ObeliskPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.block.BlockState;
@@ -175,10 +175,10 @@ public class PositionToken extends PositionCrystal {
 				return false;
 			
 			BlockState state = entityItem.world.getBlockState(pos);
-			if (state != null && state.getBlock() instanceof NostrumObelisk && NostrumObelisk.blockIsMaster(state)) {
+			if (state != null && state.getBlock() instanceof ObeliskBlock && ObeliskBlock.blockIsMaster(state)) {
 				TileEntity ent = entityItem.world.getTileEntity(pos);
-				if (ent != null && ent instanceof NostrumObeliskEntity) {
-					NostrumObeliskEntity obelisk = ((NostrumObeliskEntity) ent);
+				if (ent != null && ent instanceof ObeliskTileEntity) {
+					ObeliskTileEntity obelisk = ((ObeliskTileEntity) ent);
 					if (obelisk.canAcceptTarget(storedPos)) {
 						if (entityItem.getItem().hasDisplayName()) {
 							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName().getString());

@@ -14,11 +14,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaEntityEffect;
-import com.smanzana.nostrummagica.entity.EntityAreaEffect.IAreaLocationEffect;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaEntityEffect;
+import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.NostrumTameLightning;
+import com.smanzana.nostrummagica.entity.TameLightning;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.IReactiveEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -544,7 +544,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		final int blizzardCount = MagicArmor.GetSetCount(caster, EMagicElement.ICE, MagicArmor.Type.TRUE);
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
-		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
+		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setColor(NostrumEffects.frostbite.getLiquidColor());
 		cloud.setWaitTime(5);
@@ -588,7 +588,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
 		final int hurricaneCount = MagicArmor.GetSetCount(caster, EMagicElement.WIND, MagicArmor.Type.TRUE);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
-		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
+		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(10);
 		cloud.setRadius(.75f);
@@ -673,7 +673,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	public static void spawnJumpVortex(World world, PlayerEntity caster, Vector3d at, Type weaponType) {
-		EntityAreaEffect cloud = new EntityAreaEffect(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
+		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
 		cloud.setRadius(1f);
@@ -720,7 +720,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		}
 		
 		((ServerWorld)entity.world).addEntity(
-				new NostrumTameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ())
+				new TameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ())
 				);
 		attr.addMana(-30);
 		if (entity instanceof PlayerEntity) {
@@ -783,7 +783,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			
 			if (i == 0) {
 				((ServerWorld) world).addEntity(
-						new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, pos.x, pos.y, pos.z)
+						new TameLightning(NostrumEntityTypes.tameLightning, world, pos.x, pos.y, pos.z)
 						);
 			} else {
 				// Apply random x/z offsets. Then step up to 4 to find surface
@@ -800,7 +800,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				
 				if (world.isAirBlock(cursor)) {
 					((ServerWorld) world).addEntity(
-						new NostrumTameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
+						new TameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 						);
 				}
 			}
@@ -826,7 +826,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
         return ActionResultType.PASS;
 	}
 	
-	public static void spawnWhirlwindParticle(World world, int count, Vector3d pos, EntityAreaEffect cloud, int color, float gravity) {
+	public static void spawnWhirlwindParticle(World world, int count, Vector3d pos, AreaEffectEntity cloud, int color, float gravity) {
 		NostrumParticles.GLOW_ORB.spawn(world, new NostrumParticles.SpawnParams(count, pos.x, pos.y, pos.z,
 				cloud.getRadius(),
 				cloud.getRemainingTicks() / 4, 20,

@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.EntitySpellBubble;
-import com.smanzana.nostrummagica.entity.EntitySpellProjectile.ISpellProjectileShape;
+import com.smanzana.nostrummagica.entity.SpellBubbleEntity;
+import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -76,7 +76,7 @@ public class BubbleSprayShape extends SpellShape {
 			for (int i = 0; i < 10; i++) {
 				final Vector3d shootDir = dir.add(rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy);
 				final float thisRange = (range / 4f) * (.25f + ( rand.nextFloat() * 1f));
-				EntitySpellBubble bubble = new EntitySpellBubble(BubbleSprayShapeInstance.this,
+				SpellBubbleEntity bubble = new SpellBubbleEntity(BubbleSprayShapeInstance.this,
 						getState().getSelf(),
 						pos,
 						shootDir,

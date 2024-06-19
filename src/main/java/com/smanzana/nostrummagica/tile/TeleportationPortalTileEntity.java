@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.tile;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.NostrumPortal;
+import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.block.BlockState;
@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTileEntityBase  {
+public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 
 	private static final String NBT_TARGET = "target_pos";
 	
@@ -59,7 +59,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	@Override
 	public int getColor() {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (NostrumPortal.getRemainingCharge(player) > 0) {
+		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00A00050;
 		}
 		return 0x00500050;
@@ -75,7 +75,7 @@ public class TeleportationPortalTileEntity extends NostrumPortal.NostrumPortalTi
 	@Override
 	public float getOpacity() {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		if (NostrumPortal.getRemainingCharge(player) > 0) {
+		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0.5f;
 		}
 		return .9f;

@@ -10,8 +10,8 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed.TameRedDragonLore;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.TameRedDragonLore;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
@@ -503,9 +503,9 @@ public abstract class InfoScreenTab {
 						new PaginatedInfoSubScreen(screen, "tamed_dragon.experience"),
 						new ItemStack(Items.IRON_SWORD)));
 				
-				if (attr.hasLore(EntityTameDragonRed.SoulBoundDragonLore.instance())) {
-					buttons.add(new SubscreenInfoButton(screen, EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey(),
-							new PaginatedInfoSubScreen(screen, EntityTameDragonRed.SoulBoundDragonLore.instance().getLoreKey()),
+				if (attr.hasLore(TameRedDragonEntity.SoulBoundDragonLore.instance())) {
+					buttons.add(new SubscreenInfoButton(screen, TameRedDragonEntity.SoulBoundDragonLore.instance().getLoreKey(),
+							new PaginatedInfoSubScreen(screen, TameRedDragonEntity.SoulBoundDragonLore.instance().getLoreKey()),
 							new ItemStack(NostrumItems.dragonSoulItem)));
 				}
 					

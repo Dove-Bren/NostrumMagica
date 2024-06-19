@@ -4,14 +4,14 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelArcaneWolf;
 import com.smanzana.nostrummagica.client.render.layer.LayerArcaneWolfRunes;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderArcaneWolf extends MobRenderer<EntityArcaneWolf, ModelArcaneWolf> {
+public class RenderArcaneWolf extends MobRenderer<ArcaneWolfEntity, ModelArcaneWolf> {
 
 	private static final ResourceLocation ARCANE_WOLF_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/arcane_wolf/base.png");
 	
@@ -27,12 +27,12 @@ public class RenderArcaneWolf extends MobRenderer<EntityArcaneWolf, ModelArcaneW
 	 * @return
 	 */
 	@Override
-	protected float handleRotationFloat(EntityArcaneWolf livingBase, float partialTicks) {
+	protected float handleRotationFloat(ArcaneWolfEntity livingBase, float partialTicks) {
 		return livingBase.getTailRotation();
 	}
 	
 	@Override
-	public void render(EntityArcaneWolf entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(ArcaneWolfEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		if (entity.isWolfWet()) {
 			//float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
 			float f = entity.getShadingWhileWet(partialTicks);
@@ -49,7 +49,7 @@ public class RenderArcaneWolf extends MobRenderer<EntityArcaneWolf, ModelArcaneW
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(EntityArcaneWolf entity) {
+	public ResourceLocation getEntityTexture(ArcaneWolfEntity entity) {
 		return ARCANE_WOLF_TEXTURE_BASE;
 	}
 	

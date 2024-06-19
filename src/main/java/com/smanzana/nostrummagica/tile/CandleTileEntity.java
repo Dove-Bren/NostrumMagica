@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import java.util.Random;
 
-import com.smanzana.nostrummagica.block.Candle;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
 import net.minecraft.block.BlockState;
@@ -101,7 +101,7 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 			if (state == null)
 				return;
 			
-			Candle.extinguish(world, this.pos, state, false);
+			CandleBlock.extinguish(world, this.pos, state, false);
 		}
 	}
 	
@@ -111,6 +111,6 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	}
 	
 	protected boolean isEnhanced() {
-		return Candle.IsCandleEnhanced(getWorld(), getPos());
+		return CandleBlock.IsCandleEnhanced(getWorld(), getPos());
 	}
 }

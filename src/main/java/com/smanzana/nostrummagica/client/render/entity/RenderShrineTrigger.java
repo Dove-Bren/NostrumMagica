@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.entity.EntityShrineTrigger;
+import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
-public abstract class RenderShrineTrigger<E extends EntityShrineTrigger<?>> extends EntityRenderer<E> {
+public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> extends EntityRenderer<E> {
 
 	private static final ResourceLocation TEX_BUBBLE = NostrumMagica.Loc("textures/block/shrine_bubble.png");
 	private static final ResourceLocation TEX_BUBBLE_DAM1 = NostrumMagica.Loc("textures/block/shrine_bubble_1.png");
@@ -97,40 +97,40 @@ public abstract class RenderShrineTrigger<E extends EntityShrineTrigger<?>> exte
 		matrixStackIn.pop();
 	}
 	
-	public static class Element extends RenderShrineTrigger<EntityShrineTrigger.Element> {
+	public static class Element extends RenderShrineTrigger<ShrineTriggerEntity.Element> {
 		
 		public Element(EntityRendererManager renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
 		@Override
-		protected SpellComponentIcon getIcon(EntityShrineTrigger.Element entity) {
+		protected SpellComponentIcon getIcon(ShrineTriggerEntity.Element entity) {
 			return SpellComponentIcon.get(entity.getElement());
 		}
 		
 	}
 	
-	public static class Shape extends RenderShrineTrigger<EntityShrineTrigger.Shape> {
+	public static class Shape extends RenderShrineTrigger<ShrineTriggerEntity.Shape> {
 		
 		public Shape(EntityRendererManager renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
 		@Override
-		protected SpellComponentIcon getIcon(EntityShrineTrigger.Shape entity) {
+		protected SpellComponentIcon getIcon(ShrineTriggerEntity.Shape entity) {
 			return SpellComponentIcon.get(entity.getShape());
 		}
 		
 	}
 	
-	public static class Alteration extends RenderShrineTrigger<EntityShrineTrigger.Alteration> {
+	public static class Alteration extends RenderShrineTrigger<ShrineTriggerEntity.Alteration> {
 		
 		public Alteration(EntityRendererManager renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
 		@Override
-		protected SpellComponentIcon getIcon(EntityShrineTrigger.Alteration entity) {
+		protected SpellComponentIcon getIcon(ShrineTriggerEntity.Alteration entity) {
 			return SpellComponentIcon.get(entity.getAlteration());
 		}
 		

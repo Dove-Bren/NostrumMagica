@@ -9,8 +9,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity;
-import com.smanzana.nostrummagica.tile.NostrumObeliskEntity.NostrumObeliskTarget;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
+import com.smanzana.nostrummagica.tile.ObeliskTileEntity.NostrumObeliskTarget;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -43,7 +43,7 @@ public class ObeliskScreen extends Screen {
 
 	private static int zoomScaleFactor = 8;
 	
-	private NostrumObeliskEntity tileEntity;
+	private ObeliskTileEntity tileEntity;
 	private int xOffset;
 	private int yOffset;
 	private float scale;
@@ -59,7 +59,7 @@ public class ObeliskScreen extends Screen {
 	private String errorString;
 	private final Minecraft mc;
 	
-	public ObeliskScreen(NostrumObeliskEntity tileEntity) {
+	public ObeliskScreen(ObeliskTileEntity tileEntity) {
 		super(new StringTextComponent("Obelisk Screen"));
 		this.tileEntity = tileEntity;
 		drawList = ModConfig.config.getObeliskList();

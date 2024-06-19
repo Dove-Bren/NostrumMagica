@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
@@ -12,21 +12,21 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 
-public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed> {
+public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 
-	private EntityTameDragonRed dragon;
+	private TameRedDragonEntity dragon;
 	
-	public RedDragonBondInfoSheet(EntityTameDragonRed dragon) {
+	public RedDragonBondInfoSheet(TameRedDragonEntity dragon) {
 		this.dragon = dragon;
 	}
 	
 	@Override
-	public void showSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(EntityTameDragonRed dragon, PlayerEntity player, IPetContainer<EntityTameDragonRed> container) {
+	public void hideSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container) {
 		
 	}
 
@@ -44,15 +44,15 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 		
 		float bond = this.dragon.getBond();
 		
-		if (bond < EntityTameDragonRed.BOND_LEVEL_FOLLOW) {
+		if (bond < TameRedDragonEntity.BOND_LEVEL_FOLLOW) {
 			untrans = "info.tamed_dragon.red_bond.wild";
-		} else if (bond < EntityTameDragonRed.BOND_LEVEL_PLAYERS) {
+		} else if (bond < TameRedDragonEntity.BOND_LEVEL_PLAYERS) {
 			untrans = "info.tamed_dragon.red_bond.follow";
-		} else if (bond < EntityTameDragonRed.BOND_LEVEL_CHEST) {
+		} else if (bond < TameRedDragonEntity.BOND_LEVEL_CHEST) {
 			untrans = "info.tamed_dragon.red_bond.players";
-		} else if (bond < EntityTameDragonRed.BOND_LEVEL_ALLOW_RIDE) {
+		} else if (bond < TameRedDragonEntity.BOND_LEVEL_ALLOW_RIDE) {
 			untrans = "info.tamed_dragon.red_bond.chest";
-		} else if ((this.dragon.getCanUseMagic() && bond < EntityTameDragonRed.BOND_LEVEL_MAGIC) || (!this.dragon.getCanUseMagic() && bond < 0.9999f)) {
+		} else if ((this.dragon.getCanUseMagic() && bond < TameRedDragonEntity.BOND_LEVEL_MAGIC) || (!this.dragon.getCanUseMagic() && bond < 0.9999f)) {
 			untrans = "info.tamed_dragon.red_bond.ride";
 		} else if (this.dragon.getCanUseMagic() && bond < 0.9999f) {
 			untrans = "info.tamed_dragon.red_bond.magic";
@@ -68,39 +68,39 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 		x = 10;
 		y += (h * 4) + 10;
 		
-		if (bond >= EntityTameDragonRed.BOND_LEVEL_FOLLOW)
+		if (bond >= TameRedDragonEntity.BOND_LEVEL_FOLLOW)
 		{
-			if (bond >= EntityTameDragonRed.BOND_LEVEL_FOLLOW) {
+			if (bond >= TameRedDragonEntity.BOND_LEVEL_FOLLOW) {
 				str = "Follows";
 				
 				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
-			if (bond >= EntityTameDragonRed.BOND_LEVEL_PLAYERS) {
+			if (bond >= TameRedDragonEntity.BOND_LEVEL_PLAYERS) {
 				str = "Respects Other Players";
 				
 				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
-			if (bond >= EntityTameDragonRed.BOND_LEVEL_CHEST) {
+			if (bond >= TameRedDragonEntity.BOND_LEVEL_CHEST) {
 				str = "Can Hold Items";
 				
 				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
-			if (bond >= EntityTameDragonRed.BOND_LEVEL_ALLOW_RIDE) {
+			if (bond >= TameRedDragonEntity.BOND_LEVEL_ALLOW_RIDE) {
 				str = "Rideable";
 				
 				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
-			if (dragon.getCanUseMagic() && bond >= EntityTameDragonRed.BOND_LEVEL_MAGIC) {
+			if (dragon.getCanUseMagic() && bond >= TameRedDragonEntity.BOND_LEVEL_MAGIC) {
 				str = "Spell Tactics";
 				
 				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
-			if (dragon.getDragonMana() > 0 && bond >= EntityTameDragonRed.BOND_LEVEL_MANA ) {
+			if (dragon.getDragonMana() > 0 && bond >= TameRedDragonEntity.BOND_LEVEL_MANA ) {
 				str = "Dragon Mana Bond";
 				
 				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
@@ -125,7 +125,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<EntityTameDragonRed>
 	}
 
 	@Override
-	public boolean shouldShow(EntityTameDragonRed dragon, IPetContainer<EntityTameDragonRed> container) {
+	public boolean shouldShow(TameRedDragonEntity dragon, IPetContainer<TameRedDragonEntity> container) {
 		return true; // always show
 	}
 

@@ -20,7 +20,7 @@ import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
-import com.smanzana.nostrummagica.tile.ModificationTableEntity;
+import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -91,7 +91,7 @@ public class ModificationTableGui {
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected ModificationTableEntity inventory;
+		protected ModificationTableTileEntity inventory;
 		protected boolean isValid; // has input needed to combine
 		protected InputSlot inputSlot; // Input slot. Changes what it can accept
 		protected int floatIndex = 0;
@@ -108,7 +108,7 @@ public class ModificationTableGui {
 		protected boolean hasFloat;
 		protected SpellComponentWrapper component;
 		
-		public ModificationTableContainer(int windowId, PlayerEntity player, IInventory playerInv, ModificationTableEntity tableInventory, BlockPos pos) {
+		public ModificationTableContainer(int windowId, PlayerEntity player, IInventory playerInv, ModificationTableTileEntity tableInventory, BlockPos pos) {
 			super(NostrumContainers.ModificationTable, windowId);
 			this.inventory = tableInventory;
 			this.player = player;
@@ -190,7 +190,7 @@ public class ModificationTableGui {
 			return new ModificationTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf), buf.readBlockPos());
 		}
 		
-		public static final IPackedContainerProvider Make(ModificationTableEntity table) {
+		public static final IPackedContainerProvider Make(ModificationTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new ModificationTableContainer(windowId, player, playerInv, table, table.getPos());
 			}, (buffer) -> {

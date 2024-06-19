@@ -9,9 +9,9 @@ import java.util.Map;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonRed;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
-import com.smanzana.nostrummagica.entity.dragon.EntityTameDragonRed;
+import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
+import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.MemoryPool;
 
@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.model.Model;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T> {
+public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T> {
 	
 	public static enum EDragonOverlayMaterial {
 		NONE(""),
@@ -338,7 +338,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		float frac;
 		float weight;
 		
-		EntityDragonRedBase dragon = (EntityDragonRedBase) entityIn;
+		RedDragonBaseEntity dragon = (RedDragonBaseEntity) entityIn;
 		
 		limbSwing *= .4;
 		limbSwingAmount *= .4;
@@ -359,8 +359,8 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		boolean flying = dragon.isFlying();
 		
 		boolean sitting = false;
-		if (dragon instanceof EntityTameDragonRed) {
-			sitting = ((EntityTameDragonRed) dragon).isEntitySitting();
+		if (dragon instanceof TameRedDragonEntity) {
+			sitting = ((TameRedDragonEntity) dragon).isEntitySitting();
 		}
 		
 		boolean casting = dragon.isCasting();
@@ -396,7 +396,7 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 			
 			if (dragon.isFlightTransitioning()) {
 				float scale = (float) (stateTime)
-						/ (float) EntityDragonRed.ANIM_UNFURL_DUR;
+						/ (float) RedDragonEntity.ANIM_UNFURL_DUR;
 				
 				if (!dragon.isLanding()) {
 					scale = (1f - scale);
@@ -447,8 +447,8 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		boolean flying = dragon.isFlying();
 		
 		boolean sitting = false;
-		if (dragon instanceof EntityTameDragonRed) {
-			sitting = ((EntityTameDragonRed) dragon).isEntitySitting();
+		if (dragon instanceof TameRedDragonEntity) {
+			sitting = ((TameRedDragonEntity) dragon).isEntitySitting();
 		}
 		
 		boolean casting = dragon.isCasting();
@@ -566,16 +566,16 @@ public class ModelDragonRed<T extends EntityDragonRedBase> extends EntityModel<T
 		}
 		
 		stateTime = now - dragon.getLastSlashTime();
-		if (stateTime < EntityDragonRed.ANIM_SLASH_DUR) {
-			float progress = (float) stateTime / (float) EntityDragonRed.ANIM_SLASH_DUR;
+		if (stateTime < RedDragonEntity.ANIM_SLASH_DUR) {
+			float progress = (float) stateTime / (float) RedDragonEntity.ANIM_SLASH_DUR;
 			float ang = (float) Math.sin(progress * (float) (Math.PI * 2));
 			ang *= Math.PI * 2 * -.15;
 			frontleg_right.rotateAngleX += ang;
 		}
 		
 		stateTime = now - dragon.getLastBiteTime();
-		if (stateTime < EntityDragonRed.ANIM_BITE_DUR) {
-			float progress = (float) stateTime / (float) EntityDragonRed.ANIM_SLASH_DUR;
+		if (stateTime < RedDragonEntity.ANIM_BITE_DUR) {
+			float progress = (float) stateTime / (float) RedDragonEntity.ANIM_SLASH_DUR;
 			float ang = (float) Math.sin(progress * (float) (Math.PI * 2));
 			ang *= Math.PI * 2 * .1;
 			head.rotateAngleX += ang;

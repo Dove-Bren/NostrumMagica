@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelGolem<T extends EntityGolem> extends EntityModel<T> {
+public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
 
 	private ModelRenderer head;
 	private ModelRenderer body1;
@@ -69,7 +69,7 @@ public class ModelGolem<T extends EntityGolem> extends EntityModel<T> {
 		float ticks = entityIn.ticksExisted;
 		
 		float speedup = 1.0f;
-		if (((EntityGolem) entityIn).getAttackTarget() != null)
+		if (((MagicGolemEntity) entityIn).getAttackTarget() != null)
 			speedup = 2.0f;
 		
 		body1.rotateAngleY = ticks * -rate1 * speedup;

@@ -20,7 +20,7 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
-import com.smanzana.nostrummagica.tile.RuneShaperEntity;
+import com.smanzana.nostrummagica.tile.RuneShaperTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.ItemStacks;
@@ -90,12 +90,12 @@ public class RuneShaperGui {
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
-		protected RuneShaperEntity shaper;
+		protected RuneShaperTileEntity shaper;
 		protected final CraftResultInventory resultInv;
 		protected Slot outputSlot;
 		protected SimpleInventoryContainerlet extraInv;
 		
-		public RuneShaperContainer(int windowId, PlayerEntity player, IInventory playerInv, RuneShaperEntity tableInventory, BlockPos pos, @Nullable IInventory extraInventory) {
+		public RuneShaperContainer(int windowId, PlayerEntity player, IInventory playerInv, RuneShaperTileEntity tableInventory, BlockPos pos, @Nullable IInventory extraInventory) {
 			super(NostrumContainers.RuneShaper, windowId);
 			this.shaper = tableInventory;
 			this.resultInv = new CraftResultInventory();
@@ -144,11 +144,11 @@ public class RuneShaperGui {
 		}
 		
 		public static final RuneShaperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
-			RuneShaperEntity te = ContainerUtil.GetPackedTE(buf);
+			RuneShaperTileEntity te = ContainerUtil.GetPackedTE(buf);
 			return new RuneShaperContainer(windowId, playerInv.player, playerInv, te, buf.readBlockPos(), te.getExtraInventory());
 		}
 		
-		public static final IPackedContainerProvider Make(RuneShaperEntity table) {
+		public static final IPackedContainerProvider Make(RuneShaperTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
 				return new RuneShaperContainer(windowId, player, playerInv, table, table.getPos(), table.getExtraInventory());
 			}, (buffer) -> {

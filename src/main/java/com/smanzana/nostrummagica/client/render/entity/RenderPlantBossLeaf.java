@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossLeaf;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBoss;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBossLeafLimb> {
+public class RenderPlantBossLeaf extends EntityRenderer<PlantBossEntity.PlantBossLeafLimb> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
@@ -25,10 +25,10 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 	}
 	
 	@Override
-	public void render(EntityPlantBoss.PlantBossLeafLimb entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(PlantBossEntity.PlantBossLeafLimb entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
-		EntityPlantBoss plant = entityIn.getParent();
+		PlantBossEntity plant = entityIn.getParent();
 		if (plant == null || plant.getBody() == null) {
 			return;
 		}
@@ -58,7 +58,7 @@ public class RenderPlantBossLeaf extends EntityRenderer<EntityPlantBoss.PlantBos
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(EntityPlantBoss.PlantBossLeafLimb entity) {
+	public ResourceLocation getEntityTexture(PlantBossEntity.PlantBossLeafLimb entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

@@ -9,7 +9,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.ManiCrystal;
+import com.smanzana.nostrummagica.block.ManiCrystalBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -189,7 +189,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	
 	protected boolean isCrystal(@Nullable BlockState state) {
 		return state != null
-				&& state.getBlock() instanceof ManiCrystal;
+				&& state.getBlock() instanceof ManiCrystalBlock;
 	}
 	
 	private void scanCrystalLayer(Set<BlockPos> positions, int radius) {

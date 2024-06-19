@@ -6,7 +6,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonArmorPart;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonOverlayMaterial;
-import com.smanzana.nostrummagica.entity.dragon.EntityDragonRedBase;
+import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 
@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderDragonRed<T extends EntityDragonRedBase> extends MobRenderer<T, ModelDragonRed<T>> {
+public class RenderDragonRed<T extends RedDragonBaseEntity> extends MobRenderer<T, ModelDragonRed<T>> {
 
 	protected final ModelDragonRed<T> dragonModel;
 	

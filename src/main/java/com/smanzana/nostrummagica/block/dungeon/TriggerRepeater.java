@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.tile.TriggerRepeaterEntity;
+import com.smanzana.nostrummagica.tile.TriggerRepeaterTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.block.Block;
@@ -118,14 +118,14 @@ public class TriggerRepeater extends Block implements ITriggeredBlock {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader reader) {
-		return new TriggerRepeaterEntity();
+		return new TriggerRepeaterTileEntity();
 	}
 
 	@Override
 	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
 		TileEntity te = world.getTileEntity(blockPos);
-		if (te instanceof TriggerRepeaterEntity) {
-			((TriggerRepeaterEntity) te).trigger(triggerPos);
+		if (te instanceof TriggerRepeaterTileEntity) {
+			((TriggerRepeaterTileEntity) te).trigger(triggerPos);
 		}
 	}
 	
@@ -140,7 +140,7 @@ public class TriggerRepeater extends Block implements ITriggeredBlock {
 			return ActionResultType.FAIL;
 		}
 		
-		TriggerRepeaterEntity ent = (TriggerRepeaterEntity) te;
+		TriggerRepeaterTileEntity ent = (TriggerRepeaterTileEntity) te;
 		
 		ItemStack heldItem = playerIn.getHeldItem(hand);
 		

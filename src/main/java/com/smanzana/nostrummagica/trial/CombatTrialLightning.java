@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.trial;
 
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.entity.KoidEntity;
+import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
@@ -50,10 +50,10 @@ public class CombatTrialLightning extends CombatTrialStaged {
 		public MobEntity provideEntity(World world) {
 			MobEntity ent = super.provideEntity(world);
 			
-			if (ent instanceof EntityWillo) {
-				((EntityWillo) ent).setElement(EMagicElement.LIGHTNING);
-			} else if (ent instanceof EntityKoid) {
-				((EntityKoid) ent).setElement(EMagicElement.LIGHTNING);
+			if (ent instanceof WilloEntity) {
+				((WilloEntity) ent).setElement(EMagicElement.LIGHTNING);
+			} else if (ent instanceof KoidEntity) {
+				((KoidEntity) ent).setElement(EMagicElement.LIGHTNING);
 			} else if (ent instanceof DrownedEntity) {
 				((DrownedEntity) ent).setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.TRIDENT));
 			}

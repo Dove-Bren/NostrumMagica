@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.entity.EntitySpellMortar;
+import com.smanzana.nostrummagica.entity.SpellMortarEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderSpellMortar extends EntityRenderer<EntitySpellMortar> {
+public class RenderSpellMortar extends EntityRenderer<SpellMortarEntity> {
 	
 	private static final ResourceLocation LOC_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
@@ -28,12 +28,12 @@ public class RenderSpellMortar extends EntityRenderer<EntitySpellMortar> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntitySpellMortar entity) {
+	public ResourceLocation getEntityTexture(SpellMortarEntity entity) {
 		return LOC_TEXT;
 	}
 	
 	@Override
-	public void render(EntitySpellMortar entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(SpellMortarEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
 		// Copied from DragonFireballRenderer.

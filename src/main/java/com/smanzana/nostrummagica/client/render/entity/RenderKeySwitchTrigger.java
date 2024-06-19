@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBillboard;
 import com.smanzana.nostrummagica.client.model.ModelKeySwitchTrigger;
-import com.smanzana.nostrummagica.entity.EntityKeySwitchTrigger;
+import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -21,7 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 
-public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigger, ModelKeySwitchTrigger> {
+public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntity, ModelKeySwitchTrigger> {
 
 	private static final ResourceLocation CAGE_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/block/key_cage.png");
 	private static final ResourceLocation KEY_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/item/key.png");
@@ -35,17 +35,17 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntityKeySwitchTrigger entity) {
+	public ResourceLocation getEntityTexture(KeySwitchTriggerEntity entity) {
 		return CAGE_TEXT;
 	}
 	
 	@Override
-	protected boolean canRenderName(EntityKeySwitchTrigger entity) {
+	protected boolean canRenderName(KeySwitchTriggerEntity entity) {
 		return entity.hasCustomName() || NostrumMagica.instance.proxy.getPlayer().isCreative();
 	}
 	
 	@Override
-	protected void renderName(EntityKeySwitchTrigger entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderName(KeySwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Minecraft mc = Minecraft.getInstance();
 		final double ticks = entityIn.world.getGameTime();
 		final String info;
@@ -100,7 +100,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<EntityKeySwitchTrigge
 	}
 	
 	@Override
-	public void render(EntityKeySwitchTrigger entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(KeySwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Draw switch box, which is model passed to parent
 		final double spinIdle = 3.0; // seconds per turn
 		final double spinActivated = 3.0;

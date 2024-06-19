@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.EntityHookShot;
+import com.smanzana.nostrummagica.entity.HookShotEntity;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelHookShot extends EntityModel<EntityHookShot> {
+public class ModelHookShot extends EntityModel<HookShotEntity> {
 	
 	private static final float width = 2f;
 	private static final float height = 2f;
@@ -25,7 +25,7 @@ public class ModelHookShot extends EntityModel<EntityHookShot> {
 	}
 	
 	@Override
-	public void setRotationAngles(EntityHookShot entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(HookShotEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		
 	}

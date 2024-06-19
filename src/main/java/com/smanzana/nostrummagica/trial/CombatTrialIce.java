@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.trial;
 
-import com.smanzana.nostrummagica.entity.EntityKoid;
-import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.entity.KoidEntity;
+import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
@@ -46,10 +46,10 @@ public class CombatTrialIce extends CombatTrialStaged {
 		public MobEntity provideEntity(World world) {
 			MobEntity ent = super.provideEntity(world);
 			
-			if (ent instanceof EntityWillo) {
-				((EntityWillo) ent).setElement(EMagicElement.ICE);
-			} else if (ent instanceof EntityKoid) {
-				((EntityKoid) ent).setElement(EMagicElement.ICE);
+			if (ent instanceof WilloEntity) {
+				((WilloEntity) ent).setElement(EMagicElement.ICE);
+			} else if (ent instanceof KoidEntity) {
+				((KoidEntity) ent).setElement(EMagicElement.ICE);
 			}
 			
 			return ent;

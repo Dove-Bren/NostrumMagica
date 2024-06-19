@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.entity.EntityEnderRodBall;
+import com.smanzana.nostrummagica.entity.EnderRodBallEntity;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
@@ -16,11 +16,11 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
+public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 	
 	private static final ResourceLocation BALL_MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
-	protected ModelBaked<EntityEnderRodBall> ballOrb;
+	protected ModelBaked<EnderRodBallEntity> ballOrb;
 
 	public RenderEnderRodBall(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
@@ -29,12 +29,12 @@ public class RenderEnderRodBall extends EntityRenderer<EntityEnderRodBall> {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(EntityEnderRodBall entity) {
+	public ResourceLocation getEntityTexture(EnderRodBallEntity entity) {
 		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
 	}
 	
 	@Override
-	public void render(EntityEnderRodBall entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(EnderRodBallEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Render orb three times with different alphas and sizes to do a glow effect.
 		final float time = entityIn.ticksExisted + partialTicks;
 		//134, 80, 185

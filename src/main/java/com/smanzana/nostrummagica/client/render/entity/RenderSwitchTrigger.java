@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.client.model.ModelRepeatSwitchTrigger;
 import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.model.ModelTimedSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.entity.EntitySwitchTrigger;
+import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchHitType;
 import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchTriggerType;
@@ -22,7 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 
-public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
+public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 
 	private static final double spinIdle = 3.0; // seconds per turn
 	private static final double spinActivated = 1.0;
@@ -39,19 +39,19 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(EntitySwitchTrigger entity) {
+	public ResourceLocation getEntityTexture(SwitchTriggerEntity entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/block/spawner.png"
 				);
 	}
 	
 	@Override
-	protected boolean canRenderName(EntitySwitchTrigger entity) {
+	protected boolean canRenderName(SwitchTriggerEntity entity) {
 		return entity.hasCustomName() || NostrumMagica.instance.proxy.getPlayer().isCreative();
 	}
 	
 	@Override
-	protected void renderName(EntitySwitchTrigger entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderName(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final String triggerInfo;
 		final String extraInfo;
 		SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
@@ -84,7 +84,7 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, label, this.getFontRendererFromRenderManager(), packedLightIn, yOffset, this.renderManager.info);
 	}
 	
-	public ModelSwitchTrigger getEntityModel(EntitySwitchTrigger trigger) {
+	public ModelSwitchTrigger getEntityModel(SwitchTriggerEntity trigger) {
 		
 		if (trigger != null && trigger.getLinkedTileEntity() != null) // let null fall to fallback case after switch
 		switch (trigger.getLinkedTileEntity().getSwitchTriggerType()) {
@@ -100,7 +100,7 @@ public class RenderSwitchTrigger extends EntityRenderer<EntitySwitchTrigger> {
 	}
 	
 	@Override
-	public void render(EntitySwitchTrigger entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Note: This used to have all the LivingRenderer offsets and stuff baked in and now it doesn't. Likely have to
 		// translate and rotate
 		final ModelSwitchTrigger model = getEntityModel(entityIn);

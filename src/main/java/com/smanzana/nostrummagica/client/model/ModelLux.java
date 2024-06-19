@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.EntityLux;
+import com.smanzana.nostrummagica.entity.LuxEntity;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelLux extends EntityModel<EntityLux> {
+public class ModelLux extends EntityModel<LuxEntity> {
 	
 	private ModelRenderer main;
 	
@@ -30,7 +30,7 @@ public class ModelLux extends EntityModel<EntityLux> {
 	}
 
 	@Override
-	public void setRotationAngles(EntityLux entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(LuxEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		if (!entityIn.isRoosting()) {
 			final float angle = getSwingRot(entityIn.getSwingProgress(ageInTicks % 1f));

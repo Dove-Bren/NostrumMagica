@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelPlantBossBramble extends EntityModel<EntityPlantBossBramble> {
+public class ModelPlantBossBramble extends EntityModel<PlantBossBrambleEntity> {
 	
 	private ModelRenderer main;
 	
@@ -39,12 +39,12 @@ public class ModelPlantBossBramble extends EntityModel<EntityPlantBossBramble> {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityPlantBossBramble entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+	public void setLivingAnimations(PlantBossBrambleEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
 		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 
 	@Override
-	public void setRotationAngles(EntityPlantBossBramble entityIn, float limbSwing, float limbSwingAmount,
+	public void setRotationAngles(PlantBossBrambleEntity entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		;
 	}

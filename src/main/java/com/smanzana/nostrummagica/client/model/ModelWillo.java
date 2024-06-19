@@ -5,13 +5,13 @@ import java.util.List;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.entity.EntityWillo;
+import com.smanzana.nostrummagica.entity.WilloEntity;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public class ModelWillo extends EntityModel<EntityWillo> {
+public class ModelWillo extends EntityModel<WilloEntity> {
 	
 	private static final int SEGMENTS = 8;
 	private static final float PERIOD = 20f * 2;
@@ -51,7 +51,7 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 	}
 	
 	@Override
-	public void setLivingAnimations(EntityWillo entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
+	public void setLivingAnimations(WilloEntity entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
 		super.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTickTime);
 		
 		// Wave timing information for rendering arms
@@ -85,7 +85,7 @@ public class ModelWillo extends EntityModel<EntityWillo> {
 	}
 
 	@Override
-	public void setRotationAngles(EntityWillo entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(WilloEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

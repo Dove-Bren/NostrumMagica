@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossBramble;
-import com.smanzana.nostrummagica.entity.plantboss.EntityPlantBossBramble;
+import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class RenderPlantBossBramble extends EntityRenderer<EntityPlantBossBramble> {
+public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntity> {
 
 	private static final ResourceLocation PLANT_BOSS_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/plant_boss_body.png");
 	
@@ -27,7 +27,7 @@ public class RenderPlantBossBramble extends EntityRenderer<EntityPlantBossBrambl
 	}
 	
 	@Override
-	public void render(EntityPlantBossBramble entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(PlantBossBrambleEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 //		if (entity.isWolfWet()) {
 //			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
 //			GlStateManager.color4f(f, f, f);
@@ -50,7 +50,7 @@ public class RenderPlantBossBramble extends EntityRenderer<EntityPlantBossBrambl
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(EntityPlantBossBramble entity) {
+	public ResourceLocation getEntityTexture(PlantBossBrambleEntity entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.golem.EntityGolem;
+import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.entity.LivingEntity;
@@ -15,7 +15,7 @@ public class GolemTask extends Goal {
 	private static final Random rand = new Random();
 	private static final double RANGE_SQR = 225.0;
 	
-	private EntityGolem golem;
+	private MagicGolemEntity golem;
 	private boolean melee;
 	private boolean range;
 	private boolean aux;
@@ -30,7 +30,7 @@ public class GolemTask extends Goal {
 	private boolean strafeClockwise;
 	private boolean strafeBack;
 	
-	public GolemTask(EntityGolem golem) {
+	public GolemTask(MagicGolemEntity golem) {
 		this.golem = golem;
 	
 		meleeCooldown = 0;

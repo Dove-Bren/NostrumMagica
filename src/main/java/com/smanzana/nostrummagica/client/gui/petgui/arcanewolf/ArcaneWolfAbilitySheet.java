@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf;
-import com.smanzana.nostrummagica.entity.EntityArcaneWolf.IWolfAbility;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
+import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.IWolfAbility;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
@@ -18,18 +18,18 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
-public class ArcaneWolfAbilitySheet implements IPetGUISheet<EntityArcaneWolf> {
+public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 
-	protected EntityArcaneWolf wolf;
+	protected ArcaneWolfEntity wolf;
 	private List<AbilityWidget> widgets;
 	
-	public ArcaneWolfAbilitySheet(EntityArcaneWolf wolf) {
+	public ArcaneWolfAbilitySheet(ArcaneWolfEntity wolf) {
 		this.wolf = wolf;
 		this.widgets = new ArrayList<>();
 	}
 	
 	@Override
-	public void showSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
 		widgets.clear();
 		List<IWolfAbility> abilities = wolf.getAbilityList();
 		for (int i = 0; i < abilities.size(); i++) {
@@ -39,7 +39,7 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<EntityArcaneWolf> {
 	}
 
 	@Override
-	public void hideSheet(EntityArcaneWolf wolf, PlayerEntity player, IPetContainer<EntityArcaneWolf> container) {
+	public void hideSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
 		widgets.clear();
 	}
 
@@ -67,7 +67,7 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<EntityArcaneWolf> {
 		return "Abilities";
 	}
 	
-	public boolean shouldShow(EntityArcaneWolf wolf, IPetContainer<EntityArcaneWolf> container) {
+	public boolean shouldShow(ArcaneWolfEntity wolf, IPetContainer<ArcaneWolfEntity> container) {
 		return !wolf.getAbilityList().isEmpty();
 	}
 
