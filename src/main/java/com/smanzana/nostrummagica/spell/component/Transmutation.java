@@ -19,8 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class Transmutation {
 
@@ -135,24 +133,30 @@ public class Transmutation {
 	}
 	
 	protected static final long GetSeedToUse() {
-		// If dedicated server, use loaded world seed if there is one.
-		if (NostrumMagica.instance.proxy.getPlayer() != null) {
-			World world = NostrumMagica.instance.proxy.getPlayer().world;
-			if (world == null || world.getServer() == null) {
-				return -1;
-			}
-			return world.getServer().getWorld(World.OVERWORLD).getSeed(); // Not sure if seed is always the same? might change CLIENT list per dimension? lol
-		} else {
-			try {
-				long seed = ServerLifecycleHooks.getCurrentServer().getWorld(World.OVERWORLD).getSeed();
-				return seed;
-			} catch (Exception e) {
-				e.printStackTrace();
-				NostrumMagica.logger.error("Failed to find world seed for generating transmutations");
-			}
-		}
+		// I want the transmute list to be based on seed, but by the time we're generating recipes
+		// and registering JEI there isn't a world.
+		// I had some success just forcing JEI to refresh but it doesn't sync well with multiplayer.
+		// So just use a hardcoded seed for now.
+		return 0x54311233;
 		
-		return -1;
+//		// If dedicated server, use loaded world seed if there is one.
+//		if (NostrumMagica.instance.proxy.getPlayer() != null) {
+//			World world = NostrumMagica.instance.proxy.getPlayer().world;
+//			if (world == null || world.getServer() == null) {
+//				return -1;
+//			}
+//			return world.getServer().getWorld(World.OVERWORLD).getSeed(); // Not sure if seed is always the same? might change CLIENT list per dimension? lol
+//		} else {
+//			try {
+//				long seed = ServerLifecycleHooks.getCurrentServer().getWorld(World.OVERWORLD).getSeed();
+//				return seed;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				NostrumMagica.logger.error("Failed to find world seed for generating transmutations");
+//			}
+//		}
+//		
+//		return -1;
 	}
 	
 	protected static final @Nullable ItemTransmutationSource getItemSource(Item item) {
@@ -494,7 +498,7 @@ public class Transmutation {
 		
 		@Override
 		public Item findResultItem(int level) {
-			init(GetSeedToUse()); int unused; // Does this work, or is this before the world is loaded?
+			init(GetSeedToUse());
 			
 			return Transmutation.getResult(this, level).item;
 		}
@@ -533,7 +537,7 @@ public class Transmutation {
 		}
 		
 		public Block findResultBlock(int jumpLevel) {
-			init(GetSeedToUse()); int unused; // Does this work, or is this before the world is loaded?
+			init(GetSeedToUse());
 			
 			return Transmutation.getResult(this, jumpLevel).block;
 		}

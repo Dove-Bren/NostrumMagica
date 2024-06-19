@@ -41,7 +41,7 @@ public class ModConfigClient {
 		
 		//private Object def;
 		
-		private ForgeConfigSpec.ConfigValue<?> configField;
+		//private ForgeConfigSpec.ConfigValue<?> configField;
 		
 		private Key(ModConfig.Category Category, String key, Object def, String desc) {
 			//this.Category = Category;
