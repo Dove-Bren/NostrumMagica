@@ -83,6 +83,7 @@ public class NostrumBlocks {
 	@ObjectHolder(ShrineBlock.ID_ELEMENT) public static ShrineBlock.Element elementShrineBlock;
 	@ObjectHolder(ShrineBlock.ID_SHAPE) public static ShrineBlock.Shape shapeShrineBlock;
 	@ObjectHolder(ShrineBlock.ID_ALTERATION) public static ShrineBlock.Alteration alterationShrineBlock;
+	@ObjectHolder(ShrineBlock.ID_TIER) public static ShrineBlock.Tier tierShrineBlock;
 	@ObjectHolder(SorceryPortalBlock.ID) public static SorceryPortalBlock sorceryPortal;
 	@ObjectHolder(SorceryPortalSpawnerBlock.ID) public static SorceryPortalSpawnerBlock sorceryPortalSpawner;
 	@ObjectHolder(MasterSpellTableBlock.ID) public static MasterSpellTableBlock spellTable;
@@ -240,6 +241,7 @@ public class NostrumBlocks {
     	registerBlock(new ShrineBlock.Element(), ShrineBlock.ID_ELEMENT, registry);
     	registerBlock(new ShrineBlock.Shape(), ShrineBlock.ID_SHAPE, registry);
     	registerBlock(new ShrineBlock.Alteration(), ShrineBlock.ID_ALTERATION, registry);
+    	registerBlock(new ShrineBlock.Tier(), ShrineBlock.ID_TIER, registry);
     	registerBlock(new SorceryPortalBlock(), SorceryPortalBlock.ID, registry);
     	registerBlock(new SorceryPortalSpawnerBlock(), SorceryPortalSpawnerBlock.ID, registry);
     	registerBlock(new MasterSpellTableBlock(), MasterSpellTableBlock.ID, registry);

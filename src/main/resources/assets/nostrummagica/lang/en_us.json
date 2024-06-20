@@ -490,9 +490,10 @@
     "entity.nostrummagica.entity_plant_boss": "Thistle Lord",
 	"entity.nostrummagica.entity_ender_rod_ball": "Ender Gravity Ball",
 	"entity.nostrummagica.spell_bubble": "Spell Bubble",
-	"entity.nostrummagica.entity_shrine_ent_element": "element",
-	"entity.nostrummagica.entity_shrine_ent_alteration": "alteration",
-	"entity.nostrummagica.entity_shrine_ent_shape": "shape",
+	"entity.nostrummagica.entity_shrine_ent_element": "Element Shrine",
+	"entity.nostrummagica.entity_shrine_ent_alteration": "Alteration Shrine",
+	"entity.nostrummagica.entity_shrine_ent_shape": "Shape Shrine",
+	"entity.nostrummagica.entity_shrine_ent_tier": "Magic Shrine",
 
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 
@@ -639,7 +640,8 @@
     "info.shrine.exhausted": "This shrine's energies have already been used. You must find another",
 	"info.shrine.seektrial": "You must seek an advanced mastery altar to gain more mastery in this element",
     "info.shrine.shape": "You've mastered the %s shape",
-    "info.shrine.shape": "You've unlocked the %s alteration",
+    "info.shrine.alteration": "You've unlocked the %s alteration",
+	"info.shrine.tier": "You can now use %1$s tier magic",
     "info.spell.low_tech": "You lack the technique required for such a complex spell",
     "info.spell.low_finesse": "You lack the finesse required by such an intricate spell",
     "info.spell.low_control": "You lack the control to handle such a powerful spell",

@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.item.ResourceCrystal;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
@@ -31,6 +32,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	public static final String ID_ELEMENT = "element_shrine";
 	public static final String ID_ALTERATION = "alteration_shrine";
 	public static final String ID_SHAPE = "shape_shrine";
+	public static final String ID_TIER = "tier_shrine";
 	
 	protected static final VoxelShape BASE_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 7, 16 * 0.7D);
 	
@@ -177,6 +179,39 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 			
 			if (!heldItem.isEmpty() && heldItem.getItem() instanceof AlterationSpellRune) {
 				tile.setAlteration(SpellRune.getAlteration(heldItem));
+				return ActionResultType.SUCCESS;
+			}
+			
+			return ActionResultType.PASS;
+		}
+	}
+	
+	public static class Tier extends ShrineBlock<ShrineTileEntity.Tier> {
+		
+		public Tier() {
+			super();
+		}
+		
+		@Override
+		public boolean hasTileEntity(BlockState state) {
+			return true;
+		}
+		
+		@Override
+		public ShrineTileEntity.Tier createTileEntity(BlockState state, IBlockReader world) {
+			ShrineTileEntity.Tier ent = new ShrineTileEntity.Tier();
+			return ent;
+		}
+
+		@Override
+		protected ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack heldItem) {
+			ShrineTileEntity.Tier tile = getTileEntity(world, pos, state);
+			if (tile == null) {
+				return ActionResultType.FAIL;
+			}
+			
+			if (!heldItem.isEmpty() && heldItem.getItem() instanceof ResourceCrystal) {
+				tile.setTier(((ResourceCrystal) heldItem.getItem()).getTier());
 				return ActionResultType.SUCCESS;
 			}
 			

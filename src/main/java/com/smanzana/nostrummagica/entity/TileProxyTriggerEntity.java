@@ -66,6 +66,10 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		return air;
 	}
 	
+	protected boolean canBeHitBy(LivingEntity attacker) {
+		return true;
+	}
+	
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
 		if (this.world.isRemote()) {
@@ -77,10 +81,11 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 			return false;
 		}
 		
-		if (source.getTrueSource() != null && source.getTrueSource() instanceof LivingEntity) {
+		if (source.getTrueSource() != null && source.getTrueSource() instanceof LivingEntity && canBeHitBy((LivingEntity) source.getTrueSource())) {
 			te.trigger((LivingEntity) source.getTrueSource(), source, amount);
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	protected BlockPos getCheckPos() {

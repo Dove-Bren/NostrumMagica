@@ -50,6 +50,7 @@ public class NostrumTileEntities {
 	private static final String ID_ElementShrine = "element_shrine_te";
 	private static final String ID_AlterationShrine = "alteration_shrine_te";
 	private static final String ID_ShapeShrine = "shape_shrine_te";
+	private static final String ID_TierShrine = "tier_shrine_te";
 	
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableTileEntity> SpellTableEntityType;
@@ -88,6 +89,7 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_ElementShrine) public static TileEntityType<ShrineTileEntity.Element> ElementShrineTileType;
 	@ObjectHolder(ID_AlterationShrine) public static TileEntityType<ShrineTileEntity.Alteration> AlterationShrineTileType;
 	@ObjectHolder(ID_ShapeShrine) public static TileEntityType<ShrineTileEntity.Shape> ShapeShrineTileType;
+	@ObjectHolder(ID_TierShrine) public static TileEntityType<ShrineTileEntity.Tier> TierShrineTileType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -133,5 +135,6 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Element::new, NostrumBlocks.elementShrineBlock).build(null), ID_ElementShrine);
 		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Alteration::new, NostrumBlocks.alterationShrineBlock).build(null), ID_AlterationShrine);
 		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Shape::new, NostrumBlocks.shapeShrineBlock).build(null), ID_ShapeShrine);
+		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Tier::new, NostrumBlocks.tierShrineBlock).build(null), ID_TierShrine);
     }
 }

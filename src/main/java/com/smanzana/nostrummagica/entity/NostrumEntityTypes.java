@@ -84,6 +84,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ShrineTriggerEntity.Element.ID) public static EntityType<ShrineTriggerEntity.Element> elementShrine;
 	@ObjectHolder(ShrineTriggerEntity.Shape.ID) public static EntityType<ShrineTriggerEntity.Shape> shapeShrine;
 	@ObjectHolder(ShrineTriggerEntity.Alteration.ID) public static EntityType<ShrineTriggerEntity.Alteration> alterationShrine;
+	@ObjectHolder(ShrineTriggerEntity.Tier.ID) public static EntityType<ShrineTriggerEntity.Tier> tierShrine;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -239,6 +240,10 @@ public class NostrumEntityTypes {
 				.size(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Alteration.ID));
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Tier>create(ShrineTriggerEntity.Tier::new, EntityClassification.MISC)
+				.size(.8f, .8f)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(ShrineTriggerEntity.Tier.ID));
 		registry.register(EntityType.Builder.<TameLightning>create(TameLightning::new, EntityClassification.MISC)
 				.size(0, 0)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -370,6 +375,7 @@ public class NostrumEntityTypes {
 		event.put(elementShrine, ShrineTriggerEntity.Element.BuildAttributes().create());
 		event.put(shapeShrine, ShrineTriggerEntity.Shape.BuildAttributes().create());
 		event.put(alterationShrine, ShrineTriggerEntity.Alteration.BuildAttributes().create());
+		event.put(tierShrine, ShrineTriggerEntity.Tier.BuildAttributes().create());
 		// No attributes event.put(tameLightning, NostrumTameLightning.BuildAttributes().create());
 		// No attributes event.put(hookShot, EntityHookShot.BuildAttributes().create());
 		// No attributes event.put(spellBullet, EntitySpellBullet.BuildAttributes().create());

@@ -328,6 +328,7 @@ public class ClientInit {
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.elementShrine, (manager) -> new RenderShrineTrigger.Element(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.shapeShrine, (manager) -> new RenderShrineTrigger.Shape(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.alterationShrine, (manager) -> new RenderShrineTrigger.Alteration(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tierShrine, (manager) -> new RenderShrineTrigger.Tier(manager));
 	}
 	
 	@SubscribeEvent

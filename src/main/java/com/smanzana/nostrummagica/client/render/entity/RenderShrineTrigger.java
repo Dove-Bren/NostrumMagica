@@ -3,10 +3,12 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.MagicTierIcon;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -32,10 +34,15 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		return TEX_BUBBLE;
 	}
 	
-	protected abstract SpellComponentIcon getIcon(E entity);
+	protected abstract void renderSymbol(E entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn);
 	
 	@Override
 	public void render(E entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+		final Minecraft mc = Minecraft.getInstance();
+		if (entityIn.isInvisibleToPlayer(mc.player)) {
+			return;
+		}
+		
 		final ResourceLocation bubbleTex;
 		if (entityIn.getHitCount() <= 0) {
 			bubbleTex = TEX_BUBBLE;
@@ -71,12 +78,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 			prog = (ticks % scalePeriod) / scalePeriod;
 			final float scale = .95f + .05f * (float) Math.sin(prog * Math.PI * 2);
 
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180.0F));
-			matrixStackIn.scale(.75f, .75f, 1f);
-			matrixStackIn.scale(scale, scale, 1f);
-			matrixStackIn.translate(-.5, -.5, 0);
-			SpellComponentIcon icon = this.getIcon(entityIn);
-			icon.draw(matrixStackIn, bufferIn, packedLightIn, 1, 1, false, color[0] * glow, color[1] * glow, color[2] * glow, color[3]);
+			this.renderSymbol(entityIn, matrixStackIn, bufferIn, scale, glow, color, packedLightIn);
 		}
 		matrixStackIn.pop();
 		
@@ -97,7 +99,24 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		matrixStackIn.pop();
 	}
 	
-	public static class Element extends RenderShrineTrigger<ShrineTriggerEntity.Element> {
+	protected static abstract class SpellComponentRender<E extends ShrineTriggerEntity<?>> extends RenderShrineTrigger<E> {
+		public SpellComponentRender(EntityRendererManager renderManagerIn) {
+			super(renderManagerIn);
+		}
+		
+		protected abstract SpellComponentIcon getIcon(E entity);
+		
+		protected void renderSymbol(E entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn) {
+			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+			matrixStackIn.scale(.75f, .75f, 1f);
+			matrixStackIn.scale(scale, scale, 1f);
+			matrixStackIn.translate(-.5, -.5, 0);
+			SpellComponentIcon icon = this.getIcon(entityIn);
+			icon.draw(matrixStackIn, bufferIn, packedLightIn, 1, 1, false, color[0] * glow, color[1] * glow, color[2] * glow, color[3]);
+		}
+	}
+	
+	public static class Element extends SpellComponentRender<ShrineTriggerEntity.Element> {
 		
 		public Element(EntityRendererManager renderManagerIn) {
 			super(renderManagerIn);
@@ -110,7 +129,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		
 	}
 	
-	public static class Shape extends RenderShrineTrigger<ShrineTriggerEntity.Shape> {
+	public static class Shape extends SpellComponentRender<ShrineTriggerEntity.Shape> {
 		
 		public Shape(EntityRendererManager renderManagerIn) {
 			super(renderManagerIn);
@@ -123,7 +142,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		
 	}
 	
-	public static class Alteration extends RenderShrineTrigger<ShrineTriggerEntity.Alteration> {
+	public static class Alteration extends SpellComponentRender<ShrineTriggerEntity.Alteration> {
 		
 		public Alteration(EntityRendererManager renderManagerIn) {
 			super(renderManagerIn);
@@ -132,6 +151,24 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		@Override
 		protected SpellComponentIcon getIcon(ShrineTriggerEntity.Alteration entity) {
 			return SpellComponentIcon.get(entity.getAlteration());
+		}
+		
+	}
+	
+	public static class Tier extends RenderShrineTrigger<ShrineTriggerEntity.Tier> {
+		
+		public Tier(EntityRendererManager renderManagerIn) {
+			super(renderManagerIn);
+		}
+		
+		@Override
+		protected void renderSymbol(ShrineTriggerEntity.Tier entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn) {
+			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+			matrixStackIn.scale(.75f, .75f, 1f);
+			matrixStackIn.scale(scale, scale, 1f);
+			matrixStackIn.translate(-.5, -.5, 0);
+			MagicTierIcon icon = MagicTierIcon.get(entityIn.getTier());
+			icon.draw(matrixStackIn, bufferIn, packedLightIn, 1, 1, false, .01f * glow, .01f * glow, .01f * glow, color[3]);
 		}
 		
 	}

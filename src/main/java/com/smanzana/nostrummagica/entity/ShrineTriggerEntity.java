@@ -4,14 +4,15 @@ package com.smanzana.nostrummagica.entity;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -33,14 +34,21 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 	protected void registerData() {
 		super.registerData();
 	}
+
+	@Override
+	protected boolean canBeHitBy(LivingEntity attacker) {
+		return attacker instanceof PlayerEntity && !isInvisibleToPlayer((PlayerEntity) attacker);
+	}
 	
 	@Override
 	public boolean isInvisibleToPlayer(PlayerEntity player) {
+		if (this.getLinkedTileEntity() == null) {
+			return true;
+		}
 		@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		return !player.isCreative() && !canPlayerSee(attr, player);
+		
+		return !player.isCreative() && !this.getLinkedTileEntity().canPlayerSee(attr, player);
 	}
-	
-	protected abstract boolean canPlayerSee(INostrumMagic attr, PlayerEntity player);
 	
 	public int getHitCount() {
 		if (this.getLinkedTileEntity() != null) {
@@ -69,11 +77,6 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 			}
 			return EMagicElement.PHYSICAL;
 		}
-
-		@Override
-		protected boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getElementalMastery(this.getElement()).isGreaterOrEqual(EElementalMastery.NOVICE);
-		}
 	}
 	
 	public static class Shape extends ShrineTriggerEntity<ShrineTileEntity.Shape> {
@@ -93,11 +96,6 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 			}
 			return getDefaultShape();
 		}
-
-		@Override
-		protected boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getShapes().contains(this.getShape());
-		}
 	}
 	
 	public static class Alteration extends ShrineTriggerEntity<ShrineTileEntity.Alteration> {
@@ -113,10 +111,20 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 			}
 			return EAlteration.INFLICT;
 		}
-
-		@Override
-		protected boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getAlterations().getOrDefault(this.getAlteration(), false);
+	}
+	
+	public static class Tier extends ShrineTriggerEntity<ShrineTileEntity.Tier> {
+		public static final String ID = ID_BASE + "tier";
+		
+		public Tier(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Tier>> type, World worldIn) {
+			super(type, worldIn);
+		}
+		
+		public EMagicTier getTier() {
+			if (this.getLinkedTileEntity() != null) {
+				return this.getLinkedTileEntity().getTier();
+			}
+			return EMagicTier.MANI;
 		}
 	}
 }
