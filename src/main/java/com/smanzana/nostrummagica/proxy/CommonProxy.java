@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.IPortalBlock;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
@@ -33,6 +34,7 @@ import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.stat.PlayerStats;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -244,5 +246,18 @@ public class CommonProxy {
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {
 		final double MAX_RANGE = 50.0;
 		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimensionKey()));
+	}
+	
+	public boolean attemptBlockTeleport(Entity entity, BlockPos portalPos) {
+		final World world = entity.getEntityWorld();
+		BlockState worldBlock = world.getBlockState(portalPos);
+		if (!(worldBlock.getBlock() instanceof IPortalBlock)) {
+			NostrumMagica.logger.warn("Entity requested teleport from non-portal block: " + entity + " at " + portalPos);
+		} else {
+			IPortalBlock block = (IPortalBlock) worldBlock.getBlock();
+			block.attemptTeleport(world, portalPos, worldBlock, entity);
+		}
+		
+		return true;
 	}
 }

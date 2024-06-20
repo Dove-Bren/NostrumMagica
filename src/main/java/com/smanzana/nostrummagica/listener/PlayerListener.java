@@ -1022,7 +1022,7 @@ public class PlayerListener {
 				}
 			}
 			
-			PortalBlock.tick();
+			PortalBlock.serverTick();
 			TeleportRuneTileEntity.tickChargeMap();
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
 				MagicArmor.ServerWorldTick(world);
@@ -1056,8 +1056,9 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onTick(ClientTickEvent event) {
 		if (event.phase == Phase.START) {
-			if (!Minecraft.getInstance().isIntegratedServerRunning() && Minecraft.getInstance().player != null) {
-				PortalBlock.tick();
+			final Minecraft mc = Minecraft.getInstance();
+			if (mc.player != null) {
+				PortalBlock.clientTick();
 				//TeleportRune.tick();
 			}
 		}

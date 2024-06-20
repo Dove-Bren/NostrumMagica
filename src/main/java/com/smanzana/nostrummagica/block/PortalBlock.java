@@ -1,19 +1,21 @@
 package com.smanzana.nostrummagica.block;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.util.WeakHashSet;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
@@ -35,7 +37,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class PortalBlock extends Block  {
+public abstract class PortalBlock extends Block implements IPortalBlock  {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
@@ -198,60 +200,114 @@ public abstract class PortalBlock extends Block  {
 	
 	protected abstract void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn);
 	
-	// Note: Just doing a dumb little static map cause we don't really care to persist portal cooldowns. Just
-	// There to be nice to players.
-	private static final Map<UUID, Integer> EntityTeleportCharge = new HashMap<>();
+	@Override
+	public boolean attemptTeleport(World world, BlockPos pos, BlockState state, Entity entity) {
+		teleportEntity(world, pos, entity);
+		if (entity instanceof PlayerEntity) {
+			ServerEntityTeleportCharge.put(entity, -(TELEPORT_CHARGE_TIME * 5 * 20));
+		}
+		return true;
+	}
+	
+	// Counter only used on client side to charge up and disable teleporting.
+	// Goes from -N to X.
+	// Starts at 0, and charges when entity is in contact with the portal. When it hits X (max charge time),
+	// entity is teleported, and set to a negative number as a portal 'cooldown' before it can charge again.
+	private static int ClientTeleportCharge = 0;
+	private static boolean ClientTeleportTickMark = false; 
+	
+	// Server-side charge counter for entities.
+	// For players, this isn't used except to check that player's aren't attempting to teleport too frequently.
+	// For non-players, this acts like ClientTeleportCharge does.
+	private static final Map<Entity, Integer> ServerEntityTeleportCharge = new WeakHashMap<>();
+	private static final Set<Entity> ServerFrameEntities = new WeakHashSet<>();
 	
 	// How long entities must wait in the teleporation block before they teleport
 	public static final int TELEPORT_CHARGE_TIME = 3;
 	
-	private static boolean DumbIntegratedGuard = false;
-	
 	@Override
 	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-		Integer charge = EntityTeleportCharge.get(entityIn.getUniqueID());
-		if (charge == null) {
-			charge = 0;
+		// This func is called many (4) times each frame (per logical side) for portals.
+		// First is during entity updates on the player, which happens for both blocks since both are collided.
+		// Second is when handling player movement.
+		if (!worldIn.isRemote() && ServerFrameEntities.contains(entityIn)) {
+			return;
 		}
 		
-		if (worldIn.isRemote && entityIn == NostrumMagica.instance.proxy.getPlayer() && ((!DumbIntegratedGuard && charge == 0) || (DumbIntegratedGuard && charge == 2))) {
-			entityIn.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+		if (worldIn.isRemote() && ClientTeleportTickMark) {
+			return;
 		}
 		
-		if (!DumbIntegratedGuard) {
-			charge += 2;
-			DumbIntegratedGuard = true;
+		if (!this.canTeleport(worldIn, pos, entityIn)) {
+			return;
 		}
 		
-		
-		if (charge > TELEPORT_CHARGE_TIME * 20 && this.canTeleport(worldIn, pos, entityIn)) {
-			EntityTeleportCharge.put(entityIn.getUniqueID(), -(TELEPORT_CHARGE_TIME * 5 * 20));
-			if (!worldIn.isRemote) {
-				this.teleportEntity(worldIn, pos, entityIn);
+		boolean doTeleport = false;
+		final int maxChargeTicks = TELEPORT_CHARGE_TIME * 20;
+		final int cooldownTicks = -(TELEPORT_CHARGE_TIME * 5 * 20);
+		if (worldIn.isRemote()) {
+			// Clients manage their own entity.
+			if (entityIn == NostrumMagica.instance.proxy.getPlayer()) {
+				if (ClientTeleportCharge == 0) {
+					// First frame of charging
+					entityIn.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+				}
+				ClientTeleportCharge += 2; // + 2 because we decrement each tick, too
+				if (ClientTeleportCharge >= maxChargeTicks) {
+					ClientTeleportCharge = cooldownTicks;
+					doTeleport = true;
+				} else {
+					int count = (ClientTeleportCharge / 20) / TELEPORT_CHARGE_TIME;
+					for (int i = 0; i < count + 1; i++) {
+						double dx = pos.getX() + .5;
+						double dy = pos.getY() + .5;
+						double dz = pos.getZ() + .5;
+						
+						double mx = .25 * (NostrumMagica.rand.nextFloat() - .5f);
+						double my = .5 * (NostrumMagica.rand.nextFloat() - .5f);
+						double mz = .25 * (NostrumMagica.rand.nextFloat() - .5f);
+						worldIn.addParticle(ParticleTypes.DRAGON_BREATH, dx + mx, dy, dz + mz, mx / 3, my, mz / 3);
+					}
+				}
+				ClientTeleportTickMark = true;
 			}
 		} else {
-			EntityTeleportCharge.put(entityIn.getUniqueID(), charge);
-			if (worldIn.isRemote && charge >= 0) {
-				int count = (charge / 20) / TELEPORT_CHARGE_TIME;
-				for (int i = 0; i < count + 1; i++) {
-					double dx = pos.getX() + .5;
-					double dy = pos.getY() + .5;
-					double dz = pos.getZ() + .5;
-					
-					double mx = .25 * (NostrumMagica.rand.nextFloat() - .5f);
-					double my = .5 * (NostrumMagica.rand.nextFloat() - .5f);
-					double mz = .25 * (NostrumMagica.rand.nextFloat() - .5f);
-					worldIn.addParticle(ParticleTypes.DRAGON_BREATH, dx + mx, dy, dz + mz, mx / 3, my, mz / 3);
+			// Servers don't manage player counting
+			if (!(entityIn instanceof PlayerEntity)) {
+				int charge = ServerEntityTeleportCharge.getOrDefault(entityIn, 0) + 2; // + 2 because we decrement each tick, too
+				if (charge >= maxChargeTicks) {
+					doTeleport = true;
+					charge = cooldownTicks;
 				}
+				ServerEntityTeleportCharge.put(entityIn, charge);
 			}
+			ServerFrameEntities.add(entityIn);
+		}
+		
+		if (doTeleport) {
+			NostrumMagica.instance.proxy.attemptBlockTeleport(entityIn, pos);
 		}
 	}
 	
-	public static void tick() {
-		Iterator<UUID> it = EntityTeleportCharge.keySet().iterator();
+	public static void clientTick() {
+		if (ClientTeleportCharge < 0) {
+			ClientTeleportCharge++;
+		} else if (ClientTeleportCharge > 0) {
+			ClientTeleportCharge--;
+		}
+		ClientTeleportTickMark = false;
+	}
+	
+	public static void serverTick() {
+		ServerFrameEntities.clear();
+		if (ServerEntityTeleportCharge.isEmpty()) {
+			return;
+		}
+		
+		Iterator<Entity> it = ServerEntityTeleportCharge.keySet().iterator();
 		while (it.hasNext()) {
-			UUID key = it.next();
-			Integer charge = EntityTeleportCharge.get(key);
+			Entity ent = it.next();
+			Integer charge = ServerEntityTeleportCharge.get(ent);
 			if (charge != null) {
 				if (charge > 0) {
 					charge--;
@@ -263,63 +319,27 @@ public abstract class PortalBlock extends Block  {
 			if (charge == null || charge == 0) {
 				it.remove();
 			} else {
-				EntityTeleportCharge.put(key, charge);
+				ServerEntityTeleportCharge.put(ent, charge);
 			}
 		}
-		DumbIntegratedGuard = false;
 	}
 	
 	public static void resetTimers() {
-		EntityTeleportCharge.clear();
+		ServerEntityTeleportCharge.clear();
+		ClientTeleportCharge = 0;
 	}
 	
+	@OnlyIn(Dist.CLIENT)
 	public static int getRemainingCharge(Entity ent) {
-		Integer charge = EntityTeleportCharge.get(ent.getUniqueID());
+		Integer charge = ClientTeleportCharge;
 		return TELEPORT_CHARGE_TIME - (charge == null ? 0 : charge) * 20; 
 	}
-	
+
+	@OnlyIn(Dist.CLIENT)
 	public static int getCooldownTime(Entity ent) {
-		Integer charge = EntityTeleportCharge.get(ent.getUniqueID());
+		Integer charge = ClientTeleportCharge;
 		return (charge == null || charge >= 0 ? 0 : -charge);
 	}
-	
-//	// Note: Just doing a dumb little static map cause we don't really care to persist portal cooldowns. Just
-//	// There to be nice to players.
-//	private static final Map<UUID, Long> EntityTeleportTimes = new HashMap<>();
-//	
-//	// How long entities must wait before they can teleport again after using a portal, in seconds.
-//	public static final int TELEPORT_COOLDOWN = 10;
-//	
-//	@Override
-//	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, BlockState state, Entity entityIn) {
-//
-//		if (!worldIn.isRemote) {
-//			// Check if player teleported too recently
-//			Long lastTime = EntityTeleportTimes.get(entityIn.getPersistentID());
-//			final long now = System.currentTimeMillis();
-//			if (lastTime != null && (now - lastTime) < (1000 * TELEPORT_COOLDOWN)) {
-//				// Teleported too recently
-//				return;
-//			}
-//			
-//			// Get master block
-//			pos = getMaster(state, pos);
-//			
-//			if (canTeleport(worldIn, pos, entityIn)) {
-//				EntityTeleportTimes.put(entityIn.getPersistentID(), now);
-//				this.teleportEntity(worldIn, pos, entityIn);
-//			}
-//		}
-//	}
-//	
-//	public static void resetTimers() {
-//		EntityTeleportTimes.clear();
-//	}
-//	
-//	public static int getRemainingCooldown(Entity ent) {
-//		Long lastTime = EntityTeleportTimes.get(ent.getPersistentID());
-//		return lastTime == null ? 0 : ((1000 * TELEPORT_COOLDOWN) - (int) (System.currentTimeMillis() - lastTime)); 
-//	}
 	
 	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
 		

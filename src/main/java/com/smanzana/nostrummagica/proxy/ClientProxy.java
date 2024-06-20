@@ -50,6 +50,7 @@ import com.smanzana.nostrummagica.network.message.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.message.StatRequestMessage;
+import com.smanzana.nostrummagica.network.message.WorldPortalTeleportRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -1008,5 +1009,21 @@ public class ClientProxy extends CommonProxy {
 
 	public void doManaWiggle(int wiggleCount) {
 		this.overlayRenderer.startManaWiggle(wiggleCount);
+	}
+	
+	@Override
+	public boolean attemptBlockTeleport(Entity entity, BlockPos pos) {
+		// Check if this is a logical server op, since integrated still will call this version
+		if (!entity.getEntityWorld().isRemote()) {
+			return super.attemptBlockTeleport(entity, pos);
+		}
+		
+		// Ask server to do the teleport for us
+		if (entity == this.getPlayer()) {
+			NetworkHandler.sendToServer(new WorldPortalTeleportRequestMessage(pos));
+			return true;
+		}
+		
+		return false;
 	}
 }
