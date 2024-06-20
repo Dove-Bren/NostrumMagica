@@ -454,6 +454,7 @@
 	"block.nostrummagica.spelltable_mystic": "Mystic Spell Table",
 	"block.nostrummagica.rune_library": "Rune Library",
 	"block.nostrummagica.cursed_fire": "Cursed Fire",
+	"block.nostrummagica.launcher": "Dungeon Launcher",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",
@@ -506,6 +507,7 @@
 	"container.nostrummagica.putter.name": "Putter",
 	"container.nostrummagica.active_hopper.name": "Active Hopper",
 	"container.nostrummagica.rune_library.name": "Rune Library",
+	"container.nostrummagica.launcher.name": "Dungeon Launcher",
 	
 	"pattern.nostrummagica.lightweight": "Lightweight",
 	"pattern.nostrummagica.lightweight.description": "Makes the rune in the second slot weigh one unit less, but cost three times as much mana",

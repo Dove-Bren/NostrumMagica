@@ -1,12 +1,17 @@
 package com.smanzana.nostrummagica.tile;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -14,7 +19,9 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTileEntity {
@@ -114,10 +121,29 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 			
 			BlockState state = world.getBlockState(target);
 			if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
-				return;
+				NostrumMagica.logger.debug("Non-triggerable block pointed to at " + target);
+				continue;
 			}
 			
 			((ITriggeredBlock) state.getBlock()).trigger(world, target, state, this.getPos());
 		}
+	}
+	
+	public int cleanOffests(@Nullable PlayerEntity feedbackPlayer) {
+		Iterator<BlockPos> it = this.offsets.iterator();
+		int count = 0;
+		while (it.hasNext()) {
+			BlockPos offset = it.next();
+			final BlockPos target = this.pos.add(offset);
+			final BlockState state = world.getBlockState(target);
+			if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
+				if (feedbackPlayer != null) {
+					feedbackPlayer.sendMessage(new StringTextComponent("Cleaning out offset " + offset), Util.DUMMY_UUID);
+				}
+				it.remove();
+				count++;
+			}
+		}
+		return count;
 	}
 }

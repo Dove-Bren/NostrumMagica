@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "facing=down":  { "model": "nostrummagica:block/launcher_vertical", "x": 180 },
+        "facing=up":    { "model": "nostrummagica:block/launcher_vertical" },
+        "facing=north": { "model": "nostrummagica:block/launcher" },
+        "facing=south": { "model": "nostrummagica:block/launcher", "y": 180 },
+        "facing=west":  { "model": "nostrummagica:block/launcher", "y": 270 },
+        "facing=east":  { "model": "nostrummagica:block/launcher", "y": 90 }
+    }
+}

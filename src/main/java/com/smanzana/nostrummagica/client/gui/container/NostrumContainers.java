@@ -26,6 +26,7 @@ public class NostrumContainers {
 	@ObjectHolder(RedwoodSpellCraftGui.RedwoodContainer.ID) public static ContainerType<RedwoodSpellCraftGui.RedwoodContainer> SpellCreationRedwood;
 	@ObjectHolder(MysticSpellCraftGui.MysticContainer.ID) public static ContainerType<MysticSpellCraftGui.MysticContainer> SpellCreationMystic;
 	@ObjectHolder(RuneLibraryGui.RuneLibraryContainer.ID) public static ContainerType<RuneLibraryGui.RuneLibraryContainer> RuneLibrary;
+	@ObjectHolder(LauncherBlockGui.LauncherBlockContainer.ID) public static ContainerType<LauncherBlockGui.LauncherBlockContainer> Launcher;
 	
 	@SubscribeEvent
 	public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
@@ -43,5 +44,6 @@ public class NostrumContainers {
 		registry.register(IForgeContainerType.create(RedwoodSpellCraftGui.RedwoodContainer::FromNetwork).setRegistryName(RedwoodSpellCraftGui.RedwoodContainer.ID));
 		registry.register(IForgeContainerType.create(MysticSpellCraftGui.MysticContainer::FromNetwork).setRegistryName(MysticSpellCraftGui.MysticContainer.ID));
 		registry.register(IForgeContainerType.create(RuneLibraryGui.RuneLibraryContainer::FromNetwork).setRegistryName(RuneLibraryGui.RuneLibraryContainer.ID));
+		registry.register(IForgeContainerType.create(LauncherBlockGui.LauncherBlockContainer::FromNetwork).setRegistryName(LauncherBlockGui.LauncherBlockContainer.ID));
 	}
 }

@@ -52,40 +52,15 @@ public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 		return 1.0F;
 	}
 	
-//	@Override
-//	public boolean isSolid(BlockState state) {
-//		return false;
-//	}
-
 	@Override
 	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
 		return true;
 	}
 
-//	@Override
-//	public boolean causesSuffocation(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean canEntitySpawn(BlockState state, IBlockReader worldIn, BlockPos pos, EntityType<?> type) {
-//		return false;
-//	}
-	
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		return BlockRenderType.INVISIBLE; 
 	}
-	
-//	@Override
-//	public boolean canBeConnectedTo(BlockState state, IBlockReader world, BlockPos pos, Direction facing) {
-//		return false;
-//	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
@@ -148,6 +123,11 @@ public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 			// Display info
 			List<BlockPos> offsets = ent.getOffsets();
 			playerIn.sendMessage(new StringTextComponent("Holding " + offsets.size() + " offsets"), Util.DUMMY_UUID);
+			if (playerIn.isSneaking()) {
+				for (BlockPos offset : offsets) {
+					playerIn.sendMessage(new StringTextComponent(" > " + offset), Util.DUMMY_UUID);
+				}
+			}
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 			if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
@@ -159,6 +139,11 @@ public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 			// Clear
 			//ent.clearOffsets();
 			playerIn.sendMessage(new StringTextComponent("Cleared offsets"), Util.DUMMY_UUID);
+			NostrumMagicaSounds.DAMAGE_LIGHTNING.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.FEATHER) {
+			// Cleanup
+			final int count = ent.cleanOffests(playerIn);
+			playerIn.sendMessage(new StringTextComponent("Cleaned " + count + " offsets"), Util.DUMMY_UUID);
 			NostrumMagicaSounds.DAMAGE_WIND.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
 		

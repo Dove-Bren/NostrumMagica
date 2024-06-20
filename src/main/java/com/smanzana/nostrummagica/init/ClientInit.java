@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellCraftPatternAutoRenderer;
 import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
 import com.smanzana.nostrummagica.client.gui.container.BasicSpellCraftGui;
+import com.smanzana.nostrummagica.client.gui.container.LauncherBlockGui;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
@@ -188,6 +189,7 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationRedwood, RedwoodSpellCraftGui.Gui::new);
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneLibrary, RuneLibraryGui.Gui::new);
+		ScreenManager.registerFactory(NostrumContainers.Launcher, LauncherBlockGui.LauncherBlockGuiContainer::new);
 		
 		// Could probably make this be the default!
 		ISpellCraftPatternRenderer.RegisterRenderer(NostrumSpellCraftPatterns.lightweight, SpellCraftPatternAutoRenderer.INSTANCE);

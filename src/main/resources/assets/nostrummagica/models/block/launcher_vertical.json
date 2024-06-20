@@ -1,0 +1,7 @@
+{
+    "parent": "block/orientable_vertical",
+    "textures": {
+        "front": "nostrummagica:block/launcher_front_vertical",
+        "side": "block/furnace_top"
+    }
+}

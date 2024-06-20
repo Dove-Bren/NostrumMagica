@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
+import com.smanzana.nostrummagica.block.dungeon.DungeonLauncherBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
@@ -107,6 +108,7 @@ public class NostrumBlocks {
 	@ObjectHolder(CursedFireBlock.ID) public static CursedFireBlock cursedFire;
 	@ObjectHolder(MysticWaterBlock.ID) public static MysticWaterBlock mysticWaterBlock;
 	@ObjectHolder(LockedDoorBlock.ID) public static LockedDoorBlock lockedDoor;
+	@ObjectHolder(DungeonLauncherBlock.ID) public static DungeonLauncherBlock dungeonLauncher;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -182,6 +184,7 @@ public class NostrumBlocks {
     	registerBlockItem(mysticSpellTable, mysticSpellTable.getRegistryName(), registry);
     	registerBlockItem(runeLibrary, runeLibrary.getRegistryName(), registry);
     	registerBlockItem(lockedDoor, lockedDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(dungeonLauncher, dungeonLauncher.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -265,6 +268,7 @@ public class NostrumBlocks {
     	registerBlock(new CursedFireBlock(), CursedFireBlock.ID, registry);
     	registerBlock(new MysticWaterBlock(() -> NostrumFluids.mysticWater), MysticWaterBlock.ID, registry);
     	registerBlock(new LockedDoorBlock(), LockedDoorBlock.ID, registry);
+    	registerBlock(new DungeonLauncherBlock(), DungeonLauncherBlock.ID, registry);
     }
     
 }
