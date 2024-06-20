@@ -23,8 +23,6 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 public interface INostrumMagic {
@@ -61,31 +59,6 @@ public interface INostrumMagic {
 			}
 			
 			return false;
-		}
-	}
-	
-	public static enum EMagicTier {
-		LOCKED,
-		MANI,
-		KANI,
-		VANI,
-		LANI,
-		;
-		
-		private EMagicTier() {
-			
-		}
-		
-		public boolean isGreaterOrEqual(EMagicTier tier) {
-			return this.ordinal() >= tier.ordinal();
-		}
-		
-		public String getRawName() {
-			return getName().getString();
-		}
-		
-		public TextComponent getName() {
-			return new TranslationTextComponent("tier." + this.name().toLowerCase() + ".name");
 		}
 	}
 	

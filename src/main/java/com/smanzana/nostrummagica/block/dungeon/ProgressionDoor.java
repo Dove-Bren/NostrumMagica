@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.block.dungeon;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.item.ResourceCrystal;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.ProgressionDoorTileEntity;
@@ -50,12 +51,15 @@ public class ProgressionDoor extends NostrumMagicDoor {
 		BlockPos master = this.getMasterPos(worldIn, state, pos);
 		if (master != null && worldIn.getTileEntity(master) != null) {
 			
-			// Mostly debug code, but could be useful for map devs as well
 			if (playerIn.isCreative()) {
 				ProgressionDoorTileEntity te = (ProgressionDoorTileEntity) worldIn.getTileEntity(master);
 				ItemStack heldItem = playerIn.getHeldItem(hand);
 				if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellRune) {
 					te.require(SpellRune.toComponentWrapper(heldItem));
+					return ActionResultType.SUCCESS;
+				}
+				if (!heldItem.isEmpty() && heldItem.getItem() instanceof ResourceCrystal) {
+					te.tier(((ResourceCrystal) heldItem.getItem()).getTier());
 					return ActionResultType.SUCCESS;
 				}
 				if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.capabilities.INostrumMagic.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.TransmuteKnowledge;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.progression.skill.Skill;

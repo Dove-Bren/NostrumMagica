@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.item;
 
 import javax.annotation.Nonnull;
 
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -16,8 +17,11 @@ public class ResourceCrystal extends BlockItem implements ILoreTagged {
 	public static final String ID_CRYSTAL_MEDIUM = "crystal_medium";
 	public static final String ID_CRYSTAL_LARGE = "crystal_large";
 	
-	public ResourceCrystal(@Nonnull Block blockToPlace, Item.Properties properties) {
+	protected final EMagicTier matchingTier;
+	
+	public ResourceCrystal(@Nonnull Block blockToPlace, Item.Properties properties, EMagicTier matchingTier) {
 		super(blockToPlace, properties);
+		this.matchingTier = matchingTier;
 	}
 	
 	@Override
@@ -44,5 +48,9 @@ public class ResourceCrystal extends BlockItem implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
+	}
+	
+	public EMagicTier getTier() {
+		return this.matchingTier;
 	}
 }

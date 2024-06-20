@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.item;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
@@ -588,9 +589,9 @@ public class NostrumItems {
     	register(registry, new ResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceItem.ID_SKILL_OOZE));
     	register(registry, new ResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceItem.ID_SKILL_PENDANT));
     	register(registry, new ResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceItem.ID_SKILL_FLUTE));
-    	register(registry, new ResourceCrystal(NostrumBlocks.maniCrystalBlock, PropBase()).setRegistryName(ResourceCrystal.ID_CRYSTAL_SMALL));
-    	register(registry, new ResourceCrystal(NostrumBlocks.kaniCrystalBlock, PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(ResourceCrystal.ID_CRYSTAL_MEDIUM));
-    	register(registry, new ResourceCrystal(NostrumBlocks.vaniCrystalBlock, PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceCrystal.ID_CRYSTAL_LARGE));
+    	register(registry, new ResourceCrystal(NostrumBlocks.maniCrystalBlock, PropBase(), EMagicTier.MANI).setRegistryName(ResourceCrystal.ID_CRYSTAL_SMALL));
+    	register(registry, new ResourceCrystal(NostrumBlocks.kaniCrystalBlock, PropBase().rarity(Rarity.UNCOMMON), EMagicTier.KANI).setRegistryName(ResourceCrystal.ID_CRYSTAL_MEDIUM));
+    	register(registry, new ResourceCrystal(NostrumBlocks.vaniCrystalBlock, PropBase().rarity(Rarity.RARE), EMagicTier.VANI).setRegistryName(ResourceCrystal.ID_CRYSTAL_LARGE));
     	register(registry, new RoseItem().setRegistryName(RoseItem.ID_BLOOD_ROSE));
     	register(registry, new RoseItem().setRegistryName(RoseItem.ID_ELDRICH_ROSE));
     	register(registry, new RoseItem().setRegistryName(RoseItem.ID_PALE_ROSE));

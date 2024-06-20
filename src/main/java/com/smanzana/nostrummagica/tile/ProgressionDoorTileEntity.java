@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.ProgressionDoor;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 
@@ -27,12 +28,14 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	
 	private Set<SpellComponentWrapper> requiredComponents;
 	private int requiredLevel;
+	private EMagicTier requiredTier;
 	
 	public ProgressionDoorTileEntity() {
 		super(NostrumTileEntities.ProgressionDoorTileEntityType);
 		
 		requiredComponents = new HashSet<>();
 		requiredLevel = 0;
+		this.requiredTier = EMagicTier.LOCKED;
 	}
 	
 	public ProgressionDoorTileEntity require(SpellComponentWrapper component) {
@@ -47,6 +50,12 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		return this;
 	}
 	
+	public ProgressionDoorTileEntity tier(EMagicTier tier) {
+		this.requiredTier = tier;
+		this.dirty();
+		return this;
+	}
+	
 	public Set<SpellComponentWrapper> getRequiredComponents() {
 		return this.requiredComponents;
 	}
@@ -55,15 +64,19 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		return this.requiredLevel;
 	}
 	
+	public EMagicTier getRequiredTier() {
+		return this.requiredTier;
+	}
+	
 	public boolean meetsRequirements(LivingEntity entity, List<ITextComponent> missingDepStrings) {
 		boolean meets = true;
 		
 		if (!entity.world.isRemote) {
-			NostrumMagica.logger.info("Checking requirements: lvl [" + this.requiredLevel + "], components: " + this.requiredComponents.size());
+			NostrumMagica.logger.info("Checking requirements: lvl [" + this.requiredLevel + "], tier [" + requiredTier + "], components: " + this.requiredComponents.size());
 		}
 		
 		// Early out if no reqs, so we can have fluff doors!
-		if (this.requiredComponents.isEmpty() && this.requiredLevel <= 0) {
+		if (this.requiredComponents.isEmpty() && this.requiredLevel <= 0 && this.requiredTier == EMagicTier.LOCKED) {
 			;
 		} else {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
@@ -80,6 +93,11 @@ public class ProgressionDoorTileEntity extends TileEntity {
 				if (this.requiredLevel > 0 && attr.getLevel() < this.requiredLevel) {
 					if (missingDepStrings != null)
 						missingDepStrings.add(new TranslationTextComponent("info.door.missing.level", this.requiredLevel));
+					meets = false;
+				}
+				if (this.requiredTier != EMagicTier.LOCKED && !attr.getTier().isGreaterOrEqual(this.requiredTier)) {
+					if (missingDepStrings != null)
+						missingDepStrings.add(new TranslationTextComponent("info.door.missing.tier", this.requiredTier.getName()));
 					meets = false;
 				}
 				for (SpellComponentWrapper comp : this.requiredComponents) {
@@ -112,6 +130,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	}
 	
 	private static final String NBT_LEVEL = "level_requirement";
+	private static final String NBT_TIER = "tier_requirement";
 	private static final String NBT_COMPS = "required_componenets";
 	
 	@Override
@@ -119,6 +138,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		super.read(state, compound);
 		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
+		this.requiredTier = EMagicTier.FromNBT(compound.get(NBT_TIER));
 		this.requiredComponents.clear();
 		
 		ListNBT list = compound.getList(NBT_COMPS, NBT.TAG_STRING);
@@ -134,6 +154,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		
 		if (this.requiredLevel > 0)
 			nbt.putInt(NBT_LEVEL, this.requiredLevel);
+		
+		nbt.put(NBT_TIER, this.requiredTier.toNBT());
 		
 		if (!this.requiredComponents.isEmpty()) {
 			ListNBT list = new ListNBT();

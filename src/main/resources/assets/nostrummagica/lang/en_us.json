@@ -663,6 +663,7 @@
     "info.door.missing.shape": "Unlocked the %1$s shape",
     "info.door.missing.element": "Unlocked the %1$s element",
     "info.door.missing.alteration": "Unlocked the %1$s alteration",
+	"info.door.missing.tier": "Magic tier %1$s or greater",
     "info.teleportrune.unloaded": "The targetting location cannot be observed!",
     "info.teleportrune.norune": "The stored location does not point to a teleportation rune!",
     "info.teleportrune.toofar": "The distant rune is too far away!",

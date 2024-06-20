@@ -3,7 +3,9 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.MagicTierIcon;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
@@ -177,7 +179,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 		
 		// Draw required level
 		if (tileEntityIn.getRequiredLevel() > 0) {
-			final double drawZ = -.5;
+			final double drawZ = -.225;
 			final float VANILLA_FONT_SCALE = 0.010416667f;
 			String val = "Level: " + tileEntityIn.getRequiredLevel();
 			final int color = (attr != null && attr.getLevel() >= tileEntityIn.getRequiredLevel())
@@ -185,11 +187,32 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 					: 0xFFFFFFFF;
 			
 			matrixStackIn.push();
-			matrixStackIn.translate(0, 1, drawZ);
+			matrixStackIn.translate(0, 1.25, drawZ);
 			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
 			FontRenderer fonter = this.renderDispatcher.fontRenderer;
 			fonter.renderString(val, fonter.getStringWidth(val) / -2, 0, color, false, matrixStackIn.getLast().getMatrix(), bufferIn, false, 0x0, combinedLightIn);
+			matrixStackIn.pop();
+		}
+		
+		// Draw required tier
+		if (tileEntityIn.getRequiredTier() != EMagicTier.LOCKED) {
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0.25, -.15);
+
+			final float radius = 1.75f;
+			matrixStackIn.scale(radius, radius, 1f);
+			
+			final float outlineScale = 1.025f;
+			matrixStackIn.push();
+			matrixStackIn.scale(outlineScale, outlineScale, 1f);
+			matrixStackIn.translate(-.5, -.5, 0);
+			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, 1f);
+			matrixStackIn.pop();
+			
+			matrixStackIn.translate(-.5, -.5, 0);
+			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, .4f, .4f, .4f, 1f);
+			
 			matrixStackIn.pop();
 		}
 
