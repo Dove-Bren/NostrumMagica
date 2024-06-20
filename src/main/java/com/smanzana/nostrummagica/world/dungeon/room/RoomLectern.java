@@ -243,7 +243,7 @@ public class RoomLectern extends StaticRoom {
 		}
 		
 		// Build the spell
-		Spell spell = Spell.CreateAISpell(genSpellName(rand, element, harmful, status));
+		Spell spell = new Spell(genSpellName(rand, element, harmful, status), 75, 3);
 		if (harmful) {
 			
 			int roll = rand.nextInt(10);
@@ -258,7 +258,9 @@ public class RoomLectern extends StaticRoom {
 				spell.addPart(new SpellShapePart(NostrumSpellShapes.Touch));
 			} else if (roll < 8) {
 				spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
-			} // else no shape
+			} else {
+				spell.addPart(new SpellShapePart(NostrumSpellShapes.Ring));
+			}
 			
 			int effects = 1;
 			if (rand.nextBoolean() && rand.nextBoolean())
