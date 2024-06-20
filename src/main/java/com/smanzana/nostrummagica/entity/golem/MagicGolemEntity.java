@@ -5,7 +5,9 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.tasks.GolemTask;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -231,7 +233,7 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 		return GolemLore.instance;
 	}
 	
-	public static final class GolemLore implements ILoreTagged {
+	public static final class GolemLore implements IEntityLoreTagged<MagicGolemEntity> {
 
 		public static final GolemLore instance = new GolemLore();
 		public static final GolemLore instance() {
@@ -262,6 +264,11 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 		@Override
 		public InfoScreenTabs getTab() {
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<MagicFireGolemEntity> getEntityType() {
+			return NostrumEntityTypes.golemFire;
 		}
 	}
 	

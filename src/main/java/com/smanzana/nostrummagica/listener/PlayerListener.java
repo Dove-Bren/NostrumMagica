@@ -69,6 +69,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.SoundCategory;
@@ -753,29 +754,10 @@ public class PlayerListener {
 		if (attr != null && attr.isUnlocked()) {
 			if (event.getState().getBlock() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
-			} else if (null != LoreRegistry.getPreset(event.getState().getBlock()))
-				attr.giveBasicLore(LoreRegistry.getPreset(event.getState().getBlock()));
+			} else if (event.getState().getBlock().isIn(BlockTags.LEAVES)) {
+				attr.giveBasicLore(LoreRegistry.Leaves.instance());
+			}
 		}
-		
-//		if (event.getState().getBlock() instanceof BlockTallGrass
-//				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
-//			ItemEntity entity = new ItemEntity(event.getWorld(),
-//					event.getPos().getX() + 0.5,
-//					event.getPos().getY() + 0.5,
-//					event.getPos().getZ() + 0.5,
-//					ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1));
-//			event.getWorld().spawnEntityInWorld(entity);
-//		}
-//		
-//		if (event.getState().getBlock() instanceof BlockTallGrass
-//				&& NostrumMagica.rand.nextFloat() <= 0.05f) {
-//			ItemEntity entity = new ItemEntity(event.getWorld(),
-//					event.getPos().getX() + 0.5,
-//					event.getPos().getY() + 0.5,
-//					event.getPos().getZ() + 0.5,
-//					ReagentItem.CreateStack(ReagentType.GINSENG, 1));
-//			event.getWorld().spawnEntityInWorld(entity);
-//		}
 	}
 	
 	@SubscribeEvent
@@ -794,8 +776,8 @@ public class PlayerListener {
 					if (tag != null) {
 						attr.giveBasicLore(tag);
 					}
-				} else if (null != LoreRegistry.getPreset(event.getEntityLiving())) {
-					attr.giveBasicLore(LoreRegistry.getPreset(event.getEntityLiving()));
+				} else if (event.getEntityLiving().isEntityUndead()) {
+					attr.giveBasicLore(LoreRegistry.UndeadLore.instance());
 				}
 			}
 			

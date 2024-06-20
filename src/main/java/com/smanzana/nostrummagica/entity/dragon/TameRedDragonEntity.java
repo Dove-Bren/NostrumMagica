@@ -23,19 +23,19 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity.DragonEquipmentInventory.IChangeListener;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
 import com.smanzana.nostrummagica.entity.tasks.FollowEntityGenericGoal;
-import com.smanzana.nostrummagica.entity.tasks.PanicGenericGoal;
-import com.smanzana.nostrummagica.entity.tasks.SitGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.OwnerHurtByTargetGoalGeneric;
 import com.smanzana.nostrummagica.entity.tasks.OwnerHurtTargetGenericGoal;
-import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
+import com.smanzana.nostrummagica.entity.tasks.PanicGenericGoal;
+import com.smanzana.nostrummagica.entity.tasks.SitGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonGambittedSpellAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackGoal;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
 import com.smanzana.nostrummagica.item.DragonSoulItem;
 import com.smanzana.nostrummagica.item.RoseItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.serializer.PetJobSerializer;
@@ -1345,27 +1345,6 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	}
 
 	@Override
-	public String getLoreKey() {
-		return "nostrum__dragon_baby_red";
-	}
-
-	@Override
-	public String getLoreDisplayName() {
-		return "Baby Red Dragons";
-	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("An adorable baby dragon!");
-				
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("An adorable baby dragon!", "Those with less of a heart may find their hearts to be especially valuable...");
-	}
-
-	@Override
 	protected void setFlyingAI() {
 		//
 	}
@@ -2264,8 +2243,8 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 			return true;
 		}
 	}
-	
-	public static final class TameRedDragonLore implements ILoreTagged {
+
+	public static final class TameRedDragonLore implements IEntityLoreTagged<TameRedDragonEntity> {
 		
 		private static TameRedDragonLore instance = null;
 		public static TameRedDragonLore instance() {
@@ -2300,10 +2279,15 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 			// Don't actually display! We're going to show our own page!
 			return null;
 		}
+
+		@Override
+		public EntityType<TameRedDragonEntity> getEntityType() {
+			return NostrumEntityTypes.tameDragonRed;
+		}
 		
 	}
 	
-	public static final class SoulBoundDragonLore implements ILoreTagged {
+	public static final class SoulBoundDragonLore implements IEntityLoreTagged<TameRedDragonEntity> {
 		
 		private static SoulBoundDragonLore instance = null;
 		public static SoulBoundDragonLore instance() {
@@ -2337,6 +2321,11 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		public InfoScreenTabs getTab() {
 			// Don't actually display! We're going to show our own page!
 			return InfoScreenTabs.INFO_DRAGONS;
+		}
+
+		@Override
+		public EntityType<TameRedDragonEntity> getEntityType() {
+			return NostrumEntityTypes.tameDragonRed;
 		}
 		
 	}

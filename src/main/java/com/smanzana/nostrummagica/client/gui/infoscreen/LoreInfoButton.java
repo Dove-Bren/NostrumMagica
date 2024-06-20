@@ -9,8 +9,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.loretag.IBlockLoreTagged;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -75,20 +76,13 @@ public class LoreInfoButton extends InfoButton {
 				Item item = ((Block) lore).asItem();
 				if (item != null)
 					iconStack = new ItemStack(item, 1);
-			} else if (lore instanceof LivingEntity) { int unused; // Need some way to get ent from non-ents?
-				iconEntity = (Entity) lore;
-				if (iconEntity.world == null)
-					iconEntity.world = mc.world;
-			} else if (lore instanceof LoreRegistry.Preset) {
-				LoreRegistry.Preset preset = (LoreRegistry.Preset) lore;
-				if (preset.getBlock() != null) {
-					Item item = ((Block) preset.getBlock()).asItem();
-					if (item != null)
-						iconStack = new ItemStack(item, 1);
-				} else if (preset.getEntity(mc.world) != null) {
-					iconEntity = preset.getEntity(mc.world);
+			} else if (lore instanceof IEntityLoreTagged) {
+				iconEntity = ((IEntityLoreTagged<?>) lore).makeEntity(mc.world);
+			} else if (lore instanceof IBlockLoreTagged) {
+				Item item = ((IBlockLoreTagged) lore).getBlock().asItem();
+				if (item != null) {
+					iconStack = new ItemStack(item, 1);
 				}
-					
 			}
 		}
 		

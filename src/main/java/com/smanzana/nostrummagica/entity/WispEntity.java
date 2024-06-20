@@ -17,9 +17,10 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.tasks.StayHomeGoal;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
+import com.smanzana.nostrummagica.entity.tasks.StayHomeGoal;
 import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -260,7 +261,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		return WispLoreTag.instance;
 	}
 	
-	public static final class WispLoreTag implements ILoreTagged {
+	public static final class WispLoreTag implements IEntityLoreTagged<WispEntity> {
 		
 		private static final WispLoreTag instance = new WispLoreTag();
 		public static final WispLoreTag instance() {
@@ -291,6 +292,11 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		@Override
 		public InfoScreenTabs getTab() {
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<WispEntity> getEntityType() {
+			return NostrumEntityTypes.wisp;
 		}
 	}
 	

@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.FollowEntityGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -287,7 +288,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 		return SpriteLoreTag.instance;
 	}
 	
-	public static final class SpriteLoreTag implements ILoreTagged {
+	public static final class SpriteLoreTag implements IEntityLoreTagged<SpriteEntity> {
 		
 		private static final SpriteLoreTag instance = new SpriteLoreTag();
 		public static final SpriteLoreTag instance() {
@@ -318,6 +319,11 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 		@Override
 		public InfoScreenTabs getTab() {
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<SpriteEntity> getEntityType() {
+			return NostrumEntityTypes.sprite;
 		}
 	}
 	

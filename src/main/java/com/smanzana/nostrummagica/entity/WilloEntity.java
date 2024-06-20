@@ -20,6 +20,8 @@ import com.smanzana.nostrummagica.entity.tasks.PanicGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
@@ -84,7 +86,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class WilloEntity extends MonsterEntity implements ILoreTagged, IElementalEntity {
+public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElementalEntity {
 	
 	public static enum WilloStatus {
 		NEUTRAL,
@@ -97,8 +99,6 @@ public class WilloEntity extends MonsterEntity implements ILoreTagged, IElementa
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
 	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(WilloEntity.class, MagicElementDataSerializer.instance);
 	protected static final DataParameter<WilloStatus> STATUS = EntityDataManager.<WilloStatus>createKey(WilloEntity.class, WilloStatusSerializer.instance);
-	
-	public static final String LoreKey = "nostrum__willo";
 	
 	private int idleCooldown;
 	
@@ -265,26 +265,50 @@ public class WilloEntity extends MonsterEntity implements ILoreTagged, IElementa
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return LoreKey;
+	public ILoreTagged getLoreTag() {
+		return WilloLoreTag.instance;
 	}
+	
+	public static final class WilloLoreTag implements IEntityLoreTagged<WilloEntity> {
+		
+		public static final String LoreKey = "nostrum__willo";
+		
+		private static final WilloLoreTag instance = new WilloLoreTag();
+		public static final WilloLoreTag instance() {
+			return instance;
+		}
+	
+		@Override
+		public String getLoreKey() {
+			return LoreKey;
+		}
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Willo";
+		@Override
+		public String getLoreDisplayName() {
+			return "Willo";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("");
+		}
+		
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<WilloEntity> getEntityType() {
+			return NostrumEntityTypes.willo;
+		}
 	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("");
-				
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("");
-	}
-	
 	
 	@Override
 	protected void registerData() {
@@ -380,27 +404,6 @@ public class WilloEntity extends MonsterEntity implements ILoreTagged, IElementa
 				}
 			}
 		}
-	}
-	
-//	@Override
-//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-//		if (wasRecentlyHit) {
-////			int chance = 1 + (2 * lootingModifier);
-////			if (this.rand.nextInt(100) < chance) {
-////				this.entityDropItem(NostrumResourceItem.getItem(ResourceType.WISP_PEBBLE, 1), 0);
-////			}
-//			
-//			// Research scroll
-//			int chances = 1 + lootingModifier;
-//			if (rand.nextInt(200) < chances) {
-//				this.entityDropItem(NostrumSkillItem.getItem(SkillItemType.RESEARCH_SCROLL_SMALL, 1), 0);
-//			}
-//		}
-//	}
-
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
 	}
 	
 	@Override

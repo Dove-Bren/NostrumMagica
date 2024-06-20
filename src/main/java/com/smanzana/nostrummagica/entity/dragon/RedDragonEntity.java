@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
@@ -15,13 +16,16 @@ import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAggroTableGoal;
-import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFlyEvasionGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFlyRandomGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonLandGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackGoal;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonSummonShadowAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonTakeoffLandGoal;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializer.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -61,7 +65,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerBossInfo;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEntity, IElementalEntity {
+public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEntity, IElementalEntity, ILoreSupplier {
 
 	public static enum DragonBodyPartType {
 		BODY("body", 2.5f, 3f, Vector3d.ZERO),
@@ -513,42 +517,52 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		super.removeTrackingPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
+	
+	@Override
+	public ILoreTagged getLoreTag() {
+		return RedDragonLore.instance();
+	}
+	
+	public static final class RedDragonLore implements IEntityLoreTagged<RedDragonEntity> {
+		
+		private static RedDragonLore instance = null;
+		public static RedDragonLore instance() {
+			if (instance == null) {
+				instance = new RedDragonLore();
+			}
+			return instance;
+		}
 
-	@Override
-	public String getLoreKey() {
-		return "nostrum__dragon_red";
-	}
+		@Override
+		public String getLoreKey() {
+			return "nostrum__dragon_red";
+		}
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Red Dragons";
+		@Override
+		public String getLoreDisplayName() {
+			return "Red Dragons";
+		}
+
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.");
+		}
+
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.", "According to some reports, Red Dragons are the only ones which are hatched from eggs.", "Nothing is known about what such eggs would look like.");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<RedDragonEntity> getEntityType() {
+			return NostrumEntityTypes.dragonRed;
+		}
 	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.");
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("Red Dragons are greedy creatures. They often live in abandoned castles, and have a strong fondness to anything that's shiny.", "According to some reports, Red Dragons are the only ones which are hatched from eggs.", "Nothing is known about what such eggs would look like.");
-	}
-	
-//	@Override
-//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-//		this.entityDropItem(new ItemStack(NostrumItems.dragonEggFragment), 0);
-//		
-//		int count = this.getRNG().nextInt(2 + lootingModifier);
-//		if (count != 0) {
-//			this.entityDropItem(new ItemStack(NostrumItems.resourceDragonWing, count), 0);
-//		}
-//		
-//		// Research scroll
-//		int chances = 20 + (lootingModifier * 2);
-//		if (rand.nextInt(100) < chances) {
-//			this.entityDropItem(new ItemStack(NostrumItems.skillScrollSmall, 1), 0);
-//		}
-//	}
 
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart<?> dragonPart, DamageSource source, float damage) {

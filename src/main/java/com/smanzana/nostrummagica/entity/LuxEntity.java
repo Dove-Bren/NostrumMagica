@@ -12,17 +12,18 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
-import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.MagicaFlowerBlock;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.tasks.FlierDiveGoal;
+import com.smanzana.nostrummagica.entity.tasks.GenericTemptGoal;
 import com.smanzana.nostrummagica.entity.tasks.OrbitEntityGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.StayHomeGoal;
-import com.smanzana.nostrummagica.entity.tasks.GenericTemptGoal;
 import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -347,7 +348,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		return LuxLoreTag.instance;
 	}
 	
-	public static final class LuxLoreTag implements ILoreTagged {
+	public static final class LuxLoreTag implements IEntityLoreTagged<LuxEntity> {
 		
 		private static final LuxLoreTag instance = new LuxLoreTag(); 
 		public static final LuxLoreTag instance() {
@@ -378,6 +379,11 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		@Override
 		public InfoScreenTabs getTab() {
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<LuxEntity> getEntityType() {
+			return NostrumEntityTypes.lux;
 		}
 	}
 	

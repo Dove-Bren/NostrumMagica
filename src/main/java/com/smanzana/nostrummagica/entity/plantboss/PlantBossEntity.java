@@ -22,6 +22,8 @@ import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.serializer.FloatArraySerializer;
@@ -64,7 +66,7 @@ import net.minecraft.world.BossInfo;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerBossInfo;
 
-public class PlantBossEntity extends MobEntity implements ILoreTagged, IMultiPartEntity {
+public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiPartEntity {
 	
 	public static enum BattleState {
 		IDLE, // Not doing anything specific but throwing out attacks and looking mad
@@ -602,40 +604,50 @@ public class PlantBossEntity extends MobEntity implements ILoreTagged, IMultiPar
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return "nostrum__plant_boss";
+	public ILoreTagged getLoreTag() {
+		return PlantBossLore.instance();
 	}
+	
+	public static final class PlantBossLore implements IEntityLoreTagged<PlantBossEntity> {
+		
+		private static PlantBossLore instance = null;
+		public static PlantBossLore instance() {
+			if (instance == null) {
+				instance = new PlantBossLore();
+			}
+			return instance;
+		}
+		
+		@Override
+		public String getLoreKey() {
+			return "nostrum__plant_boss";
+		}
 
-	@Override
-	public String getLoreDisplayName() {
-		return "Nettler";
+		@Override
+		public String getLoreDisplayName() {
+			return "Nettler";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("");
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("");
+		}
+		
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<? extends PlantBossEntity> getEntityType() {
+			return NostrumEntityTypes.plantBoss;
+		}
 	}
-	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("");
-	}
-	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("");
-	}
-	
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
-	}
-	
-//	@Override
-//	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-//		int count = this.rand.nextInt(3) + 1;
-//		count += lootingModifier;
-//		
-//		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.EVIL_THISTLE, count), 0);
-//		
-//		count = 1 + lootingModifier / 2;
-//		this.entityDropItem(NostrumResourceItem.getItem(ResourceType.MANA_LEAF, 1), 0);
-//	}
 	
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart<?> plantPart, DamageSource source, float damage) {

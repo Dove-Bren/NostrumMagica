@@ -5,7 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.dragon.IDragonSpawnData.IDragonSpawnFactory;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -243,7 +245,7 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		return DragonEggLore.instance;
 	}
 	
-	public static final class DragonEggLore implements ILoreTagged {
+	public static final class DragonEggLore implements IEntityLoreTagged<DragonEggEntity> {
 
 		public static final DragonEggLore instance = new DragonEggLore();
 		public static final DragonEggLore instance() {
@@ -274,6 +276,11 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		@Override
 		public InfoScreenTabs getTab() {
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<DragonEggEntity> getEntityType() {
+			return NostrumEntityTypes.dragonEgg;
 		}
 	}
 }

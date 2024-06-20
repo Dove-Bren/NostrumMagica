@@ -21,8 +21,8 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainin
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
-import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
+import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfBarrierGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfEldrichGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfHellGoal;
@@ -30,7 +30,7 @@ import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfMysticGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfNatureGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfStormGoal;
 import com.smanzana.nostrummagica.item.ArcaneWolfSoulItem;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.serializer.ArcaneWolfElementalTypeSerializer;
@@ -2064,7 +2064,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		return newWolf;
 	}
 	
-	public static final class WolfTameLore implements ILoreTagged {
+	public static final class WolfTameLore implements IEntityLoreTagged<ArcaneWolfEntity> {
 		
 		private static WolfTameLore instance = null;
 		public static WolfTameLore instance() {
@@ -2098,6 +2098,11 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		public InfoScreenTabs getTab() {
 			// Don't actually display! We're going to show our own page!
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<ArcaneWolfEntity> getEntityType() {
+			return NostrumEntityTypes.arcaneWolf;
 		}
 		
 	}

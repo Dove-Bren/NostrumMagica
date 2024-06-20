@@ -1,8 +1,13 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFocusedTargetGoal;
-import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackGoal;
+import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
+import com.smanzana.nostrummagica.loretag.ILoreSupplier;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.entity.EntityType;
@@ -20,7 +25,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class ShadowRedDragonEntity extends RedDragonBaseEntity {
+public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_shadow_dragon_red";
 
@@ -75,26 +80,51 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity {
 	}
 	
 	@Override
-	public String getLoreKey() {
-		return "nostrum__dragon_shadow_red";
-	}
-
-	@Override
-	public String getLoreDisplayName() {
-		return "Shadow Red Dragons";
+	public ILoreTagged getLoreTag() {
+		return ShadowRedDragonLore.instance();
 	}
 	
-	@Override
-	public Lore getBasicLore() {
-		return new Lore().add("A shadowy figure taking the shape of a dragon...");
-				
+	public static final class ShadowRedDragonLore implements IEntityLoreTagged<ShadowRedDragonEntity> {
+		
+		private static ShadowRedDragonLore instance = null;
+		public static ShadowRedDragonLore instance() {
+			if (instance == null) {
+				instance = new ShadowRedDragonLore();
+			}
+			return instance;
+		}
+
+		@Override
+		public String getLoreKey() {
+			return "nostrum__dragon_shadow_red";
+		}
+
+		@Override
+		public String getLoreDisplayName() {
+			return "Shadow Red Dragons";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("A shadowy figure taking the shape of a dragon...");
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("A shadowy figure taking the shape of a dragon...");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<ShadowRedDragonEntity> getEntityType() {
+			return NostrumEntityTypes.shadowDragonRed;
+		}
 	}
 	
-	@Override
-	public Lore getDeepLore() {
-		return new Lore().add("A shadowy figure taking the shape of a dragon...");
-	}
-
 	@Override
 	protected void setFlyingAI() {
 		//

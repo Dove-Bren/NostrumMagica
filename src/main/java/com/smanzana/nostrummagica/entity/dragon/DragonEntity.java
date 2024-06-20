@@ -5,10 +5,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
@@ -37,7 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public abstract class DragonEntity extends MonsterEntity implements ILoreTagged {
+public abstract class DragonEntity extends MonsterEntity {
 	
 	//protected EntitySize size;
 	//protected AxisAlignedBB entityBBOverride;
@@ -129,11 +127,6 @@ public abstract class DragonEntity extends MonsterEntity implements ILoreTagged 
 		
 	}
 	
-	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ENTITY;
-	}
-	
 	public abstract boolean isTryingToLand();
 	
 	public abstract boolean isCasting();
@@ -147,347 +140,15 @@ public abstract class DragonEntity extends MonsterEntity implements ILoreTagged 
             super(dragon, 5, false);
             this.parentEntity = dragon;
         }
-        
-//        @Override
-//        public void tick() {
-////        	if (this.action == MovementController.Action.STRAFE)
-////    		{
-////    			float f = (float)this.entity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
-////    			float f1 = (float)this.speed * f;
-////    			float f2 = this.moveForward;
-////    			float f3 = this.moveStrafe;
-////    			float f4 = MathHelper.sqrt(f2 * f2 + f3 * f3);
-////
-////    			if (f4 < 1.0F)
-////    			{
-////    				f4 = 1.0F;
-////    			}
-////
-////    			f4 = f1 / f4;
-////    			f2 = f2 * f4;
-////    			f3 = f3 * f4;
-////    			float f5 = MathHelper.sin(this.entity.rotationYaw * 0.017453292F);
-////    			float f6 = MathHelper.cos(this.entity.rotationYaw * 0.017453292F);
-////    			float f7 = f2 * f6 - f3 * f5;
-////    			float f8 = f3 * f6 + f2 * f5;
-////    			PathNavigator PathNavigator = this.entity.getNavigator();
-////
-////    			if (PathNavigator != null)
-////    			{
-////    				NodeProcessor nodeprocessor = PathNavigator.getNodeProcessor();
-////
-////    				if (nodeprocessor != null && nodeprocessor.getPathNodeType(this.entity.world, MathHelper.floor(this.entity.getPosX() + (double)f7), MathHelper.floor(this.entity.getPosY()), MathHelper.floor(this.entity.getPosZ() + (double)f8)) != PathNodeType.OPEN)
-////    				{
-////    					this.moveForward = 1.0F;
-////    					this.moveStrafe = 0.0F;
-////    					f1 = f;
-////    				}
-////    			}
-////
-////    			this.entity.setAIMoveSpeed(f * 3);
-////    			this.entity.setMoveForward(this.moveForward);
-////    			this.entity.setMoveStrafing(this.moveStrafe);
-////    			this.action = MovementController.Action.WAIT;
-////    		}
-////        	else 
-//        	if (this.action == MovementController.Action.MOVE_TO)
-//            {
-//                double d0 = this.getPosX() - this.parentEntity.getPosX();
-//                double d1 = this.getPosY() - this.parentEntity.getPosY();
-//                double d2 = this.getPosZ() - this.parentEntity.getPosZ();
-//                double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-//
-//                d3 = (double)MathHelper.sqrt(d3);
-//                
-//                if (Math.abs(d3) < 1) {
-//                	lastDist = 0.0D;
-//                	this.action = MovementController.Action.WAIT;
-//                } else if (lastDist != 0.0D && Math.abs(lastDist - d3) < 0.05) {
-//                	courseChangeCooldown--;
-//                } else {
-//                	courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
-//                }
-//                
-//                if (courseChangeCooldown <= 0) {
-//                	lastDist = 0.0D;
-//                	this.action = MovementController.Action.WAIT;
-//                } else {
-//                	float speed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
-//                	speed *= 3f;
-//                	this.parentEntity.setMotion(
-//                			(d0 / d3) * speed,
-//                			(d1 / d3) * speed,
-//                			(d2 / d3) * speed
-//                			);
-//	                
-//	                lastDist = d3;
-//	                
-//	                float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-//	                this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, f9, 90.0F);
-//                }
-//            }
-//        }
     }
 	
 	static public class FlyNodeProcessor extends FlyingNodeProcessor {
-//	    public PathPoint getStart() {
-//	        return this.openPoint(MathHelper.floor(this.entity.getBoundingBox().minX), MathHelper.floor(this.entity.getBoundingBox().minY + 0.5D), MathHelper.floor(this.entity.getBoundingBox().minZ));
-//	    }
-//
-//	    /**
-//	     * Returns PathPoint for given coordinates
-//	     */
-//	    public PathPoint getPathPointToCoords(double x, double y, double z) {
-//	        return this.openPoint(MathHelper.floor(x - (double)(this.entity.getWidth() / 2.0F)), MathHelper.floor(y + 0.5D), MathHelper.floor(z - (double)(this.entity.getWidth() / 2.0F)));
-//	    }
-//
-//	    public int findPathOptions(PathPoint[] pathOptions, PathPoint currentPoint, PathPoint targetPoint, float maxDistance) {
-//	        int i = 0;
-//
-//	        for (Direction enumfacing : Direction.values()) {
-//	            PathPoint pathpoint = this.getAirNode(currentPoint.x + enumfacing.getXOffset(), currentPoint.y + enumfacing.getYOffset(), currentPoint.z + enumfacing.getZOffset());
-//
-//	            if (pathpoint != null && !pathpoint.visited && pathpoint.distanceTo(targetPoint) < maxDistance) {
-//	                pathOptions[i++] = pathpoint;
-//	            }
-//	        }
-//
-//	        return i;
-//	    }
-//
-//	    public PathNodeType getPathNodeType(IBlockReader blockaccessIn, int x, int y, int z, MobEntity entitylivingIn, int xSize, int ySize, int zSize, boolean canBreakDoorsIn, boolean canEnterDoorsIn) {
-//	        return PathNodeType.OPEN;
-//	    }
-//
-//	    public PathNodeType getPathNodeType(IBlockReader blockaccessIn, int x, int y, int z) {
-//	        return PathNodeType.OPEN;
-//	    }
-//
-//	    @Nullable
-//	    private PathPoint getAirNode(int p_186328_1_, int p_186328_2_, int p_186328_3_) {
-//	        PathNodeType pathnodetype = this.isFree(p_186328_1_, p_186328_2_, p_186328_3_);
-//	        return pathnodetype == PathNodeType.OPEN ? this.openPoint(p_186328_1_, p_186328_2_, p_186328_3_) : null;
-//	    }
-//
-//	    private PathNodeType isFree(int p_186327_1_, int p_186327_2_, int p_186327_3_) {
-//	        BlockPos.BlockPos.Mutable blockpos$BlockPos.Mutable = new BlockPos.BlockPos.Mutable();
-//
-//	        for (int i = p_186327_1_; i < p_186327_1_ + this.entitySizeX; ++i)
-//	        {
-//	            for (int j = p_186327_2_; j < p_186327_2_ + this.entitySizeY; ++j)
-//	            {
-//	                for (int k = p_186327_3_; k < p_186327_3_ + this.entitySizeZ; ++k)
-//	                {
-//	                    BlockState iblockstate = this.blockaccess.getBlockState(blockpos$BlockPos.Mutable.setPos(i, j, k));
-//
-//	                    if (iblockstate.getMaterial() != Material.AIR)
-//	                    {
-//	                        return PathNodeType.BLOCKED;
-//	                    }
-//	                }
-//	            }
-//	        }
-//
-//	        return PathNodeType.OPEN;
-//	    }
-//	    
-//	    @Override
-//	    public FlaggedPathPoint func_224768_a(double p_224768_1_, double p_224768_3_, double p_224768_5_) {
-//	        return new FlaggedPathPoint(super.openPoint(MathHelper.floor(p_224768_1_), MathHelper.floor(p_224768_3_), MathHelper.floor(p_224768_5_)));
-//	    }
-//
-//	    @Override
-//	    public int func_222859_a(PathPoint[] p_222859_1_, PathPoint p_222859_2_) {
-//	        int i = 0;
-//	        PathPoint pathpoint = this.openPoint(p_222859_2_.x, p_222859_2_.y, p_222859_2_.z + 1);
-//	        PathPoint pathpoint1 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y, p_222859_2_.z);
-//	        PathPoint pathpoint2 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y, p_222859_2_.z);
-//	        PathPoint pathpoint3 = this.openPoint(p_222859_2_.x, p_222859_2_.y, p_222859_2_.z - 1);
-//	        PathPoint pathpoint4 = this.openPoint(p_222859_2_.x, p_222859_2_.y + 1, p_222859_2_.z);
-//	        PathPoint pathpoint5 = this.openPoint(p_222859_2_.x, p_222859_2_.y - 1, p_222859_2_.z);
-//	        if (pathpoint != null && !pathpoint.visited) {
-//	           p_222859_1_[i++] = pathpoint;
-//	        }
-//
-//	        if (pathpoint1 != null && !pathpoint1.visited) {
-//	           p_222859_1_[i++] = pathpoint1;
-//	        }
-//
-//	        if (pathpoint2 != null && !pathpoint2.visited) {
-//	           p_222859_1_[i++] = pathpoint2;
-//	        }
-//
-//	        if (pathpoint3 != null && !pathpoint3.visited) {
-//	           p_222859_1_[i++] = pathpoint3;
-//	        }
-//
-//	        if (pathpoint4 != null && !pathpoint4.visited) {
-//	           p_222859_1_[i++] = pathpoint4;
-//	        }
-//
-//	        if (pathpoint5 != null && !pathpoint5.visited) {
-//	           p_222859_1_[i++] = pathpoint5;
-//	        }
-//
-//	        boolean flag = pathpoint3 == null || pathpoint3.costMalus != 0.0F;
-//	        boolean flag1 = pathpoint == null || pathpoint.costMalus != 0.0F;
-//	        boolean flag2 = pathpoint2 == null || pathpoint2.costMalus != 0.0F;
-//	        boolean flag3 = pathpoint1 == null || pathpoint1.costMalus != 0.0F;
-//	        boolean flag4 = pathpoint4 == null || pathpoint4.costMalus != 0.0F;
-//	        boolean flag5 = pathpoint5 == null || pathpoint5.costMalus != 0.0F;
-//	        if (flag && flag3) {
-//	           PathPoint pathpoint6 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y, p_222859_2_.z - 1);
-//	           if (pathpoint6 != null && !pathpoint6.visited) {
-//	              p_222859_1_[i++] = pathpoint6;
-//	           }
-//	        }
-//
-//	        if (flag && flag2) {
-//	           PathPoint pathpoint7 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y, p_222859_2_.z - 1);
-//	           if (pathpoint7 != null && !pathpoint7.visited) {
-//	              p_222859_1_[i++] = pathpoint7;
-//	           }
-//	        }
-//
-//	        if (flag1 && flag3) {
-//	           PathPoint pathpoint8 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y, p_222859_2_.z + 1);
-//	           if (pathpoint8 != null && !pathpoint8.visited) {
-//	              p_222859_1_[i++] = pathpoint8;
-//	           }
-//	        }
-//
-//	        if (flag1 && flag2) {
-//	           PathPoint pathpoint9 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y, p_222859_2_.z + 1);
-//	           if (pathpoint9 != null && !pathpoint9.visited) {
-//	              p_222859_1_[i++] = pathpoint9;
-//	           }
-//	        }
-//
-//	        if (flag && flag4) {
-//	           PathPoint pathpoint10 = this.openPoint(p_222859_2_.x, p_222859_2_.y + 1, p_222859_2_.z - 1);
-//	           if (pathpoint10 != null && !pathpoint10.visited) {
-//	              p_222859_1_[i++] = pathpoint10;
-//	           }
-//	        }
-//
-//	        if (flag1 && flag4) {
-//	           PathPoint pathpoint11 = this.openPoint(p_222859_2_.x, p_222859_2_.y + 1, p_222859_2_.z + 1);
-//	           if (pathpoint11 != null && !pathpoint11.visited) {
-//	              p_222859_1_[i++] = pathpoint11;
-//	           }
-//	        }
-//
-//	        if (flag2 && flag4) {
-//	           PathPoint pathpoint12 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y + 1, p_222859_2_.z);
-//	           if (pathpoint12 != null && !pathpoint12.visited) {
-//	              p_222859_1_[i++] = pathpoint12;
-//	           }
-//	        }
-//
-//	        if (flag3 && flag4) {
-//	           PathPoint pathpoint13 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y + 1, p_222859_2_.z);
-//	           if (pathpoint13 != null && !pathpoint13.visited) {
-//	              p_222859_1_[i++] = pathpoint13;
-//	           }
-//	        }
-//
-//	        if (flag && flag5) {
-//	           PathPoint pathpoint14 = this.openPoint(p_222859_2_.x, p_222859_2_.y - 1, p_222859_2_.z - 1);
-//	           if (pathpoint14 != null && !pathpoint14.visited) {
-//	              p_222859_1_[i++] = pathpoint14;
-//	           }
-//	        }
-//
-//	        if (flag1 && flag5) {
-//	           PathPoint pathpoint15 = this.openPoint(p_222859_2_.x, p_222859_2_.y - 1, p_222859_2_.z + 1);
-//	           if (pathpoint15 != null && !pathpoint15.visited) {
-//	              p_222859_1_[i++] = pathpoint15;
-//	           }
-//	        }
-//
-//	        if (flag2 && flag5) {
-//	           PathPoint pathpoint16 = this.openPoint(p_222859_2_.x + 1, p_222859_2_.y - 1, p_222859_2_.z);
-//	           if (pathpoint16 != null && !pathpoint16.visited) {
-//	              p_222859_1_[i++] = pathpoint16;
-//	           }
-//	        }
-//
-//	        if (flag3 && flag5) {
-//	           PathPoint pathpoint17 = this.openPoint(p_222859_2_.x - 1, p_222859_2_.y - 1, p_222859_2_.z);
-//	           if (pathpoint17 != null && !pathpoint17.visited) {
-//	              p_222859_1_[i++] = pathpoint17;
-//	           }
-//	        }
-//
-//	        return i;
-//	     }
 	}
 	
 	static public class PathNavigatorDragonFlier extends FlyingPathNavigator {
 	    public PathNavigatorDragonFlier(MobEntity entitylivingIn, World worldIn) {
 	        super(entitylivingIn, worldIn);
 	    }
-	
-//	    @Override
-//	    protected PathFinder getPathFinder(int i) {
-//	        return new PathFinder(new FlyNodeProcessor(), i);
-//	    }
-//	
-//	    /**
-//	     * If on ground or swimming and can swim
-//	     */
-//	    @Override
-//	    protected boolean canNavigate() {
-//	        return true;
-//	    }
-//
-//	    @Override
-//	    protected Vector3d getEntityPosition() {
-//	        return new Vector3d(this.entity.getPosX(), this.entity.getPosY() + (double)this.entity.getHeight() * 0.5D, this.entity.getPosZ());
-//	    }
-//
-//	    @Override
-//	    protected void pathFollow() {
-//	        Vector3d Vector3d = this.getEntityPosition();
-//	        float f = this.entity.getWidth() * this.entity.getWidth();
-//	
-//	        if (Vector3d.squareDistanceTo(this.currentPath.getVectorFromIndex(this.entity, this.currentPath.getCurrentPathIndex())) < (double)f) {
-//	            this.currentPath.incrementPathIndex();
-//	        }
-//	
-//	        for (int j = Math.min(this.currentPath.getCurrentPathIndex() + 6, this.currentPath.getCurrentPathLength() - 1); j > this.currentPath.getCurrentPathIndex(); --j) {
-//	            Vector3d Vector3d1 = this.currentPath.getVectorFromIndex(this.entity, j);
-//	
-//	            if (Vector3d1.squareDistanceTo(Vector3d) <= 36.0D && this.isDirectPathBetweenPoints(Vector3d, Vector3d1, 0, 0, 0)) {
-//	                this.currentPath.setCurrentPathIndex(j);
-//	                break;
-//	            }
-//	        }
-//	
-//	        this.checkForStuck(Vector3d);
-//	    }
-//	
-//	    /**
-//	     * Trims path data from the end to the first sun covered block
-//	     */
-//	    @Override
-//	    protected void removeSunnyPath() {
-//	        super.removeSunnyPath();
-//	    }
-//	
-//	    /**
-//	     * Checks if the specified entity can safely walk to the specified location.
-//	     */
-//	    @Override
-//	    protected boolean isDirectPathBetweenPoints(Vector3d posVec31, Vector3d posVec32, int sizeX, int sizeY, int sizeZ) {
-//	        RayTraceResult raytraceresult = this.world.rayTraceBlocks(posVec31, new Vector3d(posVec32.x, posVec32.y + (double)this.entity.getHeight() * 0.5D, posVec32.z), false, true, false);
-//	        return raytraceresult == null || raytraceresult.getType() == RayTraceResult.Type.MISS;
-//	    }
-//
-//	    @Override
-//	    public boolean canEntityStandOnPos(BlockPos pos) {
-//	        return !this.world.getBlockState(pos).func_215682_a(this.world, pos, this.entity);
-//	    }
 	}
 	
 	public static class DragonEquipmentInventory implements IInventory {

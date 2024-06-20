@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
+import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -173,7 +174,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 		return KoidLore.instance;
 	}
 	
-	public static final class KoidLore implements ILoreTagged {
+	public static final class KoidLore implements IEntityLoreTagged<KoidEntity> {
 
 		public static final KoidLore instance = new KoidLore();
 		public static final KoidLore instance() {
@@ -206,6 +207,11 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 		@Override
 		public InfoScreenTabs getTab() {
 			return InfoScreenTabs.INFO_ENTITY;
+		}
+
+		@Override
+		public EntityType<KoidEntity> getEntityType() {
+			return NostrumEntityTypes.koid;
 		}
 	}
 	
