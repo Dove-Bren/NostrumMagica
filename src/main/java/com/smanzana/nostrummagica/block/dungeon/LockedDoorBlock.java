@@ -18,12 +18,12 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class LockedDoor extends NostrumMagicDoor {
+public class LockedDoorBlock extends MagicDoorBlock {
 
 	public static final String ID = "locked_door";
-	public static BooleanProperty UNLOCKABLE = LockedChest.UNLOCKABLE;
+	public static BooleanProperty UNLOCKABLE = LockedChestBlock.UNLOCKABLE;
 	
-	public LockedDoor() {
+	public LockedDoorBlock() {
 		super();
 
 		this.setDefaultState(this.getDefaultState().with(UNLOCKABLE, false));

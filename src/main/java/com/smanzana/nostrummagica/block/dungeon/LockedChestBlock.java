@@ -27,14 +27,14 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class LockedChest extends HorizontalBlock {
+public class LockedChestBlock extends HorizontalBlock {
 	
 	public static final String ID = "locked_chest";
 	public static DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	public static BooleanProperty UNLOCKABLE = BooleanProperty.create("unlockable");
 	protected static final VoxelShape SHAPE = Block.makeCuboidShape(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
 	
-	public LockedChest() {
+	public LockedChestBlock() {
 		super(Block.Properties.create(Material.WOOD)
 				.sound(SoundType.WOOD)
 				.hardnessAndResistance(-1.0F, 3600000.8F)

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.ProgressionDoor;
+import com.smanzana.nostrummagica.block.dungeon.ProgressionDoorBlock;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
@@ -196,7 +196,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			faceStash = Direction.NORTH;
 			if (state != null) {
 				try {
-					faceStash = state.get(ProgressionDoor.HORIZONTAL_FACING);
+					faceStash = state.get(ProgressionDoorBlock.HORIZONTAL_FACING);
 				} catch (Exception e) {
 					NostrumMagica.logger.warn("Failed to get face for progression tile entity");
 				}
@@ -209,7 +209,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private BlockPos bottomStash = null;
 	public BlockPos getBottomCenterPos() {
 		if (bottomStash == null) {
-			bottomStash = ProgressionDoor.FindBottomCenterPos(getWorld(), getPos());
+			bottomStash = ProgressionDoorBlock.FindBottomCenterPos(getWorld(), getPos());
 		}
 		
 		return bottomStash;

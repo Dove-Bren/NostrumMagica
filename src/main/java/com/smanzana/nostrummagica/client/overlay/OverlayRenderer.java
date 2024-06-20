@@ -19,7 +19,7 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
-import com.smanzana.nostrummagica.block.dungeon.DungeonAir;
+import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
 import com.smanzana.nostrummagica.client.effects.ClientEffectAnimated;
@@ -318,7 +318,7 @@ public class OverlayRenderer extends AbstractGui {
 			
 			final int h = (int) player.getEyeHeight();
 			BlockState inBlock = player.world.getBlockState(new BlockPos(player.getPosX(), player.getPosY() + h, player.getPosZ()));
-			if (inBlock.getBlock() instanceof DungeonAir) {
+			if (inBlock.getBlock() instanceof DungeonAirBlock) {
 				// Render dungeon air overlay
 				{
 					final Matrix4f transform = matrixStackIn.getLast().getMatrix();
@@ -1386,7 +1386,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 		
 		// Dungeon Air wants no overlay
-		if (state.getBlock() instanceof DungeonAir) {
+		if (state.getBlock() instanceof DungeonAirBlock) {
 			if (!(event.getInfo().getRenderViewEntity() instanceof PlayerEntity)
 					|| ((PlayerEntity) event.getInfo().getRenderViewEntity()).isCreative()) {
 				event.setCanceled(true);

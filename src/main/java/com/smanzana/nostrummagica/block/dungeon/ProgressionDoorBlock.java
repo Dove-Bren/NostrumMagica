@@ -22,11 +22,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class ProgressionDoor extends NostrumMagicDoor {
+public class ProgressionDoorBlock extends MagicDoorBlock {
 
 	public static final String ID = "progression_door";
 	
-	public ProgressionDoor() {
+	public ProgressionDoorBlock() {
 		super();
 	}
 	

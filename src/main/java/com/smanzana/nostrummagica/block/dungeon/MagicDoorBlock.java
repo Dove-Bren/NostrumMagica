@@ -32,13 +32,13 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public abstract class NostrumMagicDoor extends HorizontalBlock {
+public abstract class MagicDoorBlock extends HorizontalBlock {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
 	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 6.4D, 16D, 16D, 9.6D);
 
-	public NostrumMagicDoor() {
+	public MagicDoorBlock() {
 		this(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()
@@ -46,7 +46,7 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 				);
 	}
 	
-	protected NostrumMagicDoor(Block.Properties properties) {
+	protected MagicDoorBlock(Block.Properties properties) {
 		super(properties);
 		
 		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false).with(HORIZONTAL_FACING, Direction.NORTH));
@@ -119,7 +119,7 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 				// Block was already destroyed, so use saved blockstate
 				state = startState;
 			} else {
-				if (state == null || !(state.getBlock() instanceof NostrumMagicDoor))
+				if (state == null || !(state.getBlock() instanceof MagicDoorBlock))
 					continue;
 			}
 			
@@ -245,7 +245,7 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 	public static final BlockPos FindBottomCenterPos(World world, BlockPos samplePos) {
 		// Master is at TE's pos... but is it the bottom block? And is it in center?
 		final BlockState startState = world.getBlockState(samplePos);
-		final Direction face = startState.get(NostrumMagicDoor.HORIZONTAL_FACING);
+		final Direction face = startState.get(MagicDoorBlock.HORIZONTAL_FACING);
 		final Block matchBlock = startState.getBlock();
 		
 		// Find bottom
@@ -299,7 +299,7 @@ public abstract class NostrumMagicDoor extends HorizontalBlock {
 	public static final MutableBoundingBox FindDisplayBounds(World world, BlockPos samplePos) {
 		// Master is at TE's pos... but is it the bottom block? And is it in center?
 		final BlockState startState = world.getBlockState(samplePos);
-		final Direction face = startState.get(NostrumMagicDoor.HORIZONTAL_FACING);
+		final Direction face = startState.get(MagicDoorBlock.HORIZONTAL_FACING);
 		final Block matchBlock = startState.getBlock();
 		
 		// Find bottom

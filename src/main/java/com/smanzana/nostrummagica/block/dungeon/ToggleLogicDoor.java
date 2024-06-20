@@ -20,7 +20,7 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class ToggleLogicDoor extends LogicDoor {
+public class ToggleLogicDoor extends LogicDoorBlock {
 
 	public static final String ID = "toggle_logic_door";
 	

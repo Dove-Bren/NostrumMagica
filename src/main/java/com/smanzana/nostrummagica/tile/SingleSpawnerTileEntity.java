@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -32,7 +32,7 @@ public class SingleSpawnerTileEntity extends TileEntity implements ITickableTile
 	public void tick() {
 		if (!world.isRemote && ++ticksExisted % 32 == 0) {
 			BlockState state = this.world.getBlockState(this.pos);
-			if (state == null || !(state.getBlock() instanceof NostrumSingleSpawner)) {
+			if (state == null || !(state.getBlock() instanceof SingleSpawnerBlock)) {
 				world.removeTileEntity(pos);
 				return;
 			}

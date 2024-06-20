@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -71,7 +71,7 @@ public class RoomEnd1 extends StaticRoom {
 				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
 				'B', Blocks.BOOKSHELF,
 				' ', null,
-				'M', (withChest ? null : (withEnemy ? new StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.GOLEM_PHYSICAL)) : null)));
+				'M', (withChest ? null : (withEnemy ? new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_PHYSICAL)) : null)));
 		
 		this.withChest = withChest;
 		this.withEnemy = withEnemy;

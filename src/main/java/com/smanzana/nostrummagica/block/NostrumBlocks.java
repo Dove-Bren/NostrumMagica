@@ -1,25 +1,25 @@
 package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.DungeonAir;
-import com.smanzana.nostrummagica.block.dungeon.DungeonBars;
+import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
+import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
-import com.smanzana.nostrummagica.block.dungeon.LockedChest;
-import com.smanzana.nostrummagica.block.dungeon.LockedDoor;
-import com.smanzana.nostrummagica.block.dungeon.LogicDoor;
+import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
+import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
+import com.smanzana.nostrummagica.block.dungeon.LogicDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicOnesidedBlock;
-import com.smanzana.nostrummagica.block.dungeon.MysticAnchor;
-import com.smanzana.nostrummagica.block.dungeon.NostrumMatchSpawner;
-import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
-import com.smanzana.nostrummagica.block.dungeon.NostrumTriggeredMatchSpawner;
-import com.smanzana.nostrummagica.block.dungeon.ProgressionDoor;
+import com.smanzana.nostrummagica.block.dungeon.MysticAnchorBlock;
+import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
+import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
+import com.smanzana.nostrummagica.block.dungeon.ProgressionDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
 import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
-import com.smanzana.nostrummagica.block.dungeon.TriggerRepeater;
+import com.smanzana.nostrummagica.block.dungeon.TriggerRepeaterBlock;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -47,13 +47,13 @@ public class NostrumBlocks {
 	@ObjectHolder(GinsengCropBlock.ID) public static GinsengCropBlock ginsengCrop;
 	@ObjectHolder(MandrakeRootCropBlock.ID) public static MandrakeRootCropBlock mandrakeCrop;
 	@ObjectHolder(CursedIceBlock.ID) public static CursedIceBlock cursedIce;
-	@ObjectHolder(DungeonAir.ID) public static DungeonAir dungeonAir;
-	@ObjectHolder(DungeonBars.ID) public static DungeonBars dungeonBars;
+	@ObjectHolder(DungeonAirBlock.ID) public static DungeonAirBlock dungeonAir;
+	@ObjectHolder(DungeonBarsBlock.ID) public static DungeonBarsBlock dungeonBars;
 	@ObjectHolder(DungeonBlock.ID_LIGHT) public static DungeonBlock lightDungeonBlock;
 	@ObjectHolder(DungeonBlock.ID_DARK) public static DungeonBlock dungeonBlock;
 	@ObjectHolder(EssenceOreBlock.ID) public static EssenceOreBlock essenceOre;
 	@ObjectHolder(ItemDuctBlock.ID) public static ItemDuctBlock itemDuct;
-	@ObjectHolder(LogicDoor.ID) public static LogicDoor logicDoor;
+	@ObjectHolder(LogicDoorBlock.ID) public static LogicDoorBlock logicDoor;
 	@ObjectHolder(LoreTableBlock.ID) public static LoreTableBlock loreTable;
 	@ObjectHolder(MagicDirtBlock.ID) public static MagicDirtBlock magicDirt;
 	@ObjectHolder(MagicWallBlock.ID) public static MagicWallBlock magicWall;
@@ -71,14 +71,14 @@ public class NostrumBlocks {
 	@ObjectHolder(MagicaFlowerBlock.ID_CRYSTABLOOM) public static MagicaFlowerBlock crystabloom;
 	@ObjectHolder(MirrorBlock.ID) public static MirrorBlock mirrorBlock;
 	@ObjectHolder(ObeliskBlock.ID) public static ObeliskBlock obelisk;
-	@ObjectHolder(NostrumSingleSpawner.ID) public static NostrumSingleSpawner singleSpawner;
-	@ObjectHolder(NostrumMatchSpawner.ID) public static NostrumMatchSpawner matchSpawner;
-	@ObjectHolder(NostrumTriggeredMatchSpawner.ID) public static NostrumTriggeredMatchSpawner triggeredMatchSpawner;
+	@ObjectHolder(SingleSpawnerBlock.ID) public static SingleSpawnerBlock singleSpawner;
+	@ObjectHolder(MatchSpawnerBlock.ID) public static MatchSpawnerBlock matchSpawner;
+	@ObjectHolder(TriggeredMatchSpawnerBlock.ID) public static TriggeredMatchSpawnerBlock triggeredMatchSpawner;
 	@ObjectHolder(ObeliskPortal.ID) public static ObeliskPortal obeliskPortal;
 	@ObjectHolder(ParadoxMirrorBlock.ID) public static ParadoxMirrorBlock paradoxMirror;
 	@ObjectHolder(PoisonWaterBlock.ID_BREAKABLE) public static PoisonWaterBlock poisonWaterBlock;
 	@ObjectHolder(PoisonWaterBlock.ID_UNBREAKABLE) public static PoisonWaterBlock unbreakablePoisonWaterBlock;
-	@ObjectHolder(ProgressionDoor.ID) public static ProgressionDoor progressionDoor;
+	@ObjectHolder(ProgressionDoorBlock.ID) public static ProgressionDoorBlock progressionDoor;
 	@ObjectHolder(PutterBlock.ID) public static PutterBlock putterBlock;
 	@ObjectHolder(ShrineBlock.ID_ELEMENT) public static ShrineBlock.Element elementShrineBlock;
 	@ObjectHolder(ShrineBlock.ID_SHAPE) public static ShrineBlock.Shape shapeShrineBlock;
@@ -91,12 +91,12 @@ public class NostrumBlocks {
 	@ObjectHolder(TeleportRuneBlock.ID) public static TeleportRuneBlock teleportRune;
 	@ObjectHolder(TemporaryTeleportationPortalBlock.ID) public static TemporaryTeleportationPortalBlock temporaryTeleportationPortal;
 	@ObjectHolder(RuneShaperBlock.ID) public static RuneShaperBlock runeShaper;
-	@ObjectHolder(LockedChest.ID) public static LockedChest lockedChest;
+	@ObjectHolder(LockedChestBlock.ID) public static LockedChestBlock lockedChest;
 	@ObjectHolder(KeySwitchBlock.ID) public static KeySwitchBlock keySwitch;
-	@ObjectHolder(MysticAnchor.ID) public static MysticAnchor mysticAnchor;
+	@ObjectHolder(MysticAnchorBlock.ID) public static MysticAnchorBlock mysticAnchor;
 	@ObjectHolder(ToggleLogicDoor.ID) public static ToggleLogicDoor toggleDoor;
 	@ObjectHolder(TrialBlock.ID) public static TrialBlock trialBlock;
-	@ObjectHolder(TriggerRepeater.ID) public static TriggerRepeater triggerRepeater;
+	@ObjectHolder(TriggerRepeaterBlock.ID) public static TriggerRepeaterBlock triggerRepeater;
 	@ObjectHolder(MineBlock.ID) public static MineBlock mineBlock;
 	@ObjectHolder(TomeWorkshopBlock.ID) public static TomeWorkshopBlock tomeWorkshop;
 	@ObjectHolder(BasicSpellTableBlock.ID) public static BasicSpellTableBlock basicSpellTable;
@@ -105,7 +105,7 @@ public class NostrumBlocks {
 	@ObjectHolder(RuneLibraryBlock.ID) public static RuneLibraryBlock runeLibrary;
 	@ObjectHolder(CursedFireBlock.ID) public static CursedFireBlock cursedFire;
 	@ObjectHolder(MysticWaterBlock.ID) public static MysticWaterBlock mysticWaterBlock;
-	@ObjectHolder(LockedDoor.ID) public static LockedDoor lockedDoor;
+	@ObjectHolder(LockedDoorBlock.ID) public static LockedDoorBlock lockedDoor;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -204,13 +204,13 @@ public class NostrumBlocks {
     	registerBlock(new GinsengCropBlock(), GinsengCropBlock.ID, registry);
     	registerBlock(new MandrakeRootCropBlock(), MandrakeRootCropBlock.ID, registry);
     	registerBlock(new CursedIceBlock(), CursedIceBlock.ID, registry);
-    	registerBlock(new DungeonAir(), DungeonAir.ID, registry);
-    	registerBlock(new DungeonBars(), DungeonBars.ID, registry);
+    	registerBlock(new DungeonAirBlock(), DungeonAirBlock.ID, registry);
+    	registerBlock(new DungeonBarsBlock(), DungeonBarsBlock.ID, registry);
     	registerBlock(new DungeonBlock(DungeonBlock.Type.LIGHT), DungeonBlock.ID_LIGHT, registry);
     	registerBlock(new DungeonBlock(DungeonBlock.Type.DARK), DungeonBlock.ID_DARK, registry);
     	registerBlock(new EssenceOreBlock(), EssenceOreBlock.ID, registry);
     	registerBlock(new ItemDuctBlock(), ItemDuctBlock.ID, registry);
-    	registerBlock(new LogicDoor(), LogicDoor.ID, registry);
+    	registerBlock(new LogicDoorBlock(), LogicDoorBlock.ID, registry);
     	registerBlock(new LoreTableBlock(), LoreTableBlock.ID, registry);
     	registerBlock(new MagicDirtBlock(), MagicDirtBlock.ID, registry);
     	registerBlock(new MagicWallBlock(), MagicWallBlock.ID, registry);
@@ -228,14 +228,14 @@ public class NostrumBlocks {
     	registerBlock(new MagicaFlowerBlock(MagicaFlowerBlock.Type.CRYSTABLOOM), MagicaFlowerBlock.ID_CRYSTABLOOM, registry);
     	registerBlock(new MirrorBlock(), MirrorBlock.ID, registry);
     	registerBlock(new ObeliskBlock(), ObeliskBlock.ID, registry);
-    	registerBlock(new NostrumSingleSpawner(), NostrumSingleSpawner.ID, registry);
-    	registerBlock(new NostrumMatchSpawner(), NostrumMatchSpawner.ID, registry);
-    	registerBlock(new NostrumTriggeredMatchSpawner(), NostrumTriggeredMatchSpawner.ID, registry);
+    	registerBlock(new SingleSpawnerBlock(), SingleSpawnerBlock.ID, registry);
+    	registerBlock(new MatchSpawnerBlock(), MatchSpawnerBlock.ID, registry);
+    	registerBlock(new TriggeredMatchSpawnerBlock(), TriggeredMatchSpawnerBlock.ID, registry);
     	registerBlock(new ObeliskPortal(), ObeliskPortal.ID, registry);
     	registerBlock(new ParadoxMirrorBlock(), ParadoxMirrorBlock.ID, registry);
     	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.poisonWater;}, false), PoisonWaterBlock.ID_BREAKABLE, registry);
     	registerBlock(new PoisonWaterBlock(() -> {return NostrumFluids.unbreakablePoisonWater;}, true), PoisonWaterBlock.ID_UNBREAKABLE, registry);
-    	registerBlock(new ProgressionDoor(), ProgressionDoor.ID, registry);
+    	registerBlock(new ProgressionDoorBlock(), ProgressionDoorBlock.ID, registry);
     	registerBlock(new PutterBlock(), PutterBlock.ID, registry);
     	registerBlock(new ShrineBlock.Element(), ShrineBlock.ID_ELEMENT, registry);
     	registerBlock(new ShrineBlock.Shape(), ShrineBlock.ID_SHAPE, registry);
@@ -248,12 +248,12 @@ public class NostrumBlocks {
     	registerBlock(new TeleportRuneBlock(), TeleportRuneBlock.ID, registry);
     	registerBlock(new TemporaryTeleportationPortalBlock(), TemporaryTeleportationPortalBlock.ID, registry);
     	registerBlock(new RuneShaperBlock(), RuneShaperBlock.ID, registry);
-    	registerBlock(new LockedChest(), LockedChest.ID, registry);
+    	registerBlock(new LockedChestBlock(), LockedChestBlock.ID, registry);
     	registerBlock(new KeySwitchBlock(), KeySwitchBlock.ID, registry);
-    	registerBlock(new MysticAnchor(), MysticAnchor.ID, registry);
+    	registerBlock(new MysticAnchorBlock(), MysticAnchorBlock.ID, registry);
     	registerBlock(new ToggleLogicDoor(), ToggleLogicDoor.ID, registry);
     	registerBlock(new TrialBlock(), TrialBlock.ID, registry);
-    	registerBlock(new TriggerRepeater(), TriggerRepeater.ID, registry);
+    	registerBlock(new TriggerRepeaterBlock(), TriggerRepeaterBlock.ID, registry);
     	registerBlock(new MineBlock(), MineBlock.ID, registry);
     	registerBlock(new TomeWorkshopBlock(), TomeWorkshopBlock.ID, registry);
     	registerBlock(new BasicSpellTableBlock(), BasicSpellTableBlock.ID, registry);
@@ -262,7 +262,7 @@ public class NostrumBlocks {
     	registerBlock(new RuneLibraryBlock(), RuneLibraryBlock.ID, registry);
     	registerBlock(new CursedFireBlock(), CursedFireBlock.ID, registry);
     	registerBlock(new MysticWaterBlock(() -> NostrumFluids.mysticWater), MysticWaterBlock.ID, registry);
-    	registerBlock(new LockedDoor(), LockedDoor.ID, registry);
+    	registerBlock(new LockedDoorBlock(), LockedDoorBlock.ID, registry);
     }
     
 }

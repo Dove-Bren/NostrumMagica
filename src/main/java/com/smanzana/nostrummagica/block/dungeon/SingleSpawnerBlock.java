@@ -40,7 +40,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ToolType;
 
-public class NostrumSingleSpawner extends Block {
+public class SingleSpawnerBlock extends Block {
 	
 	public static enum Type implements IStringSerializable {
 		// Do not change order. Ordinals are used
@@ -71,7 +71,7 @@ public class NostrumSingleSpawner extends Block {
 
 	public static final String ID = "nostrum_spawner";
 	
-	public NostrumSingleSpawner() {
+	public SingleSpawnerBlock() {
 		super(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.sound(SoundType.STONE)
@@ -89,7 +89,7 @@ public class NostrumSingleSpawner extends Block {
 		builder.add(MOB);
 	}
 	
-	public BlockState getState(NostrumSingleSpawner.Type type) {
+	public BlockState getState(SingleSpawnerBlock.Type type) {
 		return getDefaultState().with(MOB, type);
 	}
 	

@@ -20,7 +20,7 @@ import com.smanzana.nostrummagica.block.IHorizontalBlock;
 import com.smanzana.nostrummagica.block.ManiCrystalBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicOnesidedBlock;
-import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.tile.IOrientedTileEntity;
 import com.smanzana.nostrummagica.tile.IUniqueDungeonTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumTileEntities;
@@ -278,15 +278,15 @@ public class RoomBlueprint {
 			SetOldMetaBlockState(NostrumBlocks.candle, 7, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.SOUTH).with(CandleBlock.LIT, true)); // 011 3
 			SetOldMetaBlockState(NostrumBlocks.candle, 9, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.WEST).with(CandleBlock.LIT, true)); // 100 4
 			SetOldMetaBlockState(NostrumBlocks.candle, 11, NostrumBlocks.candle.getDefaultState().with(CandleBlock.FACING, Direction.EAST).with(CandleBlock.LIT, true)); // 101 5
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 0, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_EARTH));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 1, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_ENDER));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 2, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_FIRE));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 3, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_ICE));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 4, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_LIGHTNING));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 5, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_PHYSICAL));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 6, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.GOLEM_WIND));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 7, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.DRAGON_RED));
-			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 8, NostrumBlocks.singleSpawner.getDefaultState().with(NostrumSingleSpawner.MOB, NostrumSingleSpawner.Type.PLANT_BOSS));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 0, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_EARTH));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 1, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_ENDER));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 2, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_FIRE));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 3, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_ICE));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 4, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_LIGHTNING));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 5, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_PHYSICAL));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 6, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.GOLEM_WIND));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 7, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.DRAGON_RED));
+			SetOldMetaBlockState(NostrumBlocks.singleSpawner, 8, NostrumBlocks.singleSpawner.getDefaultState().with(SingleSpawnerBlock.MOB, SingleSpawnerBlock.Type.PLANT_BOSS));
 			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 0, NostrumBlocks.progressionDoor.getSlaveState(Direction.SOUTH));
 			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 1, NostrumBlocks.progressionDoor.getMaster(Direction.SOUTH));
 			SetOldMetaBlockState(NostrumBlocks.progressionDoor, 2, NostrumBlocks.progressionDoor.getSlaveState(Direction.WEST));

@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.LockedChest;
+import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
@@ -31,11 +31,11 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	}
 	
 	protected void renderLock(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		final Direction direction = te.getBlockState().get(LockedChest.FACING);
+		final Direction direction = te.getBlockState().get(LockedChestBlock.FACING);
 		float rot = direction.getHorizontalAngle() + 90f;
 		
 		final float glow;
-		if (te.getBlockState().get(LockedChest.UNLOCKABLE)) {
+		if (te.getBlockState().get(LockedChestBlock.UNLOCKABLE)) {
 			final double glowPeriod = 20;
 			final double glowProg = ((ticks % glowPeriod) / glowPeriod);
 			glow = .15f * (float) Math.sin(glowProg * 2 * Math.PI);
@@ -74,7 +74,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	}
 	
 	protected void renderChains(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		final Direction direction = te.getBlockState().get(LockedChest.FACING);
+		final Direction direction = te.getBlockState().get(LockedChestBlock.FACING);
 		float rot = direction.getHorizontalAngle();
 		
 		final float armLen = 10;

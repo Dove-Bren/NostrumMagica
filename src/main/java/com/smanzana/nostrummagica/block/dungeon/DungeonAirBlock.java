@@ -20,11 +20,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class DungeonAir extends BreakableBlock {
+public class DungeonAirBlock extends BreakableBlock {
 
 	public static final String ID = "dungeon_air";
 	
-	public DungeonAir() {
+	public DungeonAirBlock() {
 		super(Block.Properties.create(Material.BARRIER)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()

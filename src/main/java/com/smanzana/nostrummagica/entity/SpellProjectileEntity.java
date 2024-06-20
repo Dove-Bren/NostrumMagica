@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.block.dungeon.MysticAnchor;
+import com.smanzana.nostrummagica.block.dungeon.MysticAnchorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
@@ -153,7 +153,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 		// Proc mystic anchors if we hit one
 		final BlockPos selectedPos = location.selectedBlockPos;
 		BlockState state = world.getBlockState(selectedPos);
-		if (state.getBlock() instanceof MysticAnchor) {
+		if (state.getBlock() instanceof MysticAnchorBlock) {
 			state.onEntityCollision(world, selectedPos, this);
 		}
 	}

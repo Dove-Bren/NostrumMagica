@@ -34,13 +34,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class NostrumMatchSpawner extends NostrumSingleSpawner {
+public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	
 	public static final String ID = "nostrum_spawner_trigger";
 
 	public static final BooleanProperty TRIGGERED = BooleanProperty.create("triggered");
 	
-	public NostrumMatchSpawner() {
+	public MatchSpawnerBlock() {
 		super();
 		
 		this.setDefaultState(this.getDefaultState().with(TRIGGERED, false));

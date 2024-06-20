@@ -37,13 +37,13 @@ import net.minecraftforge.common.ToolType;
  * @author Skyler
  *
  */
-public class MysticAnchor extends Block {
+public class MysticAnchorBlock extends Block {
 	
 	public static final String ID = "mystic_anchor";
 	
 	protected static final VoxelShape SHAPE = Block.makeCuboidShape(5.0D, 0.0D, 5.0D, 11.0D, 20.0D, 11.0D);
 	
-	public MysticAnchor() {
+	public MysticAnchorBlock() {
 		super(Block.Properties.create(Material.ROCK)
 				.sound(SoundType.STONE)
 				.hardnessAndResistance(1.5f)

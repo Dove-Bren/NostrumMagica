@@ -14,15 +14,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 
-public class LogicDoor extends NostrumMagicDoor implements ITriggeredBlock {
+public class LogicDoorBlock extends MagicDoorBlock implements ITriggeredBlock {
 
 	public static final String ID = "logic_door";
 	
-	protected LogicDoor(Block.Properties props) {
+	protected LogicDoorBlock(Block.Properties props) {
 		super(props);
 	}
 	
-	public LogicDoor() {
+	public LogicDoorBlock() {
 		this(Block.Properties.create(Material.ROCK)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()

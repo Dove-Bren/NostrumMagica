@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.dungeon.LockedChest;
+import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -105,10 +105,10 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		
 		if (world != null && !world.isRemote()) {
 			if (ticksExisted % 20 == 0) {
-				boolean worldUnlockable = world.getBlockState(pos).get(LockedChest.UNLOCKABLE);
+				boolean worldUnlockable = world.getBlockState(pos).get(LockedChestBlock.UNLOCKABLE);
 				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(lockKey); 
 				if (worldUnlockable != tileUnlockable) {
-					world.setBlockState(pos, world.getBlockState(pos).with(LockedChest.UNLOCKABLE, tileUnlockable), 3);
+					world.setBlockState(pos, world.getBlockState(pos).with(LockedChestBlock.UNLOCKABLE, tileUnlockable), 3);
 				}
 			}
 		}
@@ -126,7 +126,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	protected void unlock() {
-		final Direction facing = world.getBlockState(pos).get(LockedChest.FACING);
+		final Direction facing = world.getBlockState(pos).get(LockedChestBlock.FACING);
 		this.world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing), 3);
 		fillChestEntity(world.getTileEntity(pos));
 		
@@ -268,7 +268,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 				invCopy.setInventorySlotContents(i, chest.removeStackFromSlot(i));
 			}
 			
-			world.setBlockState(pos, NostrumBlocks.lockedChest.getDefaultState().with(LockedChest.FACING, facing), 3);
+			world.setBlockState(pos, NostrumBlocks.lockedChest.getDefaultState().with(LockedChestBlock.FACING, facing), 3);
 			
 			LockedChestTileEntity lockedChest = (LockedChestTileEntity) world.getTileEntity(pos);
 			lockedChest.setContents(invCopy);

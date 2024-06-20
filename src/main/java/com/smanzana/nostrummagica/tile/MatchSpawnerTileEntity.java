@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.dungeon.NostrumMatchSpawner;
+import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.WorldUtil;
@@ -78,7 +78,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	protected void updateBlockState() {
-		world.setBlockState(pos, this.getBlockState().with(NostrumMatchSpawner.TRIGGERED, true), 3);
+		world.setBlockState(pos, this.getBlockState().with(MatchSpawnerBlock.TRIGGERED, true), 3);
 	}
 	
 	protected void spawnMatch(BlockState state) {
@@ -91,7 +91,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	
 	protected boolean shouldSpawnMatch(BlockState state) {
 		for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
-			if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < NostrumMatchSpawner.SPAWN_DIST_SQ) {
+			if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < MatchSpawnerBlock.SPAWN_DIST_SQ) {
 				return true;
 			}
 		}

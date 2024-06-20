@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.tile;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.LockedDoor;
+import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -91,10 +91,10 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 		
 		if (world != null && !world.isRemote()) {
 			if (ticksExisted % 20 == 0) {
-				boolean worldUnlockable = world.getBlockState(pos).get(LockedDoor.UNLOCKABLE);
+				boolean worldUnlockable = world.getBlockState(pos).get(LockedDoorBlock.UNLOCKABLE);
 				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(lockKey); 
 				if (worldUnlockable != tileUnlockable) {
-					world.setBlockState(pos, world.getBlockState(pos).with(LockedDoor.UNLOCKABLE, tileUnlockable), 3);
+					world.setBlockState(pos, world.getBlockState(pos).with(LockedDoorBlock.UNLOCKABLE, tileUnlockable), 3);
 				}
 			}
 		}
@@ -113,7 +113,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	
 	protected void unlock() {
 		BlockState state = world.getBlockState(pos);
-		((LockedDoor) state.getBlock()).clearDoor(world, pos, state);
+		((LockedDoorBlock) state.getBlock()).clearDoor(world, pos, state);
 		
 		final double flySpeed = .125;
 		NostrumParticles.WARD.spawn(world, new SpawnParams(
@@ -167,19 +167,19 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	private BlockPos bottomStash = null;
 	public BlockPos getBottomCenterPos() {
 		if (bottomStash == null) {
-			bottomStash = LockedDoor.FindBottomCenterPos(getWorld(), getPos());
+			bottomStash = LockedDoorBlock.FindBottomCenterPos(getWorld(), getPos());
 		}
 		return bottomStash;
 	}
 	
 	public Direction getFace() {
-		return this.getBlockState().get(LockedDoor.HORIZONTAL_FACING);
+		return this.getBlockState().get(LockedDoorBlock.HORIZONTAL_FACING);
 	}
 	
 	private MutableBoundingBox boundsStach = null;
 	public MutableBoundingBox getDoorBounds() {
 		if (boundsStach == null) {
-			boundsStach = LockedDoor.FindDisplayBounds(getWorld(), getPos());
+			boundsStach = LockedDoorBlock.FindDisplayBounds(getWorld(), getPos());
 		}
 		return boundsStach;
 	}

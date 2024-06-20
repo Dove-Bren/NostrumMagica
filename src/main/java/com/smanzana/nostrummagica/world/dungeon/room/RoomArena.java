@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Blocks;
@@ -22,7 +22,7 @@ public class RoomArena extends StaticRoom {
 		
 		final StaticBlockState wall = new StaticRoom.StaticBlockState(NostrumBlocks.lightDungeonBlock.getDefaultState());
 		final StaticBlockState lava = new StaticRoom.StaticBlockState(Blocks.LAVA.getDefaultState());
-		final StaticBlockState spawner = new StaticRoom.StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.DRAGON_RED));
+		final StaticBlockState spawner = new StaticRoom.StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.DRAGON_RED));
 		final StaticBlockState obsidian = new StaticRoom.StaticBlockState(Blocks.OBSIDIAN.getDefaultState());
 		
 		

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.DungeonAir;
+import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.entity.SpellMortarEntity;
 import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -124,7 +124,7 @@ public class MortarShape extends SpellShape {
 				for (int i = 0; i < 7; i++) {
 					cursor.move(Direction.UP);
 					BlockState state = world.getBlockState(cursor);
-					if (!(state.getBlock() instanceof DungeonAir) && !world.isAirBlock(cursor)) {
+					if (!(state.getBlock() instanceof DungeonAirBlock) && !world.isAirBlock(cursor)) {
 						// can't go here. Go back down and bail
 						cursor.move(Direction.DOWN);
 						break;
@@ -339,7 +339,7 @@ public class MortarShape extends SpellShape {
 			for (int i = 0; i < 7; i++) {
 				cursor.move(Direction.UP);
 				BlockState blockstate = location.world.getBlockState(cursor);
-				if (!(blockstate.getBlock() instanceof DungeonAir) && !location.world.isAirBlock(cursor)) {
+				if (!(blockstate.getBlock() instanceof DungeonAirBlock) && !location.world.isAirBlock(cursor)) {
 					// can't go here. Go back down and bail
 					cursor.move(Direction.DOWN);
 					break;

@@ -33,11 +33,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TriggerRepeater extends Block implements ITriggeredBlock {
+public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 
 	public static final String ID = "trigger_repeater";
 	
-	public TriggerRepeater() {
+	public TriggerRepeaterBlock() {
 		super(Block.Properties.create(Material.BARRIER)
 				.hardnessAndResistance(-1.0F, 3600000.8F)
 				.noDrops()

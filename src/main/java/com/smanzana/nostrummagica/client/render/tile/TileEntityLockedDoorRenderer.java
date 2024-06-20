@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.LockedDoor;
+import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedDoorTileEntity;
@@ -130,7 +130,7 @@ public class TileEntityLockedDoorRenderer extends TileEntityRenderer<LockedDoorT
 		final float height = .75f;
 		
 		final float glow;
-		if (tileEntityIn.getBlockState().get(LockedDoor.UNLOCKABLE)) {
+		if (tileEntityIn.getBlockState().get(LockedDoorBlock.UNLOCKABLE)) {
 			final double glowPeriod = 20;
 			final double glowProg = ((ticks % glowPeriod) / glowPeriod);
 			glow = .15f * (float) Math.sin(glowProg * 2 * Math.PI);

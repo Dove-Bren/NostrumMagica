@@ -14,11 +14,11 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class NostrumTriggeredMatchSpawner extends NostrumMatchSpawner implements ITriggeredBlock {
+public class TriggeredMatchSpawnerBlock extends MatchSpawnerBlock implements ITriggeredBlock {
 	
 	public static final String ID = "nostrum_match_spawner_triggered";
 	
-	public NostrumTriggeredMatchSpawner() {
+	public TriggeredMatchSpawnerBlock() {
 		super();
 	}
 	

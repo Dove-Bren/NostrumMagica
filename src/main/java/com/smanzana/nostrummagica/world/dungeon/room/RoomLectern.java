@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.block.dungeon.NostrumSingleSpawner;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -96,7 +96,7 @@ public class RoomLectern extends StaticRoom {
 				'C', new StaticBlockState(Blocks.RED_CARPET),
 				'T', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
 				'Q', Blocks.QUARTZ_BLOCK,
-				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(NostrumSingleSpawner.Type.GOLEM_FIRE)),
+				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_FIRE)),
 				'L', NostrumBlocks.altar,
 				' ', null);
 		// T STAIR, Q QUARTZ, L PEDESTAL+SPELL,  NW norsou, g golem
