@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -88,7 +89,7 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		// See note about dungeon vs blueprint facing in @getExits
-		blueprint.spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID);
+		blueprint.spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID, null);
 		
 		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
@@ -116,7 +117,7 @@ public class LoadedRoom implements IDungeonRoom {
 		// Blueprint wants your facing as you go in the door. That's there the 'opposite' comes from.
 		
 		// Blueprint exits are rotated to the entry entry direction (and have their own rotation too).
-		final Direction modDir = RoomBlueprint.getModDir(blueprint.getEntry().getFacing(), start.getFacing());
+		final Direction modDir = IBlueprint.GetModDir(blueprint.getEntry().getFacing(), start.getFacing());
 		// Door offset and final rotation is what's in exits rotated modDir times
 		
 		List<DungeonExitPoint> ret;
@@ -129,7 +130,7 @@ public class LoadedRoom implements IDungeonRoom {
 					doorDir = doorDir.rotateY();
 				}
 				final DungeonExitPoint fromEntry = new DungeonExitPoint(
-						RoomBlueprint.applyRotation(door.getPos(), modDir),
+						IBlueprint.ApplyRotation(door.getPos(), modDir),
 						doorDir
 						);
 				final DungeonExitPoint relative = new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 

@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -178,7 +178,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	@Override
 	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
 		if (this.getTriggerOffset() != null) {
-			this.setTriggerOffset(RoomBlueprint.applyRotation(this.getTriggerOffset(), rotation), isWorldGen);
+			this.setTriggerOffset(IBlueprint.ApplyRotation(this.getTriggerOffset(), rotation), isWorldGen);
 		}
 	}
 }

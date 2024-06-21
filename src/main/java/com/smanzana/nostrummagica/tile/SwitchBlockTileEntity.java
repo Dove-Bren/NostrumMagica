@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -291,6 +291,6 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 
 	@Override
 	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
-		this.setOffset(RoomBlueprint.applyRotation(this.getOffset(), rotation), isWorldGen);
+		this.setOffset(IBlueprint.ApplyRotation(this.getOffset(), rotation), isWorldGen);
 	}
 }

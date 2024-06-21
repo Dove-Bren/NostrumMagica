@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -127,7 +127,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
 		BlockPos orig = this.getOffset();
 		if (orig != null) {
-			BlockPos out = RoomBlueprint.applyRotation(this.getOffset(), rotation);
+			BlockPos out = IBlueprint.ApplyRotation(this.getOffset(), rotation);
 			this.setOffset(out.getX(), out.getY(), out.getZ(), isWorldGen);
 		} else {
 			System.out.println("Null offset?");

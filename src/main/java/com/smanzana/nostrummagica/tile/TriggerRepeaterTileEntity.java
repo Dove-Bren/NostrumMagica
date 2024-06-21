@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -106,7 +106,7 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 			this.offsets.clear();
 			
 			for (BlockPos offset : originalOffsets) {
-				BlockPos out = RoomBlueprint.applyRotation(offset, rotation);
+				BlockPos out = IBlueprint.ApplyRotation(offset, rotation);
 				this.addOffset(out, isWorldGen);
 			}
 		}
