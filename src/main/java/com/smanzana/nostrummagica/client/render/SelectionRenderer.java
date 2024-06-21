@@ -44,8 +44,8 @@ public class SelectionRenderer {
 				}
 				
 				if (minDist < 5096) {
-					
 					final IRenderTypeBuffer.Impl bufferIn = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+					bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
 					if (freePos != null) {
 						final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
 						renderSelectionBox(
@@ -63,7 +63,7 @@ public class SelectionRenderer {
 					}
 					
 					// Render anchor anchor block special
-					final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT_CULL);
+					final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
 					renderAnchorBlock(matrixStackIn, buffer, anchor, event.getPartialTicks());
 					bufferIn.finish();
 				}

@@ -199,7 +199,7 @@ public class RoomBlueprint implements IBlueprint {
 		if (dimensions != null) {
 			BlockPos offset = (entry == null ? BlockPos.ZERO : entry.getPos());
 			for (int xOff = -(width/2); xOff <= (width-1)/2; xOff++)
-			for (int yOff = 0; yOff < height; yOff++)
+			for (int yOff = -1; yOff < height-1; yOff++)
 			for (int zOff = -(depth/2); zOff <= (depth-1)/2; zOff++) {
 				final int x = xOff + offset.getX();
 				final int y = yOff + offset.getY();
@@ -209,7 +209,7 @@ public class RoomBlueprint implements IBlueprint {
 					|| x >= dimensions.getX()
 					|| y >= dimensions.getY()
 					|| z >= dimensions.getZ()) {
-					previewBlocks[xOff + (width/2)][yOff][zOff + (depth/2)] = null;
+					previewBlocks[xOff + (width/2)][yOff+1][zOff + (depth/2)] = null;
 					continue;
 				}
 				
@@ -217,9 +217,9 @@ public class RoomBlueprint implements IBlueprint {
 						+ (y * dimensions.getZ())
 						+ z;
 				if (bIndex < 0 || bIndex >= blocks.length) {
-					previewBlocks[xOff + (width/2)][yOff][zOff + (depth/2)] = null;
+					previewBlocks[xOff + (width/2)][yOff+1][zOff + (depth/2)] = null;
 				} else {
-					previewBlocks[xOff + (width/2)][yOff][zOff + (depth/2)] =
+					previewBlocks[xOff + (width/2)][yOff+1][zOff + (depth/2)] =
 							blocks[bIndex];
 				}
 			}

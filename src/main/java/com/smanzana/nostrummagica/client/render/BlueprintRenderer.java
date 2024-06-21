@@ -119,7 +119,7 @@ public class BlueprintRenderer {
 				}
 				
 				final int xOff = x - (width/2);
-				final int yOff = y;
+				final int yOff = y - 1;
 				final int zOff = z - (depth/2);
 				
 				BlockState state = block.getSpawnState(Direction.NORTH);
