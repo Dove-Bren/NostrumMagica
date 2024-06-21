@@ -205,13 +205,15 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 			
 			final float outlineScale = 1.025f;
 			matrixStackIn.push();
+			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
 			matrixStackIn.scale(outlineScale, outlineScale, 1f);
 			matrixStackIn.translate(-.5, -.5, 0);
 			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, 1f);
 			matrixStackIn.pop();
-			
+
+			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
 			matrixStackIn.translate(-.5, -.5, 0);
-			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, .4f, .4f, .4f, 1f);
+			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, .8f, .8f, .8f, 1f);
 			
 			matrixStackIn.pop();
 		}
