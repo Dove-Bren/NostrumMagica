@@ -35,6 +35,8 @@ public class NostrumRenderTypes {
 	public static final RenderType SPELLSHAPE_ORB_CHAIN;
 	public static final RenderType SPELLSHAPE_LINES;
 	public static final RenderType SPELLSHAPE_LINES_THICK;
+	public static final RenderType WORLD_SELECT_HIGHLIGHT;
+	public static final RenderType WORLD_SELECT_HIGHLIGHT_CULL;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -59,6 +61,7 @@ public class NostrumRenderTypes {
 	private static final RenderState.CullState NO_CULL = new RenderState.CullState(false);
     
 	//private static final RenderState.DepthTestState DEPTH_EQUAL = new RenderState.DepthTestState("==", GL11.GL_EQUAL);
+	private static final RenderState.DepthTestState NO_DEPTH = new RenderState.DepthTestState("none", GL11.GL_ALWAYS);
     
 	private static final RenderState.LightmapState NO_LIGHTING = new RenderState.LightmapState(false);
 	private static final RenderState.LightmapState LIGHTMAP_ENABLED = new RenderState.LightmapState(true);
@@ -242,6 +245,21 @@ public class NostrumRenderTypes {
 				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
 			.build(false);
 		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.depthTest(NO_DEPTH)
+			.build(false);
+		WORLD_SELECT_HIGHLIGHT_CULL = RenderType.makeType(Name("WorldSelectCull"), DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
+		
+		glState = RenderType.State.getBuilder()
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lightmap(NO_LIGHTING)
+				.depthTest(NO_DEPTH)
+				.cull(NO_CULL) // Previously only was no-cull if inside box
+			.build(false);
+		WORLD_SELECT_HIGHLIGHT = RenderType.makeType(Name("WorldSelect"), DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
 	}
 	
 	public static final RenderType GetIconType(ResourceLocation texture) {
