@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.client.gui.container.LauncherBlockGui;
 import com.smanzana.nostrummagica.tile.DungeonLauncherTileEntity;
 
@@ -25,7 +26,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class DungeonLauncherBlock extends Block {
+public class DungeonLauncherBlock extends Block implements ITriggeredBlock {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
@@ -99,5 +100,11 @@ public class DungeonLauncherBlock extends Block {
 				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
+	}
+
+	@Override
+	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+		DungeonLauncherTileEntity te = (DungeonLauncherTileEntity) world.getTileEntity(blockPos);
+		te.trigger();
 	}
 }

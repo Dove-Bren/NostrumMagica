@@ -66,7 +66,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
-		if (entity instanceof PlayerEntity && canPlayerSee((PlayerEntity) entity)) {
+		if (entity != null && entity instanceof PlayerEntity && canPlayerSee((PlayerEntity) entity)) {
 			final int origHitCount = getHitCount();
 			if (origHitCount+1 >= MAX_HITS) {
 				this.setHitCount(0);

@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.entity;
 
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.tile.EntityProxiedTileEntity;
 
 import net.minecraft.entity.Entity;
@@ -66,7 +68,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		return air;
 	}
 	
-	protected boolean canBeHitBy(LivingEntity attacker) {
+	protected boolean canBeHitBy(@Nullable LivingEntity attacker) {
 		return true;
 	}
 	
@@ -81,8 +83,11 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 			return false;
 		}
 		
-		if (source.getTrueSource() != null && source.getTrueSource() instanceof LivingEntity && canBeHitBy((LivingEntity) source.getTrueSource())) {
-			te.trigger((LivingEntity) source.getTrueSource(), source, amount);
+		@Nullable LivingEntity livingSource = (source.getTrueSource() != null && source.getTrueSource() instanceof LivingEntity)
+				? (LivingEntity) source.getTrueSource()
+				: null;
+		if (canBeHitBy(livingSource)) {
+			te.trigger(livingSource, source, amount);
 			return true;
 		}
 		return false;

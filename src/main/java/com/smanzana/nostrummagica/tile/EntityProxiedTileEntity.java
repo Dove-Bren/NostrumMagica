@@ -51,7 +51,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 		return this.triggerEntity;
 	}
 	
-	public abstract void trigger(LivingEntity entity, DamageSource source, float damage);
+	public abstract void trigger(@Nullable LivingEntity entity, DamageSource source, float damage);
 	
 	protected Vector3d getEntityOffset() {
 		return new Vector3d(.5, 0, .5);

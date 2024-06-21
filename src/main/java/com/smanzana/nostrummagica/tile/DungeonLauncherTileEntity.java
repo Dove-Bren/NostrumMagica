@@ -160,7 +160,29 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	protected float getFireSpeed(ProjectileEntity projectile) {
-		return 1.4f;
+		float speed = 1.4f; // base
+		if (projectile instanceof MagicDamageProjectileEntity) {
+			// Change speed based on element
+			switch (((MagicDamageProjectileEntity) projectile).getElement()) {
+			case PHYSICAL:
+			default:
+				; // No change
+				break;
+			case WIND:
+			case ENDER:
+				speed += .2f; // faster
+				break;
+			case FIRE:
+			case LIGHTNING:
+				speed -= .2f; // slower
+				break;
+			case EARTH:
+			case ICE:
+				speed -= .4f; // very slow
+				break;
+			}
+		}
+		return speed;
 	}
 	
 	protected float getFireInaccuracy(ProjectileEntity projectile) {
@@ -272,5 +294,15 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			fire();
 			setCooldown();
 		}
+	}
+
+	public boolean trigger() {
+		//if (canFire()) {
+			fire();
+			setCooldown();
+			return true;
+		//}
+		
+		//return false;
 	}
 }
