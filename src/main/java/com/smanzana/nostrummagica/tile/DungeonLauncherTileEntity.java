@@ -9,12 +9,15 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PutterBlock;
 import com.smanzana.nostrummagica.entity.MagicDamageProjectileEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.TileProxyTriggerEntity;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.Inventories;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -24,13 +27,17 @@ import net.minecraft.item.ArrowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TippedArrowItem;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class DungeonLauncherTileEntity extends TileEntity implements ITickableTileEntity {
 
@@ -71,6 +78,10 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	
 	protected int getRange() {
 		return 10;
+	}
+	
+	protected boolean canSeeEntity(LivingEntity entity) {
+		return !entity.isSpectator() && (entity instanceof PlayerEntity || entity instanceof MobEntity) && !(entity instanceof TileProxyTriggerEntity);
 	}
 	
 	protected boolean checkForEntity() {
@@ -115,7 +126,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			gz = 1;
 			break;
 		}
-		List<LivingEntity> ents = world.getEntitiesWithinAABB(LivingEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).expand(dx, dy, dz).grow(gx, gy, gz));
+		List<LivingEntity> ents = world.getEntitiesWithinAABB(LivingEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).expand(dx, dy, dz).grow(gx, gy, gz), this::canSeeEntity);
 		return ents != null && !ents.isEmpty();
 	}
 	
@@ -163,7 +174,14 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			final Vector3d direction = source.subtract(Vector3d.copyCentered(this.getPos())).normalize();
 			projectile.shoot(direction.getX(), direction.getY(), direction.getZ(), getFireSpeed(projectile), getFireInaccuracy(projectile));
 			getWorld().addEntity(projectile);
+			playFireEffect(projectile, direction);
 		}
+	}
+	
+	protected void playFireEffect(ProjectileEntity projectile, Vector3d direction) {
+		projectile.world.playSound(null, this.getPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 1f, 1f);
+		((ServerWorld) projectile.world).spawnParticle(ParticleTypes.SMOKE, projectile.getPosX(), projectile.getPosY(), projectile.getPosZ(),
+				10, direction.getX(), direction.getY(), direction.getZ(), .2f);
 	}
 	
 	protected @Nullable ProjectileEntity makeProjectile(World world, double x, double y, double z) {
