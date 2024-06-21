@@ -85,6 +85,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ShrineTriggerEntity.Shape.ID) public static EntityType<ShrineTriggerEntity.Shape> shapeShrine;
 	@ObjectHolder(ShrineTriggerEntity.Alteration.ID) public static EntityType<ShrineTriggerEntity.Alteration> alterationShrine;
 	@ObjectHolder(ShrineTriggerEntity.Tier.ID) public static EntityType<ShrineTriggerEntity.Tier> tierShrine;
+	@ObjectHolder(MagicDamageProjectileEntity.ID) public static EntityType<MagicDamageProjectileEntity> magicDamageProjectile;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -220,6 +221,10 @@ public class NostrumEntityTypes {
 				.size(1F, .2F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(CyclerSpellSaucerEntity.ID));
+		registry.register(EntityType.Builder.<MagicDamageProjectileEntity>create(MagicDamageProjectileEntity::new, EntityClassification.MISC)
+				.size(.3F, .3F)
+				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
+			.build("").setRegistryName(MagicDamageProjectileEntity.ID));
 		registry.register(EntityType.Builder.<SwitchTriggerEntity>create(SwitchTriggerEntity::new, EntityClassification.MISC)
 				.size(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)

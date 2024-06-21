@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
 import com.smanzana.nostrummagica.client.render.entity.RenderKeySwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderKoid;
 import com.smanzana.nostrummagica.client.render.entity.RenderLux;
+import com.smanzana.nostrummagica.client.render.entity.RenderMagicProjectile;
 import com.smanzana.nostrummagica.client.render.entity.RenderMagicSaucer;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBoss;
 import com.smanzana.nostrummagica.client.render.entity.RenderPlantBossBody;
@@ -331,6 +332,7 @@ public class ClientInit {
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.shapeShrine, (manager) -> new RenderShrineTrigger.Shape(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.alterationShrine, (manager) -> new RenderShrineTrigger.Alteration(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tierShrine, (manager) -> new RenderShrineTrigger.Tier(manager));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.magicDamageProjectile, (manager) -> new RenderMagicProjectile(manager, .5f));
 	}
 	
 	@SubscribeEvent

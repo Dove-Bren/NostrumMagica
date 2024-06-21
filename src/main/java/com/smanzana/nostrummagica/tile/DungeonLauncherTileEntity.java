@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PutterBlock;
+import com.smanzana.nostrummagica.entity.MagicDamageProjectileEntity;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.Inventories;
@@ -151,7 +153,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	protected float getFireInaccuracy(ProjectileEntity projectile) {
-		return 0f;
+		return 1f;
 	}
 	
 	protected void fire() {
@@ -188,9 +190,12 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 		return null;
 	}
 	
-	protected ProjectileEntity makeElementalProjectile(World world, double x, double y, double z, EMagicElement element) {
-		int unused;
-		return null; // TODO make elemental projectile
+	protected MagicDamageProjectileEntity makeElementalProjectile(World world, double x, double y, double z, EMagicElement element) {
+		MagicDamageProjectileEntity proj = new MagicDamageProjectileEntity(NostrumEntityTypes.magicDamageProjectile, world);
+		proj.setPosition(x, y, z);
+		proj.setElement(element);
+		proj.setDamage(4f);
+		return proj;
 	}
 	
 	protected ItemStack getRandomHeldItem() {
