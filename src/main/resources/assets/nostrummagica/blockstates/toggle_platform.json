@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "on=true": { "model": "nostrummagica:block/toggle_platform" },
+		"on=false": { "model": "nostrummagica:block/none" }
+    }
+}

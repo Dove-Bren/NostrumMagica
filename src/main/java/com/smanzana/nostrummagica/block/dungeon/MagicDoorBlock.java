@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -68,20 +70,19 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 			return;
 		
 		if (state.get(MASTER)) {
-			
+			// Cascade destroy to everything else
+			walkDoor(world, pos, state, (checkPos, checkState) -> {
+				world.destroyBlock(checkPos, false);
+				return false;
+			});
 		} else {
+			// Use whether master is still in place to tell if the whole door is already destructing.
+			// If NOT the master, check if it's still there and destroy it. Master walks and destroys everything.
 			BlockPos master = getMasterPos(world, state, pos);
-			if (master != null && world.getBlockState(master) != null && isMaster(world.getBlockState(master))) {
+			if (master != null && world.getBlockState(master) != null && world.getBlockState(master).getBlock() == this && isMaster(world.getBlockState(master))) {
 				world.destroyBlock(master, false);
 			}
 		}
-		
-		// Actually destroy
-		walkDoor(world, pos, state, (checkPos, checkState) -> {
-			world.destroyBlock(checkPos, false);
-			return false;
-		});
-		
 		
 		((ServerWorld)world).addParticle(ParticleTypes.LAVA, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .01, 0, .01);
 		// tODO this used to spawn 100 of them
@@ -101,48 +102,76 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	}
 	
 	protected BlockPos walkDoor(World world, BlockPos start, BlockState startState, IDoorWalker walkFunc) {
-		Set<BlockPos> visited = new HashSet<>();
-		List<BlockPos> next = new LinkedList<>();
-		
-		next.add(start);
-		
-		while (!next.isEmpty()) {
-			BlockPos cur = next.remove(0);
-			
-			if (visited.contains(cur))
-				continue;
-			
-			visited.add(cur);
-			BlockState state = world.getBlockState(cur);
-			
-			if (start == cur) {
-				// Block was already destroyed, so use saved blockstate
-				state = startState;
-			} else {
+		final BlockState origState = startState;
+		return WorldUtil.WalkConnectedBlocks(world, start, new IBlockWalker() {
+
+			@Override
+			public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance) {
 				if (state == null || !(state.getBlock() instanceof MagicDoorBlock))
-					continue;
+					return false;
+				
+				// Also should be in line with door
+				final Direction facing = origState.get(HORIZONTAL_FACING);
+				return (pos.getX() == startPos.getX() || facing.getHorizontalIndex() % 2 == 0) // E/W vary on X
+						&& (pos.getZ() == startPos.getZ() || facing.getHorizontalIndex() % 2 != 0);
+						
 			}
-			
-			if (walkFunc.walk(cur, state)) {
-				return cur;
+
+			@Override
+			public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance, int walkCount) {
+				if (startPos.equals(pos)) {
+					// Block was already destroyed, so use saved blockstate
+					state = origState;
+				}
+				return walkFunc.walk(pos, state);
 			}
-			
-			next.add(cur.up());
-			next.add(cur.down());
-			if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
-				next.add(cur.north());
-				next.add(cur.south());
-			} else {
-				next.add(cur.east());
-				next.add(cur.west());
-			}
-//			next.add(cur.east());
-//			next.add(cur.west());
-//			next.add(cur.north());
-//			next.add(cur.south());
-		}
+		}, 512);
 		
-		return null;
+		
+//		Set<BlockPos> visited = new HashSet<>();
+//		List<BlockPos> next = new LinkedList<>();
+//		
+//		next.add(start);
+//		
+//		while (!next.isEmpty()) {
+//			BlockPos cur = next.remove(0);
+//			
+//			if (visited.contains(cur))
+//				continue;
+//			
+//			visited.add(cur);
+//			BlockState state = world.getBlockState(cur);
+//			
+//			if (start == cur) {
+//				// Block was already destroyed, so use saved blockstate
+//				state = startState;
+//			} else {
+//				if (state == null || !(state.getBlock() instanceof MagicDoorBlock))
+//					continue;
+//			}
+//			
+//			if (walkFunc.walk(cur, state)) {
+//				return cur;
+//			}
+//			
+//			next.add(cur.up());
+//			next.add(cur.down());
+//			if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
+//				next.add(cur.north());
+//				next.add(cur.south());
+//			} else {
+//				next.add(cur.east());
+//				next.add(cur.west());
+//			}
+////			next.add(cur.east());
+////			next.add(cur.west());
+////			next.add(cur.north());
+////			next.add(cur.south());
+//		}
+//		
+//		return null;
 	}
 	
 	public BlockState getSlaveState(Direction facing) {

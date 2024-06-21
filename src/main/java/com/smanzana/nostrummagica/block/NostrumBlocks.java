@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.block.dungeon.ProgressionDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
+import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggerRepeaterBlock;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
@@ -109,6 +110,7 @@ public class NostrumBlocks {
 	@ObjectHolder(MysticWaterBlock.ID) public static MysticWaterBlock mysticWaterBlock;
 	@ObjectHolder(LockedDoorBlock.ID) public static LockedDoorBlock lockedDoor;
 	@ObjectHolder(DungeonLauncherBlock.ID) public static DungeonLauncherBlock dungeonLauncher;
+	@ObjectHolder(TogglePlatformBlock.ID) public static TogglePlatformBlock togglePlatform;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -185,6 +187,7 @@ public class NostrumBlocks {
     	registerBlockItem(runeLibrary, runeLibrary.getRegistryName(), registry);
     	registerBlockItem(lockedDoor, lockedDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(dungeonLauncher, dungeonLauncher.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(togglePlatform, togglePlatform.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -269,6 +272,7 @@ public class NostrumBlocks {
     	registerBlock(new MysticWaterBlock(() -> NostrumFluids.mysticWater), MysticWaterBlock.ID, registry);
     	registerBlock(new LockedDoorBlock(), LockedDoorBlock.ID, registry);
     	registerBlock(new DungeonLauncherBlock(), DungeonLauncherBlock.ID, registry);
+    	registerBlock(new TogglePlatformBlock(), TogglePlatformBlock.ID, registry);
     }
     
 }

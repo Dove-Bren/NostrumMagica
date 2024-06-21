@@ -1,6 +1,10 @@
 package com.smanzana.nostrummagica.util;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -103,6 +107,84 @@ public class WorldUtil {
 		}
 		
 		return count;
+	}
+	
+	public static interface IBlockWalker {
+		/**
+		 * Check whether the provided block/pos COULD be visitted. It may or may not be walked to depending on iteration order.
+		 * A typical check here is that the block state is related to the one that started the walk.
+		 * @param world
+		 * @param startPos
+		 * @param startState
+		 * @param pos
+		 * @param state
+		 * @param distance
+		 * @return
+		 */
+		public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance);
+		
+		/**
+		 * Actually visit a block/pos.
+		 * Return whether to STOP walking. False continues walking.
+		 * @param world
+		 * @param startPos
+		 * @param startState
+		 * @param pos
+		 * @param state
+		 * @param distance
+		 * @param walkCount
+		 * @return
+		 */
+		public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount);
+	}
+	
+	/**
+	 * Iterate over all blocks connected to the provided one, as per the passed in walker.
+	 * @param world
+	 * @param start
+	 * @param walker
+	 * @param maxIterations
+	 * @return The final pos iterated over.
+	 */
+	public static BlockPos WalkConnectedBlocks(IBlockReader world, BlockPos start, IBlockWalker walker, int maxIterations) {
+		final BlockState startState = world.getBlockState(start);
+		final Set<BlockPos> visited = new HashSet<>();
+		final List<BlockPos> next = new LinkedList<>(); // Doing breadthfirst/queue, so linked
+		int walkCount = 0;
+		
+		final Consumer<BlockPos> checkAndAdd = (pos) -> {
+			if (!visited.contains(pos) && walker.canVisit(world, start, startState, pos, world.getBlockState(pos), getBlockDistance(start, pos))) {
+				next.add(pos);
+			}
+			visited.add(pos);
+		};
+		
+		next.add(start);
+		visited.add(start);
+		
+		BlockPos last = null;
+		while (!next.isEmpty()) {
+			last = next.remove(0);
+			
+			BlockState state = world.getBlockState(last);
+			
+			final int dist = getBlockDistance(start, last);
+			if (walker.walk(world, start, startState, last, state, dist, walkCount++)) {
+				break;
+			}
+			if (walkCount >= maxIterations) {
+				break;
+			}
+			
+			checkAndAdd.accept(last.up());
+			checkAndAdd.accept(last.down());
+			checkAndAdd.accept(last.north());
+			checkAndAdd.accept(last.east());
+			checkAndAdd.accept(last.south());
+			checkAndAdd.accept(last.west());
+		}
+		
+		return last;
 	}
 	
 	/**

@@ -7,6 +7,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
+import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellCraftPatternAutoRenderer;
@@ -291,6 +292,8 @@ public class ClientInit {
 		
 		event.getBlockColors().register(tinter, NostrumBlocks.mimicDoor, NostrumBlocks.mimicDoorUnbreakable, NostrumBlocks.mimicFacade,
 				NostrumBlocks.mimicFacadeUnbreakable);
+		
+		event.getBlockColors().register(TogglePlatformBlock::MakePlatformColor, NostrumBlocks.togglePlatform);
 	}
 	
 	private static final void registerEntityRenderers() {
@@ -398,6 +401,7 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumFluids.mysticWater, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticWaterBlock, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.toggleDoor, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.togglePlatform, RenderType.getTranslucent());
 	}
 	
 	private static final void registerItemModelProperties() {
