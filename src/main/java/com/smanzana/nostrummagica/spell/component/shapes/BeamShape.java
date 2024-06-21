@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -45,14 +46,19 @@ public class BeamShape extends InstantShape {
 	protected BeamShape(String key) {
 		super(key);
 	}
+	
+	protected boolean hitsAir(SpellShapePartProperties properties) {
+		return properties.flip;
+	}
 
 	@Override
 	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+		final boolean hitsAir = hitsAir(params);
 		// Cast from eyes
 		final Vector3d start = location.shooterPosition;
 		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
 		final Vector3d end = start.add(dir.normalize().scale(BEAM_RANGE));
-		Collection<RayTraceResult> traces = RayTrace.allInPath(location.world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()));
+		Collection<RayTraceResult> traces = RayTrace.allInPath(location.world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()), hitsAir);
 		List<LivingEntity> targs = null;
 		List<SpellLocation> blocks = null;
 		
@@ -101,12 +107,12 @@ public class BeamShape extends InstantShape {
 
 	@Override
 	public boolean supportsBoolean() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String supportedBooleanName() {
-		return null;
+		return I18n.format("modification.beam.bool.name");
 	}
 
 	@Override
@@ -126,7 +132,7 @@ public class BeamShape extends InstantShape {
 
 	@Override
 	public int getWeight(SpellShapePartProperties properties) {
-		return 2;
+		return 2 + (hitsAir(properties) ? 1 : 0);
 	}
 
 	@Override
@@ -141,7 +147,7 @@ public class BeamShape extends InstantShape {
 
 	@Override
 	public int getManaCost(SpellShapePartProperties properties) {
-		return 35;
+		return 45  + (hitsAir(properties) ? 15 : 0);
 	}
 	
 	@Override

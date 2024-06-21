@@ -1,9 +1,12 @@
 package com.smanzana.nostrummagica.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
@@ -11,8 +14,10 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -22,6 +27,9 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -255,6 +263,130 @@ public class RayTrace {
 		return allInPath(world, tracingEntity, fromPos, toPos, selector);
 	}
 	
+	protected static final boolean cursorInBounds(Vector3d cursorIn, Vector3d from, Vector3d to) {
+		final int minX = (int) to.x > (int) from.x ? (int) from.x : (int) to.x;
+		final int minY = (int) to.y > (int) from.y ? (int) from.y : (int) to.y;
+		final int minZ = (int) to.z > (int) from.z ? (int) from.z : (int) to.z;
+		
+		final int maxX = (int) to.x > (int) from.x ? (int) to.x : (int) from.x;
+		final int maxY = (int) to.y > (int) from.y ? (int) to.y : (int) from.y;
+		final int maxZ = (int) to.z > (int) from.z ? (int) to.z : (int) from.z;
+		
+		// note: min and max may be equal
+		
+		BlockPos cursor = new BlockPos(cursorIn);
+		if (cursor.getX() < minX || cursor.getX() > maxX) return false;
+		if (cursor.getY() < minY || cursor.getY() > maxY) return false;
+		if (cursor.getZ() < minZ || cursor.getZ() > maxZ) return false;
+		return true;
+	}
+	
+	protected static Collection<BlockRayTraceResult> allBlocksInPath(World world, Vector3d fromPos, Vector3d toPos,
+			RayTraceContext.BlockMode blockMode, RayTraceContext.FluidMode fluidMode, ISelectionContext selectMode, boolean includeAir) {
+		// Can't use world.rayTraceBlocks since it stops at first hit
+		
+		// Going to step 'diff' units at a time and run a raytrace for every blockpos encountered.
+		// Calculate diff based on actual difference in where we're tracing, but scaled down so that no dimension is greater than 1.
+		// Just normalize/2 to achieve this even though this can miss diagonals.
+		final Vector3d diff = toPos.subtract(fromPos).normalize().scale(.5);
+		final Set<BlockPos> seen = new HashSet<>();
+		final List<BlockRayTraceResult> results = new ArrayList<>(32);
+		Vector3d cursor = new Vector3d(fromPos.x, fromPos.y, fromPos.z);
+		
+		do {
+			final BlockPos blockPos = new BlockPos(cursor);
+			if (!seen.contains(blockPos)) {
+				seen.add(blockPos.toImmutable());
+				
+				// This is generally the contents of the raytracing func IBlockReader#rayTraceBlocks passes to #doRayTrace.
+				final BlockState state = world.getBlockState(blockPos);
+				final FluidState fluidstate = world.getFluidState(blockPos);
+				
+				// Do individual block raytrace
+				final VoxelShape blockShape = world.isAirBlock(blockPos) && includeAir ? VoxelShapes.fullCube() : blockMode.get(state, world, blockPos, selectMode);
+				final BlockRayTraceResult blockResult = world.rayTraceBlocks(fromPos, toPos, blockPos, blockShape, state);
+				final VoxelShape fluidShape = fluidMode.test(fluidstate) ? fluidstate.getShape(world, blockPos) : VoxelShapes.empty();
+				final BlockRayTraceResult fluidResult = fluidShape.rayTrace(fromPos, toPos, blockPos);
+				
+				// Ooops don't do this. Add either/both if non-null
+//				// Different than vanilla: do some null checks before comparing distances.
+//				// Not sure if the added branches are actually slower though.
+//				final @Nullable BlockRayTraceResult resultToAdd;
+//				if (blockResult == null && fluidResult != null) {
+//					resultToAdd = fluidResult;
+//				} else if (fluidResult == null && blockResult != null) {
+//					resultToAdd = blockResult;
+//				} else {
+//					// Decide between block and fluid based on distance
+//					final double blockDist = blockResult == null ? Double.MAX_VALUE : fromPos.squareDistanceTo(blockResult.getHitVec());
+//					final double fluidDist = fluidResult == null ? Double.MAX_VALUE : fromPos.squareDistanceTo(fluidResult.getHitVec());
+//					resultToAdd = blockDist <= fluidDist ? blockResult : fluidResult;
+//				}
+//				
+//				if (resultToAdd != null) {
+//					results.add(resultToAdd);
+//				}
+				if (blockResult != null) {
+					results.add(blockResult);
+				}
+				if (fluidResult != null) {
+					results.add(fluidResult);
+				}
+				
+				
+				// Actual vanilla code for reference:
+				{
+					/****************************
+					BlockState blockstate = this.getBlockState(p_217297_2_);
+					FluidState fluidstate = this.getFluidState(p_217297_2_);
+					Vector3d vector3d = p_217297_1_.getStartVec();
+					Vector3d vector3d1 = p_217297_1_.getEndVec();
+					VoxelShape voxelshape = p_217297_1_.getBlockShape(blockstate, this, p_217297_2_);
+					BlockRayTraceResult blockraytraceresult = this.rayTraceBlocks(vector3d, vector3d1, p_217297_2_, voxelshape, blockstate);
+					VoxelShape voxelshape1 = p_217297_1_.getFluidShape(fluidstate, this, p_217297_2_);
+					BlockRayTraceResult blockraytraceresult1 = voxelshape1.rayTrace(vector3d, vector3d1, p_217297_2_);
+					double d0 = blockraytraceresult == null ? Double.MAX_VALUE : p_217297_1_.getStartVec().squareDistanceTo(blockraytraceresult.getHitVec());
+					double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : p_217297_1_.getStartVec().squareDistanceTo(blockraytraceresult1.getHitVec());
+					return d0 <= d1 ? blockraytraceresult : blockraytraceresult1;
+					 ****************************/
+				}
+			}
+			cursor = cursor.add(diff);
+		} while (cursorInBounds(cursor, fromPos, toPos));
+		
+		return results;
+	}
+	
+	protected static Collection<EntityRayTraceResult> allEntitiesInPath(World world, Vector3d fromPos, Vector3d toPos, Predicate<? super Entity> selector) {
+		final List<EntityRayTraceResult> results = new ArrayList<>(8);
+		
+		List<Entity> list = world.getEntitiesInAABBexcluding(null,
+				new AxisAlignedBB(fromPos.x, fromPos.y, fromPos.z, toPos.x, toPos.y, toPos.z),
+				EntityPredicates.NOT_SPECTATING.and((e) -> e.canBeCollidedWith() && selector.test(e)));
+		
+		double maxDist = fromPos.distanceTo(toPos);
+
+		for (int j = 0; j < list.size(); ++j) {
+			Entity entity1 = (Entity)list.get(j);
+
+			float f1 = entity1.getCollisionBorderSize();
+			AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f1, (double)f1, (double)f1);
+			Optional<Vector3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
+
+			if (axisalignedbb.contains(fromPos)) {
+				results.add(new EntityRayTraceResult(entity1, fromPos));
+			} else if (entHit.isPresent()) {
+				double d3 = fromPos.distanceTo(entHit.get());
+
+				if (d3 < maxDist) {
+					results.add(new EntityRayTraceResult(entity1, entHit.get()));
+				}
+			}
+		}
+		
+		return results;
+	}
+	
 	/**
 	 * Like a raytrace but returns multiple.
 	 * @param world
@@ -265,74 +397,30 @@ public class RayTrace {
 	 */
 	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity, Vector3d fromPos, Vector3d toPos,
 			Predicate<? super Entity> selector) {
-		
-		List<RayTraceResult> ret = new LinkedList<>();
-			
-        if (world == null || fromPos == null || toPos == null) {
-        	return ret;
-        }
-        
-        RayTraceResult trace;
-        
-        trace = world.rayTraceBlocks(new RayTraceContext(fromPos, toPos, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, tracingEntity));
-        
-        if (trace != null && trace.getType() != RayTraceResult.Type.MISS) {
-        	// limit toPos to position of block hit
-        	toPos = trace.getHitVec();
-        	ret.add(cloneTrace(trace));
-        }
-        
-        List<Entity> list = world.getEntitiesInAABBexcluding(null,
-        		new AxisAlignedBB(fromPos.x, fromPos.y, fromPos.z, toPos.x, toPos.y, toPos.z),
-        		EntityPredicates.NOT_SPECTATING.and(new Predicate<Entity>()
-        {
-            public boolean test(Entity p_apply_1_)
-            {
-                return p_apply_1_.canBeCollidedWith() && selector.test(p_apply_1_);
-            }
-        }));
-        
-        double maxDist = fromPos.distanceTo(toPos);
-
-        for (int j = 0; j < list.size(); ++j)
-        {
-            Entity entity1 = (Entity)list.get(j);
-            
-            float f1 = entity1.getCollisionBorderSize();
-            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f1, (double)f1, (double)f1);
-            Optional<Vector3d> entHit = axisalignedbb.rayTrace(fromPos, toPos);
-
-            if (axisalignedbb.contains(fromPos))
-            {
-                ret.add(new EntityRayTraceResult(entity1, fromPos));
-            }
-            else if (entHit.isPresent())
-            {
-                double d3 = fromPos.distanceTo(entHit.get());
-
-                if (d3 < maxDist)
-                {
-                    ret.add(new EntityRayTraceResult(entity1, entHit.get()));
-                }
-            }
-        }
-
-        return ret;
+		return allInPath(world, tracingEntity, fromPos, toPos, selector, false);
 	}
 	
-	private static RayTraceResult cloneTrace(RayTraceResult in) {
-		if (in.getType() == RayTraceResult.Type.ENTITY) {
-			EntityRayTraceResult orig = (EntityRayTraceResult) in;
-			return new EntityRayTraceResult(orig.getEntity(), orig.getHitVec());
+	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity, Vector3d fromPos, Vector3d toPos,
+			Predicate<? super Entity> selector, boolean includeAir) {
+		return allInPath(world, tracingEntity, fromPos, toPos, selector,
+				RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, includeAir);
+	}
+	
+	public static Collection<RayTraceResult> allInPath(World world, @Nonnull Entity tracingEntity, Vector3d fromPos, Vector3d toPos,
+			Predicate<? super Entity> selector, RayTraceContext.BlockMode blockMode, RayTraceContext.FluidMode fluidMode, boolean includeAir) {
+		
+		if (world == null || fromPos == null || toPos == null) {
+			return new ArrayList<>();
 		}
 		
-		BlockRayTraceResult blockResult = (BlockRayTraceResult) in;
+		final Collection<BlockRayTraceResult> blocks = allBlocksInPath(world, fromPos, toPos, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, ISelectionContext.forEntity(tracingEntity), includeAir); 
+		final Collection<EntityRayTraceResult> entities = allEntitiesInPath(world, fromPos, toPos, selector);
+		final List<RayTraceResult> ret = new ArrayList<>(blocks.size() + entities.size());
 		
-		if (in.getType() == RayTraceResult.Type.MISS)
-			return BlockRayTraceResult.createMiss(in.getHitVec(), blockResult.getFace(), blockResult.getPos());
+		ret.addAll(blocks);
+		ret.addAll(entities);
 		
-		
-		return new BlockRayTraceResult(blockResult.getHitVec(), blockResult.getFace(), blockResult.getPos(), blockResult.isInside());
+		return ret;
 	}
 	
 	public static RayTraceResult forwardsRaycast(Entity projectile, boolean includeEntities, boolean ignoreCollideFlag, boolean shouldExclude, Entity maybeExcludedEntity) {

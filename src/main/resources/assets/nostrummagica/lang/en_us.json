@@ -1677,6 +1677,7 @@
     "modification.ring.name":"Effect Radius",
 	"modification.touch.bool.name": "Fizzle On Air",
 	"modification.bubblespray.name": "Range",
+	"modification.beam.bool.name": "Hit Empty Blocks",
 
     "modification.level.flip": "Trigger When Above",
 	
