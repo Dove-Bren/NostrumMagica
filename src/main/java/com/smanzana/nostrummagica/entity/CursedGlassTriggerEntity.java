@@ -15,7 +15,7 @@ public class CursedGlassTriggerEntity extends SwitchTriggerEntity {
 	
 	@Override
 	protected BlockPos getCheckPos() {
-		return new BlockPos(this.getPosX() - 1, this.getPosY(), this.getPosZ() - 1);
+		return new BlockPos(this.getPosX() + -.5, this.getPosY(), this.getPosZ() + -.5);
 	}
 	
 	@Override

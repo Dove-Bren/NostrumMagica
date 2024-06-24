@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -78,6 +79,13 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 		}
 		final CursedGlassTileEntity te = (CursedGlassTileEntity) raw;
 		if (!te.isBroken()) {
+			matrixStackIn.push();
+			matrixStackIn.translate(-1.5, 0, -1.5);
+			matrixStackIn.scale(3f, 3f, 3f);
+			RenderFuncs.RenderBlockState(Blocks.GLASS.getDefaultState(), matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY);
+			matrixStackIn.pop();
+			
+			
 			final float[] color = ColorUtil.ARGBToColor(te.getRequiredElement() == null ? 0xFFFFFFFF : te.getRequiredElement().getColor());
 			final float glowPeriod = 20 * 3;
 			final float glowProg = ((entityIn.ticksExisted + partialTicks) % glowPeriod) / glowPeriod;
@@ -85,8 +93,8 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 			final float glow = .5f + (.25f * (float) Math.sin(glowProg * Math.PI * 2));
 			
 			matrixStackIn.push();
-			matrixStackIn.translate(0, 1, 0);
-			matrixStackIn.scale(2f, 2f, 2f);
+			matrixStackIn.translate(0, 1.5, 0);
+			matrixStackIn.scale(3f, 3f, 3f);
 			matrixStackIn.scale(.99f, .99f, .99f);
 			
 			IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityTranslucent(TEX));

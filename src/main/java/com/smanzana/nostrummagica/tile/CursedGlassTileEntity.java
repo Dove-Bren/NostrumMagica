@@ -116,7 +116,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	
 	@Override
 	protected Vector3d getEntityOffset() {
-		return new Vector3d(1, 0, 1);
+		return new Vector3d(0.5, 0, 0.5);
 	}
 	
 	@Override

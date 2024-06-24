@@ -6,11 +6,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.CursedGlassTileEntity;
+import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
@@ -71,6 +72,10 @@ public class CursedGlass extends SwitchBlock {
 		return this.getDefaultState().with(DUMMY, true);
 	}
 	
+	public boolean isDummy(BlockState state) {
+		return state.get(DUMMY);
+	}
+	
 	@Override
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
@@ -117,35 +122,44 @@ public class CursedGlass extends SwitchBlock {
 	
 	@Override
 	public boolean hasTileEntity(BlockState state) {
-		return !state.get(DUMMY);
+		return !isDummy(state);
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return state.get(DUMMY) ? null : new CursedGlassTileEntity();
+		return isDummy(state) ? null : new CursedGlassTileEntity();
 	}
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote() && playerIn.isCreative() && !state.get(DUMMY)) {
-			ItemStack heldItem = playerIn.getHeldItem(hand);
-			
-			if (!heldItem.isEmpty() && heldItem.getItem() instanceof ArmorItem) {
-				TileEntity te = worldIn.getTileEntity(pos);
-				if (te != null) {
-					CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
-					ent.setRequiredDamage(ent.getRequiredDamage() + 1f);
-					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+		if (!worldIn.isRemote() && playerIn.isCreative()) {
+			if (!isDummy(state)) {
+				ItemStack heldItem = playerIn.getHeldItem(hand);
+				
+				if (!heldItem.isEmpty() && heldItem.getItem() instanceof ArmorItem) {
+					TileEntity te = worldIn.getTileEntity(pos);
+					if (te != null) {
+						CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
+						ent.setRequiredDamage(ent.getRequiredDamage() + 1f);
+						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+					}
+					return ActionResultType.SUCCESS;
+				} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem) {
+					TileEntity te = worldIn.getTileEntity(pos);
+					if (te != null) {
+						CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
+						ent.setRequiredElement(InfusedGemItem.GetElement(heldItem));
+						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+					}
+					return ActionResultType.SUCCESS;
 				}
-				return ActionResultType.SUCCESS;
-			} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem) {
-				TileEntity te = worldIn.getTileEntity(pos);
-				if (te != null) {
-					CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
-					ent.setRequiredElement(InfusedGemItem.GetElement(heldItem));
-					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+			} else {
+				BlockPos master = findMaster(worldIn, pos, state);
+				if (master != null && worldIn.getBlockState(master).getBlock() == this) {
+					return onBlockActivated(worldIn.getBlockState(master), worldIn, master, playerIn, hand, hit);
 				}
-				return ActionResultType.SUCCESS;
+				
+				return ActionResultType.FAIL;
 			}
 		}
 		
@@ -160,12 +174,25 @@ public class CursedGlass extends SwitchBlock {
 	}
 	
 	private static final BlockPos[] GetArea(BlockPos pos) {
-		return new BlockPos[] {pos.south(), pos.east(), pos.south().east(), pos.up(), pos.up().south(), pos.up().east(), pos.up().south().east()};
+		final int radius = 1;
+		final int total = 27-1;//((radius*2 + 1) ^ 3) - 1;
+		BlockPos[] ret = new BlockPos[total];
+		int idx = 0;
+		for (int i = -radius; i <= radius; i++)
+		for (int j = -radius; j <= radius; j++)
+		for (int k = 0; k <= 2*radius; k++) {
+			if (i == 0 && j == 0 && k == 0) {
+				continue;
+			}
+			ret[idx++] = pos.add(i, k, j);
+		}
+		
+		return ret;
 	}
 	
 	public void setBroken(World world, BlockPos pos, BlockState state) {
 		setBrokenState(world, pos, state, true);
-		if (state.get(DUMMY)) {
+		if (isDummy(state)) {
 			NostrumMagica.logger.warn("Setting dummy to broken instead of cascading from master...");
 		} else {
 			for (BlockPos dummyPos : GetArea(pos)) {
@@ -175,13 +202,44 @@ public class CursedGlass extends SwitchBlock {
 	}
 	
 	protected void destroy(World world, BlockPos pos, BlockState state) {
-		if (!state.get(DUMMY)) {
+		if (state.getBlock() != this) {
+			return;
+		}
+		
+		if (!isDummy(state)) {
 			for (BlockPos dummyPos : GetArea(pos)) {
 				if (world.getBlockState(dummyPos).getBlock() == this) {
-					world.setBlockState(dummyPos, Blocks.AIR.getDefaultState(), 3);
+					world.destroyBlock(dummyPos, false);
 				}
 			}
+		} else {
+			BlockPos master = findMaster(world, pos, state);
+			BlockState masterState = world.getBlockState(master);
+			if (master != null && masterState.getBlock() == this && !isDummy(masterState)) {
+				world.destroyBlock(master, false);
+				//destroy(world, master, masterState);
+			}
 		}
+	}
+	
+	protected @Nullable BlockPos findMaster(World world, BlockPos startPos, BlockState startState) {
+		if (!isDummy(startState)) {
+			return startPos;
+		}
+		
+		return WorldUtil.WalkConnectedBlocks(world, startPos, new IBlockWalker() {
+			@Override
+			public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance) {
+				return state.getBlock() == CursedGlass.this;
+			}
+
+			@Override
+			public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance, int walkCount) {
+				return state.getBlock() == CursedGlass.this && !isDummy(state);
+			}
+		}, 48);
 	}
 	
 	@Override
@@ -216,7 +274,7 @@ public class CursedGlass extends SwitchBlock {
 	}
 	
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		if (!state.get(DUMMY)) {
+		if (!isDummy(state)) {
 			CursedGlassTileEntity tileentity = (CursedGlassTileEntity) worldIn.getTileEntity(pos);
 			return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 		}

@@ -251,7 +251,7 @@ public class NostrumEntityTypes {
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Tier.ID));
 		registry.register(EntityType.Builder.<CursedGlassTriggerEntity>create(CursedGlassTriggerEntity::new, EntityClassification.MISC)
-				.size(2.2f, 2.2f)
+				.size(3.2f, 3.2f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(CursedGlassTriggerEntity.ID));
 		registry.register(EntityType.Builder.<TameLightning>create(TameLightning::new, EntityClassification.MISC)
