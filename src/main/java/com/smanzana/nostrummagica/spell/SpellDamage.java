@@ -217,7 +217,7 @@ public class SpellDamage {
 	
 	public static final float DamageEntity(LivingEntity target, EMagicElement element, float base, @Nullable LivingEntity source) {
 		final float damage = CalculateDamage(source, target, base, element);
-		target.attackEntityFrom(new MagicDamageSource(source, EMagicElement.ENDER), damage);
+		target.attackEntityFrom(new MagicDamageSource(source, element), damage);
 		return damage;
 	}
 	

@@ -1,0 +1,19 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "minecraft:block/glass"
+    },
+	"elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 32, 32, 32 ],
+            "faces": {
+                "down":  { "texture": "#all", "cullface": "down", "tintindex": 0, "uv": [ 0, 0, 16, 16 ] },
+                "up":    { "texture": "#all", "cullface": "up", "tintindex": 0, "uv": [ 0, 0, 16, 16 ] },
+                "north": { "texture": "#all", "cullface": "north", "tintindex": 0, "uv": [ 0, 0, 16, 16 ] },
+                "south": { "texture": "#all", "cullface": "south", "tintindex": 0, "uv": [ 0, 0, 16, 16 ] },
+                "west":  { "texture": "#all", "cullface": "west", "tintindex": 0, "uv": [ 0, 0, 16, 16 ] },
+                "east":  { "texture": "#all", "cullface": "east", "tintindex": 0, "uv": [ 0, 0, 16, 16 ] }
+            }
+        }
+    ]
+}

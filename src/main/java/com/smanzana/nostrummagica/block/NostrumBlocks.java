@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
@@ -111,6 +112,7 @@ public class NostrumBlocks {
 	@ObjectHolder(LockedDoorBlock.ID) public static LockedDoorBlock lockedDoor;
 	@ObjectHolder(DungeonLauncherBlock.ID) public static DungeonLauncherBlock dungeonLauncher;
 	@ObjectHolder(TogglePlatformBlock.ID) public static TogglePlatformBlock togglePlatform;
+	@ObjectHolder(CursedGlass.ID) public static CursedGlass cursedGlass;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -188,6 +190,7 @@ public class NostrumBlocks {
     	registerBlockItem(lockedDoor, lockedDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(dungeonLauncher, dungeonLauncher.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(togglePlatform, togglePlatform.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(cursedGlass, cursedGlass.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -273,6 +276,7 @@ public class NostrumBlocks {
     	registerBlock(new LockedDoorBlock(), LockedDoorBlock.ID, registry);
     	registerBlock(new DungeonLauncherBlock(), DungeonLauncherBlock.ID, registry);
     	registerBlock(new TogglePlatformBlock(), TogglePlatformBlock.ID, registry);
+    	registerBlock(new CursedGlass(), CursedGlass.ID, registry);
     }
     
 }

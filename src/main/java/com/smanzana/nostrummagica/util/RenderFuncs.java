@@ -301,22 +301,22 @@ public final class RenderFuncs {
 		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
 		
 		// East
-		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
 		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
-		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
+		buffer.pos(transform, maxd, mind, mind).color(red, green, blue, alpha).tex(maxU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, minn, minn).endVertex();
 		buffer.pos(transform, maxd, maxd, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, maxn, minn).endVertex();
 		
 		// South
-		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
-		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(maxU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
-		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, mind, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, minn, maxn).endVertex();
+		buffer.pos(transform, maxd, maxd, maxd).color(red, green, blue, alpha).tex(maxU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, maxn, maxn, maxn).endVertex();
 		
 		// West
-		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
-		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
-		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(maxU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
-		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
+		buffer.pos(transform, mind, maxd, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, minn).endVertex();
+		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(maxU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();
+		buffer.pos(transform, mind, mind, maxd).color(red, green, blue, alpha).tex(minU,maxV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, maxn).endVertex();
+		buffer.pos(transform, mind, maxd, maxd).color(red, green, blue, alpha).tex(minU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, maxn, maxn).endVertex();
 		
 		// Bottom
 		buffer.pos(transform, mind, mind, mind).color(red, green, blue, alpha).tex(maxU,minV).overlay(combinedOverlayIn).lightmap(packedLightIn).normal(normal, minn, minn, minn).endVertex();

@@ -99,6 +99,10 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 		return this.modelOneTime;
 	}
 	
+	protected float getAnimateTicks(SwitchTriggerEntity entityIn, float partialTicks) {
+		return entityIn.world.getGameTime() + partialTicks;
+	}
+	
 	@Override
 	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Note: This used to have all the LivingRenderer offsets and stuff baked in and now it doesn't. Likely have to
@@ -117,7 +121,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 		final float turnAngle; // rotate around Z axis
 		final boolean isTimed = te != null && te.getSwitchTriggerType() == SwitchTriggerType.TIMED;
 
-		final float time = entityIn.world.getGameTime() + partialTicks;
+		final float time = getAnimateTicks(entityIn, partialTicks);
 		if (isTimed) {
 			// Timed flips on .5 second intervals
 			final float period = 10f; // half a second

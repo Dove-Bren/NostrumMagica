@@ -86,6 +86,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ShrineTriggerEntity.Alteration.ID) public static EntityType<ShrineTriggerEntity.Alteration> alterationShrine;
 	@ObjectHolder(ShrineTriggerEntity.Tier.ID) public static EntityType<ShrineTriggerEntity.Tier> tierShrine;
 	@ObjectHolder(MagicDamageProjectileEntity.ID) public static EntityType<MagicDamageProjectileEntity> magicDamageProjectile;
+	@ObjectHolder(CursedGlassTriggerEntity.ID) public static EntityType<CursedGlassTriggerEntity> cursedGlassTrigger;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -249,6 +250,10 @@ public class NostrumEntityTypes {
 				.size(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Tier.ID));
+		registry.register(EntityType.Builder.<CursedGlassTriggerEntity>create(CursedGlassTriggerEntity::new, EntityClassification.MISC)
+				.size(2.2f, 2.2f)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+			.build("").setRegistryName(CursedGlassTriggerEntity.ID));
 		registry.register(EntityType.Builder.<TameLightning>create(TameLightning::new, EntityClassification.MISC)
 				.size(0, 0)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -388,6 +393,7 @@ public class NostrumEntityTypes {
 		// No attributes event.put(areaEffect, EntityAreaEffect.BuildAttributes().create());
 		event.put(keySwitchTrigger, KeySwitchTriggerEntity.BuildKeySwitchAttributes().create());
 		// No attributes event.put(enderRodBall, EntityEnderRodBall.BuildAttributes().create());
+		event.put(cursedGlassTrigger, CursedGlassTriggerEntity.BuildAttributes().create());
 		
 	}
 	

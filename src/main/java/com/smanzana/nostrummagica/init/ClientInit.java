@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.client.render.effect.CursedFireEffectRenderer;
 import com.smanzana.nostrummagica.client.render.effect.EffectBubbleRenderer;
 import com.smanzana.nostrummagica.client.render.effect.EffectGemRenderer;
 import com.smanzana.nostrummagica.client.render.entity.RenderArcaneWolf;
+import com.smanzana.nostrummagica.client.render.entity.RenderCursedGlassTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonEgg;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderDragonRedPart;
@@ -336,6 +337,7 @@ public class ClientInit {
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.alterationShrine, (manager) -> new RenderShrineTrigger.Alteration(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tierShrine, (manager) -> new RenderShrineTrigger.Tier(manager));
 		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.magicDamageProjectile, (manager) -> new RenderMagicProjectile(manager, .5f));
+		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.cursedGlassTrigger, (manager) -> new RenderCursedGlassTrigger(manager));
 	}
 	
 	@SubscribeEvent
@@ -402,6 +404,7 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticWaterBlock, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.toggleDoor, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.togglePlatform, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedGlass, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

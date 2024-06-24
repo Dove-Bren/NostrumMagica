@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "broken=false,dummy=false": { "model": "nostrummagica:block/cursed_glass" },
+		"broken=false,dummy=true": { "model": "nostrummagica:block/none" },
+		"broken=true,dummy=false": { "model": "nostrummagica:block/none" },
+		"broken=true,dummy=true": { "model": "nostrummagica:block/none" }
+    }
+}

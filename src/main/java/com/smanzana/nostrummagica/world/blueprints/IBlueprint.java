@@ -150,7 +150,6 @@ public interface IBlueprint {
 	}
 
 	public static Direction GetModDir(Direction original, Direction newFacing) {
-		int unused; // Isn't there another version of this in utils?
 		Direction out = Direction.NORTH;
 		int rotCount = (4 + newFacing.getHorizontalIndex() - original.getHorizontalIndex()) % 4;
 		while (rotCount-- > 0) {

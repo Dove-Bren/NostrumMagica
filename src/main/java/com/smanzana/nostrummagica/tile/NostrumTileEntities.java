@@ -52,6 +52,7 @@ public class NostrumTileEntities {
 	private static final String ID_ShapeShrine = "shape_shrine_te";
 	private static final String ID_TierShrine = "tier_shrine_te";
 	private static final String ID_DungeonLauncher = "launcher_te";
+	private static final String ID_CursedGlass = "cursed_glass_te";
 	
 
 	@ObjectHolder(ID_SpellTableEntity) public static TileEntityType<SpellTableTileEntity> SpellTableEntityType;
@@ -92,6 +93,7 @@ public class NostrumTileEntities {
 	@ObjectHolder(ID_ShapeShrine) public static TileEntityType<ShrineTileEntity.Shape> ShapeShrineTileType;
 	@ObjectHolder(ID_TierShrine) public static TileEntityType<ShrineTileEntity.Tier> TierShrineTileType;
 	@ObjectHolder(ID_DungeonLauncher) public static TileEntityType<DungeonLauncherTileEntity> DungeonLauncherTileType;
+	@ObjectHolder(ID_CursedGlass) public static TileEntityType<CursedGlassTileEntity> CursedGlassType;
 	
 	private static void register(IForgeRegistry<TileEntityType<?>> registry, TileEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -139,5 +141,6 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Shape::new, NostrumBlocks.shapeShrineBlock).build(null), ID_ShapeShrine);
 		register(registry, TileEntityType.Builder.create(ShrineTileEntity.Tier::new, NostrumBlocks.tierShrineBlock).build(null), ID_TierShrine);
 		register(registry, TileEntityType.Builder.create(DungeonLauncherTileEntity::new, NostrumBlocks.dungeonLauncher).build(null), ID_DungeonLauncher);
+		register(registry, TileEntityType.Builder.create(CursedGlassTileEntity::new, NostrumBlocks.cursedGlass).build(null), ID_CursedGlass);
     }
 }
