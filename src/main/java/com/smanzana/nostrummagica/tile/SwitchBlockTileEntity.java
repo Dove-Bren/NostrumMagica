@@ -273,15 +273,19 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 		((ITriggeredBlock) state.getBlock()).trigger(world, triggerPos, state, this.getPos());
 	}
 	
+	protected void doTrigger() {
+		this.triggerWorldTicks = world.getGameTime();
+		NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+		this.dirty();
+		doTriggerInternal();
+	}
+	
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
 		if (!this.isTriggered() && !this.world.isRemote()) {
 			final boolean isMagic = (source instanceof MagicDamageSource);
 			if (hitType == SwitchHitType.ANY || isMagic) {
-				this.triggerWorldTicks = world.getGameTime();
-				NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
-				this.dirty();
-				doTriggerInternal();
+				doTrigger();
 			} else {
 				// Wrong input type
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);

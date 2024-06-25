@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 
@@ -74,6 +75,19 @@ public class PlayerStatListener {
 					PlayerStatTracker.Update(player, (stats) -> stats.incrStat(PlayerStat.ElementalKills(element)));
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onSpellEnd(SpellEffectEndEvent event) {
+		if (!event.getCaster().world.isRemote() && event.getCaster() instanceof PlayerEntity) {
+			final float damageTotalFinal = event.getSpellFinalResults().damageTotal;
+			PlayerStatTracker.Update((PlayerEntity) event.getCaster(), (stats) -> {
+				if (damageTotalFinal > 0) {
+					stats.takeMax(PlayerStat.MaxSpellDamageDealt, damageTotalFinal);
+				}
+				// Per element damage calculated by damage listener
+			});
 		}
 	}
 	

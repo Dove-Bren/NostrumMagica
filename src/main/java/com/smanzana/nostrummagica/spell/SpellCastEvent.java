@@ -6,24 +6,19 @@ import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 
-public abstract class SpellCastEvent extends Event {
+/**
+ * Events around the casting (evoking) of a spell, including information about what spell, who was casting
+ * it, and summary information about how the cast went.
+ * These events are at the very beginning of a spell's world lifetime and no relation to whether the spell
+ * actually does anything.
+ * @author Skyler
+ *
+ */
+public abstract class SpellCastEvent extends SpellEvent {
 
-	protected Spell spell;
-	protected final @Nonnull LivingEntity caster;
-	
 	public SpellCastEvent(Spell spell, @Nonnull LivingEntity caster) {
-		this.spell = spell;
-		this.caster = caster;
-	}
-
-	public Spell getSpell() {
-		return spell;
-	}
-
-	public LivingEntity getCaster() {
-		return caster;
+		super(spell, caster);
 	}
 
 	@Cancelable

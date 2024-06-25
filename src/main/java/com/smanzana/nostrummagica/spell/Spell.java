@@ -3,9 +3,11 @@ package com.smanzana.nostrummagica.spell;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,6 +21,9 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectBlockEvent;
+import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
+import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEntityEvent;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
@@ -30,6 +35,7 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
+import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,6 +49,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
 
 /**
@@ -257,7 +264,10 @@ public class Spell {
 			boolean anySuccess = false;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			float damageTotal = 0f;
-			final Map<LivingEntity, EMagicElement> totalAffectedEntities = new HashMap<>();
+			float healTotal = 0f;
+			final Map<LivingEntity, Map<EMagicElement, Float>> totalAffectedEntities = new HashMap<>();
+			final Set<SpellLocation> totalAffectedLocations = new HashSet<>();
+			final Map<LivingEntity, EMagicElement> entityLastElement = new HashMap<>();
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
 				float efficiency = this.efficiency + (part.getPotency() - 1f);
@@ -281,9 +291,12 @@ public class Spell {
 						SpellActionResult result = action.apply(caster, targ, perEfficiency); 
 						if (result.applied) {
 							affectedEnts.add(targ);
-							totalAffectedEntities.put(targ, part.getElement());
+							totalAffectedEntities.computeIfAbsent(targ, e -> new NonNullEnumMap<>(EMagicElement.class, 0f)).merge(part.getElement(), result.damage - result.heals, Float::sum);
+							entityLastElement.put(targ, part.getElement());
 							damageTotal += result.damage;
+							healTotal += result.heals;
 							anySuccess = true;
+							EmitSpellEffectEntity(spell, this.caster, targ, result);
 						}
 					}
 				} else if (locations != null && !locations.isEmpty()) {
@@ -295,6 +308,8 @@ public class Spell {
 								affectedPos.add(result.affectedPos);
 							}
 							anySuccess = true;
+							totalAffectedLocations.add(result.affectedPos);
+							EmitSpellEffectBlock(spell, caster, pos, result);
 						}
 					}
 				} else {
@@ -337,7 +352,7 @@ public class Spell {
 			
 			if (anySuccess) {
 				if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
-					for (Entry<LivingEntity, EMagicElement> entry : totalAffectedEntities.entrySet()) {
+					for (Entry<LivingEntity, EMagicElement> entry : entityLastElement.entrySet()) {
 						final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
 						entry.getKey().addPotionEffect(new EffectInstance(effect, 20 * 5, 0));
 					}
@@ -356,15 +371,7 @@ public class Spell {
 				}
 			}
 			
-			if (!caster.world.isRemote() && caster instanceof PlayerEntity) {
-				final float damageTotalFinal = damageTotal;
-				PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> {
-					if (damageTotalFinal > 0) {
-						stats.takeMax(PlayerStat.MaxSpellDamageDealt, damageTotalFinal);
-					}
-					// Per element damage calculated by damage listener
-				});
-			}
+			EmitSpellEffectEnd(spell, caster, new SpellResult(anySuccess, damageTotal, healTotal, totalAffectedEntities, totalAffectedLocations));
 		}
 
 		@Override
@@ -465,6 +472,37 @@ public class Spell {
 			;
 		}
 	}
+	
+	public static class SpellResult {
+		public final boolean anySuccess;
+		public final float damageTotal;
+		public final float healingTotal;
+		public final Map<LivingEntity, Map<EMagicElement, Float>> affectedEntities;
+		public final Set<SpellLocation> affectedLocations;
+		
+		
+		public SpellResult(boolean anySuccess, float damageTotal, float healingTotal,
+				Map<LivingEntity, Map<EMagicElement, Float>> affectedEntities, Set<SpellLocation> affectedLocations) {
+			super();
+			this.anySuccess = anySuccess;
+			this.damageTotal = damageTotal;
+			this.healingTotal = healingTotal;
+			this.affectedLocations = affectedLocations;
+			this.affectedEntities = affectedEntities;
+		}
+	}
+	
+	private static final void EmitSpellEffectEntity(Spell spell, LivingEntity caster, LivingEntity targ, SpellActionResult result) {
+		MinecraftForge.EVENT_BUS.post(new SpellEffectEntityEvent(spell, caster, targ, result));
+	}
+	
+	private static final void EmitSpellEffectBlock(Spell spell, LivingEntity caster, SpellLocation targ, SpellActionResult result) {
+		MinecraftForge.EVENT_BUS.post(new SpellEffectBlockEvent(spell, caster, targ, result));
+	}
+	
+	private static final void EmitSpellEffectEnd(Spell spell, LivingEntity caster, SpellResult result) {
+		MinecraftForge.EVENT_BUS.post(new SpellEffectEndEvent(spell, caster, result));
+	}
 
 	private final String name;
 	private final int manaCost;
@@ -486,7 +524,7 @@ public class Spell {
 		iconIndex = 0;
 		determineCharacteristics();
 	}
-	
+
 	/**
 	 * Creates a new spell and registers it in the registry.
 	 * @param name

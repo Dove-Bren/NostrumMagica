@@ -155,7 +155,7 @@ public class CursedGlass extends SwitchBlock {
 				}
 			} else {
 				BlockPos master = findMaster(worldIn, pos, state);
-				if (master != null && worldIn.getBlockState(master).getBlock() == this) {
+				if (master != null && worldIn.getBlockState(master).getBlock() == this && !master.equals(pos)) {
 					return onBlockActivated(worldIn.getBlockState(master), worldIn, master, playerIn, hand, hit);
 				}
 				

@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.tile;
 
+import java.util.Map;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
@@ -8,6 +10,7 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -16,6 +19,8 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	
@@ -32,6 +37,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		lastDamageTicks = -1;
 		lastDamage = 0f;
 		lastAttacker = null;
+		
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	public CursedGlassTileEntity() {
@@ -247,5 +254,25 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 			return true;
 		}
 		return super.receiveClientEvent(id, type);
+	}
+	
+	@SubscribeEvent
+	public void onSpellEnd(SpellEffectEndEvent event) {
+		if (event.getCaster() != null && !event.getCaster().world.isRemote()) {
+			// Was our entity affected?
+			@Nullable Map<EMagicElement, Float> damageMap = event.getSpellFinalResults().affectedEntities.get(this.getTriggerEntity());
+			if (damageMap != null) {
+				final float total;
+				if (this.requiredElement == null) {
+					total = damageMap.values().stream().reduce(Float::sum).orElse(0f);
+				} else {
+					total = damageMap.getOrDefault(this.requiredDamage, 0f);
+				}
+				
+				if (total > 0f) {
+					this.trigger(this.getTriggerEntity(), new MagicDamageSource(event.getCaster(), requiredElement), total);
+				}
+			}
+		}
 	}
 }
