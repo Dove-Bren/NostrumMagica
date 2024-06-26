@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
@@ -149,6 +150,14 @@ public class CursedGlass extends SwitchBlock {
 					if (te != null) {
 						CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
 						ent.setRequiredElement(InfusedGemItem.GetElement(heldItem));
+						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+					}
+					return ActionResultType.SUCCESS;
+				} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.GLASS) {
+					TileEntity te = worldIn.getTileEntity(pos);
+					if (te != null) {
+						CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
+						ent.setNoSwitch(!ent.isNoSwitch());
 						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 					}
 					return ActionResultType.SUCCESS;

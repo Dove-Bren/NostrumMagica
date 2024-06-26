@@ -26,6 +26,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	
 	protected float requiredDamage;
 	protected @Nullable EMagicElement requiredElement;
+	protected boolean noSwitch; // Don't show switch entity and act just like a wall thath as to be broken
 	
 	protected long lastDamageTicks; // based on world game tick count
 	protected float lastDamage;
@@ -47,6 +48,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	
 	private static final String NBT_REQUIRED_DAMAGE = "required_damage";
 	private static final String NBT_REQUIRED_ELEMENT = "required_element";
+	private static final String NBT_NO_SWITCH = "no_switch";
 	
 	@Override
 	public CompoundNBT write(CompoundNBT nbt) {
@@ -56,6 +58,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		if (this.requiredElement != null) {
 			nbt.put(NBT_REQUIRED_ELEMENT, this.requiredElement.toNBT());
 		}
+		nbt.putBoolean(NBT_NO_SWITCH, this.noSwitch);
 		
 		return nbt;
 	}
@@ -70,6 +73,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		} else {
 			this.requiredElement = null;
 		}
+		this.noSwitch = nbt.getBoolean(NBT_NO_SWITCH);
 	}
 	
 	public float getRequiredDamage() {
@@ -89,6 +93,15 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		this.requiredElement = requiredElement;
 		this.dirty();
 	}
+	
+	public boolean isNoSwitch() {
+		return this.noSwitch;
+	}
+	
+	public void setNoSwitch(boolean noSwitch) {
+		this.noSwitch = noSwitch;
+		this.dirty();
+	}
 
 	public float getLastDamage() {
 		return lastDamage;
@@ -96,6 +109,14 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 
 	public LivingEntity getLastAttacker() {
 		return lastAttacker;
+	}
+	
+	@Override
+	protected boolean shouldHaveProxy() {
+		// Should have switch entity if we're not "no switch" (always have the entity)
+		// OR if we're not broken yet
+		return !this.isNoSwitch()
+				|| !this.isBroken();
 	}
 
 	@Override

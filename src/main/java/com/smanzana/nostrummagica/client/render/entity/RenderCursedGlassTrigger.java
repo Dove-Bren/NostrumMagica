@@ -70,15 +70,26 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	}
 	
 	@Override
+	protected boolean shouldRenderSwitch(SwitchTriggerEntity entityIn) {
+		final SwitchBlockTileEntity raw = entityIn.getLinkedTileEntity();
+		if (raw == null || !(raw instanceof CursedGlassTileEntity)) {
+			return false;
+		}
+		final CursedGlassTileEntity te = (CursedGlassTileEntity) raw;
+		return !te.isNoSwitch();
+	}
+	
+	@Override
 	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Trigger itself and nameplate
-		
-		// Render damage indicator
 		final SwitchBlockTileEntity raw = entityIn.getLinkedTileEntity();
 		if (raw == null || !(raw instanceof CursedGlassTileEntity)) {
 			return;
 		}
 		final CursedGlassTileEntity te = (CursedGlassTileEntity) raw;
+		
+		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Trigger itself and nameplate
+		
+		// Render damage indicator
 		if (!te.isBroken()) {
 			model.render(matrixStackIn, bufferIn.getBuffer(RenderTypeLookup.func_239220_a_(Blocks.AIR.getDefaultState(), false)), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			

@@ -57,23 +57,34 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 		return new Vector3d(.5, 0, .5);
 	}
 	
+	protected boolean shouldHaveProxy() {
+		return true;
+	}
+	
 	@Override
 	public void tick() {
 		if (world.isRemote) {
 			return;
 		}
 		
-		// Create entity here if it doesn't exist
-		Vector3d offset = this.getEntityOffset();
-		if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
-				|| triggerEntity.getDistanceSq(pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ()) > 1.5) {
-			// Entity is dead OR is too far away
-			if (triggerEntity != null && !triggerEntity.isAlive()) {
-				triggerEntity.remove();
+		if (shouldHaveProxy()) {
+			// Create entity here if it doesn't exist
+			Vector3d offset = this.getEntityOffset();
+			if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
+					|| triggerEntity.getDistanceSq(pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ()) > 1.5) {
+				// Entity is dead OR is too far away
+				if (triggerEntity != null && !triggerEntity.isAlive()) {
+					triggerEntity.remove();
+				}
+				
+				triggerEntity = makeTriggerEntity(this.getWorld(), pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ());
+				world.addEntity(triggerEntity);
 			}
-			
-			triggerEntity = makeTriggerEntity(this.getWorld(), pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ());
-			world.addEntity(triggerEntity);
+		} else {
+			if (this.triggerEntity != null) {
+				this.triggerEntity.remove();
+				this.triggerEntity = null;
+			}
 		}
 	}
 	

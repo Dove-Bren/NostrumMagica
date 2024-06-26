@@ -103,78 +103,82 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 		return entityIn.world.getGameTime() + partialTicks;
 	}
 	
+	protected boolean shouldRenderSwitch(SwitchTriggerEntity entityIn) {
+		return true;
+	}
+	
 	@Override
 	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		// Note: This used to have all the LivingRenderer offsets and stuff baked in and now it doesn't. Likely have to
-		// translate and rotate
-		final ModelSwitchTrigger model = getEntityModel(entityIn);
-		final SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
-		final boolean magic = te == null ? false : te.getSwitchHitType() == SwitchHitType.MAGIC;
-		final boolean triggered = te != null && te.isTriggered();
-		final float saturation = !triggered ? 1f : .4f;
-		final float red = magic ? saturation * .2f : saturation * 1f;
-		final float green = magic ? saturation * .4f : saturation * 1f;
-		final float blue = magic ?  saturation * 1f : saturation * 0f;
-		final float alpha = .8f;
-		
-		final float spinAngle; // rotate around Y axis
-		final float turnAngle; // rotate around Z axis
-		final boolean isTimed = te != null && te.getSwitchTriggerType() == SwitchTriggerType.TIMED;
-
-		final float time = getAnimateTicks(entityIn, partialTicks);
-		if (isTimed) {
-			// Timed flips on .5 second intervals
-			final float period = 10f; // half a second
+		if (shouldRenderSwitch(entityIn)) {
+			final ModelSwitchTrigger model = getEntityModel(entityIn);
+			final SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
+			final boolean magic = te == null ? false : te.getSwitchHitType() == SwitchHitType.MAGIC;
+			final boolean triggered = te != null && te.isTriggered();
+			final float saturation = !triggered ? 1f : .4f;
+			final float red = magic ? saturation * .2f : saturation * 1f;
+			final float green = magic ? saturation * .4f : saturation * 1f;
+			final float blue = magic ?  saturation * 1f : saturation * 0f;
+			final float alpha = .8f;
 			
-			// Want to make sure final .5 second interval ends with a flip such that the flip finishes when time is up.
-			// Also want .5 second of just standing still between flips. Count from the back so that last one has a flip
-			
-			// for duration 30, we want
-			// [0-9] FLIP
-			// [10-19] no flip
-			// [20-29] FLIP
-			final long timeTillEnd = te.getCurrentCooldownTicks() - 1;
-			if (timeTillEnd % (2 * period) < period) { // mod by 20 and see if it's in the bottom 10
-				final float rotTicks = Math.max(0, timeTillEnd - partialTicks); // For the first tick, this is 0 - partial so negative
+			final float spinAngle; // rotate around Y axis
+			final float turnAngle; // rotate around Z axis
+			final boolean isTimed = te != null && te.getSwitchTriggerType() == SwitchTriggerType.TIMED;
+	
+			final float time = getAnimateTicks(entityIn, partialTicks);
+			if (isTimed) {
+				// Timed flips on .5 second intervals
+				final float period = 10f; // half a second
 				
-				// FLIP
-				turnAngle = 180f * ((rotTicks % period) / period);
+				// Want to make sure final .5 second interval ends with a flip such that the flip finishes when time is up.
+				// Also want .5 second of just standing still between flips. Count from the back so that last one has a flip
 				
+				// for duration 30, we want
+				// [0-9] FLIP
+				// [10-19] no flip
+				// [20-29] FLIP
+				final long timeTillEnd = te.getCurrentCooldownTicks() - 1;
+				if (timeTillEnd % (2 * period) < period) { // mod by 20 and see if it's in the bottom 10
+					final float rotTicks = Math.max(0, timeTillEnd - partialTicks); // For the first tick, this is 0 - partial so negative
+					
+					// FLIP
+					turnAngle = 180f * ((rotTicks % period) / period);
+					
+				} else {
+					turnAngle = 0f;
+				}
+				spinAngle = 0f;
 			} else {
+				// Non-timed spin around y axis based on whether they're activated or not
+				final float period = (float) (20 * (triggered ? spinActivated : spinIdle));
+				spinAngle = 360f * ((time % period) / period);
 				turnAngle = 0f;
 			}
-			spinAngle = 0f;
-		} else {
-			// Non-timed spin around y axis based on whether they're activated or not
-			final float period = (float) (20 * (triggered ? spinActivated : spinIdle));
-			spinAngle = 360f * ((time % period) / period);
-			turnAngle = 0f;
+			
+			final float bobAngle = (float) (2 * Math.PI * (time % 60 / 60));
+			final float verticalBob = (float) (Math.sin(bobAngle) * .1f);
+			
+			// Render model to two render types so that cage overlays on the regular model
+			//IVertexBuilder buffer = VertexBuilderUtils.newDelegate(bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE), bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE));
+			// This doesn't work because the buffers happen to be the same under the hood, and causes an exception
+			// So isntead, render twice
+			
+			matrixStackIn.push();
+	
+			
+			// also bob up and down
+			matrixStackIn.translate(0, verticalBob, 0);
+			
+			
+			matrixStackIn.translate(0, 1f, 0); // Should this be earlier?
+			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(spinAngle));
+			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(turnAngle)); // GlStateManager.rotated(angle, 1, 0, 1); WAS x and z?
+	
+			IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
+			model.render(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
+			IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
+			model.render(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+			matrixStackIn.pop();
 		}
-		
-		final float bobAngle = (float) (2 * Math.PI * (time % 60 / 60));
-		final float verticalBob = (float) (Math.sin(bobAngle) * .1f);
-		
-		// Render model to two render types so that cage overlays on the regular model
-		//IVertexBuilder buffer = VertexBuilderUtils.newDelegate(bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE), bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE));
-		// This doesn't work because the buffers happen to be the same under the hood, and causes an exception
-		// So isntead, render twice
-		
-		matrixStackIn.push();
-
-		
-		// also bob up and down
-		matrixStackIn.translate(0, verticalBob, 0);
-		
-		
-		matrixStackIn.translate(0, 1f, 0); // Should this be earlier?
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(spinAngle));
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(turnAngle)); // GlStateManager.rotated(angle, 1, 0, 1); WAS x and z?
-
-		IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
-		model.render(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
-		IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
-		model.render(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-		matrixStackIn.pop();
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
 	}
 	
