@@ -129,7 +129,7 @@ public class NostrumTileEntities {
 		register(registry, TileEntityType.Builder.create(LockedChestTileEntity::new, NostrumBlocks.lockedChest).build(null), ID_LockedChest);
 		register(registry, TileEntityType.Builder.create(KeySwitchBlockTileEntity::new, NostrumBlocks.keySwitch).build(null), ID_KeySwitch);
 		register(registry, TileEntityType.Builder.create(TrialBlockTileEntity::new, NostrumBlocks.trialBlock).build(null), ID_TrialBlockTileEntity);
-		register(registry, TileEntityType.Builder.create(TriggerRepeaterTileEntity::new, NostrumBlocks.triggerRepeater).build(null), ID_TriggerRepeaterTileEntity);
+		register(registry, TileEntityType.Builder.create(TriggerRepeaterTileEntity::new, NostrumBlocks.triggerRepeater, NostrumBlocks.redstoneTrigger).build(null), ID_TriggerRepeaterTileEntity);
 		register(registry, TileEntityType.Builder.create(DelayLoadedMimicBlockTileEntity::new, NostrumBlocks.mimicDoor, NostrumBlocks.mimicFacade, NostrumBlocks.mimicDoorUnbreakable, NostrumBlocks.mimicFacadeUnbreakable).build(null), ID_DelayedMimicBlockTileEntity);
 		register(registry, TileEntityType.Builder.create(BasicSpellTableTileEntity::new, NostrumBlocks.basicSpellTable).build(null), ID_BasicSpellTableTileEntity);
 		register(registry, TileEntityType.Builder.create(AdvancedSpellTableTileEntity::new, NostrumBlocks.advancedSpellTable).build(null), ID_AdvancedSpellTableTileEntity);

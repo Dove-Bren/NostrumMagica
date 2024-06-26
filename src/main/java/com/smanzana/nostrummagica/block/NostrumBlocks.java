@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.ProgressionDoorBlock;
+import com.smanzana.nostrummagica.block.dungeon.RedstoneTriggerBlock;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
@@ -113,6 +114,7 @@ public class NostrumBlocks {
 	@ObjectHolder(DungeonLauncherBlock.ID) public static DungeonLauncherBlock dungeonLauncher;
 	@ObjectHolder(TogglePlatformBlock.ID) public static TogglePlatformBlock togglePlatform;
 	@ObjectHolder(CursedGlass.ID) public static CursedGlass cursedGlass;
+	@ObjectHolder(RedstoneTriggerBlock.ID) public static RedstoneTriggerBlock redstoneTrigger;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -191,6 +193,7 @@ public class NostrumBlocks {
     	registerBlockItem(dungeonLauncher, dungeonLauncher.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(togglePlatform, togglePlatform.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(cursedGlass, cursedGlass.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(redstoneTrigger, redstoneTrigger.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -277,6 +280,7 @@ public class NostrumBlocks {
     	registerBlock(new DungeonLauncherBlock(), DungeonLauncherBlock.ID, registry);
     	registerBlock(new TogglePlatformBlock(), TogglePlatformBlock.ID, registry);
     	registerBlock(new CursedGlass(), CursedGlass.ID, registry);
+    	registerBlock(new RedstoneTriggerBlock(), RedstoneTriggerBlock.ID, registry);
     }
     
 }

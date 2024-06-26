@@ -18,6 +18,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -30,9 +31,13 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 	
 	private List<BlockPos> offsets;
 	
-	public TriggerRepeaterTileEntity() {
-		super(NostrumTileEntities.TriggerRepeaterTileEntityType);
+	protected TriggerRepeaterTileEntity(TileEntityType<? extends TriggerRepeaterTileEntity> type) {
+		super(type);
 		offsets = new ArrayList<>();
+	}
+	
+	public TriggerRepeaterTileEntity() {
+		this(NostrumTileEntities.TriggerRepeaterTileEntityType);
 	}
 	
 	// Calculates the offset to the given pos and saves it
