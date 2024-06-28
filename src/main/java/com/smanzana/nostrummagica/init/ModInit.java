@@ -1645,7 +1645,7 @@ public class ModInit {
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -1, 0, true,
 						new ItemStack(NostrumItems.resourceToken));
 
-		NostrumResearch.startBuilding().parent("magic_token").quest("lvl3")
+		NostrumResearch.startBuilding().parent("magic_token").tier(EMagicTier.KANI)
 				.reference("ritual::magic_token_3", "ritual.magic_token_3.name").build("magic_token_3",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -2, 0, true,
 						new ItemStack(NostrumItems.resourceToken));
@@ -1655,11 +1655,11 @@ public class ModInit {
 				.reference("ritual::essence_seed", "ritual.essence_seed.name").build("essence_seeds",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -3, 0, false, new ItemStack(NostrumItems.reagentSeedEssence));
 
-		NostrumResearch.startBuilding().parent("magic_token").lore(NostrumItems.resourceToken).quest("lvl3")
+		NostrumResearch.startBuilding().parent("magic_token").lore(NostrumItems.resourceToken).tier(EMagicTier.KANI)
 				.reference("ritual::kani", "ritual.kani.name").build("kani", NostrumResearchTab.MYSTICISM, Size.NORMAL,
 						-1, 1, true, new ItemStack(NostrumItems.crystalMedium));
 
-		NostrumResearch.startBuilding().parent("kani").quest("lvl7").lore(NostrumItems.resourceToken)
+		NostrumResearch.startBuilding().parent("kani").tier(EMagicTier.VANI).lore(NostrumItems.resourceToken)
 				.reference("ritual::vani", "ritual.vani.name").build("vani", NostrumResearchTab.MYSTICISM, Size.LARGE,
 						-1, 2, true, new ItemStack(NostrumItems.crystalLarge));
 
@@ -1742,7 +1742,7 @@ public class ModInit {
 				.build("enchanted_weapons", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 1, true,
 						new ItemStack(AspectedWeapon.get(EMagicElement.WIND, AspectedWeapon.Type.MASTER)));
 
-		NostrumResearch.startBuilding().hiddenParent("rituals").quest("lvl4")
+		NostrumResearch.startBuilding().hiddenParent("rituals").tier(EMagicTier.KANI)
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true,
 						new ItemStack(MagicArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, MagicArmor.Type.MASTER)));
@@ -1802,7 +1802,7 @@ public class ModInit {
 						MagicCharm.getCharm(EMagicElement.ENDER, 1));
 
 		// Tinkering
-		NostrumResearch.startBuilding().parent("rituals").quest("lvl4").reference(NostrumItems.positionCrystal).build(
+		NostrumResearch.startBuilding().parent("rituals").tier(EMagicTier.KANI).reference(NostrumItems.positionCrystal).build(
 				"geogems", NostrumResearchTab.TINKERING, Size.LARGE, 1, -1, false,
 				new ItemStack(NostrumItems.positionCrystal));
 
@@ -1812,7 +1812,7 @@ public class ModInit {
 
 		NostrumResearch.startBuilding().parent("geotokens").hiddenParent("markrecall").hiddenParent("balanced_infusion")
 				// .lore(NostrumItems.positionToken)
-				.quest("lvl10").reference("builtin::guides::obelisks", "info.obelisks.name")
+				.tier(EMagicTier.VANI).reference("builtin::guides::obelisks", "info.obelisks.name")
 				.reference("ritual::create_obelisk", "ritual.create_obelisk.name").build("obelisks",
 						NostrumResearchTab.TINKERING, Size.GIANT, 2, 2, true,
 						new ItemStack(NostrumBlocks.dungeonBlock));
@@ -1822,11 +1822,11 @@ public class ModInit {
 						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 3, true, new ItemStack(NostrumBlocks.sorceryPortal));
 
 		NostrumResearch.startBuilding().parent("geogems").hiddenParent("markrecall").lore(NostrumItems.positionCrystal)
-				.quest("lvly").reference("ritual::teleportrune", "ritual.teleportrune.name").build("teleportrune",
+				.reference("ritual::teleportrune", "ritual.teleportrune.name").build("teleportrune",
 						NostrumResearchTab.TINKERING, Size.NORMAL, 2, 0, true, new ItemStack(NostrumBlocks.teleportRune));
 
 		NostrumResearch.startBuilding().parent("geogems").hiddenParent("item_duct").lore(NostrumItems.positionCrystal)
-				.quest("lvly").reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
+				.tier(EMagicTier.KANI).reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
 				.build("paradox_mirrors", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 0, true,
 						new ItemStack(NostrumBlocks.paradoxMirror));
 
@@ -1916,7 +1916,7 @@ public class ModInit {
 				.build("wolf_transformation", NostrumResearchTab.MAGICA, Size.GIANT, 4, 0, true,
 						new ItemStack(Items.BONE));
 
-		NostrumResearch.startBuilding().hiddenParent("enchanted_armor_adv").hiddenParent("soul_daggers").quest("lvl10")
+		NostrumResearch.startBuilding().hiddenParent("enchanted_armor_adv").hiddenParent("soul_daggers").tier(EMagicTier.VANI)
 				.reference("ritual::mana_armorer", "ritual.mana_armorer.name").build("mana_armor",
 						NostrumResearchTab.ADVANCED_MAGICA, Size.GIANT, 1, 0, true,
 						new ItemStack(NostrumBlocks.manaArmorerBlock));
