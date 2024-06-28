@@ -111,7 +111,7 @@ public class SpellIngredientBuilder {
 	}
 	
 	public float getCurrentEfficiency() {
-		if (base.element == null) {
+		if (base.element == null && base.alteration == null) {
 			return 1f;
 		}
 		

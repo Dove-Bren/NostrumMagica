@@ -97,7 +97,8 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 					.mergeStyle(manaRateModifier < 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (efficiencyModifier != 0) {
-			lines.add(new TranslationTextComponent("spellcraftmod.efficiency", (efficiencyModifier < 0 ? "" : "+"), efficiencyModifier)
+			final int effPerc = (int) (efficiencyModifier * 100);
+			lines.add(new TranslationTextComponent("spellcraftmod.efficiency", (efficiencyModifier < 0 ? "" : "+"), effPerc)
 					.mergeStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementCountModifier != 0) {

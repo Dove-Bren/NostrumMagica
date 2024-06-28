@@ -373,7 +373,9 @@ public class SpellCrafting {
 			} else if (ingredient.alteration != null) {
 				if (element != null) {
 					weightBonus += ingredient.weight;
-					manaRate += (ingredient.manaRate - 1f);
+					manaRate += (ingredient.manaRate-1f);
+					efficiency += (ingredient.efficiency-1f);
+					elementCount += ingredient.elementCountBonus;
 					flushEffect(idx, ingredient.alteration);
 				} else {
 					if (errorsOut != null) {
