@@ -344,7 +344,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		protected void updateResearchState() {
 			if (NostrumMagica.getCompletedResearch(subscreen.player).contains(research))
 				state = ResearchState.COMPLETED;
-			else if (NostrumMagica.canPurchaseResearch(subscreen.player, research))
+			else if (!research.isPurchaseDisallowed() && NostrumMagica.canPurchaseResearch(subscreen.player, research))
 				state = ResearchState.INACTIVE;
 			else
 				state = ResearchState.UNAVAILABLE;
@@ -695,6 +695,9 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			} else if (this.state == ResearchState.COMPLETED) {
 				tooltip.add(new StringTextComponent(" "));
 				tooltip.add(new TranslationTextComponent("info.research.view").mergeStyle(TextFormatting.GREEN));
+			} else if (research.isPurchaseDisallowed()) {
+				tooltip.add(new StringTextComponent(" "));
+				tooltip.add(new TranslationTextComponent("info.research.disallowed").mergeStyle(TextFormatting.DARK_AQUA));
 			}
 			
 			return tooltip;

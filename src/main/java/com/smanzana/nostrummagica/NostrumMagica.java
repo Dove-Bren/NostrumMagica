@@ -581,7 +581,7 @@ public class NostrumMagica {
 		if (finished.contains(research.getKey())) {
 			return true;
 		}
-
+		
 		if (research.isHidden()) {
 			return canPurchaseResearch(player, research);
 		}
@@ -608,6 +608,10 @@ public class NostrumMagica {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
+		
+		if (research.isPurchaseDisallowed()) {
+			return false;
+		}
 
 		// Check requirements
 		if (research.getRequirements() != null && research.getRequirements().length != 0) {

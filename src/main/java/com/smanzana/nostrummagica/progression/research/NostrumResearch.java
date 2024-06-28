@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenIndexed;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -16,6 +17,7 @@ import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.requirement.LoreRequirement;
 import com.smanzana.nostrummagica.progression.requirement.QuestRequirement;
 import com.smanzana.nostrummagica.progression.requirement.SpellKnowledgeRequirement;
+import com.smanzana.nostrummagica.progression.requirement.TierRequirement;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -75,6 +77,12 @@ public class NostrumResearch {
 	protected final boolean hidden;
 	
 	/**
+	 * If true, don't let players purchase the research like normal.
+	 * Typically this is because the research is awarded from other means, like a ResearchTranscriptItem.
+	 */
+	protected final boolean disallowPurchase;
+	
+	/**
 	 * Icon to display
 	 */
 	protected final @Nonnull ItemStack iconItem;
@@ -96,7 +104,7 @@ public class NostrumResearch {
 	
 	protected String[] allParents; // Filled in during validation
 	
-	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon,
+	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, boolean disallowPurchase, @Nonnull ItemStack icon,
 			String[] parents, String[] hiddenParents, String[] linked,
 			IRequirement[] requirements,
 			String[] references, String[] referenceDisplays) {
@@ -105,6 +113,7 @@ public class NostrumResearch {
 		this.x = x;
 		this.y = y;
 		this.hidden = hidden;
+		this.disallowPurchase = disallowPurchase;
 		this.iconItem = icon;
 		this.parentKeys = (parents != null && parents.length == 0) ? null : parents; // empty->null
 		this.hiddenParentKeys = (hiddenParents != null && hiddenParents.length == 0) ? null : hiddenParents;
@@ -175,6 +184,10 @@ public class NostrumResearch {
 	
 	public boolean isHidden() {
 		return hidden;
+	}
+	
+	public boolean isPurchaseDisallowed() {
+		return disallowPurchase;
 	}
 	
 	public NostrumResearchTab getTab() {
@@ -267,6 +280,11 @@ public class NostrumResearch {
 			return this;
 		}
 		
+		public Builder tier(EMagicTier tier) {
+			this.requirements.add(new TierRequirement(tier));
+			return this;
+		}
+		
 		public Builder reference(String reference, String displayAs) {
 			references.add(reference);
 			referenceDisplays.add(displayAs);
@@ -289,7 +307,11 @@ public class NostrumResearch {
 		}
 		
 		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon) {
-			return new NostrumResearch(key, tab, size, x, y, hidden, icon,
+			return build(key, tab, size, x, y, hidden, false, icon);
+		}
+		
+		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, boolean disallowPurchase, @Nonnull ItemStack icon) {
+			return new NostrumResearch(key, tab, size, x, y, hidden, disallowPurchase, icon,
 					parentKeys.isEmpty() ? null : parentKeys.toArray(new String[parentKeys.size()]),
 					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new String[hiddenParentKeys.size()]),
 					linkedKeys.isEmpty() ? null : linkedKeys.toArray(new String[linkedKeys.size()]),

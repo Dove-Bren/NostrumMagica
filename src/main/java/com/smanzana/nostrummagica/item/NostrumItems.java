@@ -324,6 +324,7 @@ public class NostrumItems {
 	@ObjectHolder(CasterWandItem.ID) public static CasterWandItem casterWand;
 	@ObjectHolder(SpellPatternTome.ID) public static SpellPatternTome spellPatternTome;
 	@ObjectHolder(CopyWandItem.ID) public static CopyWandItem copyWand;
+	@ObjectHolder(ResearchTranscriptItem.ID) public static ResearchTranscriptItem researchTranscript;
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -648,6 +649,7 @@ public class NostrumItems {
     	register(registry, new CasterWandItem().setRegistryName(CasterWandItem.ID));
     	register(registry, new SpellPatternTome(PropUnstackable().rarity(Rarity.EPIC)).setRegistryName(SpellPatternTome.ID));
     	register(registry, new CopyWandItem().setRegistryName(CopyWandItem.ID));
+    	register(registry, new ResearchTranscriptItem(PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(ResearchTranscriptItem.ID));
     	
     	// Generate and register spell runes
     	{
