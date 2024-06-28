@@ -194,8 +194,6 @@ public class NostrumMagic implements INostrumMagic {
 			this.giveBasicLore(NostrumItems.blankScroll);
 			this.giveBasicLore(NostrumItems.spellScroll);
 			this.giveBasicLore(NostrumItems.reagentMandrakeRoot);
-			
-			NostrumMagicaSounds.LEVELUP.play(entity);
 		}
 	}
 
@@ -206,6 +204,9 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void setTier(EMagicTier tier) {
+		if (tier != EMagicTier.LOCKED) {
+			this.unlock();
+		}
 		this.tier = tier;
 	}
 	

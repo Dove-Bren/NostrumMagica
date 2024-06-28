@@ -891,6 +891,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	@Override
 	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
+		if (!worldIn.isRemote()) {
+			getTomeID(stack); // Prompt ID generation
+		}
 	}
 	
 	/**

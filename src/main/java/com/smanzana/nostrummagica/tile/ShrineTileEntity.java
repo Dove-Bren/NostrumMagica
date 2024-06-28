@@ -190,7 +190,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		
 		@Override
 		public boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getElementalMastery(this.getElement()).isGreaterOrEqual(EElementalMastery.NOVICE);
+			return attr != null && !attr.getElementalMastery(this.getElement()).isGreaterOrEqual(EElementalMastery.NOVICE);
 		}
 	}
 	
@@ -262,7 +262,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 
 		@Override
 		public boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getAlterations().getOrDefault(this.getAlteration(), false);
+			return attr != null && !attr.getAlterations().getOrDefault(this.getAlteration(), false);
 		}
 	}
 	
@@ -339,7 +339,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 
 		@Override
 		public boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getShapes().contains(this.getShape());
+			return attr != null && !attr.getShapes().contains(this.getShape());
 		}
 	}
 	
@@ -408,7 +408,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 
 		@Override
 		public boolean canPlayerSee(INostrumMagic attr, PlayerEntity player) {
-			return !attr.getTier().isGreaterOrEqual(getTier());
+			return attr != null && !attr.getTier().isGreaterOrEqual(getTier());
 		}
 	}
 	

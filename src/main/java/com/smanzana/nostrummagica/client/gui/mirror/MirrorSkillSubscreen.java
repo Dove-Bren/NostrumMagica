@@ -431,6 +431,9 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			if (this.subscreen.attr.hasSkill(skill)) {
 				tooltip.add(new StringTextComponent(" "));
 				tooltip.add(new StringTextComponent("Owned").mergeStyle(TextFormatting.BOLD, TextFormatting.DARK_GREEN));
+			} else {
+				tooltip.add(new StringTextComponent(" "));
+				tooltip.add(new TranslationTextComponent("info.research.purchase").mergeStyle(TextFormatting.GREEN));
 			}
 			
 			return tooltip;

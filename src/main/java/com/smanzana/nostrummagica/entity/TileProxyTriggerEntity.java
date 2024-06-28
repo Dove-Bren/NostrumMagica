@@ -27,6 +27,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		cacheEntity = null;
 		this.setNoGravity(true);
 		this.setInvulnerable(true);
+		this.enablePersistence();
 	}
 	
 	@Override

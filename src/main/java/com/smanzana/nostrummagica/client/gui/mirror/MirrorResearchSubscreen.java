@@ -336,8 +336,8 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			super(x, y, width, height, StringTextComponent.EMPTY);
 			this.subscreen = subscreen;
 			this.research = research;
-			this.tooltip = genTooltip();
 			updateResearchState();
+			this.tooltip = genTooltip();
 			wasHidden = this.isHidden();
 		}
 		
@@ -690,10 +690,10 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        }
 			
 			if (this.state == ResearchState.INACTIVE && subscreen.attr.getResearchPoints() > 0 && NostrumMagica.canPurchaseResearch(subscreen.player, research)) {
-				tooltip.add(new StringTextComponent(""));
+				tooltip.add(new StringTextComponent(" "));
 				tooltip.add(new TranslationTextComponent("info.research.purchase").mergeStyle(TextFormatting.GREEN));
 			} else if (this.state == ResearchState.COMPLETED) {
-				tooltip.add(new StringTextComponent(""));
+				tooltip.add(new StringTextComponent(" "));
 				tooltip.add(new TranslationTextComponent("info.research.view").mergeStyle(TextFormatting.GREEN));
 			}
 			

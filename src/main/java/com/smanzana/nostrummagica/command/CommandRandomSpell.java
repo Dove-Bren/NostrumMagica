@@ -32,11 +32,11 @@ public class CommandRandomSpell {
 		dispatcher.register(
 				Commands.literal("randomspell")
 					.requires(s -> s.hasPermissionLevel(2))
-					.then(Commands.argument("name", StringArgumentType.greedyString())
+					.then(Commands.argument("name", StringArgumentType.string())
 						.then(Commands.argument("cost", IntegerArgumentType.integer(0)).then(Commands.argument("weight", IntegerArgumentType.integer(0)))
 								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"), IntegerArgumentType.getInteger(ctx, "cost"), IntegerArgumentType.getInteger(ctx, "weight")))
-							))
-						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"))
+							)
+						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name")))
 						)
 					.executes(ctx -> execute(ctx, ""))
 				);

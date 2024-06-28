@@ -18,23 +18,23 @@ public class TrialEnder extends WorldTrial {
 	}
 
 	@SubscribeEvent
-	public void onTeleport(EntityTeleportEvent.EnderEntity e) {
+	public void onTeleport(EntityTeleportEvent e) {
 		
-		if (e.getEntityLiving() instanceof PlayerEntity) {
+		if (e.getEntity() instanceof PlayerEntity) {
 
-			Vector3d pos = e.getEntityLiving().getPositionVec();
+			Vector3d pos = e.getEntity().getPositionVec();
 			if (pos.squareDistanceTo(e.getTargetX(), e.getTargetY(), e.getTargetZ())
 					< 10000)
 				return; // 100x100
 			
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityLiving());
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntity());
 			if (attr == null || !attr.isUnlocked())
 				return;
 			
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			this.complete((PlayerEntity) e.getEntityLiving());
+			this.complete((PlayerEntity) e.getEntity());
 		}
 	}
 	

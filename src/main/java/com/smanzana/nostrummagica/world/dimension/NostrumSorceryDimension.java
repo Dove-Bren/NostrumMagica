@@ -5,6 +5,8 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
@@ -15,12 +17,18 @@ import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.PortalInfo;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -441,12 +449,39 @@ public class NostrumSorceryDimension {
 		
 		@SubscribeEvent
 		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
-			if (!checkDimension(event.getInfo().getRenderViewEntity().world)) {
+			final Entity entity = event.getInfo().getRenderViewEntity();
+			if (!checkDimension(entity.world)) {
 				return;
 			}
 			
 			event.setCanceled(true);
-			event.setDensity(.03f);
+			
+			if (entity instanceof LivingEntity && ((LivingEntity)entity).isPotionActive(Effects.BLINDNESS)) {
+				//final Minecraft mc = Minecraft.getInstance();
+				float farPlaneDistance = event.getRenderer().getFarPlaneDistance();
+				//final Vector3d cameraPos = event.getInfo().getProjectedView();
+				//boolean nearFog = ((ClientWorld) entity.world).func_239132_a_().func_230493_a_(MathHelper.floor(cameraPos.getX()), MathHelper.floor(cameraPos.getY())) || mc.ingameGUI.getBossOverlay().shouldCreateFog();
+				
+				int i = ((LivingEntity)entity).getActivePotionEffect(Effects.BLINDNESS).getDuration();
+				float rangeMod = MathHelper.lerp(Math.min(1.0F, (float)i / 20.0F), farPlaneDistance, 5.0F);
+				final float near;
+				final float far;
+				if (event.getType() == FogRenderer.FogType.FOG_SKY) {
+					near = 0.0F;
+					far = rangeMod * 0.8F;
+				} else {
+					near = rangeMod * 0.25F;
+					far = rangeMod;
+				}
+
+				RenderSystem.fogStart(near);
+				RenderSystem.fogEnd(far);
+				RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
+				RenderSystem.setupNvFogDistance();
+				net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
+			} else {
+				event.setDensity(.03f);
+			}
 		}
 		
 		@SubscribeEvent

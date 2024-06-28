@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.util.ItemStacks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
@@ -94,6 +95,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			// Set cooldown directly even though event handler will have already set it.
 			// Using a scroll has more cooldown than noticing other spells being cast.
 			playerIn.getCooldownTracker().setCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
+			
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
 		}
 
 		if (itemStackIn.getDamage() > itemStackIn.getMaxDamage() // Old way, I think never happens?

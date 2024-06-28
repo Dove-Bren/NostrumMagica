@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "nostrummagica:block/redstone_trigger" }
+        "": { "model": "nostrummagica:block/none" }
     }
 }
