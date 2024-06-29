@@ -670,7 +670,10 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			return false;
 		}
 		
-		amount = Math.min(amount, 10f);
+		if (source.getTrueSource() == null || !(source.getTrueSource() instanceof PlayerEntity)
+				|| !((PlayerEntity) source.getTrueSource()).isCreative()) {
+			amount = Math.min(amount, 10f);
+		}
 		
 		if (this.getWeakElement() != null) {
 			// Only let attacks of the right element through

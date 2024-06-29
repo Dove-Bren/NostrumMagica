@@ -9,13 +9,13 @@
   ],
   "key": {
     "L": {
-	  "tag": "forge:gems/lapis"
+	  "item": "minecraft:bedrock"
     },
     "G": {
-	  "tag": "forge:ingots/gold"
+	  "item": "minecraft:bedrock"
     },
     "C": {
-      "item": "minecraft:crafting_table"
+      "item": "minecraft:bedrock"
     }
   }
 }

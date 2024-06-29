@@ -73,9 +73,10 @@ public class BeamShape extends InstantShape {
 				if (trace.getType() == RayTraceResult.Type.MISS)
 					continue;
 				
-				if (trace.getType() == RayTraceResult.Type.ENTITY
-						&& RayTrace.livingFromRaytrace(trace) != null) {
-					targs.add(RayTrace.livingFromRaytrace(trace));
+				if (trace.getType() == RayTraceResult.Type.ENTITY) {
+					if (RayTrace.livingFromRaytrace(trace) != null) {
+						targs.add(RayTrace.livingFromRaytrace(trace));
+					}
 				} else {
 					blocks.add(new SpellLocation(location.world, trace));
 				}
