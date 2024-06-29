@@ -1998,8 +1998,8 @@ public class MagicArmor extends ArmorItem implements IReactiveEquipment, IDragon
 		
 		boolean hasJump = player.movementInput.jump && !jumpPressedEarly;
 		
-		// Start flying
-		if (!flying && hasJump && !player.isOnGround() && player.getMotion().y < 0 && !player.abilities.isFlying) {
+		// Start flying (this logic is meant to match the elytra check)
+		if (!flying && hasJump && !player.isOnGround() && !player.abilities.isFlying && player.isElytraFlying()) {
 			// Does this armor support flying?
 			if (HasElytra(player)) {
 				SetArmorFlying(player, true);
