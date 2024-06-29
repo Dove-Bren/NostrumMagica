@@ -115,6 +115,7 @@ public class NostrumBlocks {
 	@ObjectHolder(TogglePlatformBlock.ID) public static TogglePlatformBlock togglePlatform;
 	@ObjectHolder(CursedGlass.ID) public static CursedGlass cursedGlass;
 	@ObjectHolder(RedstoneTriggerBlock.ID) public static RedstoneTriggerBlock redstoneTrigger;
+	@ObjectHolder(MysticSnowLayerBlock.ID) public static MysticSnowLayerBlock mysticSnowLayer;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -281,6 +282,7 @@ public class NostrumBlocks {
     	registerBlock(new TogglePlatformBlock(), TogglePlatformBlock.ID, registry);
     	registerBlock(new CursedGlass(), CursedGlass.ID, registry);
     	registerBlock(new RedstoneTriggerBlock(), RedstoneTriggerBlock.ID, registry);
+    	registerBlock(new MysticSnowLayerBlock(), MysticSnowLayerBlock.ID, registry);
     }
     
 }
