@@ -706,6 +706,20 @@ public class ModInit {
 								},
 						new ResearchRequirement("stat_items"),
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
+		// Skill mirror (plant)
+		registry
+				.register(RitualRecipe.createTier3("form_primordial_mirror",
+						new ItemStack(NostrumItems.skillMirror), null,
+						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH,
+								ReagentType.SPIDER_SILK },
+						Ingredient.fromTag(Tags.Items.GLASS_PANES),
+						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.SkillItemOoze),
+								Ingredient.fromTag(NostrumTags.Items.SkillItemPendant),
+								Ingredient.fromItems(NostrumItems.resourceEvilThistle),
+								Ingredient.fromTag(NostrumTags.Items.SkillItemFlute)
+								},
+						new ResearchRequirement("stat_items"),
+						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillMirror))));
 
 		// Ooze
 		registry
@@ -927,7 +941,7 @@ public class ModInit {
 				new Ingredient[] { Ingredient.fromItems(Blocks.PURPUR_BLOCK),
 						Ingredient.fromTag(NostrumTags.Items.SlabKind),
 						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
-						Ingredient.fromItems(Blocks.END_ROD)
+						Ingredient.fromItems(NostrumItems.resourceManaLeaf)
 						},
 				new ResearchRequirement("mystic_spelltable"),
 				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mysticSpellTable))));
