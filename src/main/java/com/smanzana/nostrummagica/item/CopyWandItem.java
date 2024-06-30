@@ -80,7 +80,8 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 		if (player.isSneaking()) {
 			Direction face = null;
 			// Figure out facing by looking at clicked pos vs our pos
-			face = Direction.getFacingFromVector((float) (pos.getX() - player.getPosX()), 0f, (float) (pos.getZ() - player.getPosZ()));
+			final BlockPos playerPos = player.getPosition();
+			face = Direction.getFacingFromVector((float) (pos.getX() - playerPos.getX()), 0f, (float) (pos.getZ() - playerPos.getZ()));
 			BlockPos placePos = pos.offset(context.getFace()); // offset by face clicked on
 			if (this.blueprint != null) {
 				// spawn

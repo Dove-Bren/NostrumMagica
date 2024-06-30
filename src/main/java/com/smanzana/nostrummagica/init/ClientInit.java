@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.client.gui.container.RedwoodSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneLibraryGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
+import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
@@ -200,6 +201,8 @@ public class ClientInit {
 		// Register client command registering command.
 		// Note that it's on the game event bus, so it has to be registered special
 		MinecraftForge.EVENT_BUS.addListener(ClientInit::registerCommands);
+		
+		MinecraftForge.EVENT_BUS.addListener(QuickMoveBagButton::OnContainerScreenShow);
 		
 		registerBlockRenderLayer();
 		registerEntityRenderers();

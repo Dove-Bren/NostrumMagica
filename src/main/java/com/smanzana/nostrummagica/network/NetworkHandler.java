@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.network.message.ModifyMessage;
 import com.smanzana.nostrummagica.network.message.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.message.PlayerStatSyncMessage;
+import com.smanzana.nostrummagica.network.message.QuickMoveBagMessage;
 import com.smanzana.nostrummagica.network.message.ReagentBagToggleMessage;
 import com.smanzana.nostrummagica.network.message.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
@@ -117,6 +118,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellCooldownResetMessage.class, SpellCooldownResetMessage::encode, SpellCooldownResetMessage::decode, SpellCooldownResetMessage::handle);
 		syncChannel.registerMessage(discriminator++, VanillaEffectSyncMessage.class, VanillaEffectSyncMessage::encode, VanillaEffectSyncMessage::decode, VanillaEffectSyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, WorldPortalTeleportRequestMessage.class, WorldPortalTeleportRequestMessage::encode, WorldPortalTeleportRequestMessage::decode, WorldPortalTeleportRequestMessage::handle);
+		syncChannel.registerMessage(discriminator++, QuickMoveBagMessage.class, QuickMoveBagMessage::encode, QuickMoveBagMessage::decode, QuickMoveBagMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),

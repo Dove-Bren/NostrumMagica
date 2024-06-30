@@ -10,15 +10,20 @@ import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.Inventories;
+import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
+import com.smanzana.nostrummagica.util.Inventories.IterableInventoryWrapper;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -146,6 +151,29 @@ public class RuneBag extends Item implements ILoreTagged {
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
     }
+	
+	@Override
+	public ActionResultType onItemUse(ItemUseContext context) {
+		if (context.getPlayer().isSneaking()) {
+			// If sneaking, try and do container fast add.
+			final BlockPos pos = context.getPos();
+			final TileEntity te = context.getWorld().getTileEntity(pos);
+			if (te != null) {
+				ItemStack[] contents = getItems(context.getItem());
+				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getWorld().getBlockState(pos), te, context.getFace())) {
+					// Update contents
+					for (int i = 0; i < contents.length; i++) {
+						setItem(context.getItem(), contents[i], i);
+					}
+					return ActionResultType.SUCCESS;
+				}
+			}
+			
+			// Fall through to default behavior if we fail
+		}
+		
+		return super.onItemUse(context);
+	}
 	
 	public static class RuneInventory extends Inventory {
 

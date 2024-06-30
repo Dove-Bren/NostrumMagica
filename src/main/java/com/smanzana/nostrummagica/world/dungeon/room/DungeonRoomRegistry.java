@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.LoadContext;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -211,7 +212,7 @@ public class DungeonRoomRegistry {
 		return nbt;
 	}
 	
-	private final RoomBlueprint loadFromNBT(CompoundNBT nbt, boolean doRegister) {
+	private final RoomBlueprint loadFromNBT(LoadContext context, CompoundNBT nbt, boolean doRegister) {
 		String name = nbt.getString(NBT_NAME);
 		int weight = nbt.getInt(NBT_WEIGHT);
 		
@@ -219,9 +220,11 @@ public class DungeonRoomRegistry {
 			return null;
 		}
 		
+		context.name = name;
+		
 		int cost = nbt.contains(NBT_COST) ? nbt.getInt(NBT_COST) : 1;
 		
-		RoomBlueprint blueprint = RoomBlueprint.fromNBT(nbt.getCompound(NBT_BLUEPRINT));
+		RoomBlueprint blueprint = RoomBlueprint.fromNBT(context, nbt.getCompound(NBT_BLUEPRINT));
 		if (blueprint == null) {
 			return null;
 		}
@@ -247,8 +250,8 @@ public class DungeonRoomRegistry {
 		return blueprint;
 	}
 	
-	public final RoomBlueprint loadFromNBT(CompoundNBT nbt) {
-		return this.loadFromNBT(nbt, false);
+	public final RoomBlueprint loadFromNBT(LoadContext context, CompoundNBT nbt) {
+		return this.loadFromNBT(context, nbt, false);
 	}
 	
 	public final File roomLoadFolder;
@@ -300,7 +303,7 @@ public class DungeonRoomRegistry {
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
-				loadFromNBT(nbt, true);
+				loadFromNBT(new LoadContext(file.getAbsolutePath()), nbt, true);
 			}
 			
 			time = System.currentTimeMillis() - startTime;
@@ -338,7 +341,7 @@ public class DungeonRoomRegistry {
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
-				loadFromNBT(nbt, true);
+				loadFromNBT(new LoadContext(name), nbt, true);
 			}
 			
 			time = System.currentTimeMillis() - startTime;
@@ -381,7 +384,7 @@ public class DungeonRoomRegistry {
 					}
 					startTime = System.currentTimeMillis();
 					
-					root = loadFromNBT(nbt, true);
+					root = loadFromNBT(new LoadContext(subfile.getAbsolutePath()), nbt, true);
 					
 					time = System.currentTimeMillis() - startTime;
 					if (time > 100) {
@@ -417,7 +420,7 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				RoomBlueprint blueprint = loadFromNBT(nbt, false);
+				RoomBlueprint blueprint = loadFromNBT(new LoadContext(subfile.getAbsolutePath()), nbt, false);
 				
 				time = System.currentTimeMillis() - startTime;
 				if (time > 100) {
@@ -470,7 +473,7 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				RoomBlueprint blueprint = loadFromNBT(nbt, root == null);
+				RoomBlueprint blueprint = loadFromNBT(new LoadContext(compName + "/" + fileNames[i]), nbt, root == null);
 				
 				time = System.currentTimeMillis() - startTime;
 				if (time > 100) {

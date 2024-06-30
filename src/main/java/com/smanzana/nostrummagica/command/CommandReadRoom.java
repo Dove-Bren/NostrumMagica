@@ -11,6 +11,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.LoadContext;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -72,7 +73,7 @@ public class CommandReadRoom {
 				}
 				
 				if (nbt != null) {
-					RoomBlueprint blueprint = RoomBlueprint.fromNBT((CompoundNBT) nbt.get("blueprint"));
+					RoomBlueprint blueprint = RoomBlueprint.fromNBT(new LoadContext(file.getAbsolutePath()), (CompoundNBT) nbt.get("blueprint"));
 					if (blueprint != null) {
 						blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing, UUID.randomUUID());
 					} else {

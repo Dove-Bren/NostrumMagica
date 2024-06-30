@@ -1,7 +1,13 @@
 package com.smanzana.nostrummagica.util;
 
-import javax.annotation.Nonnull;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -9,7 +15,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.ChestTileEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class Inventories {
@@ -217,6 +227,55 @@ public class Inventories {
 		}
 	}
 	
+	public static final boolean attemptAddToTile(Iterable<ItemStack> itemsToAdd, BlockState state, TileEntity te, Direction direction) {
+		boolean attemptedAny = false;
+		if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent()) {
+			@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
+			
+			if (handler != null) {
+				attemptedAny = true;
+				Iterator<ItemStack> it = itemsToAdd.iterator();
+				while (it.hasNext()) {
+					ItemStack slotStack = it.next();
+					if (slotStack.isEmpty()) {
+						continue;
+					}
+					
+					ItemStack leftover = addItem(handler, slotStack);
+					if (leftover.isEmpty() || leftover.getCount() != slotStack.getCount()) {
+						slotStack.setCount(leftover.isEmpty() ? 0 : leftover.getCount());
+					}
+				}
+			}
+		} else if (te instanceof IInventory) {
+			
+			IInventory inv = (IInventory) te;
+			
+			// Special cast for stupid chests :P
+			if (te instanceof ChestTileEntity) {
+				if (state != null && state.getBlock() instanceof ChestBlock) {
+					inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, te.getWorld(), te.getPos(), true);
+				}
+			}
+			
+			attemptedAny = true;
+			Iterator<ItemStack> it = itemsToAdd.iterator();
+			while (it.hasNext()) {
+				ItemStack slotStack = it.next();
+				if (slotStack.isEmpty()) {
+					continue;
+				}
+				
+				ItemStack leftover = addItem(inv, slotStack);
+				if (leftover.isEmpty() || leftover.getCount() != slotStack.getCount()) {
+					slotStack.setCount(leftover.isEmpty() ? 0 : leftover.getCount());
+				}
+			}
+		}
+		
+		return attemptedAny;
+	}
+	
 	// TODO make a pool of these and implement a 'set' interface to avoid allocating and deallocing these
 	public static class ItemStackArrayWrapper implements IInventory {
 
@@ -307,6 +366,39 @@ public class Inventories {
 		@Override
 		public boolean isUsableByPlayer(PlayerEntity player) {
 			return true;
+		}
+		
+	}
+	
+	public static class IterableInventoryWrapper implements Iterable<ItemStack> {
+		
+		private final IInventory inventory;
+		
+		public IterableInventoryWrapper(IInventory inventory) {
+			this.inventory = inventory;
+		}
+
+		@Override
+		public Iterator<ItemStack> iterator() {
+			return new Iterator<ItemStack>() {
+				
+				int i = 0;
+
+				@Override
+				public boolean hasNext() {
+					return i < inventory.getSizeInventory();
+				}
+
+				@Override
+				public ItemStack next() {
+					if (hasNext()) {
+						return inventory.getStackInSlot(i++);
+					}
+					
+					throw new NoSuchElementException();
+				}
+				
+			};
 		}
 		
 	}

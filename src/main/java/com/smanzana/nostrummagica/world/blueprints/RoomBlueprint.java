@@ -37,6 +37,20 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class RoomBlueprint implements IBlueprint {
 	
+	public static final class LoadContext {
+		public final String source;
+		public String name;
+		
+		public LoadContext(String source) {
+			this.source = source;
+		}
+		
+		public LoadContext(String source, String name) {
+			this(source);
+			this.name = name;
+		}
+	}
+	
 	public static final class SpawnContext {
 		
 		public final IWorld world;
@@ -535,33 +549,6 @@ public class RoomBlueprint implements IBlueprint {
 		}
 	}
 	
-	private static class BlueprintSavedTE {
-		
-		public static final String NBT_DATA = "te_data";
-		public static final String NBT_POS = "pos";
-		
-		public CompoundNBT nbtTagData;
-		public BlockPos pos;
-		
-		public BlueprintSavedTE(CompoundNBT data, BlockPos pos) {
-			this.nbtTagData = data;
-			this.pos = pos;
-		}
-		
-		@SuppressWarnings("unused")
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
-			tag.put(NBT_DATA, nbtTagData);
-			tag.putLong(NBT_POS, pos.toLong());
-			return tag;
-		}
-		
-		public static BlueprintSavedTE fromNBT(CompoundNBT nbt) {
-			long pos = nbt.getLong(NBT_POS);
-			return new BlueprintSavedTE(nbt.getCompound(NBT_DATA), WorldUtil.blockPosFromLong1_12_2(pos));
-		}
-	}
-	
 	private static RoomBlueprint deserializeNBTStyleInternal(CompoundNBT nbt, byte version) {
 		BlockPos dims = NBTUtil.readBlockPos(nbt.getCompound(NBT_DIMS));
 		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
@@ -625,90 +612,6 @@ public class RoomBlueprint implements IBlueprint {
 		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0, false) == 0 ? dims : masterDims, blocks, doors, entry);
 	}
 	
-	private static RoomBlueprint deserializeVersion1(CompoundNBT nbt) {
-		return deserializeNBTStyleInternal(nbt, (byte)0);
-	}
-	
-	private static RoomBlueprint deserializeVersion2(CompoundNBT nbt) {
-		// Store blocks as int array
-		// Store TileEntities separately since there are likely few of them
-		
-		BlockPos dims = NBTUtil.readBlockPos(nbt.getCompound(NBT_DIMS));
-		// When breaking blueprints into pieces, the first one has an actual copy of the real size of the whole thing.
-		// If we have one of those, allocate the FULL array size instead of the small one
-		BlockPos masterDims = NBTUtil.readBlockPos(nbt.getCompound(NBT_WHOLE_DIMS));
-		BlueprintBlock[] blocks = null;
-		Set<DungeonExitPoint> doors = null;
-		DungeonExitPoint entry = null;
-		
-		if (dims.distanceSq(0, 0, 0, false) == 0) {
-			return null;
-		} else {
-			int[] list = nbt.getIntArray(NBT_BLOCK_LIST);
-			
-			final int count = dims.getX() * dims.getY() * dims.getZ();
-			if (count != list.length) {
-				return null;
-			}
-			
-//			ProgressBar bar = null;
-//			if (!NostrumMagica.initFinished) {
-//				bar = ProgressManager.push("Loading Room", 2);
-//				bar.step("Blocks");
-//			}
-			
-			if (masterDims.distanceSq(0, 0, 0, false) == 0) {
-				blocks = new BlueprintBlock[count];
-			} else {
-				blocks = new BlueprintBlock[masterDims.getX() * masterDims.getY() * masterDims.getZ()];
-			}
-			
-			for (int i = 0; i < count; i++) {
-				int id = list[i];
-				blocks[i] = BlueprintBlock.MakeFromData(id == 0 ? null : Block.getStateById(list[i]), null);
-			}
-			
-			if (nbt.contains(NBT_ENTITIES)) {
-				ListNBT entities = nbt.getList(NBT_ENTITIES, NBT.TAG_COMPOUND);
-				int entCount = entities.size();
-				for (int i = 0; i < entCount; i++) {
-					BlueprintSavedTE te = BlueprintSavedTE.fromNBT(entities.getCompound(i));
-					
-					// Find offset into data blocks, and then transfer data onto that block
-					// BROKE but unused
-//					blocks[
-//					    (te.pos.getX() * dims.getZ() * dims.getY())
-//					    + (te.pos.getY() * dims.getZ())
-//					    + te.pos.getZ()
-//					   ].tileEntityData = te.nbtTagData;
-				}
-			}
-			
-//			if (!NostrumMagica.initFinished && bar != null) {
-//				bar.step("Doors and Exits");
-//			}
-			
-			ListNBT doorList = nbt.getList(NBT_DOOR_LIST, NBT.TAG_COMPOUND);
-			doors = new HashSet<>();
-			
-			int listCount = doorList.size();
-			for (int i = 0; i < listCount; i++) {
-				CompoundNBT tag = doorList.getCompound(i);
-				doors.add(DungeonExitPoint.fromNBT(tag));
-			}
-			
-			if (nbt.contains(NBT_ENTRY)) {
-				entry = DungeonExitPoint.fromNBT(nbt.getCompound(NBT_ENTRY));
-			}
-			
-			if (!NostrumMagica.initFinished) {
-				//ProgressManager.pop(bar);
-			}
-		}
-		
-		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0, false) == 0 ? dims : masterDims, blocks, doors, entry);
-	}
-	
 	private static RoomBlueprint deserializeVersion3(CompoundNBT nbt) {
 		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 2);
 		
@@ -729,91 +632,21 @@ public class RoomBlueprint implements IBlueprint {
 		return blueprint;
 	}
 	
-	public static RoomBlueprint fromNBT(CompoundNBT nbt) {
+	public static RoomBlueprint fromNBT(LoadContext context, CompoundNBT nbt) {
 		byte version = nbt.getByte(NBT_VERSION);
 		switch (version) {
-		case 0:
-			return deserializeVersion1(nbt);
-		case 1:
-			return deserializeVersion2(nbt);
+		//case 0: // Was tag per block with block ID as int and TE data on that tag
+		//case 1: // Was one giant int array for block(states) and a seperate tag array for TE
 		case 2:
+			NostrumMagica.logger.warn(context.name + ": Blueprint is using a deprecated version: " + context.source);
 			return deserializeVersion3(nbt);
 		case 3:
 			return deserializeVersion4(nbt);
 		default:
-			NostrumMagica.logger.fatal("Blueprint has version we don't understand");
-			throw new RuntimeException("Could not parse blueprint version " + version);
+			NostrumMagica.logger.fatal(context.name + ": Blueprint has version we don't understand: " + context.source);
+			throw new RuntimeException(context.name + ": Could not parse blueprint version " + version + ": " + context.source);
 		}
 	}
-	
-//	public CompoundNBT toNBT() {
-//		CompoundNBT nbt = new CompoundNBT();
-//		ListNBT entList = new ListNBT();
-//		int[] blockList = new int[this.blocks.length];
-//		
-//		for (int i = 0; i < blocks.length; i++) {
-//			BlockState state = this.blocks[i].getState();
-//			if (state == null) {
-//				blockList[i] = 0;
-//			} else {
-//				blockList[i] = Block.getStateId(this.blocks[i].getState());
-//			}
-//			if (this.blocks[i].tileEntityData != null) {
-//				BlueprintSavedTE te = new BlueprintSavedTE(
-//						this.blocks[i].tileEntityData,
-//						new BlockPos(i / (dimensions.getZ() * dimensions.getY()),
-//								((i / dimensions.getZ()) % dimensions.getY()),
-//								(i % dimensions.getZ())));
-//				entList.add(te.toNBT());
-//			}
-//		}
-//		
-//		nbt.setIntArray(NBT_BLOCK_LIST, blockList);
-//		nbt.put(NBT_ENTITIES, entList);
-//		nbt.put(NBT_DIMS, NBTUtil.createPosTag(dimensions));
-//		if (this.entry != null) {
-//			nbt.put(NBT_ENTRY, entry.toNBT());
-//		}
-//		if (this.doors != null && !this.doors.isEmpty()) {
-//			ListNBT doorList = new ListNBT();
-//			for (DungeonExitPoint door : doors) {
-//				doorList.add(door.toNBT());
-//			}
-//			nbt.put(NBT_DOOR_LIST, doorList);
-//		}
-//		
-//		nbt.setByte(NBT_VERSION, (byte)1);
-//		return nbt;
-//	}
-	
-	// Version 1
-//	public CompoundNBT toNBT() {
-//		CompoundNBT nbt = new CompoundNBT();
-//		ListNBT list = new ListNBT();
-//		
-//		if (blocks != null) {
-//			for (int i = 0; i < blocks.length; i++) {
-//				list.add(blocks[i].toNBT());
-//			}
-//		}
-//		
-//		nbt.put(NBT_BLOCK_LIST, list);
-//		nbt.put(NBT_DIMS, NBTUtil.createPosTag(dimensions));
-//		if (this.entry != null) {
-//			nbt.put(NBT_ENTRY, entry.toNBT());
-//		}
-//		if (this.doors != null && !this.doors.isEmpty()) {
-//			list = new ListNBT();
-//			for (DungeonExitPoint door : doors) {
-//				list.add(door.toNBT());
-//			}
-//			nbt.put(NBT_DOOR_LIST, list);
-//		}
-//		
-//		nbt.setByte(NBT_VERSION, (byte)0);
-//		
-//		return nbt;
-//	}
 	
 	public CompoundNBT toNBT() {
 		if (shouldSplit()) {
@@ -882,57 +715,6 @@ public class RoomBlueprint implements IBlueprint {
 			
 		};
 	}
-	
-//	// Version 3
-//	protected CompoundNBT toNBTInternal(int startIdx, int count) {
-//		
-//		CompoundNBT nbt = new CompoundNBT();
-//		ListNBT list = new ListNBT();
-//		final int endIdx = Math.min(blocks.length, startIdx + count);
-//		
-//		if (blocks != null) {
-//			for (int i = startIdx; i < endIdx; i++) {
-//				list.add(blocks[i].toNBT());
-//			}
-//		}
-//		
-//		nbt.put(NBT_BLOCK_LIST, list);
-//		{
-//			// If whole struct, just dump dims
-//			if (startIdx == 0 && endIdx == blocks.length) {
-//				nbt.put(NBT_DIMS, NBTUtil.writeBlockPos(dimensions));
-//			} else {
-//				// Else figure out how big it was
-//				final int numBlocks = endIdx - startIdx;
-//				final int base = dimensions.getY() * dimensions.getZ();
-//				nbt.put(NBT_DIMS, NBTUtil.writeBlockPos(new BlockPos(numBlocks / base, dimensions.getY(), dimensions.getZ())));
-//			}
-//		}
-//		if (this.entry != null) {
-//			nbt.put(NBT_ENTRY, entry.toNBT());
-//		}
-//		
-//		// First blueprint (when splitting) has all the extra pieces
-//		if (startIdx == 0) {
-//			if (this.doors != null && !this.doors.isEmpty()) {
-//				list = new ListNBT();
-//				for (DungeonExitPoint door : doors) {
-//					list.add(door.toNBT());
-//				}
-//				nbt.put(NBT_DOOR_LIST, list);
-//			}
-//			
-//			// Master ALSO has the REAL size, so we can allocate all the space up front instead of resizing
-//			nbt.put(NBT_WHOLE_DIMS, NBTUtil.writeBlockPos(dimensions));
-//		} else {
-//			// Others have their row offset recorded
-//			nbt.putInt(NBT_PIECE_OFFSET, startIdx / (dimensions.getY() * dimensions.getZ()));
-//		}
-//		
-//		nbt.putByte(NBT_VERSION, (byte)2);
-//		
-//		return nbt;
-//	}
 	
 	// Version 4
 	protected CompoundNBT toNBTInternal(int startIdx, int count) {

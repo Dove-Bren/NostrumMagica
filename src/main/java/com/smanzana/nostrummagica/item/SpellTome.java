@@ -321,6 +321,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		ListNBT tags = new ListNBT(); // new list to replace old
 		nbt.put(NBT_SPELLS, tags);
 		
+		// Also needs to clear out all pages
+		for (int i = 0; i < getPageCount(itemStack); i++) {
+			clearPage(itemStack, i);
+		}
+		
 		itemStack.setTag(nbt);
 	}
 	
@@ -420,6 +425,14 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		ids[slot] = spellID;
 		
 		setPageSpellIDs(itemStack, pageIdx, ids);
+	}
+	
+	private static void clearPage(ItemStack itemStack, int pageIdx) {
+		if (itemStack == null || !(itemStack.getItem() instanceof SpellTome)) {
+			return;
+		}
+		
+		setPageSpellIDs(itemStack, pageIdx, makeDefaultPage(itemStack));
 	}
 	
 	private static int getPageIndex(ItemStack itemStack) {
