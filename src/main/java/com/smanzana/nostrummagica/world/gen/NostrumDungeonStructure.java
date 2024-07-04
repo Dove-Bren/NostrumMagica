@@ -114,9 +114,11 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			final DungeonExitPoint start = new DungeonExitPoint(new BlockPos(x, y, z), Direction.Plane.HORIZONTAL.random(this.rand));
 			List<DungeonRoomInstance> instances = this.dungeon.generate(start);
 			
+			boolean first = true; // This takes advantage of the fact that the starting room is always first in the list.
 			for (DungeonRoomInstance instance : instances) {
-				DungeonPiece piece = new DungeonPiece(instance);
+				DungeonPiece piece = new DungeonPiece(instance, first);
 				components.add(piece);
+				first = false;
 			}
 			
 			this.recalculateStructureSize();
@@ -125,13 +127,25 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 	
 	public static class DungeonPiece extends StructurePiece {
 		
-		protected DungeonRoomInstance instance;
+		protected final DungeonRoomInstance instance;
+		protected final boolean isStart;
 		
-		public DungeonPiece(DungeonRoomInstance instance) {
+		public DungeonPiece(DungeonRoomInstance instance, boolean isStart) {
 			super(DungeonPieceSerializer.instance, 0);
 			this.instance = instance;
+			this.isStart = isStart;
 			
 			this.boundingBox = instance.getBounds();
+			
+			// If is starting, know that we spawn things above ourselves that may not have the same chunk boundaries we do.
+			// So give our struct piece bounding box one extra chunk in either direction for some leeway
+			if (isStart) {
+				this.boundingBox = new MutableBoundingBox(this.boundingBox);
+				this.boundingBox.minX -= 16;
+				this.boundingBox.minZ -= 16;
+				this.boundingBox.maxX += 16;
+				this.boundingBox.maxZ += 16;
+			}
 		}
 		
 		@Override
@@ -160,16 +174,19 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		public static final String PIECE_ID = "nostrummagica:dungeonpiecedynamic";
 		public static final DungeonPieceSerializer instance = new DungeonPieceSerializer();
 		private static final String NBT_DATA = "nostrumdungeondata";
+		private static final String NBT_ISSTART = "isstartingroom";
 
 		@Override
 		public DungeonPiece load(TemplateManager templateManager, CompoundNBT tag) {
 			final CompoundNBT subTag = tag.getCompound(NBT_DATA);
+			final boolean isStart = tag.getBoolean(NBT_ISSTART);
 			DungeonRoomInstance instance = DungeonRoomInstance.fromNBT(subTag);
-			return new DungeonPiece(instance);
+			return new DungeonPiece(instance, isStart);
 		}
 		
 		public static void write(DungeonPiece piece, CompoundNBT tagCompound) {
 			tagCompound.put(NBT_DATA, piece.instance.toNBT(null));
+			tagCompound.putBoolean(NBT_ISSTART, piece.isStart);
 		}
 		
 	}
