@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -20,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
-public class DragonStartRoom extends StaticRoom implements ISpellComponentRoom {
+public class DragonStartRoom extends StaticRoom {
 	
 	public DragonStartRoom() {
 		// End up passing in height to surface?
@@ -120,11 +119,6 @@ public class DragonStartRoom extends StaticRoom implements ISpellComponentRoom {
 				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
 	}
 	
-	@Override
-	public void setComponent(SpellComponentWrapper component) {
-		return;
-	}
-
 	@Override
 	public int getNumExits() {
 		return 2;

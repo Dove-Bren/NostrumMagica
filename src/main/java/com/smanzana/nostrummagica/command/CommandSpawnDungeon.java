@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.command;
 
 import java.util.Random;
+import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -58,7 +59,7 @@ public class CommandSpawnDungeon {
 		}
 		
 		ServerPlayerEntity player = context.getSource().asPlayer();
-		dungeon.spawn(player.world, new DungeonExitPoint(player.getPosition(), Direction.fromAngle(player.rotationYaw)));
+		dungeon.spawn(player.world, new DungeonExitPoint(player.getPosition(), Direction.fromAngle(player.rotationYaw)), UUID.randomUUID());
 		
 		return 0;
 	}

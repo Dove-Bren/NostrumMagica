@@ -15,12 +15,14 @@ import org.apache.commons.lang3.Validate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
@@ -153,9 +155,13 @@ public class NostrumDungeon {
 		doorRooms.clear();
 	}
 	
+	public List<DungeonRoomInstance> generate(DungeonExitPoint start) {
+		return generate(start, new DungeonInstance(UUID.randomUUID()));
+	}
+	
 	// Generates a dungeon, and returns a list of all the instances that were generated.
 	// These can be used to spawn the dungeon in the world.
-	public List<DungeonRoomInstance> generate(DungeonExitPoint start) {
+	public List<DungeonRoomInstance> generate(DungeonExitPoint start, DungeonInstance instance) {
 		// Calculate caches
 		if (endRooms.isEmpty()) {
 			for (IDungeonRoom room : rooms) {
@@ -178,17 +184,20 @@ public class NostrumDungeon {
 			return new ArrayList<>();
 		}
 		
-		DungeonGenerationContext context = new DungeonGenerationContext(this, rand);
-		Path startPath = new Path(new DungeonRoomInstance(start, this.starting, false)); // Note: false means starting won't ever have key
+		DungeonGenerationContext context = new DungeonGenerationContext(this, rand, instance);
+		Path startPath = new Path(new DungeonRoomInstance(start, this.starting, false, instance, MakeNewRoomID(context))); // Note: false means starting won't ever have key
 		
 		startPath.generateChildren(context, pathLen + rand.nextInt(pathRand), ending);
 		
 		return startPath.getInstances();
 	}
 	
-	// Generates and then spawns a dungeon in the world.
-	public void spawn(IWorld world, DungeonExitPoint start) {
-		List<DungeonRoomInstance> dungeonInstances = generate(start);
+	// Generates and then spawns a dungeon in the world immediately.
+	// This doesn't do the normal structure spawning that works well on background threads
+	// and instead does a blocking generate + block spawning.
+	public void spawn(IWorld world, DungeonExitPoint start, UUID dungeonID) {
+		DungeonInstance dungeon = new DungeonInstance(dungeonID);
+		List<DungeonRoomInstance> dungeonInstances = generate(start, dungeon);
 		
 		// Iterate and spawn instances
 		// TODO I used to make sure to spawn the 'end room' last so it didn't get stomped.
@@ -251,11 +260,34 @@ public class NostrumDungeon {
 		public final NostrumDungeon dungeon;
 		public final List<MutableBoundingBox> boundingBoxes;
 		public final Random rand;
+		public final DungeonInstance instance;
 		
-		public DungeonGenerationContext(NostrumDungeon dungeon, Random rand) {
+		public DungeonGenerationContext(NostrumDungeon dungeon, Random rand, DungeonInstance instance) {
 			this.dungeon = dungeon;
 			this.rand = rand;
-			boundingBoxes = new ArrayList<>(32);
+			this.boundingBoxes = new ArrayList<>(32);
+			this.instance = instance;
+		}
+	}
+	
+	public static class DungeonInstance {
+		private final UUID dungeonID;
+		
+		public DungeonInstance(UUID dungeonID) {
+			this.dungeonID = dungeonID;
+		}
+		
+		public UUID getDungeonID() {
+			return this.dungeonID;
+		}
+		
+		public INBT toNBT() {
+			return NBTUtil.func_240626_a_(this.dungeonID);
+		}
+		
+		public static DungeonInstance FromNBT(INBT nbt) {
+			UUID id = NBTUtil.readUniqueId(nbt);
+			return new DungeonInstance(id);
 		}
 	}
 	
@@ -263,11 +295,15 @@ public class NostrumDungeon {
 		private final DungeonExitPoint entry;
 		private final IDungeonRoom template;
 		private final boolean hasKey; // whether the key should be in this room
+		private final DungeonInstance dungeonInstance;
+		private final UUID roomID;
 		
-		public DungeonRoomInstance(DungeonExitPoint entry, IDungeonRoom template, boolean hasKey) {
+		public DungeonRoomInstance(DungeonExitPoint entry, IDungeonRoom template, boolean hasKey, DungeonInstance dungeonInstance, @Nonnull UUID roomID) {
 			this.entry = entry;
 			this.template = template;
 			this.hasKey = hasKey;
+			this.dungeonInstance = dungeonInstance;
+			this.roomID = roomID;
 		}
 
 		public MutableBoundingBox getBounds() {
@@ -280,8 +316,7 @@ public class NostrumDungeon {
 		
 		public void spawn(IWorld world, MutableBoundingBox bounds) {
 			// Spawn room template
-			UUID id = UUID.randomUUID();
-			template.spawn(world, this.entry, bounds, id);
+			template.spawn(world, this.entry, bounds, this.roomID);
 			
 			// If we have a key, do special key placement
 			if (this.hasKey) {
@@ -321,6 +356,8 @@ public class NostrumDungeon {
 		private static final String NBT_ENTRY = "entry";
 		private static final String NBT_TEMPLATE = "template";
 		private static final String NBT_HASKEY = "hasKey";
+		private static final String NBT_DUNGEON_INSTANCE = "dungeonInstance";
+		private static final String NBT_ROOM_ID = "roomID";
 		
 		public @Nonnull CompoundNBT toNBT(@Nullable CompoundNBT tag) {
 			if (tag == null) {
@@ -330,6 +367,8 @@ public class NostrumDungeon {
 			tag.put(NBT_ENTRY, this.entry.toNBT());
 			tag.putString(NBT_TEMPLATE, this.template.getRoomID());
 			tag.putBoolean(NBT_HASKEY, this.hasKey);
+			tag.put(NBT_DUNGEON_INSTANCE, this.dungeonInstance.toNBT());
+			tag.putUniqueId(NBT_ROOM_ID, roomID);
 			
 			return tag;
 		}
@@ -338,8 +377,10 @@ public class NostrumDungeon {
 			final DungeonExitPoint entry = DungeonExitPoint.fromNBT(tag.getCompound(NBT_ENTRY));
 			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(tag.getString(NBT_TEMPLATE));
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
+			final DungeonInstance instance = DungeonInstance.FromNBT(tag.get(NBT_DUNGEON_INSTANCE));
+			final UUID roomID = tag.getUniqueId(NBT_ROOM_ID);
 			
-			return new DungeonRoomInstance(entry, template, hasKey);
+			return new DungeonRoomInstance(entry, template, hasKey, instance, roomID);
 		}
 	}
 	
@@ -480,11 +521,11 @@ public class NostrumDungeon {
 			if (remaining <= 0) {
 				// Terminal
 				if (ending != null) {
-					this.myRoom = new DungeonRoomInstance(entry, ending, false);
+					this.myRoom = new DungeonRoomInstance(entry, ending, false, context.instance, MakeNewRoomID(context));
 				} else if (this.hasKey) {
-					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true);
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true, context.instance, MakeNewRoomID(context));
 				} else {
-					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(context, entry), false);
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(context, entry), false, context.instance, MakeNewRoomID(context));
 				}
 				
 				if (myRoom != null) {
@@ -501,18 +542,18 @@ public class NostrumDungeon {
 				myRoom = null;
 				if (hasKey) {
 					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true);
+						myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true, context.instance, MakeNewRoomID(context));
 						hasKey = false;
 					}
 				} else if (hasDoor) {
 					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						myRoom = new DungeonRoomInstance(entry, pickRandomDoorRoom(context, entry), false);
+						myRoom = new DungeonRoomInstance(entry, pickRandomDoorRoom(context, entry), false, context.instance, MakeNewRoomID(context));
 						hasDoor = false;
 					}
 				}
 				
 				if (myRoom == null) {
-					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(context, entry, remaining), false);
+					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(context, entry, remaining), false, context.instance, MakeNewRoomID(context));
 				}
 
 				if (myRoom != null) {
@@ -639,5 +680,15 @@ public class NostrumDungeon {
 			out = out.rotateY();
 			
 		return new DungeonExitPoint(pos, out);
+	}
+	
+	/**
+	 * Generate a new room ID based on the current generation context.
+	 * Uses the context's random to provide a consistent ID that is also based on the dungeon ID.
+	 * @param context
+	 * @return
+	 */
+	protected static final UUID MakeNewRoomID(DungeonGenerationContext context) {
+		return NetUtils.CombineUUIDs(context.instance.getDungeonID(), NetUtils.RandomUUID(context.rand));
 	}
 }

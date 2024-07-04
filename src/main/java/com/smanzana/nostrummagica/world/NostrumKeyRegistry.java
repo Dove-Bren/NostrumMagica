@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.PortingUtil;
 
 import net.minecraft.nbt.CompoundNBT;
@@ -40,7 +41,7 @@ public class NostrumKeyRegistry extends WorldSavedData {
 		}
 		
 		public NostrumWorldKey() {
-			this(UUID.randomUUID());;//, 0xFF000000 | NostrumMagica.rand.nextInt());
+			this(UUID.randomUUID());//, 0xFF000000 | NostrumMagica.rand.nextInt());
 		}
 		
 		/**
@@ -52,9 +53,11 @@ public class NostrumKeyRegistry extends WorldSavedData {
 		 * @return
 		 */
 		public NostrumWorldKey mutateWithID(UUID id) {
-			final long most = this.id.getMostSignificantBits() ^ id.getMostSignificantBits();
-			final long least = this.id.getLeastSignificantBits() ^ id.getLeastSignificantBits();
-			return new NostrumWorldKey(new UUID(least, most));
+			return new NostrumWorldKey(NetUtils.CombineUUIDs(this.id, id));
+		}
+		
+		public NostrumWorldKey mutateWithKey(NostrumWorldKey other) {
+			return mutateWithID(other.id);
 		}
 		
 		public CompoundNBT asNBT() {

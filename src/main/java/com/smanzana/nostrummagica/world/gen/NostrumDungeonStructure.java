@@ -173,6 +173,7 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		
 		public static final String PIECE_ID = "nostrummagica:dungeonpiecedynamic";
 		public static final DungeonPieceSerializer instance = new DungeonPieceSerializer();
+		
 		private static final String NBT_DATA = "nostrumdungeondata";
 		private static final String NBT_ISSTART = "isstartingroom";
 

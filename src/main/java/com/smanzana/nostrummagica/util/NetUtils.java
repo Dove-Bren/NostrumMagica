@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.util;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.UUID;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableList;
@@ -76,6 +78,25 @@ public class NetUtils {
 			}
 		}
 		return mapToFill;
+	}
+	
+	public static final UUID CombineUUIDs(UUID left, UUID right) {
+		final long most = left.getMostSignificantBits() ^ right.getMostSignificantBits();
+		final long least = left.getLeastSignificantBits() ^ right.getLeastSignificantBits();
+		return new UUID(least, most);
+	}
+	
+	/**
+	 * Weaker version of {@link UUID#randomUUID()} that uses the provided random number provider
+	 * instead of a default cryptographically-secure one.
+	 * @param rand
+	 * @return
+	 */
+	public static final UUID RandomUUID(Random rand) {
+		return new UUID(
+				rand.nextLong(),
+				rand.nextLong()
+				);
 	}
 	
 }
