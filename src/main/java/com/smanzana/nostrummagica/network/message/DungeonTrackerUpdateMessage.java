@@ -4,9 +4,10 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.listener.DungeonTracker.DungeonRecord;
+import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -34,23 +35,29 @@ public class DungeonTrackerUpdateMessage {
 	}
 		
 	private final @Nonnull UUID id;
-	private final @Nonnull DungeonRecord record;
+	private final @Nullable DungeonRecord record;
 	
-	public DungeonTrackerUpdateMessage(@Nonnull UUID id, @Nonnull DungeonRecord record) {
+	public DungeonTrackerUpdateMessage(@Nonnull UUID id, @Nullable DungeonRecord record) {
 		this.id = id;
 		this.record = record;
 	}
 
 	public static DungeonTrackerUpdateMessage decode(PacketBuffer buf) {
 		UUID id = buf.readUniqueId();
-		DungeonRecord record = DungeonRecord.FromNBT(buf.readCompoundTag());
+		DungeonRecord record = null;
+		if (buf.readBoolean()) {
+			record = DungeonRecord.FromNBT(buf.readCompoundTag());
+		}
 		
 		return new DungeonTrackerUpdateMessage(id, record);
 	}
 
 	public static void encode(DungeonTrackerUpdateMessage msg, PacketBuffer buf) {
 		buf.writeUniqueId(msg.id);
-		buf.writeCompoundTag(msg.record.toNBT());
+		buf.writeBoolean(msg.record != null);
+		if (msg.record != null) {
+			buf.writeCompoundTag(msg.record.toNBT());
+		}		
 	}
 
 }

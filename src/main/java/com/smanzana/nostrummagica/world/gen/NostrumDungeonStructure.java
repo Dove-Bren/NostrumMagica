@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
@@ -105,22 +106,23 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		return random;
 	}
 	
-	public static final @Nullable DungeonInstance GetDungeonAt(ServerWorld world, BlockPos at, NostrumDungeonStructure structure) {
+	public static final @Nullable DungeonRecord GetDungeonAt(ServerWorld world, BlockPos at, NostrumDungeonStructure structure) {
 		// Would like to consider using GetContainingStructure() and use the start, but the start can't carry instance info through a write/read.
 		StructurePiece piece = WorldUtil.GetContainingStructurePiece(world, at, structure, true);
 		if (piece != null && piece instanceof DungeonPiece) {
-			return ((DungeonPiece) piece).instance.getDungeonInstance();
+			return new DungeonRecord(structure, ((DungeonPiece) piece).instance.getDungeonInstance());
 		}
 		return null;
 	}
 	
-	private static final NostrumDungeonStructure[] TYPES = {NostrumStructures.DUNGEON_PORTAL, NostrumStructures.DUNGEON_DRAGON, NostrumStructures.DUNGEON_PLANTBOSS};
+	// structures aren't set up by the first time this is set up.
+	//private static final NostrumDungeonStructure[] TYPES = {NostrumStructures.DUNGEON_PORTAL, NostrumStructures.DUNGEON_DRAGON, NostrumStructures.DUNGEON_PLANTBOSS};
 	
-	public static final @Nullable DungeonInstance GetDungeonAt(ServerWorld world, BlockPos at) {
+	public static final @Nullable DungeonRecord GetDungeonAt(ServerWorld world, BlockPos at) {
 		for (NostrumDungeonStructure structure : new NostrumDungeonStructure[] {NostrumStructures.DUNGEON_PORTAL, NostrumStructures.DUNGEON_DRAGON, NostrumStructures.DUNGEON_PLANTBOSS}) {
-			@Nullable DungeonInstance instance = GetDungeonAt(world, at, structure);
-			if (instance != null) {
-				return instance;
+			@Nullable DungeonRecord record = GetDungeonAt(world, at, structure);
+			if (record != null) {
+				return record;
 			}
 		}
 		return null;

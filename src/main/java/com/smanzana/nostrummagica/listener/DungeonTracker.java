@@ -12,12 +12,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.DungeonTrackerUpdateMessage;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
+import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
@@ -36,38 +35,6 @@ import net.minecraftforge.fml.LogicalSidedProvider;
  */
 public class DungeonTracker {
 	
-	public static final class DungeonRecord {
-		public final @Nullable DungeonInstance instance;
-		
-		public DungeonRecord(@Nullable DungeonInstance instance) {
-			this.instance = instance;
-		}
-		
-		@Override
-		public int hashCode() {
-			return instance.hashCode() * 5441 + 91;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			return o instanceof DungeonRecord && Objects.equals(((DungeonRecord) o).instance, this.instance);
-		}
-		
-		private static final String NBT_INSTANCE = "instance";
-		
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
-			if (instance != null) {
-				tag.put(NBT_INSTANCE, instance.toNBT());
-			}
-			return tag;
-		}
-		
-		public static final DungeonRecord FromNBT(CompoundNBT nbt) {
-			return new DungeonRecord(nbt.contains(NBT_INSTANCE) ? DungeonInstance.FromNBT(nbt.get(NBT_INSTANCE)) : null);
-		}
-	}
-
 	private final Map<PlayerEntity, DungeonRecord> dungeonMap;
 	
 	public DungeonTracker() {
@@ -76,33 +43,33 @@ public class DungeonTracker {
 	}
 	
 	public DungeonRecord getDungeon(PlayerEntity player) {
-		return dungeonMap.computeIfAbsent(player, p -> new DungeonRecord(null));
+		return dungeonMap.get(player);
 	}
 	
-	protected void setDungeon(PlayerEntity player, DungeonRecord record) {
+	protected void setDungeon(PlayerEntity player, @Nullable DungeonRecord record) {
 		DungeonRecord prev = this.dungeonMap.put(player, record);
-		if ((prev == null || !prev.equals(record)) && !player.getEntityWorld().isRemote()) {
+		if ((prev == null || !Objects.equals(prev, record)) && !player.getEntityWorld().isRemote()) {
 			notifyPlayer((ServerPlayerEntity) player);
 		}
 	}
 	
 	protected void notifyPlayer(ServerPlayerEntity player) {
-		DungeonRecord record = this.getDungeon(player);
+		@Nullable DungeonRecord record = this.getDungeon(player);
 		NetworkHandler.sendTo(new DungeonTrackerUpdateMessage(player.getUniqueID(), record), player);
 	}
 	
-	public void overrideClientDungeon(PlayerEntity player, DungeonRecord record) {
+	public void overrideClientDungeon(PlayerEntity player, @Nullable DungeonRecord record) {
 		this.setDungeon(player, record);
 	}
 	
 	protected void updatePlayer(ServerPlayerEntity player) {
-		final @Nullable DungeonInstance current;
+		final @Nullable DungeonRecord current;
 		if (!player.isAlive()) {
 			current = null;
 		} else {
 			current = NostrumDungeonStructure.GetDungeonAt(player.getServerWorld(), player.getPosition());
 		}
-		setDungeon(player, new DungeonRecord(current));
+		setDungeon(player, current);
 	}
 	
 	@SubscribeEvent
@@ -126,7 +93,7 @@ public class DungeonTracker {
 			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 			if (player != null) {
 				DungeonRecord record = getDungeon(player);
-				if (record.instance != null) {
+				if (record != null) {
 					Random rand = player.world.rand;
 					final float range = 15;
 					for (int i = 0; i < 15; i++) {
