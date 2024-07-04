@@ -3,9 +3,13 @@ package com.smanzana.nostrummagica.world.gen;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
@@ -38,6 +42,7 @@ import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.server.ServerWorld;
 
 public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig> {
 	
@@ -93,14 +98,34 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		return GenerationStage.Decoration.SURFACE_STRUCTURES;
 	}
 	
+	protected static final SharedSeedRandom MakeRandom(int x, int z, long seed) {
+		// Copied from vanilla structure starts which all do this to make their random
+		SharedSeedRandom random = new SharedSeedRandom();
+		random.setLargeFeatureSeed(seed, x, z);
+		return random;
+	}
+	
+	public static final @Nullable DungeonInstance GetDungeonAt(ServerWorld world, BlockPos at, NostrumDungeonStructure structure) {
+		// Would like to consider using GetContainingStructure() and use the start, but the start can't carry instance info through a write/read.
+		StructurePiece piece = WorldUtil.GetContainingStructurePiece(world, at, structure, true);
+		if (piece != null && piece instanceof DungeonPiece) {
+			return ((DungeonPiece) piece).instance.getDungeonInstance();
+		}
+		return null;
+	}
+	
 	// What is basically an 'instance' of the struct in MC gen. Doesn't have to do much besides generate logical dungeon and populate children list.
 	public static class Start extends StructureStart<NoFeatureConfig> {
 		
 		private final NostrumDungeon dungeon;
+		private final DungeonInstance instance;
+		
+		//private static final String NBT_INSTNACE = "dungeonInstance";
 		
 		public Start(NostrumDungeon dungeon, Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1) {
 			super(parent, i1, i2, bounds, i3, l1);
 			this.dungeon = dungeon;
+			this.instance = DungeonInstance.Random(MakeRandom(i1, i2, l1));
 		}
 
 		@Override
@@ -112,7 +137,7 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			final int z = (chunkZ * 16) + 8;
 			
 			final DungeonExitPoint start = new DungeonExitPoint(new BlockPos(x, y, z), Direction.Plane.HORIZONTAL.random(this.rand));
-			List<DungeonRoomInstance> instances = this.dungeon.generate(start);
+			List<DungeonRoomInstance> instances = this.dungeon.generate(start, this.instance);
 			
 			boolean first = true; // This takes advantage of the fact that the starting room is always first in the list.
 			for (DungeonRoomInstance instance : instances) {
@@ -123,6 +148,16 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			
 			this.recalculateStructureSize();
 		}
+		
+		// In 1.16, I can override this but can't override a READ anywhere that is effective.
+		// So there's no way for a deserialized start to know any extra info.
+//		@Override
+//		public CompoundNBT write(int chunkX, int chunkZ) {
+//			CompoundNBT base = super.write(chunkX, chunkZ);
+//			base.put(NBT_INSTNACE, this.instance.toNBT());
+//			// Don't need to write actual dungeon reference
+//			return base;
+//		}
 	}
 	
 	public static class DungeonPiece extends StructurePiece {

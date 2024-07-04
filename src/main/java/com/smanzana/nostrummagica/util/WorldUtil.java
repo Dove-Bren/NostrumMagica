@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableSet;
@@ -18,9 +19,14 @@ import net.minecraft.block.PaneBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.StructureStart;
+import net.minecraft.world.server.ServerWorld;
 
 public class WorldUtil {
 
@@ -245,4 +251,37 @@ public class WorldUtil {
 	
 	// Copied from StructurePiece
 	private static final Set<Block> VANILLA_BLOCKS_NEEDING_POSTPROCESSING = ImmutableSet.<Block>builder().add(Blocks.NETHER_BRICK_FENCE).add(Blocks.TORCH).add(Blocks.WALL_TORCH).add(Blocks.OAK_FENCE).add(Blocks.SPRUCE_FENCE).add(Blocks.DARK_OAK_FENCE).add(Blocks.ACACIA_FENCE).add(Blocks.BIRCH_FENCE).add(Blocks.JUNGLE_FENCE).add(Blocks.LADDER).add(Blocks.IRON_BARS).build();
+	
+	/**
+	 * Check whether the given position is within a structure of the provided type.
+	 * @param world
+	 * @param pos
+	 * @param structure
+	 * @param insideCheck if false, only check the outer bounds of a structure rather than the individual structure piece bounds.
+	 * 					 AKA check one giant bounding box for the whole structure instead of checking if the position is actually in a structure piece.
+	 * @return
+	 */
+	public static final boolean IsInStructure(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
+		return GetContainingStructure(world, pos, structure, insideCheck).isValid();
+	}
+	
+	/**
+	 * Get the first matching structure start (instance) for the specified type and position.
+	 * @param world
+	 * @param pos
+	 * @param structure
+	 * @param insideCheck if false, only check the outer bounds of a structure rather than the individual structure piece bounds.
+	 * 					 AKA check one giant bounding box for the whole structure instead of checking if the position is actually in a structure piece.
+	 * @return
+	 */
+	public static final @Nonnull StructureStart<?> GetContainingStructure(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
+		return world.func_241112_a_().getStructureStart(pos, insideCheck, structure);
+	}
+	
+	public static final @Nullable StructurePiece GetContainingStructurePiece(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
+		return world.func_241112_a_().func_235011_a_(SectionPos.from(pos), structure).filter((start) -> {
+	         return start.getBoundingBox().isVecInside(pos);
+	      }).flatMap(start -> start.getComponents().stream()).filter(piece -> piece.getBoundingBox().isVecInside(pos))
+				.findFirst().orElse(null);
+	}
 }

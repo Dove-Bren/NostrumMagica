@@ -156,7 +156,7 @@ public class NostrumDungeon {
 	}
 	
 	public List<DungeonRoomInstance> generate(DungeonExitPoint start) {
-		return generate(start, new DungeonInstance(UUID.randomUUID()));
+		return generate(start, DungeonInstance.Random());
 	}
 	
 	// Generates a dungeon, and returns a list of all the instances that were generated.
@@ -281,6 +281,14 @@ public class NostrumDungeon {
 			return this.dungeonID;
 		}
 		
+		public static DungeonInstance Random() {
+			return new DungeonInstance(UUID.randomUUID());
+		}
+		
+		public static DungeonInstance Random(Random rand) {
+			return new DungeonInstance(NetUtils.RandomUUID(rand));
+		}
+		
 		public INBT toNBT() {
 			return NBTUtil.func_240626_a_(this.dungeonID);
 		}
@@ -308,6 +316,14 @@ public class NostrumDungeon {
 
 		public MutableBoundingBox getBounds() {
 			return template.getBounds(this.entry);
+		}
+		
+		public UUID getRoomID() {
+			return roomID;
+		}
+		
+		public DungeonInstance getDungeonInstance() {
+			return this.dungeonInstance;
 		}
 		
 		public void spawn(IWorld world) {
