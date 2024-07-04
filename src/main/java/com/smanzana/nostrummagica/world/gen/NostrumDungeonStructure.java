@@ -114,6 +114,18 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		return null;
 	}
 	
+	private static final NostrumDungeonStructure[] TYPES = {NostrumStructures.DUNGEON_PORTAL, NostrumStructures.DUNGEON_DRAGON, NostrumStructures.DUNGEON_PLANTBOSS};
+	
+	public static final @Nullable DungeonInstance GetDungeonAt(ServerWorld world, BlockPos at) {
+		for (NostrumDungeonStructure structure : new NostrumDungeonStructure[] {NostrumStructures.DUNGEON_PORTAL, NostrumStructures.DUNGEON_DRAGON, NostrumStructures.DUNGEON_PLANTBOSS}) {
+			@Nullable DungeonInstance instance = GetDungeonAt(world, at, structure);
+			if (instance != null) {
+				return instance;
+			}
+		}
+		return null;
+	}
+	
 	// What is basically an 'instance' of the struct in MC gen. Doesn't have to do much besides generate logical dungeon and populate children list.
 	public static class Start extends StructureStart<NoFeatureConfig> {
 		

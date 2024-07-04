@@ -297,6 +297,19 @@ public class NostrumDungeon {
 			UUID id = NBTUtil.readUniqueId(nbt);
 			return new DungeonInstance(id);
 		}
+		
+		@Override
+		public int hashCode() {
+			return dungeonID.hashCode() * 773;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof DungeonInstance) {
+				return ((DungeonInstance) o).dungeonID.equals(this.dungeonID);
+			}
+			return false;
+		}
 	}
 	
 	public static class DungeonRoomInstance {

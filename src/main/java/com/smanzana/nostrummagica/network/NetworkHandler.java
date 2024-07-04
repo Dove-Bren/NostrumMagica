@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.network.message.ClientPurchaseResearchMessage;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseSkillMessage;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;
+import com.smanzana.nostrummagica.network.message.DungeonTrackerUpdateMessage;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
 import com.smanzana.nostrummagica.network.message.MagicEffectUpdate;
@@ -119,6 +120,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, VanillaEffectSyncMessage.class, VanillaEffectSyncMessage::encode, VanillaEffectSyncMessage::decode, VanillaEffectSyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, WorldPortalTeleportRequestMessage.class, WorldPortalTeleportRequestMessage::encode, WorldPortalTeleportRequestMessage::decode, WorldPortalTeleportRequestMessage::handle);
 		syncChannel.registerMessage(discriminator++, QuickMoveBagMessage.class, QuickMoveBagMessage::encode, QuickMoveBagMessage::decode, QuickMoveBagMessage::handle);
+		syncChannel.registerMessage(discriminator++, DungeonTrackerUpdateMessage.class, DungeonTrackerUpdateMessage::encode, DungeonTrackerUpdateMessage::decode, DungeonTrackerUpdateMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
