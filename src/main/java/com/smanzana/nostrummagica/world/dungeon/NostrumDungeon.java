@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
@@ -115,6 +116,7 @@ public class NostrumDungeon {
 	protected IDungeonRoom ending;
 	protected IDungeonRoom starting;
 	protected NostrumDungeon self;
+	protected int color;
 	
 	// Cached subsets 
 	private List<IDungeonRoom> endRooms;
@@ -141,6 +143,7 @@ public class NostrumDungeon {
 		this.starting = starting;
 		this.pathLen = minPath; // minimum length of paths
 		this.pathRand = randPath; // add rand(0, (pathRand-1)) to the length of paths
+		this.color = 0x80602080;
 		
 		if (starting.getNumExits() <= 0)
 			NostrumMagica.logger.warn("Dungeon created with 0-exit starting. This will not work.");
@@ -164,6 +167,11 @@ public class NostrumDungeon {
 		contRooms.clear();
 		keyRooms.clear();
 		doorRooms.clear();
+	}
+	
+	public NostrumDungeon setColor(int color) {
+		this.color = color;
+		return this;
 	}
 	
 	public List<DungeonRoomInstance> generate(DungeonExitPoint start) {
@@ -275,10 +283,11 @@ public class NostrumDungeon {
 				1, player.getPosX() + (rand.nextGaussian() * range), player.getPosY() + (rand.nextGaussian() * 4), player.getPosZ() + (rand.nextGaussian() * range), .5,
 				80, 30,
 				new Vector3d(0, .025, 0), new Vector3d(.01, .0125, .01)
-				).color(1f, .4f, .3f, .8f));
+				).color(color));
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void setClientFogDensity(World world, PlayerEntity player, EntityViewRenderEvent.FogDensity event) {
 		event.setCanceled(true);
 		
@@ -311,9 +320,10 @@ public class NostrumDungeon {
 	}
 	
 	public void setClientFogColor(World world, PlayerEntity player, EntityViewRenderEvent.FogColors event) {
-		event.setRed(.2f);
-		event.setGreen(0f);
-		event.setBlue(.2f);
+		float[] color = ColorUtil.ARGBToColor(this.color);
+		event.setRed(color[0]);
+		event.setGreen(color[1]);
+		event.setBlue(color[2]);
 	}
 	
 	protected static class DungeonGenerationContext {

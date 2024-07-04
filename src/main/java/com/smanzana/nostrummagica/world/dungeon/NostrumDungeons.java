@@ -20,30 +20,32 @@ public class NostrumDungeons {
 			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("plantboss_lobby"),
 					DungeonRoomRegistry.instance().getRoomRecord("plantboss_dungeon_entrance")),
 				new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_ROOM_NAME))
-			).add(new RoomGrandStaircase())
-		 .add(new RoomEnd1(false, true))
-		 .add(new RoomJail1())
-		 .add(new RoomJail1())
-		 .add(new RoomChallenge2())
-		 .add(new RoomChallenge2())
-		 .add(new RoomLectern())
-		 .add(new RoomEnd1(true, false))
-		 .add(new RoomEnd1(false, false));
+			).setColor(0x80106020)
+			.add(new RoomGrandStaircase())
+			.add(new RoomEnd1(false, true))
+			.add(new RoomJail1())
+			.add(new RoomJail1())
+			.add(new RoomChallenge2())
+			.add(new RoomChallenge2())
+			.add(new RoomLectern())
+			.add(new RoomEnd1(true, false))
+			.add(new RoomEnd1(false, false));
 
 	public static NostrumDungeon DRAGON_DUNGEON = new NostrumLoadedDungeon(
 			"dragon",
 			new DragonStartRoom(),
 			new RoomArena(),
 			4, 1
-			).add(new RoomGrandStaircase())
-			 .add(new RoomEnd1(false, true))
-			 .add(new RoomJail1())
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge2())
-			 .add(new RoomChallenge2())
-			 .add(new RoomLectern())
-			 .add(new RoomEnd1(true, false))
-			 .add(new RoomEnd1(false, false));
+			).setColor(0x80601005)
+				.add(new RoomGrandStaircase())
+				.add(new RoomEnd1(false, true))
+				.add(new RoomJail1())
+				.add(new RoomJail1())
+				.add(new RoomChallenge2())
+				.add(new RoomChallenge2())
+				.add(new RoomLectern())
+				.add(new RoomEnd1(true, false))
+				.add(new RoomEnd1(false, false));
 	
 	public static final String PORTAL_ROOM_NAME = "portal_room";
 	
@@ -52,12 +54,13 @@ public class NostrumDungeons {
 			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("portal_lobby"),
 					DungeonRoomRegistry.instance().getRoomRecord("portal_entrance")),
 			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_ROOM_NAME))
-			).add(new RoomGrandStaircase())
-			 .add(new RoomEnd1(false, true))
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge2())
-			 .add(new RoomLectern())
-			 .add(new RoomEnd1(true, false))
-			 .add(new RoomEnd1(false, false));
+			).setColor(0x80402080)
+				.add(new RoomGrandStaircase())
+				.add(new RoomEnd1(false, true))
+				.add(new RoomJail1())
+				.add(new RoomChallenge2())
+				.add(new RoomLectern())
+				.add(new RoomEnd1(true, false))
+				.add(new RoomEnd1(false, false));
 
 }
