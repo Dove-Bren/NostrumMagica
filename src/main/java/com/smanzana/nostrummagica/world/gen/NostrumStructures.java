@@ -72,12 +72,12 @@ public class NostrumStructures {
 		
 		structure = new DragonStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 20, 64, 0x4558c30e);
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 20, 48, 0x4558c30e);
 		CONFIGURED_DUNGEON_DRAGON = configured;
 		
 		structure = new PlantBossStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 64, 0x2cc3005e);
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 48, 0x2cc3005e);
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
 	}
 	
