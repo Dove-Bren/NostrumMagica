@@ -275,16 +275,6 @@ public class RoomBlueprint implements IBlueprint {
 				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
 					TileEntity te = TileEntity.readTileEntity(placeState, tileEntityData.copy());
-					if (te == null) {
-						// Before 1.12.2 ids weren't namespaced. Now they are. Check if it's an old Nostrum TE
-						final CompoundNBT copy = tileEntityData.copy();
-						final String newID = NostrumMagica.MODID + ":" + copy.getString("id");
-						copy.putString("id", newID);
-						te = TileEntity.readTileEntity(placeState, copy);
-						if (te != null) {
-							block.fixupOldTEs(newID);
-						}
-					}
 					
 					if (te != null) {
 						if (worldGen || !(context.world instanceof IServerWorld)) {
@@ -612,16 +602,6 @@ public class RoomBlueprint implements IBlueprint {
 		return new RoomBlueprint(masterDims.distanceSq(0, 0, 0, false) == 0 ? dims : masterDims, blocks, doors, entry);
 	}
 	
-	private static RoomBlueprint deserializeVersion3(CompoundNBT nbt) {
-		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 2);
-		
-		if (nbt.contains(NBT_PIECE_OFFSET)) {
-			blueprint.partOffset = nbt.getInt(NBT_PIECE_OFFSET);
-		}
-		
-		return blueprint;
-	}
-	
 	private static RoomBlueprint deserializeVersion4(CompoundNBT nbt) {
 		RoomBlueprint blueprint = deserializeNBTStyleInternal(nbt, (byte) 3);
 		
@@ -637,9 +617,7 @@ public class RoomBlueprint implements IBlueprint {
 		switch (version) {
 		//case 0: // Was tag per block with block ID as int and TE data on that tag
 		//case 1: // Was one giant int array for block(states) and a seperate tag array for TE
-		case 2:
-			NostrumMagica.logger.warn(context.name + ": Blueprint is using a deprecated version: " + context.source);
-			return deserializeVersion3(nbt);
+		//case 2: // Was like version 0 except blockstate was an int.
 		case 3:
 			return deserializeVersion4(nbt);
 		default:
