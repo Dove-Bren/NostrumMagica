@@ -9,7 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -22,7 +22,7 @@ public class CommandSpawnDungeon {
 	private static Random rand = null;
 	
 	private static final String[] names = {"dragon", "portal", "plantboss"};
-	private static final NostrumDungeon[] dungeons = {NostrumDungeonStructure.DRAGON_DUNGEON, NostrumDungeonStructure.PORTAL_DUNGEON, NostrumDungeonStructure.PLANTBOSS_DUNGEON};
+	private static final NostrumDungeon[] dungeons = {NostrumDungeons.DRAGON_DUNGEON, NostrumDungeons.PORTAL_DUNGEON, NostrumDungeons.PLANTBOSS_DUNGEON};
 	
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(

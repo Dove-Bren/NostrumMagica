@@ -3,13 +3,10 @@ package com.smanzana.nostrummagica.listener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.DungeonTrackerUpdateMessage;
 import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
@@ -18,8 +15,8 @@ import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
@@ -87,22 +84,43 @@ public class DungeonTracker {
 		}
 	}
 	
-	@SubscribeEvent
-	public void clientTick(ClientTickEvent event) {
-		if (event.phase == TickEvent.Phase.END) {
+	public static class Client extends DungeonTracker {
+	
+		public Client() {
+			super();
+		}
+		
+		@SubscribeEvent
+		public void clientTick(ClientTickEvent event) {
+			if (event.phase == TickEvent.Phase.END) {
+				PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+				if (player != null) {
+					DungeonRecord record = getDungeon(player);
+					if (record != null) {
+						record.structure.getDungeon().clientTick(player.getEntityWorld(), player);
+					}
+				}
+			}
+		}
+		
+		@SubscribeEvent
+		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
 			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 			if (player != null) {
 				DungeonRecord record = getDungeon(player);
 				if (record != null) {
-					Random rand = player.world.rand;
-					final float range = 15;
-					for (int i = 0; i < 15; i++) {
-						NostrumParticles.GLOW_ORB.spawn(player.world, new SpawnParams(
-							1, player.getPosX() + (rand.nextGaussian() * range), player.getPosY() + (rand.nextGaussian() * 4), player.getPosZ() + (rand.nextGaussian() * range), .5,
-							80, 30,
-							new Vector3d(0, .025, 0), new Vector3d(.01, .0125, .01)
-							).color(1f, .4f, .3f, .8f));
-					}
+					record.structure.getDungeon().setClientFogDensity(player.world, player, event);
+				}
+			}
+		}
+		
+		@SubscribeEvent
+		public void onFogColorCheck(EntityViewRenderEvent.FogColors event) {
+			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			if (player != null) {
+				DungeonRecord record = getDungeon(player);
+				if (record != null) {
+					record.structure.getDungeon().setClientFogColor(player.world, player, event);
 				}
 			}
 		}

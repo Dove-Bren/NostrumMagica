@@ -12,17 +12,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
-import com.smanzana.nostrummagica.world.dungeon.NostrumLoadedDungeon;
-import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
-import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.LoadedStartRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
@@ -76,13 +66,28 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 //		
 //	}
 	
-	public NostrumDungeonStructure() {
+	protected final NostrumDungeon dungeon;
+	
+	public NostrumDungeonStructure(NostrumDungeon dungeon) {
 		super(NoFeatureConfig.field_236558_a_);
+		this.dungeon = dungeon;
 	}
 	
 	@Override
 	protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 		return super.func_230363_a_(generator, biomeProvider, seed, rand, x, z, biome, pos, config);
+	}
+
+	@Override
+	public IStartFactory<NoFeatureConfig> getStartFactory() {
+		return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
+				-> {
+					return new Start(this.getDungeon(), parent, i1, i2, bounds, i3, l1);
+				};
+	}
+	
+	public NostrumDungeon getDungeon() {
+		return this.dungeon;
 	}
 	
 //	@Override
@@ -244,7 +249,7 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 	public static class DragonStructure extends NostrumDungeonStructure {
 
 		public DragonStructure() {
-			super();
+			super(NostrumDungeons.DRAGON_DUNGEON);
 		}
 		
 		@Override
@@ -252,20 +257,12 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			rand.setSeed((long)(x ^ z << 4) ^ seed);
 			return rand.nextInt(2) < 1;
 		}
-
-		@Override
-		public IStartFactory<NoFeatureConfig> getStartFactory() {
-			return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
-					-> {
-						return new Start(DRAGON_DUNGEON, parent, i1, i2, bounds, i3, l1);
-					};
-		}
 	}
 	
 	public static class PortalStructure extends NostrumDungeonStructure {
 
 		public PortalStructure() {
-			super();
+			super(NostrumDungeons.PORTAL_DUNGEON);
 		}
 		
 		@Override
@@ -280,20 +277,12 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 //			return rand.nextInt(2) < 1;
 			return true;
 		}
-
-		@Override
-		public IStartFactory<NoFeatureConfig> getStartFactory() {
-			return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
-					-> {
-						return new Start(PORTAL_DUNGEON, parent, i1, i2, bounds, i3, l1);
-					};
-		}
 	}
 	
 	public static class PlantBossStructure extends NostrumDungeonStructure {
 
 		public PlantBossStructure() {
-			super();
+			super(NostrumDungeons.PLANTBOSS_DUNGEON);
 		}
 
 		@Override
@@ -301,61 +290,6 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			rand.setSeed((long)(x ^ z << 4) ^ seed);
 			return rand.nextInt(2) < 1;
 		}
-
-		@Override
-		public IStartFactory<NoFeatureConfig> getStartFactory() {
-			return (Structure<NoFeatureConfig> parent, int i1, int i2, MutableBoundingBox bounds, int i3, long l1)
-					-> {
-						return new Start(PLANTBOSS_DUNGEON, parent, i1, i2, bounds, i3, l1);
-					};
-		}
 	}
-
-	public static NostrumDungeon DRAGON_DUNGEON = new NostrumLoadedDungeon(
-			"dragon",
-			new DragonStartRoom(),
-			new RoomArena(),
-			4, 1
-			).add(new RoomGrandStaircase())
-			 .add(new RoomEnd1(false, true))
-			 .add(new RoomJail1())
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge2())
-			 .add(new RoomChallenge2())
-			 .add(new RoomLectern())
-			 .add(new RoomEnd1(true, false))
-			 .add(new RoomEnd1(false, false));
-	
-	public static final String PORTAL_ROOM_NAME = "portal_room";
-	
-	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
-			"portal",
-			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("portal_lobby"),
-					DungeonRoomRegistry.instance().getRoomRecord("portal_entrance")),
-			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_ROOM_NAME))
-			).add(new RoomGrandStaircase())
-			 .add(new RoomEnd1(false, true))
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge2())
-			 .add(new RoomLectern())
-			 .add(new RoomEnd1(true, false))
-			 .add(new RoomEnd1(false, false));
-	
-	public static final String PLANTBOSS_ROOM_NAME = "plant_boss_room";
-	
-	public static NostrumDungeon PLANTBOSS_DUNGEON = new NostrumLoadedDungeon(
-			"plant_boss",
-			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("plantboss_lobby"),
-					DungeonRoomRegistry.instance().getRoomRecord("plantboss_dungeon_entrance")),
-			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_ROOM_NAME))
-			).add(new RoomGrandStaircase())
-			 .add(new RoomEnd1(false, true))
-			 .add(new RoomJail1())
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge2())
-			 .add(new RoomChallenge2())
-			 .add(new RoomLectern())
-			 .add(new RoomEnd1(true, false))
-			 .add(new RoomEnd1(false, false));
 	
 }

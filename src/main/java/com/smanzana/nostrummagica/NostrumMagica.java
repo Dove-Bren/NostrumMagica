@@ -149,7 +149,7 @@ public class NostrumMagica {
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
 		statListener = new PlayerStatListener();
-		dungeonTracker = new DungeonTracker();
+		dungeonTracker = DistExecutor.safeRunForDist(() -> DungeonTracker.Client::new, () -> DungeonTracker::new);;
 
 		NostrumMagica.creativeTab = new ItemGroup(MODID) {
 			@Override

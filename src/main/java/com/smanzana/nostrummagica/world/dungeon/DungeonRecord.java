@@ -50,6 +50,7 @@ public final class DungeonRecord {
 	public static final DungeonRecord FromNBT(CompoundNBT nbt) {
 		
 		final @Nullable DungeonInstance instance = DungeonInstance.FromNBT(nbt.get(NBT_INSTANCE));
+		@SuppressWarnings("deprecation")
 		final NostrumDungeonStructure structure = (NostrumDungeonStructure) Registry.STRUCTURE_FEATURE.getOptionalValue(
 				RegistryKey.getOrCreateKey(Registry.STRUCTURE_FEATURE_KEY, new ResourceLocation(nbt.getString(NBT_STRUCTURE))))
 				.orElseThrow(() -> new RuntimeException("Failed to look up structure with key " + nbt.getString(NBT_STRUCTURE)));

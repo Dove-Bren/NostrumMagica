@@ -12,23 +12,34 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
+import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class NostrumDungeon {
@@ -254,6 +265,55 @@ public class NostrumDungeon {
 //			path.spawn(world, last, inEnd);
 //		}
 		
+	}
+	
+	public void clientTick(World world, PlayerEntity player) {
+		Random rand = player.world.rand;
+		final float range = 15;
+		for (int i = 0; i < 15; i++) {
+			NostrumParticles.GLOW_ORB.spawn(player.world, new SpawnParams(
+				1, player.getPosX() + (rand.nextGaussian() * range), player.getPosY() + (rand.nextGaussian() * 4), player.getPosZ() + (rand.nextGaussian() * range), .5,
+				80, 30,
+				new Vector3d(0, .025, 0), new Vector3d(.01, .0125, .01)
+				).color(1f, .4f, .3f, .8f));
+		}
+	}
+	
+	public void setClientFogDensity(World world, PlayerEntity player, EntityViewRenderEvent.FogDensity event) {
+		event.setCanceled(true);
+		
+		if (player.isPotionActive(Effects.BLINDNESS)) {
+			//final Minecraft mc = Minecraft.getInstance();
+			float farPlaneDistance = event.getRenderer().getFarPlaneDistance();
+			//final Vector3d cameraPos = event.getInfo().getProjectedView();
+			//boolean nearFog = ((ClientWorld) entity.world).func_239132_a_().func_230493_a_(MathHelper.floor(cameraPos.getX()), MathHelper.floor(cameraPos.getY())) || mc.ingameGUI.getBossOverlay().shouldCreateFog();
+			
+			int i = player.getActivePotionEffect(Effects.BLINDNESS).getDuration();
+			float rangeMod = MathHelper.lerp(Math.min(1.0F, (float)i / 20.0F), farPlaneDistance, 5.0F);
+			final float near;
+			final float far;
+			if (event.getType() == FogRenderer.FogType.FOG_SKY) {
+				near = 0.0F;
+				far = rangeMod * 0.8F;
+			} else {
+				near = rangeMod * 0.25F;
+				far = rangeMod;
+			}
+
+			RenderSystem.fogStart(near);
+			RenderSystem.fogEnd(far);
+			RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
+			RenderSystem.setupNvFogDistance();
+			net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
+		} else {
+			event.setDensity(.03f);
+		}
+	}
+	
+	public void setClientFogColor(World world, PlayerEntity player, EntityViewRenderEvent.FogColors event) {
+		event.setRed(.2f);
+		event.setGreen(0f);
+		event.setBlue(.2f);
 	}
 	
 	protected static class DungeonGenerationContext {
