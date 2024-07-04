@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.world.dungeon.room.LoadedStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandHallway;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
@@ -252,9 +251,6 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			4, 1
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
-			 .add(new RoomGrandHallway())
-			 .add(new RoomGrandHallway())
-			 .add(new RoomGrandHallway())
 			 .add(new RoomJail1())
 			 .add(new RoomJail1())
 			 .add(new RoomChallenge2())
@@ -272,12 +268,7 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_ROOM_NAME))
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
-			 .add(new RoomGrandHallway())
-			 .add(new RoomGrandHallway())
-			 .add(new RoomGrandHallway())
 			 .add(new RoomJail1())
-			 .add(new RoomJail1())
-			 .add(new RoomChallenge2())
 			 .add(new RoomChallenge2())
 			 .add(new RoomLectern())
 			 .add(new RoomEnd1(true, false))
@@ -292,9 +283,6 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_ROOM_NAME))
 			).add(new RoomGrandStaircase())
 			 .add(new RoomEnd1(false, true))
-			 .add(new RoomGrandHallway())
-			 .add(new RoomGrandHallway())
-			 .add(new RoomGrandHallway())
 			 .add(new RoomJail1())
 			 .add(new RoomJail1())
 			 .add(new RoomChallenge2())
