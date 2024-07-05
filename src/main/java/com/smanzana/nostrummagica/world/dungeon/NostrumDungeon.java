@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 
 import net.minecraft.client.renderer.FogRenderer;
@@ -214,8 +216,8 @@ public class NostrumDungeon {
 	// Generates and then spawns a dungeon in the world immediately.
 	// This doesn't do the normal structure spawning that works well on background threads
 	// and instead does a blocking generate + block spawning.
-	public void spawn(IWorld world, DungeonExitPoint start, UUID dungeonID) {
-		DungeonInstance dungeon = new DungeonInstance(dungeonID);
+	public void spawn(IWorld world, DungeonExitPoint start) {
+		DungeonInstance dungeon = new DungeonInstance(UUID.randomUUID(), UUID.randomUUID());
 		List<DungeonRoomInstance> dungeonInstances = generate(start, dungeon);
 		
 		// Iterate and spawn instances
@@ -342,9 +344,27 @@ public class NostrumDungeon {
 	
 	public static class DungeonInstance {
 		private final UUID dungeonID;
+		private final NostrumWorldKey smallKey;
+		private final NostrumWorldKey largeKey;
 		
-		public DungeonInstance(UUID dungeonID) {
+		private static final String NBT_DUNGEON_ID = "dungeonID";
+		private static final String NBT_SMALL_KEY = "smallKey";
+		private static final String NBT_LARGE_KEY = "largeKey";
+		
+		public DungeonInstance(UUID dungeonID, NostrumWorldKey smallKey, NostrumWorldKey largeKey) {
 			this.dungeonID = dungeonID;
+			this.smallKey = smallKey;
+			this.largeKey = largeKey;
+		}
+		
+		protected DungeonInstance(UUID dungeonID, UUID keyBaseID) {
+			this(dungeonID,
+					new NostrumWorldKey(dungeonID),
+					new NostrumWorldKey(NetUtils.CombineUUIDs(dungeonID, keyBaseID)));
+		}
+		
+		protected DungeonInstance(UUID dungeonID, Random rand) {
+			this(dungeonID, NetUtils.CombineUUIDs(dungeonID, NetUtils.RandomUUID(rand)));
 		}
 		
 		public UUID getDungeonID() {
@@ -352,31 +372,41 @@ public class NostrumDungeon {
 		}
 		
 		public static DungeonInstance Random() {
-			return new DungeonInstance(UUID.randomUUID());
+			return new DungeonInstance(UUID.randomUUID(), UUID.randomUUID());
 		}
 		
 		public static DungeonInstance Random(Random rand) {
-			return new DungeonInstance(NetUtils.RandomUUID(rand));
+			return new DungeonInstance(NetUtils.RandomUUID(rand), rand);
 		}
 		
 		public INBT toNBT() {
-			return NBTUtil.func_240626_a_(this.dungeonID);
+			CompoundNBT tag = new CompoundNBT();
+			tag.putUniqueId(NBT_DUNGEON_ID, dungeonID);
+			tag.put(NBT_SMALL_KEY, this.smallKey.asNBT());
+			tag.put(NBT_LARGE_KEY, this.largeKey.asNBT());
+			return tag;
 		}
 		
 		public static DungeonInstance FromNBT(INBT nbt) {
-			UUID id = NBTUtil.readUniqueId(nbt);
-			return new DungeonInstance(id);
+			CompoundNBT tag = (CompoundNBT) nbt;
+			UUID id = tag.getUniqueId(NBT_DUNGEON_ID);
+			NostrumWorldKey smallKey = NostrumWorldKey.fromNBT(tag.getCompound(NBT_SMALL_KEY));
+			NostrumWorldKey largeKey = NostrumWorldKey.fromNBT(tag.getCompound(NBT_LARGE_KEY));
+			return new DungeonInstance(id, smallKey, largeKey);
 		}
 		
 		@Override
 		public int hashCode() {
-			return dungeonID.hashCode() * 773;
+			return Objects.hash(dungeonID, smallKey, largeKey);
 		}
 		
 		@Override
 		public boolean equals(Object o) {
 			if (o instanceof DungeonInstance) {
-				return ((DungeonInstance) o).dungeonID.equals(this.dungeonID);
+				DungeonInstance other = (DungeonInstance) o;
+				return other.dungeonID.equals(this.dungeonID)
+						&& other.smallKey.equals(this.smallKey)
+						&& other.largeKey.equals(this.largeKey);
 			}
 			return false;
 		}

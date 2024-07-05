@@ -445,6 +445,7 @@ public class NostrumSorceryDimension {
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		
+		@SuppressWarnings("deprecation")
 		@SubscribeEvent
 		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
 			final Entity entity = event.getInfo().getRenderViewEntity();
