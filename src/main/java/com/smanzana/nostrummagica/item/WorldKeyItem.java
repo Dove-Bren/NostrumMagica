@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.tile.IWorldKeyHolder;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
-import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
+import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;

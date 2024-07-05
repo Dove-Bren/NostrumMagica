@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
-import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
+import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;

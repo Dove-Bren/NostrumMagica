@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.tile;
 
-import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
+import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 public interface IWorldKeyHolder {
 

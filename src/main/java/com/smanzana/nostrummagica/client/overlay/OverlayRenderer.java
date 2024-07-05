@@ -55,6 +55,7 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MainWindow;
@@ -213,6 +214,7 @@ public class OverlayRenderer extends AbstractGui {
 			
 			renderSpellSlide(matrixStackIn, player, window, attr);
 			renderReagentTracker(matrixStackIn, player, window, attr, mc.fontRenderer);
+			renderDungeonKeys(matrixStackIn, player, window, NostrumMagica.dungeonTracker.getDungeon(player), mc.fontRenderer);
 			
 			if (mc.player.isCreative()
 					|| mc.player.isSpectator()) {
@@ -863,6 +865,45 @@ public class OverlayRenderer extends AbstractGui {
 		}
 		matrixStackIn.pop();
 		matrixStackIn.pop();
+	}
+	
+	private void renderDungeonKeys(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, @Nullable DungeonRecord dungeon, FontRenderer fonter) {
+		if (dungeon != null) {
+			final int smallCount = NostrumMagica.instance.getWorldKeys().getKeyCount(dungeon.instance.getSmallKey());
+			final int largeCount = NostrumMagica.instance.getWorldKeys().getKeyCount(dungeon.instance.getLargeKey());
+			
+			
+			final int width = 70;
+			final int xOffset = window.getScaledWidth() - width;
+			final int height = 30;
+			final int yOffset = window.getScaledHeight() - height;
+			final int colorTop = 0x20000000;
+			final int colorBottom = 0xFF000000;
+			
+			matrixStackIn.push();
+			matrixStackIn.translate(xOffset, yOffset, 0);
+			RenderFuncs.drawGradientRect(matrixStackIn, 0, 0, width, height,
+					colorTop, colorTop,
+					colorBottom, colorBottom);
+			
+			matrixStackIn.translate(width/2, 5, 0);
+			matrixStackIn.scale(.8f, .8f, 1f);
+			{
+				String msg;
+				int len;
+				
+				msg = "Small keys: " + smallCount;
+				len = fonter.getStringWidth(msg);
+				fonter.drawString(matrixStackIn, msg, -len/2, 0, 0xFFFFFFFF);
+				matrixStackIn.translate(0, fonter.FONT_HEIGHT + 2, 0);
+				
+				msg = "Large keys: " + largeCount;
+				len = fonter.getStringWidth(msg);
+				fonter.drawString(matrixStackIn, msg, -len/2, 0, 0xFFFFFFFF);
+			}
+			
+			matrixStackIn.pop();
+		}
 	}
 	
 	private void renderArmorOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {

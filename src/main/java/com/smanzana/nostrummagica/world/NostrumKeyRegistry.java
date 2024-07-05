@@ -1,14 +1,10 @@
 package com.smanzana.nostrummagica.world;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.util.NetUtils;
-import com.smanzana.nostrummagica.util.PortingUtil;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -18,88 +14,23 @@ import net.minecraftforge.common.util.Constants.NBT;
 /**
  * Allows blocks/items to grant 'keys' that can be used on other doors/chests to unlock them,
  * even when those things may not be loaded right now.
- * This is intended to be world-wide key-to-object mapping where keys are UUIDs, rather than something
- * cooler and more RPG-like where you have small keys and you consume a small key to open a door.
+ * This is used both as a world-wide key-to-object mapping where keys are UUIDs, and something
+ * an RPG-like system where you have small keys and you consume a small key to open a door.
  * In a way, this is the same as the trigger mechanic on switch blocks etc. except the thing it's triggering
  * doesn't have to be loaded and respond right then.
+ * Many things that hold keys are able to mutate them deterministically (like in templates) so that each time
+ * a template is spawned, it refers to a different key set.
  * @author Skyler
  *
  */
 public class NostrumKeyRegistry extends WorldSavedData {
 	
-	public static class NostrumWorldKey {
-		
-		private static final String NBT_ID = "key_id";
-		;//private static final String NBT_COLOR = "color";
-		
-		private final UUID id;
-		;//private final int color;
-		
-		public NostrumWorldKey(@Nonnull UUID id) {;//, int colorARGB) {
-			this.id = id;
-			;//this.color = colorARGB;
-		}
-		
-		public NostrumWorldKey() {
-			this(UUID.randomUUID());//, 0xFF000000 | NostrumMagica.rand.nextInt());
-		}
-		
-		/**
-		 * Takes another UUID and creates a new, unique key based on this key and the
-		 * other ID passed in.
-		 * This is intended to be deterministic such that two NostrumWorldKeys with the same underlying
-		 * ID can be mutated with the same second id and produce equal new keys.
-		 * @param id
-		 * @return
-		 */
-		public NostrumWorldKey mutateWithID(UUID id) {
-			return new NostrumWorldKey(NetUtils.CombineUUIDs(this.id, id));
-		}
-		
-		public NostrumWorldKey mutateWithKey(NostrumWorldKey other) {
-			return mutateWithID(other.id);
-		}
-		
-		public CompoundNBT asNBT() {
-			CompoundNBT nbt = new CompoundNBT();
-			nbt.putUniqueId(NBT_ID, id);
-			;//nbt.putInt(NBT_COLOR, color);
-			return nbt;
-		}
-		
-		public static NostrumWorldKey fromNBT(CompoundNBT nbt) {
-			UUID id = PortingUtil.readNBTUUID(nbt, NBT_ID);
-			;//int color = nbt.getInt(NBT_COLOR);
-			return new NostrumWorldKey(id);//, color);
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof NostrumWorldKey) {
-				NostrumWorldKey other = (NostrumWorldKey) o;
-				if (other.id.equals(this.id)) {;// && other.color == this.color) {
-					return true;
-				}
-			}
-			
-			return false;
-		}
-		
-		@Override
-		public int hashCode() {
-			return id.hashCode();// * 37 + Integer.hashCode(color);
-		}
-		
-		@Override
-		public String toString() {
-			return this.id.toString();// + " - " + this.color;
-		}
-	}
-	
 	public static final String DATA_NAME = NostrumMagica.MODID + "_world_keys";
-	private static final String NBT_LIST = "key_list";
+	private static final String NBT_LIST = "key_map";
+	private static final String NBT_KEY = "key";
+	private static final String NBT_COUNT = "count";
 	
-	private final Set<NostrumWorldKey> keys;
+	private final Map<NostrumWorldKey, Integer> keys;
 	
 	public NostrumKeyRegistry() {
 		this(DATA_NAME);
@@ -108,7 +39,7 @@ public class NostrumKeyRegistry extends WorldSavedData {
 	public NostrumKeyRegistry(String name) {
 		super(name);
 		
-		this.keys = new HashSet<>();
+		this.keys = new HashMap<>();
 	}
 
 	@Override
@@ -118,7 +49,11 @@ public class NostrumKeyRegistry extends WorldSavedData {
 		ListNBT list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
 			CompoundNBT tag = list.getCompound(i);
-			keys.add(NostrumWorldKey.fromNBT(tag));
+			CompoundNBT keyTag = tag.getCompound(NBT_KEY);
+			final int count = tag.getInt(NBT_COUNT);
+			if (count > 0) {
+				keys.put(NostrumWorldKey.fromNBT(keyTag), count);
+			}
 		}
 		
 		NostrumMagica.logger.info("Loaded " + keys.size() + " world keys");
@@ -127,8 +62,14 @@ public class NostrumKeyRegistry extends WorldSavedData {
 	@Override
 	public CompoundNBT write(CompoundNBT compound) {
 		ListNBT list = new ListNBT();
-		for (NostrumWorldKey key : keys) {
-			CompoundNBT tag = key.asNBT();
+		for (Entry<NostrumWorldKey, Integer> entry : keys.entrySet()) {
+			if (entry.getValue() == null || entry.getValue() <= 0) {
+				continue;
+			}
+			
+			CompoundNBT tag = new CompoundNBT();
+			tag.put(NBT_KEY, entry.getKey().asNBT());
+			tag.putInt(NBT_COUNT, entry.getValue());
 			list.add(tag);
 		}
 		compound.put(NBT_LIST, list);
@@ -138,7 +79,7 @@ public class NostrumKeyRegistry extends WorldSavedData {
 	}
 	
 	public NostrumWorldKey addKey(NostrumWorldKey key) {
-		keys.add(key);
+		keys.merge(key, 1, Integer::sum);
 		this.markDirty();
 		return key;
 	}
@@ -147,12 +88,25 @@ public class NostrumKeyRegistry extends WorldSavedData {
 		return addKey(new NostrumWorldKey());
 	}
 	
+	public int getKeyCount(NostrumWorldKey key) {
+		return keys.getOrDefault(key, 0);
+	}
+	
 	public boolean hasKey(NostrumWorldKey key) {
-		return keys.contains(key);
+		return getKeyCount(key) > 0;
 	}
 	
 	public boolean consumeKey(NostrumWorldKey key) {
-		return keys.remove(key);
+		final int count = getKeyCount(key);
+		if (count > 0) {
+			if (count == 1) {
+				keys.remove(key);
+			} else {
+				keys.put(key, count - 1);
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	public void clearKeys() {

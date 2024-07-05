@@ -23,7 +23,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
+import com.smanzana.nostrummagica.world.NostrumWorldKey;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
 
@@ -402,6 +402,14 @@ public class NostrumDungeon {
 			return this.dungeonID;
 		}
 		
+		public NostrumWorldKey getSmallKey() {
+			return smallKey;
+		}
+
+		public NostrumWorldKey getLargeKey() {
+			return largeKey;
+		}
+
 		public static DungeonInstance Random() {
 			return new DungeonInstance(UUID.randomUUID(), UUID.randomUUID());
 		}
