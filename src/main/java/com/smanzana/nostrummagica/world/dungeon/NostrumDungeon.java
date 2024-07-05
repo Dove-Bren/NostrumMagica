@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.NostrumKeyRegistry.NostrumWorldKey;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
 
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,7 +42,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -116,7 +119,7 @@ public class NostrumDungeon {
 	private int pathRand;
 	private List<IDungeonRoom> rooms;
 	protected IDungeonRoom ending;
-	protected IDungeonRoom starting;
+	protected IDungeonStartRoom starting;
 	protected NostrumDungeon self;
 	protected int color;
 	
@@ -130,11 +133,11 @@ public class NostrumDungeon {
 //	private List<Path> doorPoints;
 //	private List<Path> keyPoints; // Potential keys, that is
 	
-	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending) {
+	public NostrumDungeon(IDungeonStartRoom starting, IDungeonRoom ending) {
 		this(starting, ending, 2, 3);
 	}
 	
-	public NostrumDungeon(IDungeonRoom starting, IDungeonRoom ending, int minPath, int randPath) {
+	public NostrumDungeon(IDungeonStartRoom starting, IDungeonRoom ending, int minPath, int randPath) {
 		self = this;
 		rooms = new LinkedList<>();
 		endRooms = new LinkedList<>();
@@ -176,13 +179,13 @@ public class NostrumDungeon {
 		return this;
 	}
 	
-	public List<DungeonRoomInstance> generate(DungeonExitPoint start) {
-		return generate(start, DungeonInstance.Random());
+	public List<DungeonRoomInstance> generate(IWorldHeightReader world, DungeonExitPoint start) {
+		return generate(world, start, DungeonInstance.Random());
 	}
 	
 	// Generates a dungeon, and returns a list of all the instances that were generated.
 	// These can be used to spawn the dungeon in the world.
-	public List<DungeonRoomInstance> generate(DungeonExitPoint start, DungeonInstance instance) {
+	public List<DungeonRoomInstance> generate(IWorldHeightReader world, DungeonExitPoint start, DungeonInstance instance) {
 		// Calculate caches
 		if (endRooms.isEmpty()) {
 			for (IDungeonRoom room : rooms) {
@@ -210,7 +213,10 @@ public class NostrumDungeon {
 		
 		startPath.generateChildren(context, pathLen + rand.nextInt(pathRand), ending);
 		
-		return startPath.getInstances();
+		List<DungeonRoomInstance> ret = startPath.getInstances();
+				
+		ret.addAll(this.starting.generateExtraPieces(world, start, rand, instance));
+		return ret;
 	}
 	
 	// Generates and then spawns a dungeon in the world immediately.
@@ -218,7 +224,7 @@ public class NostrumDungeon {
 	// and instead does a blocking generate + block spawning.
 	public void spawn(IWorld world, DungeonExitPoint start) {
 		DungeonInstance dungeon = new DungeonInstance(UUID.randomUUID(), UUID.randomUUID());
-		List<DungeonRoomInstance> dungeonInstances = generate(start, dungeon);
+		List<DungeonRoomInstance> dungeonInstances = generate((type, x, z) -> world.getHeight(type, x, z), start, dungeon);
 		
 		// Iterate and spawn instances
 		// TODO I used to make sure to spawn the 'end room' last so it didn't get stomped.
@@ -278,6 +284,10 @@ public class NostrumDungeon {
 	}
 	
 	public void clientTick(World world, PlayerEntity player) {
+		if (world.getLightFor(LightType.SKY, player.getPosition()) > 0) {
+			return;
+		}
+		
 		Random rand = player.world.rand;
 		final float range = 15;
 		for (int i = 0; i < 15; i++) {
@@ -291,6 +301,11 @@ public class NostrumDungeon {
 	
 	@SuppressWarnings("deprecation")
 	public void setClientFogDensity(World world, PlayerEntity player, EntityViewRenderEvent.FogDensity event) {
+		final int worldLight = world.getLightFor(LightType.SKY, player.getPosition());
+		if (worldLight > 4) {
+			return;
+		}
+		
 		event.setCanceled(true);
 		
 		if (player.isPotionActive(Effects.BLINDNESS)) {
@@ -317,15 +332,31 @@ public class NostrumDungeon {
 			RenderSystem.setupNvFogDistance();
 			net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
 		} else {
-			event.setDensity(.03f);
+			if (worldLight <= 0) {
+				event.setDensity(.03f);
+			} else {
+				final float prog = ((float) (4-worldLight) / 4f);
+				event.setDensity(MathHelper.lerp(prog, .005f, .03f));
+			}
 		}
 	}
 	
 	public void setClientFogColor(World world, PlayerEntity player, EntityViewRenderEvent.FogColors event) {
+		final int worldLight = world.getLightFor(LightType.SKY, player.getPosition());
+		if (worldLight > 4) {
+			return;
+		}
+		
+		final float prog = Math.max(0, ((float) (4-worldLight) / 4f));
+		
 		float[] color = ColorUtil.ARGBToColor(this.color);
-		event.setRed(color[0]);
-		event.setGreen(color[1]);
-		event.setBlue(color[2]);
+		event.setRed(MathHelper.lerp(prog, event.getRed(), color[0]));
+		event.setGreen(MathHelper.lerp(prog, event.getRed(), color[1]));
+		event.setBlue(MathHelper.lerp(prog, event.getRed(), color[2]));
+	}
+	
+	public static interface IWorldHeightReader {
+		public int getHeight(Heightmap.Type type, int x, int z);
 	}
 	
 	protected static class DungeonGenerationContext {
@@ -428,6 +459,9 @@ public class NostrumDungeon {
 		}
 
 		public MutableBoundingBox getBounds() {
+			if (this.template == null) {
+				System.out.println("null");
+			}
 			return template.getBounds(this.entry);
 		}
 		

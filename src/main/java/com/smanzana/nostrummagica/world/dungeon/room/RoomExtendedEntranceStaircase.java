@@ -5,29 +5,30 @@ import java.util.List;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.Heightmap;
 
 /**
  * Entrance staircase. Extends up to nearly surface level and then spawns a shrine.
  * @author Skyler
  *
  */
-public class RoomExtendedEntranceStaircase implements IDungeonRoom {
+public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 
 	private final RoomEntryStairs stairs;
-	private final IDungeonRoom entry;
 	
-	public RoomExtendedEntranceStaircase(boolean dark, IDungeonRoom entry) {
+	
+	public RoomExtendedEntranceStaircase(boolean dark) {
 		stairs = new RoomEntryStairs(dark);
-		this.entry = entry;
 		
-		// Would want to register with IDungeonRoom.Register() but only if this was uniquified instead of created per instance
+		if (IDungeonRoom.GetRegisteredRoom(getRoomID()) == null) { 
+			IDungeonRoom.Register(getRoomID(), this);
+		}
 	}
 	
 	@Override
@@ -54,31 +55,30 @@ public class RoomExtendedEntranceStaircase implements IDungeonRoom {
 	
 	@Override
 	public void spawn(IWorld world, DungeonExitPoint start, MutableBoundingBox bounds, UUID dungeonID) {
-		
+		getEntryStart((type, x, z) -> world.getHeight(type, x, z), start, true, world, bounds, dungeonID);
+	}
+	
+	@Override
+	public DungeonExitPoint getEntryStart(IWorldHeightReader world, DungeonExitPoint start) {
+		return getEntryStart(world, start, false, null, null, null);
+	}
+	
+	private DungeonExitPoint getEntryStart(IWorldHeightReader heightReader, DungeonExitPoint start, boolean spawn, IWorld world, MutableBoundingBox bounds, UUID dungeonID) {
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
 		
-		IChunk chunk = world.getChunk(pos);
-        BlockPos blockpos;
-        BlockPos blockpos1;
-        
-        for (blockpos = new BlockPos(pos.getX(), chunk.getTopFilledSegment() + 16, pos.getZ()); blockpos.getY() >= 0; blockpos = blockpos1) {
-        	blockpos1 = blockpos.down();
-        	BlockState state = chunk.getBlockState(blockpos1);
-            
-            if (state.getMaterial().isLiquid() || (state.getMaterial().blocksMovement() && state.getMaterial() != Material.LEAVES && state.getBlockHardness(world, blockpos1) != 0)) {
-            	break;
-            }
-        }
-
+		BlockPos blockpos = new BlockPos(pos.getX(), heightReader.getHeight(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ()), pos.getZ());
+		
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
 		while (cur.getY() < maxY - 17) {
-			stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
+			if (spawn) {
+				stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
+			}
 			cur = cur.add(0, stairHeight, 0);
 		}
 		
-		entry.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
+		return new DungeonExitPoint(cur, start.getFacing());
 	}
 	
 	@Override
@@ -138,7 +138,7 @@ public class RoomExtendedEntranceStaircase implements IDungeonRoom {
 		// So instead, guess based on start to an approximate height of 128.
 		
 		final BlockPos topPos = new BlockPos(start.getPos().getX(), 128, start.getPos().getZ());
-		MutableBoundingBox bounds = entry.getBounds(new DungeonExitPoint(topPos, start.getFacing()));
+		MutableBoundingBox bounds = null;
 		
 		// Add staircase down to actual start
 		final int stairHeight = 4;
@@ -146,7 +146,11 @@ public class RoomExtendedEntranceStaircase implements IDungeonRoom {
 		cursor.setPos(start.getPos());
 		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
 			cursor.setY(i);
-			bounds.expandTo(stairs.getBounds(new DungeonExitPoint(cursor, start.getFacing())));
+			if (bounds == null) {
+				bounds = stairs.getBounds(new DungeonExitPoint(cursor, start.getFacing()));
+			} else {
+				bounds.expandTo(stairs.getBounds(new DungeonExitPoint(cursor, start.getFacing())));
+			}
 		}
 		
 		return bounds;

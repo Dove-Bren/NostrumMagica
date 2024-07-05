@@ -2,13 +2,18 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.StairsBlock;
@@ -19,7 +24,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
-public class DragonStartRoom extends StaticRoom {
+public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
+	
+	private final RoomExtendedDragonStaircase stairs;
+	private final RoomEntryDragon entry;
 	
 	public DragonStartRoom() {
 		// End up passing in height to surface?
@@ -117,6 +125,9 @@ public class DragonStartRoom extends StaticRoom {
 				'R', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
 				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
 				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
+		
+		this.stairs = new RoomExtendedDragonStaircase(false);
+		this.entry = new RoomEntryDragon(false);
 	}
 	
 	@Override
@@ -183,8 +194,17 @@ public class DragonStartRoom extends StaticRoom {
 	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		super.spawn(world, start, bounds, dungeonID);
 		
-		RoomExtendedDragonStaircase stairs = new RoomExtendedDragonStaircase(false);
 		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
 		stairs.spawn(world, adj, bounds, dungeonID);
+	}
+
+	@Override
+	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, DungeonExitPoint start, Random rand, DungeonInstance instance) {
+		// Stairs and entry room
+		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
+		return Lists.newArrayList(
+				new DungeonRoomInstance(adj, stairs, false, instance, UUID.randomUUID()),
+				new DungeonRoomInstance(stairs.getEntryStart(world, adj), entry, false, instance, UUID.randomUUID())
+				);
 	}
 }
