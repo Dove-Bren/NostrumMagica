@@ -42,6 +42,7 @@ public enum NostrumMagicaSounds {
 	UI_RESEARCH("ui.research.progress", SoundCategory.PLAYERS),
 	AMBIENT_WOOSH("ambient.woosh", SoundCategory.AMBIENT),
 	AMBIENT_WOOSH2("ambient.woosh2", SoundCategory.AMBIENT),
+	AMBIENT_WOOSH3("ambient.woosh3", SoundCategory.AMBIENT),
 	DRAGON_IDLE("mob.dragon.idle", SoundCategory.HOSTILE),
 	DRAGON_LAND_HURT("mob.dragon.land_hurt", SoundCategory.HOSTILE),
 	DRAGON_WATER_HURT("mob.dragon.water_hurt", SoundCategory.HOSTILE),

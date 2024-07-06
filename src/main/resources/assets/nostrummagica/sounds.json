@@ -268,6 +268,15 @@
         ]
     },
     
+    "ambient.woosh3":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "nostrummagica:ambient/small_fanfare"
+        ]
+    },
+    
     "ambient.portal":
     {
         "category": "neutral",

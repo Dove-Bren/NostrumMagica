@@ -159,7 +159,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 		this.world.addBlockEvent(pos, getBlockState().getBlock(), 0, 0);
 		world.playSound(null, pos, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, .5f, .8f);
 		
-		NostrumMagicaSounds fanfare = isLarge() ? NostrumMagicaSounds.AMBIENT_WOOSH : NostrumMagicaSounds.AMBIENT_WOOSH2;
+		NostrumMagicaSounds fanfare = isLarge() ? NostrumMagicaSounds.AMBIENT_WOOSH2 : NostrumMagicaSounds.AMBIENT_WOOSH3;
 		fanfare.play(world, pos);
 	}
 	
