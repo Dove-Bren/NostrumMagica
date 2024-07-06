@@ -1,0 +1,12 @@
+{
+	"variants": {
+		"facing=north,unlockable=false": { "model": "nostrummagica:block/dungeon_door_small" },
+		"facing=east,unlockable=false": { "model": "nostrummagica:block/dungeon_door_small", "y": 90 },
+		"facing=south,unlockable=false": { "model": "nostrummagica:block/dungeon_door_small", "y": 180 },
+		"facing=west,unlockable=false": { "model": "nostrummagica:block/dungeon_door_small", "y": 270 },
+		"facing=north,unlockable=true": { "model": "nostrummagica:block/dungeon_door_small" },
+		"facing=east,unlockable=true": { "model": "nostrummagica:block/dungeon_door_small", "y": 90 },
+		"facing=south,unlockable=true": { "model": "nostrummagica:block/dungeon_door_small", "y": 180 },
+		"facing=west,unlockable=true": { "model": "nostrummagica:block/dungeon_door_small", "y": 270 }
+	}
+}

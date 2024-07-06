@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
+import com.smanzana.nostrummagica.block.dungeon.DungeonDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonLauncherBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
@@ -119,6 +120,8 @@ public class NostrumBlocks {
 	@ObjectHolder(MysticSnowLayerBlock.ID) public static MysticSnowLayerBlock mysticSnowLayer;
 	@ObjectHolder(DungeonKeyChestBlock.Small.ID) public static DungeonKeyChestBlock.Small smallDungeonKeyChest;
 	@ObjectHolder(DungeonKeyChestBlock.Large.ID) public static DungeonKeyChestBlock.Large largeDungeonKeyChest;
+	@ObjectHolder(DungeonDoorBlock.Small.ID) public static DungeonDoorBlock.Small smallDungeonDoor;
+	@ObjectHolder(DungeonDoorBlock.Large.ID) public static DungeonDoorBlock.Large largeDungeonDoor; 
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -200,6 +203,8 @@ public class NostrumBlocks {
     	registerBlockItem(redstoneTrigger, redstoneTrigger.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(smallDungeonKeyChest, smallDungeonKeyChest.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(largeDungeonKeyChest, largeDungeonKeyChest.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(smallDungeonDoor, smallDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(largeDungeonDoor, largeDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -290,6 +295,9 @@ public class NostrumBlocks {
     	registerBlock(new MysticSnowLayerBlock(), MysticSnowLayerBlock.ID, registry);
     	registerBlock(new DungeonKeyChestBlock.Small(), DungeonKeyChestBlock.Small.ID, registry);
     	registerBlock(new DungeonKeyChestBlock.Large(), DungeonKeyChestBlock.Large.ID, registry);
+    	
+    	registerBlock(new DungeonDoorBlock.Small(), DungeonDoorBlock.Small.ID, registry);
+    	registerBlock(new DungeonDoorBlock.Large(), DungeonDoorBlock.Large.ID, registry);
     }
     
 }

@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/dungeon_door_large",
+    "textures": {
+        "all": "nostrummagica:item/dungeon_door_large_item"
+    }
+}

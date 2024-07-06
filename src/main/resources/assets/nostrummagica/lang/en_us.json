@@ -464,6 +464,8 @@
 	"block.nostrummagica.mystic_snow_layer": "Snow",
 	"block.nostrummagica.small_dungeon_key_chest": "Small Key Chest",
 	"block.nostrummagica.large_dungeon_key_chest": "Large Key Chest",
+	"block.nostrummagica.dungeon_door_small": "Locked Dungeon Door",
+	"block.nostrummagica.dungeon_door_large": "Locked Large Dungeon Door",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

@@ -17,6 +17,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -33,10 +34,14 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	private DyeColor color;
 	private int ticksExisted;
 	
-	public LockedDoorTileEntity() {
-		super(NostrumTileEntities.LockedDoorType);
+	protected LockedDoorTileEntity(TileEntityType<? extends LockedDoorTileEntity> type) {
+		super(type);
 		lockKey = new NostrumWorldKey();
 		color = DyeColor.GRAY;
+	}
+	
+	public LockedDoorTileEntity() {
+		this(NostrumTileEntities.LockedDoorType);
 	}
 	
 	private void dirty() {
@@ -84,6 +89,14 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
 	}
+	
+	protected void checkBlockState() {
+		boolean worldUnlockable = world.getBlockState(pos).get(LockedDoorBlock.UNLOCKABLE);
+		boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(lockKey); 
+		if (worldUnlockable != tileUnlockable) {
+			world.setBlockState(pos, world.getBlockState(pos).with(LockedDoorBlock.UNLOCKABLE, tileUnlockable), 3);
+		}
+	}
 
 	@Override
 	public void tick() {
@@ -91,11 +104,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 		
 		if (world != null && !world.isRemote()) {
 			if (ticksExisted % 20 == 0) {
-				boolean worldUnlockable = world.getBlockState(pos).get(LockedDoorBlock.UNLOCKABLE);
-				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(lockKey); 
-				if (worldUnlockable != tileUnlockable) {
-					world.setBlockState(pos, world.getBlockState(pos).with(LockedDoorBlock.UNLOCKABLE, tileUnlockable), 3);
-				}
+				checkBlockState();
 			}
 		}
 	}

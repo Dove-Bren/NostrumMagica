@@ -24,7 +24,7 @@ import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class TileEntityLockedDoorRenderer extends TileEntityRenderer<LockedDoorTileEntity> {
+public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extends TileEntityRenderer<E> {
 
 	public static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
 	public static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
@@ -33,7 +33,7 @@ public class TileEntityLockedDoorRenderer extends TileEntityRenderer<LockedDoorT
 		super(rendererDispatcherIn);
 	}
 	
-	protected void renderChains(LockedDoorTileEntity tileEntityIn, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	protected void renderChains(E tileEntityIn, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final MutableBoundingBox bounds = tileEntityIn.getDoorBounds();
 		final float length = (float) Math.sqrt(
 				Math.pow(bounds.maxX + 1 - bounds.minX, 2)
@@ -122,7 +122,7 @@ public class TileEntityLockedDoorRenderer extends TileEntityRenderer<LockedDoorT
 		}
 	}
 	
-	protected void renderLock(LockedDoorTileEntity tileEntityIn, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	protected void renderLock(E tileEntityIn, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final MutableBoundingBox bounds = tileEntityIn.getDoorBounds();
 		final float yDiff = bounds.maxY + 1 - bounds.minY;
 		
@@ -164,7 +164,7 @@ public class TileEntityLockedDoorRenderer extends TileEntityRenderer<LockedDoorT
 	}
 	
 	@Override
-	public void render(LockedDoorTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
+	public void render(E tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final Minecraft mc = Minecraft.getInstance();
 		final double time = (double)tileEntityIn.getWorld().getGameTime() + partialTicks;

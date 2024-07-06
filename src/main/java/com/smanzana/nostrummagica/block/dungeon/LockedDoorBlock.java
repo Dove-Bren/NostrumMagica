@@ -59,7 +59,7 @@ public class LockedDoorBlock extends MagicDoorBlock {
 				if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof DyeItem) {
 					DyeItem dye = (DyeItem) heldItem.getItem();
 					door.setColor(dye.getDyeColor());
-				} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof WorldKeyItem) {
+				} else if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof WorldKeyItem) {
 					; // Do nothing and let item take care of it
 					return ActionResultType.PASS;
 				} else {
