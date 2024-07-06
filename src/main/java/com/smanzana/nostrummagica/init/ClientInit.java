@@ -68,6 +68,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
 import com.smanzana.nostrummagica.client.render.item.SpellPatternTomeRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityDungeonKeyChestRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedDoorRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityManaArmorerRenderer;
@@ -180,6 +181,7 @@ public class ClientInit {
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ManaArmorerTileEntityType, TileEntityManaArmorerRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedChestEntityType, TileEntityLockedChestRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedDoorType, TileEntityLockedDoorRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.DungeonKeyChestTileEntityType, TileEntityDungeonKeyChestRenderer::new);
 		
 		ScreenManager.registerFactory(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
 		ScreenManager.registerFactory(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
@@ -408,6 +410,8 @@ public class ClientInit {
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.toggleDoor, RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.togglePlatform, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedGlass, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.smallDungeonKeyChest, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(NostrumBlocks.largeDungeonKeyChest, RenderType.getCutout());
 	}
 	
 	private static final void registerItemModelProperties() {

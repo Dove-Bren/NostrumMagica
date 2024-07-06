@@ -462,6 +462,8 @@
 	"block.nostrummagica.cursed_glass": "Cursed Glass",
 	"block.nostrummagica.redstone_trigger": "Redstone Trigger",
 	"block.nostrummagica.mystic_snow_layer": "Snow",
+	"block.nostrummagica.small_dungeon_key_chest": "Small Key Chest",
+	"block.nostrummagica.large_dungeon_key_chest": "Large Key Chest",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

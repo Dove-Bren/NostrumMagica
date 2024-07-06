@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
+import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonLauncherBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
@@ -116,6 +117,8 @@ public class NostrumBlocks {
 	@ObjectHolder(CursedGlass.ID) public static CursedGlass cursedGlass;
 	@ObjectHolder(RedstoneTriggerBlock.ID) public static RedstoneTriggerBlock redstoneTrigger;
 	@ObjectHolder(MysticSnowLayerBlock.ID) public static MysticSnowLayerBlock mysticSnowLayer;
+	@ObjectHolder(DungeonKeyChestBlock.Small.ID) public static DungeonKeyChestBlock.Small smallDungeonKeyChest;
+	@ObjectHolder(DungeonKeyChestBlock.Large.ID) public static DungeonKeyChestBlock.Large largeDungeonKeyChest;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -195,6 +198,8 @@ public class NostrumBlocks {
     	registerBlockItem(togglePlatform, togglePlatform.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(cursedGlass, cursedGlass.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(redstoneTrigger, redstoneTrigger.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(smallDungeonKeyChest, smallDungeonKeyChest.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(largeDungeonKeyChest, largeDungeonKeyChest.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -283,6 +288,8 @@ public class NostrumBlocks {
     	registerBlock(new CursedGlass(), CursedGlass.ID, registry);
     	registerBlock(new RedstoneTriggerBlock(), RedstoneTriggerBlock.ID, registry);
     	registerBlock(new MysticSnowLayerBlock(), MysticSnowLayerBlock.ID, registry);
+    	registerBlock(new DungeonKeyChestBlock.Small(), DungeonKeyChestBlock.Small.ID, registry);
+    	registerBlock(new DungeonKeyChestBlock.Large(), DungeonKeyChestBlock.Large.ID, registry);
     }
     
 }

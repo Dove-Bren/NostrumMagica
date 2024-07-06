@@ -1,0 +1,21 @@
+{
+    "variants": {
+        "slave=false,facing=north,open=false": { "model": "nostrummagica:block/large_chest" },
+        "slave=false,facing=east,open=false": { "model": "nostrummagica:block/large_chest", "y": 90 },
+        "slave=false,facing=south,open=false": { "model": "nostrummagica:block/large_chest", "y": 180 },
+        "slave=false,facing=west,open=false": { "model": "nostrummagica:block/large_chest", "y": 270 },
+        "slave=false,facing=north,open=true": { "model": "nostrummagica:block/large_chest_open" },
+        "slave=false,facing=east,open=true": { "model": "nostrummagica:block/large_chest_open", "y": 90 },
+        "slave=false,facing=south,open=true": { "model": "nostrummagica:block/large_chest_open", "y": 180 },
+        "slave=false,facing=west,open=true": { "model": "nostrummagica:block/large_chest_open", "y": 270 },
+		
+        "slave=true,facing=north,open=false": { "model": "nostrummagica:block/none" },
+        "slave=true,facing=east,open=false": { "model": "nostrummagica:block/none", "y": 90 },
+        "slave=true,facing=south,open=false": { "model": "nostrummagica:block/none", "y": 180 },
+        "slave=true,facing=west,open=false": { "model": "nostrummagica:block/none", "y": 270 },
+        "slave=true,facing=north,open=true": { "model": "nostrummagica:block/none" },
+        "slave=true,facing=east,open=true": { "model": "nostrummagica:block/none", "y": 90 },
+        "slave=true,facing=south,open=true": { "model": "nostrummagica:block/none", "y": 180 },
+        "slave=true,facing=west,open=true": { "model": "nostrummagica:block/none", "y": 270 }
+    }
+}

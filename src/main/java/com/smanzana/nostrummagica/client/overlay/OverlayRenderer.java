@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityDungeonKeyChestRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -120,7 +121,7 @@ public class OverlayRenderer extends AbstractGui {
 	private static final int GUI_CONTINGENCY_ICON_OFFSETX = 22;
 	private static final int GUI_CONTINGENCY_ICON_OFFSETY = 37;
 	private static final int GUI_CONTINGENCY_ICON_LENGTH = 18;
-
+	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
 	
@@ -871,38 +872,45 @@ public class OverlayRenderer extends AbstractGui {
 		if (dungeon != null) {
 			final int smallCount = NostrumMagica.instance.getWorldKeys().getKeyCount(dungeon.instance.getSmallKey());
 			final int largeCount = NostrumMagica.instance.getWorldKeys().getKeyCount(dungeon.instance.getLargeKey());
-			
-			
-			final int width = 70;
-			final int xOffset = window.getScaledWidth() - width;
-			final int height = 30;
-			final int yOffset = window.getScaledHeight() - height;
-			final int colorTop = 0x20000000;
-			final int colorBottom = 0xFF000000;
-			
-			matrixStackIn.push();
-			matrixStackIn.translate(xOffset, yOffset, 0);
-			RenderFuncs.drawGradientRect(matrixStackIn, 0, 0, width, height,
-					colorTop, colorTop,
-					colorBottom, colorBottom);
-			
-			matrixStackIn.translate(width/2, 5, 0);
-			matrixStackIn.scale(.8f, .8f, 1f);
-			{
-				String msg;
-				int len;
+			if (smallCount > 0 || largeCount > 0) {
+				final int width = 45;
+				final int xOffset = window.getScaledWidth() - width;
+				final int height = 14;
+				final int yOffset = window.getScaledHeight() - height;
+				final int colorTop = 0x20000000;
+				final int colorBottom = 0xFF000000;
+				final int iconWidth = 12;
+				final int iconHeight = 12;
+				final int textYOffset = (iconHeight - fonter.FONT_HEIGHT) / 2;
+				Minecraft mc = Minecraft.getInstance();
 				
-				msg = "Small keys: " + smallCount;
-				len = fonter.getStringWidth(msg);
-				fonter.drawString(matrixStackIn, msg, -len/2, 0, 0xFFFFFFFF);
-				matrixStackIn.translate(0, fonter.FONT_HEIGHT + 2, 0);
+				matrixStackIn.push();
+				matrixStackIn.translate(xOffset, yOffset, 0);
+				RenderFuncs.drawGradientRect(matrixStackIn, 0, 0, width, height,
+						colorTop, colorTop,
+						colorBottom, colorBottom);
 				
-				msg = "Large keys: " + largeCount;
-				len = fonter.getStringWidth(msg);
-				fonter.drawString(matrixStackIn, msg, -len/2, 0, 0xFFFFFFFF);
+				matrixStackIn.translate(width - 2, 2, 0);
+				matrixStackIn.scale(.8f, .8f, 1f);
+				
+				mc.getTextureManager().bindTexture(TileEntityDungeonKeyChestRenderer.ICON_COPPER_KEY);
+				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, -iconWidth, 0, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+				matrixStackIn.translate(-(iconWidth + 6), 0, 0);
+				
+				fonter.drawString(matrixStackIn, "" + smallCount, 0, textYOffset + 1, 0xFFFFFFFF);
+				matrixStackIn.translate(-(5 + 2), 0, 0);
+				
+				if (largeCount > 0) {
+					mc.getTextureManager().bindTexture(TileEntityDungeonKeyChestRenderer.ICON_SILVER_KEY);
+					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, -iconWidth, 0, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+					matrixStackIn.translate(-(iconWidth + 6), 0, 0);
+					
+					fonter.drawString(matrixStackIn, "" + largeCount, 0, textYOffset + 1, 0xFFFFFFFF);
+					matrixStackIn.translate(-(5 + 2), 0, 0);
+				}
+				
+				matrixStackIn.pop();
 			}
-			
-			matrixStackIn.pop();
 		}
 	}
 	
