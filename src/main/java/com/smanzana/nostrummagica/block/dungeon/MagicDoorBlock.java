@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
@@ -31,6 +33,7 @@ import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -215,10 +218,10 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	
 	@Override
 	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		this.spawnDoor(worldIn, pos, state);
+		this.spawnDoor(worldIn, pos, state, null);
 	}
 	
-	private void spawnDoor(World world, BlockPos masterBlock, BlockState masterState) {
+	protected void spawnDoor(IWorld world, BlockPos masterBlock, BlockState masterState, @Nullable MutableBoundingBox bounds) {
 		// Fill all air blocks around the master in all directions that are ortho to facing
 		Set<BlockPos> visited = new HashSet<>();
 		List<BlockPos> next = new LinkedList<>();
@@ -242,13 +245,18 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 			if (visited.contains(cur))
 				continue;
 			
+			visited.add(cur);
+			
+			if (bounds != null && !bounds.isVecInside(cur)) {
+				continue;
+			}
+			
 			if (!world.isAirBlock(cur))
 				continue;
 			
 			blocksLeft--;
 			
-			visited.add(cur);
-			world.setBlockState(cur, getSlaveState(masterState.get(HORIZONTAL_FACING)));
+			world.setBlockState(cur, getSlaveState(masterState.get(HORIZONTAL_FACING)), 3);
 			
 			next.add(cur.up());
 			next.add(cur.down());

@@ -13,6 +13,7 @@ import com.mojang.serialization.DataResult;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -78,6 +79,22 @@ public class NetUtils {
 			}
 		}
 		return mapToFill;
+	}
+	
+	public static <T> ListNBT ToNBT(List<T> list, Function<T, INBT> writer) {
+		ListNBT tagList = new ListNBT();
+		for (T elem : list) {
+			tagList.add(writer.apply(elem));
+		}
+		return tagList;
+	}
+	
+	public static <T> List<T> FromNBT(List<T> listToFill, ListNBT tagList, Function<INBT, T> reader) {
+		for (int i = 0; i < tagList.size(); i++) {
+			INBT tag = tagList.get(i);
+			listToFill.add(reader.apply(tag));
+		}
+		return listToFill;
 	}
 	
 	public static final UUID CombineUUIDs(UUID left, UUID right) {

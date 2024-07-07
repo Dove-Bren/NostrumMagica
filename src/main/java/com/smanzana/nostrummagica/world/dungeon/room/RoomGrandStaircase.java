@@ -111,7 +111,7 @@ public class RoomGrandStaircase extends StaticRoom {
 				"X   X",
 				"X   X",
 				"X   X",
-				"XXXXX",
+				"XX XX",
 				// L1 13
 				"XXXXX",
 				"XXXXX",
@@ -580,6 +580,11 @@ public class RoomGrandStaircase extends StaticRoom {
 	@Override
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return null;
+	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return false;
 	}
 
 	@Override

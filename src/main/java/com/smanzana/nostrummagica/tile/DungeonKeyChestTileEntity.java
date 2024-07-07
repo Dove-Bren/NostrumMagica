@@ -91,8 +91,14 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	
 	@Override
 	public void setWorldKey(NostrumWorldKey key) {
+		setWorldKey(key, false);
+	}
+	
+	public void setWorldKey(NostrumWorldKey key, boolean isWorldGen) {
 		this.key = key;
-		dirty();
+		if (!isWorldGen) {
+			dirty();
+		}
 	}
 	
 	@Override

@@ -22,7 +22,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.StructureStart;
@@ -283,5 +285,9 @@ public class WorldUtil {
 	         return start.getBoundingBox().isVecInside(pos);
 	      }).flatMap(start -> start.getComponents().stream()).filter(piece -> piece.getBoundingBox().isVecInside(pos))
 				.findFirst().orElse(null);
+	}
+	
+	public static final boolean IsWorldGen(IWorld world) {
+		return world instanceof WorldGenRegion;
 	}
 }

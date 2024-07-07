@@ -98,7 +98,12 @@ public class LoadedRoom implements IDungeonRoom {
 				continue; // Will come back for you later <3
 			}
 			
-			LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
+			// Dungeon generation may replace some chests with other things.
+			// Make sure it's still a chest.
+			// TODO improve this, especially since rooms are part of dungeongen not blueprints
+			if (world.getBlockState(lootSpot.getPos()).getBlock() instanceof ChestBlock) {
+				LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
+			}
 		}
 	}
 
@@ -117,24 +122,25 @@ public class LoadedRoom implements IDungeonRoom {
 		// Blueprint wants your facing as you go in the door. That's there the 'opposite' comes from.
 		
 		// Blueprint exits are rotated to the entry entry direction (and have their own rotation too).
-		final Direction modDir = IBlueprint.GetModDir(blueprint.getEntry().getFacing(), start.getFacing());
+		//final Direction modDir = IBlueprint.GetModDir(blueprint.getEntry().getFacing(), start.getFacing());
 		// Door offset and final rotation is what's in exits rotated modDir times
 		
 		List<DungeonExitPoint> ret;
 		if (exits != null) {
 			ret = new ArrayList<>(exits.size());
 			for (DungeonExitPoint door : exits) {
-				Direction doorDir = door.getFacing();
-				int times = (modDir.getHorizontalIndex() + 2) % 4;
-				while (times-- > 0) {
-					doorDir = doorDir.rotateY();
-				}
-				final DungeonExitPoint fromEntry = new DungeonExitPoint(
-						IBlueprint.ApplyRotation(door.getPos(), modDir),
-						doorDir
-						);
-				final DungeonExitPoint relative = new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
-				ret.add(relative);
+				ret.add(BlueprintToRoom(door, blueprint.getEntry(), start));
+//				Direction doorDir = door.getFacing();
+//				int times = (modDir.getHorizontalIndex() + 2) % 4;
+//				while (times-- > 0) {
+//					doorDir = doorDir.rotateY();
+//				}
+//				final DungeonExitPoint fromEntry = new DungeonExitPoint(
+//						IBlueprint.ApplyRotation(door.getPos(), modDir),
+//						doorDir
+//						);
+//				final DungeonExitPoint relative = new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
+//				ret.add(relative);
 			}
 		} else {
 			ret = new LinkedList<>();
@@ -149,17 +155,29 @@ public class LoadedRoom implements IDungeonRoom {
 
 	@Override
 	public boolean supportsDoor() {
-		return false;
+		return blueprint.getLargeDoorLocation() != null;
+	}
+	
+	@Override
+	public DungeonExitPoint getDoorLocation(DungeonExitPoint start) {
+		DungeonExitPoint orig = blueprint.getLargeDoorLocation();
+		return BlueprintToRoom(orig, blueprint.getEntry(), start);
 	}
 
 	@Override
 	public boolean supportsKey() {
-		return false;
+		return !blueprint.getLargeKeySpots().isEmpty();
 	}
 
 	@Override
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
-		return null;
+		DungeonExitPoint orig = blueprint.getLargeKeySpots().iterator().next();
+		return BlueprintToRoom(orig, blueprint.getEntry(), start);
+	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return !chestsRelative.isEmpty();
 	}
 
 	@Override
@@ -238,5 +256,28 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public String getRoomID() {
 		return this.registryID;
+	}
+	
+	protected static final DungeonExitPoint BlueprintToRoom(DungeonExitPoint blueprintPoint, DungeonExitPoint blueprintEntry, DungeonExitPoint start) {
+		DungeonExitPoint orig = blueprintPoint;
+		
+		// Dungeon notion of direction is backwards to blueprints:
+		// Dungeon wants facing to be you looking back through the door
+		// Blueprint wants your facing as you go in the door. That's there the 'opposite' comes from.
+		
+		// Blueprint exits are rotated to the entry entry direction (and have their own rotation too).
+		final Direction modDir = IBlueprint.GetModDir(blueprintEntry.getFacing(), start.getFacing());
+		// Door offset and final rotation is what's in exits rotated modDir times
+				
+		Direction doorDir = orig.getFacing();
+		int times = (modDir.getHorizontalIndex() + 2) % 4;
+		while (times-- > 0) {
+			doorDir = doorDir.rotateY();
+		}
+		final DungeonExitPoint fromEntry = new DungeonExitPoint(
+				IBlueprint.ApplyRotation(orig.getPos(), modDir),
+				doorDir
+				);
+		return new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
 	}
 }

@@ -62,10 +62,14 @@ public interface IDungeonRoom {
 	
 	public boolean supportsDoor();
 	
+	public default DungeonExitPoint getDoorLocation(DungeonExitPoint start) {return null;}
+	
 	public boolean supportsKey();
 	
 	// If supportsKey returns false, expected to return null
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start);
+	
+	public boolean supportsTreasure();
 	
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start);
 	

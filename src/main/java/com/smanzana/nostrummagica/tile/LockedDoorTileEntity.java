@@ -25,7 +25,7 @@ import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class LockedDoorTileEntity extends TileEntity implements ITickableTileEntity, IWorldKeyHolder, IUniqueDungeonTileEntity {
+public class LockedDoorTileEntity extends TileEntity implements ITickableTileEntity, IWorldKeyHolder, IUniqueBlueprintTileEntity {
 
 	private static final String NBT_LOCK = "lockkey";
 	private static final String NBT_COLOR = "color";
@@ -145,8 +145,14 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 
 	@Override
 	public void setWorldKey(NostrumWorldKey key) {
+		setWorldKey(key, false);
+	}
+	
+	public void setWorldKey(NostrumWorldKey key, boolean isWorldGen) {
 		this.lockKey = key;
-		this.dirty();
+		if (!isWorldGen) {
+			this.dirty();
+		}
 	}
 	
 	public void setColor(DyeColor color) {
@@ -159,18 +165,14 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void onDungeonSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+	public void onRoomBlueprintSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
 		// TODO: should this use dungeon ID? Or even let it be configurable?
 		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
 		// will want unique-per-room keys?
 		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
 		// that's wrong?
 		final NostrumWorldKey newKey = this.lockKey.mutateWithID(roomID);
-		if (isWorldGen) {
-			this.lockKey = newKey;
-		} else {
-			this.setWorldKey(newKey);
-		}
+		setWorldKey(newKey, isWorldGen);
 	}
 	
 	private BlockPos bottomStash = null;

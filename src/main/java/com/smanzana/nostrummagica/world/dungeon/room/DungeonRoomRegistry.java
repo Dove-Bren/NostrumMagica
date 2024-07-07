@@ -524,6 +524,8 @@ public class DungeonRoomRegistry {
 				"plantboss_lobby.gat",
 				"portal_entrance.gat",
 				"portal_lobby.gat",
+				"dungeon_door.gat",
+				"dungeon_end_key_1.gat"
 			};
 		
 		String[] compNames = {"sorcery_dungeon"};

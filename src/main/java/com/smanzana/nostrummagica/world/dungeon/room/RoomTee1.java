@@ -271,6 +271,11 @@ public class RoomTee1 extends StaticRoom {
 				new BlockPos(-3, 4, 18),
 				Direction.EAST);
 	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return true;
+	}
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {

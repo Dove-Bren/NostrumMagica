@@ -33,7 +33,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public class LockedChestTileEntity extends TileEntity implements ITickableTileEntity, IInventory, IWorldKeyHolder, IUniqueDungeonTileEntity {
+public class LockedChestTileEntity extends TileEntity implements ITickableTileEntity, IInventory, IWorldKeyHolder, IUniqueBlueprintTileEntity {
 
 	private static final String NBT_INV = "inventory";
 	private static final String NBT_LOCK = "lockkey";
@@ -243,7 +243,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void onDungeonSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+	public void onRoomBlueprintSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
 		// TODO: should this use dungeon ID? Or even let it be configurable?
 		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
 		// will want unique-per-room keys?

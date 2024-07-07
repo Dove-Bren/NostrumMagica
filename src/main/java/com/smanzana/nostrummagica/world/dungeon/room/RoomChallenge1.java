@@ -399,6 +399,11 @@ public class RoomChallenge1 extends StaticRoom {
 				new BlockPos(-4, 1, 21),
 				Direction.EAST); 
 	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return true;
+	}
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {

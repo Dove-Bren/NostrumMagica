@@ -23,7 +23,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchTriggerEntity> implements IWorldKeyHolder, IUniqueDungeonTileEntity {
+public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchTriggerEntity> implements IWorldKeyHolder, IUniqueBlueprintTileEntity {
 	
 	private NostrumWorldKey key;
 	private DyeColor color;
@@ -135,7 +135,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public void onDungeonSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+	public void onRoomBlueprintSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
 		// TODO: should this use dungeon ID? Or even let it be configurable?
 		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
 		// will want unique-per-room keys?

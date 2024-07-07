@@ -114,6 +114,11 @@ public class RoomEnd2 extends StaticRoom {
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return null;
 	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return true;
+	}
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {

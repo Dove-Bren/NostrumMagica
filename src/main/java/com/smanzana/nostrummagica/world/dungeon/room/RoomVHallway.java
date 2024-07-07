@@ -183,6 +183,11 @@ public class RoomVHallway extends StaticRoom {
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return null;
 	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return false;
+	}
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {

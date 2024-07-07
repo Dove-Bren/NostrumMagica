@@ -109,13 +109,18 @@ public class RoomEnd1 extends StaticRoom {
 
 	@Override
 	public boolean supportsKey() {
-		return !withEnemy && withChest;
+		return false;
 	}
 
 	@Override
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return NostrumDungeon.asRotated(start,
 				new BlockPos(-3, 0, 1), Direction.SOUTH);
+	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return true;
 	}
 
 	@Override

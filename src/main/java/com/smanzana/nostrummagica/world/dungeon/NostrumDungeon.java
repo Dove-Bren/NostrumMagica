@@ -1,11 +1,17 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -16,11 +22,11 @@ import org.apache.commons.lang3.Validate;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.item.ReagentItem;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.JavaUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.NostrumWorldKey;
@@ -29,14 +35,12 @@ import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
 
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -208,15 +212,117 @@ public class NostrumDungeon {
 			return new ArrayList<>();
 		}
 		
-		DungeonGenerationContext context = new DungeonGenerationContext(this, rand, instance);
-		Path startPath = new Path(new DungeonRoomInstance(start, this.starting, false, instance, MakeNewRoomID(context))); // Note: false means starting won't ever have key
+		final boolean supportsPuzzle = (!keyRooms.isEmpty() && !doorRooms.isEmpty());
 		
-		startPath.generateChildren(context, pathLen + rand.nextInt(pathRand), ending);
+		DungeonGenerationContext context = new DungeonGenerationContext(this, rand, instance);
+		Path startPath = new Path(new DungeonRoomInstance(start, this.starting, false, false, instance, MakeNewRoomID(context))); // Note: false means starting won't ever have key
+		
+		startPath.generateChildren(context, pathLen + rand.nextInt(pathRand), ending, supportsPuzzle);
+		
+		addPuzzle(startPath, context);
 		
 		List<DungeonRoomInstance> ret = startPath.getInstances();
-				
 		ret.addAll(this.starting.generateExtraPieces(world, start, rand, instance));
 		return ret;
+	}
+	
+	private void makeSmallDoor(DungeonRoomInstance room, DungeonExitPoint entry, DungeonGenerationContext context) {
+		room.addSmallDoor(GetDoorAdjacent(entry, true));
+	}
+	
+	private void addSmallKey(DungeonRoomInstance room, DungeonGenerationContext context) {
+		room.addSmallKey();
+	}
+	
+	private void addPuzzle(Path root, DungeonGenerationContext context) {
+		// Puzzle algo is as follows:
+		//   1) Before final ending room, put a LARGE door
+		//   2) Somewhere else in dungeon (excluding ending or door rooms), put a LARGE key
+		//   3) Let curKey be the room with LARGE key and curDoor be the same room.
+		//   4) Let curPool be all rooms excluding the end room, LARGE door room, and curKey.
+		//   5) Loop:
+		//      6) Resolve common ancestor between curKey and curDoor
+		//      7) IF ancestor is root, STOP
+		//      8) Pick entry on path from common ancestor to root and create a SMALL door. Update curDoor to the room with this entry as an exit.
+		//      9) Reduce curPool by removing all children of curDoor
+		//     10) Pick random room from curPool and add a SMALL key. Update curKey to be this room.
+		//     11) ENDLOOP (go back to 6)
+		//
+		// Note that steps 1 and 2 are done during initial generation but are validated here.
+		
+		// Find LARGE door and key rooms and verify both exist
+		Path largeDoor = root.findChild(p -> p.hasLargeDoor);
+		Path largeKey = root.findChild(p -> p.hasLargeKey);
+		
+		if (largeDoor == null || largeKey == null) {
+			NostrumMagica.logger.warn("Could not make puzzle in dungeon, as door and key rooms are not both present");
+			return;
+		} else {
+			// #3
+			Path curKey = largeKey;
+			Path curDoor = largeKey;
+			
+			// #4
+			Set<Path> curPool = new HashSet<>();
+			root.addSelfAndChildren(curPool, p -> p.myRoom.template.supportsTreasure());
+			largeDoor.removeSelfAndChildren(curPool);
+			largeKey.removeSelfAndChildren(curPool);
+			if (curPool.isEmpty()) {
+				NostrumMagica.logger.warn("Could not make puzzle in dungeon, as first-pass pool of rooms was empty");
+				return;
+			}
+			
+			// Stats
+			int loops = 0;
+			int addedDoors = 0;
+			int addedKeys = 0;
+			
+			// #5
+			while (true) {
+				loops++;
+				
+				// #6
+				Path commonParent = curKey.getCommonParent(curDoor);
+				// #7
+				if (commonParent.isRoot()) {
+					break;
+				}
+				
+				// #8
+				// Want to only go back 1 or 2 nodes to try and make more complex puzzles by default.
+				// Do so by peeking and seeing if what comes after us is the root already or not
+				final Path roomBeforeDoor;
+				final DungeonExitPoint doorEntry;
+				
+				final Path roomAfterDoor;
+				Deque<Path> rootPath = commonParent.getRootPath();
+				rootPath.removeLast(); // will be commonParent
+				if (context.rand.nextBoolean() || rootPath.peekLast().isRoot()) {
+					// Either we rolled a 1, or only possible place is 1 back (which will be root)
+					roomAfterDoor = commonParent;
+				} else {
+					roomAfterDoor = rootPath.peekLast();
+				}
+				doorEntry = roomAfterDoor.myRoom.entry;
+				roomBeforeDoor = roomAfterDoor.parent;
+				
+				makeSmallDoor(roomBeforeDoor.myRoom, doorEntry, context);
+				curDoor = roomBeforeDoor;
+				addedDoors++;
+				
+				// #9
+				// Reduce curpool
+				roomAfterDoor.removeSelfAndChildren(curPool);
+				
+				// #10 Pick new key location
+				final Path newKeyRoom = JavaUtils.GetRandom(curPool, context.rand).orElse(root);
+				addSmallKey(newKeyRoom.myRoom, context);
+				curKey = newKeyRoom;
+				addedKeys++;
+			}
+			
+			NostrumMagica.logger.debug("Generated dungeon puzzle in " + loops + " iterations with " + addedKeys + " keys and " + addedDoors + " doors");
+		}
 	}
 	
 	// Generates and then spawns a dungeon in the world immediately.
@@ -454,16 +560,32 @@ public class NostrumDungeon {
 	public static class DungeonRoomInstance {
 		private final DungeonExitPoint entry;
 		private final IDungeonRoom template;
-		private final boolean hasKey; // whether the key should be in this room
+		private final boolean hasLargeKey; // whether the key should be in this room
+		private final boolean hasLargeDoor; // Whether a large key door is in this room and should et stamped to be dungeon key
 		private final DungeonInstance dungeonInstance;
 		private final UUID roomID;
 		
-		public DungeonRoomInstance(DungeonExitPoint entry, IDungeonRoom template, boolean hasKey, DungeonInstance dungeonInstance, @Nonnull UUID roomID) {
+		// Puzzle mechanics that can be turned on after construction
+		private final List<DungeonExitPoint> smallDoors; // What (if any) exits should have small doors
+		private boolean hasSmallKey;
+		
+		public DungeonRoomInstance(DungeonExitPoint entry, IDungeonRoom template, boolean hasKey, boolean hasLargeDoor, DungeonInstance dungeonInstance, @Nonnull UUID roomID) {
 			this.entry = entry;
 			this.template = template;
-			this.hasKey = hasKey;
+			this.hasLargeKey = hasKey;
+			this.hasLargeDoor = hasLargeDoor;
 			this.dungeonInstance = dungeonInstance;
 			this.roomID = roomID;
+			this.smallDoors = new ArrayList<>(1);
+			this.hasSmallKey = false;
+		}
+		
+		protected void addSmallDoor(DungeonExitPoint exit) {
+			smallDoors.add(exit);
+		}
+		
+		protected void addSmallKey() {
+			this.hasSmallKey = true;
 		}
 
 		public MutableBoundingBox getBounds() {
@@ -490,33 +612,57 @@ public class NostrumDungeon {
 			template.spawn(world, this.entry, bounds, this.roomID);
 			
 			// If we have a key, do special key placement
-			if (this.hasKey) {
+			if (this.hasLargeKey) {
 				DungeonExitPoint keyLoc = template.getKeyLocation(this.entry);
 				if (bounds == null || bounds.isVecInside(keyLoc.pos)) {
-					spawnKey(world, keyLoc);
+					spawnLargeKey(world, keyLoc);
+				}
+			}
+			if (this.hasLargeDoor) {
+				DungeonExitPoint doorLoc = template.getDoorLocation(this.entry);
+				if (bounds == null || bounds.isVecInside(doorLoc.pos)) {
+					spawnLargeDoor(world, doorLoc);
+				}
+			}
+			if (this.hasSmallKey) {
+				if (!this.template.supportsTreasure()) {
+					NostrumMagica.logger.fatal("Room is meant to have a small key, but has no treasure locations");
+				} else {
+					// pick small key location based on something deterministic so that it'll be the same
+					// even if we can't spawn it in this call
+					Random rand = new Random(this.roomID.getLeastSignificantBits() ^ this.roomID.getMostSignificantBits());
+					List<DungeonExitPoint> treasureSpots = this.template.getTreasureLocations(this.entry);
+					DungeonExitPoint spot = treasureSpots.get((int) (rand.nextFloat() * treasureSpots.size()));
+					if (bounds == null || bounds.isVecInside(spot.pos)) {
+						spawnSmallKey(world, spot);
+					}
+				}
+			}
+			for (DungeonExitPoint smallDoor : this.smallDoors) {
+				if (bounds == null || bounds.isVecInside(smallDoor.pos)) {
+					spawnSmallDoor(world, smallDoor, bounds);
 				}
 			}
 		}
 
-		private void spawnKey(IWorld world, DungeonExitPoint keyLocation) {
-			NonNullList<ItemStack> loot = NonNullList.withSize(27, ItemStack.EMPTY);
-			for (int i = 0; i < 27; i++) {
-				if (rand.nextFloat() < .2) {
-					loot.set(i, new ItemStack(Items.ARROW, rand.nextInt(3) + 1));
-				} else if (rand.nextFloat() < .5) {
-					loot.set(i, ReagentItem.CreateStack(
-							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
-							rand.nextInt(10) + 1));
-				} else if (rand.nextFloat() < .5) {
-					loot.set(i, ReagentItem.CreateStack(
-							ReagentType.values()[rand.nextInt(ReagentType.values().length)],
-							rand.nextInt(20) + 1));
-				}
-			}
+		private void spawnLargeKey(IWorld world, DungeonExitPoint keyLocation) {
+			// Technically, this spawns at two positions and could go out of bounds
+			NostrumBlocks.largeDungeonKeyChest.makeDungeonChest(world, keyLocation.getPos(), keyLocation.getFacing(), this.dungeonInstance);
+		}
+		
+		private void spawnLargeDoor(IWorld world, DungeonExitPoint doorLocation) {
+			// Relying on there already being a door... could make large chest do the same?
+			NostrumBlocks.largeDungeonDoor.overrideDungeonKey(world, doorLocation.getPos(), this.dungeonInstance);
 			
-			loot.set(rand.nextInt(27), new ItemStack(Items.GOLDEN_APPLE)); // FIXME should be key
-			LootUtil.createLoot(world, keyLocation.getPos(), keyLocation.getFacing(),
-					loot);
+			// could if/else and use existing if it's th ere. same with large key?
+		}
+		
+		private void spawnSmallKey(IWorld world, DungeonExitPoint keyLocation) {
+			NostrumBlocks.smallDungeonKeyChest.makeDungeonChest(world, keyLocation.getPos(), keyLocation.getFacing(), this.dungeonInstance);
+		}
+		
+		private void spawnSmallDoor(IWorld world, DungeonExitPoint smallDoor, @Nullable MutableBoundingBox bounds) {
+			NostrumBlocks.smallDungeonDoor.spawnDungeonDoor(world, smallDoor.getPos(), smallDoor.facing, bounds, this.dungeonInstance);
 		}
 		
 		@Override
@@ -527,8 +673,11 @@ public class NostrumDungeon {
 		private static final String NBT_ENTRY = "entry";
 		private static final String NBT_TEMPLATE = "template";
 		private static final String NBT_HASKEY = "hasKey";
+		private static final String NBT_HASDOOR = "hasLargeDoor";
 		private static final String NBT_DUNGEON_INSTANCE = "dungeonInstance";
 		private static final String NBT_ROOM_ID = "roomID";
+		private static final String NBT_HASSMALLKEY = "hasSmallKey";
+		private static final String NBT_SMALL_DOORS = "smallDoors";
 		
 		public @Nonnull CompoundNBT toNBT(@Nullable CompoundNBT tag) {
 			if (tag == null) {
@@ -537,9 +686,12 @@ public class NostrumDungeon {
 			
 			tag.put(NBT_ENTRY, this.entry.toNBT());
 			tag.putString(NBT_TEMPLATE, this.template.getRoomID());
-			tag.putBoolean(NBT_HASKEY, this.hasKey);
+			tag.putBoolean(NBT_HASKEY, this.hasLargeKey);
 			tag.put(NBT_DUNGEON_INSTANCE, this.dungeonInstance.toNBT());
 			tag.putUniqueId(NBT_ROOM_ID, roomID);
+			tag.putBoolean(NBT_HASSMALLKEY, this.hasSmallKey);
+			tag.putBoolean(NBT_HASDOOR, this.hasLargeDoor);
+			tag.put(NBT_SMALL_DOORS, NetUtils.ToNBT(this.smallDoors, e -> e.toNBT()));
 			
 			return tag;
 		}
@@ -548,10 +700,18 @@ public class NostrumDungeon {
 			final DungeonExitPoint entry = DungeonExitPoint.fromNBT(tag.getCompound(NBT_ENTRY));
 			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(tag.getString(NBT_TEMPLATE));
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
+			final boolean hasLargeDoor = tag.getBoolean(NBT_HASDOOR);
 			final DungeonInstance instance = DungeonInstance.FromNBT(tag.get(NBT_DUNGEON_INSTANCE));
 			final UUID roomID = tag.getUniqueId(NBT_ROOM_ID);
+			final DungeonRoomInstance ret = new DungeonRoomInstance(entry, template, hasKey, hasLargeDoor, instance, roomID);
 			
-			return new DungeonRoomInstance(entry, template, hasKey, instance, roomID);
+			ret.hasSmallKey = tag.getBoolean(NBT_HASSMALLKEY);
+			ret.smallDoors.clear();
+			if (tag.contains(NBT_SMALL_DOORS, NBT.TAG_LIST)) { // mostly just legacy support?
+				NetUtils.FromNBT(ret.smallDoors, (ListNBT) tag.get(NBT_SMALL_DOORS), nbt -> DungeonExitPoint.fromNBT((CompoundNBT) nbt));
+			}
+			
+			return ret;
 		}
 	}
 	
@@ -568,23 +728,16 @@ public class NostrumDungeon {
 	
 	private class Path {
 		
-		private List<Path> children;
+		private final Path parent;
+		private final List<Path> children;
 		//private final Path parent;
-		private boolean hasKey; // whether this path will have a key when spawned
-		private boolean hasDoor; // Whether the door should be spawned on this path
+		private boolean hasLargeKey; // whether this room itself has a large key
+		private boolean hasLargeDoor; // Whether the room itself has an exit blocked by a large door
 		
 		private DungeonRoomInstance myRoom;
 		
-//		private int doorKey; // if is a door room, set to the key that's needed to unlock
-//		// If is a key supporting room, set to the key that we have. -1 is none
-//		private int numKeys; // Number of key-supporting rooms we have to have
-		
 		public Path(Path parent) {
-//			this.remaining = remaining;
-//			this.parent = parent;
-//			this.firstRoom = room;
-			this.hasKey = false;
-			this.hasDoor = false;
+			this.parent = parent;
 			this.children = new ArrayList<>();
 		}
 		
@@ -593,49 +746,78 @@ public class NostrumDungeon {
 			this.myRoom = startingRoom;
 		}
 		
-		public void hasKey() {
-			this.hasKey = true;
+		public boolean isRoot() {
+			return this.parent == null;
 		}
 		
-		public void hasDoor() {
-			this.hasDoor = true;
+		/**
+		 * Gets all nodes on the way from this node to the root.
+		 * Includes this node in the path.
+		 * Path is a stack with the root at the top of the stack and itself at the base.
+		 * @return
+		 */
+		protected Deque<Path> getRootPath() {
+			Deque<Path> stack = new ArrayDeque<>(4);
+			
+			Path cur = this;
+			while (true) {
+				stack.push(cur);
+				if (cur.isRoot()) {
+					break;
+				}
+				cur = cur.parent;
+			}
+			return stack;
 		}
 		
-//		public int getDoorKey() {
-//			return doorKey;
-//		}
+		protected Path getCommonParent(Path other) {
+			Deque<Path> myStack = this.getRootPath();
+			Deque<Path> theirStack = other.getRootPath();
+			
+			// Find node before first divergence in the stacks
+			Path lastCommon = myStack.pop();
+			Validate.isTrue(lastCommon == theirStack.pop()); // Root should be first in both no matter what
+			Validate.isTrue(lastCommon.isRoot());
+			
+			while (!myStack.isEmpty() && !theirStack.isEmpty()) {
+				Path next = myStack.pop();
+				if (next != theirStack.pop()) {
+					break;
+				}
+				lastCommon = next;
+			}
+			
+			return lastCommon;
+		}
 		
-//		/**
-//		 * Return keys behind this room
-//		 * @return
-//		 */
-//		public List<Integer> getHiddenKeys() {
-//			List<Integer> keys = null;
-//			if (children.isEmpty()) {
-//				keys = new LinkedList<>();
-//			} else {
-//				for (Path child : children) {
-//					if (keys == null)
-//						keys = child.getHiddenKeys();
-//					else
-//						keys.addAll(child.getHiddenKeys());
-//				}
-//			}
-//			
-//			if (this.doorKey != -1)
-//				keys.add(doorKey);
-//			
-//			return keys;
-//		}
+		protected void addSelfAndChildren(Collection<Path> paths, @Nullable Predicate<Path> filter) {
+			if (filter == null || filter.test(this)) {
+				paths.add(this);
+			}
+			for (Path child : this.children) {
+				child.addSelfAndChildren(paths, filter);
+			}
+		}
 		
-//		public Path getDoor(int key) {
-//			for (Path path : doorPoints) {
-//				if (path.getDoorKey() == key)
-//					return path;
-//			}
-//			
-//			return null;
-//		}
+		protected void removeSelfAndChildren(Collection<Path> paths) {
+			paths.remove(this);
+			for (Path child : this.children) {
+				child.removeSelfAndChildren(paths);
+			}
+		}
+		
+		protected @Nullable Path findChild(Predicate<Path> filter) {
+			if (filter.test(this)) {
+				return this;
+			}
+			for (Path child : this.children) {
+				Path foundChild = child.findChild(filter);
+				if (foundChild != null) {
+					return foundChild;
+				}
+			}
+			return null;
+		}
 		
 		protected @Nonnull IDungeonRoom pickRandomContRoom(DungeonGenerationContext context, DungeonExitPoint entry, int remaining) {
 			List<IDungeonRoom> eligibleRooms = contRooms.stream().filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
@@ -668,8 +850,8 @@ public class NostrumDungeon {
 			return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomDoorRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
-			List<IDungeonRoom> eligibleRooms = doorRooms.stream().filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
+		protected @Nonnull IDungeonRoom pickRandomDoorRoom(DungeonGenerationContext context, DungeonExitPoint entry, int remaining) {
+			List<IDungeonRoom> eligibleRooms = doorRooms.stream().filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
 			if (eligibleRooms.isEmpty()) {
 				NostrumMagica.logger.warn("Failed to find a door room that fit. Picking a random one for start " + entry);
 				return doorRooms.get(rand.nextInt(doorRooms.size()));
@@ -678,7 +860,7 @@ public class NostrumDungeon {
 		}
 		
 		// Fill out this path, including a room for this node and spawning any children that are needed.
-		protected void generate(DungeonGenerationContext context, int remaining, DungeonExitPoint entry, IDungeonRoom ending) {
+		protected void generate(DungeonGenerationContext context, int remaining, DungeonExitPoint entry, @Nullable IDungeonRoom ending, boolean hasKey) {
 			Validate.isTrue(this.myRoom == null); // If room is already set, only generate children!
 			
 			/*
@@ -692,88 +874,88 @@ public class NostrumDungeon {
 			if (remaining <= 0) {
 				// Terminal
 				if (ending != null) {
-					this.myRoom = new DungeonRoomInstance(entry, ending, false, context.instance, MakeNewRoomID(context));
-				} else if (this.hasKey) {
-					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true, context.instance, MakeNewRoomID(context));
+					this.myRoom = new DungeonRoomInstance(entry, ending, false, false, context.instance, MakeNewRoomID(context));
+				} else if (hasKey) {
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true, false, context.instance, MakeNewRoomID(context));
+					this.hasLargeKey = true;
 				} else {
-					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(context, entry), false, context.instance, MakeNewRoomID(context));
+					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(context, entry), false, false, context.instance, MakeNewRoomID(context));
 				}
 				
-				if (myRoom != null) {
-					final MutableBoundingBox innerBounds = myRoom.getBounds().func_215127_b(1, 1, 1);
-					innerBounds.maxX -= 2;
-					innerBounds.maxY -= 2;
-					innerBounds.maxZ -= 2;
-					context.boundingBoxes.add(innerBounds);
-				}
+				
 			} else {
-				// If we have door or key, try those first
-				// If we have both, roll for key first
-				// Do not do door if we have both and key didn'tt succeed
-				myRoom = null;
-				if (hasKey) {
-					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						myRoom = new DungeonRoomInstance(entry, pickRandomKeyRoom(context, entry), true, context.instance, MakeNewRoomID(context));
-						hasKey = false;
+				// If we have an ending and are about to terminate, get a door room.
+				// Otherwise, do a regular cont room.
+				
+				// If we will need a key door, select that FIRST on every step to get a cost.
+				// Then if there is still leftover remaining, generate a cont with that.
+				if (ending != null) {
+					IDungeonRoom doorRoom = pickRandomDoorRoom(context, entry, remaining);
+					if (doorRoom.getRoomCost() >= remaining) {
+						// Has to be door room
+						Validate.isTrue(!hasKey); // Never want to get here. A room with a door AND a key would suck.
+						myRoom = new DungeonRoomInstance(entry, doorRoom, false, true, context.instance, MakeNewRoomID(context));
+						this.hasLargeDoor = true;
+					} else {
+						myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(context, entry, remaining - doorRoom.getRoomCost()),
+								false, false, context.instance, MakeNewRoomID(context));
 					}
-				} else if (hasDoor) {
-					if (rand.nextFloat() < 1.0f / ((float) remaining + 1)) {
-						myRoom = new DungeonRoomInstance(entry, pickRandomDoorRoom(context, entry), false, context.instance, MakeNewRoomID(context));
-						hasDoor = false;
-					}
+				} else {
+					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(context, entry, remaining), false, false, context.instance, MakeNewRoomID(context));
 				}
 				
-				if (myRoom == null) {
-					myRoom = new DungeonRoomInstance(entry, pickRandomContRoom(context, entry, remaining), false, context.instance, MakeNewRoomID(context));
-				}
-
-				if (myRoom != null) {
-					final MutableBoundingBox innerBounds = myRoom.getBounds().func_215127_b(1, 1, 1);
-					innerBounds.maxX -= 2;
-					innerBounds.maxY -= 2;
-					innerBounds.maxZ -= 2;
-					context.boundingBoxes.add(innerBounds);
-				}
-				
-				this.generateChildren(context, remaining - (myRoom.template.getRoomCost()), ending);
+				this.generateChildren(context, remaining - (myRoom.template.getRoomCost()), ending, hasKey);
 			}
 		}
 		
 		// Fill out this path's children
-		protected void generateChildren(DungeonGenerationContext context, int remaining, IDungeonRoom ending) {
-			// Select a subpath to have the ending
+		protected void generateChildren(DungeonGenerationContext context, int remaining, IDungeonRoom ending, boolean hasKey) {
+			Validate.notNull(this.myRoom);
+			// Add bounding box to context
+			{
+				final MutableBoundingBox innerBounds = myRoom.getBounds();
+				// Shrink to not include walls, if walls are allowed to be shared
+//				innerBounds.offset(1, 1, 1);
+//				innerBounds.maxX -= 2;
+//				innerBounds.maxY -= 2;
+//				innerBounds.maxZ -= 2;
+				context.boundingBoxes.add(innerBounds);
+			}
+			
+			// Select a subpath to have the ending or key
 			int keyI = -1;
-			int doorI = -1;
-			IDungeonRoom inEnd;
+			int endI = -1;
 			
 			if (hasKey) {
 				keyI = rand.nextInt(myRoom.template.getNumExits());
 			}
-			if (hasDoor || ending != null) {
-				doorI = rand.nextInt(myRoom.template.getNumExits());
+			if (ending != null) {
+				endI = rand.nextInt(myRoom.template.getNumExits());
 			}
 			
-			if (keyI != -1 && doorI != -1 && keyI == doorI) {
-				doorI = (doorI + 1) % myRoom.template.getNumExits();
+			if (keyI != -1 && endI != -1 && keyI == endI) {
+				// Note: can still be equal if there's one exit, but then a future child will do this same thing
+				// until eventually there are multiple exits.
+				endI = (endI + 1) % myRoom.template.getNumExits();
 			}
 
 			// Add subpaths based on doors
 			for (DungeonExitPoint door : myRoom.template.getExits(myRoom.entry)) {
 				Path path = new Path(this);
-				inEnd = null;
-				if (doorI == 0) {
-					if (hasDoor)
-						path.hasDoor();
+				IDungeonRoom inEnd = null;
+				boolean childHasKey = false;
+				
+				if (endI == 0) {
 					inEnd = ending; // just set to null again if we don't have one 
 				}
 				if (keyI == 0) {
-					path.hasKey();
+					childHasKey = true;
 				}
 				
 				// TODO evaluate making 'remaining' be random to be like 1-remaining
-				path.generate(context, remaining, door, inEnd);
+				path.generate(context, remaining, GetDoorAdjacent(door, false), inEnd, childHasKey);
 				keyI -= 1;
-				doorI -= 1;
+				endI -= 1;
 				this.children.add(path);
 			}
 		}
@@ -851,6 +1033,20 @@ public class NostrumDungeon {
 			out = out.rotateY();
 			
 		return new DungeonExitPoint(pos, out);
+	}
+	
+	/**
+	 * Get the postion on the OTHER side of the provided door.
+	 * For entries, this is the corresponding 'exit'. For exits, this is where the next 'entry' should be.
+	 * @param door
+	 * @param isEntry
+	 * @return
+	 */
+	protected static final DungeonExitPoint GetDoorAdjacent(DungeonExitPoint door, boolean isEntry) {
+		return new DungeonExitPoint(
+				door.getPos().offset(!isEntry ? door.getFacing().getOpposite() : door.getFacing()),
+				door.getFacing()
+				);
 	}
 	
 	/**

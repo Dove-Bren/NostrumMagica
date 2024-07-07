@@ -49,8 +49,8 @@ public class LoadedStartRoom extends LoadedRoom implements IDungeonStartRoom {
 	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, DungeonExitPoint start, Random rand, DungeonInstance instance) {
 		// Stairs and entry room
 		return Lists.newArrayList(
-				new DungeonRoomInstance(start, stairs, false, instance, UUID.randomUUID()),
-				new DungeonRoomInstance(stairs.getEntryStart(world, start), entry, false, instance, UUID.randomUUID())
+				new DungeonRoomInstance(start, stairs, false, false, instance, UUID.randomUUID()),
+				new DungeonRoomInstance(stairs.getEntryStart(world, start), entry, false, false, instance, UUID.randomUUID())
 				);
 	}
 }

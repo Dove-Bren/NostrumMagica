@@ -21,7 +21,7 @@ public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 	}
 	
 	@Override
-	public void onDungeonSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+	public void onRoomBlueprintSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
 		; // Don't change key; let dungeon stamp in key
 	}
 	

@@ -179,6 +179,11 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
 		return null;
 	}
+	
+	@Override
+	public boolean supportsTreasure() {
+		return true;
+	}
 
 	@Override
 	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
@@ -203,8 +208,8 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 		// Stairs and entry room
 		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
 		return Lists.newArrayList(
-				new DungeonRoomInstance(adj, stairs, false, instance, UUID.randomUUID()),
-				new DungeonRoomInstance(stairs.getEntryStart(world, adj), entry, false, instance, UUID.randomUUID())
+				new DungeonRoomInstance(adj, stairs, false, false, instance, UUID.randomUUID()),
+				new DungeonRoomInstance(stairs.getEntryStart(world, adj), entry, false, false, instance, UUID.randomUUID())
 				);
 	}
 }

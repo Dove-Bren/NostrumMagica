@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.block.IDirectionalBlock;
 import com.smanzana.nostrummagica.block.IHorizontalBlock;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -230,6 +232,7 @@ public class BlueprintBlock {
 		return tileEntityData;
 	}
 	
+	// TODO: move these out of here
 	public boolean isDoorIndicator() {
 		return state != null && state.getBlock() == Blocks.REPEATER;
 	}
@@ -237,6 +240,19 @@ public class BlueprintBlock {
 	public boolean isEntry() {
 		return state != null && state.getBlock() == Blocks.COMPARATOR;
 	}
+	
+	public boolean isLargeKeySpot() {
+		return state != null
+				&& state.getBlock() == NostrumBlocks.largeDungeonKeyChest
+				&& !state.get(DungeonKeyChestBlock.Large.SLAVE);
+	}
+	
+	public boolean isLargeKeyDoor() {
+		return state != null
+				&& state.getBlock() == NostrumBlocks.largeDungeonDoor
+				&& NostrumBlocks.largeDungeonDoor.isMaster(state);
+	}
+	
 	
 	public Direction getFacing() {
 		Direction ret = null;
