@@ -34,6 +34,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -128,10 +129,14 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 		
 		public static final String ID = "small_dungeon_key_chest";
 		
-		private static final VoxelShape SHAPE_SMALL_NS = Block.makeCuboidShape(0.5D, 0.0D, 3.0D, 15.5D, 12.0D, 13.0D);
-		private static final VoxelShape SHAPE_SMALL_EW = Block.makeCuboidShape(3.0D, 0.0D, 0.5D, 13.0D, 12.0D, 15.5D);
-		private static final VoxelShape SHAPE_SMALL_OPEN_NS = Block.makeCuboidShape(0.5D, 0.0D, 3.0D, 15.5D, 8.0D, 13.0D);
-		private static final VoxelShape SHAPE_SMALL_OPEN_EW = Block.makeCuboidShape(3.0D, 0.0D, 0.5D, 13.0D, 8.0D, 15.5D);
+		private static final VoxelShape SHAPE_SMALL_N = Block.makeCuboidShape(0.5D, 0.0D, 0.0D, 15.5D, 12.0D, 10.0D);
+		private static final VoxelShape SHAPE_SMALL_S = Block.makeCuboidShape(0.5D, 0.0D, 6.0D, 15.5D, 12.0D, 16.0D);
+		private static final VoxelShape SHAPE_SMALL_E = Block.makeCuboidShape(6.0D, 0.0D, 0.5D, 16.0D, 12.0D, 15.5D);
+		private static final VoxelShape SHAPE_SMALL_W = Block.makeCuboidShape(0.0D, 0.0D, 0.5D, 10.0D, 12.0D, 15.5D);
+		private static final VoxelShape SHAPE_SMALL_OPEN_N = Block.makeCuboidShape(0.5D, 0.0D, 0.0D, 15.5D, 8.0D, 10.0D);
+		private static final VoxelShape SHAPE_SMALL_OPEN_S = Block.makeCuboidShape(0.5D, 0.0D, 6.0D, 15.5D, 8.0D, 16.0D);
+		private static final VoxelShape SHAPE_SMALL_OPEN_E = Block.makeCuboidShape(6.0D, 0.0D, 0.5D, 16.0D, 8.0D, 15.5D);
+		private static final VoxelShape SHAPE_SMALL_OPEN_W = Block.makeCuboidShape(0.0D, 0.0D, 0.5D, 10.0D, 8.0D, 15.5D);
 		
 		public Small() {
 			super(Block.Properties.create(Material.WOOD)
@@ -146,11 +151,13 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 			
 			switch (state.get(FACING)) {
 			case EAST:
+				return open ? SHAPE_SMALL_OPEN_E : SHAPE_SMALL_E;
 			case WEST:
-				return open ? SHAPE_SMALL_OPEN_EW : SHAPE_SMALL_EW;
+				return open ? SHAPE_SMALL_OPEN_W : SHAPE_SMALL_W;
 			case SOUTH:
+				return open ? SHAPE_SMALL_OPEN_S : SHAPE_SMALL_S;
 			case NORTH:
-				return open ? SHAPE_SMALL_OPEN_NS : SHAPE_SMALL_NS;
+				return open ? SHAPE_SMALL_OPEN_N : SHAPE_SMALL_N;
 			case UP:
 			case DOWN:
 			default:
@@ -242,6 +249,20 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 			default:
 				return VoxelShapes.fullCube();
 			}
+		}
+		
+		public VoxelShape getWholeShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+			// Put slave one together too
+			final boolean slave = state.get(SLAVE);
+			final VoxelShape base = this.getShape(state, worldIn, pos, context);
+			final Vector3i offset;
+			if (slave) {
+				offset = this.getMasterPos(pos, state).subtract(pos);
+			} else {
+				offset = this.getSlavePos(pos, state).subtract(pos);
+			}
+			final VoxelShape otherBase = this.getShape(state.with(SLAVE, !slave), worldIn, pos, context);
+			return VoxelShapes.or(base, otherBase.withOffset(offset.getX(), offset.getY(), offset.getZ()));
 		}
 		
 		@Override

@@ -15,8 +15,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
 
 public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHolder {
@@ -116,45 +119,19 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	}
 	
 	public Vector3d getCenterOffset() {
+		final VoxelShape shape;
 		if (isLarge()) {
-			switch (getBlockState().get(DungeonKeyChestBlock.Large.FACING)) {
-			case EAST:
-			case UP:
-			case DOWN:
-			default:
-				return new Vector3d(.5f, 0, 1f);
-			case NORTH:
-				return new Vector3d(1f, 0, .5f);
-			case SOUTH:
-				return new Vector3d(0f, 0, .5f);
-			case WEST:
-				return new Vector3d(.5f, 0, 0f);
-			}
+			shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), world, pos, ISelectionContext.dummy());
 		} else {
-			// Just center of block
-			return new Vector3d(.5f, 0, .5f);
+			shape = this.getBlockState().getShape(world, pos);
 		}
+		return new Vector3d(
+				(shape.getEnd(Axis.X) - shape.getStart(Axis.X)) / 2 + shape.getStart(Axis.X),
+				shape.getEnd(Axis.Y),
+				(shape.getEnd(Axis.Z) - shape.getStart(Axis.Z)) / 2 + shape.getStart(Axis.Z)
+				);
 	}
 	
-	public Vector3d getExtents() {
-		if (isLarge()) {
-			switch (getBlockState().get(DungeonKeyChestBlock.Large.FACING)) {
-			case EAST:
-			case WEST:
-			case UP:
-			case DOWN:
-			default:
-				return new Vector3d(.5f, 0, 1f);
-			case NORTH:
-			case SOUTH:
-				return new Vector3d(1f, 0, .5f);
-			}
-		} else {
-			// From center, just .5 blocks either way
-			return new Vector3d(.5f, 0, .5f);
-		}
-	}
-
 	public void open(PlayerEntity player) {
 		if (this.world.isRemote() || this.isTriggered()) {
 			return;
@@ -176,14 +153,18 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 				openTicks = this.world.getGameTime();
 				final boolean large = isLarge();
 				final Random rand = world.rand;
-				final Vector3d extents = this.getExtents();
-				final Vector3d offset = this.getCenterOffset();
-				final double x = pos.getX() + offset.x;
-				final double z = pos.getZ() + offset.z;
-				final double y = pos.getY() + (large ? (10f/16f) : (8f/16f));
+				final VoxelShape shape;
+				if (large) {
+					shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), world, pos, ISelectionContext.dummy());
+				} else {
+					shape = this.getBlockState().getShape(world, pos);
+				}
+				final double x = pos.getX() + shape.getStart(Axis.X);
+				final double z = pos.getZ() + shape.getStart(Axis.Z);
+				final double y = pos.getY() + shape.getEnd(Axis.Y);
 				for (int i = 0; i < (large ? 40 : 20); i++) {
-					final double xOffset = ((2f * rand.nextFloat()) - 1f) * extents.x;
-					final double zOffset = ((2f * rand.nextFloat()) - 1f) * extents.z;
+					final double xOffset = rand.nextFloat() * (shape.getEnd(Axis.X) - shape.getStart(Axis.X));
+					final double zOffset = rand.nextFloat() * (shape.getEnd(Axis.Z) - shape.getStart(Axis.Z));
 					
 					NostrumParticles.GLOW_ORB.spawn(this.world, new SpawnParams(
 							1, x + xOffset, y, z + zOffset, 0,
