@@ -229,9 +229,9 @@ public class LoadedRoom implements IDungeonRoom {
 		int minX = entry.getPos().getX() - offset.getX();
 		int minY = entry.getPos().getY() - offset.getY();
 		int minZ = entry.getPos().getZ() - offset.getZ();
-		int maxX = minX + (dims.getX()-1);
-		int maxY = minY + (dims.getY()-1);
-		int maxZ = minZ + (dims.getZ()-1);
+		int maxX = minX + (dims.getX()-(int) Math.signum(dims.getX()));
+		int maxY = minY + (dims.getY()-(int) Math.signum(dims.getY()));
+		int maxZ = minZ + (dims.getZ()-(int) Math.signum(dims.getZ()));
 		
 		// Have to figure out real min/max ourselves
 		return new MutableBoundingBox(
