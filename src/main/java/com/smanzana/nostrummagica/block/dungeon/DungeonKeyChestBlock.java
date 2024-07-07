@@ -383,6 +383,19 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 
 		@Override
 		public void makeDungeonChest(IWorld worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon) {
+			final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
+			// This is pretty dumb, but terrain gen will 'defer' tile entities under normal circumstances. By default,
+			// our setBlockState below will during world gen, too.
+			// BUT if something earlier in gen has done a 'getTileEntity' after something even earlier
+			// caused a deferred one, it will cache it and not allow any TE changes during generation.
+			// Specifically WorldGenRegion will push into the deferred, and then read it when getTileEntity is called.
+			// DungeonChests run into an issue where LootUtil has already forced a chest TE to generate, and so our
+			// blockstate change here doesn't cause a TE refresh.
+			// So we're going to force it.
+			if (isWorldGen && worldIn.getTileEntity(pos) != null && !(worldIn.getTileEntity(pos) instanceof DungeonKeyChestTileEntity)) {
+				worldIn.removeBlock(pos, false);
+			}
+			
 			worldIn.setBlockState(pos, this.getDefaultState().with(FACING, facing), 3);
 			makeChild(worldIn, pos, worldIn.getBlockState(pos));
 			

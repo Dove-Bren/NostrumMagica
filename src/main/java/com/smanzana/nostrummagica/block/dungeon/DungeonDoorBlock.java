@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
+import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.NostrumWorldKey;
 import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
@@ -75,6 +76,19 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock {
 	protected abstract NostrumWorldKey pickDungeonKey(DungeonInstance dungeon);
 	
 	public void spawnDungeonDoor(IWorld worldIn, BlockPos start, Direction facing, @Nullable MutableBoundingBox bounds, DungeonInstance dungeon) {
+		final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
+		// This is pretty dumb, but terrain gen will 'defer' tile entities under normal circumstances. By default,
+		// our setBlockState below will during world gen, too.
+		// BUT if something earlier in gen has done a 'getTileEntity' after something even earlier
+		// caused a deferred one, it will cache it and not allow any TE changes during generation.
+		// Specifically WorldGenRegion will push into the deferred, and then read it when getTileEntity is called.
+		// DungeonChests run into an issue where LootUtil has already forced a chest TE to generate, and so our
+		// blockstate change here doesn't cause a TE refresh.
+		// So we're going to force it.
+		if (isWorldGen && worldIn.getTileEntity(start) != null && !(worldIn.getTileEntity(start) instanceof DungeonKeyChestTileEntity)) {
+			worldIn.removeBlock(start, false);
+		}
+		
 		BlockState state = this.getMaster(facing);
 		worldIn.setBlockState(start, state, 3);
 		this.spawnDoor(worldIn, start, state, bounds);

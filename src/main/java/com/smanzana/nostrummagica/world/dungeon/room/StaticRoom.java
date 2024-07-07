@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.LadderBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
@@ -300,7 +301,12 @@ public abstract class StaticRoom implements IDungeonRoom {
 		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
 		for (NostrumDungeon.DungeonExitPoint lootSpot : this.getTreasureLocations(start)) {
-			LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
+			// Dungeon generation may replace some chests with other things.
+			// Make sure it's still a chest.
+			// TODO improve this, especially since rooms are part of dungeongen not blueprints
+			if (world.isAirBlock(lootSpot.getPos()) || world.getBlockState(lootSpot.getPos()).getBlock() instanceof ChestBlock) {
+				LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
+			}
 		}
 	}
 	
