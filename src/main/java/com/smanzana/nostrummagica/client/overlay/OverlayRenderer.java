@@ -211,6 +211,9 @@ public class OverlayRenderer extends AbstractGui {
 		MatrixStack matrixStackIn = event.getMatrixStack();
 		
 		if (event.getType() == ElementType.EXPERIENCE) {
+
+			renderDungeonKeys(matrixStackIn, player, window, NostrumMagica.dungeonTracker.getDungeon(player), mc.fontRenderer);
+			
 			// We do mana stuff in experience layer
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null || !attr.isUnlocked()) {
@@ -219,7 +222,6 @@ public class OverlayRenderer extends AbstractGui {
 			
 			renderSpellSlide(matrixStackIn, player, window, attr);
 			renderReagentTracker(matrixStackIn, player, window, attr, mc.fontRenderer);
-			renderDungeonKeys(matrixStackIn, player, window, NostrumMagica.dungeonTracker.getDungeon(player), mc.fontRenderer);
 			
 			if (mc.player.isCreative()
 					|| mc.player.isSpectator()) {
