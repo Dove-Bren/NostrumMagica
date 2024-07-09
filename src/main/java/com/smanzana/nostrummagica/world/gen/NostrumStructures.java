@@ -57,7 +57,7 @@ public class NostrumStructures {
 	public static void registerStructures(RegistryEvent.Register<Structure<?>> event) {
 		// Load rooms now, since dungeons require them
 		// TODO make only happen once?
-		DungeonRoomRegistry.instance().loadRegistryFromDisk();
+		DungeonRoomRegistry.instance().loadRegistryFromDisk(); int unused; // remove
 		
 		CUSTOM_SEPARATION_SETTINGS.clear();
 		registerStructurePieceTypes();

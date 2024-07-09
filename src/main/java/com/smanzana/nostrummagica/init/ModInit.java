@@ -45,8 +45,8 @@ import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
 import com.smanzana.nostrummagica.entity.KoidEntity;
-import com.smanzana.nostrummagica.entity.WispEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.WispEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.EssenceItem;
@@ -130,6 +130,8 @@ import com.smanzana.nostrummagica.trial.WorldTrial;
 import com.smanzana.nostrummagica.util.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.RoomCompReloadListener;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.RoomReloadListener;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
@@ -154,6 +156,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
@@ -186,7 +189,8 @@ public class ModInit {
     	// because they depend on data and re-fire when data is reloaded?
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onBiomeLoad);
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::registerDataReloaders);
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onTagsUpdated);
+		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDataLoaders);
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDefaultRituals);
 		
 		preinit();
@@ -2038,26 +2042,16 @@ public class ModInit {
 //		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
 	}
 	
-	public static final void registerDataReloaders(TagsUpdatedEvent.CustomTagTypes event) {
+	public static final void onTagsUpdated(TagsUpdatedEvent.CustomTagTypes event) {
 		NostrumMagica.logger.info("Got custom tag reload notification");
 		RitualRegistry.instance().reloadRituals();
-//		// This event is weird because it's for registering listeners of another event
-//		event.addListener(new ReloadListener<Object>() {
-//
-//			@Override
-//			protected Object prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
-//				return null;
-//			}
-//
-//			@Override
-//			protected void apply(Object objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
-//				NostrumMagica.logger.info("Got data reload notification");
-//				RitualRegistry.instance().reloadRituals();
-//				if (ServerLifecycleHooks.getCurrentServer() == null) {
-//					NostrumMagica.logger.info("Ignoring data reload with no server");
-//					return;
-//				}
-//			}
-//		});
+	}
+	
+	public static final void registerDataLoaders(AddReloadListenerEvent event) {
+		// This event is weird because it's for registering listeners of another event
+		
+		// Register data listener for dungeon rooms
+		event.addListener(new RoomReloadListener());
+		event.addListener(new RoomCompReloadListener());
 	}
 }

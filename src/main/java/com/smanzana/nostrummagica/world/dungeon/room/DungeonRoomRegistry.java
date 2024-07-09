@@ -8,13 +8,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.util.AutoReloadListener;
+import com.smanzana.nostrummagica.util.NBTReloadListener;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.LoadContext;
@@ -23,6 +27,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.profiler.IProfiler;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class DungeonRoomRegistry {
@@ -89,9 +96,10 @@ public class DungeonRoomRegistry {
 	}
 	
 	private static final String INTERNAL_ALL_NAME = "all";
-	private static final String ROOM_ROOT_NAME = "root.gat";
+	private static final String ROOM_ROOT_ID = "root";
+	private static final String ROOM_ROOT_NAME = ROOM_ROOT_ID + ".gat";
 	private static final String ROOM_COMPRESSED_EXT = "gat";
-	private static final String ROOM_ROOT_NAME_COMP = "root." + ROOM_COMPRESSED_EXT;
+	private static final String ROOM_ROOT_NAME_COMP = ROOM_ROOT_ID + "." + ROOM_COMPRESSED_EXT;
 	
 	private Map<String, DungeonRoomList> map;
 	
@@ -252,6 +260,10 @@ public class DungeonRoomRegistry {
 	
 	public final RoomBlueprint loadFromNBT(LoadContext context, CompoundNBT nbt) {
 		return this.loadFromNBT(context, nbt, false);
+	}
+	
+	public final RoomBlueprint loadAndRegisterFromNBT(LoadContext context, CompoundNBT nbt) {
+		return this.loadFromNBT(context, nbt, true);
 	}
 	
 	public final File roomLoadFolder;
@@ -505,45 +517,46 @@ public class DungeonRoomRegistry {
 	public void loadRegistryFromBuiltin() {
 		// TODO make this be dynamic. Eitehr add manifest at build time to jar, or do the gross iteration of the jar stuff.
 		
-		String[] fileNames = {"grand_hallway.gat",
+		String[] fileNames = {
 				"portal_room.gat",
-				"sorcery_lobby.gat",
-				"plant_boss_room.gat",
-				"dungeon_challenge_1.gat",
-				"dungeon_challenge_2.gat",
-				"dungeon_challenge_3.gat",
-				"dungeon_challenge_4.gat",
-				"dungeon_challenge_5.gat",
-				"dungeon_challenge_6.gat",
-				"dungeon_challenge_7.gat",
-				"dungeon_challenge_8.gat",
-				"dungeon_challenge_10.gat",
-				"dungeon_end_1.gat",
-				"dungeon_end_2.gat",
 				"plantboss_dungeon_entrance.gat",
 				"plantboss_lobby.gat",
 				"portal_entrance.gat",
 				"portal_lobby.gat",
-				"dungeon_door.gat",
-				"dungeon_end_key_1.gat",
-				"dungeon_end_key_fight_1.gat",
-				"dungeon_end_key_water_1.gat",
-				"dungeon_dmg_challenge1.gat",
-				"dungeon_vstair_1.gat",
-				"dungeon_vstair_2.gat",
-				"dungeon_vstair_3.gat",
+				"plant_boss_room.gat",
+//				"sorcery_lobby.gat",
+//				"dungeon_challenge_1.gat",
+//				"dungeon_challenge_2.gat",
+//				"dungeon_challenge_3.gat",
+//				"dungeon_challenge_4.gat",
+//				"dungeon_challenge_5.gat",
+//				"dungeon_challenge_6.gat",
+//				"dungeon_challenge_7.gat",
+//				"dungeon_challenge_8.gat",
+//				"dungeon_challenge_10.gat",
+//				"dungeon_end_1.gat",
+//				"dungeon_end_2.gat",
+//				"dungeon_door.gat",
+//				"dungeon_end_key_1.gat",
+//				"dungeon_end_key_fight_1.gat",
+//				"dungeon_end_key_water_1.gat",
+//				"dungeon_dmg_challenge1.gat",
+//				"dungeon_vstair_1.gat",
+//				"dungeon_vstair_2.gat",
+//				"dungeon_vstair_3.gat",
+//				"grand_hallway.gat",
 			};
 		
-		String[] compNames = {"sorcery_dungeon"};
-		final int dungeon_piece_count = 260;
-		String[][] compSubnames = new String[1][dungeon_piece_count + 1];
+		//String[] compNames = {"sorcery_dungeon"};
+		//final int dungeon_piece_count = 260;
+		//String[][] compSubnames = new String[1][dungeon_piece_count + 1];
 		
 		InputStream[] files = new InputStream[fileNames.length];
-		InputStream[][] compDirs = new InputStream[compNames.length][]; // lel wrong
+		//InputStream[][] compDirs = new InputStream[compNames.length][]; // lel wrong
 		
-		for (int i = 0; i <= dungeon_piece_count; i++) {
-			compSubnames[0][i] = (i == 0 ? "root.gat" : (compNames[0] + "_" + i + ".gat")); 
-		}
+//		for (int i = 0; i <= dungeon_piece_count; i++) {
+//			compSubnames[0][i] = (i == 0 ? "root.gat" : (compNames[0] + "_" + i + ".gat")); 
+//		}
 		
 		boolean error = false;
 		for (int i = 0; i < fileNames.length; i++) {
@@ -559,22 +572,22 @@ public class DungeonRoomRegistry {
 		}
 		
 		if (!error) {
-			for (int i = 0; i < compNames.length; i++) {
-				compDirs[i] = new InputStream[compSubnames[i].length];
-				for (int j = 0; j < compSubnames[i].length; j++) {
-					String subName = compSubnames[i][j];
-					String compName = compNames[i];
-					
-					InputStream stream = this.getClass().getResourceAsStream("/rooms/" + compName + "/" + subName);
-					if (stream == null) {
-						NostrumMagica.logger.fatal("Couldn't locate " + compName + "/" + subName + " in resource files");
-						error = true;
-						break;
-					} else {
-						compDirs[i][j] = stream;
-					}
-				}
-			}
+//			for (int i = 0; i < compNames.length; i++) {
+//				compDirs[i] = new InputStream[compSubnames[i].length];
+//				for (int j = 0; j < compSubnames[i].length; j++) {
+//					String subName = compSubnames[i][j];
+//					String compName = compNames[i];
+//					
+//					InputStream stream = this.getClass().getResourceAsStream("/rooms/" + compName + "/" + subName);
+//					if (stream == null) {
+//						NostrumMagica.logger.fatal("Couldn't locate " + compName + "/" + subName + " in resource files");
+//						error = true;
+//						break;
+//					} else {
+//						compDirs[i][j] = stream;
+//					}
+//				}
+//			}
 		}
 		
 		if (error) {
@@ -585,8 +598,20 @@ public class DungeonRoomRegistry {
 			loadFromFileStream(fileNames[i], files[i]);
 		}
 		
-		for (int i = 0; i < compNames.length; i++) {
-			loadFromCompDirStreams(compNames[i], compSubnames[i], compDirs[i]);
+//		for (int i = 0; i < compNames.length; i++) {
+//			loadFromCompDirStreams(compNames[i], compSubnames[i], compDirs[i]);
+//		}
+	}
+	
+	private void loadFromFiles(List<File> files) {
+		for (File file : files) {
+			loadFromFile(file);
+		}
+	}
+	
+	private void loadFromCompDirs(List<File> dirs) {
+		for (File comp : dirs) {
+			loadFromCompDir(comp);
 		}
 	}
 	
@@ -615,13 +640,9 @@ public class DungeonRoomRegistry {
 		
 		NostrumMagica.logger.info("Loading room cache overrides (" + files.size() + " simple rooms, " + compDirs.size() + " compound rooms)...");
 		startTime = System.currentTimeMillis();
-		for (File file : files) {
-			loadFromFile(file);
-		}
+		loadFromFiles(files);
 		
-		for (File comp : compDirs) {
-			loadFromCompDir(comp);
-		}
+		loadFromCompDirs(compDirs);
 		
 
 		list = map.get(INTERNAL_ALL_NAME);
@@ -688,5 +709,163 @@ public class DungeonRoomRegistry {
 		}
 		
 		return success;
+	}
+	
+	public static class RoomReloadListener extends NBTReloadListener {
+		
+		public RoomReloadListener() {
+			super("rooms", "gat", true);
+		}
+		
+		@Override
+		protected void apply(Map<ResourceLocation, CompoundNBT> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			NostrumMagica.logger.info("Loading dungeon room templates from {} resources", data.size());
+			long start;
+			long now;
+			for (Entry<ResourceLocation, CompoundNBT> entry : data.entrySet()) {
+				final LoadContext context = new LoadContext(entry.getKey().toString());
+				
+				start = System.currentTimeMillis();
+				DungeonRoomRegistry.instance().loadAndRegisterFromNBT(context, entry.getValue());
+				now = System.currentTimeMillis();
+				
+				if (now - start > 100) {
+					NostrumMagica.logger.warn("Took " + (now-start) + "ms to read " + entry.getKey());
+				}
+			}
+			
+		}
+	}
+	
+	public static class RoomCompReloadListener extends AutoReloadListener<Map<ResourceLocation, Map<String, CompoundNBT>>> {
+		
+		public RoomCompReloadListener() {
+			super("rooms", "cmp");
+		}
+		
+		@Override
+		protected Map<ResourceLocation, Map<String, CompoundNBT>> prepareResource(Map<ResourceLocation, Map<String, CompoundNBT>> builder, ResourceLocation location, InputStream input) throws IOException, IllegalStateException {
+			if (builder == null) {
+				builder = new HashMap<>();
+			}
+			
+			// Figure out the folder path
+			String compPath = getCompPath(location.getPath());
+			String subpath;
+			if (!compPath.isEmpty()) {
+				// Trim location down to comp path, and keep track of subpath
+				subpath = location.getPath().substring(compPath.length() + 1);
+				location = new ResourceLocation(location.getNamespace(), compPath);
+			} else {
+				subpath = location.getPath();
+				location = new ResourceLocation(location.getNamespace(), "");
+			}
+			
+			// Read NBT
+			CompoundNBT tag = CompressedStreamTools.readCompressed(input);
+			
+			// Add to map
+			CompoundNBT existing = builder.computeIfAbsent(location, p -> new HashMap<>())
+				.put(subpath, tag);
+			
+			if (existing != null) {
+				throw new IllegalStateException("Duplicate data file ignored with ID " + location + "/" + subpath);
+			}
+			
+			return builder;
+		}
+		
+		@Override
+		protected Map<ResourceLocation, Map<String, CompoundNBT>> checkPreparedData(Map<ResourceLocation, Map<String, CompoundNBT>> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			// Verify each path has a root
+			Iterator<Entry<ResourceLocation, Map<String, CompoundNBT>>> it = data.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<ResourceLocation, Map<String, CompoundNBT>> entry = it.next();
+				final ResourceLocation compName = entry.getKey();
+				final Map<String, CompoundNBT> compData = entry.getValue();
+				if (!compData.containsKey(ROOM_ROOT_ID)) {
+					NostrumMagica.logger.error("Failed to find root for room composition: " + compName);
+					it.remove();
+				}
+			}
+			
+			return data;
+		}
+		
+		protected void loadComp(ResourceLocation comp, Map<String, CompoundNBT> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			long start;
+			long now;
+			final DungeonRoomRegistry loader = DungeonRoomRegistry.instance();
+			
+			// Verification above means we should always have a root. Load that directly as first room
+			LoadContext context = new LoadContext(comp.toString(), ROOM_ROOT_ID);
+			start = System.currentTimeMillis();
+			RoomBlueprint root = loader.loadFromNBT(context, data.get(ROOM_ROOT_ID), true);
+			now = System.currentTimeMillis();
+			if ((now-start) > 100) {
+				NostrumMagica.logger.warn("Took " + (now-start) + "ms to load root for " + comp);
+			}
+			
+			if (root == null) {
+				NostrumMagica.logger.error("Failed to load root for composite room " + comp);
+			} else {
+				for (Entry<String, CompoundNBT> compRow : data.entrySet()) {
+					if (compRow.getKey().equalsIgnoreCase(ROOM_ROOT_ID)) {
+						continue; // handled outside of loop
+					}
+					
+					context = new LoadContext(comp.toString(), compRow.getKey());
+					
+					start = System.currentTimeMillis();
+					RoomBlueprint piece = loader.loadFromNBT(context, compRow.getValue(), false);
+					now = System.currentTimeMillis();
+					
+					if (now - start > 100) {
+						NostrumMagica.logger.warn("Took " + (now-start) + "ms to read " + compRow.getKey());
+					}
+					
+					start = System.currentTimeMillis();
+					root = root.join(piece);
+					now = System.currentTimeMillis();
+					if ((now-start) > 100) {
+						NostrumMagica.logger.warn("Took " + (now-start) + "ms to merge in " + comp + "/" + compRow.getKey());
+					}
+				}
+			}
+		}
+
+		@Override
+		protected void apply(Map<ResourceLocation, Map<String, CompoundNBT>> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			// For each comp grouping...
+			NostrumMagica.logger.info("Loading {} dungeon room compositions", data.size());
+			int pieceCount = 0;
+			
+			for (Entry<ResourceLocation, Map<String, CompoundNBT>> entry : data.entrySet()) {
+				final ResourceLocation comp = entry.getKey();
+				final Map<String, CompoundNBT> compMap = entry.getValue();
+				pieceCount += compMap.size();
+				loadComp(comp, compMap, resourceManagerIn, profilerIn);
+			}
+			
+			NostrumMagica.logger.info("Loaded {} dungeon room compositions from {} pieces", data.size(), pieceCount);
+		}
+		
+		/**
+		 * Return the "composition" path. This is the whole path up to the actual filename.
+		 * For example, "testcomp/comp1.cat" would return "testcomp".
+		 * "mycomps/testcomp/comp1.cat" would return "mycomps/testcomp".
+		 * This lets compositions still be organized by folder.
+		 * @param path
+		 * @return
+		 */
+		protected String getCompPath(String path) {
+			path = path.replace('\\', '/');
+			int idx = path.lastIndexOf('/');
+			if (idx == -1) {
+				return "";
+			} else {
+				return path.substring(0, idx);
+			}
+		}
 	}
 }
