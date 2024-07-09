@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,7 +36,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class PositionCrystal extends Item implements ILoreTagged {
+public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem {
 
 	public static final String ID = "nostrum_pos_crystal";
 	private static final String NBT_DIMENSION = "dimension";
@@ -218,5 +219,32 @@ public class PositionCrystal extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_ITEMS;
+	}
+
+	@Override
+	public boolean shouldRenderSelection(PlayerEntity player, ItemStack stack) {
+		return player.isCreative() && player.isSneaking()
+				&& !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof PositionCrystal
+				&& !player.getHeldItemOffhand().isEmpty() && player.getHeldItemOffhand().getItem() instanceof PositionCrystal
+				&& getBlockPosition(player.getHeldItemMainhand()) != null
+				&& getBlockPosition(player.getHeldItemOffhand()) != null
+				&& DimensionUtils.InDimension(player, getDimension(player.getHeldItemMainhand()))
+				&& DimensionUtils.InDimension(player, getDimension(player.getHeldItemOffhand()))
+				;
+	}
+
+	@Override
+	public BlockPos getAnchor(PlayerEntity player, ItemStack stack) {
+		return getBlockPosition(player.getHeldItemMainhand());
+	}
+
+	@Override
+	public BlockPos getBoundingPos(PlayerEntity player, ItemStack stack) {
+		return getBlockPosition(player.getHeldItemOffhand());
+	}
+
+	@Override
+	public boolean isSelectionValid(ClientPlayerEntity player, ItemStack selectionStack) {
+		return true;
 	}
 }
