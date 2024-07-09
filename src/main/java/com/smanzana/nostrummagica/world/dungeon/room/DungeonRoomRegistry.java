@@ -525,7 +525,13 @@ public class DungeonRoomRegistry {
 				"portal_entrance.gat",
 				"portal_lobby.gat",
 				"dungeon_door.gat",
-				"dungeon_end_key_1.gat"
+				"dungeon_end_key_1.gat",
+				"dungeon_end_key_fight_1.gat",
+				"dungeon_end_key_water_1.gat",
+				"dungeon_dmg_challenge1.gat",
+				"dungeon_vstair_1.gat",
+				"dungeon_vstair_2.gat",
+				"dungeon_vstair_3.gat",
 			};
 		
 		String[] compNames = {"sorcery_dungeon"};
