@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -143,11 +142,11 @@ public class NostrumDungeon {
 	
 	public NostrumDungeon(IDungeonStartRoom starting, IDungeonRoom ending, int minPath, int randPath) {
 		self = this;
-		rooms = new LinkedList<>();
-		endRooms = new LinkedList<>();
-		contRooms = new LinkedList<>();
-		keyRooms = new LinkedList<>();
-		doorRooms = new LinkedList<>();
+		rooms = new ArrayList<>();
+		endRooms = new ArrayList<>();
+		contRooms = new ArrayList<>();
+		keyRooms = new ArrayList<>();
+		doorRooms = new ArrayList<>();
 		this.ending = ending;
 		this.starting = starting;
 		this.pathLen = minPath; // minimum length of paths
@@ -191,19 +190,18 @@ public class NostrumDungeon {
 	// These can be used to spawn the dungeon in the world.
 	public List<DungeonRoomInstance> generate(IWorldHeightReader world, DungeonExitPoint start, DungeonInstance instance) {
 		// Calculate caches
+		endRooms.clear();
+		
 		if (endRooms.isEmpty()) {
 			for (IDungeonRoom room : rooms) {
-				// any doors can be key room. door rooms cannot be key.
-				
-				if (room.getNumExits() == 0)
+				if (room.supportsKey())
+					keyRooms.add(room);
+				else if (room.supportsDoor())
+					doorRooms.add(room);
+				else if (room.getNumExits() == 0)
 					endRooms.add(room);
 				else
 					contRooms.add(room);
-				if (room.supportsKey())
-					keyRooms.add(room);
-				
-				if (room.supportsDoor() && !room.supportsKey())
-					doorRooms.add(room);
 			}
 		}
 		
