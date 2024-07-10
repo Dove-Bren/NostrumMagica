@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -19,7 +20,7 @@ public class RoomGrandHallway extends StaticRoom {
 	
 	public RoomGrandHallway() {
 		// end up providing the type of shrine!
-		super("RoomGrandHallway", -7, -1, 0, 7, 9, 40,
+		super(NostrumMagica.Loc("room_grand_hallway"), -7, -1, 0, 7, 9, 40,
 				// Floor
 				"XXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXX",

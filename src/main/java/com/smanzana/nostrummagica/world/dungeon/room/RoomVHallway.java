@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -19,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 public class RoomVHallway extends StaticRoom {
 	
 	public RoomVHallway() {
-		super("RoomVHallway", -4, -11, 0, 1, 3, 5,
+		super(NostrumMagica.Loc("room_vhallway"), -4, -11, 0, 1, 3, 5,
 				// Floor
 				"XXXXXX",
 				"XXXXXX",

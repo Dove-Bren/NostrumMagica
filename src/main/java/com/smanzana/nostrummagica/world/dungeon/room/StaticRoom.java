@@ -25,6 +25,7 @@ import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
@@ -112,9 +113,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 	private int locMaxY;
 	private int locMaxZ;
 	private StaticBlockState blocks[][][];
-	private final String ID;
+	private final ResourceLocation ID;
 	
-	public StaticRoom(String ID, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+	public StaticRoom(ResourceLocation ID, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 		this.locMinX = minX;
 		this.locMinY = minY;
 		this.locMinZ = minZ;
@@ -161,7 +162,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	 * layer. Then, series of characters followed by IBlockStates or Blocks.
 	 * It's like registering a recipe in GameRegistry
 	 */
-	public StaticRoom(String ID, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+	public StaticRoom(ResourceLocation ID, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
 			Object ... args) {
 		this(ID, minX, minY, minZ, maxX, maxY, maxZ);
 		
@@ -399,7 +400,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public String getRoomID() {
+	public ResourceLocation getRoomID() {
 		return this.ID;
 	}
 	

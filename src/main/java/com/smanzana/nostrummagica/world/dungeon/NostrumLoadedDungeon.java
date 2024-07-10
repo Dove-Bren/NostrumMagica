@@ -1,10 +1,17 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
+
+import net.minecraft.util.ResourceLocation;
 
 /**
  * Dungeon with rooms picked randomly from loaded dungeon registry
@@ -13,7 +20,8 @@ import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
  */
 public class NostrumLoadedDungeon extends NostrumDungeon {
 	
-	public String tag;
+	public final String tag;
+	private final List<IDungeonRoom> staticRooms;
 	
 	public NostrumLoadedDungeon(String tag, IDungeonStartRoom starting, IDungeonRoom ending) {
 		this(tag, starting, ending, 2, 3);
@@ -22,9 +30,38 @@ public class NostrumLoadedDungeon extends NostrumDungeon {
 	public NostrumLoadedDungeon(String tag, IDungeonStartRoom starting, IDungeonRoom ending, int minPath, int randPath) {
 		super(starting, ending, minPath, randPath);
 		this.tag = tag;
+		this.staticRooms = new ArrayList<>();
+	}
+	
+	@Override
+	public NostrumDungeon add(IDungeonRoom room) {
+		this.staticRooms.add(room);
+		return super.add(room);
+	}
+	
+	@Override
+	public void clearRooms() {
+		this.staticRooms.clear();
+		super.clearRooms();
+	}
+	
+	@Override
+	protected List<IDungeonRoom> getRooms() {
+		List<IDungeonRoom> ret = new ArrayList<>(this.staticRooms.size() + 32);
+		ret.addAll(this.staticRooms);
 		
 		for (DungeonRoomRecord blueprint : DungeonRoomRegistry.instance().getAllRooms(tag)) {
-			this.add(new LoadedRoom(blueprint));
+			ret.add(GetLoadedRoom(blueprint.id));
 		}
+		
+		return ret;
+	}
+	
+	// Cache the loaded rooms so that they can do their own caching.
+	// LoadedRooms automatically look at the registry and refresh themselves if the room
+	// record changes. We don't need to do that since they handle it.
+	private static final Map<ResourceLocation, LoadedRoom> LOADED_ROOM_CACHE = new HashMap<>();
+	private static final LoadedRoom GetLoadedRoom(ResourceLocation location) {
+		return LOADED_ROOM_CACHE.computeIfAbsent(location, l -> new LoadedRoom(location));
 	}
 }

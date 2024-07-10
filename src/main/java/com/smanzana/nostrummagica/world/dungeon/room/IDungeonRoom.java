@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
@@ -83,14 +84,14 @@ public interface IDungeonRoom {
 		spawn(world, start, (MutableBoundingBox) null, UUID.randomUUID());
 	}
 	
-	public String getRoomID();
+	public ResourceLocation getRoomID();
 	
-	static final Map<String, IDungeonRoom> Registry = new HashMap<>();
-	public static @Nullable IDungeonRoom GetRegisteredRoom(String ID) {
+	static final Map<ResourceLocation, IDungeonRoom> Registry = new HashMap<>();
+	public static @Nullable IDungeonRoom GetRegisteredRoom(ResourceLocation ID) {
 		return Registry.get(ID);
 	}
 	
-	public static void Register(String ID, IDungeonRoom room) {
+	public static void Register(ResourceLocation ID, IDungeonRoom room) {
 		if (Registry.containsKey(ID)) {
 			throw new RuntimeException("Duplicate dungeon rooms registered");
 		}

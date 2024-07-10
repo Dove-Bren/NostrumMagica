@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -31,7 +32,7 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 	
 	public DragonStartRoom() {
 		// End up passing in height to surface?
-		super("DragonStartRoom", -5, -1, -5, 5, 5, 5,
+		super(NostrumMagica.Loc("dragon_start_room"), -5, -1, -5, 5, 5, 5,
 				// Floor
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",

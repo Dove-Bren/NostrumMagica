@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -20,7 +21,7 @@ public class RoomChallenge2 extends StaticRoom {
 	//21, ?, 21
 	// 
 	public RoomChallenge2() {
-		super("RoomChallenge2", -16, -1, 0, 4, 9, 20,
+		super(NostrumMagica.Loc("room_challenge2"), -16, -1, 0, 4, 9, 20,
 				// Floor (-1)
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",

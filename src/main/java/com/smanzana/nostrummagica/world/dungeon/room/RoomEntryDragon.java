@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -30,7 +31,7 @@ public class RoomEntryDragon extends StaticRoom {
 	
 	public RoomEntryDragon(boolean dark) {
 		
-		super("RoomEntryDragon", -5, 0, -5, 5, 14, 5,
+		super(NostrumMagica.Loc("room_entry_dragon"), -5, 0, -5, 5, 14, 5,
 				// Floor
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",

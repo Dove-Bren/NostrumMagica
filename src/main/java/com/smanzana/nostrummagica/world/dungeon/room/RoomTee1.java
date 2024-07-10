@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -18,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 public class RoomTee1 extends StaticRoom {
 
 	public RoomTee1() {
-		super("RoomTee1", -4, -1, 0, 4, 7, 19,
+		super(NostrumMagica.Loc("room_tee1"), -4, -1, 0, 4, 7, 19,
 				// Floor
 				"XXXXXXXXX",
 				"XXXXXXXXX",

@@ -4,10 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
@@ -132,8 +134,8 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 
 	@Override
-	public String getRoomID() {
-		return "RoomExtendedEntranceStaircase"; // Would want to incorporate dark or not?
+	public ResourceLocation getRoomID() {
+		return NostrumMagica.Loc("room_extended_entrance_staircase"); // Would want to incorporate dark or not?
 	}
 	
 	@Override

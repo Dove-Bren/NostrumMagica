@@ -40,6 +40,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -152,9 +153,6 @@ public class NostrumDungeon {
 		this.pathLen = minPath; // minimum length of paths
 		this.pathRand = randPath; // add rand(0, (pathRand-1)) to the length of paths
 		this.color = 0x80602080;
-		
-		if (starting.getNumExits() <= 0)
-			NostrumMagica.logger.warn("Dungeon created with 0-exit starting. This will not work.");
 	}
 	
 	public NostrumDungeon add(IDungeonRoom room) {
@@ -177,6 +175,10 @@ public class NostrumDungeon {
 		doorRooms.clear();
 	}
 	
+	protected List<IDungeonRoom> getRooms() {
+		return rooms;
+	}
+	
 	public NostrumDungeon setColor(int color) {
 		this.color = color;
 		return this;
@@ -189,11 +191,12 @@ public class NostrumDungeon {
 	// Generates a dungeon, and returns a list of all the instances that were generated.
 	// These can be used to spawn the dungeon in the world.
 	public List<DungeonRoomInstance> generate(IWorldHeightReader world, DungeonExitPoint start, DungeonInstance instance) {
-		// Calculate caches
-		endRooms.clear();
+		if (starting.getNumExits() <= 0)
+			NostrumMagica.logger.warn("Dungeon created with 0-exit starting. This will not work.");
 		
+		// Calculate caches
 		if (endRooms.isEmpty()) {
-			for (IDungeonRoom room : rooms) {
+			for (IDungeonRoom room : getRooms()) {
 				if (room.supportsKey())
 					keyRooms.add(room);
 				else if (room.supportsDoor())
@@ -683,7 +686,7 @@ public class NostrumDungeon {
 			}
 			
 			tag.put(NBT_ENTRY, this.entry.toNBT());
-			tag.putString(NBT_TEMPLATE, this.template.getRoomID());
+			tag.putString(NBT_TEMPLATE, this.template.getRoomID().toString());
 			tag.putBoolean(NBT_HASKEY, this.hasLargeKey);
 			tag.put(NBT_DUNGEON_INSTANCE, this.dungeonInstance.toNBT());
 			tag.putUniqueId(NBT_ROOM_ID, roomID);
@@ -696,7 +699,7 @@ public class NostrumDungeon {
 		
 		public static DungeonRoomInstance fromNBT(CompoundNBT tag) {
 			final DungeonExitPoint entry = DungeonExitPoint.fromNBT(tag.getCompound(NBT_ENTRY));
-			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(tag.getString(NBT_TEMPLATE));
+			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(new ResourceLocation(tag.getString(NBT_TEMPLATE)));
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
 			final boolean hasLargeDoor = tag.getBoolean(NBT_HASDOOR);
 			final DungeonInstance instance = DungeonInstance.FromNBT(tag.get(NBT_DUNGEON_INSTANCE));
@@ -828,7 +831,7 @@ public class NostrumDungeon {
 		
 		protected @Nonnull IDungeonRoom pickRandomEndRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
 			if (endRooms.isEmpty()) {
-				return rooms.get(rand.nextInt(rooms.size()));
+				return getRooms().get(rand.nextInt(getRooms().size()));
 			} else {
 				List<IDungeonRoom> eligibleRooms = endRooms.stream().filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
 				if (eligibleRooms.isEmpty()) {

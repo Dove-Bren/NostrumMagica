@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -12,7 +13,7 @@ import net.minecraft.block.Blocks;
 public class RoomArena extends StaticRoom {
 	
 	public RoomArena() {
-		super("RoomArena", -20, -10, 0, 20, 10, 40);
+		super(NostrumMagica.Loc("room_arena"), -20, -10, 0, 20, 10, 40);
 		final int minX = -20;
 		final int minY = -10;
 		final int minZ = 0;

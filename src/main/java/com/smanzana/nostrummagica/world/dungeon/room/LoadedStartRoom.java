@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
@@ -21,9 +21,9 @@ public class LoadedStartRoom extends LoadedRoom implements IDungeonStartRoom {
 	protected final LoadedRoom entry;
 	protected final RoomExtendedEntranceStaircase stairs;
 	
-	public LoadedStartRoom(DungeonRoomRecord lobbyRecord, DungeonRoomRecord entryRecord) {
-		super(lobbyRecord);
-		this.entry = new LoadedRoom(entryRecord);
+	public LoadedStartRoom(ResourceLocation lobbyID, ResourceLocation entryID) {
+		super(lobbyID);
+		this.entry = new LoadedRoom(entryID);
 		this.stairs = new RoomExtendedEntranceStaircase(false);
 	}
 	

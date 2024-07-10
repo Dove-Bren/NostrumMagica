@@ -544,12 +544,12 @@ public class DungeonRoomRegistry {
 		// TODO make this be dynamic. Eitehr add manifest at build time to jar, or do the gross iteration of the jar stuff.
 		
 		String[] fileNames = {
-				"portal_room.gat",
-				"plantboss_dungeon_entrance.gat",
-				"plantboss_lobby.gat",
-				"portal_entrance.gat",
-				"portal_lobby.gat",
-				"plant_boss_room.gat",
+//				"portal_room.gat",
+//				"plantboss_dungeon_entrance.gat",
+//				"plantboss_lobby.gat",
+//				"portal_entrance.gat",
+//				"portal_lobby.gat",
+//				"plant_boss_room.gat",
 //				"sorcery_lobby.gat",
 //				"dungeon_challenge_1.gat",
 //				"dungeon_challenge_2.gat",

@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
@@ -30,41 +31,60 @@ import net.minecraft.world.IWorld;
  */
 public class LoadedRoom implements IDungeonRoom {
 	
-	private RoomBlueprint blueprint;
-	private List<DungeonExitPoint> chestsRelative;
-	private final String registryID;
+	private final ResourceLocation roomID;
+	private final List<DungeonExitPoint> chestsRelative;
+	//private final String registryID;
+	private DungeonRoomRecord _cachedRoom;
 	
-	public LoadedRoom(DungeonRoomRecord blueprintRecord) {
-		this.blueprint = blueprintRecord.blueprint;
+	public LoadedRoom(ResourceLocation roomID) {
+		this.roomID = roomID;
 		
-		if (blueprint == null) {
+		if (roomID == null) {
 			throw new RuntimeException("Blueprint null when creating LoadedRoom. Wrong room name looked up, or too early?");
 		}
 		
-		// Find and save chest locations
 		chestsRelative = new ArrayList<>();
+		
+//		// Save consistent unique ID this room can be looked up later as and register as such
+//		this.registryID = "LoadedRoom_" + blueprintRecord.name;
+//		
+//		// Same as static room, being lazy and assuming children know what they're talking about.
+//		if (IDungeonRoom.GetRegisteredRoom(registryID) == null) {
+//			IDungeonRoom.Register(registryID, this);
+//		}
+	}
+	
+	protected DungeonRoomRecord getRoomRecord() {
+		DungeonRoomRecord current = DungeonRoomRegistry.instance().getRoomRecord(roomID);
+		if (current != this._cachedRoom) {
+			this._cachedRoom = current;
+			parseRoom(current.blueprint);
+		}
+		return current;
+	}
+	
+	protected RoomBlueprint getBlueprint() {
+		return getRoomRecord().blueprint;
+	}
+	
+	protected void parseRoom(RoomBlueprint blueprint) {
+		chestsRelative.clear();
+		
+		// Find and save chest locations
 		blueprint.scanBlocks((offset, block) -> {
 			BlockState state = block.getSpawnState(blueprint.getEntry().getFacing()); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
 				chestsRelative.add(new DungeonExitPoint(offset, state.get(ChestBlock.FACING)));
 			}
 		});
-		
-		// Save consistent unique ID this room can be looked up later as and register as such
-		this.registryID = "LoadedRoom_" + blueprintRecord.name;
-		
-		// Same as static room, being lazy and assuming children know what they're talking about.
-		if (IDungeonRoom.GetRegisteredRoom(registryID) == null) {
-			IDungeonRoom.Register(registryID, this);
-		}
 	}
 	
 	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
 	
 	@Override
 	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
-		BlockPos dims = blueprint.getAdjustedDimensions(start.getFacing());
-		BlockPos offset = blueprint.getAdjustedOffset(start.getFacing());
+		BlockPos dims = getBlueprint().getAdjustedDimensions(start.getFacing());
+		BlockPos offset = getBlueprint().getAdjustedOffset(start.getFacing());
 		
 		int minX = start.getPos().getX() - offset.getX();
 		int minY = start.getPos().getY() - offset.getY();
@@ -89,7 +109,7 @@ public class LoadedRoom implements IDungeonRoom {
 	@Override
 	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		// See note about dungeon vs blueprint facing in @getExits
-		blueprint.spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID, null);
+		getBlueprint().spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID, null);
 		
 		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
@@ -109,13 +129,13 @@ public class LoadedRoom implements IDungeonRoom {
 
 	@Override
 	public int getNumExits() {
-		Collection<DungeonExitPoint> exits = blueprint.getExits();
+		Collection<DungeonExitPoint> exits = getBlueprint().getExits();
 		return exits == null ? 0 : exits.size();
 	}
 
 	@Override
 	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
-		Collection<DungeonExitPoint> exits = blueprint.getExits();
+		Collection<DungeonExitPoint> exits = getBlueprint().getExits();
 		
 		// Dungeon notion of direction is backwards to blueprints:
 		// Dungeon wants facing to be you looking back through the door
@@ -129,7 +149,7 @@ public class LoadedRoom implements IDungeonRoom {
 		if (exits != null) {
 			ret = new ArrayList<>(exits.size());
 			for (DungeonExitPoint door : exits) {
-				ret.add(BlueprintToRoom(door, blueprint.getEntry(), start));
+				ret.add(BlueprintToRoom(door, getBlueprint().getEntry(), start));
 //				Direction doorDir = door.getFacing();
 //				int times = (modDir.getHorizontalIndex() + 2) % 4;
 //				while (times-- > 0) {
@@ -155,22 +175,24 @@ public class LoadedRoom implements IDungeonRoom {
 
 	@Override
 	public boolean supportsDoor() {
-		return blueprint.getLargeDoorLocation() != null;
+		return getBlueprint().getLargeDoorLocation() != null;
 	}
 	
 	@Override
 	public DungeonExitPoint getDoorLocation(DungeonExitPoint start) {
+		final RoomBlueprint blueprint = getBlueprint();
 		DungeonExitPoint orig = blueprint.getLargeDoorLocation();
 		return BlueprintToRoom(orig, blueprint.getEntry(), start);
 	}
 
 	@Override
 	public boolean supportsKey() {
-		return !blueprint.getLargeKeySpots().isEmpty();
+		return !getBlueprint().getLargeKeySpots().isEmpty();
 	}
 
 	@Override
 	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+		final RoomBlueprint blueprint = getBlueprint();
 		DungeonExitPoint orig = blueprint.getLargeKeySpots().iterator().next();
 		return BlueprintToRoom(orig, blueprint.getEntry(), start);
 	}
@@ -223,6 +245,7 @@ public class LoadedRoom implements IDungeonRoom {
 	
 	@Override
 	public MutableBoundingBox getBounds(DungeonExitPoint entry) {
+		final RoomBlueprint blueprint = getBlueprint();
 		BlockPos dims = blueprint.getAdjustedDimensions(entry.getFacing());
 		BlockPos offset = blueprint.getAdjustedOffset(entry.getFacing());
 		
@@ -254,8 +277,8 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public String getRoomID() {
-		return this.registryID;
+	public ResourceLocation getRoomID() {
+		return this.getRoomRecord().id;
 	}
 	
 	protected static final DungeonExitPoint BlueprintToRoom(DungeonExitPoint blueprintPoint, DungeonExitPoint blueprintEntry, DungeonExitPoint start) {

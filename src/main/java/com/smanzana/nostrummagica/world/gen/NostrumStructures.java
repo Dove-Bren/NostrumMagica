@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.DimensionUtils;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.DragonStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.PortalStructure;
@@ -55,10 +54,6 @@ public class NostrumStructures {
 
 	@SubscribeEvent
 	public static void registerStructures(RegistryEvent.Register<Structure<?>> event) {
-		// Load rooms now, since dungeons require them
-		// TODO make only happen once?
-		DungeonRoomRegistry.instance().loadRegistryFromDisk(); int unused; // remove
-		
 		CUSTOM_SEPARATION_SETTINGS.clear();
 		registerStructurePieceTypes();
 		

@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
@@ -16,7 +17,7 @@ public class RoomHallway extends StaticRoom {
 	
 	public RoomHallway() {
 		// end up providing the type of shrine!
-		super("RoomHallway", -2, -1, 0, 2, 3, 10,
+		super(NostrumMagica.Loc("room_hallway"), -2, -1, 0, 2, 3, 10,
 				// Floor
 				"XXXXX",
 				"XXXXX",

@@ -39,7 +39,7 @@ import net.minecraft.world.gen.WorldGenRegion;
 public class RoomLectern extends StaticRoom {
 	
 	public RoomLectern() {
-		super("RoomLectern", -18, -1, 0, 2, 4, 6,
+		super(NostrumMagica.Loc("room_lectern"), -18, -1, 0, 2, 4, 6,
 				// Floor
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",

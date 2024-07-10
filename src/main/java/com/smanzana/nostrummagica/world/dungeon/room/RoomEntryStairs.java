@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
@@ -17,7 +18,7 @@ import net.minecraft.util.Direction;
 public class RoomEntryStairs extends StaticRoom {
 	
 	public RoomEntryStairs(boolean dark) {
-		super("RoomEntryStairs", -2, 0, -2, 2, 3, 2,
+		super(NostrumMagica.Loc("room_entry_stairs"), -2, 0, -2, 2, 3, 2,
 				// Floor
 				"BBBBB",
 				"B  BB",

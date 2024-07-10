@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -18,7 +19,7 @@ public class RoomEnd2 extends StaticRoom {
 	private boolean withChest;
 	
 	public RoomEnd2(boolean withChest) {
-		super("RoomEnd2", -2, -1, 0, 7, 3, 7,
+		super(NostrumMagica.Loc("room_end2"), -2, -1, 0, 7, 3, 7,
 				// Floor
 				"XXXXXXXXXX",
 				"XXXXXXXXXX",
