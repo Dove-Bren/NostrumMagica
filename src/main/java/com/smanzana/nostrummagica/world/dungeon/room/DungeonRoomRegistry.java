@@ -36,23 +36,25 @@ import net.minecraftforge.common.util.Constants.NBT;
 public class DungeonRoomRegistry {
 	
 	public static final class DungeonRoomRecord {
+		public final ResourceLocation id;
 		public final String name;
 		public final RoomBlueprint blueprint;
 		protected final int weight;
 		protected final int cost;
 		
-		public DungeonRoomRecord(String name, RoomBlueprint blueprint, int weight, int cost) {
+		public DungeonRoomRecord(ResourceLocation id, String name, RoomBlueprint blueprint, int weight, int cost) {
 			this.blueprint = blueprint;
 			this.weight = weight;
-			this.name = name;
+			this.id = id;
 			this.cost = cost;
+			this.name = name;
 		}
 		
 		@Override
 		public boolean equals(Object o) {
 			if (o instanceof DungeonRoomRecord) {
 				DungeonRoomRecord other = (DungeonRoomRecord) o;
-				return other.name.equalsIgnoreCase(name);
+				return other.id.equals(id);
 			}
 			
 			return false;
@@ -60,7 +62,7 @@ public class DungeonRoomRegistry {
 		
 		@Override
 		public int hashCode() {
-			return this.name.hashCode() * 17;
+			return this.id.hashCode() * 17;
 		}
 	}
 	
@@ -76,7 +78,7 @@ public class DungeonRoomRegistry {
 		public void add(DungeonRoomRecord record) {
 			if (recordList.contains(record)) {
 				
-				NostrumMagica.logger.info("Overriding DungeonRoom registration for entry " + record.name);
+				NostrumMagica.logger.info("Overriding DungeonRoom registration for entry " + record.id);
 				
 				DungeonRoomRecord old = recordList.get(recordList.indexOf(record));
 				recordList.remove(record);
@@ -125,8 +127,9 @@ public class DungeonRoomRegistry {
 		map.clear();
 	}
 	
-	public void register(String name, RoomBlueprint blueprint, int weight, int cost, List<String> tags) {
-		DungeonRoomRecord record = new DungeonRoomRecord(name, blueprint, weight, cost);
+	public void register(ResourceLocation id, String name, RoomBlueprint blueprint, int weight, int cost, List<String> tags) {
+		System.out.println("Registered " + id); int unused;
+		DungeonRoomRecord record = new DungeonRoomRecord(id, name, blueprint, weight, cost);
 		add(INTERNAL_ALL_NAME, record);
 		for (String tag : tags) {
 			add(tag, record);
@@ -157,8 +160,8 @@ public class DungeonRoomRegistry {
 	}
 	
 	@Nullable
-	public RoomBlueprint getRoom(String roomName) {
-		DungeonRoomRecord record = getRoomRecord(roomName);
+	public RoomBlueprint getRoom(ResourceLocation roomID) {
+		DungeonRoomRecord record = getRoomRecord(roomID);
 		if (record != null) {
 			return record.blueprint;
 		} else {
@@ -167,12 +170,12 @@ public class DungeonRoomRegistry {
 	}
 	
 	@Nullable
-	public DungeonRoomRecord getRoomRecord(String roomName) {
+	public DungeonRoomRecord getRoomRecord(ResourceLocation roomID) {
 		DungeonRoomRecord ret = null;
 		DungeonRoomList list = map.get(INTERNAL_ALL_NAME);
 		if (list != null) {
 			for (DungeonRoomRecord record : list.recordList) {
-				if (record.name.equalsIgnoreCase(roomName)) {
+				if (record.id.equals(roomID)) {
 					ret = record;
 					break;
 				}
@@ -225,7 +228,7 @@ public class DungeonRoomRegistry {
 		return nbt;
 	}
 	
-	private final RoomBlueprint loadFromNBT(LoadContext context, CompoundNBT nbt, boolean doRegister) {
+	private final RoomBlueprint loadRoomFromNBT(LoadContext context, CompoundNBT nbt) {
 		String name = nbt.getString(NBT_NAME);
 		int weight = nbt.getInt(NBT_WEIGHT);
 		
@@ -235,12 +238,21 @@ public class DungeonRoomRegistry {
 		
 		context.name = name;
 		
-		int cost = nbt.contains(NBT_COST) ? nbt.getInt(NBT_COST) : 1;
 		
 		RoomBlueprint blueprint = RoomBlueprint.fromNBT(context, nbt.getCompound(NBT_BLUEPRINT));
+		return blueprint;
+	}
+	
+	public final RoomBlueprint loadAndRegisterFromNBT(LoadContext context, ResourceLocation id, CompoundNBT nbt) {
+		RoomBlueprint blueprint = loadRoomFromNBT(context, nbt);
+		
 		if (blueprint == null) {
 			return null;
 		}
+		
+		String name = nbt.getString(NBT_NAME);
+		int weight = nbt.getInt(NBT_WEIGHT);
+		int cost = nbt.contains(NBT_COST) ? nbt.getInt(NBT_COST) : 1;
 		
 		// TODO join to master if this is a piece?
 		
@@ -252,23 +264,13 @@ public class DungeonRoomRegistry {
 			tags.add(list.getString(i));
 		}
 		
-		if (doRegister) {
-			this.register(name, blueprint, weight, cost, tags);
-		}
+		this.register(id, name, blueprint, weight, cost, tags);
 		
 		// For version bumping
 //		int unusedWarning;
-//		writeRoomAsFile(blueprint, name, weight, tags);
+//		writeRoomAsFile(blueprint, id, weight, tags);
 		
 		return blueprint;
-	}
-	
-	public final RoomBlueprint loadFromNBT(LoadContext context, CompoundNBT nbt) {
-		return this.loadFromNBT(context, nbt, false);
-	}
-	
-	public final RoomBlueprint loadAndRegisterFromNBT(LoadContext context, CompoundNBT nbt) {
-		return this.loadFromNBT(context, nbt, true);
 	}
 	
 	public final File roomLoadFolder;
@@ -297,6 +299,20 @@ public class DungeonRoomRegistry {
 		}
 	}
 	
+	@Deprecated
+	private ResourceLocation makeIDFor(String name) {
+		int unused; // REMOVE
+		if (name.endsWith(".gat")) {
+			name = name.substring(0, name.length() - 4);
+		}
+		return NostrumMagica.Loc(name);
+	}
+	
+	@Deprecated
+	private ResourceLocation makeIDFor(File file) {
+		return makeIDFor(file.getName());
+	}
+	
 	private void loadFromFile(File file) {
 		try {
 			long startTime = System.currentTimeMillis();
@@ -320,7 +336,7 @@ public class DungeonRoomRegistry {
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
-				loadFromNBT(new LoadContext(file.getAbsolutePath()), nbt, true);
+				loadAndRegisterFromNBT(new LoadContext(file.getAbsolutePath()), makeIDFor(file), nbt);
 			}
 			
 			time = System.currentTimeMillis() - startTime;
@@ -358,7 +374,7 @@ public class DungeonRoomRegistry {
 			
 			startTime = System.currentTimeMillis();
 			if (nbt != null) {
-				loadFromNBT(new LoadContext(name), nbt, true);
+				loadAndRegisterFromNBT(new LoadContext(name), makeIDFor(name), nbt);
 			}
 			
 			time = System.currentTimeMillis() - startTime;
@@ -401,7 +417,7 @@ public class DungeonRoomRegistry {
 					}
 					startTime = System.currentTimeMillis();
 					
-					root = loadFromNBT(new LoadContext(subfile.getAbsolutePath()), nbt, true);
+					root = loadAndRegisterFromNBT(new LoadContext(subfile.getAbsolutePath()), makeIDFor(subfile), nbt);
 					
 					time = System.currentTimeMillis() - startTime;
 					if (time > 100) {
@@ -437,7 +453,7 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				RoomBlueprint blueprint = loadFromNBT(new LoadContext(subfile.getAbsolutePath()), nbt, false);
+				RoomBlueprint blueprint = loadRoomFromNBT(new LoadContext(subfile.getAbsolutePath()), nbt);
 				
 				time = System.currentTimeMillis() - startTime;
 				if (time > 100) {
@@ -490,7 +506,12 @@ public class DungeonRoomRegistry {
 				}
 				startTime = System.currentTimeMillis();
 				
-				RoomBlueprint blueprint = loadFromNBT(new LoadContext(compName + "/" + fileNames[i]), nbt, root == null);
+				RoomBlueprint blueprint;
+				if (root == null) {
+					blueprint = loadAndRegisterFromNBT(new LoadContext(compName + "/" + fileNames[i]), makeIDFor(compName), nbt);
+				} else {
+					blueprint = loadRoomFromNBT(new LoadContext(compName + "/" + fileNames[i]), nbt);
+				}
 				
 				time = System.currentTimeMillis() - startTime;
 				if (time > 100) {
@@ -733,7 +754,7 @@ public class DungeonRoomRegistry {
 				final LoadContext context = new LoadContext(entry.getKey().toString());
 				
 				start = System.currentTimeMillis();
-				loader.loadAndRegisterFromNBT(context, entry.getValue());
+				loader.loadAndRegisterFromNBT(context, entry.getKey(), entry.getValue());
 				now = System.currentTimeMillis();
 				
 				if (now - start > 100) {
@@ -807,7 +828,7 @@ public class DungeonRoomRegistry {
 			// Verification above means we should always have a root. Load that directly as first room
 			LoadContext context = new LoadContext(comp.toString(), ROOM_ROOT_ID);
 			start = System.currentTimeMillis();
-			RoomBlueprint root = loader.loadFromNBT(context, data.get(ROOM_ROOT_ID), true);
+			RoomBlueprint root = loader.loadAndRegisterFromNBT(context, comp, data.get(ROOM_ROOT_ID));
 			now = System.currentTimeMillis();
 			if ((now-start) > 100) {
 				NostrumMagica.logger.warn("Took " + (now-start) + "ms to load root for " + comp);
@@ -824,7 +845,7 @@ public class DungeonRoomRegistry {
 					context = new LoadContext(comp.toString(), compRow.getKey());
 					
 					start = System.currentTimeMillis();
-					RoomBlueprint piece = loader.loadFromNBT(context, compRow.getValue(), false);
+					RoomBlueprint piece = loader.loadRoomFromNBT(context, compRow.getValue());
 					now = System.currentTimeMillis();
 					
 					if (now - start > 100) {

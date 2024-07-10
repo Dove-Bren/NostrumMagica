@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
@@ -11,15 +12,19 @@ import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
 
+import net.minecraft.util.ResourceLocation;
+
 public class NostrumDungeons {
 	
-	public static final String PLANTBOSS_ROOM_NAME = "plant_boss_room";
+	public static final ResourceLocation PLANTBOSS_LOBBY_NAME = NostrumMagica.Loc("plantboss_lobby");
+	public static final ResourceLocation PLANTBOSS_ENTRANCE_NAME = NostrumMagica.Loc("plantboss_dungeon_entrance");
+	public static final ResourceLocation PLANTBOSS_BOSSROOM_NAME = NostrumMagica.Loc("plant_boss_room");
 
 	public static NostrumDungeon PLANTBOSS_DUNGEON = new NostrumLoadedDungeon(
 			"plant_boss",
-			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("plantboss_lobby"),
-					DungeonRoomRegistry.instance().getRoomRecord("plantboss_dungeon_entrance")),
-				new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_ROOM_NAME))
+			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_LOBBY_NAME),
+					DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_ENTRANCE_NAME)),
+				new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PLANTBOSS_BOSSROOM_NAME))
 			).setColor(0x80106020)
 			.add(new RoomGrandStaircase())
 			.add(new RoomEnd1(false, true))
@@ -47,13 +52,15 @@ public class NostrumDungeons {
 				.add(new RoomEnd1(true, false))
 				.add(new RoomEnd1(false, false));
 	
-	public static final String PORTAL_ROOM_NAME = "portal_room";
+	public static final ResourceLocation PORTAL_LOBBY_NAME = NostrumMagica.Loc("portal_lobby");
+	public static final ResourceLocation PORTAL_ENTRANCE_NAME = NostrumMagica.Loc("portal_entrance");
+	public static final ResourceLocation PORTAL_END_NAME = NostrumMagica.Loc("portal_room");
 	
 	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
 			"portal",
-			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord("portal_lobby"),
-					DungeonRoomRegistry.instance().getRoomRecord("portal_entrance")),
-			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_ROOM_NAME))
+			new LoadedStartRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_LOBBY_NAME),
+					DungeonRoomRegistry.instance().getRoomRecord(PORTAL_ENTRANCE_NAME)),
+			new LoadedRoom(DungeonRoomRegistry.instance().getRoomRecord(PORTAL_END_NAME))
 			).setColor(0x80402080)
 				.add(new RoomGrandStaircase())
 				.add(new RoomEnd1(false, true))

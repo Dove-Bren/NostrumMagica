@@ -25,6 +25,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -48,8 +49,8 @@ public class NostrumSorceryDimension {
 	
 	public static final int SPAWN_Y = 128;
 	
-	private static final String DIMENSION_ENTRY_TEMPLATE = "sorcery_lobby";
-	private static final String DIMENSION_WHOLE_TEMPLATE = "sorcery_dungeon";
+	private static final ResourceLocation DIMENSION_ENTRY_TEMPLATE = NostrumMagica.Loc("sorcery_lobby");
+	private static final ResourceLocation DIMENSION_WHOLE_TEMPLATE = NostrumMagica.Loc("sorcery_dungeon");
 	
 	public static final void RegisterListener() {
 		DistExecutor.unsafeRunForDist(() -> DimensionClientListener::new, () -> DimensionListener::new);
