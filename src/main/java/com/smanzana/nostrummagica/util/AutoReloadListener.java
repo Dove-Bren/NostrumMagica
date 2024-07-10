@@ -31,7 +31,7 @@ public abstract class AutoReloadListener<T> extends ReloadListener<T> {
 	}
 
 	@Override
-	protected T prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
+	public T prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
 		T builder = null;
 		
 		for (ResourceLocation rawLocation : resourceManagerIn.getAllResourceLocations(folder, this::checkPath)) {
@@ -70,4 +70,7 @@ public abstract class AutoReloadListener<T> extends ReloadListener<T> {
 	protected T checkPreparedData(T data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 		return data;
 	}
+	
+	@Override
+	public abstract void apply(T objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn);
 }

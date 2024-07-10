@@ -130,8 +130,7 @@ import com.smanzana.nostrummagica.trial.WorldTrial;
 import com.smanzana.nostrummagica.util.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.RoomCompReloadListener;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.RoomReloadListener;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomReloadListener;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
@@ -2051,7 +2050,6 @@ public class ModInit {
 		// This event is weird because it's for registering listeners of another event
 		
 		// Register data listener for dungeon rooms
-		event.addListener(new RoomReloadListener());
-		event.addListener(new RoomCompReloadListener());
+		event.addListener(new DungeonRoomReloadListener("rooms"));
 	}
 }

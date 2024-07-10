@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.LoadContext;
 
+import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.ListNBT;
@@ -118,6 +119,10 @@ public class DungeonRoomRegistry {
 		}
 		
 		list.add(record);
+	}
+	
+	public void clear() {
+		map.clear();
 	}
 	
 	public void register(String name, RoomBlueprint blueprint, int weight, int cost, List<String> tags) {
@@ -711,22 +716,24 @@ public class DungeonRoomRegistry {
 		return success;
 	}
 	
-	public static class RoomReloadListener extends NBTReloadListener {
+	private static class RoomReloadListener extends NBTReloadListener {
 		
-		public RoomReloadListener() {
-			super("rooms", "gat", true);
+		public RoomReloadListener(String folder) {
+			super(folder, "gat", true);
 		}
 		
 		@Override
-		protected void apply(Map<ResourceLocation, CompoundNBT> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+		public void apply(Map<ResourceLocation, CompoundNBT> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 			NostrumMagica.logger.info("Loading dungeon room templates from {} resources", data.size());
 			long start;
 			long now;
+			final DungeonRoomRegistry loader = DungeonRoomRegistry.instance();
+			
 			for (Entry<ResourceLocation, CompoundNBT> entry : data.entrySet()) {
 				final LoadContext context = new LoadContext(entry.getKey().toString());
 				
 				start = System.currentTimeMillis();
-				DungeonRoomRegistry.instance().loadAndRegisterFromNBT(context, entry.getValue());
+				loader.loadAndRegisterFromNBT(context, entry.getValue());
 				now = System.currentTimeMillis();
 				
 				if (now - start > 100) {
@@ -737,10 +744,10 @@ public class DungeonRoomRegistry {
 		}
 	}
 	
-	public static class RoomCompReloadListener extends AutoReloadListener<Map<ResourceLocation, Map<String, CompoundNBT>>> {
+	private static class RoomCompReloadListener extends AutoReloadListener<Map<ResourceLocation, Map<String, CompoundNBT>>> {
 		
-		public RoomCompReloadListener() {
-			super("rooms", "cmp");
+		public RoomCompReloadListener(String folder) {
+			super(folder, "cmp");
 		}
 		
 		@Override
@@ -835,7 +842,7 @@ public class DungeonRoomRegistry {
 		}
 
 		@Override
-		protected void apply(Map<ResourceLocation, Map<String, CompoundNBT>> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+		public void apply(Map<ResourceLocation, Map<String, CompoundNBT>> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 			// For each comp grouping...
 			NostrumMagica.logger.info("Loading {} dungeon room compositions", data.size());
 			int pieceCount = 0;
@@ -866,6 +873,43 @@ public class DungeonRoomRegistry {
 			} else {
 				return path.substring(0, idx);
 			}
+		}
+	}
+	
+	private static final class ReloadListenerData {
+		public Map<ResourceLocation, CompoundNBT> roomData;
+		public Map<ResourceLocation, Map<String, CompoundNBT>> compData;
+	}
+	
+	public static class DungeonRoomReloadListener extends ReloadListener<ReloadListenerData> {
+		
+		private final RoomReloadListener roomListener;
+		private final RoomCompReloadListener compListener;
+		
+		public DungeonRoomReloadListener(String folder) {
+			roomListener = new RoomReloadListener(folder);
+			compListener = new RoomCompReloadListener(folder);
+		}
+
+		@Override
+		protected ReloadListenerData prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			final ReloadListenerData data = new ReloadListenerData();
+			final DungeonRoomRegistry loader = DungeonRoomRegistry.instance();
+			
+			// The reason I am writing this class: clear out the loader once before any type of room loading
+			loader.clear();
+			
+			// This serializes these two operations instead of them happening in parallel :(
+			data.roomData = this.roomListener.prepare(resourceManagerIn, profilerIn);
+			data.compData = this.compListener.prepare(resourceManagerIn, profilerIn);
+			
+			return data;
+		}
+
+		@Override
+		protected void apply(ReloadListenerData data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			this.roomListener.apply(data.roomData, resourceManagerIn, profilerIn);
+			this.compListener.apply(data.compData, resourceManagerIn, profilerIn);
 		}
 	}
 }
