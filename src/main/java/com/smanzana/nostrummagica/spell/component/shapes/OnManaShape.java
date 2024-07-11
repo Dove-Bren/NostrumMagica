@@ -17,17 +17,12 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -38,7 +33,7 @@ import net.minecraftforge.common.util.Lazy;
  * @author Skyler
  *
  */
-public class OnManaShape extends SpellShape {
+public class OnManaShape extends OnMetricLevelShape {
 
 	public static class ManaShapeInstance extends SpellShapeInstance implements IGenericListener {
 
@@ -124,16 +119,8 @@ public class OnManaShape extends SpellShape {
 		this(ID);
 	}
 	
-	protected int getLevel(SpellShapePartProperties properties) {
-		return Math.max((int) supportedFloats()[0], (int) properties.level);
-	}
-	
-	protected boolean getOnAbove(SpellShapePartProperties properties) {
-		return properties.flip;
-	}
-	
 	@Override
-	public ManaShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public ManaShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new ManaShapeInstance(state, state.getCaster(),
 				getLevel(params), getOnAbove(params), 300, characteristics);
 	}
@@ -154,68 +141,12 @@ public class OnManaShape extends SpellShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {.5f, .2f, .8f, 1f};
-	}
-
-	public static NonNullList<ItemStack> costs = null;
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
-				ItemStack.EMPTY,
-				new ItemStack(Blocks.TRIPWIRE_HOOK),
-				new ItemStack(Items.REPEATER),
-				new ItemStack(Items.ENDER_PEARL)
-			);
-		}
-		return costs;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.level.flip", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.mana.name", (Object[]) null);
-	}
-
-	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 20;
 	}
 
 	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
-
-	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
-		return false;
-	}
-	
-	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
-		return new SpellShapeAttributes(false, true, false);
-	}
-
-	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
-		return true;
-	}
-	
-	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
-		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
-		return true;
-	}
-	
 }

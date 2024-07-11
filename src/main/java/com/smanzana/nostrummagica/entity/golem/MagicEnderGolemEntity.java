@@ -4,9 +4,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
@@ -28,7 +28,7 @@ public class MagicEnderGolemEntity extends MagicGolemEntity {
 		if (spellRange == null) {
 			spellRange = Spell.CreateAISpell("Overwhelm");
 			spellRange.addPart(new SpellShapePart(NostrumSpellShapes.AI));
-			spellRange.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapePartProperties(2, false)));
+			spellRange.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapeProperties(2, false)));
 			spellRange.addPart(new SpellEffectPart(
 					EMagicElement.ENDER,
 					1,

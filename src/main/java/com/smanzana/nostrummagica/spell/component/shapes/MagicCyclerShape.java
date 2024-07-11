@@ -11,12 +11,14 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -92,36 +94,40 @@ public class MagicCyclerShape extends SpellShape {
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
 			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
+	public static final SpellShapeProperty<Boolean> HIT_BLOCKS = new BooleanSpellShapeProperty("hit_blocks");
+	public static final SpellShapeProperty<Integer> DURATION = new IntSpellShapeProperty("duration", 10, 20, 50);
+	
 	protected MagicCyclerShape(String key) {
 		super(key);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		baseProperties.addProperty(HIT_BLOCKS).addProperty(DURATION);
 	}
 	
 	public MagicCyclerShape() {
 		this(ID);
 	}
 	
-	protected float getDurationSecs(SpellShapePartProperties properties) {
-		//Float param is duration param
-		if (properties == null || properties.level == 0) {
-			return supportedFloats()[0];
-		}
-		return properties.level;
+	protected float getDurationSecs(SpellShapeProperties properties) {
+		return properties.getValue(DURATION);
 	}
 	
-	protected boolean getHitsBlocks(SpellShapePartProperties properties) {
-		// We use param's flip to indicate whether we should interact with blocks
-		return properties.flip;
+	protected boolean getHitsBlocks(SpellShapeProperties properties) {
+		return properties.getValue(HIT_BLOCKS);
 	}
 	
 	@Override
-	public MagicCyclerShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MagicCyclerShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		boolean onBlocks = getHitsBlocks(params);
 		float duration = this.getDurationSecs(params);
 		return new MagicCyclerShapeInstance(state, location.world, location.shooterPosition, onBlocks, duration, characteristics);
 	}
 	
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 25;
 	}
 
@@ -140,23 +146,9 @@ public class MagicCyclerShape extends SpellShape {
 		return new ItemStack(Items.COMPASS, 1);
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[]{
-				10,
-				20,
-				50,
-		};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -164,41 +156,31 @@ public class MagicCyclerShape extends SpellShape {
 				new ItemStack(Blocks.COAL_BLOCK)
 			);
 		}
-		return costs;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.vortex_blade.bool.name", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.vortex_blade.float.name", (Object[]) null);
+		return property == DURATION ? costs : super.supportedFloatCosts(property);
 	}
 	
 	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
-		return new SpellShapeAttributes(true, true, params.flip);
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
+		return new SpellShapeAttributes(true, true, this.getHitsBlocks(params));
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		float radius = (float) (CyclerSpellSaucerEntity.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);

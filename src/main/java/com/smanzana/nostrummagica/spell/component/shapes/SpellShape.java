@@ -11,8 +11,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.entity.LivingEntity;
@@ -120,10 +121,18 @@ public abstract class SpellShape {
 		}
 	}
 	
-	private String key;
+	private final String key;
+	protected final SpellShapeProperties baseProperties;
 	
 	public SpellShape(String key) {
 		this.key = key;
+		this.baseProperties = new SpellShapeProperties();
+		
+		this.registerProperties();
+	}
+	
+	protected void registerProperties() {
+		
 	}
 	
 	public String getShapeKey() {
@@ -143,7 +152,7 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return
 	 */
-	public abstract SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics);
+	public abstract SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics);
 	
 	/**
 	 * Possibly spawn visual fx for this shape
@@ -151,17 +160,18 @@ public abstract class SpellShape {
 	 * @param harmful Whether the effects of the spell this shape is being cast as part of appear to be harmful
 	 */
 	protected void spawnShapeEffect(LivingEntity caster,
-			@Nullable LivingEntity target, SpellLocation location, SpellShapePartProperties properties,
+			@Nullable LivingEntity target, SpellLocation location, SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
 		
 		spawnDefaultShapeEffect(caster, target, location, properties, characteristics);
 	}
 	
 	protected final void spawnDefaultShapeEffect(LivingEntity caster,
-			@Nullable LivingEntity target, SpellLocation location, SpellShapePartProperties properties,
+			@Nullable LivingEntity target, SpellLocation location, SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
-		final float p = (supportedFloats() == null || supportedFloats().length == 0 ? 0 : (
-				properties.level == 0f ? supportedFloats()[0] : properties.level));
+//		final float p = (supportedFloats() == null || supportedFloats().length == 0 ? 0 : (
+//				properties.level == 0f ? supportedFloats()[0] : properties.level));
+		final float p = 1f; int unused;
 		NostrumMagica.instance.proxy.spawnEffect(location.world, new SpellComponentWrapper(this),
 				caster, null, target, location.hitPosition,
 				new SpellComponentWrapper(characteristics.element), characteristics.harmful, p);
@@ -181,50 +191,29 @@ public abstract class SpellShape {
 	public abstract ItemStack getCraftItem();
 	
 	/**
-	 * Whether this shape supports a boolean switch in its SpellPartParam
-	 * @return
-	 */
-	public abstract boolean supportsBoolean();
-	
-	/**
-	 * Display name for the boolean option.
-	 * @return
-	 */
-	public abstract String supportedBooleanName();
-	
-	/**
-	 * If this shape supports float values in its SpellPartParams, which floats are
-	 * accepted.
-	 * @return
-	 */
-	public abstract float[] supportedFloats();
-	
-	/**
 	 * Array of itemstack costs for the above floats.
 	 * Should be the same size as the array returned by supportedFloats()
 	 * The idea is you return more valuable materials the higher the float.
+	 * @param property TODO
 	 * @return
 	 */
-	public abstract NonNullList<ItemStack> supportedFloatCosts();
-	
-	/**
-	 * Display name for the float option. Should be translated already
-	 */
-	public abstract String supportedFloatName();
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+		return null;
+	}
 	
 	/**
 	 * How much using this shape should cost
 	 * @param properties TODO
 	 * @return
 	 */
-	public abstract int getManaCost(SpellShapePartProperties properties);
+	public abstract int getManaCost(SpellShapeProperties properties);
 	
 	/**
 	 * Return the weight cost of this shape. Should be 0+.
 	 * @param properties TODO
 	 * @return
 	 */
-	public abstract int getWeight(SpellShapePartProperties properties);
+	public abstract int getWeight(SpellShapeProperties properties);
 
 	/**
 	 * Whether spells that start with this shape should request tracing when players have
@@ -232,7 +221,7 @@ public abstract class SpellShape {
 	 * @param player TODO
 	 * @return
 	 */
-	public abstract boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params);
+	public abstract boolean shouldTrace(PlayerEntity player, SpellShapeProperties params);
 	
 	/**
 	 * if {@link #shouldTrace(PlayerEntity, SpellPartProperties)} is true, how far to trace
@@ -240,7 +229,7 @@ public abstract class SpellShape {
 	 * @param params
 	 * @return
 	 */
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return 0;
 	}
 	
@@ -250,7 +239,7 @@ public abstract class SpellShape {
 	 * @param params
 	 * @return
 	 */
-	public abstract boolean supportsPreview(SpellShapePartProperties params);
+	public abstract boolean supportsPreview(SpellShapeProperties params);
 	
 	/**
 	 * Add information about how this shape is expected to work if cast with the given arguments.
@@ -265,22 +254,16 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return whether to continue with the spell (return true), or if the spell is expected to fizzle here (return false)
 	 */
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return false;
 	}
 	
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(false, true, true);
 	}
 
-	public SpellShapePartProperties getDefaultProperties() {
-		final float val;
-		if (this.supportedFloats() != null) {
-			val = supportedFloats()[0];
-		} else {
-			val = 0f;
-		}
-		return new SpellShapePartProperties(val, false);
+	public SpellShapeProperties getDefaultProperties() {
+		return baseProperties.copy();
 	}
 	
 	

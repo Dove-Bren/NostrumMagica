@@ -17,13 +17,15 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -183,24 +185,34 @@ public class AuraShape extends AreaShape {
 			ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1),
 			ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
 	
+	public static final SpellShapeProperty<Boolean> AFFECT_ALLIES = new BooleanSpellShapeProperty("hit_allies");
+	public static final SpellShapeProperty<Float> RADIUS = new FloatSpellShapeProperty("radius", 2f, 3f, 5f, 10f);
+	
 	protected AuraShape(String key) {
 		super(key);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		baseProperties.addProperty(AFFECT_ALLIES, false)
+			.addProperty(RADIUS);
 	}
 	
 	public AuraShape() {
 		this(ID);
 	}
 	
-	protected float getRadius(SpellShapePartProperties properties) {
-		return Math.max(supportedFloats()[0], properties.level);
+	protected float getRadius(SpellShapeProperties properties) {
+		return properties.getValue(RADIUS);
 	}
 	
-	protected boolean includeAllies(SpellShapePartProperties properties) {
-		return properties.flip;
+	protected boolean includeAllies(SpellShapeProperties properties) {
+		return properties.getValue(AFFECT_ALLIES);
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new AuraTriggerInstance(state, state.getSelf(),
 				getRadius(params),
 				includeAllies(params),
@@ -222,19 +234,9 @@ public class AuraShape extends AreaShape {
 		return new ItemStack(Items.GUNPOWDER);
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {2f, 3f, 5f, 10f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -243,48 +245,43 @@ public class AuraShape extends AreaShape {
 				new ItemStack(NostrumItems.crystalLarge, 1)
 				);
 		}
-		return costs;
+		
+		if (property == RADIUS) {
+			return costs;
+		} else {
+			return super.supportedFloatCosts(property);
+		}
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.aura.bool.name", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.aura.float.name", (Object[]) null);
-	}
-
-	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		final float range = getRadius(properties);
 		return 50 + 100 * ((int) range / 5); // 50, 50, 150, 250
 	}
 
 	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		final float range = getRadius(properties);
 		return range < 5 ? 2 : 3;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, false);
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float range = this.getRadius(getDefaultProperties());
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		

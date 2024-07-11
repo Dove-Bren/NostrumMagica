@@ -14,12 +14,14 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,20 +36,29 @@ public class ChainShape extends InstantShape {
 
 	private static final String ID = "chain";
 	
+	public static final SpellShapeProperty<Boolean> TEAM_LOCK = new BooleanSpellShapeProperty("team_lock");
+	public static final SpellShapeProperty<Integer> JUMPS = new IntSpellShapeProperty("jumps", 3, 4, 6, 8);
+	
 	protected ChainShape(String id) {
 		super(id);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(TEAM_LOCK).addProperty(JUMPS);
 	}
 	
 	public ChainShape() {
 		this(ID);
 	}
 	
-	protected int getMaxArcs(SpellShapePartProperties properties) {
-		return Math.max((int) supportedFloats()[0], (int) properties.level);
+	protected int getMaxArcs(SpellShapeProperties properties) {
+		return properties.getValue(JUMPS);
 	}
 	
-	protected boolean getTeamLock(SpellShapePartProperties properties) {
-		return properties.flip;
+	protected boolean getTeamLock(SpellShapeProperties properties) {
+		return properties.getValue(TEAM_LOCK);
 	}
 	
 	protected static class ChainTriggerData extends TriggerData {
@@ -65,7 +76,7 @@ public class ChainShape extends InstantShape {
 	}
 	
 	@Override
-	protected ChainTriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected ChainTriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		List<LivingEntity> ret = new ArrayList<>();
 		Map<LivingEntity, List<LivingEntity>> links = new HashMap<>();
 		LivingEntity target = state.getSelf();
@@ -165,19 +176,9 @@ public class ChainShape extends InstantShape {
 		return "Chain";
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {3f, 4f, 6f, 8f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
@@ -186,21 +187,11 @@ public class ChainShape extends InstantShape {
 				new ItemStack(Items.ENDER_PEARL)
 			);
 		}
-		return costs;
+		return property == JUMPS ? costs : super.supportedFloatCosts(property);
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.chain.bool.name", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.chain.name", (Object[]) null);
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
@@ -210,22 +201,22 @@ public class ChainShape extends InstantShape {
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 35;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, false);
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		// Add link links between all links that wind up showing up
 		ChainTriggerData data = this.getTargetData(state, location, pitch, yaw, properties, characteristics);
 		if (data.targets != null) {

@@ -11,11 +11,13 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -256,20 +258,29 @@ public class WallShape extends AreaShape {
 
 	private static final String ID = "wall";
 	
+	public static final SpellShapeProperty<Boolean> LINGER = new BooleanSpellShapeProperty("linger");
+	public static final SpellShapeProperty<Float> RADIUS = new FloatSpellShapeProperty("radius", 1f, 2f, 3f, 0f);
+	
 	public WallShape() {
 		super(ID);
 	}
 	
-	protected boolean isLingering(SpellShapePartProperties properties) {
-		return properties.flip;
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(LINGER).addProperty(RADIUS);
 	}
 	
-	protected float wallRadius(SpellShapePartProperties properties) {
-		return Math.max(supportedFloats()[0], properties.level);
+	protected boolean isLingering(SpellShapeProperties properties) {
+		return properties.getValue(LINGER);
+	}
+	
+	protected float wallRadius(SpellShapeProperties properties) {
+		return properties.getValue(RADIUS);
 	}
 	
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		final boolean isLingering = this.isLingering(properties);
 		return isLingering ? 50 : 30;
 	}
@@ -282,7 +293,7 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public WallShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params,
+	public WallShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params,
 			SpellCharacteristics characteristics) {
 		// Determine facing based on actual hit position, but use selected pos (where we're looking) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
@@ -303,19 +314,9 @@ public class WallShape extends AreaShape {
 		return new ItemStack(Blocks.GLASS);
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {1f, 2f, 3f, 0f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -324,37 +325,27 @@ public class WallShape extends AreaShape {
 				new ItemStack(Blocks.GLASS)
 				);
 		}
-		return costs;
+		return property == RADIUS ? costs : super.supportedFloatCosts(property);
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.wall.bool.name", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.wall.float.name", (Object[]) null);
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		final boolean isLingering = this.isLingering(properties);
 		return isLingering ? 2 : 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = wallRadius(properties);
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded

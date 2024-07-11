@@ -10,8 +10,8 @@ import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -154,7 +154,7 @@ public abstract class AreaShape extends SpellShape {
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, true);
 	}
 }

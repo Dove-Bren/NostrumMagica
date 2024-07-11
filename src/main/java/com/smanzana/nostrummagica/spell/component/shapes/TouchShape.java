@@ -6,11 +6,12 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -28,6 +29,8 @@ public class TouchShape extends InstantShape {
 
 	public static final String ID = "touch";
 	public static final float AI_TOUCH_RANGE = 3.0f;
+
+	public static final SpellShapeProperty<Boolean> IGNORE_AIR = new BooleanSpellShapeProperty("ignore_air");
 	
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
@@ -39,11 +42,17 @@ public class TouchShape extends InstantShape {
 		super(key);
 	}
 	
-	protected boolean getIgnoreAirHits(SpellShapePartProperties properties) {
-		return properties.flip;
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(IGNORE_AIR);
 	}
 	
-	protected float getTouchRange(ISpellState state, SpellShapePartProperties params) {
+	protected boolean getIgnoreAirHits(SpellShapeProperties properties) {
+		return properties.getValue(IGNORE_AIR);
+	}
+	
+	protected float getTouchRange(ISpellState state, SpellShapeProperties params) {
 		if (state.getSelf() instanceof PlayerEntity) {
 			return getTouchRange((PlayerEntity) state.getSelf(), params);
 		} else {
@@ -51,13 +60,13 @@ public class TouchShape extends InstantShape {
 		}
 	}
 	
-	protected float getTouchRange(PlayerEntity player, SpellShapePartProperties params) {
+	protected float getTouchRange(PlayerEntity player, SpellShapeProperties params) {
 		// This copied from PlayerController#getBlockReachDistance
 		return (float) player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + (player.isCreative() ? 0 : -.5f);
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float range = getTouchRange(state, params);
 		
 		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, new RayTrace.OtherLiving(state.getCaster()));
@@ -95,42 +104,17 @@ public class TouchShape extends InstantShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return  I18n.format("modification.touch.bool.name");
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return null;
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return null;
-	}
-
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 0;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return getTouchRange(player, params);
 	}
 
@@ -140,12 +124,12 @@ public class TouchShape extends InstantShape {
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 10;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 

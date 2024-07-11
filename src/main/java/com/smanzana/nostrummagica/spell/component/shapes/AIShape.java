@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
@@ -29,7 +29,7 @@ public class AIShape extends InstantShape {
 	
 	@Override
 	protected TriggerData getTargetData(ISpellState state, SpellLocation location,
-			float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+			float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
 		if (state.getCaster() instanceof MobEntity) {
 			target = ((MobEntity) state.getCaster()).getAttackTarget();
@@ -38,7 +38,7 @@ public class AIShape extends InstantShape {
 	}
 	
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 0;
 	}
 
@@ -58,42 +58,17 @@ public class AIShape extends InstantShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return false;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return null;
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return null;
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 99;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return false;
 	}
 }

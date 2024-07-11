@@ -12,7 +12,9 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -20,7 +22,6 @@ import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -157,22 +158,29 @@ public class ProjectileShape extends SpellShape {
 		}
 	}
 	
+	public static final SpellShapeProperty<Boolean> AFFECT_ALLIES = new BooleanSpellShapeProperty("hit_allies");
+	
 	public ProjectileShape() {
 		super(ID);
 	}
 	
-	protected boolean getHitsAllies(SpellShapePartProperties properties) {
-		// We use param's flip to indicate whether allies should be hit
-		return properties != null && properties.flip;
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		baseProperties.addProperty(AFFECT_ALLIES);
+	}
+	
+	protected boolean getHitsAllies(SpellShapeProperties properties) {
+		return properties.getValue(AFFECT_ALLIES);
 	}
 	
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 30;
 	}
 
 	@Override
-	public ProjectileShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public ProjectileShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		boolean atMax = false; // legacy
 		boolean hitAllies = getHitsAllies(params);
 		return new ProjectileShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, atMax, hitAllies, characteristics);
@@ -195,52 +203,27 @@ public class ProjectileShape extends SpellShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return null;
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.projectile.bool", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return null;
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return PROJECTILE_RANGE;
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final boolean hitAllies = getHitsAllies(properties);
 		final Vector3d dir;
 		final LivingEntity self = state.getSelf();

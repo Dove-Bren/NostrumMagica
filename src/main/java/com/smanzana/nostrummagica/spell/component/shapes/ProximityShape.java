@@ -9,13 +9,14 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -86,16 +87,24 @@ public class ProximityShape extends SpellShape {
 
 	private static final String ID = "proximity";
 	
+	public static final SpellShapeProperty<Float> RANGE = new FloatSpellShapeProperty("range", 1f, 2f, 3f, 5f);
+	
 	public ProximityShape() {
 		super(ID);
 	}
 	
-	protected float getRange(SpellShapePartProperties properties) {
-		return Math.max(supportedFloats()[0], properties.level);
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(RANGE);
+	}
+	
+	protected float getRange(SpellShapeProperties properties) {
+		return properties.getValue(RANGE);
 	}
 	
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 20;
 	}
 
@@ -107,7 +116,7 @@ public class ProximityShape extends SpellShape {
 	}
 
 	@Override
-	public ProximityShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params,
+	public ProximityShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params,
 			SpellCharacteristics characteristics) {
 		return new ProximityShapeInstance(state, location.world, location.hitPosition,
 				getRange(params), characteristics);
@@ -123,19 +132,9 @@ public class ProximityShape extends SpellShape {
 		return new ItemStack(Blocks.TRIPWIRE_HOOK);
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return false;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {1f, 2f, 3f, 5f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -144,41 +143,31 @@ public class ProximityShape extends SpellShape {
 				new ItemStack(Items.DIAMOND)
 				);
 		}
-		return costs;
+		return property == RANGE ? costs : super.supportedFloatCosts(property);
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.proximity.name", (Object[]) null);
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(false, true, false);
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRange(properties);
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), radius/2));
 		return true;

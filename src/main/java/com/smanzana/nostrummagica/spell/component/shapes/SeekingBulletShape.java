@@ -4,21 +4,22 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.SpellBulletEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.SpellBulletEntity;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -183,22 +184,30 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	private static final String ID = "bullet";
+
+	public static final SpellShapeProperty<Boolean> IGNORE_ALLIES = new BooleanSpellShapeProperty("ignore_allies");
 	
 	public SeekingBulletShape() {
 		super(ID);
 	}
 	
-	protected boolean getIgnoresAllies(SpellShapePartProperties properties) {
-		return properties.flip;
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(IGNORE_ALLIES);
+	}
+	
+	protected boolean getIgnoresAllies(SpellShapeProperties properties) {
+		return properties.getValue(IGNORE_ALLIES);
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 35;
 	}
 
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new SeekingBulletShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, getIgnoresAllies(params), characteristics);
 	}
 
@@ -232,57 +241,32 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return null;
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.seeking_bullet.bool.name");
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return null;
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return MAX_DIST;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(false, true, false);
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d start = state.getSelf().getEyePosition(0f);
 		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, getIgnoresAllies(properties));

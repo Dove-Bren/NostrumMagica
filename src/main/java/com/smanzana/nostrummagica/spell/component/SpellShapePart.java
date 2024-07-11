@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.spell.component;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.nbt.CompoundNBT;
@@ -15,9 +14,9 @@ import net.minecraft.nbt.CompoundNBT;
 public class SpellShapePart {
 
 	protected final SpellShape shape;
-	protected final SpellShapePartProperties properties;
+	protected final SpellShapeProperties properties;
 	
-	public SpellShapePart(SpellShape shape, SpellShapePartProperties properties) {
+	public SpellShapePart(SpellShape shape, SpellShapeProperties properties) {
 		this.shape = shape;
 		this.properties = properties;
 	}
@@ -30,7 +29,7 @@ public class SpellShapePart {
 		return shape;
 	}
 
-	public SpellShapePartProperties getProperties() {
+	public SpellShapeProperties getProperties() {
 		return properties;
 	}
 	
@@ -43,7 +42,7 @@ public class SpellShapePart {
 		}
 		
 		tag.putString(NBT_SHAPE, this.getShape().getShapeKey());
-		tag.put(NBT_PROPS, properties.toNBT(null));
+		tag.put(NBT_PROPS, properties.toNBT());
 		
 		return tag;
 	}
@@ -54,7 +53,7 @@ public class SpellShapePart {
 			shape = SpellShape.getAllShapes().iterator().next();
 		}
 		
-		return new SpellShapePart(shape, SpellShapePartProperties.FromNBT(tag.getCompound(NBT_PROPS)));
+		return new SpellShapePart(shape, shape.getDefaultProperties().fromNBT(tag.getCompound(NBT_PROPS)));
 	}
 	
 }

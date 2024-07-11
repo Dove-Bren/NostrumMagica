@@ -12,10 +12,10 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -110,7 +110,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return runes;
 	}
 	
-	public static @Nullable SpellShapePartProperties GetPieceShapeParam(ItemStack piece) {
+	public static @Nullable SpellShapeProperties GetPieceShapeParam(ItemStack piece) {
 		if (piece.getItem() instanceof ShapeSpellRune) {
 			return ((ShapeSpellRune) piece.getItem()).getPieceShapeParam(piece);
 		}
@@ -118,7 +118,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		return null;
 	}
 	
-	public static void setPieceParam(ItemStack piece, SpellShapePartProperties params) {
+	public static void setPieceParam(ItemStack piece, SpellShapeProperties params) {
 		if (piece.getItem() instanceof ShapeSpellRune) {
 			((ShapeSpellRune) piece.getItem()).setPieceShapeParam(piece, params);
 		}
@@ -313,7 +313,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
-			SpellShapePartProperties params = getPieceShapeParam(stack);
+			SpellShapeProperties params = getPieceShapeParam(stack);
 			tooltip.add(new StringTextComponent("Shape").mergeStyle(TextFormatting.DARK_RED));
 			if (shape.getAttributes(params).terminal) {
 				tooltip.add(new StringTextComponent("Terminal Shape").mergeStyle(TextFormatting.GRAY));
@@ -333,15 +333,15 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			}
 		}
 		
-		public SpellShapePartProperties getPieceShapeParam(ItemStack piece) {
+		public SpellShapeProperties getPieceShapeParam(ItemStack piece) {
 			if (!piece.hasTag() || !piece.getTag().contains(NBT_SHAPE_PROPS)) {
 				return shape.getDefaultProperties();
 			}
 			
-			return SpellShapePartProperties.FromNBT(piece.getTag().getCompound(NBT_SHAPE_PROPS));
+			return SpellShapeProperties.FromNBT(piece.getTag().getCompound(NBT_SHAPE_PROPS));
 		}
 		
-		public void setPieceShapeParam(ItemStack stack, SpellShapePartProperties params) {
+		public void setPieceShapeParam(ItemStack stack, SpellShapeProperties params) {
 			CompoundNBT nbt = stack.getTag();
 			if (nbt == null) {
 				nbt = new CompoundNBT();

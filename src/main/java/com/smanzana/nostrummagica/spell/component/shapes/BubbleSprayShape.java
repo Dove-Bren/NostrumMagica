@@ -13,11 +13,12 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -119,21 +120,29 @@ public class BubbleSprayShape extends SpellShape {
 	private static final String ID = "bubblespray";
 	private static final float SPRAY_RANGE_BASE = 3.0f;
 	
+	public static final SpellShapeProperty<Float> RANGE = new FloatSpellShapeProperty("range", 1f, 1.25f, 1.5f, 2f);
+	
 	public BubbleSprayShape() {
 		super(ID);
 	}
 	
-	protected float getRangeMod(SpellShapePartProperties properties) {
-		return Math.max(1f, properties.level);
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(RANGE);
+	}
+	
+	protected float getRangeMod(SpellShapeProperties properties) {
+		return properties.getValue(RANGE);
 	}
 	
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 30;
 	}
 
 	@Override
-	public BubbleSprayShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public BubbleSprayShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float rangeMod = getRangeMod(params);
 		return new BubbleSprayShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, rangeMod, characteristics);
 	}
@@ -155,18 +164,8 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return false;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {1f, 1.25f, 1.5f, 2f};
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return NonNullList.from(ItemStack.EMPTY,
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+		return property != RANGE ? super.supportedFloatCosts(property) : NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.HONEY_BOTTLE),
 				new ItemStack(Items.HONEYCOMB),
@@ -174,42 +173,32 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.bubblespray.name");
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return SPRAY_RANGE_BASE * this.getRangeMod(params);
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, true);
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return true;
 	}
 	

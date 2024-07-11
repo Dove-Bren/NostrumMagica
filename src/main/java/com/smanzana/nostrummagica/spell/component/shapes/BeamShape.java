@@ -10,13 +10,14 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -39,20 +40,28 @@ public class BeamShape extends InstantShape {
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
 			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
+	public static final SpellShapeProperty<Boolean> HIT_AIR = new BooleanSpellShapeProperty("hit_air");
+	
 	public BeamShape() {
 		this(ID);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(HIT_AIR, false);
 	}
 	
 	protected BeamShape(String key) {
 		super(key);
 	}
 	
-	protected boolean hitsAir(SpellShapePartProperties properties) {
-		return properties.flip;
+	protected boolean hitsAir(SpellShapeProperties properties) {
+		return properties.getValue(HIT_AIR);
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final boolean hitsAir = hitsAir(params);
 		// Cast from eyes
 		final Vector3d start = location.shooterPosition;
@@ -107,57 +116,32 @@ public class BeamShape extends InstantShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.beam.bool.name");
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return null;
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return null;
-	}
-
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 2 + (hitsAir(properties) ? 1 : 0);
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return BEAM_RANGE;
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 45  + (hitsAir(properties) ? 15 : 0);
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, true);
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d from = location.shooterPosition;
 		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
 		final Vector3d maxDist = from.add(dir.normalize().scale(BEAM_RANGE));

@@ -14,9 +14,9 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
@@ -221,7 +221,7 @@ public class SpellCrafting {
 		return CalculateManaCost(context, parts);
 	}
 	
-	public static final int CalculateWeight(SpellCraftContext context, SpellShape shape, SpellShapePartProperties properties) {
+	public static final int CalculateWeight(SpellCraftContext context, SpellShape shape, SpellShapeProperties properties) {
 		// Shapes report their own weight
 		return shape.getWeight(properties);
 	}
@@ -491,7 +491,7 @@ public class SpellCrafting {
 			this(startIdx, endIdx, shape, null, weightBonus, manaRate, attributes);
 		}
 		
-		public SpellCraftPart(int startIdx, int endIdx, SpellShape shape, SpellShapePartProperties props, int weightBonus, float manaRate, SpellPartAttributes attributes) {
+		public SpellCraftPart(int startIdx, int endIdx, SpellShape shape, SpellShapeProperties props, int weightBonus, float manaRate, SpellPartAttributes attributes) {
 			this(startIdx, endIdx, new SpellShapePart(shape, props), weightBonus, manaRate, attributes);
 		}
 		

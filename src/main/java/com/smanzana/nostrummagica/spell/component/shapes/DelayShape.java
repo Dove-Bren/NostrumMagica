@@ -9,11 +9,12 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -58,20 +59,28 @@ public class DelayShape extends SpellShape {
 	private static final String ID = "delay";
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
+	public static final SpellShapeProperty<Integer> DELAY = new IntSpellShapeProperty("delay", 10, 30, 60, 120, 300);
+	
 	protected DelayShape(String key) {
 		super(key);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		baseProperties.addProperty(DELAY);
 	}
 	
 	public DelayShape() {
 		this(ID);
 	}
 	
-	protected int getDelaySecs(SpellShapePartProperties properties) {
-		return Math.max((int) supportedFloats()[0], (int) properties.level);
+	protected int getDelaySecs(SpellShapeProperties properties) {
+		return properties.getValue(DELAY);
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new DelayShapeInstance(state, 20 * getDelaySecs(params), characteristics);
 	}
 	
@@ -90,24 +99,9 @@ public class DelayShape extends SpellShape {
 		return new ItemStack(Items.CLOCK);
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return false;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {10f, 30f, 60f, 120f, 300f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -117,41 +111,36 @@ public class DelayShape extends SpellShape {
 				new ItemStack(Items.DIAMOND)
 			);
 		}
-		return costs;
+		return property == DELAY ? costs : super.supportedFloatCosts(property);
 	}
 
 	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.delay.name", (Object[]) null);
-	}
-
-	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 10;
 	}
 
 	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(false, true, false);
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
 		return true;
 	}

@@ -8,14 +8,15 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,20 +37,28 @@ public class RingShape extends BurstShape {
 	private static final String ID = "ring";
 	private static final int INNER_RADIUS = 2;
 	
+	public static final SpellShapeProperty<Float> RADIUS = new FloatSpellShapeProperty("radius", 2f, 3f, 4f, 6f);
+	
 	protected RingShape(String id) {
 		super(id);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(RADIUS);
 	}
 	
 	public RingShape() {
 		this(ID);
 	}
 	
-	protected float getRadius(SpellShapePartProperties properties) {
-		return Math.max(supportedFloats()[0], properties.level);
+	protected float getRadius(SpellShapeProperties properties) {
+		return properties.getValue(RADIUS);
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
 			this.spawnShapeEffect(state.getCaster(), null, location, param, characteristics);
@@ -125,19 +134,9 @@ public class RingShape extends BurstShape {
 		return "Ring";
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return false;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {2f, 3f, 4f, 6f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
@@ -146,21 +145,11 @@ public class RingShape extends BurstShape {
 				new ItemStack(NostrumItems.crystalSmall)
 			);
 		}
-		return costs;
+		return property == RADIUS ? costs : super.supportedFloatCosts(property);
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.ring.name", (Object[]) null);
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
@@ -170,27 +159,27 @@ public class RingShape extends BurstShape {
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 30;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, true);
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		float radiusEnts = getRadius(properties) + INNER_RADIUS;
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radiusEnts));
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) INNER_RADIUS));

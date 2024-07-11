@@ -16,8 +16,8 @@ import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ModifyMessage;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
@@ -130,7 +130,7 @@ public class ModificationTableGui {
 					
 					if (!stack.isEmpty() && stack.getItem() instanceof SpellRune) {
 						if (SpellRune.isShape(stack)) {
-							SpellShapePartProperties params = SpellRune.GetPieceShapeParam(stack);
+							SpellShapeProperties params = SpellRune.GetPieceShapeParam(stack);
 							SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 							
 							if (comp.getShape().supportedFloats() != null) {
@@ -298,7 +298,7 @@ public class ModificationTableGui {
 				// If we've changed float, check required item is set
 				if (hasFloat) {
 					if (hasChange) {
-						ItemStack required = component.getShape().supportedFloatCosts().get(floatIndex);
+						ItemStack required = component.getShape().supportedFloatCosts(prop).get(floatIndex);
 						
 						inputSlot.setRequired(required);
 						if (required.isEmpty()) {

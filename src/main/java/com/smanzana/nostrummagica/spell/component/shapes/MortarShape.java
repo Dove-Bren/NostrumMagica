@@ -3,24 +3,25 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.SpellMortarEntity;
 import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
-import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
-import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
@@ -196,22 +197,28 @@ public class MortarShape extends SpellShape {
 
 	private static final String ID = "mortar";
 	
+	public static final SpellShapeProperty<Boolean> ARCLESS = new BooleanSpellShapeProperty("no_arc");
+	
 	public MortarShape() {
 		super(ID);
 	}
 	
-	protected boolean getNoArc(SpellShapePartProperties properties) {
-		// We use param's flip to indicate whether to drop from the sky or not
-		return properties != null && properties.flip;
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+	}
+	
+	protected boolean getNoArc(SpellShapeProperties properties) {
+		return properties.getValue(ARCLESS);
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		return 30;
 	}
 
 	@Override
-	public MortarShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties params, SpellCharacteristics characteristics) {
+	public MortarShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(params);
 		return new MortarShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, noArc, characteristics);
 	}
@@ -233,52 +240,27 @@ public class MortarShape extends SpellShape {
 	}
 
 	@Override
-	public boolean supportsBoolean() {
-		return true;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return null;
-	}
-
-	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
-		return null;
-	}
-
-	@Override
-	public String supportedBooleanName() {
-		return I18n.format("modification.mortar.bool.name", (Object[]) null);
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return null;
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapePartProperties params) {
+	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
 		return MaxHDist;
 	}
 
 	@Override
-	public boolean supportsPreview(SpellShapePartProperties params) {
+	public boolean supportsPreview(SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(properties);
 		
 		// Do a little more work of getting a good vector for things

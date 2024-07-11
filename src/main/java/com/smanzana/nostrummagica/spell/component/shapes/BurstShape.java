@@ -7,15 +7,16 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.SpellShapePartProperties;
-import com.smanzana.nostrummagica.spell.Spell.ISpellState;
+import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,20 +31,28 @@ public class BurstShape extends InstantShape {
 
 	private static final String ID = "burst";
 	
+	public static final SpellShapeProperty<Float> RADIUS = new FloatSpellShapeProperty("radius", 2f, 3f, 5f, 10f);
+	
 	protected BurstShape(String id) {
 		super(id);
+	}
+	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(RADIUS);
 	}
 	
 	public BurstShape() {
 		this(ID);
 	}
 	
-	protected float getRadius(SpellShapePartProperties properties) {
-		return Math.max(supportedFloats()[0], properties.level);
+	protected float getRadius(SpellShapeProperties properties) {
+		return properties.getValue(RADIUS);
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
 			this.spawnShapeEffect(state.getCaster(), null, location, param, characteristics);
@@ -111,19 +120,9 @@ public class BurstShape extends InstantShape {
 		return "Burst";
 	}
 
-	@Override
-	public boolean supportsBoolean() {
-		return false;
-	}
-
-	@Override
-	public float[] supportedFloats() {
-		return new float[] {2f, 3f, 5f, 10f};
-	}
-
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public NonNullList<ItemStack> supportedFloatCosts() {
+	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
@@ -132,21 +131,11 @@ public class BurstShape extends InstantShape {
 				new ItemStack(NostrumItems.crystalLarge)
 			);
 		}
-		return costs;
+		return property == RADIUS ? costs : super.supportedFloatCosts(property);
 	}
 
 	@Override
-	public String supportedBooleanName() {
-		return null;
-	}
-
-	@Override
-	public String supportedFloatName() {
-		return I18n.format("modification.aoe.name", (Object[]) null);
-	}
-	
-	@Override
-	public int getWeight(SpellShapePartProperties properties) {
+	public int getWeight(SpellShapeProperties properties) {
 		return 1;
 	}
 
@@ -156,34 +145,34 @@ public class BurstShape extends InstantShape {
 	}
 
 	@Override
-	public int getManaCost(SpellShapePartProperties properties) {
+	public int getManaCost(SpellShapeProperties properties) {
 		final float radius = getRadius(properties);
 		return 30 + (radius > 5f ? 10 : 0);
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapePartProperties params) {
+	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
 		return false;
 	}
 	
 	@Override
-	public SpellShapeAttributes getAttributes(SpellShapePartProperties params) {
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
 		return new SpellShapeAttributes(true, true, true);
 	}
 	
-	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRadius(properties);
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		this.addRangeRings(builder, state, location, pitch, yaw, properties, characteristics);
 		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 	
 	@Override
-	protected boolean previewBlockHits(SpellShapePartProperties properties, SpellCharacteristics characteristics) {
+	protected boolean previewBlockHits(SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return false;
 	}
 
