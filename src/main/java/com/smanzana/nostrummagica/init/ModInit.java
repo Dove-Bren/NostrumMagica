@@ -590,6 +590,18 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.RuneAny) },
 						new ResearchRequirement("rune_library"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.runeLibrary))));
 
+		// Rune library
+		registry.register(RitualRecipe.createTier3("create_rune_shaper", new ItemStack(NostrumBlocks.runeShaper),
+						null, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST,
+								ReagentType.SPIDER_SILK, ReagentType.GINSENG },
+						Ingredient.fromItems(Blocks.CRAFTING_TABLE),
+						new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalMedium),
+								Ingredient.fromTag(NostrumTags.Items.RuneAny),
+								Ingredient.fromItems(Blocks.SMITHING_TABLE),
+								Ingredient.fromTag(NostrumTags.Items.RuneAny) },
+						new ResearchRequirement("rune_shaper"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.runeShaper))));
+		
+
 		// Tele to obelisk -- tier 2. Position gem, reagents
 		registry
 				.register(RitualRecipe.createTier2("teleport_obelisk", new ItemStack(Items.ENDER_PEARL),
@@ -1682,7 +1694,7 @@ public class ModInit {
 
 		NostrumResearch.startBuilding().parent("kani")
 				.reference("ritual::create_seeking_gem", "ritual.create_seeking_gem.name").build("seeking_gems",
-						NostrumResearchTab.MYSTICISM, Size.NORMAL, 0, 1, true,
+						NostrumResearchTab.MYSTICISM, Size.NORMAL, -2, 1, true,
 						new ItemStack(NostrumItems.resourceSeekingGem));
 
 		NostrumResearch.startBuilding().hiddenParent("magic_token").hiddenParent("spellcraft")
@@ -1693,6 +1705,11 @@ public class ModInit {
 				.reference("ritual::rune.self", "ritual.rune.self.name").build("spellrunes",
 						NostrumResearchTab.MYSTICISM, Size.GIANT, 0, 0, true,
 						SpellRune.getRune(EMagicElement.FIRE));
+
+		NostrumResearch.startBuilding().parent("kani").parent("spellrunes")
+				.reference("ritual::create_rune_shaper", "ritual.create_rune_shaper.name").build("rune_shaper",
+						NostrumResearchTab.MYSTICISM, Size.NORMAL, 0, 1, true,
+						new ItemStack(NostrumBlocks.runeShaper));
 
 		NostrumResearch.startBuilding().hiddenParent("kani")
 				.reference("ritual::fierce_infusion", "ritual.fierce_infusion.name").build("fierce_infusion",

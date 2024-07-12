@@ -1325,6 +1325,7 @@
 	"ritual.tome_workshop.name": "Construct Tome Workshop",
 	"ritual.advanced_spelltable.name": "Upgrade To Blackstone Spelltable",
 	"ritual.mystic_spelltable.name": "Upgrade To Mystic Spelltable",
+	"ritual.create_rune_shaper.name": "Construct Rune Shaper",
 
     "ritual.rune.physical.name": "Physical Rune",
     "ritual.rune.fire.name": "Fire Rune",
@@ -1975,6 +1976,9 @@
 	"research.mystic_spelltable.name": "Mystic Spell Table",
 	"research.mystic_spelltable.desc": "Spell Scribe",
 	"research.mystic_spelltable.info": "You've come up with a way to further improve your Blackstone Spelltable into a powerful Mystic Spelltable!|  Like the previous upgrade, the Mystic Spelltable has more rune slots and a higher weight capacity than the Blackstone Spelltable. Additionally, the Mystic Spelltable allows you to use any Spell Craft Patterns you may have learned to further enhance your spells!",
+	"research.rune_shaper.name": "Rune Shaper",
+	"research.rune_shaper.desc": "Adjustments, major and minor",
+	"research.rune_shaper.info": "The Rune Shaper is a powerful crafting block that lets you adjust many different aspects of spell shape runes!|  After putting a spell shape rune that can be adjusted in, you can select how exactly that spell shape will function. The ways to modify it depend on the specific shape.| For example, putting a Ring shape rune in allows you to modify the effect radius of the ring!",
 
     "research.soulbound_pets.name": "Soulbound Pets",
     "research.soulbound_pets.desc": "Always and Forever",
