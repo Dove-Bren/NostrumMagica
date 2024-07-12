@@ -11,10 +11,10 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
@@ -34,21 +34,23 @@ import net.minecraftforge.common.util.Lazy;
  * @author Skyler
  *
  */
-public class MagicCyclerShape extends SpellShape {
+public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	
 	public static class MagicCyclerShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
 		private final World world;
 		private final Vector3d pos;
-		private final boolean onBlocks;
+		private final boolean hitEnts;
+		private final boolean hitBlocks;
 		private final float duration;
 		private final SpellCharacteristics characteristics;
 		
-		public MagicCyclerShapeInstance(ISpellState state, World world, Vector3d pos, boolean onBlocks, float duration, SpellCharacteristics characteristics) {
+		public MagicCyclerShapeInstance(ISpellState state, World world, Vector3d pos, boolean hitEnts, boolean hitBlocks, float duration, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
-			this.onBlocks = onBlocks;
+			this.hitEnts = hitEnts;
+			this.hitBlocks = hitBlocks;
 			this.duration = duration;
 			this.characteristics = characteristics;
 		}
@@ -57,14 +59,17 @@ public class MagicCyclerShape extends SpellShape {
 		public void spawn(LivingEntity caster) {
 			SpellSaucerEntity projectile = new CyclerSpellSaucerEntity(getState().getSelf().world, getState().getSelf(),
 					MagicCyclerShapeInstance.this,
-					5.0f, (int) duration * 20, onBlocks, false);
+					5.0f, (int) duration * 20, hitBlocks, false);
 			
 			world.addEntity(projectile);
 		}
 
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, Lists.newArrayList(location), 1f, true);
+			if (hitBlocks) {
+				getState().trigger(null, Lists.newArrayList(location), 1f, true);
+			}
+			// else ignore
 		}
 		
 		@Override
@@ -74,7 +79,7 @@ public class MagicCyclerShape extends SpellShape {
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
-			} else {
+			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
 		}
@@ -94,7 +99,6 @@ public class MagicCyclerShape extends SpellShape {
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
 			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
-	public static final SpellShapeProperty<Boolean> HIT_BLOCKS = new BooleanSpellShapeProperty("hit_blocks");
 	public static final SpellShapeProperty<Integer> DURATION = new IntSpellShapeProperty("duration", 10, 20, 50);
 	
 	protected MagicCyclerShape(String key) {
@@ -104,7 +108,7 @@ public class MagicCyclerShape extends SpellShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		baseProperties.addProperty(HIT_BLOCKS).addProperty(DURATION);
+		baseProperties.addProperty(DURATION).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	public MagicCyclerShape() {
@@ -115,15 +119,12 @@ public class MagicCyclerShape extends SpellShape {
 		return properties.getValue(DURATION);
 	}
 	
-	protected boolean getHitsBlocks(SpellShapeProperties properties) {
-		return properties.getValue(HIT_BLOCKS);
-	}
-	
 	@Override
 	public MagicCyclerShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		boolean onBlocks = getHitsBlocks(params);
+		final boolean hitEnts = affectsEntities(params);
+		final boolean hitBlocks = affectsBlocks(params);
 		float duration = this.getDurationSecs(params);
-		return new MagicCyclerShapeInstance(state, location.world, location.shooterPosition, onBlocks, duration, characteristics);
+		return new MagicCyclerShapeInstance(state, location.world, location.shooterPosition, hitEnts, hitBlocks, duration, characteristics);
 	}
 	
 	@Override
@@ -171,7 +172,7 @@ public class MagicCyclerShape extends SpellShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(true, true, this.getHitsBlocks(params));
+		return new SpellShapeAttributes(true, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 
 	@Override

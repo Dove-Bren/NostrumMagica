@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Curves;
@@ -42,7 +43,7 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class MortarShape extends SpellShape {
+public class MortarShape extends SpellShape implements ISelectableShape {
 	
 	public static final float MaxHDist = 40;
 	public static final double OverworldGravity = 0.025D;
@@ -55,15 +56,19 @@ public class MortarShape extends SpellShape {
 		private final Vector3d pos;
 		private final float pitch;
 		private final float yaw;
+		private final boolean hitEnts;
+		private final boolean hitBlocks;
 		private final boolean noArc;
 		private final SpellCharacteristics characteristics;
 		
-		public MortarShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean noArc, SpellCharacteristics characteristics) {
+		public MortarShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean hitEnts, boolean hitBlocks, boolean noArc, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
+			this.hitEnts = hitEnts;
+			this.hitBlocks = hitBlocks;
 			this.noArc = noArc;
 			this.characteristics = characteristics;
 		}
@@ -91,6 +96,9 @@ public class MortarShape extends SpellShape {
 				dest = target.getPositionVec().add(0, target.getHeight()/2, 0);
 			} else {
 				RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
+					if (!hitEnts) {
+						return false;
+					}
 					if (!(ent instanceof LivingEntity)) {
 						return false;
 					}
@@ -102,7 +110,8 @@ public class MortarShape extends SpellShape {
 					return true;
 				}, .5);
 				
-				if (mop.getType() == RayTraceResult.Type.ENTITY) {
+				// Note: not opting out of block MOP dest setting based on params because we fizzle on blocks even if we don't affect them
+				if (mop.getType() == RayTraceResult.Type.ENTITY && hitEnts) {
 					final LivingEntity hitEntity = RayTrace.livingFromRaytrace(mop);
 					dest = hitEntity.getPositionVec().add(0, hitEntity.getHeight()/2, 0);
 				} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
@@ -147,6 +156,9 @@ public class MortarShape extends SpellShape {
 					1.0f, OverworldGravity);
 			
 			projectile.setFilter((ent) -> {
+				if (!hitEnts) {
+					return false;
+				}
 				
 				if (ent == null) {
 					return false;
@@ -168,7 +180,11 @@ public class MortarShape extends SpellShape {
 		
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, Lists.newArrayList(location));
+			if (hitBlocks) {
+				getState().trigger(null, Lists.newArrayList(location));
+			} else {
+				getState().triggerFail(location);
+			}
 		}
 		
 		@Override
@@ -178,7 +194,7 @@ public class MortarShape extends SpellShape {
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
-			} else {
+			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
 		}
@@ -206,7 +222,7 @@ public class MortarShape extends SpellShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(ARCLESS);
+		this.baseProperties.addProperty(ARCLESS).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	protected boolean getNoArc(SpellShapeProperties properties) {
@@ -221,7 +237,9 @@ public class MortarShape extends SpellShape {
 	@Override
 	public MortarShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(params);
-		return new MortarShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, noArc, characteristics);
+		final boolean hitEnts = affectsEntities(params);
+		final boolean hitBlocks = affectsBlocks(params);
+		return new MortarShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, hitEnts, hitBlocks, noArc, characteristics);
 	}
 
 	@Override
@@ -263,6 +281,8 @@ public class MortarShape extends SpellShape {
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(properties);
+		final boolean hitEnts = affectsEntities(properties);
+		final boolean hitBlocks = affectsBlocks(properties);
 		
 		// Do a little more work of getting a good vector for things
 		// that aren't players
@@ -286,6 +306,9 @@ public class MortarShape extends SpellShape {
 			success = true;
 		} else {
 			RayTraceResult mop = RayTrace.raytraceApprox(location.world, state.getSelf(), location.shooterPosition, dir, MaxHDist, (ent) -> {
+				if (!hitEnts) {
+					return false;
+				}
 				if (!(ent instanceof LivingEntity)) {
 					return false;
 				}
@@ -295,15 +318,18 @@ public class MortarShape extends SpellShape {
 				
 				return true;
 			}, .5);
-			
-			if (mop.getType() == RayTraceResult.Type.ENTITY) {
+
+			// Note: not opting out of block MOP dest setting based on params because we fizzle on blocks even if we don't affect them
+			if (mop.getType() == RayTraceResult.Type.ENTITY && hitEnts) {
 				final LivingEntity hit = RayTrace.livingFromRaytrace(mop);
 				dest = hit.getPositionVec().add(0, hit.getHeight() / 2, 0);
 				state.trigger(Lists.newArrayList(hit), null);
 				success = true;
 			} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
 				dest = mop.getHitVec();
-				state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, mop)));
+				if (hitBlocks) {
+					state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, mop)));
+				}
 				success = true;
 			} else {
 				dest = Vector3d.copyCentered(new BlockPos(location.shooterPosition.add(dir.scale(MaxHDist))));
@@ -344,6 +370,11 @@ public class MortarShape extends SpellShape {
 
 	public SpellShapeProperties makeProps(boolean arcless) {
 		return this.getDefaultProperties().setValue(ARCLESS, arcless);
+	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
+		return new SpellShapeAttributes(false, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 	
 }

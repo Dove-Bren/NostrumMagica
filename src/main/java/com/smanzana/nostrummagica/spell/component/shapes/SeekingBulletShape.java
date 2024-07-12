@@ -117,7 +117,8 @@ public class SeekingBulletShape extends SpellShape {
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
-			getState().trigger(null, Lists.newArrayList(new SpellLocation(world, pos)));
+			// does not affect blocks
+			getState().trigger(null, null);
 		}
 		
 		public void onProjectileHit(Entity entity) {

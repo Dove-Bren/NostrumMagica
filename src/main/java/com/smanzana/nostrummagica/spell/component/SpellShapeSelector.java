@@ -42,12 +42,12 @@ public enum SpellShapeSelector implements IPrettyEnum {
 		
 		@Override
 		public TextComponent getDisplayName(SpellShape shape) {
-			return name;
+			return name.copyRaw();
 		}
 		
 		@Override
 		public TextComponent getDisplayDescription(SpellShape shape) {
-			return desc;
+			return desc.copyRaw();
 		}
 		
 		@Override

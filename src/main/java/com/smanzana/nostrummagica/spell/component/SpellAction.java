@@ -1685,7 +1685,19 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			apply(caster, new SpellLocation(entity), efficiency, resultBuilder);
+			@Nullable EffectInstance instance = entity.getActivePotionEffect(NostrumEffects.cursedFire);
+			final int duration = 20 * 1200;
+			if (instance == null || instance.getDuration() < (int) (duration * .8f)) {
+				entity.addPotionEffect(new EffectInstance(
+						NostrumEffects.cursedFire,
+						duration,
+						0
+						));
+			}
+			caster.setLastAttackedEntity(entity);
+			entity.setRevengeTarget(caster);
+			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+			resultBuilder.applied |= true;
 		}
 
 		@Override

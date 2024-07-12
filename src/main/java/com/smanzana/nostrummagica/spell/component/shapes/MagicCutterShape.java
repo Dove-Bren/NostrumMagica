@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -34,7 +35,7 @@ import net.minecraftforge.common.util.Lazy;
  * @author Skyler
  *
  */
-public class MagicCutterShape extends SpellShape {
+public class MagicCutterShape extends SpellShape implements ISelectableShape {
 
 	public static class MagicCutterShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
@@ -42,14 +43,18 @@ public class MagicCutterShape extends SpellShape {
 		private final Vector3d pos;
 		private final float pitch;
 		private final float yaw;
+		private final boolean hitEnts;
+		private final boolean hitBlocks;
 		private final SpellCharacteristics characteristics;
 		
-		public MagicCutterShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, SpellCharacteristics characteristics) {
+		public MagicCutterShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean hitEnts, boolean hitBlocks, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
+			this.hitEnts = hitEnts;
+			this.hitBlocks = hitBlocks;
 			this.characteristics = characteristics;
 		}
 		
@@ -78,7 +83,10 @@ public class MagicCutterShape extends SpellShape {
 
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, Lists.newArrayList(location), 1f, true);
+			if (hitBlocks) {
+				getState().trigger(null, Lists.newArrayList(location), 1f, true);
+			}
+			// else ignore and let continue
 		}
 		
 		@Override
@@ -88,7 +96,7 @@ public class MagicCutterShape extends SpellShape {
 			}
 			else if (NostrumMagica.resolveLivingEntity(entity) == null) {
 				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
-			} else {
+			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, 1f, true);
 			}
 		}
@@ -112,13 +120,21 @@ public class MagicCutterShape extends SpellShape {
 		super(key);
 	}
 	
+	@Override
+	protected void registerProperties() {
+		super.registerProperties();
+		this.baseProperties.addProperty(SpellShapeSelector.PROPERTY);
+	}
+	
 	public MagicCutterShape() {
 		this(ID);
 	}
 	
 	@Override
 	public MagicCutterShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		return new MagicCutterShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, characteristics);
+		final boolean hitEnts = affectsEntities(params);
+		final boolean hitBlocks = affectsBlocks(params);
+		return new MagicCutterShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, hitEnts, hitBlocks, characteristics);
 	}
 	
 	@Override
@@ -168,6 +184,8 @@ public class MagicCutterShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+		final boolean hitEnts = affectsEntities(properties);
+		final boolean hitBlocks = affectsBlocks(properties);
 		final Vector3d dir;
 		final LivingEntity self = state.getSelf();
 		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
@@ -178,12 +196,12 @@ public class MagicCutterShape extends SpellShape {
 			dir = Projectiles.getVectorForRotation(pitch, yaw);
 		}
 		
-		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, new RayTrace.OtherLiving(state.getSelf()));
-		if (trace.getType() == RayTraceResult.Type.BLOCK) {
+		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, hitEnts ? new RayTrace.OtherLiving(state.getSelf()) : e -> false);
+		if (trace.getType() == RayTraceResult.Type.BLOCK && hitBlocks) {
 			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), Vector3d.copyCentered(RayTrace.blockPosFromResult(trace))));
 			state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 			return true;
-		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null) {
+		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null && hitEnts) {
 			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
 			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.getPositionVec().add(0, living.getHeight() / 2, 0)));
 			state.trigger(Lists.newArrayList(living), null);

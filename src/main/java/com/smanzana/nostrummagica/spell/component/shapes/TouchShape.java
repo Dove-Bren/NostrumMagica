@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
@@ -25,7 +26,7 @@ import net.minecraftforge.common.util.Lazy;
  * @author Skyler
  *
  */
-public class TouchShape extends InstantShape {
+public class TouchShape extends InstantShape implements ISelectableShape {
 
 	public static final String ID = "touch";
 	public static final float AI_TOUCH_RANGE = 3.0f;
@@ -45,7 +46,7 @@ public class TouchShape extends InstantShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(IGNORE_AIR);
+		this.baseProperties.addProperty(IGNORE_AIR).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	protected boolean getIgnoreAirHits(SpellShapeProperties properties) {
@@ -69,11 +70,12 @@ public class TouchShape extends InstantShape {
 	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float range = getTouchRange(state, params);
 		
-		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, new RayTrace.OtherLiving(state.getCaster()));
+		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, 
+				this.affectsEntities(params) ? new RayTrace.OtherLiving(state.getCaster()) : (e) -> false);
 		
 		if (trace == null || trace.getType() == RayTraceResult.Type.MISS) {
 			final boolean ignoreAirHits = getIgnoreAirHits(params);
-			if (ignoreAirHits) {
+			if (ignoreAirHits || !this.affectsBlocks(params)) {
 				return new TriggerData(null, null);
 			} else {
 				// Project where we reached and return there
@@ -82,11 +84,13 @@ public class TouchShape extends InstantShape {
 		}
 		
 		if (trace.getType() == RayTraceResult.Type.ENTITY
+				&& this.affectsEntities(params)
 				&& null != RayTrace.livingFromRaytrace(trace)
 				&& !RayTrace.livingFromRaytrace(trace).isEntityEqual(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), null);
-		} else if (trace.getType() == RayTraceResult.Type.BLOCK) {
+		} else if (trace.getType() == RayTraceResult.Type.BLOCK
+				&& this.affectsBlocks(params)) {
 			return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 		} else {
 			return new TriggerData(null, null);
@@ -131,6 +135,11 @@ public class TouchShape extends InstantShape {
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
+	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
+		return new SpellShapeAttributes(false, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 
 }

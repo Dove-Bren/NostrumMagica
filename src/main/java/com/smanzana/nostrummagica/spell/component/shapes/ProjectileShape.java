@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -40,7 +41,7 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public class ProjectileShape extends SpellShape {
+public class ProjectileShape extends SpellShape implements ISelectableShape {
 	
 	public class ProjectileShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
@@ -48,16 +49,20 @@ public class ProjectileShape extends SpellShape {
 		private final Vector3d pos;
 		private final float pitch;
 		private final float yaw;
+		private final boolean hitEnts;
+		private final boolean hitBlocks;
 		private final boolean atMax;
 		private final boolean hitAllies;
 		private final SpellCharacteristics characteristics;
 		
-		public ProjectileShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean atMax, boolean hitAllies, SpellCharacteristics characteristics) {
+		public ProjectileShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean hitEnts, boolean hitBlocks, boolean atMax, boolean hitAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
+			this.hitEnts = hitEnts;
+			this.hitBlocks = hitBlocks;
 			this.atMax = atMax;
 			this.hitAllies = hitAllies;
 			this.characteristics = characteristics;
@@ -82,14 +87,18 @@ public class ProjectileShape extends SpellShape {
 					dir,
 					5.0f, PROJECTILE_RANGE);
 			
-			projectile.setFilter(new ProjectileFilter(this.getState(), hitAllies));
+			projectile.setFilter(hitEnts ? new ProjectileFilter(this.getState(), hitAllies) : e -> false);
 			
 			world.addEntity(projectile);
 		}
 		
 		@Override
 		public void onProjectileHit(SpellLocation location) {
-			getState().trigger(null, Lists.newArrayList(location));
+			if (hitBlocks) {
+				getState().trigger(null, Lists.newArrayList(location));
+			} else {
+				getState().triggerFail(location);
+			}
 		}
 		
 		@Override
@@ -99,7 +108,7 @@ public class ProjectileShape extends SpellShape {
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
-			} else {
+			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
 		}
@@ -167,7 +176,7 @@ public class ProjectileShape extends SpellShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		baseProperties.addProperty(AFFECT_ALLIES);
+		baseProperties.addProperty(AFFECT_ALLIES).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	protected boolean getHitsAllies(SpellShapeProperties properties) {
@@ -181,9 +190,11 @@ public class ProjectileShape extends SpellShape {
 
 	@Override
 	public ProjectileShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		boolean atMax = false; // legacy
-		boolean hitAllies = getHitsAllies(params);
-		return new ProjectileShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, atMax, hitAllies, characteristics);
+		final boolean hitEnts = affectsEntities(params);
+		final boolean hitBlocks = affectsBlocks(params);
+		final boolean atMax = false; // legacy
+		final boolean hitAllies = getHitsAllies(params);
+		return new ProjectileShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, hitEnts, hitBlocks, atMax, hitAllies, characteristics);
 	}
 
 	@Override
@@ -224,6 +235,8 @@ public class ProjectileShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+		final boolean hitEnts = affectsEntities(properties);
+		final boolean hitBlocks = affectsBlocks(properties);
 		final boolean hitAllies = getHitsAllies(properties);
 		final Vector3d dir;
 		final LivingEntity self = state.getSelf();
@@ -235,12 +248,14 @@ public class ProjectileShape extends SpellShape {
 			dir = Projectiles.getVectorForRotation(pitch, yaw);
 		}
 		
-		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, new ProjectileFilter(state, hitAllies));
+		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, hitEnts ? new ProjectileFilter(state, hitAllies) : e -> false);
 		if (trace.getType() == RayTraceResult.Type.BLOCK) {
 			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), trace.getHitVec()));
-			state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
+			if (hitBlocks) {
+				state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
+			}
 			return true;
-		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null) {
+		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null && hitEnts) {
 			final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
 			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
 			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.func_242282_l(partialTicks).add(0, living.getHeight() / 2, 0)));
@@ -255,6 +270,11 @@ public class ProjectileShape extends SpellShape {
 
 	public SpellShapeProperties makeProps(boolean affectAllies) {
 		return this.getDefaultProperties().setValue(AFFECT_ALLIES, affectAllies);
+	}
+	
+	@Override
+	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
+		return new SpellShapeAttributes(false, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 	
 }
