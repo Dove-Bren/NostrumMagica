@@ -263,7 +263,6 @@ public class NostrumItems {
 	@ObjectHolder(ResourceItem.ID_MANA_LEAF) public static ResourceItem resourceManaLeaf;
 	@ObjectHolder(ResourceItem.ID_EVIL_THISTLE) public static ResourceItem resourceEvilThistle;
 	@ObjectHolder(ResourceItem.ID_DRAGON_WING) public static ResourceItem resourceDragonWing;
-	@ObjectHolder(ResourceItem.ID_SEEKING_GEM) public static ResourceItem resourceSeekingGem;
 	@ObjectHolder(ResourceItem.ID_SKILL_OOZE) public static ResourceItem resourceSkillOoze;
 	@ObjectHolder(ResourceItem.ID_SKILL_PENDANT) public static ResourceItem resourceSkillPendant;
 	@ObjectHolder(ResourceItem.ID_SKILL_FLUTE) public static ResourceItem resourceSkillFlute;
@@ -325,6 +324,7 @@ public class NostrumItems {
 	@ObjectHolder(SpellPatternTome.ID) public static SpellPatternTome spellPatternTome;
 	@ObjectHolder(CopyWandItem.ID) public static CopyWandItem copyWand;
 	@ObjectHolder(ResearchTranscriptItem.ID) public static ResearchTranscriptItem researchTranscript;
+	@ObjectHolder(SeekingGem.ID) public static SeekingGem seekingGem;
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -587,7 +587,7 @@ public class NostrumItems {
     	register(registry, new ResourceItem().setRegistryName(ResourceItem.ID_MANA_LEAF));
     	register(registry, new ResourceItem().setRegistryName(ResourceItem.ID_EVIL_THISTLE));
     	register(registry, new ResourceItem().setRegistryName(ResourceItem.ID_DRAGON_WING));
-    	register(registry, new ResourceItem().setRegistryName(ResourceItem.ID_SEEKING_GEM));
+    	register(registry, new SeekingGem(NostrumItems.PropEquipment()).setRegistryName(SeekingGem.ID));
     	register(registry, new ResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceItem.ID_SKILL_OOZE));
     	register(registry, new ResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceItem.ID_SKILL_PENDANT));
     	register(registry, new ResourceItem(NostrumItems.PropBase().rarity(Rarity.RARE)).setRegistryName(ResourceItem.ID_SKILL_FLUTE));

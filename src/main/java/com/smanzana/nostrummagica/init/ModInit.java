@@ -820,7 +820,7 @@ public class ModInit {
 						EMagicElement.ENDER,
 						new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT,
 								ReagentType.MANI_DUST },
-						Ingredient.fromItems(NostrumItems.resourceSeekingGem), new ResearchRequirement("sorceryportal"),
+						Ingredient.fromItems(NostrumItems.seekingGem), new ResearchRequirement("sorceryportal"),
 						new OutcomeCreatePortal()));
 
 		registry
@@ -910,7 +910,7 @@ public class ModInit {
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.deepMetalAxe))));
 
 		registry.register(RitualRecipe.createTier3("create_seeking_gem",
-				new ItemStack(NostrumItems.resourceSeekingGem), null,
+				new ItemStack(NostrumItems.seekingGem), null,
 				new ReagentType[] {
 						ReagentType.GRAVE_DUST, ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL },
 				Ingredient.fromItems(Items.ENDER_EYE),
@@ -920,7 +920,7 @@ public class ModInit {
 						Ingredient.EMPTY
 						},
 				new ResearchRequirement("seeking_gems"),
-				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSeekingGem))));
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.seekingGem))));
 
 		registry.register(RitualRecipe.createTier3("tome_workshop",
 				new ItemStack(NostrumBlocks.tomeWorkshop), null,
@@ -1646,7 +1646,7 @@ public class ModInit {
 				.reference("ritual::recall", "ritual.recall.name")
 				.build("markrecall", NostrumResearchTab.MAGICA, Size.LARGE, 4, 2, true, new ItemStack(Items.COMPASS));
 
-		NostrumResearch.startBuilding().parent("markrecall").lore(NostrumItems.resourceSeekingGem).build("adv_markrecall",
+		NostrumResearch.startBuilding().parent("markrecall").lore(NostrumItems.seekingGem).build("adv_markrecall",
 				NostrumResearchTab.MAGICA, Size.LARGE, 4, 3, false, new ItemStack(NostrumItems.positionToken));
 
 		NostrumResearch.startBuilding().parent("rituals").reference("ritual::buff.luck", "ritual.buff.luck.name")
@@ -1695,7 +1695,7 @@ public class ModInit {
 		NostrumResearch.startBuilding().parent("kani")
 				.reference("ritual::create_seeking_gem", "ritual.create_seeking_gem.name").build("seeking_gems",
 						NostrumResearchTab.MYSTICISM, Size.NORMAL, -2, 1, true,
-						new ItemStack(NostrumItems.resourceSeekingGem));
+						new ItemStack(NostrumItems.seekingGem));
 
 		NostrumResearch.startBuilding().hiddenParent("magic_token").hiddenParent("spellcraft")
 				.lore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE))).reference("ritual::rune.physical", "ritual.rune.physical.name")

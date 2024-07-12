@@ -35,7 +35,6 @@ public class ResourceItem extends Item implements ILoreTagged {
 	public static final String ID_MANA_LEAF = "mana_leaf";
 	public static final String ID_EVIL_THISTLE = "evil_thistle";
 	public static final String ID_DRAGON_WING = "dragon_wing";
-	public static final String ID_SEEKING_GEM = "seeking_gem";
 	public static final String ID_SKILL_OOZE = "essential_ooze";
 	public static final String ID_SKILL_PENDANT = "eldrich_pendant";
 	public static final String ID_SKILL_FLUTE = "living_flute";
