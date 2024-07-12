@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.client.Minecraft;
@@ -15,14 +15,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
- * Server has processed spell cast request and sent back
- * the status (as well as final mana)
+ * Server is broadcasting a spell vfx
  * @author Skyler
  *
  */
-public class ClientEffectRenderMessage {
+public class ClientEffectVfxRenderMessage {
 
-	public static void handle(ClientEffectRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
+	public static void handle(ClientEffectVfxRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().runAsync(() -> {
 			final World world = NostrumMagica.instance.proxy.getPlayer().world;
@@ -37,15 +36,14 @@ public class ClientEffectRenderMessage {
 				target = Entities.FindLiving(world, message.target);
 			}
 			
-			if (message.component == null) {
-				NostrumMagica.logger.warn("Malformed effect message");
+			if (message.effect == null) {
+				NostrumMagica.logger.warn("Malformed effect vfx message");
 				return;
 			}
 			
-			NostrumMagica.instance.proxy.spawnEffect(NostrumMagica.instance.proxy.getPlayer().world, 
-					message.component,
-					caster, message.casterPos, target, message.targetPos,
-					message.flavor, message.negative, message.param);
+			NostrumMagica.instance.proxy.spawnSpellEffectVfx(NostrumMagica.instance.proxy.getPlayer().world, 
+					message.effect,
+					caster, message.casterPos, target, message.targetPos);
 		});
 	}
 
@@ -53,49 +51,34 @@ public class ClientEffectRenderMessage {
 	private final Vector3d casterPos;
 	private final UUID target;
 	private final Vector3d targetPos;
-	private final SpellComponentWrapper component;
-	private final SpellComponentWrapper flavor;
-	private final boolean negative;
-	private final float param;
+	private final SpellEffectPart effect;
 	
-	public ClientEffectRenderMessage(
+	public ClientEffectVfxRenderMessage(
 			LivingEntity caster, Vector3d casterPos,
 			LivingEntity target, Vector3d targetPos,
-			SpellComponentWrapper component,
-			SpellComponentWrapper flavor,
-			boolean negative,
-			float param) {
+			SpellEffectPart effect) {
 		this(caster == null ? null : caster.getUniqueID(), casterPos,
 				target == null ? null : target.getUniqueID(), targetPos,
-				component, flavor, negative, param);
+				effect);
 	}
 	
-	public ClientEffectRenderMessage(
+	public ClientEffectVfxRenderMessage(
 			UUID caster, Vector3d casterPos,
 			UUID target, Vector3d targetPos,
-			SpellComponentWrapper component,
-			SpellComponentWrapper flavor,
-			boolean negative,
-			float param) {
+			SpellEffectPart effect) {
 		this.caster = caster;
 		this.casterPos = casterPos;
 		this.target = target;
 		this.targetPos = targetPos;
-		this.component = component;
-		this.flavor = flavor;
-		this.negative = negative;
-		this.param = param;
+		this.effect = effect;
 	}
 
-	public static ClientEffectRenderMessage decode(PacketBuffer buf) {
+	public static ClientEffectVfxRenderMessage decode(PacketBuffer buf) {
 		final UUID caster;
 		final Vector3d casterPos;
 		final UUID target;
 		final Vector3d targetPos;
-		final SpellComponentWrapper component;
-		final SpellComponentWrapper flavor;
-		final boolean negative;
-		final float param;
+		final SpellEffectPart effect;
 		
 		if (buf.readBoolean()) {
 			caster = buf.readUniqueId();
@@ -121,24 +104,15 @@ public class ClientEffectRenderMessage {
 			targetPos = null;
 		}
 		
-		component = SpellComponentWrapper.fromKeyString(buf.readString(32767));
+		effect = SpellEffectPart.FromNBT(buf.readCompoundTag());
 		
-		if (buf.readBoolean()) {
-			flavor = SpellComponentWrapper.fromKeyString(buf.readString(32767));
-		} else {
-			flavor = null;
-		}
-		
-		negative = buf.readBoolean();
-		param = buf.readFloat();
-		
-		return new ClientEffectRenderMessage(
+		return new ClientEffectVfxRenderMessage(
 				caster, casterPos, target, targetPos,
-				component, flavor, negative, param
+				effect
 				);
 	}
 
-	public static void encode(ClientEffectRenderMessage msg, PacketBuffer buf) {
+	public static void encode(ClientEffectVfxRenderMessage msg, PacketBuffer buf) {
 		buf.writeBoolean(msg.caster != null);
 		if (msg.caster != null) {
 			buf.writeUniqueId(msg.caster);
@@ -163,15 +137,7 @@ public class ClientEffectRenderMessage {
 			buf.writeDouble(msg.targetPos.z);
 		}
 		
-		buf.writeString(msg.component.getKeyString());
-		
-		buf.writeBoolean(msg.flavor != null);
-		if (msg.flavor != null) {
-			buf.writeString(msg.flavor.getKeyString());
-		}
-		
-		buf.writeBoolean(msg.negative);
-		buf.writeFloat(msg.param);
+		buf.writeCompoundTag(msg.effect.toNBT(null));
 	}
 
 }

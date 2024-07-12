@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
 import net.minecraft.entity.LivingEntity;
@@ -42,8 +41,10 @@ public class OnManaShape extends OnMetricLevelShape {
 		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
+		private final SpellShapeProperties properties;
+		private final SpellCharacteristics characteristics;
 		
-		public ManaShapeInstance(ISpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellCharacteristics characteristics) {
+		public ManaShapeInstance(ISpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
@@ -54,6 +55,8 @@ public class OnManaShape extends OnMetricLevelShape {
 				this.amount = .5f;
 			if (this.duration <= 0)
 				this.duration = 20;
+			this.properties = properties;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
@@ -76,9 +79,9 @@ public class OnManaShape extends OnMetricLevelShape {
 							);
 					
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
-							new SpellComponentWrapper(NostrumSpellShapes.OnMana),
-							this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().world,
+							NostrumSpellShapes.OnMana, properties,
+							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
 					expired = true;
 				}
@@ -122,7 +125,7 @@ public class OnManaShape extends OnMetricLevelShape {
 	@Override
 	public ManaShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new ManaShapeInstance(state, state.getCaster(),
-				getLevel(params), getOnAbove(params), 300, characteristics);
+				getLevel(params), getOnAbove(params), 300, params, characteristics);
 	}
 	
 	@Override

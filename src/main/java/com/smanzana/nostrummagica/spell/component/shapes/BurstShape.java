@@ -47,7 +47,7 @@ public class BurstShape extends InstantShape {
 		this(ID);
 	}
 	
-	protected float getRadius(SpellShapeProperties properties) {
+	public float getRadius(SpellShapeProperties properties) {
 		return properties.getValue(RADIUS);
 	}
 	

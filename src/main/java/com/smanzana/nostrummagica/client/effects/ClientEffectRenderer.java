@@ -7,10 +7,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
@@ -30,19 +36,28 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 @OnlyIn(Dist.CLIENT)
 public class ClientEffectRenderer {
 	
-	public static interface ClientEffectFactory {
+	public static interface ClientShapeEffectFactory {
 		
 		public ClientEffect build(LivingEntity caster,
 			Vector3d sourcePosition,
 			LivingEntity target,
 			Vector3d destPosition,
-			SpellComponentWrapper flavor,
-			boolean isNegative,
-			float compParam);
+			SpellShapeProperties properties,
+			SpellCharacteristics characteristics);
+	}
+	
+	public static interface ClientActionEffectFactory {
+		
+		public ClientEffect build(LivingEntity caster,
+			Vector3d sourcePosition,
+			LivingEntity target,
+			Vector3d destPosition,
+			SpellEffectPart effect);
 	}
 
-	private Map<SpellComponentWrapper, ClientEffectFactory> registeredEffects;
-	private List<ClientEffect> activeEffects;
+	private final Map<SpellShape, ClientShapeEffectFactory> registeredShapeEffects;
+	private final Map<EAlteration, ClientActionEffectFactory> registeredActionEffects;
+	private final List<ClientEffect> activeEffects;
 	
 	private static ClientEffectRenderer instance = null;
 	public static ClientEffectRenderer instance() {
@@ -54,7 +69,8 @@ public class ClientEffectRenderer {
 	
 	private ClientEffectRenderer() {
 		activeEffects = Collections.synchronizedList(new LinkedList<>());
-		registeredEffects = new HashMap<>();
+		registeredShapeEffects = new HashMap<>();
+		registeredActionEffects = new HashMap<>();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
@@ -104,33 +120,57 @@ public class ClientEffectRenderer {
 		
 	}
 	
-	public void registerEffect(SpellComponentWrapper component, ClientEffectFactory factory) {
-		registeredEffects.put(component, factory);
+	public void registerEffect(SpellShape shape, ClientShapeEffectFactory factory) {
+		this.registeredShapeEffects.put(shape, factory);
+	}
+	
+	public void registerEffect(@Nullable EAlteration alteration, ClientActionEffectFactory factory) {
+		this.registeredActionEffects.put(alteration, factory);
 	}
 	
 	private static boolean DidWarned = false;
 	
-	public void spawnEffect(SpellComponentWrapper component,
+	public void spawnEffect(SpellShape shape,
 			LivingEntity caster,
 			Vector3d sourcePosition,
 			LivingEntity target,
 			Vector3d destPosition,
-			SpellComponentWrapper flavor,
-			boolean isNegative,
-			float compParam) {
-		ClientEffectFactory factory = registeredEffects.get(component);
+			SpellShapeProperties properties,
+			SpellCharacteristics characteristics) {
+		ClientShapeEffectFactory factory = registeredShapeEffects.get(shape);
 		if (factory == null) {
 			if (!DidWarned) {
-				NostrumMagica.logger.warn("Trying to spawn effect for unmapped component. Create a mapping for the component " + component);
+				NostrumMagica.logger.warn("Trying to spawn effect for unmapped shape. Create a mapping for the component " + shape.getShapeKey());
 				DidWarned = true;
 			}
 			return;
 		}
 		
-		ClientEffect effect = factory.build(caster, sourcePosition, target, destPosition, flavor, isNegative, compParam);
+		ClientEffect effect = factory.build(caster, sourcePosition, target, destPosition, properties, characteristics);
 		if (effect == null)
 			return;
 		
 		this.addEffect(effect);
+	}
+	
+	public void spawnEffect(SpellEffectPart effect,
+			LivingEntity caster,
+			Vector3d sourcePosition,
+			LivingEntity target,
+			Vector3d destPosition) {
+		ClientActionEffectFactory factory = registeredActionEffects.get(effect.getAlteration());
+		if (factory == null) {
+			if (!DidWarned) {
+				NostrumMagica.logger.warn("Trying to spawn effect for unmapped alteration. Create a mapping for the component " + effect.getAlteration());
+				DidWarned = true;
+			}
+			return;
+		}
+		
+		ClientEffect vfx = factory.build(caster, sourcePosition, target, destPosition, effect);
+		if (vfx == null)
+			return;
+		
+		this.addEffect(vfx);
 	}
 }

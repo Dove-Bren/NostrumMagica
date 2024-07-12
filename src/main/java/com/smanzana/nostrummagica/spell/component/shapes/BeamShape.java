@@ -11,7 +11,6 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
@@ -110,8 +109,8 @@ public class BeamShape extends InstantShape {
 		}
 		
 		if (!state.isPreview()) {
-			NostrumMagica.instance.proxy.spawnEffect(location.world, new SpellComponentWrapper(this),
-					null, start, null, end, null, false, 0);
+			NostrumMagica.instance.proxy.spawnSpellShapeVfx(location.world, this, params,
+					null, start, null, end, characteristics);
 		}
 		
 		return new TriggerData(targs, blocks);

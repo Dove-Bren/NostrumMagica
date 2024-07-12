@@ -11,7 +11,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
@@ -169,12 +168,9 @@ public abstract class SpellShape {
 	protected final void spawnDefaultShapeEffect(LivingEntity caster,
 			@Nullable LivingEntity target, SpellLocation location, SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
-//		final float p = (supportedFloats() == null || supportedFloats().length == 0 ? 0 : (
-//				properties.level == 0f ? supportedFloats()[0] : properties.level));
-		final float p = 1f; int unused;
-		NostrumMagica.instance.proxy.spawnEffect(location.world, new SpellComponentWrapper(this),
+		NostrumMagica.instance.proxy.spawnSpellShapeVfx(location.world, this, properties,
 				caster, null, target, location.hitPosition,
-				new SpellComponentWrapper(characteristics.element), characteristics.harmful, p);
+				characteristics);
 	}
 	
 	/**

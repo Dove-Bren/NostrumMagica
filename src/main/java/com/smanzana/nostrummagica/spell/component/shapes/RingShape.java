@@ -55,11 +55,12 @@ public class RingShape extends BurstShape {
 		this(ID);
 	}
 	
-	protected float getRadius(SpellShapeProperties properties) {
+	@Override
+	public float getRadius(SpellShapeProperties properties) {
 		return getOuterRadius(properties);
 	}
 	
-	protected float getOuterRadius(SpellShapeProperties properties) {
+	public float getOuterRadius(SpellShapeProperties properties) {
 		return properties.getValue(OUTER_RADIUS);
 	}
 	

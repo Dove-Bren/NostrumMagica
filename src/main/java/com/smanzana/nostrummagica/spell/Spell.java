@@ -26,7 +26,6 @@ import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEntityEvent;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -318,32 +317,17 @@ public class Spell {
 				
 				// Evaluate showing vfx for each part
 				if (first) {
-					final boolean harmful = action.getProperties().isHarmful;
-					
 					if (!affectedEnts.isEmpty())
 					for (LivingEntity affected : affectedEnts) {
-						SpellComponentWrapper comp;
-						if (part.getAlteration() == null)
-							comp = new SpellComponentWrapper(part.getElement());
-						else
-							comp = new SpellComponentWrapper(part.getAlteration());
-						
-						NostrumMagica.instance.proxy.spawnEffect(affected.world, comp,
-								caster, null, affected, null,
-								new SpellComponentWrapper(part.getElement()), harmful, 0);
+						NostrumMagica.instance.proxy.spawnSpellEffectVfx(affected.world, part,
+								caster, null, affected, null);
 					}
 					
 					if (!affectedPos.isEmpty())
 					for (SpellLocation affectPos : affectedPos) {
-						SpellComponentWrapper comp;
-						if (part.getAlteration() == null)
-							comp = new SpellComponentWrapper(part.getElement());
-						else
-							comp = new SpellComponentWrapper(part.getAlteration());
-						
-						NostrumMagica.instance.proxy.spawnEffect(affectPos.world, comp,
-								caster, null, null, new Vector3d(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5),
-								new SpellComponentWrapper(part.getElement()), harmful, 0);
+						NostrumMagica.instance.proxy.spawnSpellEffectVfx(affectPos.world, part,
+								caster, null, null, new Vector3d(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5)
+								);
 					}
 				}
 				

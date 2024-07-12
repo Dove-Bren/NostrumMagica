@@ -16,7 +16,6 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
 import net.minecraft.entity.LivingEntity;
@@ -42,8 +41,10 @@ public class OnHealthShape extends OnMetricLevelShape {
 		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
+		private final SpellShapeProperties properties;
+		private final SpellCharacteristics characteristics;
 		
-		public HealthShapeInstance(ISpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellCharacteristics characteristics) {
+		public HealthShapeInstance(ISpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellCharacteristics characteristics, SpellShapeProperties properties) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
@@ -54,6 +55,8 @@ public class OnHealthShape extends OnMetricLevelShape {
 				this.amount = .5f;
 			if (this.duration <= 0)
 				this.duration = 20;
+			this.properties = properties;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
@@ -76,9 +79,9 @@ public class OnHealthShape extends OnMetricLevelShape {
 							);
 					
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
-							new SpellComponentWrapper(NostrumSpellShapes.OnHealth),
-							this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().world,
+							NostrumSpellShapes.OnHealth, properties,
+							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
 					
 					expired = true;
@@ -123,7 +126,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 	@Override
 	public HealthShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new HealthShapeInstance(state, state.getCaster(),
-				getLevel(params), getOnAbove(params), 300, characteristics);
+				getLevel(params), getOnAbove(params), 300, characteristics, params);
 	}
 	
 	@Override

@@ -10,7 +10,6 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
@@ -33,17 +32,19 @@ public class ProximityShape extends SpellShape {
 		private final Vector3d pos;
 		private final float range;
 		private final SpellCharacteristics characteristics;
+		private final SpellShapeProperties properties;
 		private boolean set;
 		private boolean dead;
 		
 		public ProximityShapeInstance(ISpellState state, World world,
-				Vector3d pos, float range, SpellCharacteristics characteristics) {
+				Vector3d pos, float range, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.set = false;
 			this.pos = pos;
 			this.range = range;
 			this.characteristics = characteristics;
+			this.properties = properties;
 			dead = false;
 		}
 		
@@ -61,8 +62,8 @@ public class ProximityShape extends SpellShape {
 				if (dead)
 					return true;
 				
-				NostrumMagica.instance.proxy.spawnEffect(world, new SpellComponentWrapper(NostrumSpellShapes.Proximity),
-						null, null, null, this.pos, new SpellComponentWrapper(this.characteristics.getElement()), false, range);
+				NostrumMagica.instance.proxy.spawnSpellShapeVfx(world, ProximityShape.this, this.properties, 
+						null, null, null, this.pos, this.characteristics);
 				if (!set) {
 					// Trap is now set!
 					set = true;
@@ -99,7 +100,7 @@ public class ProximityShape extends SpellShape {
 		this.baseProperties.addProperty(RANGE);
 	}
 	
-	protected float getRange(SpellShapeProperties properties) {
+	public float getRange(SpellShapeProperties properties) {
 		return properties.getValue(RANGE);
 	}
 	
@@ -119,7 +120,7 @@ public class ProximityShape extends SpellShape {
 	public ProximityShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params,
 			SpellCharacteristics characteristics) {
 		return new ProximityShapeInstance(state, location.world, location.hitPosition,
-				getRange(params), characteristics);
+				getRange(params), params, characteristics);
 	}
 
 	@Override

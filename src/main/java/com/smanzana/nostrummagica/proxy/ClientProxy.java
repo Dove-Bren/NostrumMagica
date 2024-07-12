@@ -58,8 +58,11 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
@@ -425,16 +428,12 @@ public class ClientProxy extends CommonProxy {
 			Vector3d sourcePos,
 			LivingEntity target,
 			Vector3d targetPos,
-			SpellComponentWrapper flavor,
-			boolean negative,
-			float param) {
+			SpellEffectPart part) {
 		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 				new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 				3L * 500L, 6);
 		
-		if (flavor != null && flavor.isElement()) {
-			effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-		}
+		effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 		
 		if (target != null) {
 			effect.modify(new ClientEffectModifierFollow(target));
@@ -453,21 +452,19 @@ public class ClientProxy extends CommonProxy {
 	public void initDefaultEffects() {
 		ClientEffectRenderer renderer = this.effectRenderer;
 		
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Burst),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(NostrumSpellShapes.Burst,
+				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					// TODO get the shape params in here to modify scale
 					// TODO get whether it's a good thing or not
 					ClientEffect effect = new ClientEffectMajorSphere(target == null ? targetPos : new Vector3d(0, 0, 0),
-							param + .5f,
-							negative,
+							NostrumSpellShapes.Burst.getRadius(properties) + .5f,
+							characteristics.isHarmful(),
 							1000L);
 					
 					if (target != null)
 						effect.modify(new ClientEffectModifierFollow(target));
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(characteristics.getElement().getColor(), characteristics.getElement().getColor()));
 					
 					// negative will blow up and then shrink down in a cool way
 					// positive will rise up and then fade out
@@ -475,7 +472,7 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .4f, 0f));
 					
-					if (negative) {
+					if (characteristics.isHarmful()) {
 						effect
 						.modify(new ClientEffectModifierGrow(.75f, .2f, 1f, .5f, .2f))
 						.modify(new ClientEffectModifierShrink(1, 1, 0f, .2f, .6f))
@@ -489,17 +486,15 @@ public class ClientProxy extends CommonProxy {
 					
 					return effect;
 				});
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Ring),
-				(source, sourcePos, targetIn, targetPosIn, flavorIn, negative, param) -> {
-					final float radius = 2 + param - .5f;
+		renderer.registerEffect(NostrumSpellShapes.Ring,
+				(source, sourcePos, targetIn, targetPosIn, properties, characteristics) -> {
+					final float radius = NostrumSpellShapes.Ring.getOuterRadius(properties);
 					
 					ClientEffect effect = new ClientEffectMirrored(targetPosIn == null ? targetIn.getPositionVec() : targetPosIn,
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							1L * 500L, 6);
 					
-					if (flavorIn != null && flavorIn.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavorIn.getElement().getColor(), flavorIn.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(characteristics.getElement().getColor(), characteristics.getElement().getColor()));
 					
 					effect
 					.modify(new ClientEffectModifierRotate(0, -.25f, 0))
@@ -510,31 +505,9 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		// elements 
-		for (EMagicElement element : EMagicElement.values()) {
-			renderer.registerEffect(new SpellComponentWrapper(element),
-					(source, sourcePos, target, targetPos, flavor, negative, param) -> {
-						ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vector3d(0, 0, 0),
-								new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
-								500L, 5);
-						
-						if (target != null)
-							effect.modify(new ClientEffectModifierFollow(target));
-						
-						effect
-						.modify(new ClientEffectModifierColor(element.getColor(), element.getColor()))
-						.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
-						.modify(new ClientEffectModifierTranslate(0, 0, -1))
-						.modify(new ClientEffectModifierMove(new Vector3d(0, 1.5, 0), new Vector3d(0, .5, .7), .5f, 1f))
-						.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
-						;
-						return effect;
-					});
-		}
-		
 		// triggers (that have them)
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Beam),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(NostrumSpellShapes.Beam,
+				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.getPositionVec() : sourcePos,
 							targetPos == null ? target.getPositionVec() : targetPos,
 							500L);
@@ -542,9 +515,7 @@ public class ClientProxy extends CommonProxy {
 					//if (target != null)
 					//	effect.modify(new ClientEffectModifierFollow(target));
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(characteristics.getElement().getColor(), characteristics.getElement().getColor()));
 					
 					effect
 					.modify(new ClientEffectModifierGrow(1f, .2f, 1f, 1f, .4f))
@@ -575,7 +546,7 @@ public class ClientProxy extends CommonProxy {
 		// Can't think of a cool one for self. Oh well
 		
 //		renderer.registerEffect(new SpellComponentWrapper(OtherTrigger.instance()),
-//				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+//				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 //					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 //							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 //							500L, 6);
@@ -597,8 +568,8 @@ public class ClientProxy extends CommonProxy {
 //					return effect;
 //				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.OnHealth),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(NostrumSpellShapes.OnHealth,
+				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
@@ -616,8 +587,8 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.OnMana),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(NostrumSpellShapes.OnMana,
+				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
@@ -635,8 +606,8 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.OnFood),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(NostrumSpellShapes.OnFood,
+				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
@@ -654,21 +625,19 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(NostrumSpellShapes.Proximity),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(NostrumSpellShapes.Proximity,
+				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 1000L, 5);
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(characteristics.getElement().getColor(), characteristics.getElement().getColor()));
 					
-					param = Math.max(1f, param);
+					final float range = NostrumSpellShapes.Proximity.getRange(properties);
 					
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
-					.modify(new ClientEffectModifierTranslate(0, .2f, (.5f * param)))
+					.modify(new ClientEffectModifierTranslate(0, .2f, (.5f * range)))
 					.modify(new ClientEffectModifierGrow(.2f, .2f, .4f, .5f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .4f))
 					;
@@ -676,7 +645,7 @@ public class ClientProxy extends CommonProxy {
 				});
 		
 //		renderer.registerEffect(new SpellComponentWrapper(WallTrigger.instance()),
-//				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+//				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 //					final boolean northsouth = (param >= 1000f);
 //					final int radius = (int) param - (northsouth ? 1000 : 0);
 //					
@@ -685,15 +654,33 @@ public class ClientProxy extends CommonProxy {
 //				);
 		
 		// Alterations
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.INFLICT),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		
+		renderer.registerEffect((EAlteration) null,
+				(source, sourcePos, target, targetPos, part) -> {
+					ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vector3d(0, 0, 0),
+							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
+							500L, 5);
+					
+					if (target != null)
+						effect.modify(new ClientEffectModifierFollow(target));
+					
+					effect
+					.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()))
+					.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
+					.modify(new ClientEffectModifierTranslate(0, 0, -1))
+					.modify(new ClientEffectModifierMove(new Vector3d(0, 1.5, 0), new Vector3d(0, .5, .7), .5f, 1f))
+					.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
+					;
+					return effect;
+				});
+		
+		renderer.registerEffect(EAlteration.INFLICT,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 							3L * 500L, 6);
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -709,15 +696,13 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RESIST),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.RESIST,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.ARROWU, 0, 0, 0),
 							3L * 500L, 6);
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -733,16 +718,14 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.GROWTH),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.GROWTH,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.getPositionVec() : targetPos, 
 							new ClientEffectMirrored(new Vector3d(0,0,0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							2L * 1000L, 4), 2L * 1000L, 5, .2f);
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -757,12 +740,11 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.SUPPORT),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.SUPPORT,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect;
 					boolean isShield = false;
-					if (flavor != null && flavor.isElement() && 
-							(flavor.getElement() == EMagicElement.EARTH || flavor.getElement() == EMagicElement.ICE)) {
+					if (part.getElement() == EMagicElement.EARTH || part.getElement() == EMagicElement.ICE) {
 						// Special ones for shields!
 						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 								new ClientEffectFormBasic(ClientEffectIcon.SHIELD, 0, 0, 0),
@@ -774,9 +756,7 @@ public class ClientProxy extends CommonProxy {
 								3L * 500L, 10);
 					}
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -799,15 +779,13 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.ENCHANT),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.ENCHANT,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							3L * 500L, 6, new Vector3f(1, 0, 0));
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -822,17 +800,15 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.CONJURE),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.CONJURE,
+				(source, sourcePos, target, targetPos, part) -> {
 					// TODO physical breaks stuff. Lots of particles. Should we return null here?
 					
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							1L * 500L, 6);
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -849,15 +825,13 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.SUMMON),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.SUMMON,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							1L * 500L, 6);
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -876,15 +850,13 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.RUIN),
-				(source, sourcePos, target, targetPos, flavor, negative, param) -> {
+		renderer.registerEffect(EAlteration.RUIN,
+				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 500L, 6, new Vector3f(.5f, .5f, 0));
 					
-					if (flavor != null && flavor.isElement()) {
-						effect.modify(new ClientEffectModifierColor(flavor.getElement().getColor(), flavor.getElement().getColor()));
-					}
+					effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
 					
 					if (target != null) {
 						effect.modify(new ClientEffectModifierFollow(target));
@@ -900,21 +872,21 @@ public class ClientProxy extends CommonProxy {
 					return effect;
 				});
 		
-		renderer.registerEffect(new SpellComponentWrapper(EAlteration.CORRUPT), ClientProxy::doCorruptEffect);
+		renderer.registerEffect(EAlteration.CORRUPT, ClientProxy::doCorruptEffect);
 	}
 	
 	@Override
-	public void spawnEffect(World world, SpellComponentWrapper comp,
+	public void spawnSpellShapeVfx(World world, SpellShape shape, SpellShapeProperties properties,
 			LivingEntity caster, Vector3d casterPos,
 			LivingEntity target, Vector3d targetPos,
-			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
+			SpellCharacteristics characteristics) {
 		if (world == null && target != null) {
 			world = target.world;
 		}
 		
 		if (world != null) {
 			if (!world.isRemote) {
-				super.spawnEffect(world, comp, caster, casterPos, target, targetPos, flavor, isNegative, compParam);
+				super.spawnSpellShapeVfx(world, shape, properties, caster, casterPos, target, targetPos, characteristics);
 				return;
 			}
 		}
@@ -924,7 +896,30 @@ public class ClientProxy extends CommonProxy {
 //			else
 				targetPos = new Vector3d(0, 0, 0);
 		
-		this.effectRenderer.spawnEffect(comp, caster, casterPos, target, targetPos, flavor, isNegative, compParam);
+		this.effectRenderer.spawnEffect(shape, caster, casterPos, target, targetPos, properties, characteristics);
+	}
+	
+	@Override
+	public void spawnSpellEffectVfx(World world, SpellEffectPart effect,
+			LivingEntity caster, Vector3d casterPos,
+			LivingEntity target, Vector3d targetPos) {
+		if (world == null && target != null) {
+			world = target.world;
+		}
+		
+		if (world != null) {
+			if (!world.isRemote) {
+				super.spawnSpellEffectVfx(world, effect, caster, casterPos, target, targetPos);
+				return;
+			}
+		}
+		if (targetPos == null)
+//			if (target != null)
+//				targetPos = target.getPositionVec();
+//			else
+				targetPos = new Vector3d(0, 0, 0);
+		
+		this.effectRenderer.spawnEffect(effect, caster, casterPos, target, targetPos);
 	}
 	
 	@Override

@@ -17,7 +17,8 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.message.ClientEffectRenderMessage;
+import com.smanzana.nostrummagica.network.message.ClientEffectVfxRenderMessage;
+import com.smanzana.nostrummagica.network.message.ClientShapeVfxRenderMessage;
 import com.smanzana.nostrummagica.network.message.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.message.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.message.ManaMessage;
@@ -30,7 +31,10 @@ import com.smanzana.nostrummagica.network.message.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.SpellCharacteristics;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStats;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
@@ -152,10 +156,10 @@ public class CommonProxy {
 	 * @param negative whether the effect should be considered 'negative'/harmful
 	 * @param param optional extra float param for display
 	 */
-	public void spawnEffect(World world, SpellComponentWrapper comp,
+	public void spawnSpellShapeVfx(World world, SpellShape shape, SpellShapeProperties properties,
 			LivingEntity caster, Vector3d casterPos,
 			LivingEntity target, Vector3d targetPos,
-			SpellComponentWrapper flavor, boolean isNegative, float compParam) {
+			SpellCharacteristics characteristics) {
 		if (world == null) {
 			if (caster == null)
 				world = target.world; // If you NPE here you suck. Supply a world!
@@ -165,11 +169,33 @@ public class CommonProxy {
 		
 		final double MAX_RANGE = 50.0;
 		
-		ClientEffectRenderMessage message = new ClientEffectRenderMessage(
+		ClientShapeVfxRenderMessage message = new ClientShapeVfxRenderMessage(
 				caster, casterPos,
 				target, targetPos,
-				comp, flavor,
-				isNegative, compParam);
+				shape, properties, characteristics);
+		if (target != null) {
+			NetworkHandler.sendToAllTracking(message, target);
+		} else {
+			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimensionKey()));
+		}
+	}
+	
+	public void spawnSpellEffectVfx(World world, SpellEffectPart effect,
+			LivingEntity caster, Vector3d casterPos,
+			LivingEntity target, Vector3d targetPos) {
+		if (world == null) {
+			if (caster == null)
+				world = target.world; // If you NPE here you suck. Supply a world!
+			else
+				world = caster.world;
+		}
+		
+		final double MAX_RANGE = 50.0;
+		
+		ClientEffectVfxRenderMessage message = new ClientEffectVfxRenderMessage(
+				caster, casterPos,
+				target, targetPos,
+				effect);
 		if (target != null) {
 			NetworkHandler.sendToAllTracking(message, target);
 		} else {

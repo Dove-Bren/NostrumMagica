@@ -16,7 +16,6 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
 import net.minecraft.entity.LivingEntity;
@@ -42,8 +41,10 @@ public class OnFoodShape extends OnMetricLevelShape {
 		private LivingEntity entity;
 		private int duration;
 		private boolean expired;
+		private final SpellShapeProperties properties;
+		private final SpellCharacteristics characteristics;
 		
-		public FoodShapeInstance(ISpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellCharacteristics characteristics) {
+		public FoodShapeInstance(ISpellState state, LivingEntity entity, float amount, boolean higher, int duration, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 			super(state);
 			this.amount = amount;
 			this.onHigh = higher;
@@ -54,6 +55,8 @@ public class OnFoodShape extends OnMetricLevelShape {
 				this.amount = 10;
 			if (this.duration <= 0)
 				this.duration = 20;
+			this.properties = properties;
+			this.characteristics = characteristics;
 		}
 		
 		@Override
@@ -83,9 +86,9 @@ public class OnFoodShape extends OnMetricLevelShape {
 							);
 					
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnEffect(this.getState().getSelf().world,
-							new SpellComponentWrapper(NostrumSpellShapes.OnFood),
-							this.getState().getSelf(), null, this.getState().getSelf(), null, null, false, 0);
+					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().world,
+							NostrumSpellShapes.OnFood, properties,
+							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
 					
 					expired = true;
@@ -135,7 +138,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 	@Override
 	public FoodShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new FoodShapeInstance(state, state.getCaster(),
-				getLevel(params), getOnAbove(params), 300, characteristics);
+				getLevel(params), getOnAbove(params), 300, params, characteristics);
 	}
 	
 	@Override
