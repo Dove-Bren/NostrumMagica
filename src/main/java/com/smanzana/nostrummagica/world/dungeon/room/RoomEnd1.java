@@ -20,7 +20,7 @@ public class RoomEnd1 extends StaticRoom {
 	private boolean withEnemy;
 	
 	public RoomEnd1(boolean withChest, boolean withEnemy) {
-		super(NostrumMagica.Loc("room_end1"), -4, -1, 0, 4, 3, 7,
+		super(NostrumMagica.Loc("room_end1" + (withChest ? "_chest" : "") + (withEnemy ? "_enemy" : "")), -4, -1, 0, 4, 3, 7,
 				// Floor
 				"XXXXXXXXX",
 				"XXXXXXXXX",

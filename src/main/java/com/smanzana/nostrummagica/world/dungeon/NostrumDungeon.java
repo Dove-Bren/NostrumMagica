@@ -699,12 +699,17 @@ public class NostrumDungeon {
 		
 		public static DungeonRoomInstance fromNBT(CompoundNBT tag) {
 			final DungeonExitPoint entry = DungeonExitPoint.fromNBT(tag.getCompound(NBT_ENTRY));
-			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(new ResourceLocation(tag.getString(NBT_TEMPLATE)));
+			final ResourceLocation templateID = new ResourceLocation(tag.getString(NBT_TEMPLATE));
+			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(templateID);
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
 			final boolean hasLargeDoor = tag.getBoolean(NBT_HASDOOR);
 			final DungeonInstance instance = DungeonInstance.FromNBT(tag.get(NBT_DUNGEON_INSTANCE));
 			final UUID roomID = tag.getUniqueId(NBT_ROOM_ID);
 			final DungeonRoomInstance ret = new DungeonRoomInstance(entry, template, hasKey, hasLargeDoor, instance, roomID);
+			
+			if (template == null) {
+				NostrumMagica.logger.error("Failed to find dungeon room instance by id " + templateID);
+			}
 			
 			ret.hasSmallKey = tag.getBoolean(NBT_HASSMALLKEY);
 			ret.smallDoors.clear();

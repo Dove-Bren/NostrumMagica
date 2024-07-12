@@ -70,7 +70,7 @@ public class SpellDamage {
 		return (float)i / 25f;
 	}
 	
-	private static boolean DamageLog = true;
+	private static boolean DamageLog = false;
 	private static final void LogDamage(float before, float after, String msg) {
 		if (DamageLog) {
 			NostrumMagica.logger.info(String.format("%s [%.2f -> %.2f][%+.2f]", msg, before, after, after-before));

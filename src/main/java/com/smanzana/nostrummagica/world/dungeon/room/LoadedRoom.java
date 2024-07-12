@@ -48,10 +48,10 @@ public class LoadedRoom implements IDungeonRoom {
 //		// Save consistent unique ID this room can be looked up later as and register as such
 //		this.registryID = "LoadedRoom_" + blueprintRecord.name;
 //		
-//		// Same as static room, being lazy and assuming children know what they're talking about.
-//		if (IDungeonRoom.GetRegisteredRoom(registryID) == null) {
-//			IDungeonRoom.Register(registryID, this);
-//		}
+		// Same as static room, being lazy and assuming children know what they're talking about.
+		if (IDungeonRoom.GetRegisteredRoom(roomID) == null) {
+			IDungeonRoom.Register(roomID, this);
+		}
 	}
 	
 	protected DungeonRoomRecord getRoomRecord() {

@@ -19,7 +19,7 @@ public class RoomEnd2 extends StaticRoom {
 	private boolean withChest;
 	
 	public RoomEnd2(boolean withChest) {
-		super(NostrumMagica.Loc("room_end2"), -2, -1, 0, 7, 3, 7,
+		super(NostrumMagica.Loc("room_end2" + (withChest ? "_chest" : "")), -2, -1, 0, 7, 3, 7,
 				// Floor
 				"XXXXXXXXXX",
 				"XXXXXXXXXX",

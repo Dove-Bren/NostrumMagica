@@ -525,6 +525,18 @@ public class DungeonRoomRegistry {
 		protected void apply(ReloadListenerData data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 			this.roomListener.apply(data.roomData, resourceManagerIn, profilerIn);
 			this.compListener.apply(data.compData, resourceManagerIn, profilerIn);
+			
+			final DungeonRoomRegistry loader = DungeonRoomRegistry.instance();
+			{
+				// After loading/registering the blueprints, register dungeon rooms for each
+				// TODO remove this and move somewhere else and make this be the BlueprintLoader!!!!
+				for (DungeonRoomRecord blueprintRecord : loader.getAllRooms()) {
+					new LoadedRoom(blueprintRecord.id);
+				}
+				
+				// Hack in support for registering statics here too
+				StaticRoom.RegisterStaticRooms();
+			}
 		}
 	}
 }

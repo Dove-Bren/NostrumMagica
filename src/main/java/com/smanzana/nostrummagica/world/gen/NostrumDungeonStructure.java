@@ -115,7 +115,8 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 		// Would like to consider using GetContainingStructure() and use the start, but the start can't carry instance info through a write/read.
 		StructurePiece piece = WorldUtil.GetContainingStructurePiece(world, at, structure, true);
 		if (piece != null && piece instanceof DungeonPiece) {
-			return new DungeonRecord(structure, ((DungeonPiece) piece).instance.getDungeonInstance());
+			DungeonPiece dungeonPiece = ((DungeonPiece) piece);
+			return new DungeonRecord(structure, dungeonPiece.instance.getDungeonInstance(), dungeonPiece.instance);
 		}
 		return null;
 	}
