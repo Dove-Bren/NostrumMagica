@@ -33,7 +33,6 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.SpellUtils;
@@ -141,14 +140,14 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			
 			spells.add(SpellUtils.MakeSpell("Leaf Blade",
 					NostrumSpellShapes.Projectile,
-					new SpellShapeProperties(1, true),
+					NostrumSpellShapes.Projectile.makeProps(true),
 					EMagicElement.WIND,
 					2,
 					EAlteration.RUIN
 					));
 			spells.add(SpellUtils.MakeSpell("Spore",
 					NostrumSpellShapes.SeekingBullet,
-					new SpellShapeProperties(0, true),
+					NostrumSpellShapes.SeekingBullet.makeProps(true),
 					EMagicElement.LIGHTNING,
 					1,
 					EAlteration.INFLICT
@@ -166,9 +165,9 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		if (SeedBombSpell == null) {
 			SeedBombSpell = SpellUtils.MakeSpell("Seed Bomb",
 					NostrumSpellShapes.Mortar,
-					new SpellShapeProperties(0, true),
+					NostrumSpellShapes.Mortar.makeProps(true),
 					NostrumSpellShapes.Field,
-					new SpellShapeProperties(2, false),
+					NostrumSpellShapes.Field.makeProps(2, false),
 					EMagicElement.EARTH,
 					1,
 					null

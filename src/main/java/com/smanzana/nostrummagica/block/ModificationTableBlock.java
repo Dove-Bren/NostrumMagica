@@ -101,7 +101,7 @@ public class ModificationTableBlock extends Block {
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
 			
 			if (comp.isShape()) {
-				return comp.getShape().supportedFloats() != null || comp.getShape().supportsBoolean();
+				return !comp.getShape().getDefaultProperties().getProperties().isEmpty();
 			}
 		}
 		

@@ -209,4 +209,8 @@ public class FieldShape extends AreaShape {
 		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
 	}
 
+	public SpellShapeProperties makeProps(float radius, boolean once) {
+		return this.getDefaultProperties().setValue(RADIUS, radius).setValue(ONCE, once);
+	}
+
 }

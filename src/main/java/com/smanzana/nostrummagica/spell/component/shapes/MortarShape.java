@@ -340,5 +340,9 @@ public class MortarShape extends SpellShape {
 		}
 		return success;
 	}
+
+	public SpellShapeProperties makeProps(boolean arcless) {
+		return this.getDefaultProperties().setValue(ARCLESS, arcless);
+	}
 	
 }

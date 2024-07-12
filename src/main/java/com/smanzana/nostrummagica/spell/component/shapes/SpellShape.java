@@ -265,6 +265,18 @@ public abstract class SpellShape {
 	public SpellShapeProperties getDefaultProperties() {
 		return baseProperties.copy();
 	}
+
+	@SuppressWarnings("unchecked")
+	public <T> SpellShapeProperty<T> getProperty(String propName) {
+		SpellShapeProperty<T> prop = null;
+		for (SpellShapeProperty<?> property : this.getDefaultProperties().getProperties()) {
+			if (property.getName().equalsIgnoreCase(propName)) {
+				prop = (SpellShapeProperty<T>) property;
+				break;
+			}
+		}
+		return prop;
+	}
 	
 	
 }

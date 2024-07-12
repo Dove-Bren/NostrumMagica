@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
@@ -161,7 +160,7 @@ public class KoidTask extends Goal {
 					null);
 			spell = Spell.CreateAISpell("Fireball");
 			spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
-			spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapeProperties(3, false)));
+			spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(3f)));
 			spell.addPart(new SpellEffectPart(EMagicElement.FIRE,
 					1, null));
 			rangedSpells.get(EMagicElement.FIRE).add(spell);
@@ -183,7 +182,7 @@ public class KoidTask extends Goal {
 					null);
 			spell = Spell.CreateAISpell("Group Frostbite");
 			spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
-			spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapeProperties(5, false)));
+			spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(5f)));
 			spell.addPart(new SpellEffectPart(EMagicElement.ICE,
 					1, EAlteration.INFLICT));
 			rangedSpells.get(EMagicElement.ICE).add(spell);

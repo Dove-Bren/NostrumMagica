@@ -242,4 +242,10 @@ public class ChainShape extends InstantShape {
 		return (data.targets != null && !data.targets.isEmpty()) || (data.locations != null && !data.locations.isEmpty());
 	}
 
+	public SpellShapeProperties makeProps(int jumps, boolean teamLock) {
+		return this.getDefaultProperties()
+				.setValue(JUMPS, jumps)
+				.setValue(TEAM_LOCK, teamLock);
+	}
+
 }

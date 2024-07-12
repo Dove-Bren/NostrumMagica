@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
+import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -111,7 +112,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	public static @Nullable SpellShapeProperties GetPieceShapeParam(ItemStack piece) {
-		if (piece.getItem() instanceof ShapeSpellRune) {
+		if (!piece.isEmpty() && piece.getItem() instanceof ShapeSpellRune) {
 			return ((ShapeSpellRune) piece.getItem()).getPieceShapeParam(piece);
 		}
 		
@@ -146,6 +147,13 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	public static @Nullable EMagicElement getElement(ItemStack stack) {
 		if (isElement(stack)) {
 			return ((ElementSpellRune) stack.getItem()).getElement();
+		}
+		return null;
+	}
+	
+	public static @Nullable SpellShape getShape(ItemStack stack) {
+		if (isShape(stack)) {
+			return ((ShapeSpellRune) stack.getItem()).getShape();
 		}
 		return null;
 	}
@@ -309,6 +317,14 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			return SpellRune.ID_PREFIX + ID_FIX + this.shape.getShapeKey();
 		}
 		
+		@SuppressWarnings("unchecked")
+		protected <T> void addTooltipProperty(List<ITextComponent> tooltip, SpellShapeProperty<T> property, SpellShape shape, Object value) {
+			tooltip.add(property.getDisplayName(shape)
+					.append(new StringTextComponent(": "))
+					.append(property.getDisplayValue(shape, (T) value))
+					);
+		}
+		
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
@@ -322,23 +338,23 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).mergeStyle(TextFormatting.DARK_PURPLE));
 				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").mergeStyle(TextFormatting.GREEN));
 			}
+
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
-			if (comp.getShape().supportsBoolean() && params.flip) {
-				tooltip.add(new StringTextComponent(comp.getShape().supportedBooleanName() + ": On"));
-			}
-			if (comp.getShape().supportedFloats() != null) {
-				float[] vals = comp.getShape().supportedFloats();
-				if (params.level != 0f && params.level != vals[0])
-					tooltip.add(new StringTextComponent(comp.getShape().getDisplayName() + ": " + params.level));
+			for (SpellShapeProperty<?> property : params.getProperties()) {
+				Object value = params.getValue(property);
+				if (!property.getDefault().equals(value)) {
+					addTooltipProperty(tooltip, property, comp.getShape(), value);
+				}
 			}
 		}
 		
 		public SpellShapeProperties getPieceShapeParam(ItemStack piece) {
-			if (!piece.hasTag() || !piece.getTag().contains(NBT_SHAPE_PROPS)) {
-				return shape.getDefaultProperties();
+			SpellShapeProperties props = shape.getDefaultProperties();
+			if (piece.hasTag() && piece.getTag().contains(NBT_SHAPE_PROPS)) {
+				props = props.fromNBT(piece.getTag().getCompound(NBT_SHAPE_PROPS));
 			}
 			
-			return SpellShapeProperties.FromNBT(piece.getTag().getCompound(NBT_SHAPE_PROPS));
+			return props;
 		}
 		
 		public void setPieceShapeParam(ItemStack stack, SpellShapeProperties params) {
@@ -347,7 +363,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 				nbt = new CompoundNBT();
 			}
 			
-			nbt.put(NBT_SHAPE_PROPS, params.toNBT(null));
+			nbt.put(NBT_SHAPE_PROPS, params.toNBT());
 			
 			stack.setTag(nbt);
 		}

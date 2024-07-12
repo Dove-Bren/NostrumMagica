@@ -21,9 +21,7 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	
 	/**
 	 * Inventory:
-	 *   0 - Shape slot
-	 *   1, 2, 3, 4 - Element slots
-	 *   5 - Alteration slot
+	 *   0 - Rune slot
 	 */
 	
 	private @Nonnull ItemStack slots[];
@@ -36,24 +34,13 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 		}
 	}
 	
-	public  @Nonnull ItemStack getShapeSlot() {
+	public  @Nonnull ItemStack getRuneSlot() {
 		return this.getStackInSlot(0);
-	}
-	
-	public @Nonnull ItemStack getElementSlot(int idx) {
-		if (idx < 0 || idx > 4) {
-			return ItemStack.EMPTY;
-		}
-		return this.getStackInSlot(1 + idx);
-	}
-	
-	public @Nonnull ItemStack getAlterationSlot() {
-		return this.getStackInSlot(5);
 	}
 	
 	@Override
 	public int getSizeInventory() {
-		return 6;
+		return 1;
 	}
 
 	@Override
@@ -130,15 +117,7 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 			return true;
 		
 		if (index == 0) {
-			return SpellRune.isShape(stack);// && !SpellRune.isPackedShape(stack);
-		}
-		
-		if (index >= 1 && index <= 4) {
-			return SpellRune.isElement(stack);
-		}
-		
-		if (index == 5) {
-			return SpellRune.isAlteration(stack);
+			return stack.getItem() instanceof SpellRune && canShapeRune(stack);
 		}
 		
 		return false;
@@ -184,7 +163,7 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 			try {
 				id = Integer.parseInt(key);
 			} catch (NumberFormatException e) {
-				NostrumMagica.logger.error("Failed reading SpellTable inventory slot: " + key);
+				NostrumMagica.logger.error("Failed reading RuneShaper inventory slot: " + key);
 				continue;
 			}
 			
@@ -212,5 +191,10 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 		}
 		
 		return null;
+	}
+	
+	public boolean canShapeRune(ItemStack stack) {
+		return SpellRune.isShape(stack)
+				&& !SpellRune.getShape(stack).getDefaultProperties().getProperties().isEmpty();
 	}
 }

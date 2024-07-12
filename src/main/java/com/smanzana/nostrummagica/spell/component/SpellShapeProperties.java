@@ -37,9 +37,9 @@ public class SpellShapeProperties {
 		return this.properties.containsKey(property);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> T setValue(SpellShapeProperty<T> property, T value) {
-		return (T) this.properties.put(property, value);
+	public <T> SpellShapeProperties setValue(SpellShapeProperty<T> property, T value) {
+		this.properties.put(property, value);
+		return this;
 	}
 	
 	public Set<SpellShapeProperty<?>> getProperties() {
@@ -69,7 +69,11 @@ public class SpellShapeProperties {
 	}
 	
 	public SpellShapeProperties fromNBT(CompoundNBT nbt) {
-		this.properties.clear();
+		//this.reset();
+		for (SpellShapeProperty<?> property : this.properties.keySet()) {
+			this.properties.put(property, property.getDefault());
+		}
+		
 		for (String key : nbt.keySet()) {
 			SpellShapeProperty<?> property = findProperty(key);
 			if (property != null) {

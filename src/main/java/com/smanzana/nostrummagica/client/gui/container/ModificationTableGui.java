@@ -17,15 +17,12 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ModifyMessage;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
-import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
-import com.smanzana.nostrummagica.util.ItemStacks;
+import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.TextUtils;
-import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
@@ -129,27 +126,27 @@ public class ModificationTableGui {
 					floatIndex = 0;
 					
 					if (!stack.isEmpty() && stack.getItem() instanceof SpellRune) {
-						if (SpellRune.isShape(stack)) {
-							SpellShapeProperties params = SpellRune.GetPieceShapeParam(stack);
-							SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
-							
-							if (comp.getShape().supportedFloats() != null) {
-								float[] vals = comp.getShape().supportedFloats();
-								int i = 0;
-								for (float val : vals) {
-									if (val == params.level) {
-										floatIndex = i;
-										break;
-									}
-									i++;
-										
-								}
-							}
-							
-							if (comp.getShape().supportsBoolean()) {
-								boolIndex = params.flip;
-							}
-						}
+//						if (SpellRune.isShape(stack)) {
+//							SpellShapeProperties params = SpellRune.GetPieceShapeParam(stack);
+//							SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
+//							
+//							if (comp.getShape().supportedFloats() != null) {
+//								float[] vals = comp.getShape().supportedFloats();
+//								int i = 0;
+//								for (float val : vals) {
+//									if (val == params.level) {
+//										floatIndex = i;
+//										break;
+//									}
+//									i++;
+//										
+//								}
+//							}
+//							
+//							if (comp.getShape().supportsBoolean()) {
+//								boolIndex = params.flip;
+//							}
+//						}
 					} else if (!stack.isEmpty() && stack.getItem() instanceof SpellScroll) {
 						// Shouldn't be null since we disallow null in the slot... but let's just be safe. This is UI code.
 						Spell spell = SpellScroll.GetSpell(stack);
@@ -275,59 +272,59 @@ public class ModificationTableGui {
 				this.component = component;
 				hasBool = false;
 				hasFloat = false;
-				boolean hasChange = false;
+				//boolean hasChange = false;
 				
-				if (component.isShape()) {
-					hasBool = component.getShape().supportsBoolean();
-					hasFloat = component.getShape().supportedFloats() != null;
-				} else {
+//				if (component.isShape()) {
+//					hasBool = component.getShape().supportsBoolean();
+//					hasFloat = component.getShape().supportedFloats() != null;
+//				} else {
 					this.isValid = false;
 					this.runeMode = false;
 					return;
-				}
-				
-				this.isValid = true;
-				
-				// Check that we've changed float selection
-				if (hasFloat) {
-					float cur = SpellRune.GetPieceShapeParam(inventory.getMainSlot()).level;
-					float targ = component.getShape().supportedFloats()[floatIndex];
-					hasChange = targ != cur;
-				}
-				
-				// If we've changed float, check required item is set
-				if (hasFloat) {
-					if (hasChange) {
-						ItemStack required = component.getShape().supportedFloatCosts(prop).get(floatIndex);
-						
-						inputSlot.setRequired(required);
-						if (required.isEmpty()) {
-							this.isValid = !inputSlot.getHasStack();
-						} else if (inputSlot.getHasStack()) {
-							this.isValid = ItemStacks.stacksMatch(required, inputSlot.getStack());
-						} else {
-							this.isValid = false;
-						}
-					}
-					else
-						inputSlot.setRequired(ItemStack.EMPTY);
-					
-				}
-				
-				// Check for change on bool if no change on float
-				if (isValid && hasBool && !hasChange) {
-					boolean cur = SpellRune.GetPieceShapeParam(inventory.getMainSlot()).flip;
-					boolean targ = boolIndex;
-					hasChange = targ != cur;
-				}
-				
-				if (isValid && !hasBool && !hasFloat)
-					isValid = false;
-				
-				if (isValid && !hasChange)
-					isValid = false;
-				
-				return;
+//				}
+//				
+//				this.isValid = true;
+//				
+//				// Check that we've changed float selection
+//				if (hasFloat) {
+//					float cur = SpellRune.GetPieceShapeParam(inventory.getMainSlot()).level;
+//					float targ = component.getShape().supportedFloats()[floatIndex];
+//					hasChange = targ != cur;
+//				}
+//				
+//				// If we've changed float, check required item is set
+//				if (hasFloat) {
+//					if (hasChange) {
+//						ItemStack required = component.getShape().supportedFloatCosts(prop).get(floatIndex);
+//						
+//						inputSlot.setRequired(required);
+//						if (required.isEmpty()) {
+//							this.isValid = !inputSlot.getHasStack();
+//						} else if (inputSlot.getHasStack()) {
+//							this.isValid = ItemStacks.stacksMatch(required, inputSlot.getStack());
+//						} else {
+//							this.isValid = false;
+//						}
+//					}
+//					else
+//						inputSlot.setRequired(ItemStack.EMPTY);
+//					
+//				}
+//				
+//				// Check for change on bool if no change on float
+//				if (isValid && hasBool && !hasChange) {
+//					boolean cur = SpellRune.GetPieceShapeParam(inventory.getMainSlot()).flip;
+//					boolean targ = boolIndex;
+//					hasChange = targ != cur;
+//				}
+//				
+//				if (isValid && !hasBool && !hasFloat)
+//					isValid = false;
+//				
+//				if (isValid && !hasChange)
+//					isValid = false;
+//				
+//				return;
 			}
 			
 			if (inventory.getMainSlot().getItem() instanceof SpellScroll) {
@@ -427,11 +424,11 @@ public class ModificationTableGui {
 			shadows = NonNullList.create();
 			shadows.add(new ItemStack(NostrumItems.spellTomeNovice)); // hasto be index 0
 			shadows.add(new ItemStack(NostrumItems.spellScroll)); // has to be index 1
-			for (SpellShape shape : SpellShape.getAllShapes()) {
-				if (shape.supportsBoolean() || shape.supportedFloats() != null) {
-					shadows.add(SpellRune.getRune(shape));
-				}
-			}
+//			for (SpellShape shape : SpellShape.getAllShapes()) {
+//				if (shape.supportsBoolean() || shape.supportedFloats() != null) {
+//					shadows.add(SpellRune.getRune(shape));
+//				}
+//			}
 			shadows.add(new ItemStack(NostrumItems.casterWand));
 		}
 		
@@ -464,27 +461,27 @@ public class ModificationTableGui {
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			if (container.runeMode) {
-				// Draw rune sliders or toggles
-				int x, y;
-				int len = mc.fontRenderer.getStringWidth("Rune Modification");
-				mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Rune Modification",
-						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
-						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
-				y = verticalMargin + PANEL_VOFFSET + 20;
-				x = horizontalMargin + PANEL_HOFFSET + 5;
-				if (container.hasBool) {
-					String boolTitle = container.component.getShape().supportedBooleanName();
-					mc.fontRenderer.drawStringWithShadow(matrixStackIn, boolTitle, x, y, 0xFFa0a0a0);
-					
-					y += 25;
-				}
-				
-				if (container.hasFloat && container.runeMode) {
-					String floatTitle = container.component.getShape().supportedFloatName();
-					mc.fontRenderer.drawStringWithShadow(matrixStackIn, floatTitle, x, y, 0xFFa0a0a0);
-					
-					y += 25;
-				}
+//				// Draw rune sliders or toggles
+//				int x, y;
+//				int len = mc.fontRenderer.getStringWidth("Rune Modification");
+//				mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Rune Modification",
+//						horizontalMargin + (PANEL_HOFFSET) + (PANEL_WIDTH / 2) - (len / 2),
+//						verticalMargin + PANEL_VOFFSET + 5, 0xFFFFFFFF);
+//				y = verticalMargin + PANEL_VOFFSET + 20;
+//				x = horizontalMargin + PANEL_HOFFSET + 5;
+//				if (container.hasBool) {
+//					String boolTitle = container.component.getShape().supportedBooleanName();
+//					mc.fontRenderer.drawStringWithShadow(matrixStackIn, boolTitle, x, y, 0xFFa0a0a0);
+//					
+//					y += 25;
+//				}
+//				
+//				if (container.hasFloat && container.runeMode) {
+//					String floatTitle = container.component.getShape().supportedFloatName();
+//					mc.fontRenderer.drawStringWithShadow(matrixStackIn, floatTitle, x, y, 0xFFa0a0a0);
+//					
+//					y += 25;
+//				}
 			} else if (container.scrollMode) {
 				
 			} else if (container.tomeMode) {
@@ -678,12 +675,12 @@ public class ModificationTableGui {
 		protected void onSubmitButton() {
 			if (container.isValid) {
 				if (container.runeMode) {
-					SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
-					float[] vals = component.getShape().supportedFloats();
-					float fVal = (vals == null ? 0 : vals[container.floatIndex]);
-					NetworkHandler.sendToServer(
-							new ModifyMessage(container.pos, container.boolIndex, fVal));
-					container.inventory.modify(container.boolIndex, fVal);
+//					SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
+//					float[] vals = component.getShape().supportedFloats();
+//					float fVal = (vals == null ? 0 : vals[container.floatIndex]);
+//					NetworkHandler.sendToServer(
+//							new ModifyMessage(container.pos, container.boolIndex, fVal));
+//					container.inventory.modify(container.boolIndex, fVal);
 				} else if (container.scrollMode) {
 					float fVal = (float) container.floatIndex;
 					NetworkHandler.sendToServer(
@@ -704,12 +701,12 @@ public class ModificationTableGui {
 		
 		protected void onFloatButton(FloatButton button) {
 			if (container.runeMode) {
-				SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
-				float[] vals = component.getShape().supportedFloats();
-				if (vals == null)
-					container.floatIndex = 0;
-				else
-					container.floatIndex = Math.min(vals.length - 1, ((FloatButton) button).val);
+//				SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
+//				float[] vals = component.getShape().supportedFloats();
+//				if (vals == null)
+//					container.floatIndex = 0;
+//				else
+//					container.floatIndex = Math.min(vals.length - 1, ((FloatButton) button).val);
 			} else if (container.scrollMode) {
 				container.floatIndex =((FloatButton) button).val;
 			}
@@ -735,19 +732,19 @@ public class ModificationTableGui {
 				}
 				if (container.hasFloat) {
 					if (container.runeMode) {
-						SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
-						float[] vals;
-						
-						if (component != null) {
-							vals = component.getShape().supportedFloats();
-							
-							for (int i = 0; i < vals.length; i++) {
-								FloatButton button = new FloatButton(x, y, i, vals[i], this);
-								
-								this.addButton(button);
-								x += 25;
-							}
-						}
+//						SpellComponentWrapper component = SpellRune.toComponentWrapper(container.inventory.getMainSlot());
+//						float[] vals;
+//						
+//						if (component != null) {
+//							vals = component.getShape().supportedFloats();
+//							
+//							for (int i = 0; i < vals.length; i++) {
+//								FloatButton button = new FloatButton(x, y, i, vals[i], this);
+//								
+//								this.addButton(button);
+//								x += 25;
+//							}
+//						}
 					} else if (container.scrollMode) {
 						final int margin = 2;
 						

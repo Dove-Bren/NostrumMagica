@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
@@ -39,7 +38,7 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 			
 			spellRanged2 = Spell.CreateAISpell("Spark");
 			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
-			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapeProperties(1, false)));
+			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(1f)));
 			spellRanged2.addPart(new SpellEffectPart(
 					EMagicElement.LIGHTNING,
 					1,

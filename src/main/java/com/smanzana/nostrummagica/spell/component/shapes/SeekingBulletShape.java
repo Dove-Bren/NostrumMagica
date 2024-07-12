@@ -277,5 +277,9 @@ public class SeekingBulletShape extends SpellShape {
 			return false;
 		}
 	}
+
+	public SpellShapeProperties makeProps(boolean affectAllies) {
+		return this.getDefaultProperties().setValue(IGNORE_ALLIES, affectAllies);
+	}
 	
 }

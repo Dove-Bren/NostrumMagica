@@ -6,7 +6,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 
 import net.minecraft.entity.EntityType;
@@ -37,14 +36,14 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 			
 			spellRanged2 = Spell.CreateAISpell("Blaze");
 			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
-			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Burst, new SpellShapeProperties(2, false)));
+			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(2f)));
 			spellRanged2.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
 					EAlteration.CONJURE));
 			
 			spellRanged3 = Spell.CreateAISpell("Melt Armor");
-			spellRanged3.addPart(new SpellShapePart(NostrumSpellShapes.Projectile, new SpellShapeProperties(1, false)));
+			spellRanged3.addPart(new SpellShapePart(NostrumSpellShapes.Projectile, NostrumSpellShapes.Projectile.makeProps(false)));
 			spellRanged3.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,

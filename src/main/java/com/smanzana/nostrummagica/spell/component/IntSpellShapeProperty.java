@@ -1,16 +1,26 @@
 package com.smanzana.nostrummagica.spell.component;
 
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
+
 import net.minecraft.nbt.FloatNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.IntNBT;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 
 public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 
 	private final int[] possibleValues;
+	private final Integer[] possibleValuesBoxed;
 	
 	public IntSpellShapeProperty(String name, int ... values) {
 		super(name);
 		this.possibleValues = values.clone();
+		
+		possibleValuesBoxed = new Integer[values.length];
+		for (int i = 0; i < values.length; i++) {
+			possibleValuesBoxed[i] = values[i];
+		}
 	}
 
 	@Override
@@ -40,6 +50,16 @@ public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public TextComponent getDisplayValue(SpellShape shape, Integer value) {
+		return new StringTextComponent("" + value); 
+	}
+
+	@Override
+	public Integer[] getPossibleValues() {
+		return this.possibleValuesBoxed;
 	}
 
 }

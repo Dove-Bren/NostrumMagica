@@ -1673,6 +1673,11 @@
 	"skill.nostrummagica.ender.corrupt.desc": "Changes the Disruption effect to no longer prevent teleporations that you cause, and inflict 4 + 1 damage per level.",
 	"skill.nostrummagica.ender.weapon": "Ender Rod Shield",
 	"skill.nostrummagica.ender.weapon.desc": "Modifies the ball effect when using the Ender Rod with the True Ender armor set to grant 2 points of magic and physical shielding per entity hit when exploding.",
+	
+	"shapeprop.wall.radius.name": "Radius",
+	"shapeprop.wall.radius.desc": "Radius in blocks of the wall",
+	"shapeprop.wall.linger.name": "Linger",
+	"shapeprop.wall.linger.desc": "Whether the wall should linger, repeating its effects periodically",
 
     "modification.aoe.name":"Effect Radius",
     "modification.aoe.bool.name":"Ignore Allies",

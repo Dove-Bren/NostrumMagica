@@ -134,6 +134,11 @@ public class BurstShape extends InstantShape {
 		return property == RADIUS ? costs : super.supportedFloatCosts(property);
 	}
 
+	public SpellShapeProperties makeProps(float radius) {
+		return this.getDefaultProperties()
+				.setValue(RADIUS, radius);
+	}
+
 	@Override
 	public int getWeight(SpellShapeProperties properties) {
 		return 1;

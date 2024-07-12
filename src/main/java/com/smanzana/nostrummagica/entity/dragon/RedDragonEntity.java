@@ -32,7 +32,6 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
@@ -134,7 +133,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			DSPELL_Fireball = SpellUtils.MakeSpell("Fireball",
 					NostrumSpellShapes.Projectile,
 					NostrumSpellShapes.Burst,
-					new SpellShapeProperties(3, false),
+					NostrumSpellShapes.Burst.makeProps(3),
 					EMagicElement.FIRE,
 					2,
 					null
@@ -142,7 +141,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			DSPELL_Fireball2 = SpellUtils.MakeSpell("Fireball2",
 					NostrumSpellShapes.Projectile,
 					NostrumSpellShapes.Burst,
-					new SpellShapeProperties(3, false),
+					NostrumSpellShapes.Burst.makeProps(3),
 					EMagicElement.FIRE,
 					3,
 					null);

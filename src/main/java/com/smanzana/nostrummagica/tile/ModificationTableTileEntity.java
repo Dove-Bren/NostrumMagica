@@ -199,9 +199,10 @@ public class ModificationTableTileEntity extends TileEntity implements IInventor
 				SpellTome.setModifications(stack, mods);
 				this.setInventorySlotContents(1, ItemStack.EMPTY);
 			}
-		} else if (stack.getItem() instanceof SpellRune) {
-			this.setInventorySlotContents(1, ItemStack.EMPTY);
-			SpellRune.setPieceParam(stack, new SpellShapeProperties(valF, valB));
+		int unused; // remove this, and simplify modify to not take all the params that aren't needed?
+//		} else if (stack.getItem() instanceof SpellRune) {
+//			this.setInventorySlotContents(1, ItemStack.EMPTY);
+//			SpellRune.setPieceParam(stack, new SpellShapeProperties(valF, valB));
 		} else if (stack.getItem() instanceof SpellScroll) {
 			Spell spell = SpellScroll.GetSpell(stack);
 			if (spell != null) {
