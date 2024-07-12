@@ -206,6 +206,7 @@ public class MortarShape extends SpellShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
+		this.baseProperties.addProperty(ARCLESS);
 	}
 	
 	protected boolean getNoArc(SpellShapeProperties properties) {

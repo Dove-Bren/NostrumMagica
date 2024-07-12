@@ -46,7 +46,9 @@ public class RingShape extends BurstShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(RADIUS);
+		
+		// Burst register's it's own radius
+		this.baseProperties.evict(BurstShape.RADIUS).addProperty(RADIUS);
 	}
 	
 	public RingShape() {

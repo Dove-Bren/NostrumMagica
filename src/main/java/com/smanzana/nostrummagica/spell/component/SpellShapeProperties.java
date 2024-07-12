@@ -42,6 +42,11 @@ public class SpellShapeProperties {
 		return this;
 	}
 	
+	public <T> SpellShapeProperties evict(SpellShapeProperty<T> property) {
+		this.properties.remove(property);
+		return this;
+	}
+	
 	public Set<SpellShapeProperty<?>> getProperties() {
 		return this.properties.keySet();
 	}
@@ -68,12 +73,13 @@ public class SpellShapeProperties {
 		return null;
 	}
 	
-	public SpellShapeProperties fromNBT(CompoundNBT nbt) {
-		//this.reset();
+	protected void reset() {
 		for (SpellShapeProperty<?> property : this.properties.keySet()) {
 			this.properties.put(property, property.getDefault());
 		}
-		
+	}
+	
+	public SpellShapeProperties fromNBT(CompoundNBT nbt) {
 		for (String key : nbt.keySet()) {
 			SpellShapeProperty<?> property = findProperty(key);
 			if (property != null) {

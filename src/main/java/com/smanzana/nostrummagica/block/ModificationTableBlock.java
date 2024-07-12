@@ -2,12 +2,10 @@ package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.ModificationTableGui;
-import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
 
 import net.minecraft.block.Block;
@@ -96,14 +94,6 @@ public class ModificationTableBlock extends Block {
 		}
 		
 		Item item = stack.getItem();
-		
-		if (item instanceof SpellRune) {
-			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);
-			
-			if (comp.isShape()) {
-				return !comp.getShape().getDefaultProperties().getProperties().isEmpty();
-			}
-		}
 		
 		return item instanceof SpellTome
 				//|| item instanceof SpellRune

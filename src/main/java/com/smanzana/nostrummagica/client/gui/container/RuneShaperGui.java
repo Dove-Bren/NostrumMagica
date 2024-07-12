@@ -458,9 +458,17 @@ public class RuneShaperGui {
 						TEX_WIDTH, TEX_HEIGHT,
 						colors[0], colors[1], colors[2], colors[3]);
 				
+				// Guess at scale based on message bare string representation
+				final int guessedLen = this.getMessage().getString().length();
+				final float scale;
+				if (guessedLen >= 4) {
+					scale = .75f / ((float) guessedLen / 3f);
+				} else {
+					scale = .75f;
+				}
 				matrixStackIn.push();
 				matrixStackIn.translate(this.x + width/2, this.y + (this.height / 2), 0);
-				matrixStackIn.scale(.75f, .75f, .75f);
+				matrixStackIn.scale(scale, scale, 1f);
 				drawCenteredString(matrixStackIn, gui.font, this.getMessage(), 0, -gui.font.FONT_HEIGHT/2, 0xFFFFFFFF);
 				matrixStackIn.pop();
 			}
@@ -589,7 +597,7 @@ public class RuneShaperGui {
 				final int maxCol = ((GUI_WIDTH - POS_VALUE_HOFFSET) - (2 * margin)) / width;
 				final int xOffset;
 				if (values.length < maxCol) {
-					xOffset = (((GUI_WIDTH - POS_VALUE_HOFFSET) - (2 * margin)) - (maxCol * width)) / 2;
+					xOffset = (((GUI_WIDTH - POS_VALUE_HOFFSET) - (2 * margin)) - (values.length * width)) / 2;
 				} else {
 					xOffset = (((GUI_WIDTH - POS_VALUE_HOFFSET) - (2 * margin)) - (maxCol * width)) / 2;
 				}
@@ -634,7 +642,7 @@ public class RuneShaperGui {
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 			
-			if (this.description != null) {
+			if (!container.getRune().isEmpty() && this.description != null) {
 				final int xOffset = POS_PANEL_HOFFSET + POS_PANEL_WIDTH + 4;
 				final float scale = .75f;
 				final int areaWidth = GUI_WIDTH - (xOffset + 4);
@@ -655,8 +663,11 @@ public class RuneShaperGui {
 		
 		protected void checkForChanges() {
 			if (!ItemStack.areItemStacksEqual(lastViewedRune, container.getRune())) {
-				this.refreshWidgets();
+				selectedProperty = null;
+				propertyValueIdx = -1;
+				description = null;
 				lastViewedRune = container.getRune().copy();
+				this.refreshWidgets();
 			}
 		}
 		
@@ -717,7 +728,7 @@ public class RuneShaperGui {
 			if (property != this.selectedProperty) {
 				this.selectedProperty = property;
 				this.propertyValueIdx = getMatchingPropertyValueIdx(container.getRuneProperties(), this.selectedProperty);
-				this.description = selectedProperty.getDisplayDescription(container.getRuneShape());
+				this.description = property.getDisplayDescription(container.getRuneShape());
 				
 				container.setAcceptingInput(container.getRuneShape().supportedFloatCosts(property) != null);
 				refreshWidgets();

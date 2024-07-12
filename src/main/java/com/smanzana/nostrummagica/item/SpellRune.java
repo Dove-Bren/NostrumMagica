@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -337,6 +339,15 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 			if (extra) {
 				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).mergeStyle(TextFormatting.DARK_PURPLE));
 				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").mergeStyle(TextFormatting.GREEN));
+			}
+			
+			if (extra
+					|| (NostrumMagica.instance.proxy.getPlayer() != null
+						&& NostrumMagica.instance.proxy.getPlayer().openContainer != null
+						&& NostrumMagica.instance.proxy.getPlayer().openContainer instanceof RuneShaperGui.RuneShaperContainer)) {
+				if (!shape.getDefaultProperties().getProperties().isEmpty()) {
+					tooltip.add(new StringTextComponent("Rune Shaper Compatible").mergeStyle(TextFormatting.GOLD));
+				}
 			}
 
 			SpellComponentWrapper comp = SpellRune.toComponentWrapper(stack);

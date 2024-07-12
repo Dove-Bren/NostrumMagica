@@ -4,14 +4,12 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
-import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.block.BlockState;
@@ -199,10 +197,6 @@ public class ModificationTableTileEntity extends TileEntity implements IInventor
 				SpellTome.setModifications(stack, mods);
 				this.setInventorySlotContents(1, ItemStack.EMPTY);
 			}
-		int unused; // remove this, and simplify modify to not take all the params that aren't needed?
-//		} else if (stack.getItem() instanceof SpellRune) {
-//			this.setInventorySlotContents(1, ItemStack.EMPTY);
-//			SpellRune.setPieceParam(stack, new SpellShapeProperties(valF, valB));
 		} else if (stack.getItem() instanceof SpellScroll) {
 			Spell spell = SpellScroll.GetSpell(stack);
 			if (spell != null) {
