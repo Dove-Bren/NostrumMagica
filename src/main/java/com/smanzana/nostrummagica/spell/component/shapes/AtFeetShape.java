@@ -58,7 +58,7 @@ public class AtFeetShape extends InstantShape {
 	}
 
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		return null;
 	}
 

@@ -50,7 +50,7 @@ public abstract class OnMetricLevelShape extends SpellShape {
 	
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -59,7 +59,7 @@ public abstract class OnMetricLevelShape extends SpellShape {
 				new ItemStack(Items.ENDER_PEARL)
 			);
 		}
-		return property == LEVEL ? costs : super.supportedFloatCosts(property);
+		return property == LEVEL ? costs : super.getPropertyItemRequirements(property);
 	}
 	
 	@Override

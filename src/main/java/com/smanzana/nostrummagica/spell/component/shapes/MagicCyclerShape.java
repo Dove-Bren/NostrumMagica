@@ -148,7 +148,7 @@ public class MagicCyclerShape extends SpellShape {
 
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -156,7 +156,7 @@ public class MagicCyclerShape extends SpellShape {
 				new ItemStack(Blocks.COAL_BLOCK)
 			);
 		}
-		return property == DURATION ? costs : super.supportedFloatCosts(property);
+		return property == DURATION ? costs : super.getPropertyItemRequirements(property);
 	}
 	
 	@Override

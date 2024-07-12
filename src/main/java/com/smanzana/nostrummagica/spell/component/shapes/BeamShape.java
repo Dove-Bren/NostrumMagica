@@ -59,6 +59,23 @@ public class BeamShape extends InstantShape {
 	protected boolean hitsAir(SpellShapeProperties properties) {
 		return properties.getValue(HIT_AIR);
 	}
+	
+	private static NonNullList<ItemStack> costs = null;
+	@Override
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
+		if (costs == null) {
+			costs = NonNullList.from(ItemStack.EMPTY,
+				ItemStack.EMPTY,
+				new ItemStack(Items.DRAGON_BREATH)
+				);
+		}
+		
+		if (property == HIT_AIR) {
+			return costs;
+		} else {
+			return super.getPropertyItemRequirements(property);
+		}
+	}
 
 	@Override
 	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {

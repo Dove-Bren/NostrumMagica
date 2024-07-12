@@ -230,7 +230,7 @@ public class RuneShaperGui {
 			
 			// Check required input
 			ItemStack required = null;
-			final NonNullList<ItemStack> requirements = shape.supportedFloatCosts(property);
+			final NonNullList<ItemStack> requirements = shape.getPropertyItemRequirements(property);
 			if (requirements != null) {
 				required = requirements.get(propertyValueIdx);
 				if (!required.isEmpty()) {
@@ -343,7 +343,7 @@ public class RuneShaperGui {
 					matrixStackIn.push();
 					matrixStackIn.translate(x, y, 0);
 					if (gui.container.getIngredient().isEmpty()) {
-						ItemStack needed = gui.container.getRuneShape().supportedFloatCosts(gui.selectedProperty).get(gui.propertyValueIdx);
+						ItemStack needed = gui.container.getRuneShape().getPropertyItemRequirements(gui.selectedProperty).get(gui.propertyValueIdx);
 						if (needed != null && !needed.isEmpty()) { 
 							matrixStackIn.push();
 							matrixStackIn.translate(0, 0, -50);
@@ -706,7 +706,7 @@ public class RuneShaperGui {
 		}
 		
 		protected boolean isPropertyValid(SpellShape shape, SpellShapeProperties base, SpellShapeProperty<?> property, int choice, ItemStack input) {
-			NonNullList<ItemStack> costs = shape.supportedFloatCosts(property);
+			NonNullList<ItemStack> costs = shape.getPropertyItemRequirements(property);
 			if (costs == null) {
 				return input.isEmpty();
 			}
@@ -730,7 +730,7 @@ public class RuneShaperGui {
 				this.propertyValueIdx = getMatchingPropertyValueIdx(container.getRuneProperties(), this.selectedProperty);
 				this.description = property.getDisplayDescription(container.getRuneShape());
 				
-				container.setAcceptingInput(container.getRuneShape().supportedFloatCosts(property) != null);
+				container.setAcceptingInput(container.getRuneShape().getPropertyItemRequirements(property) != null);
 				refreshWidgets();
 			}
 		}

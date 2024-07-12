@@ -35,9 +35,9 @@ import net.minecraft.util.math.vector.Vector3d;
 public class RingShape extends BurstShape {
 
 	private static final String ID = "ring";
-	private static final int INNER_RADIUS = 2;
 	
-	public static final SpellShapeProperty<Float> RADIUS = new FloatSpellShapeProperty("radius", 2f, 3f, 4f, 6f);
+	public static final SpellShapeProperty<Float> OUTER_RADIUS = new FloatSpellShapeProperty("outer_radius", 4f, 5f, 6f, 8f);
+	public static final SpellShapeProperty<Float> INNER_RADIUS = new FloatSpellShapeProperty("inner_radius", 2f, 1.5f, 1f, .5f);
 	
 	protected RingShape(String id) {
 		super(id);
@@ -48,7 +48,7 @@ public class RingShape extends BurstShape {
 		super.registerProperties();
 		
 		// Burst register's it's own radius
-		this.baseProperties.evict(BurstShape.RADIUS).addProperty(RADIUS);
+		this.baseProperties.evict(BurstShape.RADIUS).addProperty(OUTER_RADIUS).addProperty(INNER_RADIUS);
 	}
 	
 	public RingShape() {
@@ -56,7 +56,15 @@ public class RingShape extends BurstShape {
 	}
 	
 	protected float getRadius(SpellShapeProperties properties) {
-		return properties.getValue(RADIUS);
+		return getOuterRadius(properties);
+	}
+	
+	protected float getOuterRadius(SpellShapeProperties properties) {
+		return properties.getValue(OUTER_RADIUS);
+	}
+	
+	protected float getInnerRadius(SpellShapeProperties properties) {
+		return properties.getValue(INNER_RADIUS);
 	}
 	
 	@Override
@@ -68,7 +76,9 @@ public class RingShape extends BurstShape {
 		
 		List<LivingEntity> ret = new ArrayList<>();
 		
-		double radiusEnts = getRadius(param) + INNER_RADIUS + .5;
+		final float innerRadius = getInnerRadius(param);
+		final float outerRadius = getOuterRadius(param);
+		double radiusEnts = outerRadius + .5;
 		final Vector3d centerPos = location.hitPosition;
 		
 		for (Entity entity : location.world.getEntitiesWithinAABBExcludingEntity(null, 
@@ -83,8 +93,8 @@ public class RingShape extends BurstShape {
 				final Vector3d diff = entity.getPositionVec().subtract(centerPos);
 				final double distFlat = Math.sqrt(Math.abs(Math.pow(diff.getX(), 2)) + Math.abs(Math.pow(diff.getZ(), 2)));
 				if (distFlat <= radiusEnts
-						&& distFlat >= INNER_RADIUS
-						&& Math.abs(entity.getPosY() - centerPos.getY()) <= (INNER_RADIUS + .5) // Flatter than a sphere
+						&& distFlat >= innerRadius
+						&& Math.abs(entity.getPosY() - centerPos.getY()) <= (innerRadius + .5) // Flatter than a sphere
 					) {
 					ret.add(living);
 				}
@@ -93,7 +103,7 @@ public class RingShape extends BurstShape {
 		
 		List<SpellLocation> list = new ArrayList<>();
 		
-		final int radiusBlocks = Math.round(Math.max(2.0f, getRadius(param) + INNER_RADIUS));
+		final int radiusBlocks = Math.round(outerRadius);
 		
 		final BlockPos center = location.hitBlockPos;
 		if (radiusBlocks == 0) {
@@ -101,10 +111,10 @@ public class RingShape extends BurstShape {
 		} else {
 			for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
 				// x loop. I is offset of x
-				int innerRadius = radiusBlocks - Math.abs(i);
-				for (int j = -innerRadius; j <= innerRadius; j++) {
+				int innerLoopRadius = radiusBlocks - Math.abs(i);
+				for (int j = -innerLoopRadius; j <= innerLoopRadius; j++) {
 					// Make sure it's outside the inner radius
-					final int safetyRadius = (characteristics.harmful ? INNER_RADIUS + 1 : INNER_RADIUS);
+					final int safetyRadius = Math.round(characteristics.harmful ? innerRadius + 1 : innerRadius);
 					if (Math.abs(i) + Math.abs(j) < safetyRadius) {
 						continue;
 					}
@@ -136,18 +146,27 @@ public class RingShape extends BurstShape {
 		return "Ring";
 	}
 
-	public static NonNullList<ItemStack> costs = null;
+	private static NonNullList<ItemStack> INNER_COSTS = null;
+	private static NonNullList<ItemStack> OUTER_COSTS = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
-		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY, 
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
+		if (INNER_COSTS == null) {
+			OUTER_COSTS = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
 				new ItemStack(ReagentItem.GetItem(ReagentType.MANI_DUST)),
 				new ItemStack(Blocks.REDSTONE_BLOCK, 1),
 				new ItemStack(NostrumItems.crystalSmall)
 			);
+			INNER_COSTS = NonNullList.from(ItemStack.EMPTY, 
+					ItemStack.EMPTY,
+					new ItemStack(Items.REDSTONE),
+					new ItemStack(ReagentItem.GetItem(ReagentType.MANI_DUST)),
+					new ItemStack(NostrumItems.infusedGemUnattuned)
+				);
 		}
-		return property == RADIUS ? costs : super.supportedFloatCosts(property);
+		return property == INNER_RADIUS ? INNER_COSTS
+				: property == OUTER_RADIUS ? OUTER_COSTS
+				: super.getPropertyItemRequirements(property);
 	}
 
 	@Override
@@ -182,9 +201,10 @@ public class RingShape extends BurstShape {
 	
 	@Override
 	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-		float radiusEnts = getRadius(properties) + INNER_RADIUS;
+		float radiusEnts = getOuterRadius(properties) + .5f;
+		float innerRadius = getInnerRadius(properties);
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radiusEnts));
-		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) INNER_RADIUS));
+		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) innerRadius));
 	}
 
 }

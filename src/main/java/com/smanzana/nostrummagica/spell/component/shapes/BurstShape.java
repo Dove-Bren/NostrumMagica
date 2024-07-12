@@ -120,9 +120,9 @@ public class BurstShape extends InstantShape {
 		return "Burst";
 	}
 
-	public static NonNullList<ItemStack> costs = null;
+	private static NonNullList<ItemStack> costs = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
@@ -131,7 +131,7 @@ public class BurstShape extends InstantShape {
 				new ItemStack(NostrumItems.crystalLarge)
 			);
 		}
-		return property == RADIUS ? costs : super.supportedFloatCosts(property);
+		return property == RADIUS ? costs : super.getPropertyItemRequirements(property);
 	}
 
 	public SpellShapeProperties makeProps(float radius) {

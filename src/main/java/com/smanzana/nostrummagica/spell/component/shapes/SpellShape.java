@@ -191,13 +191,13 @@ public abstract class SpellShape {
 	public abstract ItemStack getCraftItem();
 	
 	/**
-	 * Array of itemstack costs for the above floats.
-	 * Should be the same size as the array returned by supportedFloats()
-	 * The idea is you return more valuable materials the higher the float.
-	 * @param property TODO
+	 * Array of itemstack costs for changing to the different values of the provided property.
+	 * Should be the same size as the list of possible values of the property, or NULL.
+	 * The idea is you return more valuable materials the more expensive the value should be to get.
+	 * @param property which property's costs to query
 	 * @return
 	 */
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		return null;
 	}
 	

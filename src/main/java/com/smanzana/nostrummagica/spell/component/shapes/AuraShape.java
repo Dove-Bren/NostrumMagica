@@ -236,7 +236,7 @@ public class AuraShape extends AreaShape {
 
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -249,7 +249,7 @@ public class AuraShape extends AreaShape {
 		if (property == RADIUS) {
 			return costs;
 		} else {
-			return super.supportedFloatCosts(property);
+			return super.getPropertyItemRequirements(property);
 		}
 	}
 

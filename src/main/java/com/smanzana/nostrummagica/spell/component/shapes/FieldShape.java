@@ -168,7 +168,7 @@ public class FieldShape extends AreaShape {
 
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -178,7 +178,7 @@ public class FieldShape extends AreaShape {
 				new ItemStack(NostrumItems.crystalMedium, 1)
 				);
 		}
-		return property == RADIUS ? costs : super.supportedFloatCosts(property);
+		return property == RADIUS ? costs : super.getPropertyItemRequirements(property);
 	}
 
 	@Override

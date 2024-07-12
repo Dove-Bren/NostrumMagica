@@ -164,8 +164,8 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
-		return property != RANGE ? super.supportedFloatCosts(property) : NonNullList.from(ItemStack.EMPTY,
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
+		return property != RANGE ? super.getPropertyItemRequirements(property) : NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.HONEY_BOTTLE),
 				new ItemStack(Items.HONEYCOMB),

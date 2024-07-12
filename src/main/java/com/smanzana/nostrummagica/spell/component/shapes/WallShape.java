@@ -314,18 +314,25 @@ public class WallShape extends AreaShape {
 		return new ItemStack(Blocks.GLASS);
 	}
 
-	public static NonNullList<ItemStack> costs = null;
+	private static NonNullList<ItemStack> RADIUS_COSTS = null;
+	private static NonNullList<ItemStack> LINGER_COSTS = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
-		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
+		if (RADIUS_COSTS == null) {
+			RADIUS_COSTS = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.DIAMOND),
 				new ItemStack(Items.EMERALD),
 				new ItemStack(Blocks.GLASS)
 				);
+			LINGER_COSTS = NonNullList.from(ItemStack.EMPTY,
+					ItemStack.EMPTY,
+					new ItemStack(Items.DRAGON_BREATH)
+					);
 		}
-		return property == RADIUS ? costs : super.supportedFloatCosts(property);
+		return property == RADIUS ? RADIUS_COSTS
+				: property == LINGER ? LINGER_COSTS
+				: super.getPropertyItemRequirements(property);
 	}
 
 	@Override

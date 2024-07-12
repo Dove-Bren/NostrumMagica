@@ -101,7 +101,7 @@ public class DelayShape extends SpellShape {
 
 	public static NonNullList<ItemStack> costs = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
 			costs = NonNullList.from(ItemStack.EMPTY,
 				ItemStack.EMPTY,
@@ -111,7 +111,7 @@ public class DelayShape extends SpellShape {
 				new ItemStack(Items.DIAMOND)
 			);
 		}
-		return property == DELAY ? costs : super.supportedFloatCosts(property);
+		return property == DELAY ? costs : super.getPropertyItemRequirements(property);
 	}
 
 	@Override

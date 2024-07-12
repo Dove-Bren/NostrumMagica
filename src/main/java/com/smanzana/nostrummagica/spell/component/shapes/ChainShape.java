@@ -176,18 +176,25 @@ public class ChainShape extends InstantShape {
 		return "Chain";
 	}
 
-	public static NonNullList<ItemStack> costs = null;
+	private static NonNullList<ItemStack> JUMP_COSTS = null;
+	private static NonNullList<ItemStack> LOCK_COSTS = null;
 	@Override
-	public <T> NonNullList<ItemStack> supportedFloatCosts(SpellShapeProperty<T> property) {
-		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY, 
+	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
+		if (JUMP_COSTS == null) {
+			JUMP_COSTS = NonNullList.from(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
 				new ItemStack(Items.STRING),
 				new ItemStack(Items.GOLD_INGOT),
 				new ItemStack(Items.ENDER_PEARL)
 			);
+			LOCK_COSTS = NonNullList.from(ItemStack.EMPTY, 
+					ItemStack.EMPTY,
+					new ItemStack(Items.COMPASS)
+				);
 		}
-		return property == JUMPS ? costs : super.supportedFloatCosts(property);
+		return property == JUMPS ? JUMP_COSTS 
+				: property == TEAM_LOCK ? LOCK_COSTS
+				: super.getPropertyItemRequirements(property);
 	}
 
 	@Override
