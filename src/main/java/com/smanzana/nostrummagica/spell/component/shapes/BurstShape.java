@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
@@ -27,7 +28,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 
-public class BurstShape extends InstantShape {
+public class BurstShape extends InstantShape implements ISelectableShape {
 
 	private static final String ID = "burst";
 	
@@ -40,7 +41,7 @@ public class BurstShape extends InstantShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(RADIUS);
+		this.baseProperties.addProperty(RADIUS).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	public BurstShape() {
@@ -59,46 +60,50 @@ public class BurstShape extends InstantShape {
 		}
 		
 		List<LivingEntity> ret = new ArrayList<>();
+
+		if (this.affectsEntities(param)) {
+			double radiusEnts = getRadius(param) + .5;
+			final Vector3d center = location.hitPosition;
 		
-		double radiusEnts = getRadius(param) + .5;
-		final Vector3d center = location.hitPosition;
-		
-		for (Entity entity : location.world.getEntitiesWithinAABBExcludingEntity(null, 
-				new AxisAlignedBB(center.getX() - radiusEnts,
-						center.getY() - radiusEnts,
-						center.getZ() - radiusEnts,
-						center.getX() + radiusEnts,
-						center.getY() + radiusEnts,
-						center.getZ() + radiusEnts))) {
-			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
-			if (living != null)
-				if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(center.getX(), center.getY(), center.getZ()))) <= radiusEnts)
-					ret.add(living);
+			for (Entity entity : location.world.getEntitiesWithinAABBExcludingEntity(null, 
+					new AxisAlignedBB(center.getX() - radiusEnts,
+							center.getY() - radiusEnts,
+							center.getZ() - radiusEnts,
+							center.getX() + radiusEnts,
+							center.getY() + radiusEnts,
+							center.getZ() + radiusEnts))) {
+				LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
+				if (living != null)
+					if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(center.getX(), center.getY(), center.getZ()))) <= radiusEnts)
+						ret.add(living);
+			}
 		}
 		
 		List<SpellLocation> list = new ArrayList<>();
 		
-		final int radiusBlocks = Math.round(Math.max(2.0f, getRadius(param)));
-		
-		final BlockPos centerBlock = location.hitBlockPos;
-		if (radiusBlocks == 0) {
-			list.add(new SpellLocation(location.world, centerBlock));
-		} else {
-			for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
-				// x loop. I is offset of x
-				int innerRadius = radiusBlocks - Math.abs(i);
-				for (int j = -innerRadius; j <= innerRadius; j++) {
-					int yRadius = innerRadius - Math.abs(j);
-					// 0 means just that cell. Otherwise, +- n
-					if (yRadius == 0) {
-						list.add(new SpellLocation(location.world, centerBlock.add(i, j, 0)));
-					} else {
-						for (int k = -yRadius; k <= yRadius; k++) {
-							list.add(new SpellLocation(location.world, centerBlock.add(i, j, k)));
+		if (this.affectsBlocks(param)) {
+			final int radiusBlocks = Math.round(Math.max(2.0f, getRadius(param)));
+			
+			final BlockPos centerBlock = location.hitBlockPos;
+			if (radiusBlocks == 0) {
+				list.add(new SpellLocation(location.world, centerBlock));
+			} else {
+				for (int i = -radiusBlocks; i <= radiusBlocks; i++) {
+					// x loop. I is offset of x
+					int innerRadius = radiusBlocks - Math.abs(i);
+					for (int j = -innerRadius; j <= innerRadius; j++) {
+						int yRadius = innerRadius - Math.abs(j);
+						// 0 means just that cell. Otherwise, +- n
+						if (yRadius == 0) {
+							list.add(new SpellLocation(location.world, centerBlock.add(i, j, 0)));
+						} else {
+							for (int k = -yRadius; k <= yRadius; k++) {
+								list.add(new SpellLocation(location.world, centerBlock.add(i, j, k)));
+							}
 						}
 					}
+					
 				}
-				
 			}
 		}
 		
@@ -162,7 +167,7 @@ public class BurstShape extends InstantShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(true, true, true);
+		return new SpellShapeAttributes(true, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 	
 	protected void addRangeRings(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
@@ -178,7 +183,7 @@ public class BurstShape extends InstantShape {
 	
 	@Override
 	protected boolean previewBlockHits(SpellShapeProperties properties, SpellCharacteristics characteristics) {
-		return false;
+		return affectsBlocks(properties) && !affectsEntities(properties);
 	}
 
 }

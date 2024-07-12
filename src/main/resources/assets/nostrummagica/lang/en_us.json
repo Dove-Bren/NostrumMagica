@@ -1727,6 +1727,12 @@
 	"shapeprop.mana.when_above.name": "Trigger Type",
 	"shapeprop.mana.when_above.desc": "Whether to trigger above or below the Mana Level",
 	
+	"shapeprop.selector.name": "Mode",
+	"shapeprop.selector.desc": "Whether to affect blocks, mobs, or both",
+	"shape_selector.entities.name": "Mobs",
+	"shape_selector.both.name": "Both",
+	"shape_selector.blocks.name": "Blocks",
+	
 	"modification.caster_wand.intro": "Bind a spell to the wand by supplying|a spell scroll",
 	"modification.caster_wand.remove": "Release the spell bound to the|wand back into a spell scroll",
 	"modification.caster_wand.addspell": "Bind \"%1$s\" to the wand",

@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
@@ -39,8 +40,8 @@ public class FieldShape extends AreaShape {
 		private final float radius;
 		private final SpellCharacteristics characteristics;
 		
-		public FieldShapeInstance(ISpellState state, World world, Vector3d pos, float radius, boolean continuous, SpellCharacteristics characteristics) {
-			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, true, characteristics);
+		public FieldShapeInstance(ISpellState state, World world, Vector3d pos, float radius, boolean continuous, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, affectsEntities(properties), affectsBlocks(properties), characteristics);
 			this.radius = radius;
 			this.origin = pos;
 			this.characteristics = characteristics;
@@ -129,7 +130,7 @@ public class FieldShape extends AreaShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		baseProperties.addProperty(ONCE, false).addProperty(RADIUS);
+		baseProperties.addProperty(ONCE, false).addProperty(RADIUS).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	public FieldShape() {
@@ -153,7 +154,7 @@ public class FieldShape extends AreaShape {
 	public FieldShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
 		return new FieldShapeInstance(state, location.world, location.hitPosition,
-				getRadius(properties), getContinuous(properties), characteristics);
+				getRadius(properties), getContinuous(properties), properties, characteristics);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
 import net.minecraft.block.Blocks;
@@ -60,8 +61,8 @@ public class WallShape extends AreaShape {
 		
 		private MutableBoundingBox bounds;
 		
-		public WallShapeInstance(ISpellState state, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellCharacteristics characteristics) {
-			super(state, location.world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, true, characteristics);
+		public WallShapeInstance(ISpellState state, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+			super(state, location.world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, affectsEntities(properties), affectsBlocks(properties), characteristics);
 			this.radius = radius;
 			this.facing = facing;
 			this.characteristics = characteristics;
@@ -268,7 +269,7 @@ public class WallShape extends AreaShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(LINGER).addProperty(RADIUS);
+		this.baseProperties.addProperty(LINGER).addProperty(RADIUS).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	protected boolean isLingering(SpellShapeProperties properties) {
@@ -301,7 +302,7 @@ public class WallShape extends AreaShape {
 		final float radius = wallRadius(params);
 		
 		return new WallShapeInstance(state, location,
-				facing, radius, isLingering, characteristics);
+				facing, radius, isLingering, params, characteristics);
 	}
 
 	@Override
@@ -355,6 +356,9 @@ public class WallShape extends AreaShape {
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = wallRadius(properties);
 		
+		// TODO: this would be better as a 'bounds' preview shape that was the whole shape at once.
+		// That way, it could be the same regardless of whether the selector mode is blocks, entities, or both!
+		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
 		MutableBoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
@@ -363,7 +367,6 @@ public class WallShape extends AreaShape {
 		for (int x = bounds.minX; x <= bounds.maxX; x++)
 		for (int y = bounds.minY; y <= bounds.maxY; y++)
 		for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
-			// should trigger?
 			positions.add(new SpellLocation(location.world, new BlockPos(x, y, z)));
 		}
 		state.trigger(null, positions);

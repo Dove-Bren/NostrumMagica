@@ -462,7 +462,7 @@ public class RuneShaperGui {
 				final int guessedLen = this.getMessage().getString().length();
 				final float scale;
 				if (guessedLen >= 4) {
-					scale = .75f / ((float) guessedLen / 3f);
+					scale = .75f / (float) Math.sqrt((float) guessedLen / 3f);
 				} else {
 					scale = .75f;
 				}

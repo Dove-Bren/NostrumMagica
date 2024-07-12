@@ -271,8 +271,18 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
+	public boolean affectsBlocks(SpellShapeProperties properties) {
+		return false;
+	}
+	
+	@Override
+	public boolean affectsEntities(SpellShapeProperties properties) {
+		return true;
+	}
+	
+	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(true, true, false);
+		return super.getAttributes(params);
 	}
 
 	@Override

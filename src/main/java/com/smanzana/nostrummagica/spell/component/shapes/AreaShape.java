@@ -24,7 +24,7 @@ import net.minecraft.world.World;
  * @author Skyler
  *
  */
-public abstract class AreaShape extends SpellShape {
+public abstract class AreaShape extends SpellShape implements ISelectableShape {
 	
 	public abstract class AreaShapeInstance extends SpellShape.SpellShapeInstance implements IGenericListener {
 		
@@ -38,6 +38,7 @@ public abstract class AreaShape extends SpellShape {
 		protected final int duration;
 		private final boolean continuous;
 		private final boolean affectsGround;
+		private final boolean affectsEnts;
 		
 		private final float radiusHint;
 		
@@ -45,7 +46,7 @@ public abstract class AreaShape extends SpellShape {
 		private boolean dead;
 		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
-		public AreaShapeInstance(ISpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsGround, SpellCharacteristics characteristics) {
+		public AreaShapeInstance(ISpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsEnts, boolean affectsGround, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -54,6 +55,7 @@ public abstract class AreaShape extends SpellShape {
 			this.tickRate = tickRate;
 			this.duration = duration;
 			this.affectsGround = affectsGround;
+			this.affectsEnts = affectsEnts;
 			
 			dead = false;
 			affected = new HashMap<>();
@@ -112,7 +114,7 @@ public abstract class AreaShape extends SpellShape {
 			
 			
 			// Else we've already been set. Check if actually inside wall, and then try to trigger
-			if (this.isInArea(entity)) {
+			if (affectsEnts && this.isInArea(entity)) {
 				if (visitEntity(entity)) {
 					TriggerData data = new TriggerData(
 							Lists.newArrayList(entity),
@@ -155,6 +157,6 @@ public abstract class AreaShape extends SpellShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(true, true, true);
+		return new SpellShapeAttributes(true, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 }
