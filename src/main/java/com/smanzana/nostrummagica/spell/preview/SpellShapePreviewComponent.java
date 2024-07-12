@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.vector.Vector3d;
 
 public abstract class SpellShapePreviewComponent {
@@ -23,6 +24,7 @@ public abstract class SpellShapePreviewComponent {
 	public static final Type<AoELine> AOE_LINE = new Type<>(NostrumMagica.Loc("spellshape.preview.aoeline"));
 	public static final Type<Curve> CURVE = new Type<>(NostrumMagica.Loc("spellshape.preview.curve"));
 	public static final Type<Disk> DISK = new Type<>(NostrumMagica.Loc("spellshape.preview.disk"));
+	public static final Type<Box> BOX = new Type<>(NostrumMagica.Loc("spellshape.preview.box"));
 	
 	protected final Type<? extends SpellShapePreviewComponent> type;
 	
@@ -156,6 +158,25 @@ public abstract class SpellShapePreviewComponent {
 		
 		public float getRadius() {
 			return this.radius;
+		}
+	}
+	
+	public static class Box extends Span {
+
+		protected Box(Type<? extends Span> type, Vector3d boundsMin, Vector3d boundsMax) {
+			super(type, boundsMin, boundsMax);
+		}
+
+		protected Box(Type<? extends Span> type, MutableBoundingBox bounds) {
+			super(type, new Vector3d(bounds.minX, bounds.minY, bounds.minZ), new Vector3d(bounds.maxX, bounds.maxY, bounds.maxZ));
+		}
+		
+		public Box(Vector3d boundsMin, Vector3d boundsMax) {
+			this(BOX, boundsMin, boundsMax);
+		}
+		
+		public Box(MutableBoundingBox bounds) {
+			this(BOX, bounds);
 		}
 	}
 }

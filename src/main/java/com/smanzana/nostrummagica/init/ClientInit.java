@@ -624,6 +624,22 @@ public class ClientInit {
 			final ICurve3d curve = new Curves.FlatEllipse(radius, radius);
 			RenderFuncs.renderVerticalRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
 		});
+		
+		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BOX, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
+			final Vector3d start = comp.getStart();
+			final Vector3d end = comp.getEnd();
+			final Vector3d halfdiff = end.subtract(start).add(1, 1, 1).scale(.5f);
+			
+			final int combinedLight = RenderFuncs.BrightPackedLight;
+			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
+			
+			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
+			matrixStackIn.push();
+			matrixStackIn.translate(start.getX() + halfdiff.getX(), start.getY() + halfdiff.getY(), start.getZ() + halfdiff.getZ());
+			matrixStackIn.scale((float) halfdiff.getX() * 2, (float) halfdiff.getY() * 2, (float) halfdiff.getZ() * 2);
+			RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
+			matrixStackIn.pop();
+		});
 	}
 	
 	private static final void registerEffectRenderers() {

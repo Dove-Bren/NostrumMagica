@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.SpellBubbleEntity;
 import com.smanzana.nostrummagica.entity.SpellProjectileEntity.ISpellProjectileShape;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -14,6 +15,7 @@ import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
@@ -45,14 +47,16 @@ public class BubbleSprayShape extends SpellShape {
 		private final float yaw;
 		private final SpellCharacteristics characteristics;
 		private final float rangeScale;
+		private final int bubbleCount;
 		
-		public BubbleSprayShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, float rangeScale, SpellCharacteristics characteristics) {
+		public BubbleSprayShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, float rangeScale, int bubbleCount, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
 			this.pitch = pitch;
 			this.yaw = yaw;
 			this.rangeScale = rangeScale;
+			this.bubbleCount = bubbleCount;
 			this.characteristics = characteristics;
 		}
 		
@@ -74,7 +78,7 @@ public class BubbleSprayShape extends SpellShape {
 			final float inaccuracy = 30f / rangeScaleSqrt;
 			final float range = SPRAY_RANGE_BASE * rangeScaleSqrt;
 			
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < bubbleCount; i++) {
 				final Vector3d shootDir = dir.add(rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy);
 				final float thisRange = (range / 4f) * (.25f + ( rand.nextFloat() * 1f));
 				SpellBubbleEntity bubble = new SpellBubbleEntity(BubbleSprayShapeInstance.this,
@@ -120,7 +124,8 @@ public class BubbleSprayShape extends SpellShape {
 	private static final String ID = "bubblespray";
 	private static final float SPRAY_RANGE_BASE = 3.0f;
 	
-	public static final SpellShapeProperty<Float> RANGE = new FloatSpellShapeProperty("range", 1f, 1.25f, 1.5f, 2f);
+	public static final SpellShapeProperty<Float> RANGE = new FloatSpellShapeProperty("range", 1f, 1.5f, 2f, 3f, 5f);
+	public static final SpellShapeProperty<Integer> COUNT = new IntSpellShapeProperty("count", 10, 16, 20, 24);
 	
 	public BubbleSprayShape() {
 		super(ID);
@@ -129,22 +134,27 @@ public class BubbleSprayShape extends SpellShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(RANGE);
+		this.baseProperties.addProperty(RANGE).addProperty(COUNT);
 	}
 	
 	protected float getRangeMod(SpellShapeProperties properties) {
 		return properties.getValue(RANGE);
 	}
 	
+	protected int getBubbleCount(SpellShapeProperties properties) {
+		return properties.getValue(COUNT);
+	}
+	
 	@Override
 	public int getManaCost(SpellShapeProperties properties) {
-		return 30;
+		return 30 + (getBubbleCount(properties) - 10);
 	}
 
 	@Override
 	public BubbleSprayShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float rangeMod = getRangeMod(params);
-		return new BubbleSprayShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, rangeMod, characteristics);
+		final int bubbleCount = getBubbleCount(params);
+		return new BubbleSprayShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, rangeMod, bubbleCount, characteristics);
 	}
 
 	@Override
@@ -165,11 +175,22 @@ public class BubbleSprayShape extends SpellShape {
 
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
-		return property != RANGE ? super.getPropertyItemRequirements(property) : NonNullList.from(ItemStack.EMPTY,
-				ItemStack.EMPTY,
-				new ItemStack(Items.HONEY_BOTTLE),
-				new ItemStack(Items.HONEYCOMB),
-				new ItemStack(Items.HONEY_BLOCK));
+		if (property == RANGE) {
+			return NonNullList.from(ItemStack.EMPTY,
+					ItemStack.EMPTY,
+					new ItemStack(Items.HONEY_BOTTLE),
+					new ItemStack(Items.HONEYCOMB),
+					new ItemStack(Items.HONEY_BLOCK),
+					new ItemStack(Items.HONEYCOMB_BLOCK));
+		}
+		if (property == COUNT) {
+			return NonNullList.from(ItemStack.EMPTY,
+					ItemStack.EMPTY,
+					new ItemStack(NostrumItems.crystalSmall),
+					new ItemStack(NostrumItems.resourceWispPebble),
+					new ItemStack(NostrumItems.resourceSpriteCore));
+		}
+		return super.getPropertyItemRequirements(property);
 	}
 
 	@Override

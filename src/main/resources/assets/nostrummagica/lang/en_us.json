@@ -1693,6 +1693,8 @@
 	"shapeprop.mortar.no_arc.desc": "Whether to drop the mortar directly from above instead of arcing",
 	"shapeprop.bubblespray.range.name": "Range",
 	"shapeprop.bubblespray.range.desc": "Range of the bubble spray",
+	"shapeprop.bubblespray.count.name": "Count",
+	"shapeprop.bubblespray.count.desc": "Number of bubbles to spray",
 	"shapeprop.touch.ignore_air.name": "No Air Hits",
 	"shapeprop.touch.ignore_air.desc": "Avoid doing any effects if not close enough to touch anything",
 	"shapeprop.aura.radius.name": "Radius",

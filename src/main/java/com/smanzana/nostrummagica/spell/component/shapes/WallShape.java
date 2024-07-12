@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -356,20 +357,23 @@ public class WallShape extends AreaShape {
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = wallRadius(properties);
 		
-		// TODO: this would be better as a 'bounds' preview shape that was the whole shape at once.
-		// That way, it could be the same regardless of whether the selector mode is blocks, entities, or both!
-		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
 		MutableBoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
 		
-		List<SpellLocation> positions = new ArrayList<>();
-		for (int x = bounds.minX; x <= bounds.maxX; x++)
-		for (int y = bounds.minY; y <= bounds.maxY; y++)
-		for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
-			positions.add(new SpellLocation(location.world, new BlockPos(x, y, z)));
+		// Do block preview if affecting blocks at all
+		if (this.affectsBlocks(properties)) {
+			List<SpellLocation> positions = new ArrayList<>();
+			for (int x = bounds.minX; x <= bounds.maxX; x++)
+			for (int y = bounds.minY; y <= bounds.maxY; y++)
+			for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
+				positions.add(new SpellLocation(location.world, new BlockPos(x, y, z)));
+			}
+			state.trigger(null, positions);
+		} else {
+			// Else do region box shape
+			builder.add(new SpellShapePreviewComponent.Box(bounds));
 		}
-		state.trigger(null, positions);
 		
 		return true;
 	}

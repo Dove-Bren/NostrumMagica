@@ -35,7 +35,7 @@ public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 
 	@Override
 	public INBT writeValue(Integer value) {
-		return FloatNBT.valueOf(value);
+		return IntNBT.valueOf(value);
 	}
 
 	@Override
