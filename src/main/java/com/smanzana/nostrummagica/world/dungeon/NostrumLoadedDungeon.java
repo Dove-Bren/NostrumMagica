@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry.RoomBlueprintRecord;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.BlueprintDungeonRoom;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -50,7 +50,7 @@ public class NostrumLoadedDungeon extends NostrumDungeon {
 		List<IDungeonRoom> ret = new ArrayList<>(this.staticRooms.size() + 32);
 		ret.addAll(this.staticRooms);
 		
-		for (DungeonRoomRecord blueprint : DungeonRoomRegistry.instance().getAllRooms(tag)) {
+		for (RoomBlueprintRecord blueprint : RoomBlueprintRegistry.instance().getAllRooms(tag)) {
 			ret.add(GetLoadedRoom(blueprint.id));
 		}
 		
@@ -60,8 +60,8 @@ public class NostrumLoadedDungeon extends NostrumDungeon {
 	// Cache the loaded rooms so that they can do their own caching.
 	// LoadedRooms automatically look at the registry and refresh themselves if the room
 	// record changes. We don't need to do that since they handle it.
-	private static final Map<ResourceLocation, LoadedRoom> LOADED_ROOM_CACHE = new HashMap<>();
-	private static final LoadedRoom GetLoadedRoom(ResourceLocation location) {
-		return LOADED_ROOM_CACHE.computeIfAbsent(location, l -> new LoadedRoom(location));
+	private static final Map<ResourceLocation, BlueprintDungeonRoom> LOADED_ROOM_CACHE = new HashMap<>();
+	private static final BlueprintDungeonRoom GetLoadedRoom(ResourceLocation location) {
+		return LOADED_ROOM_CACHE.computeIfAbsent(location, l -> new BlueprintDungeonRoom(location));
 	}
 }

@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.world.dungeon;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.LoadedRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.LoadedStartRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.BlueprintDungeonRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.BlueprintStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
@@ -21,9 +21,9 @@ public class NostrumDungeons {
 
 	public static NostrumDungeon PLANTBOSS_DUNGEON = new NostrumLoadedDungeon(
 			"plant_boss",
-			new LoadedStartRoom(PLANTBOSS_LOBBY_NAME,
+			new BlueprintStartRoom(PLANTBOSS_LOBBY_NAME,
 					PLANTBOSS_ENTRANCE_NAME),
-				new LoadedRoom(PLANTBOSS_BOSSROOM_NAME)
+				new BlueprintDungeonRoom(PLANTBOSS_BOSSROOM_NAME)
 			).setColor(0x80106020)
 			.add(new RoomGrandStaircase())
 			.add(new RoomEnd1(false, true))
@@ -57,9 +57,9 @@ public class NostrumDungeons {
 	
 	public static NostrumDungeon PORTAL_DUNGEON = new NostrumLoadedDungeon(
 			"portal",
-			new LoadedStartRoom(PORTAL_LOBBY_NAME,
+			new BlueprintStartRoom(PORTAL_LOBBY_NAME,
 					PORTAL_ENTRANCE_NAME),
-			new LoadedRoom(PORTAL_END_NAME)
+			new BlueprintDungeonRoom(PORTAL_END_NAME)
 			).setColor(0x80402080)
 				.add(new RoomGrandStaircase())
 				.add(new RoomEnd1(false, true))

@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.PortalInfo;
@@ -61,8 +61,8 @@ public class NostrumSorceryDimension {
 		private static RoomBlueprint wholeBlueprint = null;
 		
 		private static void initBlueprints() {
-			lobbyBlueprint = DungeonRoomRegistry.instance().getRoom(DIMENSION_ENTRY_TEMPLATE);
-			wholeBlueprint = DungeonRoomRegistry.instance().getRoom(DIMENSION_WHOLE_TEMPLATE);
+			lobbyBlueprint = RoomBlueprintRegistry.instance().getRoom(DIMENSION_ENTRY_TEMPLATE);
+			wholeBlueprint = RoomBlueprintRegistry.instance().getRoom(DIMENSION_WHOLE_TEMPLATE);
 			
 			if (lobbyBlueprint == null) {
 				NostrumMagica.logger.fatal("Failed to load sorcery lobby from name " + DIMENSION_ENTRY_TEMPLATE);

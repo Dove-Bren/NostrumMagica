@@ -16,14 +16,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 
-public class LoadedStartRoom extends LoadedRoom implements IDungeonStartRoom {
+public class BlueprintStartRoom extends BlueprintDungeonRoom implements IDungeonStartRoom {
 	
-	protected final LoadedRoom entry;
+	protected final BlueprintDungeonRoom entry;
 	protected final RoomExtendedEntranceStaircase stairs;
 	
-	public LoadedStartRoom(ResourceLocation lobbyID, ResourceLocation entryID) {
+	public BlueprintStartRoom(ResourceLocation lobbyID, ResourceLocation entryID) {
 		super(lobbyID);
-		this.entry = new LoadedRoom(entryID);
+		this.entry = new BlueprintDungeonRoom(entryID);
 		this.stairs = new RoomExtendedEntranceStaircase(false);
 	}
 	

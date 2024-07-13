@@ -8,8 +8,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.item.PositionCrystal;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -65,7 +65,7 @@ public class CommandWriteRoom {
 				PositionCrystal.getBlockPosition(offhand),
 				true);
 		
-		if (DungeonRoomRegistry.instance().writeRoomAsFile(blueprint, name, weight, cost, new LinkedList<>())) {
+		if (RoomBlueprintRegistry.instance().writeRoomAsFile(blueprint, name, weight, cost, new LinkedList<>())) {
 			context.getSource().sendFeedback(new StringTextComponent("Room written!"), true);
 		} else {
 			context.getSource().sendFeedback(new StringTextComponent("An error was encountered while writing the room"), true);

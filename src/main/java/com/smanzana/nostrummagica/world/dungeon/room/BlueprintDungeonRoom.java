@@ -9,11 +9,12 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
 import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry.RoomBlueprintRecord;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,14 +30,14 @@ import net.minecraft.world.IWorld;
  * @author Skyler
  *
  */
-public class LoadedRoom implements IDungeonRoom {
+public class BlueprintDungeonRoom implements IDungeonRoom {
 	
 	private final ResourceLocation roomID;
 	private final List<BlueprintLocation> chestsRelative;
 	//private final String registryID;
-	private DungeonRoomRecord _cachedRoom;
+	private RoomBlueprintRecord _cachedRoom;
 	
-	public LoadedRoom(ResourceLocation roomID) {
+	public BlueprintDungeonRoom(ResourceLocation roomID) {
 		this.roomID = roomID;
 		
 		if (roomID == null) {
@@ -54,8 +55,8 @@ public class LoadedRoom implements IDungeonRoom {
 		}
 	}
 	
-	protected DungeonRoomRecord getRoomRecord() {
-		DungeonRoomRecord current = DungeonRoomRegistry.instance().getRoomRecord(roomID);
+	protected RoomBlueprintRecord getRoomRecord() {
+		RoomBlueprintRecord current = RoomBlueprintRegistry.instance().getRoomRecord(roomID);
 		if (current != this._cachedRoom) {
 			this._cachedRoom = current;
 			parseRoom(current.blueprint);
