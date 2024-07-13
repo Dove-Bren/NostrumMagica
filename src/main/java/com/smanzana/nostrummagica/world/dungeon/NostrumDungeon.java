@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.util.JavaUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.world.NostrumWorldKey;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
 
@@ -635,7 +636,7 @@ public class NostrumDungeon {
 		public static DungeonRoomInstance fromNBT(CompoundNBT tag) {
 			final BlueprintLocation entry = BlueprintLocation.fromNBT(tag.getCompound(NBT_ENTRY));
 			final ResourceLocation templateID = new ResourceLocation(tag.getString(NBT_TEMPLATE));
-			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(templateID);
+			final IDungeonRoom template = DungeonRoomRegistry.GetInstance().getRegisteredRoom(templateID);
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
 			final boolean hasLargeDoor = tag.getBoolean(NBT_HASDOOR);
 			final DungeonInstance instance = DungeonInstance.FromNBT(tag.get(NBT_DUNGEON_INSTANCE));

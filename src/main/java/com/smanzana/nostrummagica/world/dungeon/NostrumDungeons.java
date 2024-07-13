@@ -1,15 +1,17 @@
 package com.smanzana.nostrummagica.world.dungeon;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.BlueprintDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.BlueprintStartRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.RoomArena;
+import com.smanzana.nostrummagica.world.dungeon.room.DragonStartRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomChallenge2;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomEnd1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomGrandStaircase;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomJail1;
 import com.smanzana.nostrummagica.world.dungeon.room.RoomLectern;
+import com.smanzana.nostrummagica.world.dungeon.room.RoomRedDragonArena;
+import com.smanzana.nostrummagica.world.dungeon.room.RoomTee1;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -28,8 +30,6 @@ public class NostrumDungeons {
 			.add(new RoomGrandStaircase())
 			.add(new RoomEnd1(false, true))
 			.add(new RoomJail1())
-			.add(new RoomJail1())
-			.add(new RoomChallenge2())
 			.add(new RoomChallenge2())
 			.add(new RoomLectern())
 			.add(new RoomEnd1(true, false))
@@ -38,16 +38,16 @@ public class NostrumDungeons {
 	public static NostrumDungeon DRAGON_DUNGEON = new NostrumLoadedDungeon(
 			"dragon",
 			new DragonStartRoom(),
-			new RoomArena(),
+			new RoomRedDragonArena(),
 			4, 1
 			).setColor(0x80601005)
 				.add(new RoomGrandStaircase())
 				.add(new RoomEnd1(false, true))
 				.add(new RoomJail1())
-				.add(new RoomJail1())
-				.add(new RoomChallenge2())
+				.add(new RoomChallenge1())
 				.add(new RoomChallenge2())
 				.add(new RoomLectern())
+				.add(new RoomTee1())
 				.add(new RoomEnd1(true, false))
 				.add(new RoomEnd1(false, false));
 	

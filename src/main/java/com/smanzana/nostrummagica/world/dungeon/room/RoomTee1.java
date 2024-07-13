@@ -263,14 +263,12 @@ public class RoomTee1 extends StaticRoom {
 
 	@Override
 	public boolean supportsKey() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
-		return NostrumDungeon.asRotated(start,
-				new BlockPos(-3, 4, 18),
-				Direction.EAST);
+		return null;
 	}
 	
 	@Override

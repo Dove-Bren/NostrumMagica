@@ -19,8 +19,7 @@ import com.smanzana.nostrummagica.util.AutoReloadListener;
 import com.smanzana.nostrummagica.util.NBTReloadListener;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.LoadContext;
-import com.smanzana.nostrummagica.world.dungeon.room.BlueprintDungeonRoom;
-import com.smanzana.nostrummagica.world.dungeon.room.StaticRoom;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.nbt.CompoundNBT;
@@ -527,17 +526,8 @@ public class RoomBlueprintRegistry {
 			this.roomListener.apply(data.roomData, resourceManagerIn, profilerIn);
 			this.compListener.apply(data.compData, resourceManagerIn, profilerIn);
 			
-			final RoomBlueprintRegistry loader = RoomBlueprintRegistry.instance();
-			{
-				// After loading/registering the blueprints, register dungeon rooms for each
-				// TODO remove this and move somewhere else and make this be the BlueprintLoader!!!!
-				for (RoomBlueprintRecord blueprintRecord : loader.getAllRooms()) {
-					new BlueprintDungeonRoom(blueprintRecord.id);
-				}
-				
-				// Hack in support for registering statics here too
-				StaticRoom.RegisterStaticRooms();
-			}
+			// This should not be here yet, but I can't find a good 'after data loading' event
+			DungeonRoomRegistry.GetInstance().reload();
 		}
 	}
 }

@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -85,18 +83,5 @@ public interface IDungeonRoom {
 	}
 	
 	public ResourceLocation getRoomID();
-	
-	static final Map<ResourceLocation, IDungeonRoom> Registry = new HashMap<>();
-	public static @Nullable IDungeonRoom GetRegisteredRoom(ResourceLocation ID) {
-		return Registry.get(ID);
-	}
-	
-	public static void Register(ResourceLocation ID, IDungeonRoom room) {
-		if (Registry.containsKey(ID)) {
-			throw new RuntimeException("Duplicate dungeon rooms registered");
-		}
-		
-		Registry.put(ID, room);
-	}
 
 }

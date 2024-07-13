@@ -9,9 +9,9 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
 import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry.RoomBlueprintRecord;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
@@ -34,8 +34,11 @@ public class BlueprintDungeonRoom implements IDungeonRoom {
 	
 	private final ResourceLocation roomID;
 	private final List<BlueprintLocation> chestsRelative;
-	//private final String registryID;
-	private RoomBlueprintRecord _cachedRoom;
+	private RoomBlueprintRecord _cachedRoom; // Only reason for this still is because dungeons have instances hardcodedin them.
+											 // But if they took resource locations and/or wrappers, this isn't needed and only
+											 // once instance could exist (in DungeonRoomRegistry) and anything that wanted it
+											 // could get it by doing a lookup.
+											 // Wrapper could be typed for when start rooms vs non-start rooms are needed, etc.
 	
 	public BlueprintDungeonRoom(ResourceLocation roomID) {
 		this.roomID = roomID;
@@ -45,14 +48,6 @@ public class BlueprintDungeonRoom implements IDungeonRoom {
 		}
 		
 		chestsRelative = new ArrayList<>();
-		
-//		// Save consistent unique ID this room can be looked up later as and register as such
-//		this.registryID = "LoadedRoom_" + blueprintRecord.name;
-//		
-		// Same as static room, being lazy and assuming children know what they're talking about.
-		if (IDungeonRoom.GetRegisteredRoom(roomID) == null) {
-			IDungeonRoom.Register(roomID, this);
-		}
 	}
 	
 	protected RoomBlueprintRecord getRoomRecord() {

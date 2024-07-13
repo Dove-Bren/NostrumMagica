@@ -391,14 +391,12 @@ public class RoomChallenge1 extends StaticRoom {
 
 	@Override
 	public boolean supportsKey() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
-		return NostrumDungeon.asRotated(start, 
-				new BlockPos(-4, 1, 21),
-				Direction.EAST); 
+		return null;
 	}
 	
 	@Override

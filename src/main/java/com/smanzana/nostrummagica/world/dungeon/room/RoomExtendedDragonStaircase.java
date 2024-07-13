@@ -26,10 +26,6 @@ public class RoomExtendedDragonStaircase implements IStaircaseRoom {
 	
 	public RoomExtendedDragonStaircase(boolean dark) {
 		stairs = new RoomEntryStairs(dark);
-		
-		if (IDungeonRoom.GetRegisteredRoom(getRoomID()) == null) { 
-			IDungeonRoom.Register(getRoomID(), this);
-		}
 	}
 	
 	@Override

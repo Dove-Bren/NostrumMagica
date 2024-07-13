@@ -39,32 +39,6 @@ import net.minecraft.world.gen.WorldGenRegion;
  */
 public abstract class StaticRoom implements IDungeonRoom {
 	
-	public static final void RegisterStaticRooms() {
-		// TODO: get rid of static rooms?
-		new DragonStartRoom();
-		new RoomArena();
-		new RoomChallenge1();
-		new RoomChallenge2();
-		new RoomEnd1(false, false);
-		new RoomEnd1(false, true);
-		new RoomEnd1(true, false);
-		new RoomEnd1(true, true);
-		new RoomEnd2(false);
-		new RoomEnd2(true);
-		new RoomEntryDragon(false);
-		new RoomEntryStairs(false);
-		new RoomExtendedDragonStaircase(false);
-		new RoomExtendedEntranceStaircase(false);
-		new RoomGrandHallway();
-		new RoomHallway();
-		new RoomJail1();
-		new RoomLectern();
-		new RoomLongHallway();
-		new RoomPortal(); // don't need?
-		new RoomTee1();
-		new RoomVHallway();
-	}
-	
 	protected static class StaticBlockState {
 		private BlockState wrappedState;
 		
@@ -167,12 +141,6 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 		
 		this.ID = ID;
-		
-		// Out of laziness, just gonna allow dupes assuming all static rooms with the same name
-		// are EXACT copies and that all children that call with the same name kn ow what they're doing.
-		if (IDungeonRoom.GetRegisteredRoom(this.ID) == null) { 
-			IDungeonRoom.Register(this.ID, this);
-		}
 	}
 	
 	/**
