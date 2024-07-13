@@ -5,8 +5,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
-
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -24,9 +22,9 @@ public interface IBlueprint {
 	
 	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds, UUID globalID, @Nullable IBlueprintBlockPlacer spawner);
 	
-	public Collection<DungeonExitPoint> getExits();
+	public Collection<BlueprintLocation> getExits();
 	
-	public DungeonExitPoint getEntry();
+	public BlueprintLocation getEntry();
 	
 	/**
 	 * Returns a preview of the blueprint centered around the blueprint entry point.
@@ -47,7 +45,7 @@ public interface IBlueprint {
 	 */
 	public default BlockPos getAdjustedDimensions(Direction facing) {
 		final BlockPos dimensions = this.getDimensions();
-		final DungeonExitPoint entry = this.getEntry();
+		final BlueprintLocation entry = this.getEntry();
 		
 		Direction mod = GetModDir(entry == null ? Direction.NORTH : entry.getFacing(), facing);
 		int width = dimensions.getX();
@@ -85,7 +83,7 @@ public interface IBlueprint {
 	 * @return
 	 */
 	public default BlockPos getAdjustedOffset(Direction facing) {
-		final DungeonExitPoint entry = this.getEntry();
+		final BlueprintLocation entry = this.getEntry();
 		BlockPos offset = entry == null ? new BlockPos(0,0,0) : entry.getPos().toImmutable();
 		Direction mod = IBlueprint.GetModDir(entry == null ? Direction.NORTH : entry.getFacing(), facing);
 		

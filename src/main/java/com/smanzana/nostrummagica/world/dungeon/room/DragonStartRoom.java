@@ -10,8 +10,8 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
@@ -137,8 +137,8 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
-		List<DungeonExitPoint> list = new LinkedList<>();
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
+		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos pos;
 		
@@ -177,7 +177,7 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		return null;
 	}
 	
@@ -187,8 +187,8 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
-		List<DungeonExitPoint> list = new LinkedList<>();
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
+		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos pos = new BlockPos(3, 0, -4);
 		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
@@ -197,17 +197,17 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		super.spawn(world, start, bounds, dungeonID);
 		
-		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
+		BlueprintLocation adj = new BlueprintLocation(start.getPos().add(0, 6, 0), start.getFacing());
 		stairs.spawn(world, adj, bounds, dungeonID);
 	}
 
 	@Override
-	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, DungeonExitPoint start, Random rand, DungeonInstance instance) {
+	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, BlueprintLocation start, Random rand, DungeonInstance instance) {
 		// Stairs and entry room
-		DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
+		BlueprintLocation adj = new BlueprintLocation(start.getPos().add(0, 6, 0), start.getFacing());
 		return Lists.newArrayList(
 				new DungeonRoomInstance(adj, stairs, false, false, instance, UUID.randomUUID()),
 				new DungeonRoomInstance(stairs.getEntryStart(world, adj), entry, false, false, instance, UUID.randomUUID())

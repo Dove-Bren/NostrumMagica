@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
@@ -156,7 +156,7 @@ public abstract class NostrumDungeonStructure extends Structure<NoFeatureConfig>
 			final int x = (chunkX * 16) + 8;
 			final int z = (chunkZ * 16) + 8;
 			
-			final DungeonExitPoint start = new DungeonExitPoint(new BlockPos(x, y, z), Direction.Plane.HORIZONTAL.random(this.rand));
+			final BlueprintLocation start = new BlueprintLocation(new BlockPos(x, y, z), Direction.Plane.HORIZONTAL.random(this.rand));
 			List<DungeonRoomInstance> instances = this.dungeon.generate((type, cx, cz) -> generator.getHeight(cx, cz, type), start, this.instance);
 			
 			for (DungeonRoomInstance instance : instances) {

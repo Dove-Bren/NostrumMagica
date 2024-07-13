@@ -14,7 +14,6 @@ import com.smanzana.nostrummagica.tile.IOrientedTileEntity;
 import com.smanzana.nostrummagica.tile.IUniqueBlueprintTileEntity;
 import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -94,18 +93,18 @@ public class RoomBlueprint implements IBlueprint {
 	
 	private BlockPos dimensions;
 	private BlueprintBlock[] blocks;
-	private DungeonExitPoint entry;
-	private final Set<DungeonExitPoint> doors;
-	private final List<DungeonExitPoint> largeKeySpots;
-	private @Nullable DungeonExitPoint largeKeyDoor;
+	private BlueprintLocation entry;
+	private final Set<BlueprintLocation> doors;
+	private final List<BlueprintLocation> largeKeySpots;
+	private @Nullable BlueprintLocation largeKeyDoor;
 	private int partOffset; // Only used for fragments
 	
 	// Cached sublist of blocks for previews (5x2x5)
 	private BlueprintBlock[][][] previewBlocks = new BlueprintBlock[5][2][5];
 	
 	
-	public RoomBlueprint(BlockPos dimensions, BlueprintBlock[] blocks, Set<DungeonExitPoint> exits, DungeonExitPoint entry, List<DungeonExitPoint> largeKeySpots,
-			@Nullable DungeonExitPoint largeKeyDoor) {
+	public RoomBlueprint(BlockPos dimensions, BlueprintBlock[] blocks, Set<BlueprintLocation> exits, BlueprintLocation entry, List<BlueprintLocation> largeKeySpots,
+			@Nullable BlueprintLocation largeKeyDoor) {
 		if (dimensions != null && blocks != null
 				&& (dimensions.getX() * dimensions.getY() * dimensions.getZ() != blocks.length)) {
 			throw new RuntimeException("Dimensions do not match block array provided to blueprint constructor!");
@@ -155,9 +154,9 @@ public class RoomBlueprint implements IBlueprint {
 		final int height = dimensions.getY();
 		final int length = dimensions.getZ();
 		this.blocks = new BlueprintBlock[width * height * length];
-		final List<DungeonExitPoint> doorsRaw = new ArrayList<>();
-		final List<DungeonExitPoint> keysRaw = new ArrayList<>();
-		DungeonExitPoint largeDoorRaw = null;
+		final List<BlueprintLocation> doorsRaw = new ArrayList<>();
+		final List<BlueprintLocation> keysRaw = new ArrayList<>();
+		BlueprintLocation largeDoorRaw = null;
 		
 		int slot = 0;
 		for (int i = 0; i < width; i++)
@@ -170,22 +169,22 @@ public class RoomBlueprint implements IBlueprint {
 			// Maybe check for blocks th at actually indicate entries and exits
 			if (usePlaceholders) {
 				if (block.isDoorIndicator()) {
-					doorsRaw.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
+					doorsRaw.add(new BlueprintLocation(cursor.toImmutable().subtract(pos1), block.getFacing().getOpposite()));
 					block = BlueprintBlock.Air(); // Make block an air one
 				} else if (block.isEntry()) {
 					if (this.entry != null) {
 						NostrumMagica.logger.error("Found multiple entry points to room while creating blueprint!");
 					}
-					this.entry = new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing());
+					this.entry = new BlueprintLocation(cursor.toImmutable().subtract(pos1), block.getFacing());
 					block = BlueprintBlock.Air(); // Make block an air one
 				} else if (block.isLargeKeySpot()) {
-					keysRaw.add(new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing()));
+					keysRaw.add(new BlueprintLocation(cursor.toImmutable().subtract(pos1), block.getFacing()));
 					block = BlueprintBlock.Air(); // Make block into an air one. Could make it a chest...
 				} else if (block.isLargeKeyDoor()) {
 					if (largeDoorRaw != null) {
 						NostrumMagica.logger.error("Found multiple large dungeon doors in room while creating blueprint!");
 					}
-					largeDoorRaw = new DungeonExitPoint(cursor.toImmutable().subtract(pos1), block.getFacing());
+					largeDoorRaw = new BlueprintLocation(cursor.toImmutable().subtract(pos1), block.getFacing());
 				}
 			}
 			
@@ -197,29 +196,29 @@ public class RoomBlueprint implements IBlueprint {
 			if (this.entry != null) {
 				NostrumMagica.logger.error("Had a legit entry point but stamping another in");
 			}
-			this.entry = new DungeonExitPoint(origin, originDir);
+			this.entry = new BlueprintLocation(origin, originDir);
 		}
 		
 		if (this.entry == null && !usePlaceholders) {
-			this.entry = new DungeonExitPoint(new BlockPos(width / 2, 0, length / 2), Direction.NORTH);
+			this.entry = new BlueprintLocation(new BlockPos(width / 2, 0, length / 2), Direction.NORTH);
 		}
 		
 		// Adjust found doors/chests/etc. to be offsets from entry
 		if (entry != null) {
-			for (DungeonExitPoint door : doorsRaw) {
-				doors.add(new DungeonExitPoint(
+			for (BlueprintLocation door : doorsRaw) {
+				doors.add(new BlueprintLocation(
 						door.getPos().subtract(entry.getPos()),
 						door.getFacing()
 						));
 			}
-			for (DungeonExitPoint keySpot : keysRaw) {
-				largeKeySpots.add(new DungeonExitPoint(
+			for (BlueprintLocation keySpot : keysRaw) {
+				largeKeySpots.add(new BlueprintLocation(
 						keySpot.getPos().subtract(entry.getPos()),
 						keySpot.getFacing()
 						));
 			}
 			if (largeDoorRaw != null) {
-				this.largeKeyDoor = new DungeonExitPoint(
+				this.largeKeyDoor = new BlueprintLocation(
 						largeDoorRaw.getPos().subtract(entry.getPos()),
 						largeDoorRaw.getFacing()
 						);
@@ -481,12 +480,12 @@ public class RoomBlueprint implements IBlueprint {
 	}
 	
 	@Override
-	public Collection<DungeonExitPoint> getExits() {
+	public Collection<BlueprintLocation> getExits() {
 		return this.doors;
 	}
 	
 	@Override
-	public DungeonExitPoint getEntry() {
+	public BlueprintLocation getEntry() {
 		return this.entry;
 	}
 	
@@ -502,11 +501,11 @@ public class RoomBlueprint implements IBlueprint {
 		return this.previewBlocks;
 	}
 	
-	public Collection<DungeonExitPoint> getLargeKeySpots() {
+	public Collection<BlueprintLocation> getLargeKeySpots() {
 		return this.largeKeySpots;
 	}
 	
-	public @Nullable DungeonExitPoint getLargeDoorLocation() {
+	public @Nullable BlueprintLocation getLargeDoorLocation() {
 		return this.largeKeyDoor;
 	}
 	
@@ -578,10 +577,10 @@ public class RoomBlueprint implements IBlueprint {
 		// If we have one of those, allocate the FULL array size instead of the small one
 		BlockPos masterDims = NBTUtil.readBlockPos(nbt.getCompound(NBT_WHOLE_DIMS));
 		BlueprintBlock[] blocks = null;
-		Set<DungeonExitPoint> doors = null;
-		DungeonExitPoint entry = null;
-		List<DungeonExitPoint> keys = null;
-		DungeonExitPoint largeDoor = null;
+		Set<BlueprintLocation> doors = null;
+		BlueprintLocation entry = null;
+		List<BlueprintLocation> keys = null;
+		BlueprintLocation largeDoor = null;
 		
 		if (dims.distanceSq(0, 0, 0, false) == 0) {
 			return null;
@@ -619,23 +618,23 @@ public class RoomBlueprint implements IBlueprint {
 			int listCount = list.size();
 			for (int i = 0; i < listCount; i++) {
 				CompoundNBT tag = (CompoundNBT) list.getCompound(i);
-				DungeonExitPoint door;
-				door = DungeonExitPoint.fromNBT(tag);
+				BlueprintLocation door;
+				door = BlueprintLocation.fromNBT(tag);
 				doors.add(door);
 			}
 			
 			if (nbt.contains(NBT_ENTRY)) {
 				CompoundNBT tag = nbt.getCompound(NBT_ENTRY);
-				entry = DungeonExitPoint.fromNBT(tag);
+				entry = BlueprintLocation.fromNBT(tag);
 			}
 			
 			if (nbt.contains(NBT_DUNGEON_DOOR)) {
-				largeDoor = DungeonExitPoint.fromNBT(nbt.getCompound(NBT_DUNGEON_DOOR));
+				largeDoor = BlueprintLocation.fromNBT(nbt.getCompound(NBT_DUNGEON_DOOR));
 			}
 			
 			if (nbt.contains(NBT_KEYS, NBT.TAG_LIST)) {
 				keys = new ArrayList<>();
-				NetUtils.FromNBT(keys, (ListNBT) nbt.get(NBT_KEYS), subtag -> DungeonExitPoint.fromNBT((CompoundNBT) subtag));
+				NetUtils.FromNBT(keys, (ListNBT) nbt.get(NBT_KEYS), subtag -> BlueprintLocation.fromNBT((CompoundNBT) subtag));
 			}
 			
 			if (!NostrumMagica.initFinished) {
@@ -771,7 +770,7 @@ public class RoomBlueprint implements IBlueprint {
 		if (startIdx == 0) {
 			if (this.doors != null && !this.doors.isEmpty()) {
 				list = new ListNBT();
-				for (DungeonExitPoint door : doors) {
+				for (BlueprintLocation door : doors) {
 					list.add(door.toNBT());
 				}
 				nbt.put(NBT_DOOR_LIST, list);

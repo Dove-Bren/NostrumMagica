@@ -8,11 +8,11 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 
 import net.minecraft.block.BlockState;
@@ -32,7 +32,7 @@ import net.minecraft.world.IWorld;
 public class LoadedRoom implements IDungeonRoom {
 	
 	private final ResourceLocation roomID;
-	private final List<DungeonExitPoint> chestsRelative;
+	private final List<BlueprintLocation> chestsRelative;
 	//private final String registryID;
 	private DungeonRoomRecord _cachedRoom;
 	
@@ -74,7 +74,7 @@ public class LoadedRoom implements IDungeonRoom {
 		blueprint.scanBlocks((offset, block) -> {
 			BlockState state = block.getSpawnState(blueprint.getEntry().getFacing()); 
 			if (state != null && state.getBlock() == Blocks.CHEST) {
-				chestsRelative.add(new DungeonExitPoint(offset, state.get(ChestBlock.FACING)));
+				chestsRelative.add(new BlueprintLocation(offset, state.get(ChestBlock.FACING)));
 			}
 		});
 	}
@@ -82,7 +82,7 @@ public class LoadedRoom implements IDungeonRoom {
 	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
 	
 	@Override
-	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
+	public boolean canSpawnAt(IWorld world, BlueprintLocation start) {
 		BlockPos dims = getBlueprint().getAdjustedDimensions(start.getFacing());
 		BlockPos offset = getBlueprint().getAdjustedOffset(start.getFacing());
 		
@@ -107,13 +107,13 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		// See note about dungeon vs blueprint facing in @getExits
 		getBlueprint().spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID, null);
 		
-		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
+		List<BlueprintLocation> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
-		for (NostrumDungeon.DungeonExitPoint lootSpot : loots) {
+		for (BlueprintLocation lootSpot : loots) {
 			if (bounds != null && !bounds.isVecInside(lootSpot.getPos())) {
 				continue; // Will come back for you later <3
 			}
@@ -129,13 +129,13 @@ public class LoadedRoom implements IDungeonRoom {
 
 	@Override
 	public int getNumExits() {
-		Collection<DungeonExitPoint> exits = getBlueprint().getExits();
+		Collection<BlueprintLocation> exits = getBlueprint().getExits();
 		return exits == null ? 0 : exits.size();
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
-		Collection<DungeonExitPoint> exits = getBlueprint().getExits();
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
+		Collection<BlueprintLocation> exits = getBlueprint().getExits();
 		
 		// Dungeon notion of direction is backwards to blueprints:
 		// Dungeon wants facing to be you looking back through the door
@@ -145,10 +145,10 @@ public class LoadedRoom implements IDungeonRoom {
 		//final Direction modDir = IBlueprint.GetModDir(blueprint.getEntry().getFacing(), start.getFacing());
 		// Door offset and final rotation is what's in exits rotated modDir times
 		
-		List<DungeonExitPoint> ret;
+		List<BlueprintLocation> ret;
 		if (exits != null) {
 			ret = new ArrayList<>(exits.size());
-			for (DungeonExitPoint door : exits) {
+			for (BlueprintLocation door : exits) {
 				ret.add(BlueprintToRoom(door, getBlueprint().getEntry(), start));
 //				Direction doorDir = door.getFacing();
 //				int times = (modDir.getHorizontalIndex() + 2) % 4;
@@ -179,9 +179,9 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public DungeonExitPoint getDoorLocation(DungeonExitPoint start) {
+	public BlueprintLocation getDoorLocation(BlueprintLocation start) {
 		final RoomBlueprint blueprint = getBlueprint();
-		DungeonExitPoint orig = blueprint.getLargeDoorLocation();
+		BlueprintLocation orig = blueprint.getLargeDoorLocation();
 		return BlueprintToRoom(orig, blueprint.getEntry(), start);
 	}
 
@@ -191,9 +191,9 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		final RoomBlueprint blueprint = getBlueprint();
-		DungeonExitPoint orig = blueprint.getLargeKeySpots().iterator().next();
+		BlueprintLocation orig = blueprint.getLargeKeySpots().iterator().next();
 		return BlueprintToRoom(orig, blueprint.getEntry(), start);
 	}
 	
@@ -203,7 +203,7 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 //		// See note about dungeon vs blueprint facing in @getExits
 //		
 //		// Blueprint exits are rotated to the entry entry direction (and have their own rotation too).
@@ -234,9 +234,9 @@ public class LoadedRoom implements IDungeonRoom {
 		
 		
 		{
-			List<DungeonExitPoint> ret = new ArrayList<>();
-			for (DungeonExitPoint orig : chestsRelative) {
-				final DungeonExitPoint relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
+			List<BlueprintLocation> ret = new ArrayList<>();
+			for (BlueprintLocation orig : chestsRelative) {
+				final BlueprintLocation relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
 				ret.add(relative);
 			}
 			return ret;
@@ -244,7 +244,7 @@ public class LoadedRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public MutableBoundingBox getBounds(DungeonExitPoint entry) {
+	public MutableBoundingBox getBounds(BlueprintLocation entry) {
 		final RoomBlueprint blueprint = getBlueprint();
 		BlockPos dims = blueprint.getAdjustedDimensions(entry.getFacing());
 		BlockPos offset = blueprint.getAdjustedOffset(entry.getFacing());
@@ -281,8 +281,8 @@ public class LoadedRoom implements IDungeonRoom {
 		return this.getRoomRecord().id;
 	}
 	
-	protected static final DungeonExitPoint BlueprintToRoom(DungeonExitPoint blueprintPoint, DungeonExitPoint blueprintEntry, DungeonExitPoint start) {
-		DungeonExitPoint orig = blueprintPoint;
+	protected static final BlueprintLocation BlueprintToRoom(BlueprintLocation blueprintPoint, BlueprintLocation blueprintEntry, BlueprintLocation start) {
+		BlueprintLocation orig = blueprintPoint;
 		
 		// Dungeon notion of direction is backwards to blueprints:
 		// Dungeon wants facing to be you looking back through the door
@@ -297,10 +297,10 @@ public class LoadedRoom implements IDungeonRoom {
 		while (times-- > 0) {
 			doorDir = doorDir.rotateY();
 		}
-		final DungeonExitPoint fromEntry = new DungeonExitPoint(
+		final BlueprintLocation fromEntry = new BlueprintLocation(
 				IBlueprint.ApplyRotation(orig.getPos(), modDir),
 				doorDir
 				);
-		return new DungeonExitPoint(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
+		return new BlueprintLocation(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
 	}
 }

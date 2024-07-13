@@ -7,7 +7,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
@@ -38,7 +38,7 @@ public class LoadedStartRoom extends LoadedRoom implements IDungeonStartRoom {
 	}
 
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		super.spawn(world, start, bounds, dungeonID);
 		
 		//DungeonExitPoint adj = new DungeonExitPoint(start.getPos().add(0, 6, 0), start.getFacing());
@@ -46,7 +46,7 @@ public class LoadedStartRoom extends LoadedRoom implements IDungeonStartRoom {
 	}
 
 	@Override
-	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, DungeonExitPoint start, Random rand, DungeonInstance instance) {
+	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, BlueprintLocation start, Random rand, DungeonInstance instance) {
 		// Stairs and entry room
 		return Lists.newArrayList(
 				new DungeonRoomInstance(start, stairs, false, false, instance, UUID.randomUUID()),

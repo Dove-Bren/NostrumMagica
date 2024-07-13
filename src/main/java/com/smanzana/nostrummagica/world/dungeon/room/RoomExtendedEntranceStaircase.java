@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.BlockState;
@@ -34,7 +34,7 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 	
 	@Override
-	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
+	public boolean canSpawnAt(IWorld world, BlueprintLocation start) {
 		int minX = start.getPos().getX() - 5;
 		int minY = start.getPos().getY();
 		int minZ = start.getPos().getZ() - 5;
@@ -56,16 +56,16 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(IWorld world, BlueprintLocation start, MutableBoundingBox bounds, UUID dungeonID) {
 		getEntryStart((type, x, z) -> world.getHeight(type, x, z), start, true, world, bounds, dungeonID);
 	}
 	
 	@Override
-	public DungeonExitPoint getEntryStart(IWorldHeightReader world, DungeonExitPoint start) {
+	public BlueprintLocation getEntryStart(IWorldHeightReader world, BlueprintLocation start) {
 		return getEntryStart(world, start, false, null, null, null);
 	}
 	
-	private DungeonExitPoint getEntryStart(IWorldHeightReader heightReader, DungeonExitPoint start, boolean spawn, IWorld world, MutableBoundingBox bounds, UUID dungeonID) {
+	private BlueprintLocation getEntryStart(IWorldHeightReader heightReader, BlueprintLocation start, boolean spawn, IWorld world, MutableBoundingBox bounds, UUID dungeonID) {
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
 		
@@ -75,12 +75,12 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 		BlockPos cur = start.getPos();
 		while (cur.getY() < maxY - 17) {
 			if (spawn) {
-				stairs.spawn(world, new DungeonExitPoint(cur, start.getFacing()), bounds, dungeonID);
+				stairs.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonID);
 			}
 			cur = cur.add(0, stairHeight, 0);
 		}
 		
-		return new DungeonExitPoint(cur, start.getFacing());
+		return new BlueprintLocation(cur, start.getFacing());
 	}
 	
 	@Override
@@ -89,7 +89,7 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
 		return new LinkedList<>();
 	}
 
@@ -109,7 +109,7 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		return null;
 	}
 	
@@ -119,7 +119,7 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		return null;
 	}
 
@@ -139,7 +139,7 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 	
 	@Override
-	public MutableBoundingBox getBounds(DungeonExitPoint start) {
+	public MutableBoundingBox getBounds(BlueprintLocation start) {
 		// This should repeat what spawn does and find the actual bounds, but that requires querying the world which
 		// this method would like to not do.
 		// So instead, guess based on start to an approximate height of 128.
@@ -154,9 +154,9 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
 			cursor.setY(i);
 			if (bounds == null) {
-				bounds = stairs.getBounds(new DungeonExitPoint(cursor, start.getFacing()));
+				bounds = stairs.getBounds(new BlueprintLocation(cursor, start.getFacing()));
 			} else {
-				bounds.expandTo(stairs.getBounds(new DungeonExitPoint(cursor, start.getFacing())));
+				bounds.expandTo(stairs.getBounds(new BlueprintLocation(cursor, start.getFacing())));
 			}
 		}
 		

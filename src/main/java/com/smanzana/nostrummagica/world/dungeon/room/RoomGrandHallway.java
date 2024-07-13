@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWallTorchBlock;
@@ -499,8 +499,8 @@ public class RoomGrandHallway extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
-		List<DungeonExitPoint> list = new LinkedList<>();
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
+		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos exit = new BlockPos(0, 0, 41);
 		
@@ -535,7 +535,7 @@ public class RoomGrandHallway extends StaticRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		return null;
 	}
 	
@@ -545,7 +545,7 @@ public class RoomGrandHallway extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		return Lists.newArrayList(NostrumDungeon.asRotated(start,
 				new BlockPos(-4, 4, 4), Direction.WEST));
 	}

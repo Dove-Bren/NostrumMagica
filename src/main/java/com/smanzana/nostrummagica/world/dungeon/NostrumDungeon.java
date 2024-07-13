@@ -27,8 +27,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.JavaUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
-import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.NostrumWorldKey;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonStartRoom;
 
@@ -37,7 +37,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -54,70 +53,6 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class NostrumDungeon {
 	
-	public static class DungeonExitPoint {
-		private Direction facing;
-		private BlockPos pos;
-		
-		public DungeonExitPoint(BlockPos pos, Direction facing) {
-			this.pos = pos;
-			this.facing = facing;
-		}
-
-		public Direction getFacing() {
-			return facing;
-		}
-
-		public BlockPos getPos() {
-			return pos;
-		}
-		
-		@Override
-		public String toString() {
-			return "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")[" + facing.name() + "]";
-		}
-		
-		private static final String NBT_POS = "pos";
-		private static final String NBT_DIR = "facing";
-		
-		
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
-			tag.put(NBT_POS, NBTUtil.writeBlockPos(pos));
-			tag.putByte(NBT_DIR, (byte) facing.getHorizontalIndex());
-			return tag;
-		}
-		
-		public static DungeonExitPoint fromNBT(CompoundNBT nbt) {
-			final BlockPos pos;
-			
-			if (nbt.contains(NBT_POS, NBT.TAG_LONG)) {
-				// Legacy
-				// 1.13/1.14 changed BlockPos.fromLong, so have to use old version
-				pos = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_POS));
-			} else {
-				pos = NBTUtil.readBlockPos(nbt.getCompound(NBT_POS));
-			}
-			
-			Direction facing = Direction.byHorizontalIndex(nbt.getByte(NBT_DIR));
-			return new DungeonExitPoint(pos, facing);
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof DungeonExitPoint) {
-				DungeonExitPoint other = (DungeonExitPoint) o;
-				return other.facing == this.facing && other.pos.equals(this.pos);
-			}
-			
-			return false;
-		}
-		
-		@Override
-		public int hashCode() {
-			return this.facing.hashCode() * 91 + this.pos.hashCode();
-		}
-	}
-
 	private static Random rand = new Random();
 	private int pathLen;
 	private int pathRand;
@@ -184,13 +119,13 @@ public class NostrumDungeon {
 		return this;
 	}
 	
-	public List<DungeonRoomInstance> generate(IWorldHeightReader world, DungeonExitPoint start) {
+	public List<DungeonRoomInstance> generate(IWorldHeightReader world, BlueprintLocation start) {
 		return generate(world, start, DungeonInstance.Random());
 	}
 	
 	// Generates a dungeon, and returns a list of all the instances that were generated.
 	// These can be used to spawn the dungeon in the world.
-	public List<DungeonRoomInstance> generate(IWorldHeightReader world, DungeonExitPoint start, DungeonInstance instance) {
+	public List<DungeonRoomInstance> generate(IWorldHeightReader world, BlueprintLocation start, DungeonInstance instance) {
 		if (starting.getNumExits() <= 0)
 			NostrumMagica.logger.warn("Dungeon created with 0-exit starting. This will not work.");
 		
@@ -227,7 +162,7 @@ public class NostrumDungeon {
 		return ret;
 	}
 	
-	private void makeSmallDoor(DungeonRoomInstance room, DungeonExitPoint entry, DungeonGenerationContext context) {
+	private void makeSmallDoor(DungeonRoomInstance room, BlueprintLocation entry, DungeonGenerationContext context) {
 		room.addSmallDoor(GetDoorAdjacent(entry, true));
 	}
 	
@@ -293,7 +228,7 @@ public class NostrumDungeon {
 				// Want to only go back 1 or 2 nodes to try and make more complex puzzles by default.
 				// Do so by peeking and seeing if what comes after us is the root already or not
 				final Path roomBeforeDoor;
-				final DungeonExitPoint doorEntry;
+				final BlueprintLocation doorEntry;
 				
 				final Path roomAfterDoor;
 				Deque<Path> rootPath = commonParent.getRootPath();
@@ -329,7 +264,7 @@ public class NostrumDungeon {
 	// Generates and then spawns a dungeon in the world immediately.
 	// This doesn't do the normal structure spawning that works well on background threads
 	// and instead does a blocking generate + block spawning.
-	public void spawn(IWorld world, DungeonExitPoint start) {
+	public void spawn(IWorld world, BlueprintLocation start) {
 		DungeonInstance dungeon = new DungeonInstance(UUID.randomUUID(), UUID.randomUUID());
 		List<DungeonRoomInstance> dungeonInstances = generate((type, x, z) -> world.getHeight(type, x, z), start, dungeon);
 		
@@ -559,7 +494,7 @@ public class NostrumDungeon {
 	}
 	
 	public static class DungeonRoomInstance {
-		private final DungeonExitPoint entry;
+		private final BlueprintLocation entry;
 		private final IDungeonRoom template;
 		private final boolean hasLargeKey; // whether the key should be in this room
 		private final boolean hasLargeDoor; // Whether a large key door is in this room and should et stamped to be dungeon key
@@ -567,10 +502,10 @@ public class NostrumDungeon {
 		private final UUID roomID;
 		
 		// Puzzle mechanics that can be turned on after construction
-		private final List<DungeonExitPoint> smallDoors; // What (if any) exits should have small doors
+		private final List<BlueprintLocation> smallDoors; // What (if any) exits should have small doors
 		private boolean hasSmallKey;
 		
-		public DungeonRoomInstance(DungeonExitPoint entry, IDungeonRoom template, boolean hasKey, boolean hasLargeDoor, DungeonInstance dungeonInstance, @Nonnull UUID roomID) {
+		public DungeonRoomInstance(BlueprintLocation entry, IDungeonRoom template, boolean hasKey, boolean hasLargeDoor, DungeonInstance dungeonInstance, @Nonnull UUID roomID) {
 			this.entry = entry;
 			this.template = template;
 			this.hasLargeKey = hasKey;
@@ -581,7 +516,7 @@ public class NostrumDungeon {
 			this.hasSmallKey = false;
 		}
 		
-		protected void addSmallDoor(DungeonExitPoint exit) {
+		protected void addSmallDoor(BlueprintLocation exit) {
 			smallDoors.add(exit);
 		}
 		
@@ -614,14 +549,14 @@ public class NostrumDungeon {
 			
 			// If we have a key, do special key placement
 			if (this.hasLargeKey) {
-				DungeonExitPoint keyLoc = template.getKeyLocation(this.entry);
-				if (bounds == null || bounds.isVecInside(keyLoc.pos)) {
+				BlueprintLocation keyLoc = template.getKeyLocation(this.entry);
+				if (bounds == null || bounds.isVecInside(keyLoc.getPos())) {
 					spawnLargeKey(world, keyLoc);
 				}
 			}
 			if (this.hasLargeDoor) {
-				DungeonExitPoint doorLoc = template.getDoorLocation(this.entry);
-				if (bounds == null || bounds.isVecInside(doorLoc.pos)) {
+				BlueprintLocation doorLoc = template.getDoorLocation(this.entry);
+				if (bounds == null || bounds.isVecInside(doorLoc.getPos())) {
 					spawnLargeDoor(world, doorLoc);
 				}
 			}
@@ -632,43 +567,43 @@ public class NostrumDungeon {
 					// pick small key location based on something deterministic so that it'll be the same
 					// even if we can't spawn it in this call
 					Random rand = new Random(this.roomID.getLeastSignificantBits() ^ this.roomID.getMostSignificantBits());
-					List<DungeonExitPoint> treasureSpots = this.template.getTreasureLocations(this.entry);
-					DungeonExitPoint spot = treasureSpots.get((int) (rand.nextFloat() * treasureSpots.size()));
-					if (bounds == null || bounds.isVecInside(spot.pos)) {
+					List<BlueprintLocation> treasureSpots = this.template.getTreasureLocations(this.entry);
+					BlueprintLocation spot = treasureSpots.get((int) (rand.nextFloat() * treasureSpots.size()));
+					if (bounds == null || bounds.isVecInside(spot.getPos())) {
 						spawnSmallKey(world, spot);
 					}
 				}
 			}
-			for (DungeonExitPoint smallDoor : this.smallDoors) {
-				if (bounds == null || bounds.isVecInside(smallDoor.pos)) {
+			for (BlueprintLocation smallDoor : this.smallDoors) {
+				if (bounds == null || bounds.isVecInside(smallDoor.getPos())) {
 					spawnSmallDoor(world, smallDoor, bounds);
 				}
 			}
 		}
 
-		private void spawnLargeKey(IWorld world, DungeonExitPoint keyLocation) {
+		private void spawnLargeKey(IWorld world, BlueprintLocation keyLocation) {
 			// Technically, this spawns at two positions and could go out of bounds
 			NostrumBlocks.largeDungeonKeyChest.makeDungeonChest(world, keyLocation.getPos(), keyLocation.getFacing(), this.dungeonInstance);
 		}
 		
-		private void spawnLargeDoor(IWorld world, DungeonExitPoint doorLocation) {
+		private void spawnLargeDoor(IWorld world, BlueprintLocation doorLocation) {
 			// Relying on there already being a door... could make large chest do the same?
 			NostrumBlocks.largeDungeonDoor.overrideDungeonKey(world, doorLocation.getPos(), this.dungeonInstance);
 			
 			// could if/else and use existing if it's th ere. same with large key?
 		}
 		
-		private void spawnSmallKey(IWorld world, DungeonExitPoint keyLocation) {
+		private void spawnSmallKey(IWorld world, BlueprintLocation keyLocation) {
 			NostrumBlocks.smallDungeonKeyChest.makeDungeonChest(world, keyLocation.getPos(), keyLocation.getFacing(), this.dungeonInstance);
 		}
 		
-		private void spawnSmallDoor(IWorld world, DungeonExitPoint smallDoor, @Nullable MutableBoundingBox bounds) {
-			NostrumBlocks.smallDungeonDoor.spawnDungeonDoor(world, smallDoor.getPos(), smallDoor.facing, bounds, this.dungeonInstance);
+		private void spawnSmallDoor(IWorld world, BlueprintLocation smallDoor, @Nullable MutableBoundingBox bounds) {
+			NostrumBlocks.smallDungeonDoor.spawnDungeonDoor(world, smallDoor.getPos(), smallDoor.getFacing(), bounds, this.dungeonInstance);
 		}
 		
 		@Override
 		public String toString() {
-			return "[" + this.entry.pos + "] " + this.template.getRoomID() + ": " + this.getBounds();
+			return "[" + this.entry.getPos() + "] " + this.template.getRoomID() + ": " + this.getBounds();
 		}
 		
 		private static final String NBT_ENTRY = "entry";
@@ -698,7 +633,7 @@ public class NostrumDungeon {
 		}
 		
 		public static DungeonRoomInstance fromNBT(CompoundNBT tag) {
-			final DungeonExitPoint entry = DungeonExitPoint.fromNBT(tag.getCompound(NBT_ENTRY));
+			final BlueprintLocation entry = BlueprintLocation.fromNBT(tag.getCompound(NBT_ENTRY));
 			final ResourceLocation templateID = new ResourceLocation(tag.getString(NBT_TEMPLATE));
 			final IDungeonRoom template = IDungeonRoom.GetRegisteredRoom(templateID);
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
@@ -714,7 +649,7 @@ public class NostrumDungeon {
 			ret.hasSmallKey = tag.getBoolean(NBT_HASSMALLKEY);
 			ret.smallDoors.clear();
 			if (tag.contains(NBT_SMALL_DOORS, NBT.TAG_LIST)) { // mostly just legacy support?
-				NetUtils.FromNBT(ret.smallDoors, (ListNBT) tag.get(NBT_SMALL_DOORS), nbt -> DungeonExitPoint.fromNBT((CompoundNBT) nbt));
+				NetUtils.FromNBT(ret.smallDoors, (ListNBT) tag.get(NBT_SMALL_DOORS), nbt -> BlueprintLocation.fromNBT((CompoundNBT) nbt));
 			}
 			
 			return ret;
@@ -722,7 +657,7 @@ public class NostrumDungeon {
 	}
 	
 	// Checks if the provided room overlaps any existing bounds if it were to be spawned
-	protected static boolean CheckRoomBounds(IDungeonRoom room, DungeonExitPoint entry, DungeonGenerationContext context) {
+	protected static boolean CheckRoomBounds(IDungeonRoom room, BlueprintLocation entry, DungeonGenerationContext context) {
 		MutableBoundingBox bounds = room.getBounds(entry);
 		for (MutableBoundingBox box : context.boundingBoxes) {
 			if (bounds.intersectsWith(box)) {
@@ -825,7 +760,7 @@ public class NostrumDungeon {
 			return null;
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomContRoom(DungeonGenerationContext context, DungeonExitPoint entry, int remaining) {
+		protected @Nonnull IDungeonRoom pickRandomContRoom(DungeonGenerationContext context, BlueprintLocation entry, int remaining) {
 			List<IDungeonRoom> eligibleRooms = contRooms.stream().filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
 			if (eligibleRooms.isEmpty()) {
 				NostrumMagica.logger.warn("Failed to find a cont room that fit. Picking a random one for start " + entry);
@@ -834,7 +769,7 @@ public class NostrumDungeon {
 			return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomEndRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
+		protected @Nonnull IDungeonRoom pickRandomEndRoom(DungeonGenerationContext context, BlueprintLocation entry) {
 			if (endRooms.isEmpty()) {
 				return getRooms().get(rand.nextInt(getRooms().size()));
 			} else {
@@ -847,7 +782,7 @@ public class NostrumDungeon {
 			}
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomKeyRoom(DungeonGenerationContext context, DungeonExitPoint entry) {
+		protected @Nonnull IDungeonRoom pickRandomKeyRoom(DungeonGenerationContext context, BlueprintLocation entry) {
 			List<IDungeonRoom> eligibleRooms = keyRooms.stream().filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
 			if (eligibleRooms.isEmpty()) {
 				NostrumMagica.logger.warn("Failed to find a key room that fit. Picking a random one for start " + entry);
@@ -856,7 +791,7 @@ public class NostrumDungeon {
 			return eligibleRooms.get(rand.nextInt(eligibleRooms.size()));
 		}
 		
-		protected @Nonnull IDungeonRoom pickRandomDoorRoom(DungeonGenerationContext context, DungeonExitPoint entry, int remaining) {
+		protected @Nonnull IDungeonRoom pickRandomDoorRoom(DungeonGenerationContext context, BlueprintLocation entry, int remaining) {
 			List<IDungeonRoom> eligibleRooms = doorRooms.stream().filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
 			if (eligibleRooms.isEmpty()) {
 				NostrumMagica.logger.warn("Failed to find a door room that fit. Picking a random one for start " + entry);
@@ -866,7 +801,7 @@ public class NostrumDungeon {
 		}
 		
 		// Fill out this path, including a room for this node and spawning any children that are needed.
-		protected void generate(DungeonGenerationContext context, int remaining, DungeonExitPoint entry, @Nullable IDungeonRoom ending, boolean hasKey) {
+		protected void generate(DungeonGenerationContext context, int remaining, BlueprintLocation entry, @Nullable IDungeonRoom ending, boolean hasKey) {
 			Validate.isTrue(this.myRoom == null); // If room is already set, only generate children!
 			
 			/*
@@ -946,7 +881,7 @@ public class NostrumDungeon {
 			}
 
 			// Add subpaths based on doors
-			for (DungeonExitPoint door : myRoom.template.getExits(myRoom.entry)) {
+			for (BlueprintLocation door : myRoom.template.getExits(myRoom.entry)) {
 				Path path = new Path(this);
 				IDungeonRoom inEnd = null;
 				boolean childHasKey = false;
@@ -981,7 +916,7 @@ public class NostrumDungeon {
 		}
 	}
 	
-	public static DungeonExitPoint asRotated(DungeonExitPoint start, BlockPos offset, Direction facing) {
+	public static BlueprintLocation asRotated(BlueprintLocation start, BlockPos offset, Direction facing) {
 		int modX = 1;
 		int modZ = 1;
 		boolean swap = false;
@@ -1018,7 +953,7 @@ public class NostrumDungeon {
 		pos = new BlockPos(pos.getX() + x, pos.getY() + offset.getY(), pos.getZ() + z);
 		
 		int rot;
-		Direction out = start.facing;
+		Direction out = start.getFacing();
 		switch (facing) {
 		case NORTH:
 		default:
@@ -1038,7 +973,7 @@ public class NostrumDungeon {
 		while (rot-- > 0)
 			out = out.rotateY();
 			
-		return new DungeonExitPoint(pos, out);
+		return new BlueprintLocation(pos, out);
 	}
 	
 	/**
@@ -1048,8 +983,8 @@ public class NostrumDungeon {
 	 * @param isEntry
 	 * @return
 	 */
-	protected static final DungeonExitPoint GetDoorAdjacent(DungeonExitPoint door, boolean isEntry) {
-		return new DungeonExitPoint(
+	protected static final BlueprintLocation GetDoorAdjacent(BlueprintLocation door, boolean isEntry) {
+		return new BlueprintLocation(
 				door.getPos().offset(!isEntry ? door.getFacing().getOpposite() : door.getFacing()),
 				door.getFacing()
 				);

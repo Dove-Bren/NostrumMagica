@@ -6,7 +6,7 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 
 import net.minecraft.block.Blocks;
 
@@ -90,7 +90,7 @@ public class RoomArena extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
 		return new LinkedList<>();
 	}
 
@@ -120,7 +120,7 @@ public class RoomArena extends StaticRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		return null;
 	}
 	
@@ -130,7 +130,7 @@ public class RoomArena extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		return new LinkedList<>();
 	}
 }

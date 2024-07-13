@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -22,7 +22,7 @@ public interface IDungeonRoom {
 	 * @param world
 	 * @return
 	 */
-	public boolean canSpawnAt(IWorld world, DungeonExitPoint start); // TODO ! Some of these checks might spill into other chunks!
+	public boolean canSpawnAt(IWorld world, BlueprintLocation start); // TODO ! Some of these checks might spill into other chunks!
 	
 	/**
 	 * Return the number of exits this room has
@@ -35,7 +35,7 @@ public interface IDungeonRoom {
 	 * placed at the given position and facing
 	 * @return
 	 */
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start);
+	public List<BlueprintLocation> getExits(BlueprintLocation start);
 	
 	/**
 	 * Return the bounds of this dungeon room if it were spawned at the
@@ -43,7 +43,7 @@ public interface IDungeonRoom {
 	 * @param entry
 	 * @return
 	 */
-	public MutableBoundingBox getBounds(DungeonExitPoint entry);
+	public MutableBoundingBox getBounds(BlueprintLocation entry);
 	
 	/**
 	 * Returns the difficulty of the given room, which is used when figuring outa
@@ -63,24 +63,24 @@ public interface IDungeonRoom {
 	
 	public boolean supportsDoor();
 	
-	public default DungeonExitPoint getDoorLocation(DungeonExitPoint start) {return null;}
+	public default BlueprintLocation getDoorLocation(BlueprintLocation start) {return null;}
 	
 	public boolean supportsKey();
 	
 	// If supportsKey returns false, expected to return null
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start);
+	public BlueprintLocation getKeyLocation(BlueprintLocation start);
 	
 	public boolean supportsTreasure();
 	
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start);
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start);
 	
 	public boolean hasEnemies();
 	
 	public boolean hasTraps();
 	
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID);
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID);
 	
-	default public void spawn(IWorld world, DungeonExitPoint start) {
+	default public void spawn(IWorld world, BlueprintLocation start) {
 		spawn(world, start, (MutableBoundingBox) null, UUID.randomUUID());
 	}
 	

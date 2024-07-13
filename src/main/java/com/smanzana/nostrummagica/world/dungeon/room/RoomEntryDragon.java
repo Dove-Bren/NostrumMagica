@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LadderBlock;
@@ -232,7 +232,7 @@ public class RoomEntryDragon extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
 		return new LinkedList<>();
 	}
 
@@ -262,7 +262,7 @@ public class RoomEntryDragon extends StaticRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		return null;
 	}
 	
@@ -272,8 +272,8 @@ public class RoomEntryDragon extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
-		List<DungeonExitPoint> list = new LinkedList<>();
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
+		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos pos = new BlockPos(-1, 11, 1);
 		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
@@ -285,7 +285,7 @@ public class RoomEntryDragon extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		super.spawn(world, start, bounds, dungeonID);
 	}
 }

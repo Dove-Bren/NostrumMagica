@@ -12,9 +12,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -213,7 +213,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public boolean canSpawnAt(IWorld world, DungeonExitPoint start) {
+	public boolean canSpawnAt(IWorld world, BlueprintLocation start) {
 		int relMinX = locMinX;
 		int relMinY = locMinY;
 		int relMinZ = locMinZ;
@@ -260,7 +260,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		Set<IChunk> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
@@ -325,9 +325,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 			
 		}
 		
-		List<DungeonExitPoint> loots = this.getTreasureLocations(start);
+		List<BlueprintLocation> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
-		for (NostrumDungeon.DungeonExitPoint lootSpot : this.getTreasureLocations(start)) {
+		for (BlueprintLocation lootSpot : this.getTreasureLocations(start)) {
 			// Dungeon generation may replace some chests with other things.
 			// Make sure it's still a chest.
 			// TODO improve this, especially since rooms are part of dungeongen not blueprints
@@ -431,10 +431,10 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public MutableBoundingBox getBounds(DungeonExitPoint entry) {
+	public MutableBoundingBox getBounds(BlueprintLocation entry) {
 		// TODO stash and store these
-		DungeonExitPoint corner1 = NostrumDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
-		DungeonExitPoint corner2 = NostrumDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
+		BlueprintLocation corner1 = NostrumDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
+		BlueprintLocation corner2 = NostrumDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
 		
 		return new MutableBoundingBox(corner1.getPos(), corner2.getPos());
 	}

@@ -6,8 +6,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.command.CommandSource;
@@ -58,7 +58,7 @@ public class CommandSpawnDungeon {
 		}
 		
 		ServerPlayerEntity player = context.getSource().asPlayer();
-		dungeon.spawn(player.world, new DungeonExitPoint(player.getPosition(), Direction.fromAngle(player.rotationYaw)));
+		dungeon.spawn(player.world, new BlueprintLocation(player.getPosition(), Direction.fromAngle(player.rotationYaw)));
 		
 		return 0;
 	}

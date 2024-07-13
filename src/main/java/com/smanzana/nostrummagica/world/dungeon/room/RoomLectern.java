@@ -20,8 +20,8 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonExitPoint;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWallTorchBlock;
@@ -108,8 +108,8 @@ public class RoomLectern extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getExits(DungeonExitPoint start) {
-		List<DungeonExitPoint> list = new LinkedList<>();
+	public List<BlueprintLocation> getExits(BlueprintLocation start) {
+		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos exit = new BlockPos(0, 0, 6);
 		
@@ -144,7 +144,7 @@ public class RoomLectern extends StaticRoom {
 	}
 
 	@Override
-	public DungeonExitPoint getKeyLocation(DungeonExitPoint start) {
+	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
 		return null;
 	}
 	
@@ -154,7 +154,7 @@ public class RoomLectern extends StaticRoom {
 	}
 
 	@Override
-	public List<DungeonExitPoint> getTreasureLocations(DungeonExitPoint start) {
+	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		return new LinkedList<>();
 	}
 	
@@ -326,13 +326,13 @@ public class RoomLectern extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, DungeonExitPoint start, @Nullable MutableBoundingBox bounds, UUID dungeonID)
+	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID)
 	{
 		super.spawn(world, start, bounds, dungeonID);
 		
 		// Fill out lectern!
 		BlockPos offset = new BlockPos(-15, 1, 3);
-		DungeonExitPoint point = NostrumDungeon.asRotated(start, offset, start.getFacing());
+		BlueprintLocation point = NostrumDungeon.asRotated(start, offset, start.getFacing());
 		BlockPos pos = point.getPos();
 		
 		if (bounds == null || bounds.isVecInside(pos)) {
