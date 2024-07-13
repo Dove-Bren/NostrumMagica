@@ -26,7 +26,6 @@ public class NostrumDungeonRooms {
 	public static final DungeonRoomRef RefEnd1_Chest = new DungeonRoomRef(RoomEnd1.ID(true, false));
 	public static final DungeonRoomRef RefEnd1_Full = new DungeonRoomRef(RoomEnd1.ID(true, true));
 	public static final DungeonRoomRef RefEntryDragon = new DungeonRoomRef(RoomEntryDragon.ID);
-	private int unused;//public static final DungeonRoomRef RefEntryStairs = new DungeonRoomRef(RoomEntryStairs.ID);
 	public static final DungeonStaircaseRoomRef RefExtendedEntranceStaircaseLight = new DungeonStaircaseRoomRef(RoomExtendedEntranceStaircase.ID_LIGHT);
 	public static final DungeonStaircaseRoomRef RefExtendedEntranceStaircaseDark = new DungeonStaircaseRoomRef(RoomExtendedEntranceStaircase.ID_DARK);
 	public static final DungeonRoomRef RefGrandStaircase = new DungeonRoomRef(RoomGrandStaircase.ID);
@@ -70,7 +69,6 @@ public class NostrumDungeonRooms {
 		registry.register(new RoomEnd1(true, false));
 		registry.register(new RoomEnd1(true, true));
 		registry.register(new RoomEntryDragon(false));
-		//registry.register(new RoomEntryStairs(false));
 		registry.register(new RoomExtendedEntranceStaircase(false));
 		registry.register(new RoomGrandStaircase());
 		registry.register(new RoomJail1());

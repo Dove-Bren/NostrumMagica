@@ -5,10 +5,17 @@ import java.util.List;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneWallTorchBlock;
+import net.minecraft.block.StairsBlock;
+import net.minecraft.state.properties.Half;
+import net.minecraft.state.properties.StairsShape;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -20,17 +27,44 @@ import net.minecraft.world.gen.Heightmap;
  * @author Skyler
  *
  */
-public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
+public class RoomExtendedEntranceStaircase extends StaticRoom implements IStaircaseRoom {
 	
 	public static final ResourceLocation ID_LIGHT = NostrumMagica.Loc("room_extended_entrance_staircase");
 	public static final ResourceLocation ID_DARK = NostrumMagica.Loc("room_extended_entrance_staircase_dark");
 
-	private final RoomEntryStairs stairs;
-	private final boolean dark;
-	
 	public RoomExtendedEntranceStaircase(boolean dark) {
-		stairs = new RoomEntryStairs(dark);
-		this.dark = dark;
+		super(dark ? ID_DARK : ID_LIGHT, -2, 0, -2, 2, 3, 2,
+				// Floor
+				"BBBBB",
+				"B  BB",
+				"B  UB",
+				"B N B",
+				"BBBBB",
+				//
+				"BBBBB",
+				"BBL B",
+				"B   B",
+				"B   B",
+				"BBBBB",
+				//
+				"BBBBB",
+				"B   B",
+				"BD  B",
+				"BB  B",
+				"BBBBB",
+				//
+				"BBBBB",
+				"B   B",
+				"B   B",
+				"B RBB",
+				"BBBBB",
+				'B', (dark ? NostrumBlocks.dungeonBlock : NostrumBlocks.lightDungeonBlock),
+				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
+				' ', null,
+				'U', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.NORTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'R', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
 	}
 	
 	@Override
@@ -75,7 +109,7 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 		BlockPos cur = start.getPos();
 		while (cur.getY() < maxY - 17) {
 			if (spawn) {
-				stairs.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonID);
+				super.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonID);
 			}
 			cur = cur.add(0, stairHeight, 0);
 		}
@@ -134,14 +168,6 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 	}
 
 	@Override
-	public ResourceLocation getRoomID() {
-		int unused; // Like lobby, this room isn't real? Or actually unlike 'start' rooms it IS
-					// real but uses the staircse room as a template? So the issue is actually
-					// that the template staircase isn't a real room
-		return dark ? ID_DARK : ID_LIGHT;
-	}
-	
-	@Override
 	public MutableBoundingBox getBounds(BlueprintLocation start) {
 		// This should repeat what spawn does and find the actual bounds, but that requires querying the world which
 		// this method would like to not do.
@@ -157,9 +183,9 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
 			cursor.setY(i);
 			if (bounds == null) {
-				bounds = stairs.getBounds(new BlueprintLocation(cursor, start.getFacing()));
+				bounds = super.getBounds(new BlueprintLocation(cursor, start.getFacing()));
 			} else {
-				bounds.expandTo(stairs.getBounds(new BlueprintLocation(cursor, start.getFacing())));
+				bounds.expandTo(super.getBounds(new BlueprintLocation(cursor, start.getFacing())));
 			}
 		}
 		
