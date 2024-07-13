@@ -14,13 +14,16 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomGrandStaircase extends StaticRoom {
 	
+	public static final ResourceLocation ID = NostrumMagica.Loc("room_grand_staircase");
+	
 	public RoomGrandStaircase() {
 		// end up providing the type of shrine!
-		super(NostrumMagica.Loc("room_grand_staircase"), -2, -17, 0, 2, 3, 21,
+		super(ID, -2, -17, 0, 2, 3, 21,
 				// Floor (-17)
 				"XXXXX",
 				"XXXXX",

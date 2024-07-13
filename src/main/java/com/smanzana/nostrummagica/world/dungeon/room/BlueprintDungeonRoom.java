@@ -23,6 +23,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 
 /**
@@ -30,7 +31,7 @@ import net.minecraft.world.IWorld;
  * @author Skyler
  *
  */
-public class BlueprintDungeonRoom implements IDungeonRoom {
+public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 	
 	private final ResourceLocation roomID;
 	private final List<BlueprintLocation> chestsRelative;
@@ -298,5 +299,11 @@ public class BlueprintDungeonRoom implements IDungeonRoom {
 				doorDir
 				);
 		return new BlueprintLocation(start.getPos().add(fromEntry.getPos()), fromEntry.getFacing()); 
+	}
+
+	// This is a bit hacky, but all loaded rooms can be 'lobby' rooms in that the entry should be where the stairs go.
+	@Override
+	public Vector3i getStairOffset() {
+		return Vector3i.NULL_VECTOR;
 	}
 }

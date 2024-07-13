@@ -9,11 +9,14 @@ import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.util.ResourceLocation;
 
 public class RoomRedDragonArena extends StaticRoom {
 	
+	public static final ResourceLocation ID = NostrumMagica.Loc("room_arena");
+	
 	public RoomRedDragonArena() {
-		super(NostrumMagica.Loc("room_arena"), -20, -10, 0, 20, 10, 40);
+		super(ID, -20, -10, 0, 20, 10, 40);
 		final int minX = -20;
 		final int minY = -10;
 		final int minZ = 0;

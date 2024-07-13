@@ -14,13 +14,17 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.LadderBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomChallenge1 extends StaticRoom {
+	
+	public static final ResourceLocation ID = NostrumMagica.Loc("room_challenge1");
+	
 	//25, 13, 24
 	// 
 	public RoomChallenge1() {
-		super(NostrumMagica.Loc("room_challenge1"), -19, -7, 0, 5, 5, 23,
+		super(ID, -19, -7, 0, 5, 5, 23,
 				// Floor
 				"XXXXXXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXXXXXX",

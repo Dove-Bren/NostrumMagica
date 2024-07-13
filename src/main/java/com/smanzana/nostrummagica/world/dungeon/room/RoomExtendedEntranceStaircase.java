@@ -21,12 +21,16 @@ import net.minecraft.world.gen.Heightmap;
  *
  */
 public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
+	
+	public static final ResourceLocation ID_LIGHT = NostrumMagica.Loc("room_extended_entrance_staircase");
+	public static final ResourceLocation ID_DARK = NostrumMagica.Loc("room_extended_entrance_staircase_dark");
 
 	private final RoomEntryStairs stairs;
-	
+	private final boolean dark;
 	
 	public RoomExtendedEntranceStaircase(boolean dark) {
 		stairs = new RoomEntryStairs(dark);
+		this.dark = dark;
 	}
 	
 	@Override
@@ -131,7 +135,10 @@ public class RoomExtendedEntranceStaircase implements IStaircaseRoom {
 
 	@Override
 	public ResourceLocation getRoomID() {
-		return NostrumMagica.Loc("room_extended_entrance_staircase"); // Would want to incorporate dark or not?
+		int unused; // Like lobby, this room isn't real? Or actually unlike 'start' rooms it IS
+					// real but uses the staircse room as a template? So the issue is actually
+					// that the template staircase isn't a real room
+		return dark ? ID_DARK : ID_LIGHT;
 	}
 	
 	@Override

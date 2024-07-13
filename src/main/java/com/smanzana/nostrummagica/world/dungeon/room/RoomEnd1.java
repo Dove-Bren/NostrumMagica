@@ -12,15 +12,18 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class RoomEnd1 extends StaticRoom {
+	
+	public static final ResourceLocation ID(boolean withChest, boolean withEnemy) { return NostrumMagica.Loc("room_end1" + (withChest ? "_chest" : "") + (withEnemy ? "_enemy" : "")); }
 	
 	private boolean withChest;
 	private boolean withEnemy;
 	
 	public RoomEnd1(boolean withChest, boolean withEnemy) {
-		super(NostrumMagica.Loc("room_end1" + (withChest ? "_chest" : "") + (withEnemy ? "_enemy" : "")), -4, -1, 0, 4, 3, 7,
+		super(ID(withChest, withEnemy), -4, -1, 0, 4, 3, 7,
 				// Floor
 				"XXXXXXXXX",
 				"XXXXXXXXX",

@@ -19,6 +19,7 @@ import net.minecraft.block.StairsBlock;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
@@ -26,12 +27,14 @@ import net.minecraft.world.IWorld;
 // Tiny tight spiral staircase used when creating the entrance to the dungeon
 public class RoomEntryDragon extends StaticRoom {
 	
+	public static final ResourceLocation ID = NostrumMagica.Loc("room_entry_dragon");
+	
 	// Number of y levels below the ground we'd like to be
 	public static final int LevelsBelow = 7;
 	
 	public RoomEntryDragon(boolean dark) {
 		
-		super(NostrumMagica.Loc("room_entry_dragon"), -5, 0, -5, 5, 14, 5,
+		super(ID, -5, 0, -5, 5, 14, 5,
 				// Floor
 				"BBBBBBBBBBB",
 				"BBBBBBBBBBB",

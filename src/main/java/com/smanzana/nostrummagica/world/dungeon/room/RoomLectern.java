@@ -31,6 +31,7 @@ import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
@@ -38,8 +39,10 @@ import net.minecraft.world.gen.WorldGenRegion;
 
 public class RoomLectern extends StaticRoom {
 	
+	public static final ResourceLocation ID = NostrumMagica.Loc("room_lectern");
+	
 	public RoomLectern() {
-		super(NostrumMagica.Loc("room_lectern"), -18, -1, 0, 2, 4, 6,
+		super(ID, -18, -1, 0, 2, 4, 6,
 				// Floor
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",

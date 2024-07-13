@@ -2,37 +2,28 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
-import javax.annotation.Nullable;
-
-import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonRoomInstance;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IWorld;
+import net.minecraft.util.math.vector.Vector3i;
 
-public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
+public class DragonLobby extends StaticRoom implements IDungeonLobbyRoom {
 	
-	private final RoomExtendedDragonStaircase stairs;
-	private final RoomEntryDragon entry;
+	public static final ResourceLocation ID = NostrumMagica.Loc("dragon_start_room");
 	
-	public DragonStartRoom() {
+	public DragonLobby() {
 		// End up passing in height to surface?
-		super(NostrumMagica.Loc("dragon_start_room"), -5, -1, -5, 5, 5, 5,
+		super(ID, -5, -1, -5, 5, 5, 5,
 				// Floor
 				"XXXXXXXXXXX",
 				"XXXXXXXXXXX",
@@ -127,8 +118,13 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
 				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
 		
-		this.stairs = new RoomExtendedDragonStaircase(false);
-		this.entry = new RoomEntryDragon(false);
+//		this.stairs = new RoomExtendedDragonStaircase(false);
+//		this.entry = new RoomEntryDragon(false);
+	}
+	
+	@Override
+	public Vector3i getStairOffset() {
+		return new Vector3i(0, 6, 0);
 	}
 	
 	@Override
@@ -194,23 +190,5 @@ public class DragonStartRoom extends StaticRoom implements IDungeonStartRoom {
 		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		return list;
-	}
-	
-	@Override
-	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
-		super.spawn(world, start, bounds, dungeonID);
-		
-		BlueprintLocation adj = new BlueprintLocation(start.getPos().add(0, 6, 0), start.getFacing());
-		stairs.spawn(world, adj, bounds, dungeonID);
-	}
-
-	@Override
-	public List<DungeonRoomInstance> generateExtraPieces(IWorldHeightReader world, BlueprintLocation start, Random rand, DungeonInstance instance) {
-		// Stairs and entry room
-		BlueprintLocation adj = new BlueprintLocation(start.getPos().add(0, 6, 0), start.getFacing());
-		return Lists.newArrayList(
-				new DungeonRoomInstance(adj, stairs, false, false, instance, UUID.randomUUID()),
-				new DungeonRoomInstance(stairs.getEntryStart(world, adj), entry, false, false, instance, UUID.randomUUID())
-				);
 	}
 }
