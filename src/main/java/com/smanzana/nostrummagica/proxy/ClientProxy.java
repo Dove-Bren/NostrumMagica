@@ -1028,6 +1028,11 @@ public class ClientProxy extends CommonProxy {
 		return false;
 	}
 	
+	@Override
+	public boolean hasIntegratedServer() {
+		return Minecraft.getInstance().isIntegratedServerRunning();
+	}
+	
 	public BlueprintRenderer getBlueprintRenderer() {
 		return this.blueprintRenderer;
 	}

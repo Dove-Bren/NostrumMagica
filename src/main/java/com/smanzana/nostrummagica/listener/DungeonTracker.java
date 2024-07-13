@@ -56,7 +56,9 @@ public class DungeonTracker {
 	}
 	
 	public void overrideClientDungeon(PlayerEntity player, @Nullable DungeonRecord record) {
-		this.setDungeon(player, record);
+		if (!NostrumMagica.instance.proxy.hasIntegratedServer()) {
+			this.setDungeon(player, record);
+		}
 	}
 	
 	protected void updatePlayer(ServerPlayerEntity player) {

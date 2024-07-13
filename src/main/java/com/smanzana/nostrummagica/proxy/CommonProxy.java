@@ -286,4 +286,8 @@ public class CommonProxy {
 		
 		return true;
 	}
+
+	public boolean hasIntegratedServer() {
+		return false;
+	}
 }
