@@ -60,10 +60,10 @@ public class CommandWriteRoom {
 			return 1;
 		}
 		
-		RoomBlueprint blueprint = new RoomBlueprint(player.world,
+		RoomBlueprint blueprint = RoomBlueprint.Capture(player.world,
 				PositionCrystal.getBlockPosition(main),
 				PositionCrystal.getBlockPosition(offhand),
-				true);
+				null);
 		
 		if (RoomBlueprintRegistry.instance().writeRoomAsFile(blueprint, name, weight, cost, new LinkedList<>())) {
 			context.getSource().sendFeedback(new StringTextComponent("Room written!"), true);

@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.item;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
@@ -31,7 +31,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 
 	public static final String ID = "copy_wand";
 	
-	private @Nullable RoomBlueprint blueprint;
+	private @Nullable Blueprint blueprint;
 	
 	private @Nullable World selectWorld;
 	private @Nullable BlockPos select1;
@@ -85,7 +85,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 			BlockPos placePos = pos.offset(context.getFace()); // offset by face clicked on
 			if (this.blueprint != null) {
 				// spawn
-				blueprint.spawn(world, placePos, face, UUID.randomUUID()); // spawn rotated based on direction from us
+				blueprint.spawn(world, placePos, face); // spawn rotated based on direction from us
 				
 			} else if (select1 != null && select2 != null) {
 				final BlockPos min = new BlockPos(Math.min(select1.getX(), select2.getX()),
@@ -95,7 +95,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 						Math.max(select1.getY(), select2.getY()),
 						Math.max(select1.getZ(), select2.getZ()));
 				final BlockPos offset = placePos.subtract(min);
-				this.blueprint = new RoomBlueprint(world, min, max, false, offset, face);
+				this.blueprint = Blueprint.Capture(world, min, max, new BlueprintLocation(offset, face));
 				select1 = select2 = null;
 				selectWorld = null;
 			}

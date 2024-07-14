@@ -106,7 +106,7 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 	@Override
 	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		// See note about dungeon vs blueprint facing in @getExits
-		getBlueprint().spawn(world, start.getPos(), start.getFacing(), bounds, dungeonID, null);
+		getBlueprint().spawn(world, start.getPos(), start.getFacing(), bounds, null, dungeonID);
 		
 		List<BlueprintLocation> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())

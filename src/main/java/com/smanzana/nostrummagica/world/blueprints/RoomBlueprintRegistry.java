@@ -17,8 +17,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.AutoReloadListener;
 import com.smanzana.nostrummagica.util.NBTReloadListener;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.INBTGenerator;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint.LoadContext;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint.INBTGenerator;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint.LoadContext;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
 
 import net.minecraft.client.resources.ReloadListener;
@@ -235,7 +235,7 @@ public class RoomBlueprintRegistry {
 		context.name = name;
 		
 		
-		RoomBlueprint blueprint = RoomBlueprint.fromNBT(context, nbt.getCompound(NBT_BLUEPRINT));
+		RoomBlueprint blueprint = RoomBlueprint.FromNBT(context, nbt.getCompound(NBT_BLUEPRINT));
 		return blueprint;
 	}
 	

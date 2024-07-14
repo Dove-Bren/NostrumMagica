@@ -9,8 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class BlueprintLocation {
-	private Direction facing;
-	private BlockPos pos;
+	private final Direction facing;
+	private final BlockPos pos;
 	
 	public BlueprintLocation(BlockPos pos, Direction facing) {
 		this.pos = pos;

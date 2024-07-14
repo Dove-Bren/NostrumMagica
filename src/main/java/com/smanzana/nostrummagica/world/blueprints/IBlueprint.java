@@ -1,8 +1,5 @@
 package com.smanzana.nostrummagica.world.blueprints;
 
-import java.util.Collection;
-import java.util.UUID;
-
 import javax.annotation.Nullable;
 
 import net.minecraft.util.Direction;
@@ -12,17 +9,15 @@ import net.minecraft.world.IWorld;
 
 public interface IBlueprint {
 
-	public default void spawn(IWorld world, BlockPos at, UUID globalID) {
-		this.spawn(world, at, Direction.NORTH, globalID);
+	public default void spawn(IWorld world, BlockPos at) {
+		this.spawn(world, at, Direction.NORTH);
 	}
 	
-	public default void spawn(IWorld world, BlockPos at, Direction direction, UUID globalID) {
-		this.spawn(world, at, direction, (MutableBoundingBox) null, globalID, null);
+	public default void spawn(IWorld world, BlockPos at, Direction direction) {
+		this.spawn(world, at, direction, (MutableBoundingBox) null, null);
 	}
 	
-	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds, UUID globalID, @Nullable IBlueprintBlockPlacer spawner);
-	
-	public Collection<BlueprintLocation> getExits();
+	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds, @Nullable IBlueprintBlockPlacer spawner);
 	
 	public BlueprintLocation getEntry();
 	

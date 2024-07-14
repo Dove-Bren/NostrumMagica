@@ -79,11 +79,11 @@ public class NostrumSorceryDimension {
 			}
 			
 			long startTime = System.currentTimeMillis();
-			lobbyBlueprint.spawn(world, center, dungeonID);
+			lobbyBlueprint.spawn(world, center, Direction.NORTH, null, null, dungeonID);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
 			
 			startTime = System.currentTimeMillis();
-			wholeBlueprint.spawn(world, center, dungeonID);
+			wholeBlueprint.spawn(world, center, Direction.NORTH, null, null, dungeonID);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
 		}
 		
