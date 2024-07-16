@@ -231,8 +231,8 @@ public class NostrumDungeon {
 				final Path roomAfterDoor;
 				Deque<Path> rootPath = commonParent.getRootPath();
 				rootPath.removeLast(); // will be commonParent
-				if (context.rand.nextBoolean() || rootPath.peekLast().isRoot()) {
-					// Either we rolled a 1, or only possible place is 1 back (which will be root)
+				if (loops == 1 || context.rand.nextBoolean() || rootPath.peekLast().isRoot()) {
+					// Either we rolled a 1, this is the large key room, or only possible place is 1 back (which will be root)
 					roomAfterDoor = commonParent;
 				} else {
 					roomAfterDoor = rootPath.peekLast();
