@@ -30,9 +30,11 @@ import com.smanzana.nostrummagica.util.NetUtils;
 import com.smanzana.nostrummagica.world.NostrumWorldKey;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonStartRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef;
+import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
 
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,26 +57,30 @@ import net.minecraftforge.common.util.Constants.NBT;
 
 public class NostrumDungeon {
 	
-	private static Random rand = new Random();
-	private int pathLen;
-	private int pathRand;
-	private List<IDungeonRoomRef<?>> rooms;
-	protected IDungeonRoomRef<?> ending;
-	protected DungeonStartRoom starting;
-	protected NostrumDungeon self;
+	private static final Random rand = new Random();
+	
+	private final String tag;
+	private final int pathLen;
+	private final int pathRand;
+	//private final List<IDungeonRoomRef<?>> rooms;
+	protected final IDungeonRoomRef<?> ending;
+	protected final DungeonStartRoom starting;
+	protected final NostrumDungeon self;
+	
 	protected int color;
 	
 	// Puzzle sets per spawn run
 //	private List<Path> doorPoints;
 //	private List<Path> keyPoints; // Potential keys, that is
 	
-	public NostrumDungeon(DungeonStartRoom starting, IDungeonRoomRef<?> ending) {
-		this(starting, ending, 2, 3);
+	public NostrumDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending) {
+		this(tag, starting, ending, 2, 3);
 	}
 	
-	public NostrumDungeon(DungeonStartRoom starting, IDungeonRoomRef<?> ending, int minPath, int randPath) {
+	public NostrumDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending, int minPath, int randPath) {
+		this.tag = tag;
 		self = this;
-		rooms = new ArrayList<>();
+		//rooms = new ArrayList<>();
 		this.ending = ending;
 		this.starting = starting;
 		this.pathLen = minPath; // minimum length of paths
@@ -82,17 +88,25 @@ public class NostrumDungeon {
 		this.color = 0x80602080;
 	}
 	
+	@Deprecated
 	public NostrumDungeon add(IDungeonRoomRef<?> room) {
-		rooms.add(room);
+		//rooms.add(room);
 		return this;
 	}
-	
+
+	@Deprecated
 	public void clearRooms() {
-		rooms.clear();
+		//rooms.clear();
 	}
 	
 	protected List<IDungeonRoomRef<?>> getRooms() {
-		return rooms;
+		List<IDungeonRoomRef<?>> ret = new ArrayList<>();
+		
+		for (DungeonRoomRecord record : DungeonRoomRegistry.GetInstance().getAllRooms(tag)) {
+			ret.add(new DungeonRoomRef(record.room.getRoomID()));
+		}
+		
+		return ret;
 	}
 	
 	public NostrumDungeon setColor(int color) {
@@ -132,6 +146,7 @@ public class NostrumDungeon {
 			return new ArrayList<>();
 		}
 		
+		int unused; // This is still putting large key doors before the boss room even when supportsPuzzle is false
 		final boolean supportsPuzzle = (!context.keyRooms.isEmpty() && !context.doorRooms.isEmpty());
 		
 		Path startPath = new Path(new DungeonRoomInstance(start, this.starting.getLobby(), false, false, instance, MakeNewRoomID(context))); // Note: false means starting won't ever have key
@@ -626,16 +641,17 @@ public class NostrumDungeon {
 		public static DungeonRoomInstance fromNBT(CompoundNBT tag) {
 			final BlueprintLocation entry = BlueprintLocation.fromNBT(tag.getCompound(NBT_ENTRY));
 			final ResourceLocation templateID = new ResourceLocation(tag.getString(NBT_TEMPLATE));
-			final IDungeonRoom template = DungeonRoomRegistry.GetInstance().getRegisteredRoom(templateID);
+			final DungeonRoomRecord record = DungeonRoomRegistry.GetInstance().getRegisteredRoom(templateID);
 			final boolean hasKey = tag.getBoolean(NBT_HASKEY);
 			final boolean hasLargeDoor = tag.getBoolean(NBT_HASDOOR);
 			final DungeonInstance instance = DungeonInstance.FromNBT(tag.get(NBT_DUNGEON_INSTANCE));
 			final UUID roomID = tag.getUniqueId(NBT_ROOM_ID);
-			final DungeonRoomInstance ret = new DungeonRoomInstance(entry, template, hasKey, hasLargeDoor, instance, roomID);
 			
-			if (template == null) {
+			if (record == null) {
 				NostrumMagica.logger.error("Failed to find dungeon room instance by id " + templateID);
 			}
+			
+			final DungeonRoomInstance ret = new DungeonRoomInstance(entry, record.room, hasKey, hasLargeDoor, instance, roomID);
 			
 			ret.hasSmallKey = tag.getBoolean(NBT_HASSMALLKEY);
 			ret.smallDoors.clear();
@@ -813,8 +829,6 @@ public class NostrumDungeon {
 				} else {
 					this.myRoom = new DungeonRoomInstance(entry, pickRandomEndRoom(context, entry), false, false, context.instance, MakeNewRoomID(context));
 				}
-				
-				
 			} else {
 				// If we have an ending and are about to terminate, get a door room.
 				// Otherwise, do a regular cont room.

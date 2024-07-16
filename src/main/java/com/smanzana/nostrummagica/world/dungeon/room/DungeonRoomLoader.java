@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.world.blueprints;
+package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,14 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.AutoReloadListener;
 import com.smanzana.nostrummagica.util.NBTReloadListener;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint;
 import com.smanzana.nostrummagica.world.blueprints.Blueprint.INBTGenerator;
 import com.smanzana.nostrummagica.world.blueprints.Blueprint.LoadContext;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRegisterEvent;
 
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.nbt.CompoundNBT;
@@ -29,177 +28,47 @@ import net.minecraft.nbt.StringNBT;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class RoomBlueprintRegistry {
+public class DungeonRoomLoader {
 	
-	public static final class RoomBlueprintRecord {
-		public final ResourceLocation id;
-		public final String name;
-		public final RoomBlueprint blueprint;
-		protected final int weight;
-		protected final int cost;
-		
-		public RoomBlueprintRecord(ResourceLocation id, String name, RoomBlueprint blueprint, int weight, int cost) {
-			this.blueprint = blueprint;
-			this.weight = weight;
-			this.id = id;
-			this.cost = cost;
-			this.name = name;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof RoomBlueprintRecord) {
-				RoomBlueprintRecord other = (RoomBlueprintRecord) o;
-				return other.id.equals(id);
-			}
-			
-			return false;
-		}
-		
-		@Override
-		public int hashCode() {
-			return this.id.hashCode() * 17;
-		}
-	}
-	
-	private static final class RoomBlueprintList {
-		private List<RoomBlueprintRecord> recordList;
-		private int weightSum;
-		
-		public RoomBlueprintList() {
-			recordList = new LinkedList<>();
-			weightSum = 0;
-		}
-		
-		public void add(RoomBlueprintRecord record) {
-			if (recordList.contains(record)) {
-				
-				NostrumMagica.logger.info("Overriding RoomBlueprint registration for entry " + record.id);
-				
-				RoomBlueprintRecord old = recordList.get(recordList.indexOf(record));
-				recordList.remove(record);
-				weightSum -= old.weight;
-			}
-			recordList.add(record);
-			weightSum += record.weight;
-		}
-	}
-	
-	private static RoomBlueprintRegistry instance = null;
-	public static RoomBlueprintRegistry instance() {
+	private static DungeonRoomLoader instance = null;
+	public static DungeonRoomLoader instance() {
 		if (instance == null) {
-			instance = new RoomBlueprintRegistry();
+			instance = new DungeonRoomLoader();
 		}
 		
 		return instance;
 	}
 	
-	private static final String INTERNAL_ALL_NAME = "all";
 	private static final String ROOM_ROOT_ID = "root";
 	private static final String ROOM_ROOT_NAME = ROOM_ROOT_ID + ".gat";
 	private static final String ROOM_COMPRESSED_EXT = "gat";
 	
-	private Map<String, RoomBlueprintList> map;
-	
-	private RoomBlueprintRegistry() {
-		this.map = new HashMap<>();
+	private DungeonRoomLoader() {
 		
 		this.roomSaveFolder = new File("./NostrumMagicaData/room_blueprint_captures/");
 		this.roomLoadFolder = new File("./NostrumMagicaData/room_blueprint_captures/");
 	}
 	
-	private void add(String tag, RoomBlueprintRecord record) {
-		RoomBlueprintList list = map.get(tag);
-		if (list == null) {
-			list = new RoomBlueprintList();
-			map.put(tag, list);
-		}
+	private static final class DungeonRoomEntry {
+		public Blueprint blueprint;
+		public final ResourceLocation id;
+		public final String name;
+		public final List<String> tags;
+		public final int weight;
+		public final int cost;
 		
-		list.add(record);
-	}
-	
-	public void clear() {
-		map.clear();
-	}
-	
-	public void register(ResourceLocation id, String name, RoomBlueprint blueprint, int weight, int cost, List<String> tags) {
-		RoomBlueprintRecord record = new RoomBlueprintRecord(id, name, blueprint, weight, cost);
-		add(INTERNAL_ALL_NAME, record);
-		for (String tag : tags) {
-			add(tag, record);
+		public DungeonRoomEntry(Blueprint blueprint, ResourceLocation id, String name, List<String> tags, int weight, int cost) {
+			this.blueprint = blueprint;
+			this.id = id;
+			this.name = name;
+			this.tags = tags;
+			this.weight = weight;
+			this.cost = cost;
 		}
-	}
-	
-	@Nullable
-	public RoomBlueprint getRandomRoom() {
-		return getRandomRoom(INTERNAL_ALL_NAME);
-	}
-	
-	@Nullable
-	public RoomBlueprint getRandomRoom(String tag) {
-		RoomBlueprint ret = null;
-		RoomBlueprintList list = map.get(tag);
-		if (list != null) {
-			int idx = NostrumMagica.rand.nextInt(list.weightSum);
-			for (RoomBlueprintRecord record : list.recordList) {
-				idx -= record.weight;
-				if (idx < 0) {
-					ret = record.blueprint;
-					break;
-				}
-			}
-		}
-		
-		return ret;
-	}
-	
-	@Nullable
-	public RoomBlueprint getRoom(ResourceLocation roomID) {
-		RoomBlueprintRecord record = getRoomRecord(roomID);
-		if (record != null) {
-			return record.blueprint;
-		} else {
-			return null;
-		}
-	}
-	
-	@Nullable
-	public RoomBlueprintRecord getRoomRecord(ResourceLocation roomID) {
-		RoomBlueprintRecord ret = null;
-		RoomBlueprintList list = map.get(INTERNAL_ALL_NAME);
-		if (list != null) {
-			for (RoomBlueprintRecord record : list.recordList) {
-				if (record.id.equals(roomID)) {
-					ret = record;
-					break;
-				}
-			}
-		}
-		
-		return ret;
-	}
-	
-	public List<RoomBlueprintRecord> getAllRooms() {
-		return this.getAllRooms(INTERNAL_ALL_NAME);
-	}
-	
-	public List<RoomBlueprintRecord> getAllRooms(String tag) {
-		RoomBlueprintList list = map.get(tag);
-		List<RoomBlueprintRecord> ret;
-		
-		if (list != null) {
-			ret = new ArrayList<>(list.recordList.size());
-			for (RoomBlueprintRecord record : list.recordList) {
-				ret.add(record);
-				// TODO use weight...
-			}
-		} else {
-			ret = new LinkedList<>();
-		}
-		
-		return ret;
 	}
 	
 	private static final String NBT_BLUEPRINT = "blueprint";
@@ -224,23 +93,17 @@ public class RoomBlueprintRegistry {
 		return nbt;
 	}
 	
-	private final RoomBlueprint loadRoomFromNBT(LoadContext context, CompoundNBT nbt) {
+	private final Blueprint loadBlueprintFromNBT(LoadContext context, CompoundNBT nbt) {
+		// Get and stash name for loading debug
 		String name = nbt.getString(NBT_NAME);
-		int weight = nbt.getInt(NBT_WEIGHT);
-		
-		if (name.isEmpty() || weight <= 0) {
-			return null;
-		}
-		
 		context.name = name;
 		
-		
-		RoomBlueprint blueprint = RoomBlueprint.FromNBT(context, nbt.getCompound(NBT_BLUEPRINT));
+		Blueprint blueprint = Blueprint.FromNBT(context, nbt.getCompound(NBT_BLUEPRINT));
 		return blueprint;
 	}
 	
-	public final RoomBlueprint loadAndRegisterFromNBT(LoadContext context, ResourceLocation id, CompoundNBT nbt) {
-		RoomBlueprint blueprint = loadRoomFromNBT(context, nbt);
+	public final DungeonRoomEntry loadEntryFromNBT(LoadContext context, ResourceLocation id, CompoundNBT nbt) {
+		Blueprint blueprint = loadBlueprintFromNBT(context, nbt);
 		
 		if (blueprint == null) {
 			return null;
@@ -260,13 +123,11 @@ public class RoomBlueprintRegistry {
 			tags.add(list.getString(i));
 		}
 		
-		this.register(id, name, blueprint, weight, cost, tags);
-		
 		// For version bumping
-//		int unusedWarning;
-//		writeRoomAsFile(blueprint, id, weight, tags);
+		//int unusedWarning;
+		//writeRoomAsFile(blueprint, name, weight, cost, tags);
 		
-		return blueprint;
+		return new DungeonRoomEntry(blueprint, id, name, tags, weight, cost);
 	}
 	
 	public final File roomLoadFolder;
@@ -289,18 +150,22 @@ public class RoomBlueprintRegistry {
 		return success;
 	}
 	
-	public final boolean writeRoomAsFile(RoomBlueprint blueprint, String name, int weight, int cost, List<String> tags) {
+	public final boolean writeRoomAsFile(Blueprint blueprint, String name, int weight, int cost, List<String> tags) {
+		return writeRoomAsFile(new DungeonRoomEntry(blueprint, null, name, tags, weight, cost));
+	}
+	
+	protected final boolean writeRoomAsFile(DungeonRoomEntry entry) {
 		boolean success = true;
 		String path = null;
 		
-		if (blueprint.shouldSplit()) {
-			File baseDir = new File(this.roomSaveFolder, name);
+		if (entry.blueprint.shouldSplit()) {
+			File baseDir = new File(this.roomSaveFolder, entry.name);
 			if (!baseDir.mkdirs()) {
 				throw new RuntimeException("Failed to create directories for complex room: " + baseDir.getPath());
 			}
 			
-			INBTGenerator gen = blueprint.toNBTWithBreakdown();
-			NostrumMagica.logger.info("Writing complex room " + name + " as " + gen.getTotal() + " pieces");
+			INBTGenerator gen = entry.blueprint.toNBTWithBreakdown();
+			NostrumMagica.logger.info("Writing complex room " + entry.name + " as " + gen.getTotal() + " pieces");
 			
 			for (int i = 0; gen.hasNext(); i++) {
 				String fileName;
@@ -309,18 +174,18 @@ public class RoomBlueprintRegistry {
 					// Root room has extra info and needs to be identified
 					fileName = ROOM_ROOT_NAME;
 				} else {
-					fileName = name + "_" + i + "." + ROOM_COMPRESSED_EXT;
+					fileName = entry.name + "_" + i + "." + ROOM_COMPRESSED_EXT;
 				}
 				
 				File outFile = new File(baseDir, fileName);
-				success = writeRoomAsFileInternal(outFile, nbt, name, weight, cost, tags);
+				success = writeRoomAsFileInternal(outFile, nbt, entry.name, entry.weight, entry.cost, entry.tags);
 				path = outFile.getPath();
 			}
 		} else {
-			File outFile = new File(this.roomSaveFolder, name + "." + ROOM_COMPRESSED_EXT);
+			File outFile = new File(this.roomSaveFolder, entry.name + "." + ROOM_COMPRESSED_EXT);
 			success = writeRoomAsFileInternal(outFile,
-					blueprint.toNBT(),
-					name, weight, cost, tags);
+					entry.blueprint.toNBT(),
+					entry.name, entry.weight, entry.cost, entry.tags);
 			path = outFile.getPath();
 		}
 		
@@ -333,36 +198,68 @@ public class RoomBlueprintRegistry {
 	
 	private static class RoomReloadListener extends NBTReloadListener {
 		
+		protected static RoomReloadListener lastInstance = null;
+		
+		protected final List<DungeonRoomEntry> loadedRooms;
+		
 		public RoomReloadListener(String folder) {
 			super(folder, "gat", true);
+			loadedRooms = new ArrayList<>();
+			MinecraftForge.EVENT_BUS.register(this);
+			
+			if (lastInstance != null) {
+				MinecraftForge.EVENT_BUS.unregister(lastInstance);
+			}
+			lastInstance = this;
 		}
 		
 		@Override
 		public void apply(Map<ResourceLocation, CompoundNBT> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+			loadedRooms.clear();
 			NostrumMagica.logger.info("Loading room blueprints from {} resources", data.size());
 			long start;
 			long now;
-			final RoomBlueprintRegistry loader = RoomBlueprintRegistry.instance();
+			final DungeonRoomLoader loader = DungeonRoomLoader.instance();
 			
 			for (Entry<ResourceLocation, CompoundNBT> entry : data.entrySet()) {
 				final LoadContext context = new LoadContext(entry.getKey().toString());
 				
 				start = System.currentTimeMillis();
-				loader.loadAndRegisterFromNBT(context, entry.getKey(), entry.getValue());
+				loadedRooms.add(loader.loadEntryFromNBT(context, entry.getKey(), entry.getValue()));
 				now = System.currentTimeMillis();
 				
 				if (now - start > 100) {
 					NostrumMagica.logger.warn("Took " + (now-start) + "ms to read " + entry.getKey());
 				}
 			}
+		}
+		
+		@SubscribeEvent
+		public final void onRoomRegistration(DungeonRoomRegisterEvent event) {
+			DungeonRoomRegistry registry = event.getRegistry();
 			
+			// Blueprint Rooms
+			for (DungeonRoomEntry entry : loadedRooms) {
+				registry.register(entry.name, new BlueprintDungeonRoom(entry.id, entry.blueprint), entry.weight, entry.cost, entry.tags);;
+			}
 		}
 	}
 	
 	private static class RoomCompReloadListener extends AutoReloadListener<Map<ResourceLocation, Map<String, CompoundNBT>>> {
 		
+		private static RoomCompReloadListener lastInstance = null;
+		
+		protected final List<DungeonRoomEntry> loadedRooms;
+		
 		public RoomCompReloadListener(String folder) {
 			super(folder, "cmp");
+			loadedRooms = new ArrayList<>();
+			MinecraftForge.EVENT_BUS.register(this);
+			
+			if (lastInstance != null) {
+				MinecraftForge.EVENT_BUS.unregister(lastInstance);
+			}
+			lastInstance = this;
 		}
 		
 		@Override
@@ -417,12 +314,12 @@ public class RoomBlueprintRegistry {
 		protected void loadComp(ResourceLocation comp, Map<String, CompoundNBT> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 			long start;
 			long now;
-			final RoomBlueprintRegistry loader = RoomBlueprintRegistry.instance();
+			final DungeonRoomLoader loader = DungeonRoomLoader.instance();
 			
 			// Verification above means we should always have a root. Load that directly as first room
 			LoadContext context = new LoadContext(comp.toString(), ROOM_ROOT_ID);
 			start = System.currentTimeMillis();
-			RoomBlueprint root = loader.loadAndRegisterFromNBT(context, comp, data.get(ROOM_ROOT_ID));
+			DungeonRoomEntry root = loader.loadEntryFromNBT(context, comp, data.get(ROOM_ROOT_ID));
 			now = System.currentTimeMillis();
 			if ((now-start) > 100) {
 				NostrumMagica.logger.warn("Took " + (now-start) + "ms to load root for " + comp);
@@ -439,7 +336,7 @@ public class RoomBlueprintRegistry {
 					context = new LoadContext(comp.toString(), compRow.getKey());
 					
 					start = System.currentTimeMillis();
-					RoomBlueprint piece = loader.loadRoomFromNBT(context, compRow.getValue());
+					Blueprint piece = loader.loadBlueprintFromNBT(context, compRow.getValue());
 					now = System.currentTimeMillis();
 					
 					if (now - start > 100) {
@@ -447,18 +344,20 @@ public class RoomBlueprintRegistry {
 					}
 					
 					start = System.currentTimeMillis();
-					root = root.join(piece);
+					root.blueprint = root.blueprint.join(piece);
 					now = System.currentTimeMillis();
 					if ((now-start) > 100) {
 						NostrumMagica.logger.warn("Took " + (now-start) + "ms to merge in " + comp + "/" + compRow.getKey());
 					}
 				}
+				this.loadedRooms.add(root);
 			}
 		}
 
 		@Override
 		public void apply(Map<ResourceLocation, Map<String, CompoundNBT>> data, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 			// For each comp grouping...
+			loadedRooms.clear();
 			NostrumMagica.logger.info("Loading {} room blueprint compositions", data.size());
 			int pieceCount = 0;
 			
@@ -489,6 +388,16 @@ public class RoomBlueprintRegistry {
 				return path.substring(0, idx);
 			}
 		}
+		
+		@SubscribeEvent
+		public final void onRoomRegistration(DungeonRoomRegisterEvent event) {
+			DungeonRoomRegistry registry = event.getRegistry();
+			
+			// Blueprint Rooms
+			for (DungeonRoomEntry entry : loadedRooms) {
+				registry.register(entry.name, new BlueprintDungeonRoom(entry.id, entry.blueprint), entry.weight, entry.cost, entry.tags);;
+			}
+		}
 	}
 	
 	private static final class ReloadListenerData {
@@ -496,12 +405,12 @@ public class RoomBlueprintRegistry {
 		public Map<ResourceLocation, Map<String, CompoundNBT>> compData;
 	}
 	
-	public static class RoomBlueprintReloadListener extends ReloadListener<ReloadListenerData> {
+	public static class BlueprintReloadListener extends ReloadListener<ReloadListenerData> {
 		
 		private final RoomReloadListener roomListener;
 		private final RoomCompReloadListener compListener;
 		
-		public RoomBlueprintReloadListener(String folder) {
+		public BlueprintReloadListener(String folder) {
 			roomListener = new RoomReloadListener(folder);
 			compListener = new RoomCompReloadListener(folder);
 		}
@@ -509,10 +418,8 @@ public class RoomBlueprintRegistry {
 		@Override
 		protected ReloadListenerData prepare(IResourceManager resourceManagerIn, IProfiler profilerIn) {
 			final ReloadListenerData data = new ReloadListenerData();
-			final RoomBlueprintRegistry loader = RoomBlueprintRegistry.instance();
 			
-			// The reason I am writing this class: clear out the loader once before any type of room loading
-			loader.clear();
+			// Note: this whole class is here so that after applying, we can trigger a dungeon room reload.
 			
 			// This serializes these two operations instead of them happening in parallel :(
 			data.roomData = this.roomListener.prepare(resourceManagerIn, profilerIn);

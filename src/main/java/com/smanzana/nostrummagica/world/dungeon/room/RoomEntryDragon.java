@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
@@ -290,5 +291,15 @@ public class RoomEntryDragon extends StaticRoom {
 	@Override
 	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
 		super.spawn(world, start, bounds, dungeonID);
+	}
+
+	@Override
+	public List<String> getRoomTags() {
+		return Lists.newArrayList(); // no tags; don't auto place anywhere!
+	}
+
+	@Override
+	public String getRoomName() {
+		return "A Cagey Beginning";
 	}
 }

@@ -20,7 +20,7 @@ public interface IBlueprint {
 	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds, @Nullable IBlueprintBlockPlacer spawner);
 	
 	public BlueprintLocation getEntry();
-	
+
 	/**
 	 * Returns a preview of the blueprint centered around the blueprint entry point.
 	 * Note that the preview is un-rotated. You must rotate yourself if you want that.

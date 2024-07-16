@@ -406,4 +406,16 @@ public abstract class StaticRoom implements IDungeonRoom {
 		
 		return new MutableBoundingBox(corner1.getPos(), corner2.getPos());
 	}
+	
+	public int getRoomWeight() {
+		return 1;
+	}
+	
+	public int getRoomCost() {
+		return 1;
+	}
+	
+	public abstract List<String> getRoomTags();
+	
+	public abstract String getRoomName();
 }

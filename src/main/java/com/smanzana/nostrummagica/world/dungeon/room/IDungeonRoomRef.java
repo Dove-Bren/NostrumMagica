@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRecord;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -157,10 +158,10 @@ public interface IDungeonRoomRef<T extends IDungeonRoom> extends IDungeonRoom {
 		@SuppressWarnings("unchecked")
 		@Override
 		public @Nullable T getUnchecked() {
-			@Nullable IDungeonRoom raw = DungeonRoomRegistry.GetInstance().getRegisteredRoom(this.roomID);
+			@Nullable DungeonRoomRecord raw = DungeonRoomRegistry.GetInstance().getRegisteredRoom(this.roomID);
 			if (raw != null) {
 				try {
-					return (T) raw;
+					return (T) raw.room;
 				} catch (ClassCastException e) {
 					;
 				}

@@ -1,8 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry.RoomBlueprintRecord;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRegisterEvent;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonLobbyRoomRef;
 import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
@@ -55,26 +53,24 @@ public class NostrumDungeonRooms {
 	public static final void onRoomRegistration(DungeonRoomRegisterEvent event) {
 		DungeonRoomRegistry registry = event.getRegistry();
 		
-		// Blueprint Rooms
-		for (RoomBlueprintRecord record : RoomBlueprintRegistry.instance().getAllRooms()) {
-			registry.register(new BlueprintDungeonRoom(record.id));
-		}
-		
 		// Static Rooms
-		registry.register(new DragonLobby());
-		registry.register(new RoomChallenge1());
-		registry.register(new RoomChallenge2());
-		registry.register(new RoomEnd1(false, false));
-		registry.register(new RoomEnd1(false, true));
-		registry.register(new RoomEnd1(true, false));
-		registry.register(new RoomEnd1(true, true));
-		registry.register(new RoomEntryDragon(false));
-		registry.register(new RoomExtendedEntranceStaircase(false));
-		registry.register(new RoomGrandStaircase());
-		registry.register(new RoomJail1());
-		registry.register(new RoomLectern());
-		registry.register(new RoomRedDragonArena());
-		registry.register(new RoomTee1());
-
+		registerStaticRoom(registry, new DragonLobby());
+		registerStaticRoom(registry, new RoomChallenge1());
+		registerStaticRoom(registry, new RoomChallenge2());
+		registerStaticRoom(registry, new RoomEnd1(false, false));
+		registerStaticRoom(registry, new RoomEnd1(false, true));
+		registerStaticRoom(registry, new RoomEnd1(true, false));
+		registerStaticRoom(registry, new RoomEnd1(true, true));
+		registerStaticRoom(registry, new RoomEntryDragon(false));
+		registerStaticRoom(registry, new RoomExtendedEntranceStaircase(false));
+		registerStaticRoom(registry, new RoomGrandStaircase());
+		registerStaticRoom(registry, new RoomJail1());
+		registerStaticRoom(registry, new RoomLectern());
+		registerStaticRoom(registry, new RoomRedDragonArena());
+		registerStaticRoom(registry, new RoomTee1());
+	}
+	
+	protected static final void registerStaticRoom(DungeonRoomRegistry registry, StaticRoom room) {
+		registry.register(room.getRoomName(), room, room.getRoomWeight(), room.getRoomCost(), room.getRoomTags());
 	}
 }

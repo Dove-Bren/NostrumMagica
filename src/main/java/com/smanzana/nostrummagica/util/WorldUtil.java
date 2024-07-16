@@ -95,8 +95,8 @@ public class WorldUtil {
 			final int startZ = (chunkZ == beginChunkZ ? beginChunkOffsetZ : 0);
 			final int endX = (chunkX == endChunkX ? endChunkOffsetX : 16);
 			final int endZ = (chunkZ == endChunkZ ? endChunkOffsetZ : 16);
-			for (int iterX = startX; iterX < endX; iterX++)
-			for (int iterZ = startZ; iterZ < endZ; iterZ++)
+			for (int iterX = startX; iterX <= endX; iterX++)
+			for (int iterZ = startZ; iterZ <= endZ; iterZ++)
 			for (int iterY = min.getY(); iterY <= max.getY(); iterY++) {
 				final int x = (baseX + iterX);
 				final int z = (baseZ + iterZ);

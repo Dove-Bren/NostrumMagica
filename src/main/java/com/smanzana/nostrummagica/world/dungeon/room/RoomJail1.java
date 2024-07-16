@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LadderBlock;
@@ -389,6 +390,16 @@ public class RoomJail1 extends StaticRoom {
 				NostrumDungeon.asRotated(start,
 						new BlockPos(6, 4, 11),
 						Direction.SOUTH));
+	}
+
+	@Override
+	public List<String> getRoomTags() {
+		return Lists.newArrayList(NostrumDungeons.TAG_DRAGON, NostrumDungeons.TAG_PLANTBOSS, NostrumDungeons.TAG_PORTAL);
+	}
+
+	@Override
+	public String getRoomName() {
+		return "Golem Jail";
 	}
 	
 }

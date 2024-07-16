@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -190,5 +191,15 @@ public class DragonLobby extends StaticRoom implements IDungeonLobbyRoom {
 		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		return list;
+	}
+
+	@Override
+	public List<String> getRoomTags() {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public String getRoomName() {
+		return "Red Lobby";
 	}
 }

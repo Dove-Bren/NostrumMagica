@@ -2,23 +2,28 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.tile.IUniqueBlueprintTileEntity;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintBlock;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintSpawnContext;
 import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry.RoomBlueprintRecord;
+import com.smanzana.nostrummagica.world.blueprints.IBlueprintBlockPlacer;
 import com.smanzana.nostrummagica.world.dungeon.LootUtil;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,56 +32,91 @@ import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 
 /**
- * Room where all blocks are loaded from a file at startup.
+ * Room where the room structure is a blueprint.
  * @author Skyler
  *
  */
 public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 	
-	private final ResourceLocation roomID;
-	private final List<BlueprintLocation> chestsRelative;
-	private RoomBlueprintRecord _cachedRoom; // Only reason for this still is because dungeons have instances hardcodedin them.
-											 // But if they took resource locations and/or wrappers, this isn't needed and only
-											 // once instance could exist (in DungeonRoomRegistry) and anything that wanted it
-											 // could get it by doing a lookup.
-											 // Wrapper could be typed for when start rooms vs non-start rooms are needed, etc.
-	
-	public BlueprintDungeonRoom(ResourceLocation roomID) {
-		this.roomID = roomID;
+	protected static class BlueprintDungeonRoomPlacer implements IBlueprintBlockPlacer {
+
+		private final UUID dungeonID;
+		private final UUID roomID;
 		
-		if (roomID == null) {
-			throw new RuntimeException("Blueprint null when creating LoadedRoom. Wrong room name looked up, or too early?");
+		public BlueprintDungeonRoomPlacer(UUID dungeonID, UUID roomID) {
+			this.dungeonID = dungeonID;
+			this.roomID = roomID;
+		}
+
+		@Override
+		public boolean spawnBlock(BlueprintSpawnContext context, BlockPos pos, Direction direction, BlueprintBlock block) {
+			return false; // do regular BP spawning
 		}
 		
-		chestsRelative = new ArrayList<>();
-	}
-	
-	protected RoomBlueprintRecord getRoomRecord() {
-		RoomBlueprintRecord current = RoomBlueprintRegistry.instance().getRoomRecord(roomID);
-		if (current != this._cachedRoom) {
-			this._cachedRoom = current;
-			parseRoom(current.blueprint);
-		}
-		return current;
-	}
-	
-	protected RoomBlueprint getBlueprint() {
-		return getRoomRecord().blueprint;
-	}
-	
-	protected void parseRoom(RoomBlueprint blueprint) {
-		chestsRelative.clear();
-		
-		// Find and save chest locations
-		blueprint.scanBlocks((offset, block) -> {
-			BlockState state = block.getSpawnState(blueprint.getEntry().getFacing()); 
-			if (state != null && state.getBlock() == Blocks.CHEST) {
-				chestsRelative.add(new BlueprintLocation(offset, state.get(ChestBlock.FACING)));
+		@Override
+		public void finalizeBlock(BlueprintSpawnContext context, BlockPos pos, BlockState placedState, @Nullable TileEntity te, Direction direction, BlueprintBlock block) {
+			if (te != null) {
+				if (te instanceof IUniqueBlueprintTileEntity) {
+					((IUniqueBlueprintTileEntity) te).onRoomBlueprintSpawn(dungeonID, roomID, context.isWorldGen);
+				}
 			}
-		});
+		}
 	}
 	
-	// Need to have some sort of 'exit point' placeholder block so that I can encode doorways into the blueprint
+	private final ResourceLocation id;
+	private final IBlueprint blueprint;
+	private final Set<BlueprintLocation> doors;
+	private final List<BlueprintLocation> largeKeySpots;
+	private @Nullable BlueprintLocation largeKeyDoor;
+	private final List<BlueprintLocation> chestsRelative;
+	
+	public BlueprintDungeonRoom(ResourceLocation id, Blueprint blueprint) {
+		this.id = id;
+		this.blueprint = blueprint;
+		this.doors = new HashSet<>();
+		this.largeKeySpots = new ArrayList<>();
+		this.largeKeyDoor = null;
+		this.chestsRelative = new ArrayList<>();
+		
+		blueprint.scanBlocks(this::parseRoom);
+	}
+	
+	private static boolean debugConnections = false;
+
+	protected BlueprintBlock parseRoom(BlockPos offset, BlueprintBlock block) {
+		BlockState state = block.getSpawnState(blueprint.getEntry().getFacing()); 
+		if (state != null && state.getBlock() == Blocks.CHEST) {
+			chestsRelative.add(new BlueprintLocation(offset, state.get(ChestBlock.FACING)));
+		}
+		
+		if (block.isDoorIndicator()) {
+			doors.add(new BlueprintLocation(offset, block.getFacing().getOpposite()));
+			if (!debugConnections) {
+				block = BlueprintBlock.Air; // Make block an air one
+			}
+		} else if (block.isEntry()) {
+			if (!debugConnections && offset.equals(BlockPos.ZERO)) {
+				// Clear out any comparator that's there from capturing still
+				block = BlueprintBlock.Air;
+			}
+		} else if (block.isLargeKeySpot()) {
+			largeKeySpots.add(new BlueprintLocation(offset, block.getFacing()));
+			if (!debugConnections) {
+				block = BlueprintBlock.Air; // Make block into an air one. Could make it a chest...
+			}
+		} else if (block.isLargeKeyDoor()) {
+			if (this.largeKeyDoor != null) {
+				NostrumMagica.logger.error("Found multiple large dungeon doors in room while parsing blueprint!");
+			}
+			this.largeKeyDoor = new BlueprintLocation(offset, block.getFacing());
+		}
+		
+		return block;
+	}
+	
+	protected IBlueprint getBlueprint() {
+		return blueprint;
+	}
 	
 	@Override
 	public boolean canSpawnAt(IWorld world, BlueprintLocation start) {
@@ -105,9 +145,10 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 	
 	@Override
 	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
+		final BlueprintDungeonRoomPlacer placer = new BlueprintDungeonRoomPlacer(UUID.randomUUID(), dungeonID);
+		getBlueprint().spawn(world, start.getPos(), start.getFacing(), bounds, placer);
+
 		// See note about dungeon vs blueprint facing in @getExits
-		getBlueprint().spawn(world, start.getPos(), start.getFacing(), bounds, null, dungeonID);
-		
 		List<BlueprintLocation> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
 		for (BlueprintLocation lootSpot : loots) {
@@ -126,13 +167,12 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 
 	@Override
 	public int getNumExits() {
-		Collection<BlueprintLocation> exits = getBlueprint().getExits();
-		return exits == null ? 0 : exits.size();
+		return doors.size();
 	}
 
 	@Override
 	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		Collection<BlueprintLocation> exits = getBlueprint().getExits();
+		Collection<BlueprintLocation> exits = doors;
 		
 		// Dungeon notion of direction is backwards to blueprints:
 		// Dungeon wants facing to be you looking back through the door
@@ -146,7 +186,15 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 		if (exits != null) {
 			ret = new ArrayList<>(exits.size());
 			for (BlueprintLocation door : exits) {
+				
+//				final BlueprintLocation relative = NostrumDungeon.asRotated(start, door.getPos(), door.getFacing()); 
+//				ret.add(relative);
+				
 				ret.add(BlueprintToRoom(door, getBlueprint().getEntry(), start));
+				
+				
+				
+				
 //				Direction doorDir = door.getFacing();
 //				int times = (modDir.getHorizontalIndex() + 2) % 4;
 //				while (times-- > 0) {
@@ -172,26 +220,25 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 
 	@Override
 	public boolean supportsDoor() {
-		return getBlueprint().getLargeDoorLocation() != null;
+		return largeKeyDoor != null;
 	}
 	
 	@Override
 	public BlueprintLocation getDoorLocation(BlueprintLocation start) {
-		final RoomBlueprint blueprint = getBlueprint();
-		BlueprintLocation orig = blueprint.getLargeDoorLocation();
-		return BlueprintToRoom(orig, blueprint.getEntry(), start);
+		return BlueprintToRoom(largeKeyDoor, blueprint.getEntry(), start);
+		//return NostrumDungeon.asRotated(start, largeKeyDoor.getPos(), largeKeyDoor.getFacing());
 	}
 
 	@Override
 	public boolean supportsKey() {
-		return !getBlueprint().getLargeKeySpots().isEmpty();
+		return !largeKeySpots.isEmpty();
 	}
 
 	@Override
 	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
-		final RoomBlueprint blueprint = getBlueprint();
-		BlueprintLocation orig = blueprint.getLargeKeySpots().iterator().next();
+		BlueprintLocation orig = largeKeySpots.get(0);
 		return BlueprintToRoom(orig, blueprint.getEntry(), start);
+		//return NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing());
 	}
 	
 	@Override
@@ -233,8 +280,9 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 		{
 			List<BlueprintLocation> ret = new ArrayList<>();
 			for (BlueprintLocation orig : chestsRelative) {
-				final BlueprintLocation relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
-				ret.add(relative);
+				//final BlueprintLocation relative = NostrumDungeon.asRotated(start, orig.getPos(), orig.getFacing().getOpposite()); 
+				//ret.add(relative);
+				ret.add(BlueprintToRoom(orig, blueprint.getEntry(), start));
 			}
 			return ret;
 		}
@@ -242,7 +290,7 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 	
 	@Override
 	public MutableBoundingBox getBounds(BlueprintLocation entry) {
-		final RoomBlueprint blueprint = getBlueprint();
+		final IBlueprint blueprint = getBlueprint();
 		BlockPos dims = blueprint.getAdjustedDimensions(entry.getFacing());
 		BlockPos offset = blueprint.getAdjustedOffset(entry.getFacing());
 		
@@ -275,7 +323,7 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 	
 	@Override
 	public ResourceLocation getRoomID() {
-		return this.getRoomRecord().id;
+		return id;
 	}
 	
 	protected static final BlueprintLocation BlueprintToRoom(BlueprintLocation blueprintPoint, BlueprintLocation blueprintEntry, BlueprintLocation start) {

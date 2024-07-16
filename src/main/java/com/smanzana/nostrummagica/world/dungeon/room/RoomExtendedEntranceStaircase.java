@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -190,5 +191,15 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 		}
 		
 		return bounds;
+	}
+
+	@Override
+	public List<String> getRoomTags() {
+		return new ArrayList<>(); // don't autoplace anywhere
+	}
+
+	@Override
+	public String getRoomName() {
+		return "Descent";
 	}
 }

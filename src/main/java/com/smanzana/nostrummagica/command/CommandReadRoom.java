@@ -3,15 +3,14 @@ package com.smanzana.nostrummagica.command;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.item.PositionCrystal;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint;
 import com.smanzana.nostrummagica.world.blueprints.Blueprint.LoadContext;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -52,9 +51,9 @@ public class CommandReadRoom {
 			context.getSource().sendFeedback(new StringTextComponent("You must be holding a filled geogem in your main hand"), true);
 		} else {
 			
-			File file = new File("./NostrumMagicaData/dungeon_room_captures/" + name + ".dat");
+			File file = new File("./NostrumMagicaData/room_blueprint_captures/" + name + ".dat");
 			if (!file.exists()) {
-				file = new File("./NostrumMagicaData/dungeon_room_captures/" + name + ".gat");
+				file = new File("./NostrumMagicaData/room_blueprint_captures/" + name + ".gat");
 			}
 			if (file.exists()) {
 				CompoundNBT nbt = null;
@@ -73,9 +72,9 @@ public class CommandReadRoom {
 				}
 				
 				if (nbt != null) {
-					RoomBlueprint blueprint = RoomBlueprint.FromNBT(new LoadContext(file.getAbsolutePath()), (CompoundNBT) nbt.get("blueprint"));
+					Blueprint blueprint = Blueprint.FromNBT(new LoadContext(file.getAbsolutePath()), (CompoundNBT) nbt.get("blueprint"));
 					if (blueprint != null) {
-						blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing, null, null, UUID.randomUUID());
+						blueprint.spawn(player.world, PositionCrystal.getBlockPosition(main), facing, null, null);
 					} else {
 						context.getSource().sendFeedback(new StringTextComponent("Room failed to load"), true);
 					}

@@ -44,34 +44,16 @@ public class Blueprint implements IBlueprint {
 		}
 	}
 	
-	public static class SpawnContext {
-		
-		public final IWorld world;
-		public final BlockPos at;
-		public final Direction direction;
-		public final @Nullable MutableBoundingBox bounds;
-		public final @Nullable IBlueprintBlockPlacer placer; // Overriding block spawner interface
-		
-		public SpawnContext(IWorld world, BlockPos pos, Direction direction, @Nullable MutableBoundingBox bounds, @Nullable IBlueprintBlockPlacer placer) {
-			this.world = world;
-			this.at = pos;
-			this.direction = direction;
-			this.bounds = bounds;
-			this.placer = placer;
-		}
-		
-		public SpawnContext(IWorld world, BlockPos pos, Direction direction, @Nullable MutableBoundingBox bounds) {
-			this(world, pos, direction, bounds, null);
-		}
-	}
-	
 	protected static class CaptureContext {
+		public final Blueprint blueprint;
+		public final IWorld world;
 		public final BlockPos pos1;
 		public final BlockPos pos2;
 		public final @Nullable BlueprintLocation origin;
 		
-		public CaptureContext(BlockPos pos1, BlockPos pos2, BlueprintLocation origin) {
-			super();
+		public CaptureContext(Blueprint blueprint, IWorld world, BlockPos pos1, BlockPos pos2, BlueprintLocation origin) {
+			this.blueprint = blueprint;
+			this.world = world;
 			this.pos1 = pos1;
 			this.pos2 = pos2;
 			this.origin = origin;
@@ -115,7 +97,7 @@ public class Blueprint implements IBlueprint {
 	}
 	
 	protected CaptureContext makeCaptureContext(IWorld world, BlockPos pos1, BlockPos pos2, @Nullable BlueprintLocation origin) {
-		return new CaptureContext(pos1, pos2, origin);
+		return new CaptureContext(this, world, pos1, pos2, origin);
 	}
 	
 	protected BlueprintBlock captureBlock(CaptureContext context, IWorld world, BlockPos pos) {
@@ -226,26 +208,24 @@ public class Blueprint implements IBlueprint {
 		return false;
 	}
 	
-	protected void fixupTileEntity(TileEntity te, Direction direction, SpawnContext context, boolean worldGen) {
+	protected void fixupTileEntity(TileEntity te, Direction direction, BlueprintSpawnContext context) {
 		if (te instanceof IOrientedTileEntity) {
 			// Let tile ent respond to rotation
-			((IOrientedTileEntity) te).setSpawnedFromRotation(direction, worldGen);
+			((IOrientedTileEntity) te).setSpawnedFromRotation(direction, context.isWorldGen);
 		}
 	}
 	
-	protected void placeBlock(SpawnContext context, BlockPos at, Direction direction, BlueprintBlock block) {
+	protected void placeBlock(BlueprintSpawnContext context, BlockPos at, Direction direction, BlueprintBlock block) {
+		BlockState placeState;
+		TileEntity te = null;
 		
-		final boolean worldGen = WorldUtil.IsWorldGen(context.world);
-		
-		if (context.placer != null) {
-			context.placer.spawnBlock(context, at, direction, block);
-		} else {
-			BlockState placeState = block.getSpawnState(direction);
+		if (context.placer == null || !context.placer.spawnBlock(context, at, direction, block)) {
+			placeState = block.getSpawnState(direction);
 			if (placeState != null) {
 				// TODO: add fluid state support
 				context.world.setBlockState(at, placeState, 2);
 				if (WorldUtil.blockNeedsGenFixup(block.getState())) {
-					if (worldGen) {
+					if (context.isWorldGen) {
 						context.world.getChunk(at).markBlockForPostprocessing(at);
 					} else {
 						BlockState blockstate = context.world.getBlockState(at);
@@ -256,37 +236,47 @@ public class Blueprint implements IBlueprint {
 				
 				CompoundNBT tileEntityData = block.getTileEntityData();
 				if (tileEntityData != null) {
-					TileEntity te = TileEntity.readTileEntity(placeState, tileEntityData.copy());
+					te = TileEntity.readTileEntity(placeState, tileEntityData.copy());
 					
 					if (te != null) {
-						if (worldGen || !(context.world instanceof IServerWorld)) {
+						if (context.isWorldGen || !(context.world instanceof IServerWorld)) {
 							context.world.getChunk(at).addTileEntity(at, te);
 						} else {
 							((IServerWorld) context.world).getWorld().setTileEntity(at, te);
 						}
-						this.fixupTileEntity(te, direction, context, worldGen);
+						this.fixupTileEntity(te, direction, context);
 					} else {
 						NostrumMagica.logger.error("Could not deserialize TileEntity with id \"" + tileEntityData.getString("id") + "\"");
 					}
 				}
 			} else {
 				//world.removeBlock(at, false);
-				context.world.setBlockState(at, Blocks.AIR.getDefaultState(), 2);
+				placeState = Blocks.AIR.getDefaultState();
+				context.world.setBlockState(at, placeState, 2);
 			}
+		} else {
+			// placer handled placement. Do slower lookup of what happened
+			placeState = context.world.getBlockState(at);
+			te = context.world.getTileEntity(at);
+		}
+		
+		if (context.placer != null) {
+			context.placer.finalizeBlock(context, at, placeState, te, direction, block);
 		}
 	}
 	
-	protected SpawnContext makeContext(IWorld world, BlockPos at, Direction direction, MutableBoundingBox bounds, IBlueprintBlockPlacer placer) {
-		return new SpawnContext(world, at, direction, bounds, placer);
+	protected BlueprintSpawnContext makeContext(IWorld world, BlockPos at, Direction direction, boolean isWorldGen, MutableBoundingBox bounds, IBlueprintBlockPlacer placer) {
+		return new BlueprintSpawnContext(world, at, direction, isWorldGen, bounds, placer);
 	}
 	
 	@Override
 	public void spawn(IWorld world, BlockPos at, Direction direction, @Nullable MutableBoundingBox bounds, @Nullable IBlueprintBlockPlacer placer) {
-		SpawnContext context = makeContext(world, at, direction, bounds, placer);
+		final boolean worldGen = WorldUtil.IsWorldGen(world);
+		BlueprintSpawnContext context = makeContext(world, at, direction, worldGen, bounds, placer);
 		spawnWithContext(context);
 	}
 	
-	protected void spawnWithContext(SpawnContext context) {
+	protected void spawnWithContext(BlueprintSpawnContext context) {
 		
 		final int width = dimensions.getX();
 		final int height = dimensions.getY();
@@ -455,7 +445,7 @@ public class Blueprint implements IBlueprint {
 	public BlueprintBlock[][][] getPreview() {
 		return this.previewBlocks;
 	}
-	
+
 	/**
 	 * Adds one blueprint to the other. Returns the original blueprint modified to include blocks from the other.
 	 * This SHOULD be compatible with completely different blueprints.
@@ -511,10 +501,11 @@ public class Blueprint implements IBlueprint {
 		for (int j = 0; j < height; j++)
 		for (int k = 0; k < length; k++) {
 			BlockPos offsetOrigOrient = new BlockPos(i, j, k).subtract(origin);
-			BlockPos offsetNorthOrient = IBlueprint.ApplyRotation(offsetOrigOrient, 
-						IBlueprint.GetModDir(Direction.NORTH, this.entry.getFacing())
-					); // rotate to north
-			scanner.scan(offsetNorthOrient, blocks[slot++]);
+//			BlockPos offsetNorthOrient = IBlueprint.ApplyRotation(offsetOrigOrient, 
+//						IBlueprint.GetModDir(Direction.NORTH, this.entry.getFacing())
+//					); // rotate to north
+			final int blockIdx = slot++;
+			blocks[blockIdx] = scanner.scan(offsetOrigOrient, blocks[blockIdx]);
 		}
 	}
 	
@@ -721,5 +712,4 @@ public class Blueprint implements IBlueprint {
 		public boolean hasNext();
 		
 	}
-	
 }

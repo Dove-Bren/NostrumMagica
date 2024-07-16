@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWallTorchBlock;
@@ -360,5 +361,15 @@ public class RoomLectern extends StaticRoom {
 				}
 			}
 		}
+	}
+
+	@Override
+	public List<String> getRoomTags() {
+		return Lists.newArrayList(NostrumDungeons.TAG_DRAGON, NostrumDungeons.TAG_PLANTBOSS, NostrumDungeons.TAG_PORTAL);
+	}
+
+	@Override
+	public String getRoomName() {
+		return "Magic Lectern";
 	}
 }

@@ -11,8 +11,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.util.DimensionUtils;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
 
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.PortalInfo;
@@ -57,18 +57,18 @@ public class NostrumSorceryDimension {
 	}
 	
 	private static final class DungeonSpawner {
-		private static RoomBlueprint lobbyBlueprint = null;
-		private static RoomBlueprint wholeBlueprint = null;
+		private static DungeonRoomRef lobbyBlueprint = null;
+		private static DungeonRoomRef wholeBlueprint = null;
 		
 		private static void initBlueprints() {
-			lobbyBlueprint = RoomBlueprintRegistry.instance().getRoom(DIMENSION_ENTRY_TEMPLATE);
-			wholeBlueprint = RoomBlueprintRegistry.instance().getRoom(DIMENSION_WHOLE_TEMPLATE);
+			lobbyBlueprint = new DungeonRoomRef(DIMENSION_ENTRY_TEMPLATE);
+			wholeBlueprint = new DungeonRoomRef(DIMENSION_WHOLE_TEMPLATE);
 			
-			if (lobbyBlueprint == null) {
+			if (!lobbyBlueprint.isValid()) {
 				NostrumMagica.logger.fatal("Failed to load sorcery lobby from name " + DIMENSION_ENTRY_TEMPLATE);
 			}
 			
-			if (wholeBlueprint == null) {
+			if (!wholeBlueprint.isValid()) {
 				NostrumMagica.logger.fatal("Failed to load sorcery dungeon from name " + DIMENSION_WHOLE_TEMPLATE);
 			}
 		}
@@ -79,11 +79,11 @@ public class NostrumSorceryDimension {
 			}
 			
 			long startTime = System.currentTimeMillis();
-			lobbyBlueprint.spawn(world, center, Direction.NORTH, null, null, dungeonID);
+			lobbyBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
 			
 			startTime = System.currentTimeMillis();
-			wholeBlueprint.spawn(world, center, Direction.NORTH, null, null, dungeonID);
+			wholeBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
 			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
 		}
 		

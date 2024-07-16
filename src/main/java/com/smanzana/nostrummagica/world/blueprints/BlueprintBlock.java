@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.DirectionalBlock;
 import net.minecraft.block.HorizontalBlock;
@@ -47,7 +48,11 @@ public class BlueprintBlock {
 		}
 		
 		if (block == null) {
-			block = new BlueprintBlock(state, teData);
+			if (state == null || state.getBlock() == Blocks.AIR) {
+				block = Air;
+			} else {
+				block = new BlueprintBlock(state, teData);
+			}
 			if (teData == null) {
 				SET_BLUEPRINT_CACHE(state, block);
 			}
@@ -83,13 +88,11 @@ public class BlueprintBlock {
 		}
 	}
 	
-	public static BlueprintBlock MakeFromData(BlockState state, CompoundNBT teData) {
-		return new BlueprintBlock(state, teData);
-	}
+//	public static BlueprintBlock MakeFromData(BlockState state, CompoundNBT teData) {
+//		return new BlueprintBlock(state, teData);
+//	}
 	
-	public static BlueprintBlock Air() {
-		return new BlueprintBlock((BlockState) null, null);
-	}
+	public static BlueprintBlock Air = new BlueprintBlock((BlockState) null, null);
 	
 	private static final String NBT_TILE_ENTITY = "te_data";
 	private static final String NBT_BLOCKSTATE_TAG = "blockstate";
@@ -219,6 +222,12 @@ public class BlueprintBlock {
 					Direction cur = placeState.get(IDirectionalBlock.FACING);
 					cur = rotate(cur, facing);
 					placeState = placeState.with(IDirectionalBlock.FACING, cur);
+				} else if (block instanceof ChestBlock) {
+					// Doesn't implement directional interfaces
+					// Only want to rotate horizontally
+					Direction cur = placeState.get(ChestBlock.FACING);
+					cur = rotate(cur, facing);
+					placeState = placeState.with(ChestBlock.FACING, cur);
 				}
 			}
 			

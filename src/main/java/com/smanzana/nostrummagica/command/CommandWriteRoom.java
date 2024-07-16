@@ -8,13 +8,19 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.item.PositionCrystal;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprintRegistry;
-import com.smanzana.nostrummagica.world.blueprints.RoomBlueprint;
+import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.world.blueprints.Blueprint;
+import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomLoader;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ComparatorBlock;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
 public class CommandWriteRoom {
@@ -60,12 +66,33 @@ public class CommandWriteRoom {
 			return 1;
 		}
 		
-		RoomBlueprint blueprint = RoomBlueprint.Capture(player.world,
-				PositionCrystal.getBlockPosition(main),
-				PositionCrystal.getBlockPosition(offhand),
-				null);
+		final BlockPos pos1 = PositionCrystal.getBlockPosition(main);
+		final BlockPos pos2 = PositionCrystal.getBlockPosition(offhand);
+		final BlockPos minPos = new BlockPos(Math.min(pos1.getX(), pos2.getX()),
+				Math.min(pos1.getY(), pos2.getY()),
+				Math.min(pos1.getZ(), pos2.getZ()));
+		final BlockPos maxPos = new BlockPos(Math.max(pos1.getX(), pos2.getX()),
+				Math.max(pos1.getY(), pos2.getY()),
+				Math.max(pos1.getZ(), pos2.getZ()));
+		BlueprintLocation[] foundEntry = {null};
 		
-		if (RoomBlueprintRegistry.instance().writeRoomAsFile(blueprint, name, weight, cost, new LinkedList<>())) {
+		// Look for entry marker
+		WorldUtil.ScanBlocks(player.world, minPos, maxPos, (world, pos) -> {
+			BlockState state = world.getBlockState(pos);
+			System.out.println("Checking " + state);
+			if (state != null && state.getBlock() == Blocks.COMPARATOR) {
+				foundEntry[0] = new BlueprintLocation(pos.toImmutable().subtract(minPos), state.get(ComparatorBlock.HORIZONTAL_FACING).getOpposite());
+				return false;
+			}
+			
+			return true;
+		});
+		
+		Blueprint blueprint = Blueprint.Capture(player.world,
+				minPos, maxPos,
+				foundEntry[0]);
+		
+		if (DungeonRoomLoader.instance().writeRoomAsFile(blueprint, name, weight, cost, new LinkedList<>())) {
 			context.getSource().sendFeedback(new StringTextComponent("Room written!"), true);
 		} else {
 			context.getSource().sendFeedback(new StringTextComponent("An error was encountered while writing the room"), true);
