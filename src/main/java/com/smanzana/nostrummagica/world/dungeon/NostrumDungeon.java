@@ -146,8 +146,12 @@ public class NostrumDungeon {
 			return new ArrayList<>();
 		}
 		
-		int unused; // This is still putting large key doors before the boss room even when supportsPuzzle is false
 		final boolean supportsPuzzle = (!context.keyRooms.isEmpty() && !context.doorRooms.isEmpty());
+		
+		if (!supportsPuzzle) {
+			// Signal to generation not to place a key door by clearing out pool of key doors dooms
+			context.doorRooms.clear();
+		}
 		
 		Path startPath = new Path(new DungeonRoomInstance(start, this.starting.getLobby(), false, false, instance, MakeNewRoomID(context))); // Note: false means starting won't ever have key
 		
@@ -835,7 +839,7 @@ public class NostrumDungeon {
 				
 				// If we will need a key door, select that FIRST on every step to get a cost.
 				// Then if there is still leftover remaining, generate a cont with that.
-				if (ending != null) {
+				if (ending != null && !context.doorRooms.isEmpty()) {
 					IDungeonRoom doorRoom = pickRandomDoorRoom(context, entry, remaining);
 					if (doorRoom.getRoomCost() >= remaining) {
 						// Has to be door room
