@@ -11,6 +11,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.tile.IUniqueBlueprintTileEntity;
 import com.smanzana.nostrummagica.world.blueprints.Blueprint;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintBlock;
@@ -81,6 +83,27 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 		blueprint.scanBlocks(this::parseRoom);
 	}
 	
+	// TODO: move these out of here
+	public static boolean IsDoorIndicator(BlockState state) {
+		return state != null && state.getBlock() == Blocks.REPEATER;
+	}
+	
+	public static boolean IsEntry(BlockState state) {
+		return state != null && state.getBlock() == Blocks.COMPARATOR;
+	}
+	
+	public static boolean IsLargeKeySpot(BlockState state) {
+		return state != null
+				&& state.getBlock() == NostrumBlocks.largeDungeonKeyChest
+				&& !state.get(DungeonKeyChestBlock.Large.SLAVE);
+	}
+	
+	public static boolean IsLargeKeyDoor(BlockState state) {
+		return state != null
+				&& state.getBlock() == NostrumBlocks.largeDungeonDoor
+				&& NostrumBlocks.largeDungeonDoor.isMaster(state);
+	}
+	
 	private static boolean debugConnections = false;
 
 	protected BlueprintBlock parseRoom(BlockPos offset, BlueprintBlock block) {
@@ -89,22 +112,22 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 			chestsRelative.add(new BlueprintLocation(offset, state.get(ChestBlock.FACING)));
 		}
 		
-		if (block.isDoorIndicator()) {
+		if (IsDoorIndicator(block.getState())) {
 			doors.add(new BlueprintLocation(offset, block.getFacing().getOpposite()));
 			if (!debugConnections) {
 				block = BlueprintBlock.Air; // Make block an air one
 			}
-		} else if (block.isEntry()) {
+		} else if (IsEntry(block.getState())) {
 			if (!debugConnections && offset.equals(BlockPos.ZERO)) {
 				// Clear out any comparator that's there from capturing still
 				block = BlueprintBlock.Air;
 			}
-		} else if (block.isLargeKeySpot()) {
+		} else if (IsLargeKeySpot(block.getState())) {
 			largeKeySpots.add(new BlueprintLocation(offset, block.getFacing()));
 			if (!debugConnections) {
 				block = BlueprintBlock.Air; // Make block into an air one. Could make it a chest...
 			}
-		} else if (block.isLargeKeyDoor()) {
+		} else if (IsLargeKeyDoor(block.getState())) {
 			if (this.largeKeyDoor != null) {
 				NostrumMagica.logger.error("Found multiple large dungeon doors in room while parsing blueprint!");
 			}

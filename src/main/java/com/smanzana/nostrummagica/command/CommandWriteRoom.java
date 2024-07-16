@@ -11,10 +11,10 @@ import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.blueprints.Blueprint;
 import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
+import com.smanzana.nostrummagica.world.dungeon.room.BlueprintDungeonRoom;
 import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomLoader;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -79,8 +79,7 @@ public class CommandWriteRoom {
 		// Look for entry marker
 		WorldUtil.ScanBlocks(player.world, minPos, maxPos, (world, pos) -> {
 			BlockState state = world.getBlockState(pos);
-			System.out.println("Checking " + state);
-			if (state != null && state.getBlock() == Blocks.COMPARATOR) {
+			if (BlueprintDungeonRoom.IsEntry(state)) {
 				foundEntry[0] = new BlueprintLocation(pos.toImmutable().subtract(minPos), state.get(ComparatorBlock.HORIZONTAL_FACING).getOpposite());
 				return false;
 			}
