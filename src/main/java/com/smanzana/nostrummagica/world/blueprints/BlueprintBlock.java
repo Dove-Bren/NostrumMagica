@@ -258,6 +258,10 @@ public class BlueprintBlock {
 			ret = state.get(LadderBlock.FACING);
 		} else if (block instanceof StairsBlock) {
 			ret = state.get(StairsBlock.FACING);
+		} else if (block instanceof DirectionalBlock) {
+			ret = state.get(DirectionalBlock.FACING);
+		} else if (block instanceof IDirectionalBlock) {
+			ret = state.get(IDirectionalBlock.FACING);
 		}
 		return ret;
 	}
