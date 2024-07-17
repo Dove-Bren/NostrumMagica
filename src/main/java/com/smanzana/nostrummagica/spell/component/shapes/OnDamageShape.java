@@ -132,11 +132,6 @@ public class OnDamageShape extends SpellShape {
 	}
 	
 	@Override
-	public String getDisplayName() {
-		return "On Damage";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

@@ -14,8 +14,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -307,7 +307,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			final float unknown = .15f;
 			final int iconWidth = 16;
 			int drawX, drawY;
-			String tooltipText = null;
+			ITextComponent tooltipText = null;
 			
 			drawX = x + 20;
 			drawY = y + 20;
@@ -332,9 +332,8 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
-					tooltipText = elem.getName() + ": " 
-							+ mastery.toString().toUpperCase().substring(0, 1)
-							+ mastery.toString().toLowerCase().substring(1);
+					tooltipText = new StringTextComponent(elem.getName() + ": ")
+							.append(mastery.getName());
 				}
 				
 				drawX += 5 + iconWidth;
@@ -391,7 +390,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					if (knownShapes.contains(shape)) {
 						tooltipText = shape.getDisplayName();
 					} else {
-						tooltipText = "Unknown Shape";
+						tooltipText = new StringTextComponent("Unknown Shape");
 					}
 				}
 				
@@ -419,9 +418,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
 					if (has != null && has) {
-						tooltipText = alteration.getName();
+						tooltipText = new StringTextComponent(alteration.getName());
 					} else {
-						tooltipText = "Unknown Alteration";
+						tooltipText = new StringTextComponent("Unknown Alteration");
 					}
 				}
 				
@@ -435,7 +434,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			mc.fontRenderer.drawStringWithShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 			
 			if (tooltipText != null) {
-				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new StringTextComponent(tooltipText)), mouseX, mouseY, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 200, mc.fontRenderer);
+				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(tooltipText), mouseX, mouseY, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 200, mc.fontRenderer);
 				RenderHelper.disableStandardItemLighting();
 			}
 		}

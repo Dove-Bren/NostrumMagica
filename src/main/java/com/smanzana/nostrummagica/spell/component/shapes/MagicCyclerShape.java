@@ -138,11 +138,6 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Mana Cycle";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.COMPASS, 1);
 	}

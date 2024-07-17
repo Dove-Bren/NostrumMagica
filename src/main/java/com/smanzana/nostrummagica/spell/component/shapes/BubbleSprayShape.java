@@ -164,11 +164,6 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Bubble Spray";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.HONEY_BOTTLE, 1);
 	}

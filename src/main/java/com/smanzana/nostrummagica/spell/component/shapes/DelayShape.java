@@ -85,11 +85,6 @@ public class DelayShape extends SpellShape {
 	}
 	
 	@Override
-	public String getDisplayName() {
-		return "Delay";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

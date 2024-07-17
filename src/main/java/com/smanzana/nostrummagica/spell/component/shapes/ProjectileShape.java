@@ -204,11 +204,6 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Projectile";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.BOW, 1);
 	}

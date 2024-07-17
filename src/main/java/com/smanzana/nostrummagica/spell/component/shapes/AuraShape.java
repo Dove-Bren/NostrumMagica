@@ -220,11 +220,6 @@ public class AuraShape extends AreaShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Aura";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

@@ -142,11 +142,6 @@ public class RingShape extends BurstShape {
 		return list;
 	}
 
-	@Override
-	public String getDisplayName() {
-		return "Ring";
-	}
-
 	private static NonNullList<ItemStack> INNER_COSTS = null;
 	private static NonNullList<ItemStack> OUTER_COSTS = null;
 	@Override

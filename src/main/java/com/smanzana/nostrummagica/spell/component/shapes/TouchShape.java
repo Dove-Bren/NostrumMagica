@@ -98,11 +98,6 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Touch";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

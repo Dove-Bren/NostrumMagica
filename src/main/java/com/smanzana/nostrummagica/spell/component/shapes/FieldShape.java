@@ -146,11 +146,6 @@ public class FieldShape extends AreaShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Field";
-	}
-
-	@Override
 	public FieldShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
 		return new FieldShapeInstance(state, location.world, location.hitPosition,

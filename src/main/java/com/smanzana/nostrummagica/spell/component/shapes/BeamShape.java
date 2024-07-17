@@ -117,11 +117,6 @@ public class BeamShape extends InstantShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Beam";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

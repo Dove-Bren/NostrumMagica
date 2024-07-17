@@ -42,10 +42,6 @@ public class AtFeetShape extends InstantShape {
 		return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, state.getSelf().getPosition().down())));
 	}
 
-	@Override
-	public String getDisplayName() {
-		return "At Feet";
-	}
 	
 	@Override
 	public int getManaCost(SpellShapeProperties properties) {

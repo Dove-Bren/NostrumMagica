@@ -249,11 +249,6 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Mortar";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.FIRE_CHARGE, 1);
 	}

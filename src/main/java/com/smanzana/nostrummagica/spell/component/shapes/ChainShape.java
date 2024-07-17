@@ -171,11 +171,6 @@ public class ChainShape extends InstantShape {
 		return list;
 	}
 
-	@Override
-	public String getDisplayName() {
-		return "Chain";
-	}
-
 	private static NonNullList<ItemStack> JUMP_COSTS = null;
 	private static NonNullList<ItemStack> LOCK_COSTS = null;
 	@Override

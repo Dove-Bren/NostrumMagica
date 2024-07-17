@@ -130,11 +130,6 @@ public class OnHealthShape extends OnMetricLevelShape {
 	}
 	
 	@Override
-	public String getDisplayName() {
-		return "Health Level";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

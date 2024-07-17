@@ -129,11 +129,6 @@ public class OnManaShape extends OnMetricLevelShape {
 	}
 	
 	@Override
-	public String getDisplayName() {
-		return "Mana Level";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

@@ -23,8 +23,8 @@ import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -48,7 +48,6 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -1391,8 +1390,8 @@ public class SpellCreationGui {
 					final SpellShapePart shape = part.getShape();
 					final String name;
 					final String desc;
-					name = shape.getShape().getDisplayName();//I18n.format("effect." + action.getName() + ".name", (Object[]) null) + suffix;
-					desc = I18n.format("shape." + shape.getShape().getShapeKey() + ".desc", (Object[]) null);
+					name = shape.getShape().getDisplayName().getString();
+					desc = shape.getShape().getDescription().getString();
 					
 					int len = fontRenderer.getStringWidth(name);
 					fontRenderer.drawString(matrixStackIn, name,

@@ -148,11 +148,6 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Mana Cutter";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Items.SNOWBALL, 1);
 	}

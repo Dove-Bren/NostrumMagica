@@ -232,11 +232,6 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Seeking Bullet";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Blocks.DISPENSER, 1);
 	}

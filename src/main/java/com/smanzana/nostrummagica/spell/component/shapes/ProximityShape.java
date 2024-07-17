@@ -124,11 +124,6 @@ public class ProximityShape extends SpellShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Proximity";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Blocks.TRIPWIRE_HOOK);
 	}

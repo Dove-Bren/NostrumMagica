@@ -307,11 +307,6 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "Wall";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Blocks.GLASS);
 	}

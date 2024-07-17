@@ -48,11 +48,6 @@ public class AIShape extends InstantShape {
 	}
 
 	@Override
-	public String getDisplayName() {
-		return "AI";
-	}
-
-	@Override
 	public ItemStack getCraftItem() {
 		return new ItemStack(Blocks.BEDROCK);
 	}

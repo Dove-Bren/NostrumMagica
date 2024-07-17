@@ -142,11 +142,6 @@ public class OnFoodShape extends OnMetricLevelShape {
 	}
 	
 	@Override
-	public String getDisplayName() {
-		return "Food Level";
-	}
-
-	@Override
 	public NonNullList<ItemStack> getReagents() {
 		return REAGENTS.get();
 	}

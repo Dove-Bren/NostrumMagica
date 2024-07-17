@@ -39,11 +39,6 @@ public class SelfShape extends InstantShape {
 	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new TriggerData(Lists.newArrayList(state.getSelf()), null);
 	}
-
-	@Override
-	public String getDisplayName() {
-		return "Self";
-	}
 	
 	@Override
 	public int getManaCost(SpellShapeProperties properties) {

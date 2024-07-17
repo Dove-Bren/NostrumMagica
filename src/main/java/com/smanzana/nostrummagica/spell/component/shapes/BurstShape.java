@@ -120,11 +120,6 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 		return list;
 	}
 
-	@Override
-	public String getDisplayName() {
-		return "Burst";
-	}
-
 	private static NonNullList<ItemStack> costs = null;
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {

@@ -19,6 +19,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -138,7 +140,13 @@ public abstract class SpellShape {
 		return key;
 	}
 	
-	public abstract String getDisplayName();
+	public TextComponent getDisplayName() {
+		return new TranslationTextComponent("shape." + this.getShapeKey() + ".name");
+	}
+	
+	public TextComponent getDescription() {
+		return new TranslationTextComponent("shape." + this.getShapeKey() + ".desc");
+	}
 	
 	/**
 	 * Spawn an instance to perform this spell shape's action.
