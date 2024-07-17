@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
 
@@ -817,7 +818,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction();
 			fly.push(5.0f, typeScale(this.type));
-			fly.apply(playerIn, target, 1.0f);
+			fly.apply(playerIn, target, 1.0f, ISpellLogBuilder.Dummy);
 			ItemStacks.damageItem(stack, playerIn, hand, 2);
 			return ActionResultType.SUCCESS;
 		}
@@ -859,7 +860,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				motion = new Vector3d(motion.x, 0, motion.z);
 			}
 			if (motion.length() < 1.0 || player.isElytraFlying()) {
-				propelAction.apply(player, player, 1f);
+				propelAction.apply(player, player, 1f, ISpellLogBuilder.Dummy);
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 				attr.addMana(-WIND_COST);
 				NostrumMagica.instance.proxy.sendMana(player);

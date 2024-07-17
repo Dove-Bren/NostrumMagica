@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.listener.PlayerListener.Event;
 import com.smanzana.nostrummagica.listener.PlayerListener.SpellActionListenerData;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
 import net.minecraft.entity.LivingEntity;
@@ -80,7 +81,7 @@ public class MirrorShieldImproved extends MirrorShield {
 				
 				// If there was a caster, reflect part of the spell back
 				if (data.caster != null && data.caster != entity) {
-					data.summary.getAction().apply(entity, data.caster, reduc);
+					data.summary.getAction().apply(entity, data.caster, reduc, ISpellLogBuilder.Dummy);
 				}
 				
 				// If fully blocked, cancel. Otherwise, reduce

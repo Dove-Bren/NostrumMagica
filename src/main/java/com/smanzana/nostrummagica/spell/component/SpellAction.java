@@ -44,6 +44,7 @@ import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmuteResult;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.HarvestUtil;
 import com.smanzana.nostrummagica.util.HarvestUtil.ITreeWalker;
@@ -80,6 +81,7 @@ import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -88,6 +90,8 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.ToolType;
 
 public class SpellAction {
+	
+	private static final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
 	
 	public static class SpellActionProperties {
 		public final boolean isHarmful;
@@ -137,8 +141,8 @@ public class SpellAction {
 	}
 	
 	private static interface SpellEffect {
-		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder);
-		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder);
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log);
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log);
 		
 		public default boolean isHarmful() {
 			return false;
@@ -160,9 +164,9 @@ public class SpellAction {
 			return true;
 		}
 		
-		protected abstract void applyEffect(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder);
+		protected abstract void applyEffect(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log);
 		
-		public final void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder) {
+		public final void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (entity != null && isHarmful() && caster != entity) {
 				if (PetFuncs.GetOwner(entity) != null && caster.equals(PetFuncs.GetOwner(entity))) {
 					return; // we own the target entity
@@ -173,7 +177,7 @@ public class SpellAction {
 				}
 			}
 			
-			applyEffect(caster, entity, eff, resultBuilder);
+			applyEffect(caster, entity, eff, resultBuilder, log);
 		}
 	}
 	
@@ -187,12 +191,17 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			caster.setLastAttackedEntity(entity);
 			entity.setRevengeTarget(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 			entity.hurtResistantTime = 0;
-			final float fin = SpellDamage.DamageEntity(entity, element, amount * efficiency, caster);
+			
+			final float baseDmg = amount;
+			log.damageStart(this.amount, this.element);
+			log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
+			
+			final float fin = SpellDamage.DamageEntity(entity, element, baseDmg * efficiency, caster, log);
 			
 			NostrumMagicaSounds sound;
 			switch (element) {
@@ -224,10 +233,11 @@ public class SpellAction {
 			sound.play(entity);
 			resultBuilder.applied |= true;
 			resultBuilder.damage += fin;
+			log.damageFinish(fin);
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -238,6 +248,9 @@ public class SpellAction {
 	}
 	
 	private static class HealEffect implements SpellEffect {
+		
+		private static final ITextComponent LABEL_MOD_ICE_MASTER = new TranslationTextComponent("spelllogmod.nostrummagica.ice.master");
+		
 		private float amount;
 		
 		public HealEffect(float amount) {
@@ -245,19 +258,30 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			float base = this.amount;
+			
+			log.pushModifierStack();
 			final INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Ice_Master)) {
 				base *= 2;
+				log.addGlobalModifier(LABEL_MOD_ICE_MASTER, 2, false);
 			}
 			
 			if (entity.isEntityUndead()) {
 				caster.setLastAttackedEntity(entity);
 				entity.setRevengeTarget(caster);
 				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
+				
+				log.damageStart(this.amount, null); // trickery here: skill modifiers added globally so 'start' with real base
+													// even though later we use the current 'base' modified amount
+				log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
+				
+				final float fin = SpellDamage.DamageEntity(entity, EMagicElement.ICE, base * efficiency, caster, log);
+				
 				entity.hurtResistantTime = 0;
-				resultBuilder.damage += SpellDamage.DamageEntity(entity, EMagicElement.ICE, base * efficiency, caster);
+				resultBuilder.damage += fin;
+				log.damageFinish(fin);
 			} else {
 				entity.heal(base * efficiency);
 				if (entity instanceof TameRedDragonEntity) {
@@ -282,10 +306,11 @@ public class SpellAction {
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 			resultBuilder.applied |= true;
+			log.popModifierStack();
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -308,7 +333,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) entity;
 				player.getFoodStats().addStats((int) (amount * efficiency), 2);
@@ -330,7 +355,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -353,7 +378,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			INostrumMagic magic = NostrumMagica.getMagicWrapper(entity);
 			if (magic == null) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
@@ -368,7 +393,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -404,7 +429,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			entity.addPotionEffect(this.makeEffect(caster, entity, efficiency, resultBuilder));
 			
 			if (effect.getEffectType() == EffectType.HARMFUL) {
@@ -420,7 +445,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -443,7 +468,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
 			if (number == -1 || entity.getActivePotionEffects().size() < number) {
@@ -462,7 +487,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -509,9 +534,9 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (this.predicate.test(caster, entity, efficiency)) {
-				super.applyEffect(caster, entity, efficiency, resultBuilder);
+				super.applyEffect(caster, entity, efficiency, resultBuilder, log);
 			}
 		}
 	}
@@ -524,7 +549,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
 			if (caster != null && caster instanceof PlayerEntity) {
@@ -630,7 +655,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Do nothing
 		}
 		
@@ -655,12 +680,12 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
-			apply(caster, new SpellLocation(entity), efficiency, resultBuilder);
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			apply(caster, new SpellLocation(entity), efficiency, resultBuilder, log);
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
@@ -732,7 +757,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			ItemStack inhand = entity.getHeldItemMainhand();
 			boolean offhand = false;
 			if (inhand.isEmpty() || inhand.getItem() instanceof SpellScroll) {
@@ -783,7 +808,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			Block block = location.world.getBlockState(location.selectedBlockPos).getBlock();
 			TransmuteResult<Block> result = Transmutation.GetTransmutationResult(block, level);
 			if (!result.valid) {
@@ -826,7 +851,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			int duration = (int) (this.duration * efficiency);
 			if (duration == 0)
 				return; // Nope
@@ -843,7 +868,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos applyPos = location.hitBlockPos;
 			BlockState state = location.world.getBlockState(applyPos);
 			if (state != null && state.getBlock() instanceof CandleBlock) {
@@ -885,15 +910,15 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			entity.setRevengeTarget(caster);
 			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
 			entity.hurtResistantTime = 0;
-			apply(caster, new SpellLocation(entity), efficiency, resultBuilder);
+			apply(caster, new SpellLocation(entity), efficiency, resultBuilder, log);
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			
 			int count = 1;
 			
@@ -979,7 +1004,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// Pick a place to spawn it and then defer to location one
 			World world = caster.getEntityWorld();
 			BlockPos center = caster.getPosition();
@@ -1004,11 +1029,11 @@ public class SpellAction {
 				pos = center;
 			} while (false);
 			
-			apply(caster, new SpellLocation(world, pos), efficiency, resultBuilder);
+			apply(caster, new SpellLocation(world, pos), efficiency, resultBuilder, log);
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockPos applyPos = location.hitBlockPos;
 			
 			// For non-player entities, just spawn some new golems.
@@ -1125,7 +1150,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (caster == null || entity == null)
 				return;
 			
@@ -1175,7 +1200,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = adjustPosition(location.world, location.hitBlockPos);
 			
 			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, pos.getX() + .5, pos.getY(), pos.getZ() + .5, caster);
@@ -1208,7 +1233,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 
 			Vector3d force = entity.getLookVec().add(0, 0.15, 0).normalize();
 			float scale = 1f * (.5f * (level + 1)) * efficiency;
@@ -1227,7 +1252,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return; // Doesn't mean anything
 		}
 		
@@ -1251,7 +1276,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (caster != entity && entity instanceof MobEntity) {
 				// Make sure they want to attack you if you do it
 				entity.setRevengeTarget(caster);
@@ -1307,7 +1332,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// Summon an entity
 			int count = 1;
 			for (int i = 1; i < level; i++)
@@ -1359,7 +1384,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// If entity is special enchantable entity, try to use that
 			if (entity instanceof IEnchantableEntity && ((IEnchantableEntity) entity).canEnchant(entity, element, level)) {
 				resultBuilder.applied |= ((IEnchantableEntity) entity).attemptEnchant(entity, element, level);
@@ -1435,7 +1460,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return;
 		}
 		
@@ -1459,7 +1484,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (entity instanceof AnimalEntity) {
 				AnimalEntity animal = (AnimalEntity) entity;
 				animal.addGrowth((int) (count * 500 * efficiency));
@@ -1470,7 +1495,7 @@ public class SpellAction {
 
 		@SuppressWarnings("deprecation")
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// Since farmland is smaller than a block, standing on it means the block below you (at feet trigger) is
 			// the block below the farmland. So try and step up if we're in that specific case.
 			BlockPos pos = location.selectedBlockPos;
@@ -1532,7 +1557,7 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			int amount = (int) (20 * level * efficiency);
 			if (level > 2)
 				amount *= 2;
@@ -1561,7 +1586,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			return;
 		}
 		
@@ -1586,7 +1611,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// Apply mystic air.
 			// Doing in here instead of a status effect so that wall doesn't get created if used on an entity
 			final int duration = (int) (20 * 60 * efficiency);
@@ -1596,7 +1621,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = location.hitBlockPos;
 			if (!location.world.isAirBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWallBlock)) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, pos);
@@ -1634,7 +1659,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// Apply status here instead of using a StatusEffect so that we can scale the amplitude, too
 			float amp = healAmt * efficiency;
 			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -1654,7 +1679,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = location.hitBlockPos;
 			if (location.world.isAirBlock(pos) || location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
 				location.world.setBlockState(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
@@ -1684,7 +1709,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			@Nullable EffectInstance instance = entity.getActivePotionEffect(NostrumEffects.cursedFire);
 			final int duration = 20 * 1200;
 			if (instance == null || instance.getDuration() < (int) (duration * .8f)) {
@@ -1701,7 +1726,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockState state = NostrumBlocks.cursedFire.GetWithLevel(level);
 			final BlockPos pos = location.hitBlockPos;
 			if (location.world.getBlockState(pos).getMaterial().isReplaceable() && state.isValidPosition(location.world, pos) && location.world.setBlockState(pos, state)) {
@@ -1731,8 +1756,8 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder) {
-			apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder);
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder, log);
 		}
 		
 		protected boolean isTool(@Nullable PlayerEntity player, ItemStack stack) {
@@ -1752,7 +1777,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockPos pos = location.selectedBlockPos;
 			if (location.world.isAirBlock(pos))
 				return;
@@ -1832,13 +1857,13 @@ public class SpellAction {
 		}
 		
 		@Override
-		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Earth_Corrupt)) {
 				entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, (int) (15 * eff) * 20, level-1));
 				resultBuilder.applied = true;
 			} else {
-				apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder);
+				apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder, log);
 			}
 		}
 		
@@ -1938,7 +1963,7 @@ public class SpellAction {
 		}
 
 		@Override
-		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder) {
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockPos pos = location.selectedBlockPos;
 			if (location.world.isAirBlock(pos))
 				return;
@@ -2017,7 +2042,7 @@ public class SpellAction {
 	 * @param efficiency
 	 * @return
 	 */
-	public SpellActionResult apply(LivingEntity source, LivingEntity entity, float efficiency) {
+	public SpellActionResult apply(LivingEntity source, LivingEntity entity, float efficiency, ISpellLogBuilder log) {
 		if (entity.world.isRemote)
 			return SpellActionResult.FAIL;
 		
@@ -2033,7 +2058,7 @@ public class SpellAction {
 				if (!entity.getServer().isOnExecutionThread()) { // TODO I think?
 					throw new RuntimeException("Wrong thread for spell effects!");
 				}
-				effect.apply(source, ent, summary.getEfficiency(), result);
+				effect.apply(source, ent, summary.getEfficiency(), result, log);
 			}
 		}
 		
@@ -2047,7 +2072,7 @@ public class SpellAction {
 	 * @param efficiency
 	 * @return
 	 */
-	public SpellActionResult apply(LivingEntity source, SpellLocation location, float efficiency) {
+	public SpellActionResult apply(LivingEntity source, SpellLocation location, float efficiency, ISpellLogBuilder log) {
 		if (location.world.isRemote)
 			return SpellActionResult.FAIL;
 		SpellActionResult result = new SpellActionResult();
@@ -2059,7 +2084,7 @@ public class SpellAction {
 			}
 			
 			//world.getMinecraftServer().runAsync(() -> {
-				effect.apply(source, location, efficiency, result);
+				effect.apply(source, location, efficiency, result, log);
 			//});
 		}
 		

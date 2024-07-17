@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellDamage;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

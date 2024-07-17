@@ -51,6 +51,7 @@ import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
 
@@ -608,7 +609,7 @@ public class PlayerListener {
 						if (ench.shouldTrigger(false, stack)) {
 							SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 							if (action != null)
-								action.apply(livingTarget, livingSource, 1.0f);
+								action.apply(livingTarget, livingSource, 1.0f, ISpellLogBuilder.Dummy);
 						}
 					}
 					if (NostrumMagica.instance.curios.isEnabled() && livingTarget instanceof PlayerEntity) {
@@ -623,7 +624,7 @@ public class PlayerListener {
 								if (ench.shouldTrigger(false, stack)) {
 									SpellAction action = ench.getTriggerAction(livingTarget, false, stack);
 									if (action != null)
-										action.apply(livingTarget, livingSource, 1.0f);
+										action.apply(livingTarget, livingSource, 1.0f, ISpellLogBuilder.Dummy);
 								}
 							}
 						}
@@ -639,7 +640,7 @@ public class PlayerListener {
 					if (ench.shouldTrigger(true, stack)) {
 						SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 						if (action != null)
-							action.apply(livingSource, livingTarget, 1.0f);
+							action.apply(livingSource, livingTarget, 1.0f, ISpellLogBuilder.Dummy);
 					}
 				}
 				if (NostrumMagica.instance.curios.isEnabled() && livingSource instanceof PlayerEntity) {
@@ -654,7 +655,7 @@ public class PlayerListener {
 							if (ench.shouldTrigger(true, stack)) {
 								SpellAction action = ench.getTriggerAction(livingSource, true, stack);
 								if (action != null)
-									action.apply(livingSource, livingTarget, 1.0f);
+									action.apply(livingSource, livingTarget, 1.0f, ISpellLogBuilder.Dummy);
 							}
 						}
 					}

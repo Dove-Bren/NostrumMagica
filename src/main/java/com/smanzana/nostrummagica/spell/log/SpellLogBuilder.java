@@ -1,0 +1,486 @@
+package com.smanzana.nostrummagica.spell.log;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.progression.skill.Skill;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.SpellLocation;
+
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.potion.Effect;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+
+public class SpellLogBuilder implements ISpellLogBuilder {
+	
+	private static abstract class EffectBuilder {
+		protected final List<SpellLogModifier> lineModifiers;
+		
+		protected EffectBuilder(List<SpellLogModifier> baseModifiers) {
+			this.lineModifiers = new ArrayList<>(baseModifiers);
+		}
+		
+		public EffectBuilder modify(SpellLogModifier modifier) {
+			this.lineModifiers.add(modifier);
+			return this;
+		}
+		
+		public abstract SpellLogEffectLine build();
+		
+		// Dmg/Heal amt + general
+		public EffectBuilder baseHeal(float amt) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder finalHeal(float amt) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder baseDamage(float amt) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder finalDamage(float amt) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder element(@Nullable EMagicElement elem) { throw new IllegalStateException("Building the wrong type of effect"); }
+		
+		// Effect
+		public EffectBuilder effect(Effect effect) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder baseDuration(int duration) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder finalDuration(int duration) { throw new IllegalStateException("Building the wrong type of effect"); }
+		
+		// General
+		public EffectBuilder harmful(boolean harmful) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder desc(ITextComponent desc) { throw new IllegalStateException("Building the wrong type of effect"); }
+	}
+	
+	private static final class DamageEffectBuilder extends EffectBuilder {
+		
+		private float baseDmg;
+		private float finalDmg;
+		private EMagicElement element;
+		
+		public DamageEffectBuilder(List<SpellLogModifier> baseModifiers) {
+			super(baseModifiers);
+			baseDmg = -1;
+			finalDmg = -1;
+		}
+
+		@Override
+		public EffectBuilder baseDamage(float amt) {
+			baseDmg = amt;
+			return this;
+		}
+
+		@Override
+		public EffectBuilder finalDamage(float amt) {
+			finalDmg = amt;
+			return this;
+		}
+		
+		@Override
+		public EffectBuilder element(@Nullable EMagicElement elem) {
+			this.element = elem;
+			return this;
+		}
+
+		@Override
+		public SpellLogEffectLine build() {
+			if (baseDmg == -1 || finalDmg == -1) {
+				throw new IllegalStateException("Didn't specify both base and final damage amounts");
+			}
+			return new SpellLogEffectLine.Damage(baseDmg, finalDmg, lineModifiers);
+		}
+	}
+	
+	private static final class HealEffectBuilder extends EffectBuilder {
+		
+		private float baseHeal;
+		private float finalHeal;
+		private EMagicElement element;
+		
+		public HealEffectBuilder(List<SpellLogModifier> baseModifiers) {
+			super(baseModifiers);
+			baseHeal = -1;
+			finalHeal = -1;
+		}
+
+		@Override
+		public EffectBuilder baseHeal(float amt) {
+			baseHeal = amt;
+			return this;
+		}
+
+		@Override
+		public EffectBuilder finalHeal(float amt) {
+			finalHeal = amt;
+			return this;
+		}
+		
+		@Override
+		public EffectBuilder element(@Nullable EMagicElement elem) {
+			this.element = elem;
+			return this;
+		}
+
+		@Override
+		public SpellLogEffectLine build() {
+			if (baseHeal == -1 || finalHeal == -1) {
+				throw new IllegalStateException("Didn't specify both base and final heal amounts");
+			}
+			return new SpellLogEffectLine.Heal(baseHeal, finalHeal, lineModifiers);
+		}
+	}
+	
+	private static final class StatusEffectBuilder extends EffectBuilder {
+		
+		private Effect effect;
+		private int baseDuration;
+		private int finalDuration;
+		
+		public StatusEffectBuilder(List<SpellLogModifier> baseModifiers) {
+			super(baseModifiers);
+			baseDuration = -1;
+			finalDuration = -1;
+		}
+		
+		@Override
+		public EffectBuilder effect(Effect effect) {
+			this.effect = effect;
+			return this;
+		}
+
+		@Override
+		public EffectBuilder baseDuration(int duration) {
+			baseDuration = duration;
+			return this;
+		}
+
+		@Override
+		public EffectBuilder finalDuration(int duration) {
+			finalDuration = duration;
+			return this;
+		}
+
+		@Override
+		public SpellLogEffectLine build() {
+			if (effect == null || baseDuration == -1 || finalDuration == -1) {
+				throw new IllegalStateException("Must specify effect, base duration, and final duration");
+			}
+			return new SpellLogEffectLine.Status(effect, baseDuration, finalDuration, lineModifiers);
+		}
+	}
+	
+	private static final class GeneralEffectBuilder extends EffectBuilder {
+		
+		private float amtDmg;
+		private float amtHeal;
+		private ITextComponent desc;
+		private boolean harmful;
+		
+		public GeneralEffectBuilder(List<SpellLogModifier> baseModifiers) {
+			super(baseModifiers);
+			amtDmg = -1;
+			amtHeal = -1;
+			desc = null;
+			harmful = false;
+		}
+
+		@Override
+		public EffectBuilder finalDamage(float amt) {
+			amtDmg = amt;
+			return this;
+		}
+
+		@Override
+		public EffectBuilder finalHeal(float amt) {
+			amtHeal = amt;
+			return this;
+		}
+		
+		@Override
+		public EffectBuilder harmful(boolean harmful) {
+			this.harmful = harmful;
+			return this;
+		}
+
+		@Override
+		public SpellLogEffectLine build() {
+			if (amtDmg == -1 || amtHeal == -1 || desc == null) {
+				throw new IllegalStateException("Must specify damage and heal amounts and a description");
+			}
+			return new SpellLogEffectLine.General(harmful, amtDmg, amtHeal, desc, lineModifiers);
+		}
+	}
+
+	private SpellLogEntry log;
+	
+	private boolean buildingStage;
+	private boolean buildingEffectSummary;
+	private boolean buildingEffectLine;
+	
+	// Stage building
+	private final Map<LivingEntity, SpellLogEffectSummary> stageEnts;
+	private final Map<SpellLocation, SpellLogEffectSummary> stageLocs;
+	private int stageTicks;
+	private ITextComponent stageLabel;
+	
+	// Effect summary
+	private LivingEntity summaryEntity;
+	private SpellLocation summaryLocation;
+	private final List<SpellLogEffectLine> summaryEffects;
+	
+	// Effect line building
+	private EffectBuilder effectBuilder;
+	private final List<List<SpellLogModifier>> modifierStack;
+	
+	public SpellLogBuilder(SpellLogEntry log) {
+		this.log = log;
+		
+		this.stageEnts = new HashMap<>();
+		this.stageLocs = new HashMap<>();
+		this.stageTicks = -1;
+		this.stageLabel = null;
+		
+		this.summaryEntity = null;
+		this.summaryLocation = null;
+		this.summaryEffects = new ArrayList<>();
+		
+		this.effectBuilder = null;
+		
+		this.modifierStack = new ArrayList<>();
+		this.modifierStack.add(new ArrayList<>());
+	}
+	
+	protected boolean isBuilding() {
+		return buildingStage || buildingEffectSummary || buildingEffectLine;
+	}
+	
+	@Override
+	public void flush() {
+		if (isBuilding()) {
+			if (!buildingStage) {
+				throw new IllegalStateException("Was building effects but no stage!");
+			}
+			
+			if (buildingEffectLine) {
+				flushEffectLine();
+			}
+			
+			if (buildingEffectSummary) {
+				flushEffectSummary();
+			}
+			
+			SpellLogStage stage = new SpellLogStage(stageLabel, new HashMap<>(stageEnts), new HashMap<>(stageLocs), stageTicks);
+			
+			buildingStage = false;
+			stageEnts.clear();
+			stageLocs.clear();
+			stageTicks = -1;
+			stageLabel = null;
+			
+			this.log.addStage(stage);
+		}
+	}
+	
+	protected void flushEffectSummary() {
+		if (buildingEffectSummary) {
+			final SpellLogEffectSummary summary = new SpellLogEffectSummary(new ArrayList<>(this.summaryEffects));
+			if (this.summaryEntity != null) {
+				this.stageEnts.put(this.summaryEntity, summary);
+			} else {
+				this.stageLocs.put(this.summaryLocation, summary);
+			}
+			
+			summaryEffects.clear();
+		}
+		
+		buildingEffectSummary = false;
+	}
+	
+	protected void flushEffectLine() {
+		if (buildingEffectLine) {
+			if (!buildingEffectSummary) {
+				throw new IllegalStateException("Was building effect lines but no summary!");
+			}
+			
+			this.summaryEffects.add(this.effectBuilder.build());
+		}
+		
+		buildingEffectLine = false;
+		effectBuilder = null;
+	}
+
+	@Override
+	public SpellLogBuilder stage(ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) {
+		flush();
+		
+		buildingStage = true;
+		this.stageTicks = ticksElapsed;
+		this.stageLabel = label;
+		
+		if (affectedEnts != null)
+		for (LivingEntity ent : affectedEnts) {
+			this.stageEnts.put(ent, null);
+		}
+		
+		if (affectedLocs != null)
+		for (SpellLocation loc : affectedLocs) {
+			this.stageLocs.put(loc, null);
+		}
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder effect(LivingEntity entity) {
+		if (this.buildingEffectSummary) {
+			throw new IllegalStateException("Previous effect summary was not finished");
+		}
+		
+		this.buildingEffectSummary = true;
+		this.summaryEntity = entity;
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder effect(SpellLocation location) {
+		if (this.buildingEffectSummary) {
+			throw new IllegalStateException("Previous effect summary was not finished");
+		}
+		
+		this.buildingEffectSummary = true;
+		this.summaryLocation = location;
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder endEffect() {
+		this.flushEffectSummary();
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder damageStart(float baseDamage, @Nullable EMagicElement element) {
+		if (this.buildingEffectLine) {
+			throw new IllegalStateException("Previous effect was not finished");
+		}
+		
+		this.buildingEffectSummary = true;
+		this.buildingEffectLine = true;
+		this.effectBuilder = new DamageEffectBuilder(getModifiers());
+		this.effectBuilder.baseDamage(baseDamage).element(element);
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder damageFinish(float finalDamage) {
+		this.effectBuilder.finalDamage(finalDamage);
+		flushEffectLine();
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder healStart(float baseHeal, @Nullable EMagicElement element) {
+		if (this.buildingEffectLine) {
+			throw new IllegalStateException("Previous effect was not finished");
+		}
+		
+		this.buildingEffectSummary = true;
+		this.buildingEffectLine = true;
+		this.effectBuilder = new HealEffectBuilder(getModifiers());
+		this.effectBuilder.baseHeal(baseHeal).element(element);
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder healFinish(float finalHeal) {
+		this.effectBuilder.finalHeal(finalHeal);
+		flushEffectLine();
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder statusStart(Effect effect, int baseDuration) {
+		if (this.buildingEffectLine) {
+			throw new IllegalStateException("Previous effect was not finished");
+		}
+		
+		this.buildingEffectSummary = true;
+		this.buildingEffectLine = true;
+		this.effectBuilder = new StatusEffectBuilder(getModifiers());
+		this.effectBuilder.effect(effect).baseDuration(baseDuration);
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder statusFinish(int finalDuration) {
+		this.effectBuilder.finalDuration(finalDuration);
+		flushEffectLine();
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder generalEffectStart(ITextComponent description, boolean harmful) {
+		if (this.buildingEffectLine) {
+			throw new IllegalStateException("Previous effect was not finished");
+		}
+		
+		this.buildingEffectSummary = true;
+		this.buildingEffectLine = true;
+		this.effectBuilder = new GeneralEffectBuilder(getModifiers());
+		this.effectBuilder.desc(description).harmful(harmful);
+		
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder generalEffectFinish(float finalDmg, float finalHeal) {
+		this.effectBuilder.finalDamage(finalDmg).finalHeal(finalHeal);
+		flushEffectLine();
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder effectMod(ITextComponent label, float amt, boolean flat) {
+		if (!this.buildingEffectLine || this.effectBuilder == null) {
+			throw new IllegalStateException("Wasn't building an effect line, so can't add a modifier");
+		}
+		this.effectBuilder.modify(flat ? new SpellLogModifier.Flat(label, amt) : new SpellLogModifier.Percentage(label, amt));
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder pushModifierStack() {
+		this.modifierStack.add(new ArrayList<>(this.modifierStack.get(this.modifierStack.size() - 1)));
+		return this;
+	}
+
+	@Override
+	public SpellLogBuilder popModifierStack() {
+		this.modifierStack.remove(this.modifierStack.size() - 1);
+		if (this.modifierStack.isEmpty()) {
+			throw new IllegalStateException("Popped too many modifiers");
+		}
+		return this;
+	}
+	
+	@Override
+	public ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, boolean flat) {
+		getModifiers().add(flat ? new SpellLogModifier.Flat(label, amt) : new SpellLogModifier.Percentage(label, amt));
+		return this;
+	}
+	
+	@Override
+	public ISpellLogBuilder addGlobalModifier(Skill skill, float amt, boolean flat) {
+		final ITextComponent label = new TranslationTextComponent("spelllogmod.nostrummagica.skill").mergeStyle(TextFormatting.DARK_PURPLE)
+				.append(skill.getName());
+		return addGlobalModifier(label, amt, flat);
+	}
+	
+	protected List<SpellLogModifier> getModifiers() {
+		return this.modifierStack.get(this.modifierStack.size() - 1);
+	}
+	
+}

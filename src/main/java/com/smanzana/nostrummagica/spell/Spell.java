@@ -30,6 +30,9 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape.SpellShapeInstance;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
+import com.smanzana.nostrummagica.spell.log.SpellLogBuilder;
+import com.smanzana.nostrummagica.spell.log.SpellLogEntry;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.stat.PlayerStat;
@@ -46,6 +49,8 @@ import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -74,19 +79,24 @@ public class Spell {
 	}
 	
 	protected static class SpellState implements ISpellState {
+		
+		private static final ITextComponent LABEL_STAGE_START = new TranslationTextComponent("spelllogstage.start");
+		
 		protected final Spell spell;
 		protected final LivingEntity caster;
 		protected float efficiency;
+		protected final ISpellLogBuilder log;
 
 		protected int index;
 		private LivingEntity self;
 		private SpellShapeInstance shapeInstance;
 		
-		public SpellState(Spell spell, LivingEntity caster, float efficiency) {
+		public SpellState(Spell spell, LivingEntity caster, float efficiency, ISpellLogBuilder log) {
 			index = -1;
 			this.caster = this.self = caster;
 			this.efficiency = efficiency;
 			this.spell = spell;
+			this.log = log;
 		}
 		
 		public int getIndex() {
@@ -107,6 +117,10 @@ public class Spell {
 			if (forceSplit) {
 				this.split().trigger(targets, locations, stageEfficiency, false);
 			} else {
+				// Log the stage
+				final ITextComponent stageLabel = index == -1 ? LABEL_STAGE_START : (this.spell.shapes.get(index).getShape().getDisplayName());
+				this.log.stage(stageLabel, 0, targets, locations); int unused; // time!
+				
 				this.efficiency *= stageEfficiency;
 				index++;
 				if (index >= spell.shapes.size()) {
@@ -187,7 +201,7 @@ public class Spell {
 		}
 		
 		protected SpellState split() {
-			SpellState spawn = new SpellState(spell, caster, this.efficiency);
+			SpellState spawn = new SpellState(spell, caster, this.efficiency, this.log);
 			spawn.index = this.index;
 			
 			return spawn;
@@ -198,21 +212,23 @@ public class Spell {
 			((ServerWorld) world).spawnParticle(ParticleTypes.SMOKE, pos.getX(), pos.getY(), pos.getZ(), 10, 0, 0, 0, .05);
 		}
 		
-		protected float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base) {
+		protected float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
 			float bonus = 0f;
 			
 			if (effect.getElement() != EMagicElement.PHYSICAL) {
 				final Effect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
 				if (target.getActivePotionEffect(boostEffect) != null) {
-					bonus += .25f * (1 + target.getActivePotionEffect(boostEffect).getAmplifier());
+					final float amt = .25f * (1 + target.getActivePotionEffect(boostEffect).getAmplifier());
+					bonus += amt;
 					target.removePotionEffect(boostEffect);
+					log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLinger, amt, false);
 				}
 			}
 			
 			return bonus;
 		}
 		
-		protected float getCasterEfficiencyBonus(LivingEntity caster, SpellEffectPart effect, SpellAction action, float base) {
+		protected float getCasterEfficiencyBonus(LivingEntity caster, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
 			float bonus = 0f;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			
@@ -221,36 +237,43 @@ public class Spell {
 			case EARTH:
 				if (attr.hasSkill(NostrumSkills.Earth_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Earth_Novice, .2f, false);
 				}
 				break;
 			case ENDER:
 				if (attr.hasSkill(NostrumSkills.Ender_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Ender_Novice, .2f, false);
 				}
 				break;
 			case FIRE:
 				if (attr.hasSkill(NostrumSkills.Fire_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Fire_Novice, .2f, false);
 				}
 				break;
 			case ICE:
 				if (attr.hasSkill(NostrumSkills.Ice_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Ice_Novice, .2f, false);
 				}
 				break;
 			case LIGHTNING:
 				if (attr.hasSkill(NostrumSkills.Lightning_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Lightning_Novice, .2f, false);
 				}
 				break;
 			case PHYSICAL:
 				if (attr.hasSkill(NostrumSkills.Physical_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Physical_Novice, .2f, false);
 				}
 				break;
 			case WIND:
 				if (attr.hasSkill(NostrumSkills.Wind_Novice)) {
 					bonus += .2f;
+					log.addGlobalModifier(NostrumSkills.Wind_Novice, .2f, false);
 				}
 				break;
 			}
@@ -271,8 +294,11 @@ public class Spell {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
 				float efficiency = this.efficiency + (part.getPotency() - 1f);
 				
+				log.pushModifierStack();
+				
 				// Apply part-specific bonuses that don't matter on targets here
-				efficiency *= 1f + getCasterEfficiencyBonus(caster, part, action, efficiency);
+				final float partBonus = getCasterEfficiencyBonus(caster, part, action, efficiency, log);
+				efficiency *= 1f + partBonus;
 				
 				if (attr != null && attr.isUnlocked()) {
 					attr.setKnowledge(part.getElement(), part.getAlteration());
@@ -284,10 +310,14 @@ public class Spell {
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
-						// Apply per-target bonuses
-						float perEfficiency = efficiency * (1f + getTargetEfficiencyBonus(caster, targ, part, action, efficiency));
+						log.effect(targ);
+						log.pushModifierStack();
 						
-						SpellActionResult result = action.apply(caster, targ, perEfficiency); 
+						// Apply per-target bonuses
+						final float targBonus = getTargetEfficiencyBonus(caster, targ, part, action, efficiency, log);
+						float perEfficiency = efficiency * (1f + targBonus);
+						
+						SpellActionResult result = action.apply(caster, targ, perEfficiency, log); 
 						if (result.applied) {
 							affectedEnts.add(targ);
 							totalAffectedEntities.computeIfAbsent(targ, e -> new NonNullEnumMap<>(EMagicElement.class, 0f)).merge(part.getElement(), result.damage - result.heals, Float::sum);
@@ -297,11 +327,16 @@ public class Spell {
 							anySuccess = true;
 							EmitSpellEffectEntity(spell, this.caster, targ, result);
 						}
+						
+						log.popModifierStack();
+						
+						log.endEffect();
 					}
 				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
 					for (SpellLocation pos : locations) {
-						SpellActionResult result = action.apply(caster, pos, efficiency); 
+						log.effect(pos);
+						SpellActionResult result = action.apply(caster, pos, efficiency, log); 
 						if (result.applied) {
 							if (result.affectedPos != null) {
 								affectedPos.add(result.affectedPos);
@@ -310,6 +345,7 @@ public class Spell {
 							totalAffectedLocations.add(result.affectedPos);
 							EmitSpellEffectBlock(spell, caster, pos, result);
 						}
+						log.endEffect();
 					}
 				} else {
 					; // Drop it on the floor
@@ -332,6 +368,8 @@ public class Spell {
 				}
 				
 				first = false;
+				
+				log.popModifierStack();
 			}
 			
 			if (anySuccess) {
@@ -355,9 +393,10 @@ public class Spell {
 				}
 			}
 			
+			log.flush();
 			EmitSpellEffectEnd(spell, caster, new SpellResult(anySuccess, damageTotal, healTotal, totalAffectedEntities, totalAffectedLocations));
 		}
-
+		
 		@Override
 		public LivingEntity getSelf() {
 			return self;
@@ -373,6 +412,7 @@ public class Spell {
 		 */
 		@Override
 		public void triggerFail(SpellLocation pos) {
+			log.flush();
 			doFailEffect(pos.world, pos.hitPosition);
 		}
 	}
@@ -383,7 +423,7 @@ public class Spell {
 		private final float partialTicks;
 		
 		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder, float partialTicks) {
-			super(spell, caster, 1f);
+			super(spell, caster, 1f, ISpellLogBuilder.Dummy);
 			this.previewBuilder = previewBuilder;
 			this.partialTicks = partialTicks;
 		}
@@ -596,7 +636,8 @@ public class Spell {
 			throw new IllegalStateException("Can't cast spell on a thread other than the game thread");
 		}
 		
-		SpellState state = new SpellState(this, caster, efficiency);
+		SpellLogEntry log = new SpellLogEntry(caster);
+		SpellState state = new SpellState(this, caster, efficiency, new SpellLogBuilder(log));
 		state.trigger(Lists.newArrayList(caster), null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
