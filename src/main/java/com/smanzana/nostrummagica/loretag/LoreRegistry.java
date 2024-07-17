@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.loretag;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smanzana.nostrummagica.block.PoisonWaterBlock.PoisonWaterTag;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
 import com.smanzana.nostrummagica.entity.KoidEntity;
@@ -76,6 +77,7 @@ public class LoreRegistry {
 		
 		register(UndeadLore.instance());
 		register(Leaves.instance());
+		register(PoisonWaterTag.instance());
 	}
 	
 	public static final class UndeadLore implements IEntityLoreTagged<SkeletonEntity> {

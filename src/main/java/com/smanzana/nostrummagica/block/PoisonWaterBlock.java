@@ -2,7 +2,15 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
+import com.smanzana.nostrummagica.loretag.IBlockLoreTagged;
+import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -15,6 +23,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -72,11 +81,69 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 				&& entity instanceof LivingEntity) {
 			if (entity.ticksExisted % 10 == 0) {
 				LivingEntity living = (LivingEntity) entity;
+				
+				@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(living);
+				if (attr != null && attr.isUnlocked()) {
+					// Either give full or basic randomly, so that the average experience
+					// is that players have to stay in the water long enough to get full
+					if (attr.hasLore(PoisonWaterTag.instance()) && world.rand.nextInt(50) == 0) {
+						attr.giveFullLore(PoisonWaterTag.instance());
+					} else {
+						attr.giveBasicLore(PoisonWaterTag.instance());
+					}
+				}
+				
+				// Mystic air effect prevents poison water damage
+				final EffectInstance instance = living.getActivePotionEffect(NostrumEffects.mysticAir);
+				if (instance != null && instance.getDuration() > 0) {
+					return;
+				}
+				
 				living.attackEntityFrom(PoisonWaterFluid.PoisonWaterDamageSource, .25f);
 			}
 		}
 		
-		// TODO check this works
 		super.onEntityCollision(state, world, pos, entity);
+	}
+	
+	public static final class PoisonWaterTag implements IBlockLoreTagged {
+		
+		private static final String LoreKey = "poison_water";
+		
+		private static final PoisonWaterTag instance = new PoisonWaterTag();
+		public static final PoisonWaterTag instance() {
+			return instance;
+		}
+	
+		@Override
+		public String getLoreKey() {
+			return LoreKey;
+		}
+	
+		@Override
+		public String getLoreDisplayName() {
+			return "Poison Water";
+		}
+		
+		@Override
+		public Lore getBasicLore() {
+			return new Lore().add("Dangerous poisonous water that does damage on contact.", "You imagine there is some magical means to prevent the damage...");
+					
+		}
+		
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add("Dangerous poisonous water that does damage on contact.", "You can prevent the negative effects of poison water with the Mystic Air effect!");
+		}
+
+		@Override
+		public InfoScreenTabs getTab() {
+			return InfoScreenTabs.INFO_BLOCKS;
+		}
+
+		@Override
+		public Block getBlock() {
+			return NostrumBlocks.poisonWaterBlock;
+		}
 	}
 }
