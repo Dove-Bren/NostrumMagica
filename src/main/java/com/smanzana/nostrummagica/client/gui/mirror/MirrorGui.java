@@ -274,7 +274,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				  (int) (System.currentTimeMillis() / cycle) % EMagicElement.values().length
 			      ];
 		}
-		SpellComponentIcon.get(element).draw(this, matrixStackIn, this.font, x, y, width, width, color[0], color[1], color[2], color[3]);
+		SpellComponentIcon.get(element).draw(matrixStackIn, x, y, width, width, color[0], color[1], color[2], color[3]);
 		str = I18n.format("element.name", new Object[0]);
 		strLen = this.font.getStringWidth(str);
 		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
@@ -291,7 +291,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 			      ];
 		}
-		SpellComponentIcon.get(shape).draw(this, matrixStackIn, this.font, x, y, width, width, color[0], color[1], color[2], color[3]);
+		SpellComponentIcon.get(shape).draw(matrixStackIn, x, y, width, width, color[0], color[1], color[2], color[3]);
 		str = I18n.format("shape.name", new Object[0]);
 		strLen = this.font.getStringWidth(str);
 		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);

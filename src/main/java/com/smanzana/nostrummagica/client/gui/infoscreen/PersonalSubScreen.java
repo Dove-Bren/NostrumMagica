@@ -91,7 +91,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (System.currentTimeMillis() / cycle) % EMagicElement.values().length
 					      ];
 				}
-				SpellComponentIcon.get(element).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
+				SpellComponentIcon.get(element).draw(matrixStackIn, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
 				str = I18n.format("element.name", new Object[0]);
 				strLen = mc.fontRenderer.getStringWidth(str);
 				mc.fontRenderer.drawString(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
@@ -108,7 +108,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		                  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
 					      ];
 				}
-				SpellComponentIcon.get(shape).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
+				SpellComponentIcon.get(shape).draw(matrixStackIn, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
 				str = I18n.format("shape.name", new Object[0]);
 				strLen = mc.fontRenderer.getStringWidth(str);
 				mc.fontRenderer.drawString(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
@@ -328,7 +328,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					alpha = unknown;
 				
 				RenderFuncs.drawRect(matrixStackIn, drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
-				SpellComponentIcon.get(elem).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
+				SpellComponentIcon.get(elem).draw(matrixStackIn, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
@@ -383,7 +383,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					alpha = unknown;
 				
 				RenderFuncs.drawRect(matrixStackIn, drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
-				SpellComponentIcon.get(shape).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
+				SpellComponentIcon.get(shape).draw(matrixStackIn, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
@@ -413,7 +413,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					alpha = unknown;
 				
 				RenderFuncs.drawRect(matrixStackIn, drawX, drawY, drawX + iconWidth, drawY + iconWidth, 0xFF406080);
-				SpellComponentIcon.get(alteration).draw(mc.currentScreen, matrixStackIn, mc.fontRenderer, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
+				SpellComponentIcon.get(alteration).draw(matrixStackIn, drawX, drawY, iconWidth, iconWidth, 1f, 1f, 1f, alpha);
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {

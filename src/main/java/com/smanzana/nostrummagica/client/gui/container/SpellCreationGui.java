@@ -1214,12 +1214,12 @@ public class SpellCreationGui {
 		
 		protected void drawAffectEntity(MatrixStack matrixStackIn, int width, int height, float[] color) {
 			SpellComponentIcon.get(NostrumSpellShapes.AtFeet)
-				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
+				.draw(matrixStackIn, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 		
 		protected void drawAffectBlock(MatrixStack matrixStackIn, int width, int height, float[] color) {
 			SpellComponentIcon.get(NostrumSpellShapes.Proximity)
-				.draw(this, matrixStackIn, this.font, 0, 0, width, height, color[0], color[1], color[2], color[3]);
+				.draw(matrixStackIn, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 		
 		protected void drawElementalBoost(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
@@ -1229,7 +1229,7 @@ public class SpellCreationGui {
 					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
 			
 			SpellComponentIcon.get(element)
-				.draw(this, matrixStackIn, this.font, width/2, 0, width/2, height);
+				.draw(matrixStackIn, width/2, 0, width/2, height);
 		}
 		
 		protected void drawElementalPenalty(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
@@ -1239,7 +1239,7 @@ public class SpellCreationGui {
 					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
 			
 			SpellComponentIcon.get(element)
-				.draw(this, matrixStackIn, this.font, width/2, 0, width/2, height);
+				.draw(matrixStackIn, width/2, 0, width/2, height);
 		}
 		
 		protected final void renderSpellPanel(MatrixStack matrixStackIn, int width, int height, float partialTicks) {

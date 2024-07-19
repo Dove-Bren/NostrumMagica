@@ -15,8 +15,6 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -94,12 +92,12 @@ public class SpellComponentIcon {
 				"textures/models/symbol/shape_" + shape.getShapeKey().toLowerCase() + ".png");
 	}
 	
-	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
-		draw(parent, matrixStackIn, fonter, xOffset, yOffset, width, height, 1f, 1f, 1f, 1f);
+	public void draw(MatrixStack matrixStackIn, int xOffset, int yOffset, int width, int height) {
+		draw(matrixStackIn, xOffset, yOffset, width, height, 1f, 1f, 1f, 1f);
 	}
 	
-	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height,
-			float red, float green, float blue, float alpha) {
+	public void draw(MatrixStack matrixStackIn, int xOffset, int yOffset, int width, int height, float red, float green,
+			float blue, float alpha) {
 		matrixStackIn.push();
 
 		{

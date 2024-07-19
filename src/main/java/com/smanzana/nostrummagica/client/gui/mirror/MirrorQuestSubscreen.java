@@ -333,7 +333,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 					color[0], color[1], color[2], color[3]);
 			
 			if (icon != null) {
-				icon.draw(this, matrixStackIn, null, x + 2, y + 2, width-4, height-4); // Blend with color?
+				icon.draw(matrixStackIn, x + 2, y + 2, width-4, height-4); // Blend with color?
 			} else {
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x + 4, y + 4,
 						iconU, iconV, TEX_ICON_REWARD_WIDTH, TEX_ICON_REWARD_HEIGHT, width-8, height-8, TEX_ICON_WIDTH, TEX_ICON_HEIGHT,

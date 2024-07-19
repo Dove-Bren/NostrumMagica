@@ -8,7 +8,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.widget.LabeledTextWidget;
+import com.smanzana.nostrummagica.client.gui.widget.LabeledWidget;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -80,21 +80,21 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			int x = leftMargin + 4;
 			
 			// First column: Mana
-			parent.addWidget(new LabeledTextWidget(helper, "Mana: ", () -> attr.getMana() + "/" + attr.getMaxMana(), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Mana: "), new LabeledWidget.TextValue(() -> attr.getMana() + "/" + attr.getMaxMana()), x, y, width/2, yPer).scale(scale));
 			y += yPer;
-			parent.addWidget(new LabeledTextWidget(helper, "Mana Regen: ", () -> String.format("%+.1f%% (%.02f/s)", attr.getManaRegenModifier() * 100f, 2 * (1 + attr.getManaRegenModifier())), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Mana Regen: "), new LabeledWidget.TextValue(() -> String.format("%+.1f%% (%.02f/s)", attr.getManaRegenModifier() * 100f, 2 * (1 + attr.getManaRegenModifier()))), x, y, width/2, yPer).scale(scale));
 			y += yPer;
-			parent.addWidget(new LabeledTextWidget(helper, "Mana Cost: ", () -> String.format("%+.1f%%", attr.getManaCostModifier() * 100f), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Mana Cost: "), new LabeledWidget.TextValue(() -> String.format("%+.1f%%", attr.getManaCostModifier() * 100f)), x, y, width/2, yPer).scale(scale));
 			y += yPer;
 			
 			// Second column: Mana modifiers
 			y = yTop;
 			x = leftMargin + width/2;
-			parent.addWidget(new LabeledTextWidget(helper, "Bonus Mana: ", () -> String.format("%+.1f%%", attr.getManaModifier() * 100f), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Bonus Mana: "), new LabeledWidget.TextValue(() -> String.format("%+.1f%%", attr.getManaModifier() * 100f)), x, y, width/2, yPer).scale(scale));
 			y += yPer;
-			parent.addWidget(new LabeledTextWidget(helper, "Bonus Mana (Flat): ", () -> "" + attr.getManaBonus(), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Bonus Mana (Flat): "), new LabeledWidget.TextValue(() -> "" + attr.getManaBonus()), x, y, width/2, yPer).scale(scale));
 			y += yPer;
-			parent.addWidget(new LabeledTextWidget(helper, "Reserved Mana: ", () -> "" + attr.getReservedMana(), x, y, width/2, yPer).scale(scale).tooltip(getMiscDesc("info.reserved_mana.desc")));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Reserved Mana: "), new LabeledWidget.TextValue(() -> "" + attr.getReservedMana()), x, y, width/2, yPer).scale(scale).tooltip(getMiscDesc("info.reserved_mana.desc")));
 			y += yPer;
 		}
 		
@@ -116,7 +116,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledTextWidget(helper, I18n.format(attribute.getAttributeName()) + ": ", () -> player.getAttribute(attribute).getValue() + "%", x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> player.getAttribute(attribute).getValue() + "%"), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
 				y += yPer;
 			}
 			
@@ -134,7 +134,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledTextWidget(helper, I18n.format(attribute.getAttributeName()) + ": ", () -> "" + player.getAttribute(attribute).getValue(), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> "" + player.getAttribute(attribute).getValue()), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
 				y += yPer;
 			}
 		}
@@ -148,14 +148,14 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			int x = leftMargin + 4;
 			
 			// First row: skillpoints
-			parent.addWidget(new LabeledTextWidget(helper, "Skill Points: ", () -> "" + attr.getSkillPoints(), x, y, width/2, yPer).scale(scale));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Skill Points: "), new LabeledWidget.TextValue(() -> "" + attr.getSkillPoints()), x, y, width/2, yPer).scale(scale));
 			y += yPer;
 			
 			// Second row: elemental skillpoints
 			int elemCount = 0;
 			for (EMagicElement element : EMagicElement.values()) {
 				if (attr.getElementalMastery(element).isGreaterOrEqual(EElementalMastery.NOVICE)) {
-					parent.addWidget(new LabeledTextWidget(helper, element.getName() + " Points: ", () -> "" + attr.getElementalSkillPoints(element), x, y, width / 5, yPer).scale(scale));
+					parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(element.getName() + " Points: "), new LabeledWidget.TextValue(() -> "" + attr.getElementalSkillPoints(element)), x, y, width / 5, yPer).scale(scale));
 					x += (width/5);
 					if (++elemCount >= 4) {
 						x = leftMargin + 4;
