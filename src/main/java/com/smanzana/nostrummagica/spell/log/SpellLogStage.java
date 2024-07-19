@@ -18,10 +18,8 @@ public class SpellLogStage {
 	private final Map<LivingEntity, SpellLogEffectSummary> affectedEnts;
 	private final Map<SpellLocation, SpellLogEffectSummary> affectedLocs;
 	private final int elapsedTicks;
-	private final ITextComponent label;
 
-	public SpellLogStage(ITextComponent label, Map<LivingEntity, SpellLogEffectSummary> affectedEnts, Map<SpellLocation, SpellLogEffectSummary> affectedLocs, int elapsedTicks) {
-		this.label = label;
+	public SpellLogStage(Map<LivingEntity, SpellLogEffectSummary> affectedEnts, Map<SpellLocation, SpellLogEffectSummary> affectedLocs, int elapsedTicks) {
 		this.affectedEnts = affectedEnts;
 		this.affectedLocs = affectedLocs;
 		this.elapsedTicks = elapsedTicks;
@@ -37,9 +35,5 @@ public class SpellLogStage {
 
 	public int getElapsedTicks() {
 		return elapsedTicks;
-	}
-	
-	public ITextComponent getLabel() {
-		return label;
 	}
 }

@@ -1,9 +1,14 @@
 package com.smanzana.nostrummagica.spell.log;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.spell.Spell;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.text.ITextComponent;
 
 /**
  * Top level entry for a spell log.
@@ -13,24 +18,42 @@ import net.minecraft.entity.LivingEntity;
  */
 public class SpellLogEntry {
 
+	public static SpellLogEntry LAST = null;
+	
+	private final Spell spell;
 	private final LivingEntity caster;
-	private final List<SpellLogStage> stages;
+	private final Map<Integer, SpellLogStageSummary> stages;
 	
-	public SpellLogEntry(LivingEntity caster) {
+	public SpellLogEntry(Spell spell, LivingEntity caster) {
+		this.spell = spell;
 		this.caster = caster;
-		this.stages = new ArrayList<>();
+		this.stages = new TreeMap<>();
+		
+		LAST = this; int unused;
 	}
 	
-	public void addStage(SpellLogStage stage) {
-		stages.add(stage);
+	public void addStage(int stageIdx, ITextComponent label, SpellLogStage stage) {
+		stages.computeIfAbsent(stageIdx, idx -> new SpellLogStageSummary(label)).addStage(stage);
 	}
 	
-	public List<SpellLogStage> getStages() {
+	public @Nullable SpellLogStageSummary getStages(int idx) {
+		return stages.get(idx); // not computeIfAbsent so size still reflects real size
+	}
+	
+	public Map<Integer, SpellLogStageSummary> getAllStages() {
 		return stages;
+	}
+	
+	public int getStageIndexCount() {
+		return stages.size();
 	}
 	
 	public LivingEntity getCaster() {
 		return caster;
+	}
+	
+	public Spell getSpell() {
+		return this.spell;
 	}
 	
 }

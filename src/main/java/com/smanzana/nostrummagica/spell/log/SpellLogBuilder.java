@@ -85,7 +85,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			if (baseDmg == -1 || finalDmg == -1) {
 				throw new IllegalStateException("Didn't specify both base and final damage amounts");
 			}
-			return new SpellLogEffectLine.Damage(baseDmg, finalDmg, lineModifiers);
+			return new SpellLogEffectLine.Damage(baseDmg, finalDmg, element, lineModifiers);
 		}
 	}
 	
@@ -124,7 +124,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			if (baseHeal == -1 || finalHeal == -1) {
 				throw new IllegalStateException("Didn't specify both base and final heal amounts");
 			}
-			return new SpellLogEffectLine.Heal(baseHeal, finalHeal, lineModifiers);
+			return new SpellLogEffectLine.Heal(baseHeal, finalHeal, element, lineModifiers);
 		}
 	}
 	
@@ -218,6 +218,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	// Stage building
 	private final Map<LivingEntity, SpellLogEffectSummary> stageEnts;
 	private final Map<SpellLocation, SpellLogEffectSummary> stageLocs;
+	private int stageIdx;
 	private int stageTicks;
 	private ITextComponent stageLabel;
 	
@@ -267,15 +268,16 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 				flushEffectSummary();
 			}
 			
-			SpellLogStage stage = new SpellLogStage(stageLabel, new HashMap<>(stageEnts), new HashMap<>(stageLocs), stageTicks);
+			SpellLogStage stage = new SpellLogStage(new HashMap<>(stageEnts), new HashMap<>(stageLocs), stageTicks);
 			
 			buildingStage = false;
 			stageEnts.clear();
 			stageLocs.clear();
 			stageTicks = -1;
-			stageLabel = null;
 			
-			this.log.addStage(stage);
+			this.log.addStage(stageIdx, stageLabel, stage);
+			stageLabel = null;
+			stageIdx = -1;
 		}
 	}
 	
@@ -308,10 +310,11 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder stage(ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) {
+	public SpellLogBuilder stage(int spellStageIdx, ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) {
 		flush();
 		
 		buildingStage = true;
+		this.stageIdx = spellStageIdx;
 		this.stageTicks = ticksElapsed;
 		this.stageLabel = label;
 		

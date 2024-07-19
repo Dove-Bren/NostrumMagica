@@ -14,14 +14,15 @@ import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.TameRedDragonLore;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
-import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.RitualRegistry;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spell.log.SpellLogEntry;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -40,6 +41,7 @@ public abstract class InfoScreenTab {
 	private static InfoScreenTab INFO_GUIDES;
 	private static InfoScreenTab INFO_TRIALS;
 	private static InfoScreenTab INFO_DRAGONS;
+	private static InfoScreenTab SPELL_LOG;
 	
 	public static void init() {
 		if (INFO_ITEMS != null)
@@ -513,6 +515,25 @@ public abstract class InfoScreenTab {
 			}
 			
 		};
+		
+		SPELL_LOG = new InfoScreenTab(InfoScreenTabs.SPELL_LOG,
+				new ItemStack(NostrumItems.spellScroll, 1)) {
+
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				return attr.isUnlocked() && SpellLogEntry.LAST != null;
+			}
+
+			@Override
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
+				List<InfoButton> buttons = new LinkedList<>();
+				
+				buttons.add(new SpellLogButton(screen, SpellLogEntry.LAST));
+				
+				return buttons;
+			}
+			
+		};
 	}
 	
 	public static InfoScreenTab get(InfoScreenTabs tab) {
@@ -550,6 +571,9 @@ public abstract class InfoScreenTab {
 			break;
 		case INFO_DRAGONS:
 			ret = INFO_DRAGONS;
+			break;
+		case SPELL_LOG:
+			ret = SPELL_LOG;
 			break;
 		}
 		

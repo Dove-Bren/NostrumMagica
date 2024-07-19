@@ -55,7 +55,7 @@ public class ScrollScreen extends Screen {
 			this.icon = SpellIcon.get(spell.getIconIndex());
 			
 			for (SpellShapePart part : spell.getSpellShapeParts()) {
-				this.components.add(" - " + part.getShape().getDisplayName());
+				this.components.add(" - " + part.getShape().getDisplayName().getString());
 			}
 			
 			for (SpellEffectPart part : spell.getSpellEffectParts()) {

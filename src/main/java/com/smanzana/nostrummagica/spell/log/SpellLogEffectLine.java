@@ -2,6 +2,10 @@ package com.smanzana.nostrummagica.spell.log;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.spell.EMagicElement;
+
 import net.minecraft.potion.Effect;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -49,10 +53,10 @@ public abstract class SpellLogEffectLine {
 
 		private final TranslationTextComponent desc;
 		
-		public Damage(float base, float total, List<SpellLogModifier> modifiers) {
+		public Damage(float base, float total, @Nullable EMagicElement element, List<SpellLogModifier> modifiers) {
 			super(base, total, modifiers);
 			
-			desc = new TranslationTextComponent("spelllog.damage.desc", base, total);
+			desc = new TranslationTextComponent("spelllog.damage.desc", base, total, element == null ? "" : (element.getName() + " "));
 		}
 
 		@Override
@@ -80,10 +84,10 @@ public abstract class SpellLogEffectLine {
 
 		private final TranslationTextComponent desc;
 		
-		public Heal(float base, float total, List<SpellLogModifier> modifiers) {
+		public Heal(float base, float total, @Nullable EMagicElement element, List<SpellLogModifier> modifiers) {
 			super(base, total, modifiers);
 			
-			desc = new TranslationTextComponent("spelllog.heal.desc", base, total);
+			desc = new TranslationTextComponent("spelllog.heal.desc", base, total, element == null ? "" : (element.getName() + " "));
 		}
 
 		@Override

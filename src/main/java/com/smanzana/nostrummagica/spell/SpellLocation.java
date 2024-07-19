@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.spell;
 
+import java.util.Objects;
+
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -111,6 +113,26 @@ public class SpellLocation {
 	
 	public SpellLocation(World world, RayTraceResult rayTrace) {
 		this(world, (BlockRayTraceResult) rayTrace); // Kinda lame
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SpellLocation) {
+			final SpellLocation other = (SpellLocation) o;
+			return world.equals(other.world)
+					&& selectedBlockPos.equals(other.selectedBlockPos)
+					&& hitPosition.equals(other.hitPosition)
+					&& hitBlockPos.equals(other.hitBlockPos)
+					&& shooterPosition.equals(other.shooterPosition)
+					;
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(world, selectedBlockPos, hitPosition, hitBlockPos, shooterPosition);
 	}
 	
 }

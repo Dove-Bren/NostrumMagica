@@ -2027,14 +2027,14 @@
 	"research.sword_ender.desc": "Great balls of Ender!",
 	"research.sword_ender.info": "By enhancing a mage blade enchanted with ender, you've created a magic rod. When charged up, the rod can create a point of ender energy at a distant location. Striking an enemy or right-clicking on an entity aftere doing so will teleport them to the ball of ender energy!|  You suspect the tool could be even more useful with a set of True Ender armor...",
 	
-	"spelllog.damage.desc": "Damaged for %2$s damage (%1$s base)",
-	"spelllog.heal.desc": "Healed for %2$s health (%1$s base)",
+	"spelllog.damage.desc": "Damaged for %3$s%2$s damage (%1$s base)",
+	"spelllog.heal.desc": "Healed for %2$s health (%1$s %3$sbase)",
 	"spelllog.status.desc": "Applied %1$s effect for %3$s seconds (%2$s base)",
 	
 	"spelllogstage.start": "Start",
 	
 	"spelllogmod.nostrummagica.skill": "[Skill] ",
-	"spelllogmod.nostrummagica.target": "Spell Target Bonus",
+	"spelllogmod.nostrummagica.spellboost": "Spell Target Bonus",
 	"spelllogmod.nostrummagica.efficiency": "",
 	"spelllogmod.nostrummagica.": "",
 	"spelllogmod.nostrummagica.": "",

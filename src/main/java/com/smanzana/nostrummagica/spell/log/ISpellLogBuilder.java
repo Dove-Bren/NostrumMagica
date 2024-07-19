@@ -16,7 +16,7 @@ public interface ISpellLogBuilder {
 	
 	public default void flush() { }
 	
-	public default ISpellLogBuilder stage(ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) { return this; }
+	public default ISpellLogBuilder stage(int stageIdx, ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) { return this; }
 	
 	public default ISpellLogBuilder effect(LivingEntity entity) { return this; }
 	

@@ -86,6 +86,8 @@ public class Spell {
 		protected final LivingEntity caster;
 		protected float efficiency;
 		protected final ISpellLogBuilder log;
+		
+		private final long startTicks;
 
 		protected int index;
 		private LivingEntity self;
@@ -97,6 +99,8 @@ public class Spell {
 			this.efficiency = efficiency;
 			this.spell = spell;
 			this.log = log;
+			
+			this.startTicks = caster.world.getGameTime();
 		}
 		
 		public int getIndex() {
@@ -119,7 +123,7 @@ public class Spell {
 			} else {
 				// Log the stage
 				final ITextComponent stageLabel = index == -1 ? LABEL_STAGE_START : (this.spell.shapes.get(index).getShape().getDisplayName());
-				this.log.stage(stageLabel, 0, targets, locations); int unused; // time!
+				this.log.stage(index + 1, stageLabel, (int) (this.caster.world.getGameTime() - this.startTicks), targets, locations);
 				
 				this.efficiency *= stageEfficiency;
 				index++;
@@ -636,8 +640,14 @@ public class Spell {
 			throw new IllegalStateException("Can't cast spell on a thread other than the game thread");
 		}
 		
-		SpellLogEntry log = new SpellLogEntry(caster);
-		SpellState state = new SpellState(this, caster, efficiency, new SpellLogBuilder(log));
+		final ISpellLogBuilder logger;
+		if (caster instanceof PlayerEntity) {
+			SpellLogEntry log = new SpellLogEntry(this, caster);
+			logger = new SpellLogBuilder(log);
+		} else {
+			logger = ISpellLogBuilder.Dummy;
+		}
+		SpellState state = new SpellState(this, caster, efficiency, logger);
 		state.trigger(Lists.newArrayList(caster), null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
