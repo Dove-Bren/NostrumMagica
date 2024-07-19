@@ -10,10 +10,12 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -47,6 +49,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		
 		// General
 		public EffectBuilder harmful(boolean harmful) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder name(ITextComponent name) { throw new IllegalStateException("Building the wrong type of effect"); }
 		public EffectBuilder desc(ITextComponent desc) { throw new IllegalStateException("Building the wrong type of effect"); }
 	}
 	
@@ -171,6 +174,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		
 		private float amtDmg;
 		private float amtHeal;
+		private ITextComponent name;
 		private ITextComponent desc;
 		private boolean harmful;
 		
@@ -199,13 +203,25 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			this.harmful = harmful;
 			return this;
 		}
+		
+		@Override
+		public EffectBuilder name(ITextComponent name) {
+			this.name = name;
+			return this;
+		}
+		
+		@Override
+		public EffectBuilder desc(ITextComponent desc) {
+			this.desc = desc;
+			return this;
+		}
 
 		@Override
 		public SpellLogEffectLine build() {
-			if (amtDmg == -1 || amtHeal == -1 || desc == null) {
+			if (amtDmg == -1 || amtHeal == -1 || desc == null || name == null) {
 				throw new IllegalStateException("Must specify damage and heal amounts and a description");
 			}
-			return new SpellLogEffectLine.General(harmful, amtDmg, amtHeal, desc, lineModifiers);
+			return new SpellLogEffectLine.General(harmful, amtDmg, amtHeal, name, desc, lineModifiers);
 		}
 	}
 
@@ -220,7 +236,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	private final Map<SpellLocation, SpellLogEffectSummary> stageLocs;
 	private int stageIdx;
 	private int stageTicks;
-	private ITextComponent stageLabel;
+	private SpellShape stageShape;
 	
 	// Effect summary
 	private LivingEntity summaryEntity;
@@ -237,7 +253,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		this.stageEnts = new HashMap<>();
 		this.stageLocs = new HashMap<>();
 		this.stageTicks = -1;
-		this.stageLabel = null;
+		this.stageShape = null;
 		
 		this.summaryEntity = null;
 		this.summaryLocation = null;
@@ -275,8 +291,8 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			stageLocs.clear();
 			stageTicks = -1;
 			
-			this.log.addStage(stageIdx, stageLabel, stage);
-			stageLabel = null;
+			this.log.addStage(stageIdx, stageShape, stage);
+			stageShape = null;
 			stageIdx = -1;
 		}
 	}
@@ -285,9 +301,19 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		if (buildingEffectSummary) {
 			final SpellLogEffectSummary summary = new SpellLogEffectSummary(new ArrayList<>(this.summaryEffects));
 			if (this.summaryEntity != null) {
-				this.stageEnts.put(this.summaryEntity, summary);
+				this.stageEnts.merge(this.summaryEntity, summary, (a, b) -> {
+					List<SpellLogEffectLine> combined = new ArrayList<>(a.getElements().size() + b.getElements().size());
+					combined.addAll(a.getElements());
+					combined.addAll(b.getElements());
+					return new SpellLogEffectSummary(combined);
+				});
 			} else {
-				this.stageLocs.put(this.summaryLocation, summary);
+				this.stageLocs.merge(this.summaryLocation, summary, (a, b) -> {
+					List<SpellLogEffectLine> combined = new ArrayList<>(a.getElements().size() + b.getElements().size());
+					combined.addAll(a.getElements());
+					combined.addAll(b.getElements());
+					return new SpellLogEffectSummary(combined);
+				});
 			}
 			
 			summaryEffects.clear();
@@ -310,13 +336,13 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder stage(int spellStageIdx, ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) {
+	public SpellLogBuilder stage(int spellStageIdx, SpellShape shape, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) {
 		flush();
 		
 		buildingStage = true;
 		this.stageIdx = spellStageIdx;
 		this.stageTicks = ticksElapsed;
-		this.stageLabel = label;
+		this.stageShape = shape;
 		
 		if (affectedEnts != null)
 		for (LivingEntity ent : affectedEnts) {
@@ -425,7 +451,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder generalEffectStart(ITextComponent description, boolean harmful) {
+	public SpellLogBuilder generalEffectStart(ITextComponent name, ITextComponent description, boolean harmful) {
 		if (this.buildingEffectLine) {
 			throw new IllegalStateException("Previous effect was not finished");
 		}
@@ -433,7 +459,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		this.buildingEffectSummary = true;
 		this.buildingEffectLine = true;
 		this.effectBuilder = new GeneralEffectBuilder(getModifiers());
-		this.effectBuilder.desc(description).harmful(harmful);
+		this.effectBuilder.name(name).desc(description).harmful(harmful);
 		
 		return this;
 	}
@@ -452,6 +478,11 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		}
 		this.effectBuilder.modify(flat ? new SpellLogModifier.Flat(label, amt) : new SpellLogModifier.Percentage(label, amt));
 		return this;
+	}
+	
+	@Override
+	public ISpellLogBuilder effectMod(Skill skill, float amt, boolean flat) {
+		return effectMod(makeSkillLabel(skill), amt, flat);
 	}
 
 	@Override
@@ -477,13 +508,17 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	
 	@Override
 	public ISpellLogBuilder addGlobalModifier(Skill skill, float amt, boolean flat) {
-		final ITextComponent label = new TranslationTextComponent("spelllogmod.nostrummagica.skill").mergeStyle(TextFormatting.DARK_PURPLE)
-				.append(skill.getName());
-		return addGlobalModifier(label, amt, flat);
+		return addGlobalModifier(makeSkillLabel(skill), amt, flat);
 	}
 	
 	protected List<SpellLogModifier> getModifiers() {
 		return this.modifierStack.get(this.modifierStack.size() - 1);
+	}
+	
+	protected ITextComponent makeSkillLabel(Skill skill) {
+		return new StringTextComponent("")
+			.append(new TranslationTextComponent("spelllogmod.nostrummagica.skill").mergeStyle(TextFormatting.GOLD))
+			.append(skill.getName().deepCopy());
 	}
 	
 }

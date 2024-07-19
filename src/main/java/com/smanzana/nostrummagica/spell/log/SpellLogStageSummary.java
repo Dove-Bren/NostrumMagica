@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.text.ITextComponent;
 
 /**
  * Each shape in a spell can trigger multiple times, each time creating a spell log 'stage' with the same idx.
@@ -23,17 +23,17 @@ public class SpellLogStageSummary {
 	private final List<SpellLogStage> stages;
 	private final Map<LivingEntity, Integer> affectedEntCounts;
 	private final Map<SpellLocation, Integer> affectedLocCounts;
-	private final ITextComponent label;
+	private final SpellShape shape;
 	
 	private float totalDamage;
 	private float totalHeal;
 	private boolean hasEffects;
 	
-	public SpellLogStageSummary(ITextComponent label) {
+	public SpellLogStageSummary(SpellShape shape) {
 		this.stages = new ArrayList<>();
 		this.affectedEntCounts = new HashMap<>();
 		this.affectedLocCounts = new HashMap<>();
-		this.label = label;
+		this.shape = shape;
 		
 		totalDamage = 0;
 		totalHeal = 0;
@@ -73,8 +73,8 @@ public class SpellLogStageSummary {
 		return affectedLocCounts;
 	}
 
-	public ITextComponent getLabel() {
-		return label;
+	public SpellShape getShape() {
+		return shape;
 	}
 
 	public float getTotalDamage() {

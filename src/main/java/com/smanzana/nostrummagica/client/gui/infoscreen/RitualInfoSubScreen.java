@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -325,7 +326,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<ISubScreenButton> getButtons() {
+	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 		return null;
 	}
 

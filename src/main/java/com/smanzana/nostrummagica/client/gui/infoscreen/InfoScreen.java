@@ -41,7 +41,7 @@ public class InfoScreen extends StackableScreen {
 	private List<TabButton> tabs;
 	private List<InfoButton> infoButtons;
 	private IInfoSubScreen subscreen;
-	private List<ISubScreenButton> subscreenButtons;
+	private List<Widget> subscreenButtons;
 	
 	protected int globButtonID = 0;
 	
@@ -149,25 +149,24 @@ public class InfoScreen extends StackableScreen {
 
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		
+		// Figure out draw offset depending on how many buttons there are
+		final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
+		int xOffset = 0;
+		int yOffset = POS_BUTTONS_HEIGHT + POS_BUTTONS_HEIGHT;
+		if (infoButtons.size() > maxHorizontal * 2) {
+			xOffset = (2 + InfoButton.BUTTON_WIDTH) * 5;
+			yOffset = 10;
+		}
+		
+		yOffset += POS_SUBSCREEN_VOFFSET;
+		
 		if (this.subscreen != null) {
-			
-			// Figure out draw offset depending on how many buttons there are
-			final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
-			int xOffset = 0;
-			int yOffset = POS_BUTTONS_HEIGHT + POS_BUTTONS_HEIGHT;
-			if (infoButtons.size() > maxHorizontal * 2) {
-				xOffset = (2 + InfoButton.BUTTON_WIDTH) * 5;
-				yOffset = 10;
-			}
-			
-			yOffset += POS_SUBSCREEN_VOFFSET;
-			
 			this.subscreen.draw(attribute, minecraft, matrixStackIn, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
 		}
 		
 		// Do buttons and other parent stuff
 		for (int i = 0; i < this.buttons.size(); ++i) {
-			((AbstractButton)this.buttons.get(i)).render(matrixStackIn, mouseX, mouseY, partialTicks);
+			this.buttons.get(i).render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 		// Mask out any partial buttons or buttons that are above button line, since we support scrolling
@@ -185,6 +184,10 @@ public class InfoScreen extends StackableScreen {
 //		for (int j = 0; j < this.labelList.size(); ++j) {
 //			((GuiLabel)this.labelList.get(j)).drawLabel(this.minecraft, mouseX, mouseY);
 //		}
+		
+		if (this.subscreen != null) {
+			this.subscreen.drawForeground(attribute, minecraft, matrixStackIn, xOffset, yOffset, width - xOffset, height - yOffset, mouseX, mouseY);
+		}
 		
 		// Only show sub buttons if mouseY is lower than button  vertical offset
 		if (mouseY > POS_SUBSCREEN_VOFFSET) {
@@ -220,13 +223,27 @@ public class InfoScreen extends StackableScreen {
 		// Since we allow scrolling, disallow clicks that are above the button location
 		this.subscreen = ((InfoButton) button).getScreen(attribute);
 		this.subscreenButtons.clear();
-		Collection<ISubScreenButton> screenbutts = subscreen.getButtons();
-		if (screenbutts != null && !screenbutts.isEmpty())
-			this.subscreenButtons.addAll(screenbutts);
 		
-		if (!this.subscreenButtons.isEmpty()) {
+		{
+			// Figure out draw offset depending on how many buttons there are
+			final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
+			int xOffset = 0;
+			int yOffset = POS_BUTTONS_HEIGHT + POS_BUTTONS_HEIGHT;
+			if (infoButtons.size() > maxHorizontal * 2) {
+				xOffset = (2 + InfoButton.BUTTON_WIDTH) * 5;
+				yOffset = 10;
+			}
+			
+			yOffset += POS_SUBSCREEN_VOFFSET;
+						
+			Collection<Widget> screenbutts = subscreen.getWidgets(xOffset, yOffset, width - xOffset, height - yOffset);
+			if (screenbutts != null && !screenbutts.isEmpty())
+				this.subscreenButtons.addAll(screenbutts);
+		}
+		
+		if (!this.subscreenButtons.isEmpty() && this.subscreenButtons.stream().allMatch(b -> b.x == 0 && b.y == 0)) {
 			int i = 0;
-			for (ISubScreenButton butt : subscreenButtons) {
+			for (Widget butt : subscreenButtons) {
 				butt.x = i;
 				i += butt.getWidth() + 2;
 				butt.y = this.height - 15;

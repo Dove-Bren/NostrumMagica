@@ -199,9 +199,9 @@ public class SpellAction {
 			
 			final float baseDmg = amount;
 			log.damageStart(this.amount, this.element);
-			log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
 			
-			final float fin = SpellDamage.DamageEntity(entity, element, baseDmg * efficiency, caster, log);
+			final float fin = SpellDamage.DamageEntity(entity, element, baseDmg, caster, log) * efficiency;
+			log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
 			
 			NostrumMagicaSounds sound;
 			switch (element) {
@@ -273,7 +273,7 @@ public class SpellAction {
 				entity.setRevengeTarget(caster);
 				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 				
-				log.damageStart(this.amount, null); // trickery here: skill modifiers added globally so 'start' with real base
+				log.damageStart(this.amount, EMagicElement.ICE); // trickery here: skill modifiers added globally so 'start' with real base
 													// even though later we use the current 'base' modified amount
 				log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
 				
@@ -283,6 +283,9 @@ public class SpellAction {
 				resultBuilder.damage += fin;
 				log.damageFinish(fin);
 			} else {
+				
+				log.healStart(this.amount, EMagicElement.ICE);
+				
 				entity.heal(base * efficiency);
 				if (entity instanceof TameRedDragonEntity) {
 					TameRedDragonEntity dragon = (TameRedDragonEntity) entity;
@@ -296,6 +299,7 @@ public class SpellAction {
 					}
 				}
 				resultBuilder.heals += base * efficiency;
+				log.healFinish(base * efficiency);
 				
 				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 					if (NostrumMagica.rand.nextBoolean()) {

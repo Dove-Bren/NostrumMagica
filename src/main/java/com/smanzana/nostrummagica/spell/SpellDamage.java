@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 
 import net.minecraft.entity.LivingEntity;
@@ -37,22 +38,40 @@ public class SpellDamage {
 			this.log = log;
 		}
 		
-		public final void mul(String cause, float scale) {
+		private final void mulInternal(String cause, float scale) {
 			final float pre = base;
 			base *= scale;
 			base = Math.max(0, base);
 			final float post = base;
 			LogDamage(pre, post, cause);
-			log.effectMod(MakeLabel(cause), scale, false);
 		}
 		
-		public final void add(String cause, float diff) {
+		public final void mul(String cause, float scale) {
+			mulInternal(cause, scale);
+			log.effectMod(MakeLabel(cause), scale-1f, false);
+		}
+		
+		public final void mul(Skill skill, float scale) {
+			mulInternal("Skill: " + skill.getName().getString(), scale);
+			log.effectMod(skill, scale-1f, false);
+		}
+		
+		private final void addInternal(String cause, float diff) {
 			final float pre = base;
 			base += diff;
 			base = Math.max(0, base);
 			final float post = base;
 			LogDamage(pre, post, cause);
+		}
+		
+		public final void add(String cause, float diff) {
+			addInternal(cause, diff);
 			log.effectMod(MakeLabel(cause), diff, true);
+		}
+		
+		public final void add(Skill skill, float diff) {
+			addInternal("Skill: " + skill.getName().getString(), diff);
+			log.effectMod(skill, diff, true);
 		}
 		
 		public final float calc() {
@@ -61,7 +80,7 @@ public class SpellDamage {
 		}
 	}
 
-	protected static final float GetPhysicalAttributeBonus(@Nullable LivingEntity caster) {
+	protected static final float GetPhysicalAttributeBonusNoMainhand(@Nullable LivingEntity caster) {
 		// Get raw amount
 		if (caster == null || !caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
 			return 0f;
@@ -80,12 +99,28 @@ public class SpellDamage {
 					extra += mod.getAmount();
 				}
 				
-				// Note that the physical master skill includes using some of this
-				final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.hasSkill(NostrumSkills.Physical_Master)) {
-					amt -= (int) ((float) extra * .8f);
-				} else {
-					amt -= extra;
+				amt -= extra;
+			}
+		}
+		
+		return (float) amt;
+	}
+
+	protected static final float GetPhysicalAttributeBonusMainhand(@Nullable LivingEntity caster) {
+		// Get raw amount
+		if (caster == null || !caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
+			return 0f;
+		}
+		
+		double amt = 0;
+		
+		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
+		ItemStack held = caster.getHeldItemMainhand();
+		if (!held.isEmpty()) {
+			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
+			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
+				for (AttributeModifier mod : heldAttribs.get(Attributes.ATTACK_DAMAGE)) {
+					amt += mod.getAmount();
 				}
 			}
 		}
@@ -123,7 +158,15 @@ public class SpellDamage {
 		if (element == EMagicElement.PHYSICAL) {
 			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
 			// It still gains power from magic boost/magic damage AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).
-			damage.add("PhysicalAttribute", GetPhysicalAttributeBonus(caster));
+			final float baseAttribute = GetPhysicalAttributeBonusNoMainhand(caster);
+			final float mainhand = GetPhysicalAttributeBonusMainhand(caster);
+			damage.add("PhysicalAttributeBase", baseAttribute);
+			
+			// Note that the physical master skill includes using some of this
+			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Physical_Master)) {
+				damage.add(NostrumSkills.Physical_Master, (int) (mainhand * .2f));
+			}
 		} else {
 		
 			final int armor = target.getTotalArmorValue();
@@ -158,18 +201,18 @@ public class SpellDamage {
 			}
 			
 			if (element == EMagicElement.FIRE && magic != null && magic.hasSkill(NostrumSkills.Fire_Adept)) {
-				damage.add("FireAdept", 2);
+				damage.add(NostrumSkills.Fire_Adept, 2);
 			}
 			
 			if (element == EMagicElement.LIGHTNING && magic != null && magic.hasSkill(NostrumSkills.Lightning_Adept)) {
-				damage.add("LightningAdept", 1);
+				damage.add(NostrumSkills.Lightning_Adept, 1);
 			}
 			
 			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
 				EffectInstance strength = caster == null ? null : caster.getActivePotionEffect(Effects.STRENGTH);
 				if (strength != null) {
 					// Matches strength attribute boost
-					damage.add("EarthAdeptStrength", 3 * (strength.getAmplifier() + 1));
+					damage.add(NostrumSkills.Earth_Adept, 3 * (strength.getAmplifier() + 1));
 				}
 			}
 				
@@ -185,19 +228,35 @@ public class SpellDamage {
 				damage.mul("LightningDamage", .75f + ((float) armor / 20f)); // double in power for every 20 armor
 				break;
 			case FIRE:
-				damage.mul("FireDamage", undead ? 1.5f : (flamy ? .5f : 1f)); // 1.5x damage against undead. Regular otherwise
+				// 1.5x damage against undead. Half on flame-resistant. Regular otherwise
+				if (undead) {
+					damage.mul("FireXUndead", 1.5f); 
+				} else if (flamy) {
+					damage.mul("FireXFire", .5f); // 1.5x damage against undead. Regular otherwise
+				}
 				break;
 			case EARTH:
-				damage.mul("EarthDamage", 1f); // No change for earth damage
+				// No change for earth damage
+				//damage.mul("EarthDamage", 1f); not useful for logging 
 				break;
 			case ICE:
-				damage.mul("IceDamage", undead ? .6f : 1.3f); // More affective against everything except undead
+				// More affective against everything except undead
+				if (undead) {
+					damage.mul("IceXUndead", .6f);
+				} else {
+					damage.mul("IceDamage", 1.3f);
+				}
 				if (target.isBurning()) {
 					damage.mul("IceDamageOnBurning", 2);
 				}
 				break;
 			case WIND:
-				damage.mul("WindDamage", light ? 1.8f : .8f); // 180% against light (endermen included) enemies
+				// 180% against light (endermen included) enemies
+				if (light) {
+					damage.mul("WindLightDamage", 1.8f);
+				} else {
+					damage.mul("WindHeavyDamage", .8f);
+				}
 				break;
 			default:
 				//base;

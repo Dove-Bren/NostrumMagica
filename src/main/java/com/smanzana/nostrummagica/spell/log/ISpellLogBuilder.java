@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
@@ -16,7 +17,7 @@ public interface ISpellLogBuilder {
 	
 	public default void flush() { }
 	
-	public default ISpellLogBuilder stage(int stageIdx, ITextComponent label, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) { return this; }
+	public default ISpellLogBuilder stage(int stageIdx, SpellShape shape, int ticksElapsed, List<LivingEntity> affectedEnts, List<SpellLocation> affectedLocs) { return this; }
 	
 	public default ISpellLogBuilder effect(LivingEntity entity) { return this; }
 	
@@ -36,11 +37,13 @@ public interface ISpellLogBuilder {
 	
 	public default ISpellLogBuilder statusFinish(int finalDuration) { return this; }
 	
-	public default ISpellLogBuilder generalEffectStart(ITextComponent description, boolean harmful) { return this; }
+	public default ISpellLogBuilder generalEffectStart(ITextComponent name, ITextComponent description, boolean harmful) { return this; }
 	
 	public default ISpellLogBuilder generalEffectFinish(float finalDmg, float finalHeal) { return this; }
 	
 	public default ISpellLogBuilder effectMod(ITextComponent label, float amt, boolean flat) { return this; }
+	
+	public default ISpellLogBuilder effectMod(Skill skill, float amt, boolean flat) { return this; }
 	
 	public default ISpellLogBuilder pushModifierStack() { return this; }
 	
@@ -48,7 +51,7 @@ public interface ISpellLogBuilder {
 	
 	public default ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, boolean flat) { return this; }
 
-	public default ISpellLogBuilder addGlobalModifier(Skill wind_Novice, float amt, boolean flat) { return this; }
+	public default ISpellLogBuilder addGlobalModifier(Skill skill, float amt, boolean flat) { return this; }
 	
 	public static class DummyImpl implements ISpellLogBuilder {
 		

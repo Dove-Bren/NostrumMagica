@@ -25,7 +25,7 @@ public class LabeledWidget extends FixedWidget {
 	}
 	
 	public static interface IValue {
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color);
+		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color, Rectangle2d labelArea);
 	}
 	
 	protected final Screen parent;
@@ -72,8 +72,8 @@ public class LabeledWidget extends FixedWidget {
 		return this.label.render(matrixStackIn, x, y, partialTicks, this.colorLabel);
 	}
 	
-	protected Rectangle2d renderValue(MatrixStack matrixStackIn, int x, int y, float partialTicks) {
-		return this.value.render(matrixStackIn, x, y, partialTicks, this.colorValue);
+	protected Rectangle2d renderValue(MatrixStack matrixStackIn, int x, int y, float partialTicks, Rectangle2d labelArea) {
+		return this.value.render(matrixStackIn, x, y, partialTicks, this.colorValue, labelArea);
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class LabeledWidget extends FixedWidget {
 		matrixStackIn.translate(this.x, this.y, 0);
 		matrixStackIn.scale(scale, scale, 1f);
 		final Rectangle2d labelArea = renderLabel(matrixStackIn, 0, 0, partialTicks);
-		final Rectangle2d valueArea = renderValue(matrixStackIn, labelArea.getWidth(), 0, partialTicks);
+		final Rectangle2d valueArea = renderValue(matrixStackIn, labelArea.getWidth(), 0, partialTicks, labelArea);
 		matrixStackIn.pop();
 		
 		// Recalc hover to be actual rendered text length. value can change so have to keep redoing this...
@@ -129,9 +129,9 @@ public class LabeledWidget extends FixedWidget {
 	
 	public static class SpellIconLabel implements ILabel {
 		
-		private final SpellIcon icon;
-		private final int width;
-		private final int height;
+		protected final SpellIcon icon;
+		protected final int width;
+		protected final int height;
 		
 		public SpellIconLabel(SpellIcon icon, int width, int height) {
 			this.icon = icon;
@@ -149,9 +149,9 @@ public class LabeledWidget extends FixedWidget {
 	
 	public static class ComponentIconLabel implements ILabel {
 		
-		private final SpellComponentIcon icon;
-		private final int width;
-		private final int height;
+		protected final SpellComponentIcon icon;
+		protected final int width;
+		protected final int height;
 		
 		public ComponentIconLabel(SpellComponentIcon icon, int width, int height) {
 			this.icon = icon;
@@ -176,15 +176,19 @@ public class LabeledWidget extends FixedWidget {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color, Rectangle2d labelArea) {
 			final Minecraft mc = Minecraft.getInstance();
 			final FontRenderer font = mc.fontRenderer;
 			final String value = valueGetter.get();
 			final int len = font.getStringWidth(value);
 			
-			font.drawString(matrixStackIn, value, x, y, color);
+			// Try to center vertically with the label
+			final int labelCenter = (labelArea.getY() + (labelArea.getHeight() / 2));
+			final int yAdjust = labelCenter - (font.FONT_HEIGHT / 2);
 			
-			return new Rectangle2d(x, y, len, font.FONT_HEIGHT);
+			font.drawString(matrixStackIn, value, x, yAdjust, color);
+			
+			return new Rectangle2d(x, yAdjust, len, font.FONT_HEIGHT);
 		}
 	}
 }

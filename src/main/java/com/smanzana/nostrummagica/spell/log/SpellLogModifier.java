@@ -27,7 +27,7 @@ public abstract class SpellLogModifier {
 		public Percentage(ITextComponent label, float modifier) {
 			super(label, modifier);
 			
-			description = label.copyRaw().append(new StringTextComponent(": ")).append(
+			description = label.deepCopy().append(new StringTextComponent(": ")).append(
 					new StringTextComponent(String.format("%+.0f%%", modifier * 100f)).mergeStyle(modifier <= 0 ? TextFormatting.RED : TextFormatting.GREEN)
 				);
 		}
@@ -45,8 +45,8 @@ public abstract class SpellLogModifier {
 		public Flat(ITextComponent label, float modifier) {
 			super(label, modifier);
 			
-			description = label.copyRaw().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.2f%%", modifier)).mergeStyle(modifier <= 0 ? TextFormatting.RED : TextFormatting.GREEN)
+			description = label.deepCopy().append(new StringTextComponent(": ")).append(
+					new StringTextComponent(String.format("%+.1f", modifier)).mergeStyle(modifier <= 0 ? TextFormatting.RED : TextFormatting.GREEN)
 				);
 		}
 

@@ -80,8 +80,6 @@ public class Spell {
 	
 	protected static class SpellState implements ISpellState {
 		
-		private static final ITextComponent LABEL_STAGE_START = new TranslationTextComponent("spelllogstage.start");
-		
 		protected final Spell spell;
 		protected final LivingEntity caster;
 		protected float efficiency;
@@ -122,8 +120,8 @@ public class Spell {
 				this.split().trigger(targets, locations, stageEfficiency, false);
 			} else {
 				// Log the stage
-				final ITextComponent stageLabel = index == -1 ? LABEL_STAGE_START : (this.spell.shapes.get(index).getShape().getDisplayName());
-				this.log.stage(index + 1, stageLabel, (int) (this.caster.world.getGameTime() - this.startTicks), targets, locations);
+				final SpellShape stageShape = index == -1 ? null : this.spell.shapes.get(index).getShape();
+				this.log.stage(index + 1, stageShape, (int) (this.caster.world.getGameTime() - this.startTicks), targets, locations);
 				
 				this.efficiency *= stageEfficiency;
 				index++;
@@ -294,6 +292,12 @@ public class Spell {
 			final Map<LivingEntity, Map<EMagicElement, Float>> totalAffectedEntities = new HashMap<>();
 			final Set<SpellLocation> totalAffectedLocations = new HashSet<>();
 			final Map<LivingEntity, EMagicElement> entityLastElement = new HashMap<>();
+			
+			final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
+			
+			log.pushModifierStack();
+			log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, false);
+			
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
 				float efficiency = this.efficiency + (part.getPotency() - 1f);
@@ -375,6 +379,8 @@ public class Spell {
 				
 				log.popModifierStack();
 			}
+			
+			log.popModifierStack();
 			
 			if (anySuccess) {
 				if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {

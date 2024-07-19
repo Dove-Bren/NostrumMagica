@@ -17,7 +17,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -124,7 +127,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<ISubScreenButton> getButtons() {
+	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 		return Lists.newArrayList(
 				new NextPageButton(this.screen, 0, 0, false),
 				new NextPageButton(this.screen, 0, 0, true),
@@ -132,11 +135,11 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		);
 	}
 	
-	class NextPageButton extends ISubScreenButton {
+	class NextPageButton extends AbstractButton {
 		private final boolean isNextButton;
 
 		public NextPageButton(InfoScreen screen, int parPosX, int parPosY, boolean parIsNextButton) {
-			super(screen, parPosX, parPosY);
+			super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
 			this.width = 23;
 			this.height = 13;
 			isNextButton = parIsNextButton;
@@ -180,11 +183,9 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-    class HomeButton extends ISubScreenButton {
+    class HomeButton extends AbstractButton {
 		public HomeButton(InfoScreen screen, int parPosX, int parPosY) {
-            super(screen, parPosX, parPosY);
-            this.width = 23; 
-            this.height = 13;
+            super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
 		}
 
         @Override

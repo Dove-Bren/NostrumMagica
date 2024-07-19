@@ -6,9 +6,9 @@ import java.util.TreeMap;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.text.ITextComponent;
 
 /**
  * Top level entry for a spell log.
@@ -32,8 +32,8 @@ public class SpellLogEntry {
 		LAST = this; int unused;
 	}
 	
-	public void addStage(int stageIdx, ITextComponent label, SpellLogStage stage) {
-		stages.computeIfAbsent(stageIdx, idx -> new SpellLogStageSummary(label)).addStage(stage);
+	public void addStage(int stageIdx, SpellShape shape, SpellLogStage stage) {
+		stages.computeIfAbsent(stageIdx, idx -> new SpellLogStageSummary(shape)).addStage(stage);
 	}
 	
 	public @Nullable SpellLogStageSummary getStages(int idx) {

@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.widget.Widget;
 
 public class LoreInfoSubScreen implements IInfoSubScreen {
 
@@ -41,7 +42,7 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<ISubScreenButton> getButtons() {
+	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 		return null;
 	}
 

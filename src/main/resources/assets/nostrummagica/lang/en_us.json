@@ -2027,18 +2027,32 @@
 	"research.sword_ender.desc": "Great balls of Ender!",
 	"research.sword_ender.info": "By enhancing a mage blade enchanted with ender, you've created a magic rod. When charged up, the rod can create a point of ender energy at a distant location. Striking an enemy or right-clicking on an entity aftere doing so will teleport them to the ball of ender energy!|  You suspect the tool could be even more useful with a set of True Ender armor...",
 	
-	"spelllog.damage.desc": "Damaged for %3$s%2$s damage (%1$s base)",
+	"spelllog.damage.name": "Damage Entity",
+	"spelllog.damage.desc": "Damaged for %2$s %3$sdamage (%1$s base)",
+	"spelllog.heal.name": "Heal Entity",
 	"spelllog.heal.desc": "Healed for %2$s health (%1$s %3$sbase)",
+	"spelllog.status.name": "Apply Status Effect",
 	"spelllog.status.desc": "Applied %1$s effect for %3$s seconds (%2$s base)",
 	
 	"spelllogstage.start": "Start",
 	
 	"spelllogmod.nostrummagica.skill": "[Skill] ",
 	"spelllogmod.nostrummagica.spellboost": "Spell Target Bonus",
-	"spelllogmod.nostrummagica.efficiency": "",
-	"spelllogmod.nostrummagica.": "",
-	"spelllogmod.nostrummagica.": "",
-	"spelllogmod.nostrummagica.": "",
-	"spelllogmod.nostrummagica.": ""
+	"spelllogmod.nostrummagica.efficiency": "Casting Efficiency Bonus",
+	"spelllogmod.nostrummagica.firexundead": "Fire VS Undead Bonus",
+	"spelllogmod.nostrummagica.firexfire": "Fire VS Fire Penalty",
+	"spelllogmod.nostrummagica.enderxender": "Ender VS Ender Negation",
+	"spelllogmod.nostrummagica.enderdamage": "Ender VS Non-Ender Bonus",
+	"spelllogmod.nostrummagica.lightningdamage": "Lighting Armor Damage Bonus",
+	"spelllogmod.nostrummagica.icexundead": "Ice VS Undead Penalty",
+	"spelllogmod.nostrummagica.icedamage": "Ice VS Living Bonus",
+	"spelllogmod.nostrummagica.icedamageonburning": "Ice VS Burning Bonus",
+	"spelllogmod.nostrummagica.windlightdamage": "Wind VS Light Bonus",
+	"spelllogmod.nostrummagica.windheavydamage": "Wind VS Heavy Penalty",
+	"spelllogmod.nostrummagica.physicalattribute": "Physical Damage Attribute Bonus",
+	"spelllogmod.nostrummagica.magicdamageattribute": "Magic Damage Attribute Bonus",
+	"spelllogmod.nostrummagica.magicresistattribute": "Magic Resist Attribute Negation",
+	"spelllogmod.nostrummagica.physicalarmor": "Physical Armor Negation",
+	"spelllogmod.nostrummagica.efficiency": "Casting Efficiency"
 	
 }

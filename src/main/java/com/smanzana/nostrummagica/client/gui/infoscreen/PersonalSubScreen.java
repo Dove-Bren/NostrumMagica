@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
@@ -123,7 +124,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<ISubScreenButton> getButtons() {
+		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -287,7 +288,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<ISubScreenButton> getButtons() {
+		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -440,7 +441,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<ISubScreenButton> getButtons() {
+		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -517,7 +518,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<ISubScreenButton> getButtons() {
+		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
