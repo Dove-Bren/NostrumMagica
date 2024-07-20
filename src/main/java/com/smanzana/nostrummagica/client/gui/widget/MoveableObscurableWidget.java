@@ -21,8 +21,7 @@ public class MoveableObscurableWidget extends ObscurableWidget implements IMovea
 
 	@Override
 	public void offset(int x, int y) {
-		this.x = this.x + x;
-		this.y = this.y + y;
+		this.setPosition(this.x + x, this.y + y);
 	}
 
 	@Override

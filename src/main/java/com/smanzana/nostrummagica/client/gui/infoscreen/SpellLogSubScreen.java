@@ -13,7 +13,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.widget.LabeledWidget;
+import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
+import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
 import com.smanzana.nostrummagica.client.gui.widget.TextWidget;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -39,8 +41,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	private SpellLogEntry log;
 	
 	private final List<StageButton> stageButtons;
-	private final List<List<Widget>> stageSubWidgets;
-	
+	private final List<List<ObscurableWidget>> stageSubWidgets;
 	
 	public SpellLogSubScreen(SpellLogEntry log) {
 		this.log = log;
@@ -66,7 +67,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	public void drawForeground(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		matrixStackIn.push();
 		matrixStackIn.translate(0, 0, 100);
-		for (List<Widget> widgets : stageSubWidgets) {
+		for (List<ObscurableWidget> widgets : stageSubWidgets) {
 			for (Widget widget : widgets) {
 				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
 			}
@@ -74,8 +75,8 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		matrixStackIn.pop();
 	}
 	
-	protected List<Widget> generateStageWidgets(int idx, SpellLogStageSummary summary, int x, int y, int width, int height) {
-		final List<Widget> widgets = new ArrayList<>();
+	protected List<ObscurableWidget> generateStageWidgets(int idx, SpellLogStageSummary summary, int x, int y, int width, int height) {
+		final List<ObscurableWidget> widgets = new ArrayList<>();
 		
 		final Minecraft mc = Minecraft.getInstance();
 		final ITextComponent title = (summary.getShape() == null ? new StringTextComponent("Start") : summary.getShape().getDisplayName());
@@ -131,102 +132,20 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			Optional<Entry<LivingEntity, SpellLogEffectSummary>> first = summary.getStages().stream().map(stage -> stage.getAffectedEnts()).flatMap(m -> m.entrySet().stream()).filter(e -> e.getValue() != null).findFirst();
 			if (first.isPresent()) {
 				//first.get().getValue().
-				widgets.add(new EffectSummaryWidget(first.get().getKey(), first.get().getValue(),
+				final EffectSummaryWidget summaryWidget = new EffectSummaryWidget(first.get().getKey(), first.get().getValue(),
 						x + GUI.EFFECT_HOFFSET, y + GUI.EFFECT_VOFFSET, width - (GUI.EFFECT_HOFFSET * 2), height - (GUI.EFFECT_VOFFSET + 5)
-						));
+						);
+				widgets.add(summaryWidget);
+				
+				if (summaryWidget.getHeightRealms() > height - (GUI.EFFECT_VOFFSET + 5)) {
+					summaryWidget.setHeight(height - (GUI.EFFECT_VOFFSET + 5));
+					summaryWidget.setHasScrollbar();
+				}
 			}
 		} else {
 			
 		}
 		return widgets;
-		
-//		matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//		
-//		final int left = 5;
-//		for (int stageIdx = 0; stageIdx < log.getStageIndexCount(); stageIdx++) {
-//			SpellLogStageSummary stageSummary = log.getStages(stageIdx);
-//			final boolean emptyStage = !stageSummary.hasEffects();
-//			final int stageHeight;
-//			if (emptyStage) {
-//				stageHeight = 32;
-//			} else {
-//				stageHeight = 50;
-//			}
-//			RenderFuncs.drawRect(matrixStackIn, left, 0, left + width - (10), 0 + stageHeight, 0x40FFFFFF);
-//			
-//			matrixStackIn.push();
-//			matrixStackIn.translate(width/2, 0, 0);
-//			matrixStackIn.scale(.75f, .75f, 0);
-//			AbstractGui.drawCenteredString(matrixStackIn, mc.fontRenderer, stageSummary.getShape().getDisplayName(), 0, 2, 0xFFFFFFFF);
-//			matrixStackIn.pop();
-//			
-//			matrixStackIn.push();
-//			matrixStackIn.translate(left, 0, 0);
-//			matrixStackIn.scale(.75f, .75f, 1f);
-//			matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//			
-//			//drawAffectedEntCount(matrixStackIn, stageSummary.getAffectedEntCounts().size(), 3, 0);
-//			mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Affected " + stageSummary.getAffectedEntCounts().size() + " entities", 3, 0, 0xFFAAAAAA);
-//			matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//			//drawAffectedLocCount(matrixStackIn, stageSummary.getAffectedLocCounts().size(), 3, 0);
-//			mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Affected " + stageSummary.getAffectedLocCounts().size() + " blocks", 3, 0, 0xFFAAAAAA);
-//			matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//			//drawTriggerCount(matrixStackIn, stageSummary.getStages().size(), 3, 0);
-//			mc.fontRenderer.drawStringWithShadow(matrixStackIn, "Triggered " + stageSummary.getStages().size() + " time(s)", 3, 0, 0xFFAAAAAA);
-//			matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//			if (!emptyStage) {
-//				//drawTotalDamage(matrixStackIn, stageSummary.getTotalDamage(), 3, 0);
-//				mc.fontRenderer.drawStringWithShadow(matrixStackIn, String.format("Total Damage: %.1f", stageSummary.getTotalDamage()), 3, 0, 0xFFAAAAAA);
-//				matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//				//drawTotalHealing(matrixStackIn, stageSummary.getTotalHeal(), 3, 0);
-//				mc.fontRenderer.drawStringWithShadow(matrixStackIn, String.format("Total Healing: %.1f", stageSummary.getTotalHeal()), 3, 0, 0xFFAAAAAA);
-//				matrixStackIn.translate(0, mc.fontRenderer.FONT_HEIGHT + 2, 0);
-//			}
-//			
-//			matrixStackIn.pop();
-//			matrixStackIn.translate(0, stageHeight + 5, 0);
-			
-//			for (SpellLogStage stage : log.getStages()) {
-//				
-//				final int top = y + 15 + (i * 55);
-//				
-//				
-//				AbstractGui.drawCenteredString(matrixStackIn, mc.fontRenderer, stage.getLabel(), x + (width/2), top + 2, 0xFFFFFFFF);
-//				
-//				final String timeStr = String.format("@%.2f secs", ((float) stage.getElapsedTicks() / 20.0f));
-//				mc.fontRenderer.drawString(matrixStackIn, timeStr, x + width - (5 + 2 + mc.fontRenderer.getStringWidth(timeStr)), top + 2, 0xFF808080);
-//				
-//				boolean foundEffect = false;
-//				int effectlessCount = 0;
-//				float totalDamage = 0f;
-//				float totalHeal = 0f;
-//				for (Entry<LivingEntity, SpellLogEffectSummary> entry : stage.getAffectedEnts().entrySet()) {
-//					if (entry.getValue() == null) {
-//						effectlessCount++;
-//					} else {
-//						foundEffect = true;
-//						totalDamage += entry.getValue().getTotalDamage();
-//						totalHeal += entry.getValue().getTotalHeal();
-//					}
-//				}
-//				
-//				if (!foundEffect) {
-//					mc.fontRenderer.drawString(matrixStackIn, effectlessCount + " Entities", left + 5, top + 2 + 8, 0xFF808080);
-//				} else {
-//					mc.fontRenderer.drawString(matrixStackIn, "Total Damage: " + totalDamage, left + 5, top + 2 + 8, 0xFF808080);
-//					mc.fontRenderer.drawString(matrixStackIn, "Total Healing: " + totalHeal, left + 5, top + 2 + 8 + 8, 0xFF808080);
-//					
-//					int j = 0;
-//					for (Entry<LivingEntity, SpellLogEffectSummary> entry : stage.getAffectedEnts().entrySet()) {
-//						mc.fontRenderer.drawString(matrixStackIn, entry.getKey().getDisplayName().getString() + ": " + entry.getValue().getTotalDamage(),
-//								left + 5, top + 2 + 8 + 8 + 8 + (j * 8), 0xFF808080);
-//						j++;
-//					}
-//				}
-//				
-//				i++;
-//			}
-//		}
 	}
 
 	@Override
@@ -252,7 +171,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			stageSubWidgets.add(generateStageWidgets(i, log.getStages(i), x, y, width, height));
 		}
 		this.stageSubWidgets.forEach(l -> widgets.addAll(l));
-		
+
 		setStage(0);
 		return widgets;
 	}
@@ -261,11 +180,9 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		for (int i = 0; i < this.stageButtons.size(); i++) {
 			final boolean active = (i == idx);
 			this.stageButtons.get(i).setActive(active);
-			this.stageSubWidgets.get(i).forEach(w -> w.visible = active);
+			this.stageSubWidgets.get(i).forEach(w -> w.setHidden(!active));
 		}
-		
 	}
-	
 	
 	private static final class Texture {
 		private Texture() {}
@@ -323,8 +240,6 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 
 		private static final int EFFECT_HOFFSET = 24;
 		private static final int EFFECT_VOFFSET = STAGE_SECTION_VOFFSET + 40;
-		private static final int EFFECT_WIDTH = 24;
-		private static final int EFFECT_HEIGHT = 24;
 	}
 	
 	private static class StageButton extends AbstractButton {
@@ -506,13 +421,11 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	
 	private static class EffectSummaryWidget extends ParentWidget {
 		
-		private SpellLogEffectSummary summary;
-		private LivingEntity entity;
+		private final ScrollbarWidget scrollbar;
+		private final List<EffectLineWidget> lineWidgets;
 		
 		public EffectSummaryWidget(LivingEntity entity, SpellLogEffectSummary summary, int x, int y, int width, int heightIn) {
 			super(x, y, width, heightIn, StringTextComponent.EMPTY);
-			this.summary = summary;
-			this.entity = entity;
 			
 			// Reset height and built it as we go
 			this.height = 0;
@@ -538,13 +451,45 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 					.center());
 			height += mc.fontRenderer.FONT_HEIGHT + 12;
 			
+			lineWidgets = new ArrayList<>(summary.getElements().size());
 			for (SpellLogEffectLine line : summary.getElements()) {
 				EffectLineWidget child = new EffectLineWidget(line, x + 10, y + height, width - 20, 70);
+				child.setBounds(x, y, width, heightIn + 100); // so it can just scroll off end of page
 				addChild(child);
+				lineWidgets.add(child);
 				height += child.getHeightRealms() + 5;
 			}
 			
 			height += 4; // bottom margin
+			
+
+			final int scrollWidth = 10;
+			this.scrollbar = new ScrollbarWidget(this::setToScroll, x + width - (scrollWidth + 2), y + 2, scrollWidth, height - 4);
+			scrollbar.setScrollRate(1f / (summary.getElements().size()-1));
+		}
+		
+		public void setHasScrollbar() {
+			this.scrollbar.setHeight(this.height - 4);
+			addChild(scrollbar);
+			
+			for (EffectLineWidget line : lineWidgets) {
+				line.setWidth(this.width - 20 - (this.scrollbar.getWidth() + 4));
+			}
+		}
+		
+		protected void setToScroll(float scroll) {
+			final int idx = Math.round(scroll / (1f / (lineWidgets.size()-1)));
+			int heightOffset = 0;
+			for (int i = 0; i < lineWidgets.size(); i++) {
+				if (i < idx) {
+					final EffectLineWidget line = lineWidgets.get(i);
+					line.offsetFromStart(-500, -100);
+					heightOffset += line.getHeightRealms() + 5;
+				} else {
+					final EffectLineWidget line = lineWidgets.get(i);
+					line.offsetFromStart(0, -heightOffset);
+				}
+			}
 		}
 		
 		@Override
@@ -584,12 +529,12 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (line instanceof SpellLogEffectLine.Damage) {
 				final String damageText = String.format(" %.1f", line.getTotalDamage());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Damage)line).getElement();
-				this.addChild(new LabeledWidget(mc.currentScreen, new DamageLabel(element, 12, 12), new LabeledWidget.TextValue(() -> damageText), x + width - (12 + 24), y + height, 10, 10)
+				this.addChild(new LabeledWidget(mc.currentScreen, new DamageLabel(element, 12, 12), new LabeledWidget.TextValue(() -> damageText), x + width - (12 + 40), y + height, 10, 10)
 						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Damage")));
 			} else if (line instanceof SpellLogEffectLine.Heal) {
 				final String healText = String.format(" %.1f", line.getTotalHeal());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Heal)line).getElement();
-				this.addChild(new LabeledWidget(mc.currentScreen, new HealLabel(element, 12, 12), new LabeledWidget.TextValue(() -> healText), x + width - (12 + 24), y + height, 10, 10)
+				this.addChild(new LabeledWidget(mc.currentScreen, new HealLabel(element, 12, 12), new LabeledWidget.TextValue(() -> healText), x + width - (12 + 40), y + height, 10, 10)
 						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Healing")));
 			}
 			
@@ -628,11 +573,8 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	
 	private static class ModifierWidget extends ParentWidget {
 		
-		private SpellLogModifier modifier;
-		
 		public ModifierWidget(SpellLogModifier modifier, int x, int y, int width, int heightIn) {
 			super(x, y, width, heightIn, StringTextComponent.EMPTY);
-			this.modifier = modifier;
 			
 			final Minecraft mc = Minecraft.getInstance();
 			

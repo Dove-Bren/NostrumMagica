@@ -528,7 +528,9 @@ public abstract class InfoScreenTab {
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<InfoButton> buttons = new LinkedList<>();
 				
-				buttons.add(new SpellLogButton(screen, SpellLogEntry.LAST));
+				for (SpellLogEntry log : SpellLogEntry.LAST) {
+					buttons.add(new SpellLogButton(screen, log));
+				}
 				
 				return buttons;
 			}

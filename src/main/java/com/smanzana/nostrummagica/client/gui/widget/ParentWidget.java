@@ -6,9 +6,10 @@ import java.util.List;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.text.ITextComponent;
 
-public abstract class ParentWidget extends Widget {
+public abstract class ParentWidget extends MoveableObscurableWidget {
 	
 	protected final List<Widget> children;
 	
@@ -148,6 +149,25 @@ public abstract class ParentWidget extends Widget {
 		
 		//return super.charTyped(codePoint, modifiers);
 		return false;
+	}
+	
+	@Override
+	public void setPosition(int x, int y) {
+		super.setPosition(x, y);
+		
+		final int xDiff = x - this.getStartingX();
+		final int yDiff = y - this.getStartingY();
+		
+		final Rectangle2d bounds = new Rectangle2d(x, y, this.width, this.height);
+		
+		for (Widget widget : children) {
+			if (widget instanceof ObscurableWidget) {
+				((ObscurableWidget) widget).setBounds(bounds);
+			}
+			if (widget instanceof IMoveableWidget) {
+				((IMoveableWidget) widget).offsetFromStart(xDiff, yDiff);
+			}
+		}
 	}
 
 }

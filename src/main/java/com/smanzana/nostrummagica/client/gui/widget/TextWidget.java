@@ -13,7 +13,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-public class TextWidget extends FixedWidget {
+public class TextWidget extends MoveableObscurableWidget {
 	
 	protected final Screen parent;
 	protected final ITextComponent text;

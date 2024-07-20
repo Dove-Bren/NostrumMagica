@@ -46,6 +46,13 @@ public class SpellDamage {
 			resistScale = 1f;
 			finalFlat = 0f;
 		}
+
+		public String paramStr() {
+			// BaseAdJ = (base + baseFlat)
+			// SemiFinal = BaseAdj * bonusScale * resistScale
+			// Final = SemiFinal + finalFlat;
+			return String.format("(%.1f + %.1f) x %.1f x %.1f + %.1f", base, baseFlat, bonusScale, resistScale, finalFlat);
+		}
 		
 		public final float calc() {
 			final float baseAdj = Math.max(0, base + baseFlat);
@@ -59,28 +66,28 @@ public class SpellDamage {
 			final float pre = calc();
 			this.baseFlat += scale;
 			final float post = calc();
-			LogDamage(pre, post, cause);
+			LogDamage(pre, post, this, cause);
 		}
 		
 		private final void bonusScaleInternal(String cause, float scale) {
 			final float pre = calc();
 			this.bonusScale += scale;
 			final float post = calc();
-			LogDamage(pre, post, cause);
+			LogDamage(pre, post, this, cause);
 		}
 		
 		private final void resistScaleInternal(String cause, float scale) {
 			final float pre = calc();
 			this.resistScale += scale;
 			final float post = calc();
-			LogDamage(pre, post, cause);
+			LogDamage(pre, post, this, cause);
 		}
 		
 		private final void finalFlatInternal(String cause, float scale) {
 			final float pre = calc();
 			this.finalFlat += scale;
 			final float post = calc();
-			LogDamage(pre, post, cause);
+			LogDamage(pre, post, this, cause);
 		}
 		
 		private final void baseFlat(String cause, float flat) {
@@ -98,6 +105,7 @@ public class SpellDamage {
 			log.effectMod(MakeLabel(cause), scale, ESpellLogModifierType.BONUS_SCALE);
 		}
 		
+		@SuppressWarnings("unused")
 		private final void bonusScale(Skill skill, float scale) {
 			bonusScaleInternal("Skill: " + skill.getName().getString(), scale);
 			log.effectMod(skill, scale, ESpellLogModifierType.BONUS_SCALE);
@@ -107,7 +115,8 @@ public class SpellDamage {
 			resistScaleInternal(cause, scale);
 			log.effectMod(MakeLabel(cause), scale, ESpellLogModifierType.RESIST_SCALE);
 		}
-		
+
+		@SuppressWarnings("unused")
 		private final void resistScale(Skill skill, float scale) {
 			resistScaleInternal("Skill: " + skill.getName().getString(), scale);
 			log.effectMod(skill, scale, ESpellLogModifierType.RESIST_SCALE);
@@ -117,7 +126,8 @@ public class SpellDamage {
 			finalFlatInternal(cause, flat);
 			log.effectMod(MakeLabel(cause), flat, ESpellLogModifierType.FINAL_FLAT);
 		}
-		
+
+		@SuppressWarnings("unused")
 		private final void finalFlat(Skill skill, float flat) {
 			finalFlatInternal("Skill: " + skill.getName().getString(), flat);
 			log.effectMod(skill, flat, ESpellLogModifierType.FINAL_FLAT);
@@ -178,9 +188,9 @@ public class SpellDamage {
 	}
 	
 	private static boolean DamageConsoleLog = false;
-	private static final void LogDamage(float before, float after, String msg) {
+	private static final void LogDamage(float before, float after, Damage damage, String msg) {
 		if (DamageConsoleLog) {
-			NostrumMagica.logger.info(String.format("%s [%.2f -> %.2f][%+.2f]", msg, before, after, after-before));
+			NostrumMagica.logger.info(String.format("%s {%s}[%.2f -> %.2f][%+.2f]", msg, damage.paramStr(), before, after, after-before));
 		}
 	}
 	
@@ -196,8 +206,8 @@ public class SpellDamage {
 		
 		final @Nullable INostrumMagic magic = caster == null ? null : NostrumMagica.getMagicWrapper(caster);
 		
-		LogDamage(0, baseDamage, "Start");
 		final Damage damage = new Damage(baseDamage, efficiency, log);
+		LogDamage(0, baseDamage, damage, "Start");
 		
 		if (element == EMagicElement.PHYSICAL) {
 			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
@@ -321,13 +331,16 @@ public class SpellDamage {
 				damage.resistScale("MagicResistAttribute", (float) (Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)))) - 1f);
 			}
 		} else {
-			damage.resistScale("PhysicalArmor", GetArmorModifier(target, damage) - 1f);
+			final float mod = GetArmorModifier(target, damage) - 1f;
+			if (mod != 0f) {
+				damage.resistScale("PhysicalArmor", mod);
+			}
 		}
 		
 		// Apply armor reductions
 		attr = target.getAttribute(NostrumAttributes.GetReduceAttribute(element));
 		if (attr != null && attr.getValue() != 0.0D) {
-			damage.finalFlat("FlatReducAttribute", (float) -attr.getValue());
+			damage.finalFlat("FlatReducAttribute_" + element.getName(), (float) -attr.getValue());
 		}
 		
 		return damage.calc();

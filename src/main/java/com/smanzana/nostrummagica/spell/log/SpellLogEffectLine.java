@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.potion.Effect;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class SpellLogEffectLine {
@@ -149,8 +150,9 @@ public abstract class SpellLogEffectLine {
 			super(base, total, modifiers);
 			this.effect = effect;
 
-			name = new TranslationTextComponent("spelllog.effect.name");
-			desc = new TranslationTextComponent("spelllog.effect.desc", effect.getDisplayName(), base, total);
+			final ITextComponent effectName = effect.getDisplayName().deepCopy().mergeStyle(this.isHarmful() ? TextFormatting.RED : TextFormatting.DARK_BLUE);
+			name = new TranslationTextComponent("spelllog.status.name", effectName);
+			desc = new TranslationTextComponent("spelllog.status.desc", effectName, base, total);
 		}
 
 		@Override

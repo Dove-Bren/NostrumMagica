@@ -52,7 +52,7 @@ public abstract class SpellLogModifier {
 	
 	protected static class ResistScale extends Percentage {
 		public ResistScale(ITextComponent label, float modifier) {
-			super(ESpellLogModifierType.RESIST_SCALE, label, modifier, TextFormatting.DARK_BLUE, TextFormatting.DARK_RED);
+			super(ESpellLogModifierType.RESIST_SCALE, label, modifier, TextFormatting.DARK_RED, TextFormatting.DARK_BLUE);
 		}
 	}
 	

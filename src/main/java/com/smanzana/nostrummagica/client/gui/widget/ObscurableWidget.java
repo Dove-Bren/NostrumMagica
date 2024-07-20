@@ -10,10 +10,20 @@ import net.minecraft.util.text.ITextComponent;
 public abstract class ObscurableWidget extends FixedWidget {
 
 	protected @Nullable Rectangle2d bounds;
+	protected boolean hidden;
 	
 	public ObscurableWidget(int x, int y, int width, int height, ITextComponent label) {
 		super(x, y, width, height, label);
 		bounds = null;
+		hidden = false;
+	}
+	
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+	
+	public boolean isHidden() {
+		return this.hidden;
 	}
 	
 	public void setBounds(Rectangle2d bounds) {
@@ -50,7 +60,7 @@ public abstract class ObscurableWidget extends FixedWidget {
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		// Check bounds
-		this.visible = inBounds();
+		this.visible = !isHidden() && inBounds();
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	

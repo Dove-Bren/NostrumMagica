@@ -45,6 +45,7 @@ public class ScrollbarWidget extends Widget {
 	
 	public void setScrollRate(float rate) {
 		this.scrollRate = rate;
+		this.scroll = 0f;
 	}
 	
 	protected int getYForScroll(float scroll) {

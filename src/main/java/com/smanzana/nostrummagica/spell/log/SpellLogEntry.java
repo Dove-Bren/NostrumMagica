@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.spell.log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,7 +20,7 @@ import net.minecraft.entity.LivingEntity;
  */
 public class SpellLogEntry {
 
-	public static SpellLogEntry LAST = null;
+	public static List<SpellLogEntry> LAST = new ArrayList<>();
 	
 	private final Spell spell;
 	private final LivingEntity caster;
@@ -29,7 +31,10 @@ public class SpellLogEntry {
 		this.caster = caster;
 		this.stages = new TreeMap<>();
 		
-		LAST = this; int unused;
+		if (LAST.size() >= 5) {
+			LAST.remove(0);
+		}
+		LAST.add(this);
 	}
 	
 	public void addStage(int stageIdx, SpellShape shape, SpellLogStage stage) {

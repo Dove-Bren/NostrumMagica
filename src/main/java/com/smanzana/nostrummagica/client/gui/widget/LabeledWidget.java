@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-public class LabeledWidget extends FixedWidget {
+public class LabeledWidget extends MoveableObscurableWidget {
 	
 	public static interface ILabel {
 		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color);

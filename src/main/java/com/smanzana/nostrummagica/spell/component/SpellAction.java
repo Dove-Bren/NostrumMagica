@@ -92,8 +92,6 @@ import net.minecraftforge.common.ToolType;
 
 public class SpellAction {
 	
-	private static final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
-	
 	public static class SpellActionProperties {
 		public final boolean isHarmful;
 		public final boolean affectsEntity;
@@ -327,6 +325,10 @@ public class SpellAction {
 	}
 	
 	private static class HealFoodEffect implements SpellEffect {
+		private static final ITextComponent LABEL_FOOD_NAME = new TranslationTextComponent("spelllog.nostrummagica.food.name");
+		private static final ITextComponent LABEL_BREED_NAME = new TranslationTextComponent("spelllog.nostrummagica.breed.name");
+		private static final ITextComponent LABEL_BREED_DESC = new TranslationTextComponent("spelllog.nostrummagica.breed.desc");
+		
 		private int amount;
 		
 		public HealFoodEffect(int amount) {
@@ -335,11 +337,14 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			
 			if (entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) entity;
 				player.getFoodStats().addStats((int) (amount * efficiency), 2);
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				resultBuilder.applied |= true;
+				log.generalEffectStart(LABEL_FOOD_NAME, new TranslationTextComponent("spelllog.nostrummagica.food.desc", "" + amount, "" + (int) (amount * efficiency)), false);
+				log.generalEffectFinish(0f, 0f);
 				return;
 			} else if (entity instanceof AnimalEntity && caster != null && 
 					caster instanceof PlayerEntity) {
@@ -347,6 +352,8 @@ public class SpellAction {
 					.setInLove((PlayerEntity) caster);
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				resultBuilder.applied |= true;
+				log.generalEffectStart(LABEL_BREED_NAME, LABEL_BREED_DESC, false);
+				log.generalEffectFinish(0f, 0f);
 				return;
 			} else {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
@@ -372,6 +379,8 @@ public class SpellAction {
 	}
 	
 	private static class HealManaEffect implements SpellEffect {
+		private static final ITextComponent LABEL_MANA_NAME = new TranslationTextComponent("spelllog.nostrummagica.mana.name");
+		
 		private int amount;
 		
 		public HealManaEffect(int amount) {
@@ -388,6 +397,8 @@ public class SpellAction {
 				magic.addMana((int) (amount * efficiency));
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				resultBuilder.applied |= true;
+				log.generalEffectStart(LABEL_MANA_NAME, new TranslationTextComponent("spelllog.nostrummagica.mana.desc", "" + amount, "" + (int) (amount * efficiency)), false);
+				log.generalEffectFinish(0f, 0f);
 				return;
 			}
 				
@@ -433,7 +444,7 @@ public class SpellAction {
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			entity.addPotionEffect(this.makeEffect(caster, entity, efficiency, resultBuilder));
 			
-			if (effect.getEffectType() == EffectType.HARMFUL) {
+			if (isHarmful()) {
 				caster.setLastAttackedEntity(entity);
 				entity.setRevengeTarget(caster);
 				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
@@ -441,6 +452,10 @@ public class SpellAction {
 			} else {
 				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			}
+			
+			log.statusStart(this.effect, this.duration);
+			log.statusFinish((int) (duration * efficiency));
+			
 			resultBuilder.applied |= true;
 			return;
 		}

@@ -35,7 +35,7 @@ public class InfoScreen extends StackableScreen {
 	
 	protected static final int POS_TABS_HEIGHT = 36;
 	protected static final int POS_BUTTONS_HEIGHT = 28;
-	protected static final int POS_SUBSCREEN_VOFFSET = POS_TABS_HEIGHT;
+	protected static final int POS_SUBSCREEN_VOFFSET = 8;
 	
 	private INostrumMagic attribute;
 	private List<TabButton> tabs;

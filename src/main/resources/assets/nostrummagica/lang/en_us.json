@@ -2031,8 +2031,14 @@
 	"spelllog.damage.desc": "Damaged for %2$s %3$sdamage (%1$s base)",
 	"spelllog.heal.name": "Heal Entity",
 	"spelllog.heal.desc": "Healed for %2$s health (%1$s %3$sbase)",
-	"spelllog.status.name": "Apply Status Effect",
+	"spelllog.status.name": "Apply %1$s Status Effect",
 	"spelllog.status.desc": "Applied %1$s effect for %3$s seconds (%2$s base)",
+	"spelllog.food.name": "Restore Food",
+	"spelllog.food.desc": "Restored %2$s food points (%1$2 base)",
+	"spelllog.breed.name": "Breed Animal",
+	"spelllog.breed.desc": "Put the animal in love mode",
+	"spelllog.mana.name": "Restore Mana",
+	"spelllog.mana.desc": "Restored %2$s mana points (%1$2 base)",
 	
 	"spelllogstage.start": "Start",
 	
@@ -2049,9 +2055,16 @@
 	"spelllogmod.nostrummagica.icedamageonburning": "Ice VS Burning Bonus",
 	"spelllogmod.nostrummagica.windlightdamage": "Wind VS Light Bonus",
 	"spelllogmod.nostrummagica.windheavydamage": "Wind VS Heavy Penalty",
-	"spelllogmod.nostrummagica.physicalattribute": "Physical Damage Attribute Bonus",
+	"spelllogmod.nostrummagica.physicalattributebase": "Physical Damage Attribute Bonus",
 	"spelllogmod.nostrummagica.magicdamageattribute": "Magic Damage Attribute Bonus",
 	"spelllogmod.nostrummagica.magicresistattribute": "Magic Resist Attribute Negation",
+	"spelllogmod.nostrummagica.flatreducattribute_fire": "Fire Magic Damage Reduction",
+	"spelllogmod.nostrummagica.flatreducattribute_ice": "Ice Magic Damage Reduction",
+	"spelllogmod.nostrummagica.flatreducattribute_wind": "Wind Magic Damage Reduction",
+	"spelllogmod.nostrummagica.flatreducattribute_earth": "Earth Magic Damage Reduction",
+	"spelllogmod.nostrummagica.flatreducattribute_lightning": "Lightning Magic Damage Reduction",
+	"spelllogmod.nostrummagica.flatreducattribute_ender": "Ender Magic Damage Reduction",
+	"spelllogmod.nostrummagica.flatreducattribute_physical": "Physical Magic Damage Reduction",
 	"spelllogmod.nostrummagica.physicalarmor": "Physical Armor Negation",
 	"spelllogmod.nostrummagica.efficiency": "Casting Efficiency"
 	

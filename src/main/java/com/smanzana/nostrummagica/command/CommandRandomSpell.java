@@ -87,6 +87,15 @@ public class CommandRandomSpell {
 				alt
 				));
 		
+//		int unused;
+//		spell.addPart(new SpellShapePart(NostrumSpellShapes.Touch));
+//		for (EMagicElement element : EMagicElement.values()) {
+//			spell.addPart(new SpellEffectPart(element, 1, null));
+//			for (EAlteration alteration : EAlteration.values()) {
+//				spell.addPart(new SpellEffectPart(element, 1, alteration));
+//			}
+//		}
+		
 		return spell;
 	}
 

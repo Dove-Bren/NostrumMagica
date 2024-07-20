@@ -350,7 +350,8 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				state = ResearchState.UNAVAILABLE;
 		}
 		
-		protected boolean isHidden() {
+		@Override
+		public boolean isHidden() {
 			return !NostrumMagica.getResearchVisible(subscreen.player, research);
 		}
 		

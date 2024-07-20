@@ -81,6 +81,8 @@ public class Spell {
 	
 	protected static class SpellState implements ISpellState {
 		
+		private static final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
+		
 		protected final Spell spell;
 		protected final LivingEntity caster;
 		protected float efficiency;
@@ -293,8 +295,6 @@ public class Spell {
 			final Map<LivingEntity, Map<EMagicElement, Float>> totalAffectedEntities = new HashMap<>();
 			final Set<SpellLocation> totalAffectedLocations = new HashSet<>();
 			final Map<LivingEntity, EMagicElement> entityLastElement = new HashMap<>();
-			
-			final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
 			
 			log.pushModifierStack();
 			log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, ESpellLogModifierType.BONUS_SCALE);
