@@ -667,9 +667,15 @@ public class NostrumDungeon {
 		}
 	}
 	
-	// Checks if the provided room overlaps any existing bounds if it were to be spawned
+	// Checks if the provided room overlaps any existing bounds if it were to be spawned or would be out of world bounds
 	protected static boolean CheckRoomBounds(IDungeonRoom room, BlueprintLocation entry, DungeonGenerationContext context) {
 		MutableBoundingBox bounds = room.getBounds(entry);
+		
+		if (bounds.minY < 0 || bounds.maxY < 0 || bounds.minY >= 255 || bounds.maxY >= 255) {
+			return false;
+		}
+		
+		// Check existing room boxes
 		for (MutableBoundingBox box : context.boundingBoxes) {
 			if (bounds.intersectsWith(box)) {
 				return false;
@@ -772,7 +778,7 @@ public class NostrumDungeon {
 		}
 		
 		protected @Nonnull IDungeonRoom pickRandomContRoom(DungeonGenerationContext context, BlueprintLocation entry, int remaining) {
-			List<IDungeonRoom> eligibleRooms = context.contRooms.stream().filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
+			List<IDungeonRoom> eligibleRooms = context.contRooms.stream().filter(r -> !r.getRoomID().equals(parent.myRoom.template.getRoomID())).filter(r -> r.getRoomCost() <= remaining).filter(r -> NostrumDungeon.CheckRoomBounds(r, entry, context)).collect(Collectors.toList());
 			if (eligibleRooms.isEmpty()) {
 				NostrumMagica.logger.warn("Failed to find a cont room that fit. Picking a random one for start " + entry);
 				return context.contRooms.get(rand.nextInt(context.contRooms.size()));
