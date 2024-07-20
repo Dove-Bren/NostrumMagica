@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
+import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -23,6 +24,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
@@ -331,20 +333,21 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
+			final @Nullable Container openContainer = (NostrumMagica.instance.proxy.getPlayer() != null)
+					? NostrumMagica.instance.proxy.getPlayer().openContainer : null;
 			SpellShapeProperties params = getPieceShapeParam(stack);
 			tooltip.add(new StringTextComponent("Shape").mergeStyle(TextFormatting.DARK_RED));
 			if (shape.getAttributes(params).terminal) {
 				tooltip.add(new StringTextComponent("Terminal Shape").mergeStyle(TextFormatting.GRAY));
 			}
-			if (extra) {
+			if (extra
+					|| (openContainer != null && openContainer instanceof SpellCreationGui.SpellCreationContainer)) {
 				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).mergeStyle(TextFormatting.DARK_PURPLE));
 				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").mergeStyle(TextFormatting.GREEN));
 			}
 			
 			if (extra
-					|| (NostrumMagica.instance.proxy.getPlayer() != null
-						&& NostrumMagica.instance.proxy.getPlayer().openContainer != null
-						&& NostrumMagica.instance.proxy.getPlayer().openContainer instanceof RuneShaperGui.RuneShaperContainer)) {
+					|| (openContainer != null && openContainer instanceof RuneShaperGui.RuneShaperContainer)) {
 				if (!shape.getDefaultProperties().getProperties().isEmpty()) {
 					tooltip.add(new StringTextComponent("Rune Shaper Compatible").mergeStyle(TextFormatting.GOLD));
 				}
