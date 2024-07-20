@@ -2,9 +2,10 @@ package com.smanzana.nostrummagica.item;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.api.item.IAetherBurnable;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -13,13 +14,17 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
-public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
+public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvider {
 
 	public static enum ReagentType implements IStringSerializable {
 		// Do not rearrange.
@@ -200,14 +205,21 @@ public class ReagentItem extends Item implements ILoreTagged, IAetherBurnable {
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_REAGENTS;
 	}
+	
+	private LazyOptional<?> AetherBurnableLazy = LazyOptional.of(() -> NostrumMagica.instance.aetheria.makeBurnable(100, 150f));
 
 	@Override
-	public int getBurnTicks(ItemStack stack) {
-		return 100;
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+		
+		if (NostrumMagica.instance.aetheria.isEnabled() && cap != null && cap == AetheriaProxy.AetherBurnableCapability) {
+			return AetherBurnableLazy.cast();
+		}
+		
+		return LazyOptional.empty();
 	}
-
+	
 	@Override
-	public float getAetherYield(ItemStack stack) {
-		return 150f;
+	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
+		return this::getCapability;
 	}
 }

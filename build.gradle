@@ -100,6 +100,11 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories { 
 	mavenCentral()
+	
+	flatDir {
+		dir 'libs'
+	}
+	
 	maven {
         url = "https://maven.blamejared.com"
     }
@@ -146,13 +151,14 @@ dependencies {
 	//compile 'top.theillusivec4.caelus:caelus-forge:${caelus_version}'
 	compileOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
-	compileOnly files("libs/NostrumAetheriaAPI-${aetheria_version}.jar")
-	runtimeOnly files("libs/NostrumAetheriaAPI-${aetheria_version}.jar")
-	compileOnly files("libs/musica-${musica_version}.jar")
-	runtimeOnly files("libs/musica-${musica_version}.jar")
+	compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
+	//runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
 	
-	runtimeOnly files("libs/petcommand-${petcommand_version}-deobf.jar")
-	compileOnly files("libs/petcommand-${petcommand_version}-api.jar")
+	compileOnly fg.deobf("com.smanzana:musica:${musica_version}")
+	runtimeOnly fg.deobf("com.smanzana:musica:${musica_version}")
+	
+	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
+	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
 }
 
 task sourcesJar(type: Jar) {
