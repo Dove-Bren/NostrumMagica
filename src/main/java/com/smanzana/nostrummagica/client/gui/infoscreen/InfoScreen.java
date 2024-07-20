@@ -304,6 +304,11 @@ public class InfoScreen extends StackableScreen {
 	
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double dx) {
+		final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
+		if (infoButtons.size() <= maxHorizontal * 2) {
+			return super.mouseScrolled(mouseX, mouseY, dx);
+		}
+		
 		this.handleMouseScroll(dx > 0 ? 1 : -1, (int) mouseX, (int) mouseY);
 		return true;
 	}
@@ -314,7 +319,7 @@ public class InfoScreen extends StackableScreen {
 		
 		// Cap scroll Y to the amount of y overflow we have from buttons
 		final int maxHorizontal = this.width / (InfoButton.BUTTON_WIDTH + 2);
-		if (buttons.size() <= maxHorizontal * 2) {
+		if (infoButtons.size() <= maxHorizontal * 2) {
 			// Wrapped against top
 			scrollY = 0;
 		} else {

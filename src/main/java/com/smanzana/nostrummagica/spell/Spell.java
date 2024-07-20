@@ -297,7 +297,9 @@ public class Spell {
 			final Map<LivingEntity, EMagicElement> entityLastElement = new HashMap<>();
 			
 			log.pushModifierStack();
-			log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, ESpellLogModifierType.BONUS_SCALE);
+			if (this.efficiency != 1f) {
+				log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, ESpellLogModifierType.BONUS_SCALE);
+			}
 			
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
@@ -870,7 +872,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().status(Effects.SATURATION, 1, 4 * elementCount).name("food");
+			return new SpellAction().healFood(4 * elementCount).name("food");
 		case EARTH:
 			return new SpellAction().status(Effects.REGENERATION, duration, amp).name("regen");
 		case ENDER:

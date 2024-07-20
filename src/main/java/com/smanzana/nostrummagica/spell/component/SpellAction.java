@@ -477,6 +477,8 @@ public class SpellAction {
 	}
 	
 	private static class DispelEffect implements SpellEffect {
+		private static final ITextComponent LABEL_DISPEL_NAME = new TranslationTextComponent("spelllog.nostrummagica.dispel.name");
+		
 		private int number; // -1 to clear all
 		
 		public DispelEffect(int number) {
@@ -485,6 +487,10 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			log.generalEffectStart(LABEL_DISPEL_NAME, new TranslationTextComponent("spelllog.nostrummagica.dispel.desc", number), false);
+			log.generalEffectFinish(0f, 0f);
+			
+			
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
 			if (number == -1 || entity.getActivePotionEffects().size() < number) {
@@ -557,7 +563,12 @@ public class SpellAction {
 		}
 	}
 	
-	private class BlinkEffect implements SpellEffect {
+	private static class BlinkEffect implements SpellEffect {
+		
+		private static final ITextComponent LABEL_BLINK_NAME = new TranslationTextComponent("spelllog.nostrummagica.blink.name");
+		private static final ITextComponent LABEL_BLINK_MOD_ENDERBELT = new TranslationTextComponent("spelllogmod.nostrummagica.enderbelt");
+		private static final ITextComponent LABEL_BLINK_MOD_ENDERSET = new TranslationTextComponent("spelllogmod.nostrummagica.enderset");
+		
 		private float dist;
 		
 		public BlinkEffect(float dist) {
@@ -567,6 +578,7 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
+			log.pushModifierStack();
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
@@ -578,7 +590,8 @@ public class SpellAction {
 							continue;
 						}
 						
-						efficiency *= 2;
+						efficiency += 1f;
+						log.addGlobalModifier(LABEL_BLINK_MOD_ENDERBELT, +1f, ESpellLogModifierType.BONUS_SCALE);
 						break;
 					}
 				}
@@ -586,7 +599,8 @@ public class SpellAction {
 			
 			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4) {
 				// has full ender set
-				efficiency *= 2;
+				efficiency += 1f;
+				log.addGlobalModifier(LABEL_BLINK_MOD_ENDERSET, +1f, ESpellLogModifierType.BONUS_SCALE);
 			}
 			
 			// Apply efficiency bonus
@@ -652,6 +666,11 @@ public class SpellAction {
 					resultBuilder.applied |= true;
 				}
 			}
+			
+			log.generalEffectStart(LABEL_BLINK_NAME, new TranslationTextComponent("spelllog.nostrummagica.blink.desc",
+					String.format("%.1f", this.dist), String.format("%.1f", dist), String.format("%.1f", source.distanceTo(entity.getPositionVec().add(0, entity.getEyeHeight(), 0)))), false);
+			log.generalEffectFinish(0f, 0f);
+			log.popModifierStack();
 		}
 		
 		private boolean isPassable(World world, BlockPos pos) {
@@ -686,7 +705,11 @@ public class SpellAction {
 		}
 	}
 	
-	private class PushEffect extends NegativeSpellEffect {
+	private static class PushEffect extends NegativeSpellEffect {
+
+		private static final ITextComponent LABEL_PUSH_NAME = new TranslationTextComponent("spelllog.nostrummagica.push.name");
+		private static final ITextComponent LABEL_PULL_NAME = new TranslationTextComponent("spelllog.nostrummagica.pull.name");
+		
 		private float range;
 		private int amp; // - is pull
 		
@@ -702,6 +725,11 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			final ITextComponent desc = (amp < 0
+					? new TranslationTextComponent("spelllog.nostrummagica.pull.desc", String.format("%.1f", this.range))
+					: new TranslationTextComponent("spelllog.nostrummagica.push.desc", String.format("%.1f", this.range)));
+			log.generalEffectStart(amp < 0 ? LABEL_PULL_NAME : LABEL_PUSH_NAME, desc, false);
+			log.generalEffectFinish(0f, 0f);
 
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
@@ -766,6 +794,8 @@ public class SpellAction {
 	
 	private static class TransmuteEffect implements SpellEffect {
 		
+		private static final ITextComponent LABEL_TRANSMUTE_NAME = new TranslationTextComponent("spelllog.nostrummagica.transmute.name");
+		
 		private int level;
 		
 		public TransmuteEffect(int level) {
@@ -789,8 +819,13 @@ public class SpellAction {
 			
 			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
+				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", item.getName()), false);
+				log.generalEffectFinish(0f, 0f);
 				return;
 			}
+
+			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", item.getName(), result.output.getName()), false);
+			log.generalEffectFinish(0f, 0f);
 			
 			ItemStack stack = new ItemStack(result.output);
 			NostrumMagicaSounds.CAST_CONTINUE.play(entity);
@@ -829,8 +864,13 @@ public class SpellAction {
 			TransmuteResult<Block> result = Transmutation.GetTransmutationResult(block, level);
 			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
+				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", block.getTranslatedName()), false);
+				log.generalEffectFinish(0f, 0f);
 				return;
 			}
+			
+			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", block.getTranslatedName(), result.output.getTranslatedName()), false);
+			log.generalEffectFinish(0f, 0f);
 			
 			NostrumMagicaSounds.CAST_CONTINUE.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
 
@@ -859,6 +899,8 @@ public class SpellAction {
 	}
 	
 	private static class BurnEffect extends NegativeSpellEffect {
+		
+		private static final ITextComponent LABEL_BURN_NAME = new TranslationTextComponent("spelllog.nostrummagica.burn.name");
 
 		private int duration;
 		
@@ -881,6 +923,10 @@ public class SpellAction {
 			
 			entity.setFire((int) Math.ceil((float) duration / 20.0f));
 			resultBuilder.applied |= true;
+			
+			log.generalEffectStart(LABEL_BURN_NAME,
+					new TranslationTextComponent("spelllog.nostrummagica.burn_ent.desc", String.format("%.1f", (float) this.duration / 20f), "" + (int) Math.ceil((float) duration / 20.0f)), true);
+			log.generalEffectFinish(0f, 0f);
 		}
 
 		@Override
@@ -904,6 +950,10 @@ public class SpellAction {
 						applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
+				
+				log.generalEffectStart(LABEL_BURN_NAME,
+						new TranslationTextComponent("spelllog.nostrummagica.burn.desc"), true);
+				log.generalEffectFinish(0f, 0f);
 			}
 			return;
 		}
@@ -921,6 +971,9 @@ public class SpellAction {
 	
 	private static class LightningEffect extends NegativeSpellEffect {
 		
+		private static final ITextComponent LABEL_LIGHTNING_NAME = new TranslationTextComponent("spelllog.nostrummagica.lightning.name");
+		private static final ITextComponent LABEL_LIGHTNING_MOD_BELT = new TranslationTextComponent("spelllogmod.nostrummagica.lightningbelt");
+		
 		public LightningEffect() {
 			
 		}
@@ -935,8 +988,9 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			
 			int count = 1;
+			
+			log.pushModifierStack();
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
@@ -949,6 +1003,7 @@ public class SpellAction {
 						}
 						
 						count = caster.getRNG().nextInt(3) + 3;
+						log.addGlobalModifier(LABEL_LIGHTNING_MOD_BELT, count - 1, ESpellLogModifierType.FINAL_FLAT); // dishonest; not a damage bonus
 						break;
 					}
 				}
@@ -961,6 +1016,10 @@ public class SpellAction {
 			}
 			
 			damage = (damage * efficiency);
+			
+			log.generalEffectStart(LABEL_LIGHTNING_NAME,
+					new TranslationTextComponent("spelllog.nostrummagica.lightning.desc", "" + count, String.format("%.1f", damage)), true);
+			log.generalEffectFinish(damage * count, 0f);
 			
 			final BlockPos applyPos = location.hitBlockPos;
 			BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(applyPos);
@@ -994,6 +1053,8 @@ public class SpellAction {
 
 			resultBuilder.applied |= true;
 			resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
+			
+			log.popModifierStack();
 		}
 		
 		@Override
@@ -1068,7 +1129,8 @@ public class SpellAction {
 					golem.setOwnerId(caster.getUniqueID());
 					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 				}
-				int time = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)) * efficiency);
+				int baseTime = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)));
+				int time = (int) (baseTime * efficiency);
 				caster.addPotionEffect(new EffectInstance(NostrumEffects.familiar, time, 0) {
 					@Override
 					public boolean tick(LivingEntity entityIn, Runnable onComplete) {
@@ -1100,6 +1162,11 @@ public class SpellAction {
 						return ret;
 					}
 				});
+				
+				final ITextComponent LABEL_SUMMON_NAME = new TranslationTextComponent("spelllog.nostrummagica.summon.name", this.element.getName());
+				final ITextComponent LABEL_SUMMON_DESC = new TranslationTextComponent("spelllog.nostrummagica.summon.desc", this.element.getName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
+				log.generalEffectStart(LABEL_SUMMON_NAME, LABEL_SUMMON_DESC, false);
+				log.generalEffectFinish(0f, 0f);
 			} else {
 				// Just summon some new golems
 				final int time = (int) (20f * (15f * efficiency));
@@ -2187,7 +2254,7 @@ public class SpellAction {
 	}
 	
 	public SpellAction healFood(int level) {
-		effects.add(new HealFoodEffect(4 * level));
+		effects.add(new HealFoodEffect(level));
 		return this;
 	}
 	

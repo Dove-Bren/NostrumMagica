@@ -65,6 +65,10 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	
 	@Override
 	public void drawForeground(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+		
+		// A bit hacky, but sometimes we scroll off vertically and it looks ugly...
+		RenderFuncs.drawRect(matrixStackIn, x, y + height - 5, x + width, y + height, 0xFF000000);
+		
 		matrixStackIn.push();
 		matrixStackIn.translate(0, 0, 100);
 		for (List<ObscurableWidget> widgets : stageSubWidgets) {
@@ -436,13 +440,15 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (summary.getTotalDamage() > 0 || summary.getTotalHeal() == 0f) {
 				final String damageText = String.format(" %.1f", summary.getTotalDamage());
 				this.addChild(new LabeledWidget(mc.currentScreen, new TotalDamageLabel(16, 16), new LabeledWidget.TextValue(() -> damageText), x + 10, y + height, 10, 10)
-						.tooltip(new StringTextComponent("Damaged")));
+						.tooltip(new StringTextComponent("Damaged"))
+						.scale(.75f));
 				shift = true;
 			}
 			if (summary.getTotalHeal() > 0f) {
 				final String healText = String.format(" %.1f", summary.getTotalHeal());
 				this.addChild(new LabeledWidget(mc.currentScreen, new TotalHealLabel(16, 16), new LabeledWidget.TextValue(() -> healText), x + 10 + (shift ? 40 : 0), y + height, 10, 10)
-						.tooltip(new StringTextComponent("Healed")));
+						.tooltip(new StringTextComponent("Healed"))
+						.scale(.75f));
 			}
 			
 			final ITextComponent title = entity.getName();
@@ -470,7 +476,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		public void setHasScrollbar() {
 			this.scrollbar.setHeight(this.height - 4);
-			addChild(scrollbar);
+			this.children.add(0, scrollbar); // put at first of list so that it gets rendered over
 			
 			for (EffectLineWidget line : lineWidgets) {
 				line.setWidth(this.width - 20 - (this.scrollbar.getWidth() + 4));
@@ -529,19 +535,22 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (line instanceof SpellLogEffectLine.Damage) {
 				final String damageText = String.format(" %.1f", line.getTotalDamage());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Damage)line).getElement();
-				this.addChild(new LabeledWidget(mc.currentScreen, new DamageLabel(element, 12, 12), new LabeledWidget.TextValue(() -> damageText), x + width - (12 + 40), y + height, 10, 10)
-						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Damage")));
+				this.addChild(new LabeledWidget(mc.currentScreen, new DamageLabel(element, 16, 16), new LabeledWidget.TextValue(() -> damageText), x + width - (12 + 40), y + height, 10, 10)
+						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Damage"))
+						.scale(.75f));
 			} else if (line instanceof SpellLogEffectLine.Heal) {
 				final String healText = String.format(" %.1f", line.getTotalHeal());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Heal)line).getElement();
-				this.addChild(new LabeledWidget(mc.currentScreen, new HealLabel(element, 12, 12), new LabeledWidget.TextValue(() -> healText), x + width - (12 + 40), y + height, 10, 10)
-						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Healing")));
+				this.addChild(new LabeledWidget(mc.currentScreen, new HealLabel(element, 16, 16), new LabeledWidget.TextValue(() -> healText), x + width - (12 + 40), y + height, 10, 10)
+						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Healing"))
+						.scale(.75f));
 			}
 			
-			height += 12 + 4;
+			height += 12;
 			
 			if (line.getModifiers().isEmpty()) {
-				this.addChild(new TextWidget(mc.currentScreen, new StringTextComponent("No modifiers"), x + 8, y + height, 100, 10));
+				this.addChild(new TextWidget(mc.currentScreen, new StringTextComponent("No modifiers"), x + 8, y + height, 100, 10).scale(.75f));
+				height += (int) (mc.fontRenderer.FONT_HEIGHT * .75f);
 			} else {
 				for (SpellLogModifier mod : line.getModifiers()) {
 					final ModifierWidget modWidget = new ModifierWidget(mod, x + 8, y + height, 100, 10);
@@ -582,8 +591,9 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			this.height = 0;
 			height += 1; // top margin 
 
-			this.addChild(new TextWidget(mc.currentScreen, modifier.getDescription(), x, y + height, 100, 10));
-			height += mc.fontRenderer.FONT_HEIGHT;
+			this.addChild(new TextWidget(mc.currentScreen, modifier.getDescription(), x, y + height, 100, 10)
+					.scale(.75f));
+			height += (int) (mc.fontRenderer.FONT_HEIGHT * .75f);
 
 			height += 1; // bottom margin
 		}
