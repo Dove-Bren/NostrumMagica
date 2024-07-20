@@ -599,8 +599,9 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 				this.addChild(new TextWidget(mc.currentScreen, new StringTextComponent("No modifiers"), x + 8, y + height, 100, 10));
 			} else {
 				for (SpellLogModifier mod : line.getModifiers()) {
-					this.addChild(new TextWidget(mc.currentScreen, mod.getDescription(), x + 8, y + height, 100, 10));
-					height += 10;
+					final ModifierWidget modWidget = new ModifierWidget(mod, x + 8, y + height, 100, 10);
+					this.addChild(modWidget);
+					height += modWidget.getHeightRealms();
 				}
 			}
 
@@ -610,6 +611,44 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		@Override
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, line.isHarmful() ? 0xFF804040 : 0xFF404080);
+		}
+		
+		@Override
+		protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			super.renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
+			
+			matrixStackIn.push();
+			matrixStackIn.translate(0, 0, 100);
+			for (Widget widget : this.children) {
+				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
+			}
+			matrixStackIn.pop();
+		}
+	}
+	
+	private static class ModifierWidget extends ParentWidget {
+		
+		private SpellLogModifier modifier;
+		
+		public ModifierWidget(SpellLogModifier modifier, int x, int y, int width, int heightIn) {
+			super(x, y, width, heightIn, StringTextComponent.EMPTY);
+			this.modifier = modifier;
+			
+			final Minecraft mc = Minecraft.getInstance();
+			
+			// Reset height and built it as we go
+			this.height = 0;
+			height += 1; // top margin 
+
+			this.addChild(new TextWidget(mc.currentScreen, modifier.getDescription(), x, y + height, 100, 10));
+			height += mc.fontRenderer.FONT_HEIGHT;
+
+			height += 1; // bottom margin
+		}
+		
+		@Override
+		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			;
 		}
 		
 		@Override

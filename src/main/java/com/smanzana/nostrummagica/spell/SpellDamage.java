@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
+import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 
 import net.minecraft.entity.LivingEntity;
@@ -30,53 +31,96 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class SpellDamage {
 	
 	private static final class Damage {
-		private float base;
+		private final float base;
+		private float baseFlat;
+		private float bonusScale;
+		private float resistScale;
+		private float finalFlat;
 		private final ISpellLogBuilder log;
 		
-		public Damage(float base, ISpellLogBuilder log) {
+		public Damage(float base, float startingBonus, ISpellLogBuilder log) {
 			this.base = base;
 			this.log = log;
-		}
-		
-		private final void mulInternal(String cause, float scale) {
-			final float pre = base;
-			base *= scale;
-			base = Math.max(0, base);
-			final float post = base;
-			LogDamage(pre, post, cause);
-		}
-		
-		public final void mul(String cause, float scale) {
-			mulInternal(cause, scale);
-			log.effectMod(MakeLabel(cause), scale-1f, false);
-		}
-		
-		public final void mul(Skill skill, float scale) {
-			mulInternal("Skill: " + skill.getName().getString(), scale);
-			log.effectMod(skill, scale-1f, false);
-		}
-		
-		private final void addInternal(String cause, float diff) {
-			final float pre = base;
-			base += diff;
-			base = Math.max(0, base);
-			final float post = base;
-			LogDamage(pre, post, cause);
-		}
-		
-		public final void add(String cause, float diff) {
-			addInternal(cause, diff);
-			log.effectMod(MakeLabel(cause), diff, true);
-		}
-		
-		public final void add(Skill skill, float diff) {
-			addInternal("Skill: " + skill.getName().getString(), diff);
-			log.effectMod(skill, diff, true);
+			baseFlat = 0f;
+			bonusScale = startingBonus;
+			resistScale = 1f;
+			finalFlat = 0f;
 		}
 		
 		public final float calc() {
-			LogDamage(base, base, "Result");
-			return this.base;
+			final float baseAdj = Math.max(0, base + baseFlat);
+			final float preFin = baseAdj * Math.max(0f, bonusScale) * Math.max(0f, resistScale);
+			final float fin = preFin + finalFlat;
+			//LogDamage(base, fin, "Result");
+			return fin;
+		}
+		
+		private final void baseFlatInternal(String cause, float scale) {
+			final float pre = calc();
+			this.baseFlat += scale;
+			final float post = calc();
+			LogDamage(pre, post, cause);
+		}
+		
+		private final void bonusScaleInternal(String cause, float scale) {
+			final float pre = calc();
+			this.bonusScale += scale;
+			final float post = calc();
+			LogDamage(pre, post, cause);
+		}
+		
+		private final void resistScaleInternal(String cause, float scale) {
+			final float pre = calc();
+			this.resistScale += scale;
+			final float post = calc();
+			LogDamage(pre, post, cause);
+		}
+		
+		private final void finalFlatInternal(String cause, float scale) {
+			final float pre = calc();
+			this.finalFlat += scale;
+			final float post = calc();
+			LogDamage(pre, post, cause);
+		}
+		
+		private final void baseFlat(String cause, float flat) {
+			baseFlatInternal(cause, flat);
+			log.effectMod(MakeLabel(cause), flat, ESpellLogModifierType.BASE_FLAT);
+		}
+		
+		private final void baseFlat(Skill skill, float flat) {
+			baseFlatInternal("Skill: " + skill.getName().getString(), flat);
+			log.effectMod(skill, flat, ESpellLogModifierType.BASE_FLAT);
+		}
+		
+		private final void bonusScale(String cause, float scale) {
+			bonusScaleInternal(cause, scale);
+			log.effectMod(MakeLabel(cause), scale, ESpellLogModifierType.BONUS_SCALE);
+		}
+		
+		private final void bonusScale(Skill skill, float scale) {
+			bonusScaleInternal("Skill: " + skill.getName().getString(), scale);
+			log.effectMod(skill, scale, ESpellLogModifierType.BONUS_SCALE);
+		}
+		
+		private final void resistScale(String cause, float scale) {
+			resistScaleInternal(cause, scale);
+			log.effectMod(MakeLabel(cause), scale, ESpellLogModifierType.RESIST_SCALE);
+		}
+		
+		private final void resistScale(Skill skill, float scale) {
+			resistScaleInternal("Skill: " + skill.getName().getString(), scale);
+			log.effectMod(skill, scale, ESpellLogModifierType.RESIST_SCALE);
+		}
+		
+		private final void finalFlat(String cause, float flat) {
+			finalFlatInternal(cause, flat);
+			log.effectMod(MakeLabel(cause), flat, ESpellLogModifierType.FINAL_FLAT);
+		}
+		
+		private final void finalFlat(Skill skill, float flat) {
+			finalFlatInternal("Skill: " + skill.getName().getString(), flat);
+			log.effectMod(skill, flat, ESpellLogModifierType.FINAL_FLAT);
 		}
 	}
 
@@ -144,7 +188,7 @@ public class SpellDamage {
 		return new TranslationTextComponent("spelllogmod.nostrummagica." + cause.toLowerCase());
 	}
 	
-	public static final float CalculateDamage(@Nullable LivingEntity caster, LivingEntity target, float baseDamage, EMagicElement element, ISpellLogBuilder log) {
+	public static final float CalculateDamage(@Nullable LivingEntity caster, LivingEntity target, float baseDamage, float efficiency, EMagicElement element, ISpellLogBuilder log) {
 		float amt = 0f;
 		
 		if (target == null)
@@ -153,19 +197,19 @@ public class SpellDamage {
 		final @Nullable INostrumMagic magic = caster == null ? null : NostrumMagica.getMagicWrapper(caster);
 		
 		LogDamage(0, baseDamage, "Start");
-		final Damage damage = new Damage(baseDamage, log);
+		final Damage damage = new Damage(baseDamage, efficiency, log);
 		
 		if (element == EMagicElement.PHYSICAL) {
 			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
 			// It still gains power from magic boost/magic damage AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).
 			final float baseAttribute = GetPhysicalAttributeBonusNoMainhand(caster);
 			final float mainhand = GetPhysicalAttributeBonusMainhand(caster);
-			damage.add("PhysicalAttributeBase", baseAttribute);
+			damage.baseFlat("PhysicalAttributeBase", baseAttribute);
 			
 			// Note that the physical master skill includes using some of this
 			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Physical_Master)) {
-				damage.add(NostrumSkills.Physical_Master, (int) (mainhand * .2f));
+				damage.baseFlat(NostrumSkills.Physical_Master, (int) (mainhand * .2f));
 			}
 		} else {
 		
@@ -201,38 +245,38 @@ public class SpellDamage {
 			}
 			
 			if (element == EMagicElement.FIRE && magic != null && magic.hasSkill(NostrumSkills.Fire_Adept)) {
-				damage.add(NostrumSkills.Fire_Adept, 2);
+				damage.baseFlat(NostrumSkills.Fire_Adept, 2);
 			}
 			
 			if (element == EMagicElement.LIGHTNING && magic != null && magic.hasSkill(NostrumSkills.Lightning_Adept)) {
-				damage.add(NostrumSkills.Lightning_Adept, 1);
+				damage.baseFlat(NostrumSkills.Lightning_Adept, 1);
 			}
 			
 			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
 				EffectInstance strength = caster == null ? null : caster.getActivePotionEffect(Effects.STRENGTH);
 				if (strength != null) {
 					// Matches strength attribute boost
-					damage.add(NostrumSkills.Earth_Adept, 3 * (strength.getAmplifier() + 1));
+					damage.baseFlat(NostrumSkills.Earth_Adept, 3 * (strength.getAmplifier() + 1));
 				}
 			}
 				
 			switch (element) {
 			case ENDER:
 				if (ender) {
-					damage.mul("EnderXEnder", 0f);
+					damage.bonusScale("EnderXEnder", -1f);
 					return 0.0f; // does not affect ender
 				}
-				damage.mul("EnderDamage", 1.2f); // return raw damage (+20%) not affected by armor
+				damage.bonusScale("EnderDamage", +.2f); // return raw damage (+20%) not affected by armor
 				break;
 			case LIGHTNING:
-				damage.mul("LightningDamage", .75f + ((float) armor / 20f)); // double in power for every 20 armor
+				damage.bonusScale("LightningDamage", (.75f + ((float) armor / 20f)) -1f); // double in power for every 20 armor
 				break;
 			case FIRE:
 				// 1.5x damage against undead. Half on flame-resistant. Regular otherwise
 				if (undead) {
-					damage.mul("FireXUndead", 1.5f); 
+					damage.bonusScale("FireXUndead", +.5f); 
 				} else if (flamy) {
-					damage.mul("FireXFire", .5f); // 1.5x damage against undead. Regular otherwise
+					damage.bonusScale("FireXFire", -.5f); // 1.5x damage against undead. Regular otherwise
 				}
 				break;
 			case EARTH:
@@ -242,20 +286,20 @@ public class SpellDamage {
 			case ICE:
 				// More affective against everything except undead
 				if (undead) {
-					damage.mul("IceXUndead", .6f);
+					damage.bonusScale("IceXUndead", -.4f);
 				} else {
-					damage.mul("IceDamage", 1.3f);
+					damage.bonusScale("IceDamage", +.3f);
 				}
 				if (target.isBurning()) {
-					damage.mul("IceDamageOnBurning", 2);
+					damage.bonusScale("IceDamageOnBurning", +1f);
 				}
 				break;
 			case WIND:
 				// 180% against light (endermen included) enemies
 				if (light) {
-					damage.mul("WindLightDamage", 1.8f);
+					damage.bonusScale("WindLightDamage", +.8f);
 				} else {
-					damage.mul("WindHeavyDamage", .8f);
+					damage.bonusScale("WindHeavyDamage", -.2f);
 				}
 				break;
 			default:
@@ -267,36 +311,36 @@ public class SpellDamage {
 		// Apply boosts and resist
 		ModifiableAttributeInstance attr = caster == null ? null : caster.getAttribute(NostrumAttributes.magicDamage);
 		if (attr != null && attr.getValue() != 0.0D) {
-			damage.mul("MagicDamageAttribute", Math.max(0, Math.min(100, 1f + (float)(attr.getValue() / 100.0))));
+			damage.bonusScale("MagicDamageAttribute", (Math.max(0, Math.min(100, 1f + (float)(attr.getValue() / 100.0)))) - 1f);
 		}
 		
 		// No magic resist for physical; it uses armor value
 		if (element != EMagicElement.PHYSICAL) {
 			attr = target.getAttribute(NostrumAttributes.magicResist);
 			if (attr != null && attr.getValue() != 0.0D) {
-				damage.mul("MagicResistAttribute", (float) Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D))));
+				damage.resistScale("MagicResistAttribute", (float) (Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)))) - 1f);
 			}
 		} else {
-			damage.mul("PhysicalArmor", GetArmorModifier(target, damage));
+			damage.resistScale("PhysicalArmor", GetArmorModifier(target, damage) - 1f);
 		}
 		
 		// Apply armor reductions
 		attr = target.getAttribute(NostrumAttributes.GetReduceAttribute(element));
 		if (attr != null && attr.getValue() != 0.0D) {
-			damage.add("FlatReducAttribute", (float) -attr.getValue());
+			damage.finalFlat("FlatReducAttribute", (float) -attr.getValue());
 		}
 		
 		return damage.calc();
 	}
 	
-	public static final float DamageEntity(LivingEntity target, EMagicElement element, float base, @Nullable LivingEntity source, ISpellLogBuilder log) {
-		final float damage = CalculateDamage(source, target, base, element, log);
+	public static final float DamageEntity(LivingEntity target, EMagicElement element, float base, float efficiency, @Nullable LivingEntity source, ISpellLogBuilder log) {
+		final float damage = CalculateDamage(source, target, base, efficiency, element, log);
 		target.attackEntityFrom(new MagicDamageSource(source, element), damage);
 		return damage;
 	}
 	
 	public static final float DamageEntity(LivingEntity target, EMagicElement element, float base, @Nullable LivingEntity source) {
-		return DamageEntity(target, element, base, source, ISpellLogBuilder.Dummy);
+		return DamageEntity(target, element, base, 1f, source, ISpellLogBuilder.Dummy);
 	}
 	
 }

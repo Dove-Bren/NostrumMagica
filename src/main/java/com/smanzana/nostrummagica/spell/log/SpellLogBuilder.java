@@ -22,7 +22,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class SpellLogBuilder implements ISpellLogBuilder {
 	
 	private static abstract class EffectBuilder {
-		protected final List<SpellLogModifier> lineModifiers;
+		private final List<SpellLogModifier> lineModifiers;
 		
 		protected EffectBuilder(List<SpellLogModifier> baseModifiers) {
 			this.lineModifiers = new ArrayList<>(baseModifiers);
@@ -31,6 +31,11 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		public EffectBuilder modify(SpellLogModifier modifier) {
 			this.lineModifiers.add(modifier);
 			return this;
+		}
+		
+		protected List<SpellLogModifier> buildModifiers() {
+			lineModifiers.sort((a, b) -> a.getType().ordinal() - b.getType().ordinal());
+			return this.lineModifiers;
 		}
 		
 		public abstract SpellLogEffectLine build();
@@ -88,7 +93,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			if (baseDmg == -1 || finalDmg == -1) {
 				throw new IllegalStateException("Didn't specify both base and final damage amounts");
 			}
-			return new SpellLogEffectLine.Damage(baseDmg, finalDmg, element, lineModifiers);
+			return new SpellLogEffectLine.Damage(baseDmg, finalDmg, element, buildModifiers());
 		}
 	}
 	
@@ -127,7 +132,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			if (baseHeal == -1 || finalHeal == -1) {
 				throw new IllegalStateException("Didn't specify both base and final heal amounts");
 			}
-			return new SpellLogEffectLine.Heal(baseHeal, finalHeal, element, lineModifiers);
+			return new SpellLogEffectLine.Heal(baseHeal, finalHeal, element, buildModifiers());
 		}
 	}
 	
@@ -166,7 +171,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			if (effect == null || baseDuration == -1 || finalDuration == -1) {
 				throw new IllegalStateException("Must specify effect, base duration, and final duration");
 			}
-			return new SpellLogEffectLine.Status(effect, baseDuration, finalDuration, lineModifiers);
+			return new SpellLogEffectLine.Status(effect, baseDuration, finalDuration, buildModifiers());
 		}
 	}
 	
@@ -221,7 +226,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 			if (amtDmg == -1 || amtHeal == -1 || desc == null || name == null) {
 				throw new IllegalStateException("Must specify damage and heal amounts and a description");
 			}
-			return new SpellLogEffectLine.General(harmful, amtDmg, amtHeal, name, desc, lineModifiers);
+			return new SpellLogEffectLine.General(harmful, amtDmg, amtHeal, name, desc, buildModifiers());
 		}
 	}
 
@@ -472,17 +477,17 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder effectMod(ITextComponent label, float amt, boolean flat) {
+	public SpellLogBuilder effectMod(ITextComponent label, float amt, ESpellLogModifierType type) {
 		if (!this.buildingEffectLine || this.effectBuilder == null) {
 			throw new IllegalStateException("Wasn't building an effect line, so can't add a modifier");
 		}
-		this.effectBuilder.modify(flat ? new SpellLogModifier.Flat(label, amt) : new SpellLogModifier.Percentage(label, amt));
+		this.effectBuilder.modify(SpellLogModifier.Make(label, amt, type));
 		return this;
 	}
 	
 	@Override
-	public ISpellLogBuilder effectMod(Skill skill, float amt, boolean flat) {
-		return effectMod(makeSkillLabel(skill), amt, flat);
+	public ISpellLogBuilder effectMod(Skill skill, float amt, ESpellLogModifierType type) {
+		return effectMod(makeSkillLabel(skill), amt, type);
 	}
 
 	@Override
@@ -501,14 +506,14 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 	
 	@Override
-	public ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, boolean flat) {
-		getModifiers().add(flat ? new SpellLogModifier.Flat(label, amt) : new SpellLogModifier.Percentage(label, amt));
+	public ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, ESpellLogModifierType type) {
+		getModifiers().add(SpellLogModifier.Make(label, amt, type));
 		return this;
 	}
 	
 	@Override
-	public ISpellLogBuilder addGlobalModifier(Skill skill, float amt, boolean flat) {
-		return addGlobalModifier(makeSkillLabel(skill), amt, flat);
+	public ISpellLogBuilder addGlobalModifier(Skill skill, float amt, ESpellLogModifierType type) {
+		return addGlobalModifier(makeSkillLabel(skill), amt, type);
 	}
 	
 	protected List<SpellLogModifier> getModifiers() {

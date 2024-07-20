@@ -44,6 +44,7 @@ import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmuteResult;
+import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.HarvestUtil;
@@ -200,8 +201,7 @@ public class SpellAction {
 			final float baseDmg = amount;
 			log.damageStart(this.amount, this.element);
 			
-			final float fin = SpellDamage.DamageEntity(entity, element, baseDmg, caster, log) * efficiency;
-			log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
+			final float fin = SpellDamage.DamageEntity(entity, element, baseDmg, efficiency, caster, log);
 			
 			NostrumMagicaSounds sound;
 			switch (element) {
@@ -265,7 +265,7 @@ public class SpellAction {
 			final INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Ice_Master)) {
 				base *= 2;
-				log.addGlobalModifier(LABEL_MOD_ICE_MASTER, 2, false);
+				log.addGlobalModifier(LABEL_MOD_ICE_MASTER, +1f, ESpellLogModifierType.BONUS_SCALE);
 			}
 			
 			if (entity.isEntityUndead()) {
@@ -275,9 +275,7 @@ public class SpellAction {
 				
 				log.damageStart(this.amount, EMagicElement.ICE); // trickery here: skill modifiers added globally so 'start' with real base
 													// even though later we use the current 'base' modified amount
-				log.effectMod(LABEL_MOD_EFF, efficiency - 1f, false);
-				
-				final float fin = SpellDamage.DamageEntity(entity, EMagicElement.ICE, base * efficiency, caster, log);
+				final float fin = SpellDamage.DamageEntity(entity, EMagicElement.ICE, base, efficiency, caster, log);
 				
 				entity.hurtResistantTime = 0;
 				resultBuilder.damage += fin;
@@ -285,7 +283,6 @@ public class SpellAction {
 			} else {
 				
 				log.healStart(this.amount, EMagicElement.ICE);
-				
 				entity.heal(base * efficiency);
 				if (entity instanceof TameRedDragonEntity) {
 					TameRedDragonEntity dragon = (TameRedDragonEntity) entity;

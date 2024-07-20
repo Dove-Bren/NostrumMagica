@@ -41,17 +41,17 @@ public interface ISpellLogBuilder {
 	
 	public default ISpellLogBuilder generalEffectFinish(float finalDmg, float finalHeal) { return this; }
 	
-	public default ISpellLogBuilder effectMod(ITextComponent label, float amt, boolean flat) { return this; }
+	public default ISpellLogBuilder effectMod(ITextComponent label, float amt, ESpellLogModifierType type) { return this; }
 	
-	public default ISpellLogBuilder effectMod(Skill skill, float amt, boolean flat) { return this; }
+	public default ISpellLogBuilder effectMod(Skill skill, float amt, ESpellLogModifierType type) { return this; }
 	
 	public default ISpellLogBuilder pushModifierStack() { return this; }
 	
 	public default ISpellLogBuilder popModifierStack() { return this; }
 	
-	public default ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, boolean flat) { return this; }
+	public default ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, ESpellLogModifierType type) { return this; }
 
-	public default ISpellLogBuilder addGlobalModifier(Skill skill, float amt, boolean flat) { return this; }
+	public default ISpellLogBuilder addGlobalModifier(Skill skill, float amt, ESpellLogModifierType type) { return this; }
 	
 	public static class DummyImpl implements ISpellLogBuilder {
 		

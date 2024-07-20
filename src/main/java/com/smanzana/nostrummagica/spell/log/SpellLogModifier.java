@@ -7,9 +7,11 @@ import net.minecraft.util.text.TextFormatting;
 public abstract class SpellLogModifier {
 
 	protected final ITextComponent label;
+	protected final ESpellLogModifierType type;
 	private final float modifier;
 	
-	public SpellLogModifier(ITextComponent label, float modifier) {
+	public SpellLogModifier(ESpellLogModifierType type, ITextComponent label, float modifier) {
+		this.type = type;
 		this.label = label;
 		this.modifier = modifier;
 	}
@@ -19,16 +21,20 @@ public abstract class SpellLogModifier {
 	public float getModifier() {
 		return modifier;
 	}
+
+	protected ESpellLogModifierType getType() {
+		return type;
+	}
 	
-	public static class Percentage extends SpellLogModifier {
+	protected static abstract class Percentage extends SpellLogModifier {
 		
 		private final ITextComponent description;
 
-		public Percentage(ITextComponent label, float modifier) {
-			super(label, modifier);
+		public Percentage(ESpellLogModifierType type, ITextComponent label, float modifier, TextFormatting negColor, TextFormatting posColor) {
+			super(type, label, modifier);
 			
 			description = label.deepCopy().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.0f%%", modifier * 100f)).mergeStyle(modifier <= 0 ? TextFormatting.RED : TextFormatting.GREEN)
+					new StringTextComponent(String.format("%+.0f%%", modifier * 100f)).mergeStyle(modifier <= 0 ? negColor : posColor)
 				);
 		}
 
@@ -38,15 +44,27 @@ public abstract class SpellLogModifier {
 		}
 	}
 	
-	public static class Flat extends SpellLogModifier {
+	protected static class BonusScale extends Percentage {
+		public BonusScale(ITextComponent label, float modifier) {
+			super(ESpellLogModifierType.BONUS_SCALE, label, modifier, TextFormatting.RED, TextFormatting.GREEN);
+		}
+	}
+	
+	protected static class ResistScale extends Percentage {
+		public ResistScale(ITextComponent label, float modifier) {
+			super(ESpellLogModifierType.RESIST_SCALE, label, modifier, TextFormatting.DARK_BLUE, TextFormatting.DARK_RED);
+		}
+	}
+	
+	protected static abstract class Flat extends SpellLogModifier {
 		
 		private final ITextComponent description;
 
-		public Flat(ITextComponent label, float modifier) {
-			super(label, modifier);
+		public Flat(ESpellLogModifierType type, ITextComponent label, float modifier, TextFormatting negColor, TextFormatting posColor) {
+			super(type, label, modifier);
 			
 			description = label.deepCopy().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.1f", modifier)).mergeStyle(modifier <= 0 ? TextFormatting.RED : TextFormatting.GREEN)
+					new StringTextComponent(String.format("%+.1f", modifier)).mergeStyle(modifier <= 0 ? negColor : posColor)
 				);
 		}
 
@@ -54,6 +72,33 @@ public abstract class SpellLogModifier {
 		public ITextComponent getDescription() {
 			return description;
 		}
+	}
+	
+	protected static class BaseFlat extends Flat {
+		public BaseFlat(ITextComponent label, float modifier) {
+			super(ESpellLogModifierType.BASE_FLAT, label, modifier, TextFormatting.YELLOW, TextFormatting.GOLD);
+		}
+	}
+	
+	protected static class FinalFlat extends Flat {
+		public FinalFlat(ITextComponent label, float modifier) {
+			super(ESpellLogModifierType.FINAL_FLAT, label, modifier, TextFormatting.RED, TextFormatting.BLUE);
+		}
+	}
+	
+	public static final SpellLogModifier Make(ITextComponent label, float modifier, ESpellLogModifierType type) {
+		switch (type) {
+		case BASE_FLAT:
+			return new BaseFlat(label, modifier);
+		case BONUS_SCALE:
+			return new BonusScale(label, modifier);
+		case FINAL_FLAT:
+			return new FinalFlat(label, modifier);
+		case RESIST_SCALE:
+			return new ResistScale(label, modifier);
+		}
+		
+		return null;
 	}
 	
 }

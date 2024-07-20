@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape.SpellShapeInstance;
+import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.spell.log.SpellLogBuilder;
 import com.smanzana.nostrummagica.spell.log.SpellLogEntry;
@@ -223,7 +224,7 @@ public class Spell {
 					final float amt = .25f * (1 + target.getActivePotionEffect(boostEffect).getAmplifier());
 					bonus += amt;
 					target.removePotionEffect(boostEffect);
-					log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLinger, amt, false);
+					log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLinger, amt, ESpellLogModifierType.BONUS_SCALE);
 				}
 			}
 			
@@ -239,43 +240,43 @@ public class Spell {
 			case EARTH:
 				if (attr.hasSkill(NostrumSkills.Earth_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Earth_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Earth_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			case ENDER:
 				if (attr.hasSkill(NostrumSkills.Ender_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Ender_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Ender_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			case FIRE:
 				if (attr.hasSkill(NostrumSkills.Fire_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Fire_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Fire_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			case ICE:
 				if (attr.hasSkill(NostrumSkills.Ice_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Ice_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Ice_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			case LIGHTNING:
 				if (attr.hasSkill(NostrumSkills.Lightning_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Lightning_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Lightning_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			case PHYSICAL:
 				if (attr.hasSkill(NostrumSkills.Physical_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Physical_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Physical_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			case WIND:
 				if (attr.hasSkill(NostrumSkills.Wind_Novice)) {
 					bonus += .2f;
-					log.addGlobalModifier(NostrumSkills.Wind_Novice, .2f, false);
+					log.addGlobalModifier(NostrumSkills.Wind_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 				}
 				break;
 			}
@@ -296,7 +297,7 @@ public class Spell {
 			final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
 			
 			log.pushModifierStack();
-			log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, false);
+			log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, ESpellLogModifierType.BONUS_SCALE);
 			
 			for (SpellEffectPart part : spell.parts) {
 				SpellAction action = solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
@@ -306,7 +307,7 @@ public class Spell {
 				
 				// Apply part-specific bonuses that don't matter on targets here
 				final float partBonus = getCasterEfficiencyBonus(caster, part, action, efficiency, log);
-				efficiency *= 1f + partBonus;
+				efficiency += partBonus;
 				
 				if (attr != null && attr.isUnlocked()) {
 					attr.setKnowledge(part.getElement(), part.getAlteration());
@@ -323,7 +324,7 @@ public class Spell {
 						
 						// Apply per-target bonuses
 						final float targBonus = getTargetEfficiencyBonus(caster, targ, part, action, efficiency, log);
-						float perEfficiency = efficiency * (1f + targBonus);
+						float perEfficiency = efficiency + targBonus;
 						
 						SpellActionResult result = action.apply(caster, targ, perEfficiency, log); 
 						if (result.applied) {

@@ -19,7 +19,7 @@ public class TextWidget extends FixedWidget {
 	protected final ITextComponent text;
 	
 	protected @Nullable List<ITextComponent> tooltip;
-	protected int color = 0xFFAAAAAA;
+	protected int color = 0xFFDDDDDD;
 	protected float scale = 1f;
 	protected boolean centered = false;
 	
@@ -62,7 +62,7 @@ public class TextWidget extends FixedWidget {
 		matrixStackIn.translate(this.x, this.y, 0);
 		matrixStackIn.scale(scale, scale, 1f);
 		final int textWidth = font.func_243245_a(this.text.func_241878_f());
-		font.func_243246_a(matrixStackIn, this.text, centered ? -(textWidth/2) : 0, 0, color);
+		font.func_243248_b(matrixStackIn, this.text, centered ? -(textWidth/2) : 0, 0, color);
 		matrixStackIn.pop();
 		
 		final int actingWidth = (int) (textWidth * scale);
