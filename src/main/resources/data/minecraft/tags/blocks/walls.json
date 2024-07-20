@@ -1,0 +1,11 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:locked_door",
+		"nostrummagica:dungeon_door_small",
+		"nostrummagica:dungeon_door_large",
+		"nostrummagica:logic_door",
+		"nostrummagica:toggle_logic_door",
+		"nostrummagica:progression_door"
+	]
+}

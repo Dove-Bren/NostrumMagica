@@ -262,6 +262,8 @@ public class BlueprintBlock {
 			ret = state.get(DirectionalBlock.FACING);
 		} else if (block instanceof IDirectionalBlock) {
 			ret = state.get(IDirectionalBlock.FACING);
+		} else if (block instanceof ChestBlock) {
+			ret = state.get(ChestBlock.FACING);
 		}
 		return ret;
 	}

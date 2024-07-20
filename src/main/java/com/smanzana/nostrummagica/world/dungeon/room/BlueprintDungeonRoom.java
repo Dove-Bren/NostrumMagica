@@ -83,7 +83,6 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 		blueprint.scanBlocks(this::parseRoom);
 	}
 	
-	// TODO: move these out of here
 	public static boolean IsDoorIndicator(BlockState state) {
 		return state != null && state.getBlock() == Blocks.REPEATER;
 	}
@@ -104,15 +103,16 @@ public class BlueprintDungeonRoom implements IDungeonRoom, IDungeonLobbyRoom {
 				&& NostrumBlocks.largeDungeonDoor.isMaster(state);
 	}
 	
+	public static boolean IsChest(BlockState state) {
+		return state != null && state.getBlock() == Blocks.CHEST;
+	}
+	
 	private static boolean debugConnections = false;
 
 	protected BlueprintBlock parseRoom(BlockPos offset, BlueprintBlock block) {
-		BlockState state = block.getSpawnState(blueprint.getEntry().getFacing()); 
-		if (state != null && state.getBlock() == Blocks.CHEST) {
-			chestsRelative.add(new BlueprintLocation(offset, state.get(ChestBlock.FACING)));
-		}
-		
-		if (IsDoorIndicator(block.getState())) {
+		if (IsChest(block.getState())) {
+			chestsRelative.add(new BlueprintLocation(offset, block.getFacing()));
+		} else if (IsDoorIndicator(block.getState())) {
 			doors.add(new BlueprintLocation(offset, block.getFacing().getOpposite()));
 			if (!debugConnections) {
 				block = BlueprintBlock.Air; // Make block an air one
