@@ -146,6 +146,12 @@ public class NostrumDungeon {
 			return new ArrayList<>();
 		}
 		
+		// Genereate lobby/stair/etc. early and add thier boxes to aid in generation
+		final List<DungeonRoomInstance> startingExtras = this.starting.generateExtraPieces(world, start, rand, instance);
+		for (DungeonRoomInstance extra : startingExtras) {
+			context.boundingBoxes.add(extra.getBounds());
+		}
+		
 		final boolean supportsPuzzle = (!context.keyRooms.isEmpty() && !context.doorRooms.isEmpty());
 		
 		if (!supportsPuzzle) {
@@ -160,7 +166,7 @@ public class NostrumDungeon {
 		addPuzzle(startPath, context);
 		
 		List<DungeonRoomInstance> ret = startPath.getInstances();
-		ret.addAll(this.starting.generateExtraPieces(world, start, rand, instance));
+		ret.addAll(startingExtras);
 		return ret;
 	}
 	
