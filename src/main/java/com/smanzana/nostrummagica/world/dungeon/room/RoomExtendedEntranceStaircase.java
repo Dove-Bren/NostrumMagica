@@ -108,11 +108,15 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 		
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
-		while (cur.getY() < maxY - 17) {
+		int loops = 0;
+		while (cur.getY() < maxY - 17
+				|| loops < 2 // Make sure we always do at least two
+			) {
 			if (spawn) {
 				super.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonID);
 			}
 			cur = cur.add(0, stairHeight, 0);
+			loops++;
 		}
 		
 		return new BlueprintLocation(cur, start.getFacing());
