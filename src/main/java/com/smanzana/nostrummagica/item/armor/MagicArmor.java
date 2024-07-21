@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.attribute.MagicPotencyAttribute;
 import com.smanzana.nostrummagica.attribute.MagicReductionAttribute;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -46,6 +47,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate.ArmorState;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
@@ -150,6 +152,19 @@ public class MagicArmor extends ArmorItem
 				return ADEPT;
 			}
 
+			return null;
+		}
+		
+		public final EElementalMastery getMatchingMastery() {
+			switch (this) {
+			case NOVICE:
+				return EElementalMastery.NOVICE;
+			case ADEPT:
+				return EElementalMastery.ADEPT;
+			case MASTER:
+				return EElementalMastery.MASTER;
+			}
+			
 			return null;
 		}
 	}

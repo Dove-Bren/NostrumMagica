@@ -1010,7 +1010,8 @@ public class ModInit {
 							new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 									ReagentType.MANI_DUST },
 							input, new Ingredient[] { essence, gem, essence, essence },
-							new ResearchRequirement(research), new OutcomeSpawnItem(outcome.copy())));
+							IRequirement.AND(new ResearchRequirement(research), new ElementMasteryRequirement(elem, type.getMatchingMastery())),
+							new OutcomeSpawnItem(outcome.copy())));
 				}
 			}
 		}
@@ -1045,7 +1046,8 @@ public class ModInit {
 								input,
 								new Ingredient[] { Ingredient.fromTag(Tags.Items.OBSIDIAN),
 										wings, augment, Ingredient.fromTag(NostrumTags.Items.CrystalLarge) },
-								new ResearchRequirement(research), outcome));
+								IRequirement.AND(new ResearchRequirement(research), new ElementMasteryRequirement(elem, MagicArmor.Type.MASTER.getMatchingMastery())),
+								outcome));
 			}
 		}
 		

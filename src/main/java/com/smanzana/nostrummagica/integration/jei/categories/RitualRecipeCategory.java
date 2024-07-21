@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.outcome.IItemRitualOutcome;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.TextUtils;
 
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -262,8 +263,6 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		return null;
 	}
 	
-	private String tooltipInvalidKey = null;
-	private List<ITextComponent> tooltipInvalid = null;
 	private List<ITextComponent> tooltipEmpty = new ArrayList<>();
 
 	@Override
@@ -272,15 +271,12 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		if (!canPerform(ritual)
 				&& mouseX > 101 && mouseX < 124
 				&& mouseY > 66 && mouseY < 85) {
-			if (tooltipInvalidKey == null || !tooltipInvalidKey.equals(I18n.format("info.jei.recipe.ritual.invalid", TextFormatting.BOLD + "" + TextFormatting.RED, TextFormatting.BLACK))) {
-				tooltipInvalidKey = I18n.format("info.jei.recipe.ritual.invalid", TextFormatting.BOLD + "" + TextFormatting.RED, TextFormatting.BLACK);
-				final String[] lines = tooltipInvalidKey.split("\\|");
-				tooltipInvalid = new ArrayList<>(lines.length);
-				for (String line : lines) {
-					tooltipInvalid.add(new StringTextComponent(line));
-				}
+			List<ITextComponent> tooltip = TextUtils.GetTranslatedList("info.jei.recipe.ritual.invalid", TextFormatting.BOLD + "" + TextFormatting.RED, TextFormatting.BLACK);
+			List<ITextComponent> extras = ritual.getRequirement() == null ? null : ritual.getRequirement().getDescription(NostrumMagica.instance.proxy.getPlayer());
+			if (extras != null) {
+				extras.forEach(t -> tooltip.add(new StringTextComponent(" - ").append(t)));
 			}
-			return tooltipInvalid;
+			return tooltip;
 		}
 			
 		return tooltipEmpty;
