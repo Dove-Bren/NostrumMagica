@@ -154,10 +154,9 @@ public class SublimationEffect extends Effect {
 				// If we suspect regular fire damage is happening next, set resistant time to 0 so it still happens.
 				// Otherwise, don't reset
 				final boolean lavaSet = MagicArmor.GetSetCount(entity, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
-				final boolean trueSet = MagicArmor.GetSetCount(entity, EMagicElement.FIRE, MagicArmor.Type.TRUE) == 4;
 				if (!entity.isImmuneToFire()
 						&& entity.getActivePotionEffect(Effects.FIRE_RESISTANCE) == null
-						&& !lavaSet && !trueSet) {
+						&& !lavaSet) {
 					entity.hurtResistantTime = 0;
 				}
 			}

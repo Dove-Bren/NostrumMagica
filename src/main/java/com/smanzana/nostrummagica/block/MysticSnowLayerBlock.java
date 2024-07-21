@@ -69,7 +69,7 @@ public class MysticSnowLayerBlock extends Block {
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		final int blizzardPieces = MagicArmor.GetSetCount(player, EMagicElement.ICE, MagicArmor.Type.TRUE);
+		final int blizzardPieces = MagicArmor.GetSetCount(player, EMagicElement.ICE, MagicArmor.Type.MASTER);
 		if (blizzardPieces == 4) {
 			player.addItemStackToInventory(new ItemStack(Items.SNOWBALL));
 			worldIn.removeBlock(pos, false);

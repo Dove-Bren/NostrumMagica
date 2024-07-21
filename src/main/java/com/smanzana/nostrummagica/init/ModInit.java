@@ -968,8 +968,8 @@ public class ModInit {
 			}
 			
 			for (MagicArmor.Type type : MagicArmor.Type.values()) {
-				if (type == MagicArmor.Type.TRUE) {
-					continue; // True armors below
+				if (type == MagicArmor.Type.MASTER) {
+					continue; // Master armors below
 				}
 				
 				for (EquipmentSlotType slot : EquipmentSlotType.values()) {
@@ -1000,6 +1000,7 @@ public class ModInit {
 					} else if (type == MagicArmor.Type.ADEPT) {
 						gem = Ingredient.fromTag(NostrumTags.Items.CrystalMedium);
 					} else {
+						// doesn't happen anymore
 						gem = Ingredient.fromTag(NostrumTags.Items.CrystalLarge);
 					}
 
@@ -1025,19 +1026,19 @@ public class ModInit {
 				final Ingredient augment = (isTrue ? Ingredient.fromTag(NostrumTags.Items.SlabKind)
 						: Ingredient.fromTag(NostrumTags.Items.SlabFierce));
 
-				final Ingredient input = Ingredient.fromItems(MagicArmor.get(isTrue ? elem : elem.getOpposite(), slot, MagicArmor.Type.MASTER));
+				final Ingredient input = Ingredient.fromItems(MagicArmor.get(isTrue ? elem : elem.getOpposite(), slot, MagicArmor.Type.ADEPT));
 				final String name = "spawn_enchanted_armor";
-				final String regName = "spawn_enchanted_armor_" + elem.name().toLowerCase() + "_" + slot.name().toLowerCase() + "_" + MagicArmor.Type.TRUE.name().toLowerCase();
+				final String regName = "spawn_enchanted_armor_" + elem.name().toLowerCase() + "_" + slot.name().toLowerCase() + "_" + MagicArmor.Type.MASTER.name().toLowerCase();
 				final String research = "enchanted_armor_adv";
 				final Ingredient wings = (isTrue ? Ingredient.fromTag(NostrumTags.Items.DragonWing)
 						: Ingredient.fromStacks(new ItemStack(Items.ELYTRA)));
 				final IRitualOutcome outcome = (isTrue
-						? new OutcomeSpawnItem(new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.TRUE)))
-						: new OutcomeSpawnItem(new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.TRUE)),
+						? new OutcomeSpawnItem(new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.MASTER)))
+						: new OutcomeSpawnItem(new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.MASTER)),
 								new ItemStack(Items.ELYTRA)));
 
 				registry
-						.register(RitualRecipe.createTier3(regName, name, new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.TRUE)),
+						.register(RitualRecipe.createTier3(regName, name, new ItemStack(MagicArmor.get(elem, slot, MagicArmor.Type.MASTER)),
 								elem == EMagicElement.PHYSICAL ? null : elem,
 								new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 										ReagentType.MANI_DUST },

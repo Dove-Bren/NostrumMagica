@@ -119,7 +119,7 @@ public class MagicArmor extends ArmorItem
 		implements IReactiveEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
 
 	public static enum Type {
-		NOVICE(0), ADEPT(1), MASTER(2), TRUE(3);
+		NOVICE(0), ADEPT(1), MASTER(2);
 
 		public final int scale;
 
@@ -134,8 +134,6 @@ public class MagicArmor extends ArmorItem
 			case ADEPT:
 				return MASTER;
 			case MASTER:
-				return TRUE;
-			case TRUE:
 				return null;
 			}
 
@@ -150,8 +148,6 @@ public class MagicArmor extends ArmorItem
 				return NOVICE;
 			case MASTER:
 				return ADEPT;
-			case TRUE:
-				return MASTER;
 			}
 
 			return null;
@@ -290,7 +286,7 @@ public class MagicArmor extends ArmorItem
 			mod = .5f;
 			break;
 		case PHYSICAL:
-			if (type == Type.TRUE) {
+			if (type == Type.MASTER) {
 				mod = /* (12.6363f / 24f) */ (12.5f / 22f); // Want to actually hit 50%
 			} else {
 				mod = (5 / 24f);
@@ -438,7 +434,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	private static double calcArmorSpeedBoost(EquipmentSlotType slot, EMagicElement element, Type type) {
-		if (type != Type.TRUE) {
+		if (type != Type.MASTER) {
 			return 0;
 		}
 
@@ -458,7 +454,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	private static double calcArmorJumpBoost(EquipmentSlotType slot, EMagicElement element, Type type) {
-		if (type != Type.TRUE) {
+		if (type != Type.MASTER) {
 			return 0;
 		}
 
@@ -649,9 +645,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEarthHeadMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEarthHeadTrue;
-					break;
 				}
 				break;
 			case CHEST:
@@ -664,9 +657,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEarthChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEarthChestTrue;
 					break;
 				}
 				break;
@@ -681,9 +671,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEarthLegsMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEarthLegsTrue;
-					break;
 				}
 				break;
 			case FEET:
@@ -696,9 +683,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEarthFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEarthFeetTrue;
 					break;
 				}
 				break;
@@ -720,9 +704,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEnderHeadMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEnderHeadTrue;
-					break;
 				}
 				break;
 			case CHEST:
@@ -735,9 +716,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEnderChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEnderChestTrue;
 					break;
 				}
 				break;
@@ -752,9 +730,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEnderLegsMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEnderLegsTrue;
-					break;
 				}
 				break;
 			case FEET:
@@ -767,9 +742,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorEnderFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorEnderFeetTrue;
 					break;
 				}
 				break;
@@ -791,9 +763,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorFireHeadMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorFireHeadTrue;
-					break;
 				}
 				break;
 			case CHEST:
@@ -806,9 +775,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorFireChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorFireChestTrue;
 					break;
 				}
 				break;
@@ -823,9 +789,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorFireLegsMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorFireLegsTrue;
-					break;
 				}
 				break;
 			case FEET:
@@ -838,9 +801,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorFireFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorFireFeetTrue;
 					break;
 				}
 				break;
@@ -860,10 +820,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorIceHeadAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorIceHeadMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorIceHeadTrue;
+					armor = NostrumItems.enchantedArmorIceHeadMaster;
 					break;
 				}
 				break;
@@ -876,10 +833,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorIceChestAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorIceChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorIceChestTrue;
+					armor = NostrumItems.enchantedArmorIceChestMaster;
 					break;
 				}
 				break;
@@ -892,10 +846,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorIceLegsAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorIceLegsMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorIceLegsTrue;
+					armor = NostrumItems.enchantedArmorIceLegsMaster;
 					break;
 				}
 				break;
@@ -908,10 +859,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorIceFeetAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorIceFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorIceFeetTrue;
+					armor = NostrumItems.enchantedArmorIceFeetMaster;
 					break;
 				}
 				break;
@@ -931,10 +879,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorLightningHeadAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorLightningHeadMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorLightningHeadTrue;
+					armor = NostrumItems.enchantedArmorLightningHeadMaster;
 					break;
 				}
 				break;
@@ -947,10 +892,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorLightningChestAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorLightningChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorLightningChestTrue;
+					armor = NostrumItems.enchantedArmorLightningChestMaster;
 					break;
 				}
 				break;
@@ -963,10 +905,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorLightningLegsAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorLightningLegsMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorLightningLegsTrue;
+					armor = NostrumItems.enchantedArmorLightningLegsMaster;
 					break;
 				}
 				break;
@@ -979,10 +918,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorLightningFeetAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorLightningFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorLightningFeetTrue;
+					armor = NostrumItems.enchantedArmorLightningFeetMaster;
 					break;
 				}
 				break;
@@ -1004,9 +940,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorPhysicalHeadMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorPhysicalHeadTrue;
-					break;
 				}
 				break;
 			case CHEST:
@@ -1019,9 +952,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorPhysicalChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorPhysicalChestTrue;
 					break;
 				}
 				break;
@@ -1036,9 +966,6 @@ public class MagicArmor extends ArmorItem
 				case MASTER:
 					armor = NostrumItems.enchantedArmorPhysicalLegsMaster;
 					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorPhysicalLegsTrue;
-					break;
 				}
 				break;
 			case FEET:
@@ -1051,9 +978,6 @@ public class MagicArmor extends ArmorItem
 					break;
 				case MASTER:
 					armor = NostrumItems.enchantedArmorPhysicalFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorPhysicalFeetTrue;
 					break;
 				}
 				break;
@@ -1073,10 +997,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorWindHeadAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorWindHeadMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorWindHeadTrue;
+					armor = NostrumItems.enchantedArmorWindHeadMaster;
 					break;
 				}
 				break;
@@ -1089,10 +1010,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorWindChestAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorWindChestMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorWindChestTrue;
+					armor = NostrumItems.enchantedArmorWindChestMaster;
 					break;
 				}
 				break;
@@ -1105,10 +1023,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorWindLegsAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorWindLegsMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorWindLegsTrue;
+					armor = NostrumItems.enchantedArmorWindLegsMaster;
 					break;
 				}
 				break;
@@ -1121,10 +1036,7 @@ public class MagicArmor extends ArmorItem
 					// armor = NostrumItems.enchantedArmorWindFeetAdept;
 					break;
 				case MASTER:
-					// armor = NostrumItems.enchantedArmorWindFeetMaster;
-					break;
-				case TRUE:
-					armor = NostrumItems.enchantedArmorWindFeetTrue;
+					armor = NostrumItems.enchantedArmorWindFeetMaster;
 					break;
 				}
 				break;
@@ -1170,7 +1082,7 @@ public class MagicArmor extends ArmorItem
 	public BipedModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot,
 			BipedModel defaultModel) {
 		final int setCount = getSetPieces(entity);
-		final int index = (setCount - 1) + (type == Type.TRUE ? 1 : 0); // Boost 1 if ultimate armor
+		final int index = (setCount - 1) + (type == Type.MASTER ? 1 : 0); // Boost 1 if ultimate armor
 		ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());
 		model.setVisibleFrom(slot);
 
@@ -1219,7 +1131,6 @@ public class MagicArmor extends ArmorItem
 		case ADEPT:
 			return 0xFF7F7F7F;
 		case MASTER:
-		case TRUE:
 			return 0xFFFFFFFF;
 		}
 	}
@@ -1341,7 +1252,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected void onServerTick(World world, PlayerEntity player, ItemStack stack, int setCount) {
-		if (setCount == 4 && this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST) {
+		if (setCount == 4 && this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
 			if (element == EMagicElement.ICE) {
 				if (player.isOnGround() && !ArmorCheckFlying(player)) {
 					final BlockPos pos = player.getPosition();
@@ -1550,8 +1461,8 @@ public class MagicArmor extends ArmorItem
 					// Level 1(0) reduces fire time (25% reduction by 50% of the time reducing by
 					// another tick)
 					// Level 2(1) halves fire time
-					// Level 3 and 4(2/3) prevents fire all-together
-					if (type.getType() == Type.MASTER || type.getType() == Type.TRUE) {
+					// Level 3 prevents fire all-together
+					if (type.getType() == Type.MASTER) {
 						if (entity.isBurning()) {
 							entity.extinguish();
 						}
@@ -1758,7 +1669,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected boolean hasElytra(LivingEntity entity) {
-		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
 			// Check if full set is available
 			return (4 == getSetPieces(entity));
 		}
@@ -1806,7 +1717,7 @@ public class MagicArmor extends ArmorItem
 	protected static final int EARTH_GROW_COST = 5;
 
 	protected boolean hasManaJump(LivingEntity entity) {
-		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < MANA_JUMP_COST) {
@@ -1823,7 +1734,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected boolean hasWindTornado(LivingEntity entity) {
-		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.WIND) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.WIND) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < WIND_TORNADO_COST) {
@@ -1840,7 +1751,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected boolean hasEnderDash(LivingEntity entity) {
-		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.ENDER) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.ENDER) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < ENDER_DASH_COST) {
@@ -1857,7 +1768,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected boolean hasDragonFlight(LivingEntity entity) {
-		if (this.type == Type.TRUE && this.slot == EquipmentSlotType.CHEST) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
 			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH
 					|| element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
 			if (!hasRightElement) {
@@ -2643,7 +2554,7 @@ public class MagicArmor extends ArmorItem
 
 		LivingEntity ent = event.getEntityLiving();
 		MagicArmor armor = getChestPiece(ent);
-		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
+		if (armor != null && armor.getType() == Type.MASTER && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			Vector3d motion = ent.getMotion();
 			ent.setMotion(motion.x, motion.y + armor.jumpBoost, motion.z);
@@ -2660,7 +2571,7 @@ public class MagicArmor extends ArmorItem
 		LivingEntity ent = event.getEntityLiving();
 
 		MagicArmor armor = getChestPiece(ent);
-		if (armor != null && armor.getType() == Type.TRUE && armor.getSetPieces(ent) == 4) {
+		if (armor != null && armor.getType() == Type.MASTER && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			final float amt = (float) (armor.jumpBoost / .1f);
 			event.setDistance(Math.max(0f, event.getDistance() - amt));
@@ -2671,14 +2582,14 @@ public class MagicArmor extends ArmorItem
 	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
 		final boolean flying = player.isElytraFlying();
 		// Maybe should have an interface?
-		if (MagicArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.TRUE) == 4
-				|| MagicArmor.GetSetCount(player, EMagicElement.EARTH, Type.TRUE) == 4
-				|| MagicArmor.GetSetCount(player, EMagicElement.FIRE, Type.TRUE) == 4
-				|| MagicArmor.GetSetCount(player, EMagicElement.ENDER, Type.TRUE) == 4
+		if (MagicArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.MASTER) == 4
+				|| MagicArmor.GetSetCount(player, EMagicElement.EARTH, Type.MASTER) == 4
+				|| MagicArmor.GetSetCount(player, EMagicElement.FIRE, Type.MASTER) == 4
+				|| MagicArmor.GetSetCount(player, EMagicElement.ENDER, Type.MASTER) == 4
 				|| (MagicArmor.GetHasWingUpgrade(stack)
-						&& (MagicArmor.GetSetCount(player, EMagicElement.ICE, Type.TRUE) == 4
-								|| MagicArmor.GetSetCount(player, EMagicElement.WIND, Type.TRUE) == 4
-								|| MagicArmor.GetSetCount(player, EMagicElement.LIGHTNING, Type.TRUE) == 4)
+						&& (MagicArmor.GetSetCount(player, EMagicElement.ICE, Type.MASTER) == 4
+								|| MagicArmor.GetSetCount(player, EMagicElement.WIND, Type.MASTER) == 4
+								|| MagicArmor.GetSetCount(player, EMagicElement.LIGHTNING, Type.MASTER) == 4)
 
 				)) {
 			if (flying) {

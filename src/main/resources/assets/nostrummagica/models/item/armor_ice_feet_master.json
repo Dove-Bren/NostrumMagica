@@ -1,7 +1,7 @@
 {
 	"parent": "builtin/generated",
 	"textures": {
-		"layer0": "nostrummagica:item/armor_ice_chest_true"
+		"layer0": "nostrummagica:item/armor_ice_feet_master"
 	},
 	"display": {
 		"thirdperson": {

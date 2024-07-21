@@ -553,9 +553,8 @@ public class PlayerListener {
 			
 			// lava set ignores fire damage (but not lava). True lava set ignores lava as well
 			final boolean lavaSet = MagicArmor.GetSetCount(living, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
-			final boolean trueSet = MagicArmor.GetSetCount(living, EMagicElement.FIRE, MagicArmor.Type.TRUE) == 4;
 			final boolean isLava = event.getSource() == DamageSource.LAVA || event.getSource().getDamageType().equalsIgnoreCase("lava");
-			if (lavaSet || trueSet) {
+			if (lavaSet) {
 				final int manaCost = 1; // / 4
 				final INostrumMagic attr = NostrumMagica.getMagicWrapper(living);
 				if (attr != null) {
@@ -1210,7 +1209,7 @@ public class PlayerListener {
 		
 		LivingEntity living = (LivingEntity) e.getEntity();
 		
-		final boolean hasLightningSet = MagicArmor.GetSetCount(living, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4;
+		final boolean hasLightningSet = MagicArmor.GetSetCount(living, EMagicElement.LIGHTNING, MagicArmor.Type.MASTER) == 4;
 		if (hasLightningSet) {
 			// Alternate between buff and attack modes
 			EffectInstance boostEffect = living.getActivePotionEffect(NostrumEffects.lightningCharge);
@@ -1278,7 +1277,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (MagicArmor.GetSetCount(player, EMagicElement.EARTH, MagicArmor.Type.TRUE) != 4) {
+		if (MagicArmor.GetSetCount(player, EMagicElement.EARTH, MagicArmor.Type.MASTER) != 4) {
 			return;
 		}
 		

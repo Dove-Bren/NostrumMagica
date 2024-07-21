@@ -165,7 +165,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	public ActionResultType onItemUse(ItemUseContext context) {
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(context.getPlayer());
 		final ItemStack held = context.getItem();
-		final boolean hasBonus = MagicArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, MagicArmor.Type.TRUE) == 4;
+		final boolean hasBonus = MagicArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, MagicArmor.Type.MASTER) == 4;
 		final boolean canUpgrade = attr != null && attr.hasSkill(NostrumSkills.Earth_Weapon);
 		final int manaCost = 20;
 		

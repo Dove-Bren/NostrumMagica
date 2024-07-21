@@ -142,7 +142,7 @@ public class TeleportRuneBlock extends Block  {
 					break;
 				}
 			}
-			final boolean hasEnderSet = MagicArmor.GetSetCount(playerIn, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4;
+			final boolean hasEnderSet = MagicArmor.GetSetCount(playerIn, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4;
 			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1) * (hasEnderSet ? 2 : 1);
 			
 			if (dist > range) {

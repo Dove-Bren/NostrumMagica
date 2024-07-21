@@ -34,23 +34,19 @@ public class MagicIceArmor extends MagicArmor {
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
 	public static final String ID_HELM_ADEPT = ID_PREFIX + "helm_adept";
 	public static final String ID_HELM_MASTER = ID_PREFIX + "helm_master";
-	public static final String ID_HELM_TRUE = ID_PREFIX + "helm_true";
-	
+		
 	public static final String ID_CHEST_NOVICE = ID_PREFIX + "chest_novice";
 	public static final String ID_CHEST_ADEPT = ID_PREFIX + "chest_adept";
 	public static final String ID_CHEST_MASTER = ID_PREFIX + "chest_master";
-	public static final String ID_CHEST_TRUE = ID_PREFIX + "chest_true";
-	
+		
 	public static final String ID_LEGS_NOVICE = ID_PREFIX + "legs_novice";
 	public static final String ID_LEGS_ADEPT = ID_PREFIX + "legs_adept";
 	public static final String ID_LEGS_MASTER = ID_PREFIX + "legs_master";
-	public static final String ID_LEGS_TRUE = ID_PREFIX + "legs_true";
-	
+		
 	public static final String ID_FEET_NOVICE = ID_PREFIX + "feet_novice";
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
-	public static final String ID_FEET_TRUE = ID_PREFIX + "feet_true";
-	
+		
 	public MagicIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.ICE, slot, type, properties);
 		if (slot == EquipmentSlotType.CHEST) {
@@ -64,7 +60,7 @@ public class MagicIceArmor extends MagicArmor {
 			items.add(new ItemStack(this));
 			
 			// Add an upgraded copy of true chestplates
-			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.TRUE) {
+			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.MASTER) {
 				ItemStack stack = new ItemStack(this);
 				MagicArmor.SetHasWingUpgrade(stack, true);
 				items.add(stack);
@@ -83,7 +79,7 @@ public class MagicIceArmor extends MagicArmor {
 				&& event.getSource().getTrueSource() instanceof LivingEntity) {
 			// If shooter has full blizzard set...
 			final LivingEntity thrower = (LivingEntity) event.getSource().getTrueSource();
-			final int blizzardCount = MagicArmor.GetSetCount(thrower, EMagicElement.ICE, Type.TRUE);
+			final int blizzardCount = MagicArmor.GetSetCount(thrower, EMagicElement.ICE, Type.MASTER);
 			if (blizzardCount == 4) {
 				// Either 'freeze' enemy, or heal ally
 				@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(thrower);

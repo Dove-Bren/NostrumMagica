@@ -243,7 +243,7 @@ public class CuriosProxy {
 		
 		//SetHasWingUpgrade
 		for (EMagicElement elem : new EMagicElement[] {EMagicElement.ICE, EMagicElement.WIND, EMagicElement.LIGHTNING}) {
-			MagicArmor armor = MagicArmor.get(elem, EquipmentSlotType.CHEST, MagicArmor.Type.TRUE);
+			MagicArmor armor = MagicArmor.get(elem, EquipmentSlotType.CHEST, MagicArmor.Type.MASTER);
 			ItemStack upgradedStack = new ItemStack(armor);
 			MagicArmor.SetHasWingUpgrade(upgradedStack, true);
 			

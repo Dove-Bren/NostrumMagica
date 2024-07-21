@@ -178,7 +178,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	
 	protected static void doBlock(LivingEntity blocker) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(blocker);
-		final boolean hasBonus = MagicArmor.GetSetCount(blocker, EMagicElement.PHYSICAL, MagicArmor.Type.TRUE) == 4;
+		final boolean hasBonus = MagicArmor.GetSetCount(blocker, EMagicElement.PHYSICAL, MagicArmor.Type.MASTER) == 4;
 		final boolean hasSkill = attr != null && attr.hasSkill(NostrumSkills.Physical_Weapon);
 		blocker.addPotionEffect(new EffectInstance(NostrumEffects.rendStrike, 1 * 20, 0));
 		

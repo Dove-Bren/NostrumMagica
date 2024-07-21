@@ -437,7 +437,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 			}
 			
-		} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4) {
+		} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.MASTER) == 4) {
 			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
 				// If full set, strike at targetting location (unless sneaking, then strike self)
 				boolean used = false;
@@ -503,7 +503,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				}
 				playerIn.resetCooldown();
 				return ActionResultType.SUCCESS;
-			} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.TRUE) == 4) {
+			} else if (element == EMagicElement.LIGHTNING && MagicArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, MagicArmor.Type.MASTER) == 4) {
 				
 				boolean used = false;
 				if (playerIn.isSneaking()) {
@@ -542,7 +542,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	protected static void spawnIceCloud(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
-		final int blizzardCount = MagicArmor.GetSetCount(caster, EMagicElement.ICE, MagicArmor.Type.TRUE);
+		final int blizzardCount = MagicArmor.GetSetCount(caster, EMagicElement.ICE, MagicArmor.Type.MASTER);
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
@@ -587,7 +587,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
-		final int hurricaneCount = MagicArmor.GetSetCount(caster, EMagicElement.WIND, MagicArmor.Type.TRUE);
+		final int hurricaneCount = MagicArmor.GetSetCount(caster, EMagicElement.WIND, MagicArmor.Type.MASTER);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);

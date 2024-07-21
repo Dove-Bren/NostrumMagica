@@ -63,7 +63,7 @@ public class FrostbiteEffect extends Effect {
 		}
 		
 		// If entity has blizzard set, heal instead of harm
-		final int blizzardCount = MagicArmor.GetSetCount(entity, EMagicElement.ICE, MagicArmor.Type.TRUE);
+		final int blizzardCount = MagicArmor.GetSetCount(entity, EMagicElement.ICE, MagicArmor.Type.MASTER);
 		if (blizzardCount == 4) {
 			entity.heal(1);
 			if (!entity.world.isRemote) {

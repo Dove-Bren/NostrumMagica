@@ -150,7 +150,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	
 	protected boolean castOn(LivingEntity caster, LivingEntity target) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.FIRE, MagicArmor.Type.TRUE) == 4;
+		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
 		final boolean hasSkill = attr.hasSkill(NostrumSkills.Fire_Weapon);
 		
 		if (hasBonus) {

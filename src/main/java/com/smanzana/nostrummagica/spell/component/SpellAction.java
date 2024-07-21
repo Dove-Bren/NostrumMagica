@@ -597,7 +597,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4) {
+			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4) {
 				// has full ender set
 				efficiency += 1f;
 				log.addGlobalModifier(LABEL_BLINK_MOD_ENDERSET, +1f, ESpellLogModifierType.BONUS_SCALE);
@@ -1385,7 +1385,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.TRUE) == 4) {
+			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4) {
 				// has full ender set
 				radius *= 2.0;
 			}
