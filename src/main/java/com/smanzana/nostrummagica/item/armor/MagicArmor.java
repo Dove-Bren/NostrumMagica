@@ -119,11 +119,11 @@ public class MagicArmor extends ArmorItem
 		implements IReactiveEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
 
 	public static enum Type {
-		NOVICE(0), ADEPT(1), MASTER(2);
+		NOVICE(.8f), ADEPT(.9f), MASTER(1f);
 
-		public final int scale;
+		public final float scale;
 
-		private Type(int scale) {
+		private Type(float scale) {
 			this.scale = scale;
 		}
 
@@ -210,124 +210,130 @@ public class MagicArmor extends ArmorItem
 
 	private static int calcArmor(EquipmentSlotType slot, EMagicElement element, Type type) {
 
-		// Ratio compared to BASE
-		// BASE is 14, 18, 22 for the whole set (with rounding errors)
-		float mod;
+		// Ratio of full armor for a MASTER set
+		final float fullProt;
 
 		switch (element) {
-		// 14, 18, 22 BASE
 		case EARTH:
-			mod = (22f / 24f); // 13, 16.5, 20
+			fullProt = (22f / 25f);
 			break;
 		case ENDER:
-			mod = (20f / 24f); // 12, 15, 18
+			fullProt = (20f / 25f);
 			break;
 		case FIRE:
-			mod = (20f / 24f); // 12, 15, 18
+			fullProt = (20f / 25f);
 			break;
 		case PHYSICAL:
-			mod = 1f; // 15, 18.75, 22.5
+			fullProt = 1f;
 			break;
 		case ICE:
-			mod = (20f / 24f);
+			fullProt = (20f / 25f);
 			break;
 		case LIGHTNING:
-			mod = (17.5f / 24f);
+			fullProt = (18f / 25f);
 			break;
 		case WIND:
-			mod = (17.5f / 24f);
+			fullProt = (18f / 25f);
 			break;
 		default:
-			mod = 0.5f;
+			fullProt = 0.5f;
 		}
+		
+		// How much of the 'full' armor we get for this type
+		final float typeScale = type.scale;
 
-		int base;
+		// How much to put into each slot.
+		// Iron is head:2, chest:6, legs:5, feet:2   / 15
+		// Diamond is  :3,      :8,     :6,     :3   / 20
+		final float slotScale;
 
 		switch (slot) {
 		case CHEST:
-			base = 8 + (ModConfig.config.usingAdvancedArmors() ? 4 : 0);
+		default:
+			slotScale = (8f/20f);
 			break;
 		case FEET:
-			base = 2;
+			slotScale = (3f/20f);
 			break;
 		case HEAD:
-			base = 2;
+			slotScale = (3f/20f);
 			break;
 		case LEGS:
-			base = 6;
+			slotScale = (6f/20f);
 			break;
-		default:
-			base = 0;
 		}
 
-		if (base != 0)
-			base += Math.min(2, type.scale) - 1;
-
-		if (true) {// ModConfig.config.usingAdvancedArmors()) {
-			base += 1;
+		final float real = fullProt * typeScale * slotScale * 25f;
+		
+		// Round, but with .5 rounding down
+		final int amt = (int) ((real - (int)real) - .5f < .01 ? Math.floor(real) : Math.round(real));
+		final int extra;
+		
+		if (ModConfig.config.usingAdvancedArmors()) {
+			extra = 1;
+		} else {
+			extra = 0;
 		}
 
-		return Math.max(1, (int) ((float) base * mod));
+		return amt + extra;
 	}
 
-	// Calcs magic resist, but as if it were armor which is base 20/25
+	// Calcs magic resist on a scale from 0 to 1 (with 1 being 100%)
 	private static float calcMagicResistBase(EquipmentSlotType slot, EMagicElement element, Type type) {
 
-		float mod;
-		// 14, 18, 22 BASE
+		// Ratio of full armor for a MASTER set
+		final float fullProt;
+		
 		switch (element) {
 		case EARTH:
-			mod = (9f / 24f);
+			fullProt = .35f;
 			break;
 		case ENDER:
-			mod = (11f / 24f);
+			fullProt = .4f;
 			break;
 		case FIRE:
-			mod = .5f;
+			fullProt = .45f;
 			break;
 		case PHYSICAL:
-			if (type == Type.MASTER) {
-				mod = /* (12.6363f / 24f) */ (12.5f / 22f); // Want to actually hit 50%
-			} else {
-				mod = (5 / 24f);
-			}
+			fullProt = .5f;
 			break;
 		case ICE:
-			mod = (15f / 22f); // 60%
+			fullProt = .6f;
 			break;
 		case LIGHTNING:
-			mod = (12f / 22f); // 48%
+			fullProt = .45f;
 			break;
 		case WIND:
-			mod = (11f / 24f); // 40%
+			fullProt = .4f;
 			break;
 		default:
-			mod = 0.25f;
+			fullProt = 0.25f;
 		}
+		
+		// How much of the 'full' armor we get for this type
+		final float typeScale = type.scale;
 
-		int base;
+		// How much break down protection by slot
+		final float slotScale;
 
 		switch (slot) {
 		case CHEST:
-			base = 8;
+			slotScale = (8f/20f);
 			break;
 		case FEET:
-			base = 2;
+			slotScale = (3f/20f);
 			break;
 		case HEAD:
-			base = 2;
+			slotScale = (3f/20f);
 			break;
 		case LEGS:
-			base = 6;
+			slotScale = (6f/20f);
 			break;
 		default:
-			base = 0;
+			slotScale = .5f;
 		}
 
-		if (base != 0)
-			base += Math.min(2, type.scale) - 1;
-
-		return Math.max(1f, ((float) base * mod));
+		return fullProt * typeScale * slotScale;
 	}
 
 	private static final double calcMagicReduct(EquipmentSlotType slot, EMagicElement element, Type type) {
@@ -427,8 +433,8 @@ public class MagicArmor extends ArmorItem
 			break;
 		}
 
-		int iron = ArmorMaterial.DIAMOND.getDurability(slot);
-		double amt = iron * Math.pow(1.5, type.scale - 1);
+		int diamond = ArmorMaterial.DIAMOND.getDurability(slot);
+		double amt = diamond * 1.25 * type.scale; // 80, 90, 100% of (125% of diamond)
 
 		return (int) Math.floor(amt * mod);
 	}
@@ -501,9 +507,14 @@ public class MagicArmor extends ArmorItem
 	private static double calcArmorMagicBoost(EquipmentSlotType slot, EMagicElement element, int setCount) {
 		return calcArmorMagicBoostTotal(element, setCount) / 4;
 	}
+	
+	private static int calcArmorToughness(EquipmentSlotType slot, EMagicElement element, Type type) {
+		return type.ordinal() + 2;
+	}
 
 	private final Type type;
 	private int armor; // Can't use vanilla; it's final
+	private int armorToughness;
 	private double magicResistAmount;
 	private double magicReducAmount;
 	private EMagicElement element;
@@ -520,13 +531,11 @@ public class MagicArmor extends ArmorItem
 		this.type = type;
 		this.element = element;
 		this.armor = calcArmor(slot, element, type);
-		this.magicResistAmount = (Math.round((double) calcMagicResistBase(slot, element, type) * 4.0D)); // Return is
-																											// out of
-																											// 25, so x
-																											// 4 for %
+		this.magicResistAmount = (Math.round((double) calcMagicResistBase(slot, element, type) * 100.0D));
 		this.magicReducAmount = calcMagicReduct(slot, element, type);
 		this.jumpBoost = calcArmorJumpBoost(slot, element, type);
 		this.speedBoost = calcArmorSpeedBoost(slot, element, type);
+		this.armorToughness = calcArmorToughness(slot, element, type);
 
 		// TODO move somewhere else?
 		if (!NostrumMagica.instance.proxy.isServer()) {
@@ -539,20 +548,6 @@ public class MagicArmor extends ArmorItem
 		}
 	}
 
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-//		super.getSubItems(tab, subItems); // Base armor
-//		
-//		// Corrupted armors should also present the upgraded flight version
-//		final boolean hasFlight = element == EMagicElement.ENDER || element == EMagicElement.EARTH || element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL; 
-//		if (!hasFlight && this.getEquipmentSlot() == EquipmentSlotType.CHEST) {
-//			ItemStack modStack = new ItemStack(this);
-//			SetHasWingUpgrade(modStack, true);
-//			subItems.add(modStack);
-//		}
-//	}
-
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
@@ -563,7 +558,7 @@ public class MagicArmor extends ArmorItem
 			builder.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()],
 					"Armor modifier", (double) this.armor, AttributeModifier.Operation.ADDITION));
 			builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()],
-					"Armor toughness", 4, AttributeModifier.Operation.ADDITION));
+					"Armor toughness", this.armorToughness, AttributeModifier.Operation.ADDITION));
 			builder.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(ARMOR_SPEED_MODS[equipmentSlot.getIndex()],
 					"Armor speed boost", (double) this.speedBoost, AttributeModifier.Operation.MULTIPLY_TOTAL));
 			builder.put(NostrumAttributes.magicResist, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()],
@@ -600,11 +595,11 @@ public class MagicArmor extends ArmorItem
 		switch (element) {
 		case EARTH:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction().status(NostrumEffects.rooted, 20 * 5 * (Math.min(2, type.scale) + 1), 0);
+			action = new SpellAction().status(NostrumEffects.rooted, (int) (20 * 5 * type.scale), 0);
 			break;
 		case ENDER:
 //			if (NostrumMagica.rand.nextFloat() <= 0.15f * (float) (Math.min(2, level) + 1))
-			action = new SpellAction().phase(Math.min(2, type.scale));
+			action = new SpellAction().phase(Math.min(2, type.ordinal()));
 			break;
 		case FIRE:
 //			if (NostrumMagica.rand.nextFloat() <= 0.35f * (float) (Math.min(2, level) + 1))
@@ -1150,27 +1145,8 @@ public class MagicArmor extends ArmorItem
 		return list;
 	}
 
-	// Physical (and earth?) capped to 20 effectively. Consider adding physical
-	// bonus like -1 to all damage?
-//	@Override
-//	public ArmorProperties getProperties(LivingEntity player, ItemStack armor, DamageSource source, double damage,
-//			int slot) {
-//		if (source.isDamageAbsolute() || source.isUnblockable()) {
-//			return new ArmorProperties(1, 0.0, 0);
-//		}
-//		
-//		// This is deducted in addition to amount from attributes -- which cap out at diamond level.
-//		// Subtract diamond level when calculating ratio
-//		final int extraArmorPts = this.armor - ArmorMaterial.DIAMOND.getDamageReductionAmount(armorType);
-//		return new ArmorProperties(1, Math.max(0, (double) extraArmorPts / 25.0), Integer.MAX_VALUE);
-//	}
-
 	protected void onArmorDisplayTick(World world, PlayerEntity player, ItemStack itemStack, int setCount) {
-		final int displayLevel = (Math.min(2, type.scale) + 1) * (setCount * setCount);
-
-//		if (setCount == 4 && element == EMagicElement.ICE && level == 3) {
-//			RenderFuncs.renderWeather(player.getPosition(), Minecraft.getInstance().getRenderPartialTicks(), true);
-//		}
+		final int displayLevel = (Math.min(2, type.ordinal()) + 1) * (setCount * setCount);
 
 		if (NostrumMagica.rand.nextInt(400) > displayLevel) {
 			return;
@@ -1210,18 +1186,9 @@ public class MagicArmor extends ArmorItem
 			rangeMod = 2;
 			break;
 		case LIGHTNING:
-//			effect = ParticleTypes.FALLING_DUST;
-//			dx = dz = 0;
-//			dy = -.025;
-//			mult = 1;
-//			rangeMod = 1;
-//			data = new int[] {Block.getStateId(Blocks.GOLD_BLOCK.getDefaultState())};
 			effect = null;
 			dx = dz = dy = mult = 0;
 			rangeMod = 0;
-			// int count, double spawnX, double spawnY, double spawnZ, double
-			// spawnJitterRadius, int lifetime, int lifetimeJitter,
-			// Vector3d velocity, boolean unused
 			NostrumParticles.LIGHTNING_STATIC.spawn(world,
 					new SpawnParams(1, player.getPosX(), player.getPosY() + 1, player.getPosZ(), 1, 20 * 1, 0,
 							new Vector3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null).color(.8f, 1f,
