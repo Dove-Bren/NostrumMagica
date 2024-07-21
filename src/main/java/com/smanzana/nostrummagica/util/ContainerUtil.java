@@ -29,7 +29,8 @@ public class ContainerUtil {
 	
 	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
-	public static final <T extends TileEntity> @Nullable T GetPackedTE(@Nonnull PacketBuffer buffer) {
+	@Nullable
+	public static final <T extends TileEntity> T GetPackedTE(@Nonnull PacketBuffer buffer) {
 		BlockPos pos = buffer.readBlockPos();
 		final Minecraft mc = Minecraft.getInstance();
 		TileEntity teRaw = mc.world.getTileEntity(pos);

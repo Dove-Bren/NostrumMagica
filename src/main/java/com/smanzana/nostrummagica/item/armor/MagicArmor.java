@@ -25,7 +25,6 @@ import com.smanzana.nostrummagica.attribute.MagicPotencyAttribute;
 import com.smanzana.nostrummagica.attribute.MagicReductionAttribute;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;

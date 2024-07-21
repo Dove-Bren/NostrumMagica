@@ -137,7 +137,8 @@ public class SpellShapeRenderer {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected static <T extends SpellShapePreviewComponent> @Nullable ISpellShapeComponentRenderer<T> GetRenderer(T comp) {
+	@Nullable
+	protected static <T extends SpellShapePreviewComponent> ISpellShapeComponentRenderer<T> GetRenderer(T comp) {
 		return (ISpellShapeComponentRenderer<T>) ComponentRenderers.get(comp.getType());
 	}
 }
