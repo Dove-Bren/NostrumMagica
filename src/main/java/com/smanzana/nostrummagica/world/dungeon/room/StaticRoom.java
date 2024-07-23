@@ -9,15 +9,16 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
-import com.smanzana.nostrummagica.world.dungeon.LootUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.LadderBlock;
@@ -296,11 +297,14 @@ public abstract class StaticRoom implements IDungeonRoom {
 		List<BlueprintLocation> loots = this.getTreasureLocations(start);
 		if (loots != null && !loots.isEmpty())
 		for (BlueprintLocation lootSpot : this.getTreasureLocations(start)) {
-			// Dungeon generation may replace some chests with other things.
-			// Make sure it's still a chest.
-			// TODO improve this, especially since rooms are part of dungeongen not blueprints
-			if (world.isAirBlock(lootSpot.getPos()) || world.getBlockState(lootSpot.getPos()).getBlock() instanceof ChestBlock) {
-				LootUtil.generateLoot(world, lootSpot.getPos(), lootSpot.getFacing());
+			// Actual dugneon generation will set up loot, but I was originally lazy and didn't put chests in spots.
+			// So if there isn't a chest there and it's air, replace with a chest.
+			if (bounds != null && !bounds.isVecInside(lootSpot.getPos())) {
+				continue;
+			}
+			
+			if (world.isAirBlock(lootSpot.getPos())) {
+				world.setBlockState(lootSpot.getPos(), Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, lootSpot.getFacing()), 2);
 			}
 		}
 	}

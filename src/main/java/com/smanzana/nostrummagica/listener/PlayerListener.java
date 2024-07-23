@@ -14,6 +14,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.smanzana.autodungeons.event.GetPlayerRegionSelectionEvent;
+import com.smanzana.autodungeons.event.GetPlayerSelectionEvent;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportedOtherEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
@@ -29,6 +31,7 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTypeCapability;
 import com.smanzana.nostrummagica.item.IReactiveEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.armor.MagicArmor;
@@ -1541,5 +1544,28 @@ public class PlayerListener {
 		if (removedEffect != null) {
 			NetworkHandler.sendToAllTracking(new VanillaEffectSyncMessage(ent.getEntityId(), removedEffect.getPotion()), ent);
 		}
+	}
+	
+	@SubscribeEvent
+	public void onDungeonSelect(GetPlayerSelectionEvent event) {
+		// Must be a position crystals in hand with low corner selected
+		ItemStack main = event.getPlayer().getHeldItemMainhand();
+		if (!main.isEmpty() && main.getItem() instanceof PositionCrystal) {
+			event.setSelection(PositionCrystal.getBlockPosition(main));
+		}
+	}
+	
+	@SubscribeEvent
+	public void onDungeonSelect(GetPlayerRegionSelectionEvent event) {
+		// Must be holding two position crystals in hands with corners selected
+		ItemStack main = event.getPlayer().getHeldItemMainhand();
+		ItemStack offhand =  event.getPlayer().getHeldItemOffhand();
+		if ((main.isEmpty() || !(main.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(main) == null)
+			|| (offhand.isEmpty() || !(offhand.getItem() instanceof PositionCrystal) || PositionCrystal.getBlockPosition(offhand) == null)) {
+			return;
+		}
+		
+		event.setPos1(PositionCrystal.getBlockPosition(main));
+		event.setPos2(PositionCrystal.getBlockPosition(offhand));
 	}
 }

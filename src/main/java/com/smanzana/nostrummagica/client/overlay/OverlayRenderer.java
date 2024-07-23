@@ -35,7 +35,6 @@ import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
-import com.smanzana.nostrummagica.client.render.tile.TileEntityDungeonKeyChestRenderer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -56,7 +55,6 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
-import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MainWindow;
@@ -131,10 +129,6 @@ public class OverlayRenderer extends AbstractGui {
 	private int reagentIndex; // Contols reagent HUD element fade in and out
 	private static final int reagentFadeDur = 60;
 	private static final int reagentFadeDelay = 3 * 60;
-	
-	private int keyIndex; // Controls dungoen key overlay fade in and out
-	private @Nullable DungeonRecord lastDungeon;
-	private static final int keyFadeDur = 60;
 	
 	private boolean HUDToggle;
 	
@@ -211,8 +205,6 @@ public class OverlayRenderer extends AbstractGui {
 		MatrixStack matrixStackIn = event.getMatrixStack();
 		
 		if (event.getType() == ElementType.EXPERIENCE) {
-
-			renderDungeonKeys(matrixStackIn, player, window, NostrumMagica.dungeonTracker.getDungeon(player), mc.fontRenderer);
 			
 			// We do mana stuff in experience layer
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -872,71 +864,6 @@ public class OverlayRenderer extends AbstractGui {
 		}
 		matrixStackIn.pop();
 		matrixStackIn.pop();
-	}
-	
-	private void renderDungeonKeys(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, @Nullable DungeonRecord dungeon, FontRenderer fonter) {
-		
-		if (dungeon != null) {
-			lastDungeon = dungeon;
-		}
-		
-		if (lastDungeon != null) {
-			final int smallCount = NostrumMagica.instance.getWorldKeys().getKeyCount(lastDungeon.instance.getSmallKey());
-			final int largeCount = NostrumMagica.instance.getWorldKeys().getKeyCount(lastDungeon.instance.getLargeKey());
-			
-			if (dungeon != null && (smallCount > 0 || largeCount > 0)) {
-				this.keyIndex = Math.min(keyFadeDur, keyIndex + 1);
-			} else {
-				this.keyIndex = Math.max(0, keyIndex - 1);
-			}
-			
-			if (keyIndex > 0) {
-				final float slideProg = (float) keyIndex / (float) keyFadeDur;
-				if (smallCount > 0 || largeCount > 0) {
-					final int width = 45;
-					final int xOffset = window.getScaledWidth() - width;
-					final int height = 14;
-					final int yOffset = window.getScaledHeight() - height;
-					final int colorTop = 0x20000000;
-					final int colorBottom = 0xFF000000;
-					final int iconWidth = 12;
-					final int iconHeight = 12;
-					final int textYOffset = (iconHeight - fonter.FONT_HEIGHT) / 2;
-					Minecraft mc = Minecraft.getInstance();
-					
-					matrixStackIn.push();
-					
-					// Fade in/out
-					matrixStackIn.translate(0, (1f-slideProg) * height, 0);
-					
-					matrixStackIn.translate(xOffset, yOffset, 0);
-					RenderFuncs.drawGradientRect(matrixStackIn, 0, 0, width, height,
-							colorTop, colorTop,
-							colorBottom, colorBottom);
-					
-					matrixStackIn.translate(width - 2, 2, 0);
-					matrixStackIn.scale(.8f, .8f, 1f);
-					
-					mc.getTextureManager().bindTexture(TileEntityDungeonKeyChestRenderer.ICON_COPPER_KEY);
-					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, -iconWidth, 0, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
-					matrixStackIn.translate(-(iconWidth + 6), 0, 0);
-					
-					fonter.drawString(matrixStackIn, "" + smallCount, 0, textYOffset + 1, 0xFFFFFFFF);
-					matrixStackIn.translate(-(5 + 2), 0, 0);
-					
-					if (largeCount > 0) {
-						mc.getTextureManager().bindTexture(TileEntityDungeonKeyChestRenderer.ICON_SILVER_KEY);
-						RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, -iconWidth, 0, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
-						matrixStackIn.translate(-(iconWidth + 6), 0, 0);
-						
-						fonter.drawString(matrixStackIn, "" + largeCount, 0, textYOffset + 1, 0xFFFFFFFF);
-						matrixStackIn.translate(-(5 + 2), 0, 0);
-					}
-					
-					matrixStackIn.pop();
-				}
-			}
-		}
 	}
 	
 	private void renderArmorOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {

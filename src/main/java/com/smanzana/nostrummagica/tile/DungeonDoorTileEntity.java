@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.autodungeons.AutoDungeons;
 import com.smanzana.nostrummagica.block.dungeon.DungeonDoorBlock;
 
 public class DungeonDoorTileEntity extends LockedDoorTileEntity {
@@ -14,7 +14,7 @@ public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 	@Override
 	protected void checkBlockState() {
 		boolean worldUnlockable = world.getBlockState(pos).get(DungeonDoorBlock.UNLOCKABLE);
-		boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(this.getWorldKey()); 
+		boolean tileUnlockable = AutoDungeons.GetWorldKeys().hasKey(this.getWorldKey()); 
 		if (worldUnlockable != tileUnlockable) {
 			world.setBlockState(pos, world.getBlockState(pos).with(DungeonDoorBlock.UNLOCKABLE, tileUnlockable), 3);
 		}

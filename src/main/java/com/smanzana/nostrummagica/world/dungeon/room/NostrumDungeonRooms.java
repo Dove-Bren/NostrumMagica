@@ -1,10 +1,11 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomRegistry;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRegisterEvent;
+import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonLobbyRoomRef;
+import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
+import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonStaircaseRoomRef;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRegisterEvent;
-import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonLobbyRoomRef;
-import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
-import com.smanzana.nostrummagica.world.dungeon.room.IDungeonRoomRef.DungeonStaircaseRoomRef;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

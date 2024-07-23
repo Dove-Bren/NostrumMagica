@@ -6,9 +6,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.tile.IOrientedTileEntity;
+import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
-import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

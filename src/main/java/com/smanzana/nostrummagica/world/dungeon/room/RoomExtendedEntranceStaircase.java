@@ -5,10 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.Dungeon.IWorldHeightReader;
+import com.smanzana.autodungeons.world.dungeon.room.IStaircaseRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.IWorldHeightReader;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

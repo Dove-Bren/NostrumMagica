@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.world.WorldKey;
+import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -13,8 +15,6 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
-import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -90,7 +90,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 					return false;
 				}
 				
-				final NostrumWorldKey hasKey = ((DungeonKeyChestTileEntity) te).getWorldKey();
+				final WorldKey hasKey = ((DungeonKeyChestTileEntity) te).getWorldKey();
 				return hasKey != null && (hasKey.equals(dungeon.instance.getLargeKey()) || hasKey.equals(dungeon.instance.getSmallKey()));
 			});
 		}
@@ -101,7 +101,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 	protected boolean doSeek(World world, PlayerEntity player, ItemStack stack) {
 		// Only do work on client side!
 		if (world.isRemote) {
-			@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, NostrumMagica.dungeonTracker.getDungeon(player));
+			@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, AutoDungeons.GetDungeonTracker().getDungeon(player));
 			if (nearest != null) {
 				NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
 			} else {

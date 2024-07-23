@@ -7,13 +7,14 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.LadderBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.StairsBlock;
@@ -199,7 +200,7 @@ public class RoomEntryDragon extends StaticRoom {
 				"B  BBBBBBBB",
 				"B         B",
 				"B  BBBBB  B",
-				"B  B   B  B",
+				"B  BT TB  B",
 				"B  B   B  B",
 				"B         B",
 				"B         B",
@@ -227,7 +228,8 @@ public class RoomEntryDragon extends StaticRoom {
 				'F', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_FIRE)),
 				'M', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_PHYSICAL)),
 				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_WIND)),
-				'#', Blocks.IRON_BARS);
+				'#', Blocks.IRON_BARS,
+				'T', new StaticBlockState(Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH)));
 	}
 
 	@Override

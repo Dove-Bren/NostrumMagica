@@ -159,6 +159,9 @@ dependencies {
 	
 	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
+	
+	runtimeOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
+	compileOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
 }
 
 task sourcesJar(type: Jar) {

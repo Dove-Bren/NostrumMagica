@@ -2,13 +2,15 @@ package com.smanzana.nostrummagica.tile;
 
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.tile.IUniqueBlueprintTileEntity;
+import com.smanzana.autodungeons.tile.IWorldKeyHolder;
+import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -25,18 +27,18 @@ import net.minecraft.world.server.ServerWorld;
 
 public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchTriggerEntity> implements IWorldKeyHolder, IUniqueBlueprintTileEntity {
 	
-	private NostrumWorldKey key;
+	private WorldKey key;
 	private DyeColor color;
 	private boolean triggered;
 	
 	public KeySwitchBlockTileEntity() {
 		super(NostrumTileEntities.KeySwitchTileEntityType);
-		key = new NostrumWorldKey();
+		key = new WorldKey();
 		color = DyeColor.RED;
 		triggered = false;
 	}
 	
-	public KeySwitchBlockTileEntity(NostrumWorldKey key) {
+	public KeySwitchBlockTileEntity(WorldKey key) {
 		this();
 		this.key = key;
 	}
@@ -60,7 +62,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	public void read(BlockState state, CompoundNBT nbt) {
 		super.read(state, nbt);
 		
-		this.key = NostrumWorldKey.fromNBT(nbt.getCompound(NBT_KEY));
+		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
 		try {
 			this.color = DyeColor.valueOf(nbt.getString(NBT_COLOR).toUpperCase());
 		} catch (Exception e) {
@@ -88,7 +90,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public void setWorldKey(NostrumWorldKey key) {
+	public void setWorldKey(WorldKey key) {
 		this.key = key;
 		dirty();
 	}
@@ -99,7 +101,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public NostrumWorldKey getWorldKey() {
+	public WorldKey getWorldKey() {
 		return this.key;
 	}
 	
@@ -117,7 +119,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 		}
 		
 		this.setTriggered(true);
-		NostrumMagica.instance.getWorldKeys().addKey(getWorldKey());
+		AutoDungeons.GetWorldKeys().addKey(getWorldKey());
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
 
 		for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers((p) -> {
@@ -141,7 +143,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 		// will want unique-per-room keys?
 		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
 		// that's wrong?
-		final NostrumWorldKey newKey = this.key.mutateWithID(roomID);
+		final WorldKey newKey = this.key.mutateWithID(roomID);
 		if (isWorldGen) {
 			this.key = newKey;
 		} else {

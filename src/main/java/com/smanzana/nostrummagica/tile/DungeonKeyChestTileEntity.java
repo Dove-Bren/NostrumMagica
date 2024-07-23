@@ -2,12 +2,13 @@ package com.smanzana.nostrummagica.tile;
 
 import java.util.Random;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.tile.IWorldKeyHolder;
+import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,7 +25,7 @@ import net.minecraft.util.math.vector.Vector3d;
 
 public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHolder {
 	
-	private NostrumWorldKey key;
+	private WorldKey key;
 	private boolean triggered;
 	
 	// Ticks when opened, for client animation
@@ -32,11 +33,11 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	
 	public DungeonKeyChestTileEntity() {
 		super(NostrumTileEntities.DungeonKeyChestTileEntityType);
-		key = new NostrumWorldKey();
+		key = new WorldKey();
 		triggered = false;
 	}
 	
-	public DungeonKeyChestTileEntity(NostrumWorldKey key) {
+	public DungeonKeyChestTileEntity(WorldKey key) {
 		this();
 		this.key = key;
 	}
@@ -79,7 +80,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	public void read(BlockState state, CompoundNBT nbt) {
 		super.read(state, nbt);
 		
-		this.key = NostrumWorldKey.fromNBT(nbt.getCompound(NBT_KEY));
+		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
 	}
 	
@@ -93,11 +94,11 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	}
 	
 	@Override
-	public void setWorldKey(NostrumWorldKey key) {
+	public void setWorldKey(WorldKey key) {
 		setWorldKey(key, false);
 	}
 	
-	public void setWorldKey(NostrumWorldKey key, boolean isWorldGen) {
+	public void setWorldKey(WorldKey key, boolean isWorldGen) {
 		this.key = key;
 		if (!isWorldGen) {
 			dirty();
@@ -110,7 +111,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	}
 	
 	@Override
-	public NostrumWorldKey getWorldKey() {
+	public WorldKey getWorldKey() {
 		return this.key;
 	}
 	
@@ -138,7 +139,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 		}
 		
 		this.setTriggered(true);
-		NostrumMagica.instance.getWorldKeys().addKey(getWorldKey());
+		AutoDungeons.GetWorldKeys().addKey(getWorldKey());
 		this.world.addBlockEvent(pos, getBlockState().getBlock(), 0, 0);
 		world.playSound(null, pos, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, .5f, .8f);
 		

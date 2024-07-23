@@ -4,10 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.item.IBlueprintHolder;
+import com.smanzana.autodungeons.world.blueprints.Blueprint;
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.util.DimensionUtils;
-import com.smanzana.nostrummagica.world.blueprints.Blueprint;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
-import com.smanzana.nostrummagica.world.blueprints.IBlueprint;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;

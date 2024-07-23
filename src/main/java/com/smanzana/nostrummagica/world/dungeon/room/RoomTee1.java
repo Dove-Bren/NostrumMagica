@@ -4,14 +4,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.LadderBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.util.Direction;
@@ -146,7 +147,7 @@ public class RoomTee1 extends StaticRoom {
 				"X       X",
 				"X       X",
 				"XBBBBBBBX",
-				"X       X",
+				"XT      X",
 				"X   G   X",
 				"X      LX",
 				"XXXXXXXXX",
@@ -222,6 +223,7 @@ public class RoomTee1 extends StaticRoom {
 				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
 				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				'C', new StaticBlockState(Blocks.RED_CARPET),
+				'T', new StaticBlockState(Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.EAST)),
 				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_LIGHTNING)));
 	}
 

@@ -2,13 +2,15 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.block.ILargeDoorMarker;
+import com.smanzana.autodungeons.world.WorldKey;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
+import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
+import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
-import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +29,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public abstract class DungeonDoorBlock extends LockedDoorBlock {
+public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILargeDoorMarker {
 
 	public static BooleanProperty UNLOCKABLE = LockedChestBlock.UNLOCKABLE;
 	
@@ -55,9 +57,9 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock {
 				
 				if (playerIn.isCreative() && heldItem.isEmpty() && playerIn.isSneaking()) {
 					// Try to take key from dungeon
-					DungeonRecord record = NostrumMagica.dungeonTracker.getDungeon(playerIn);
+					DungeonRecord record = AutoDungeons.GetDungeonTracker().getDungeon(playerIn);
 					if (record != null) {
-						NostrumWorldKey key = door.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
+						WorldKey key = door.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
 						door.setWorldKey(key);
 						playerIn.sendMessage(new StringTextComponent("Set to dungeon key"), Util.DUMMY_UUID);
 					} else {
@@ -73,7 +75,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock {
 		return ActionResultType.SUCCESS;
 	}
 	
-	protected abstract NostrumWorldKey pickDungeonKey(DungeonInstance dungeon);
+	protected abstract WorldKey pickDungeonKey(DungeonInstance dungeon);
 	
 	public void spawnDungeonDoor(IWorld worldIn, BlockPos start, Direction facing, @Nullable MutableBoundingBox bounds, DungeonInstance dungeon) {
 		final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
@@ -99,7 +101,22 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock {
 	
 	public void overrideDungeonKey(IWorld worldIn, BlockPos masterPos, DungeonInstance dungeon) {
 		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getTileEntity(masterPos);
+		if (door == null) {
+			System.out.println("No door where it said there would be! " + masterPos);
+			System.out.println("Instead, there is: " + worldIn.getBlockState(masterPos));
+		}
 		door.setWorldKey(pickDungeonKey(dungeon), WorldUtil.IsWorldGen(worldIn));
+	}
+	
+	@Override
+	public boolean isLargeDoor(BlockState state) {
+		return state.get(MASTER);
+	}
+	
+	@Override
+	public void setKey(IWorld worldIn, BlockState state, BlockPos masterPos, WorldKey key, DungeonRoomInstance dungeon, @Nullable MutableBoundingBox bounds) {
+		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getTileEntity(masterPos);
+		door.setWorldKey(key, WorldUtil.IsWorldGen(worldIn));
 	}
 	
 	public static class Small extends DungeonDoorBlock {
@@ -111,7 +128,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock {
 		}
 
 		@Override
-		protected NostrumWorldKey pickDungeonKey(DungeonInstance dungeon) {
+		protected WorldKey pickDungeonKey(DungeonInstance dungeon) {
 			return dungeon.getSmallKey();
 		}
 	}
@@ -125,7 +142,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock {
 		}
 
 		@Override
-		protected NostrumWorldKey pickDungeonKey(DungeonInstance dungeon) {
+		protected WorldKey pickDungeonKey(DungeonInstance dungeon) {
 			return dungeon.getLargeKey();
 		}
 	}

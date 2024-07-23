@@ -32,7 +32,6 @@ import com.smanzana.nostrummagica.client.gui.TomeWorkshopScreen;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.gui.mirror.MirrorGui;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
-import com.smanzana.nostrummagica.client.render.BlueprintRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
@@ -111,7 +110,6 @@ public class ClientProxy extends CommonProxy {
 	private ClientEffectRenderer effectRenderer;
 	private OutlineRenderer outlineRenderer;
 	private SpellShapeRenderer spellshapeRenderer;
-	private BlueprintRenderer blueprintRenderer;
 	private SelectionRenderer selectionRenderer;
 	
 	public ClientProxy() {
@@ -121,7 +119,6 @@ public class ClientProxy extends CommonProxy {
 		this.effectRenderer = ClientEffectRenderer.instance();
 		this.outlineRenderer = new OutlineRenderer();
 		this.spellshapeRenderer = new SpellShapeRenderer(this.outlineRenderer);
-		this.blueprintRenderer = new BlueprintRenderer();
 		this.selectionRenderer = new SelectionRenderer();
 		
 		MinecraftForge.EVENT_BUS.register(this); // For client join welcome message
@@ -1031,10 +1028,6 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public boolean hasIntegratedServer() {
 		return Minecraft.getInstance().isIntegratedServerRunning();
-	}
-	
-	public BlueprintRenderer getBlueprintRenderer() {
-		return this.blueprintRenderer;
 	}
 	
 	public SelectionRenderer getSelectionRenderer() {

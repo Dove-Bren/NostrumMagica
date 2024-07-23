@@ -10,7 +10,6 @@ import com.smanzana.nostrummagica.network.message.ClientPurchaseSkillMessage;
 import com.smanzana.nostrummagica.network.message.ClientShapeVfxRenderMessage;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;
-import com.smanzana.nostrummagica.network.message.DungeonTrackerUpdateMessage;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
 import com.smanzana.nostrummagica.network.message.MagicEffectUpdate;
@@ -123,7 +122,6 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, VanillaEffectSyncMessage.class, VanillaEffectSyncMessage::encode, VanillaEffectSyncMessage::decode, VanillaEffectSyncMessage::handle);
 		syncChannel.registerMessage(discriminator++, WorldPortalTeleportRequestMessage.class, WorldPortalTeleportRequestMessage::encode, WorldPortalTeleportRequestMessage::decode, WorldPortalTeleportRequestMessage::handle);
 		syncChannel.registerMessage(discriminator++, QuickMoveBagMessage.class, QuickMoveBagMessage::encode, QuickMoveBagMessage::decode, QuickMoveBagMessage::handle);
-		syncChannel.registerMessage(discriminator++, DungeonTrackerUpdateMessage.class, DungeonTrackerUpdateMessage::encode, DungeonTrackerUpdateMessage::decode, DungeonTrackerUpdateMessage::handle);
 		syncChannel.registerMessage(discriminator++, RuneShaperMessage.class, RuneShaperMessage::encode, RuneShaperMessage::decode, RuneShaperMessage::handle);
 	}
 	

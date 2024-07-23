@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.tile.IWorldKeyHolder;
+import com.smanzana.autodungeons.tile.IWorldKeyHolder;
+import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -46,7 +46,7 @@ public class WorldKeyItem extends Item {
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		String keyName = "No key set";
-		NostrumWorldKey key = getKey(stack);
+		WorldKey key = getKey(stack);
 		if (key != null) {
 			keyName = key.toString();
 		}
@@ -54,15 +54,15 @@ public class WorldKeyItem extends Item {
 		tooltip.add(new StringTextComponent(keyName).mergeStyle(TextFormatting.GREEN));
 	}
 	
-	public NostrumWorldKey getKey(ItemStack stack) {
+	public WorldKey getKey(ItemStack stack) {
 		if (!stack.hasTag() || !stack.getTag().contains(NBT_KEY_ID)) {
-			setKey(stack, new NostrumWorldKey());
+			setKey(stack, new WorldKey());
 		}
 		
-		return NostrumWorldKey.fromNBT(stack.getTag().getCompound(NBT_KEY_ID));
+		return WorldKey.fromNBT(stack.getTag().getCompound(NBT_KEY_ID));
 	}
 	
-	public void setKey(ItemStack stack, NostrumWorldKey key) {
+	public void setKey(ItemStack stack, WorldKey key) {
 		CompoundNBT compound = stack.getTag();
 		if (compound == null) {
 			compound = new CompoundNBT();
@@ -104,12 +104,12 @@ public class WorldKeyItem extends Item {
 		if (te instanceof IWorldKeyHolder) {
 			IWorldKeyHolder holder = (IWorldKeyHolder) te;
 			if (playerIn.isSneaking()) {
-				NostrumWorldKey key = getKey(stack);
+				WorldKey key = getKey(stack);
 				holder.setWorldKey(key);
 				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
 			} else {
 				if (holder.hasWorldKey()) {
-					NostrumWorldKey key = holder.getWorldKey();
+					WorldKey key = holder.getWorldKey();
 					setKey(stack, key);
 					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
 				} else {
@@ -121,7 +121,7 @@ public class WorldKeyItem extends Item {
 		
 		if (te instanceof ChestTileEntity) {
 			// Convert chests to locked chests
-			final NostrumWorldKey key = this.getKey(stack);
+			final WorldKey key = this.getKey(stack);
 			if (!LockedChestTileEntity.LockChest(worldIn, pos, key)) {
 				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"), Util.DUMMY_UUID);
 			} else {
@@ -138,7 +138,7 @@ public class WorldKeyItem extends Item {
 		
 		if (!worldIn.isRemote() && playerIn.isSneaking()) {
 			clearKey(itemStackIn);
-			final NostrumWorldKey key = this.getKey(itemStackIn);
+			final WorldKey key = this.getKey(itemStackIn);
 			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}

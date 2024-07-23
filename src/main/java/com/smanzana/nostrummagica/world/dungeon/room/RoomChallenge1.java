@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 

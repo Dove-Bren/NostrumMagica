@@ -2,12 +2,15 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.block.ILargeKeyMarker;
+import com.smanzana.autodungeons.world.WorldKey;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
+import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
+import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
-import com.smanzana.nostrummagica.world.dungeon.DungeonRecord;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon.DungeonInstance;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -31,6 +34,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -41,7 +45,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
-public abstract class DungeonKeyChestBlock extends HorizontalBlock {
+public abstract class DungeonKeyChestBlock extends HorizontalBlock implements ILargeKeyMarker {
 	
 	public static DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	public static BooleanProperty OPEN = BooleanProperty.create("open");
@@ -81,9 +85,9 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 		if (!worldIn.isRemote()) {
 			DungeonKeyChestTileEntity chest = (DungeonKeyChestTileEntity) worldIn.getTileEntity(pos);
 			if (player.isCreative() && player.isSneaking()) {
-				DungeonRecord record = NostrumMagica.dungeonTracker.getDungeon(player);
+				DungeonRecord record = AutoDungeons.GetDungeonTracker().getDungeon(player);
 				if (record != null) {
-					NostrumWorldKey key = chest.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
+					WorldKey key = chest.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
 					chest.setWorldKey(key);
 					player.sendMessage(new StringTextComponent("Set to dungeon key"), Util.DUMMY_UUID);
 				} else {
@@ -123,6 +127,12 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 		DungeonKeyChestTileEntity tileentity = (DungeonKeyChestTileEntity) worldIn.getTileEntity(pos);
 		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	}
+
+	@Override
+	public void setKey(IWorld world, BlockState state, BlockPos pos, WorldKey key, DungeonRoomInstance instance, MutableBoundingBox bounds) {
+		DungeonKeyChestTileEntity tileentity = (DungeonKeyChestTileEntity) world.getTileEntity(pos);
+		tileentity.setWorldKey(key, WorldUtil.IsWorldGen(world));
 	}
 	
 	public static class Small extends DungeonKeyChestBlock {
@@ -401,6 +411,11 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock {
 			
 			DungeonKeyChestTileEntity chest = (DungeonKeyChestTileEntity) worldIn.getTileEntity(pos);
 			chest.setWorldKey(dungeon.getLargeKey(), WorldUtil.IsWorldGen(worldIn));
+		}
+		
+		@Override
+		public boolean isLargeKey(BlockState state) {
+			return !state.get(SLAVE);
 		}
 	}
 }

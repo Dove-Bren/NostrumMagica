@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBillboard;
 import com.smanzana.nostrummagica.client.model.ModelKeySwitchTrigger;
@@ -9,7 +10,6 @@ import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -53,7 +53,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 		KeySwitchBlockTileEntity te = (KeySwitchBlockTileEntity) entityIn.getLinkedTileEntity();
 		if (te != null) {
 			if (te.getWorldKey() != null) {
-				NostrumWorldKey key = te.getWorldKey();
+				WorldKey key = te.getWorldKey();
 				info = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
 				
 				final ItemStack held = mc.player.getHeldItemMainhand();

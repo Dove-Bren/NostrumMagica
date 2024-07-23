@@ -2,13 +2,13 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
@@ -185,7 +185,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 			final String lockStr;
 			boolean matches = false;
 			if (tileEntityIn.hasWorldKey()) {
-				NostrumWorldKey key = tileEntityIn.getWorldKey();
+				WorldKey key = tileEntityIn.getWorldKey();
 				lockStr = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
 				
 				final ItemStack held = mc.player.getHeldItemMainhand();

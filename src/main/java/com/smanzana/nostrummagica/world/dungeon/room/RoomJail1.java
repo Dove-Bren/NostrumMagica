@@ -4,14 +4,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.blueprints.BlueprintLocation;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.LadderBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.util.Direction;
@@ -65,7 +66,7 @@ public class RoomJail1 extends StaticRoom {
 				"X   C   I     X   X",
 				"X   C   I         X",
 				"X   C   X     X   X",
-				"X   C   X     X   X",
+				"X   C   XR    X   X",
 				"X   C   XXXXXXX   X",
 				"X   C   X         X",
 				"X   C   I  G  X   X",
@@ -168,7 +169,7 @@ public class RoomJail1 extends StaticRoom {
 				"X       I     X   X",
 				"X       I   G X   X",
 				"X       XXXX  X   X",
-				"X       I  X  I   X",
+				"X       I TX  I   X",
 				"X       I  X      X",
 				"X       I  X  I   X",
 				"X       I  XXXXI IX",
@@ -323,7 +324,10 @@ public class RoomJail1 extends StaticRoom {
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				'C', new StaticBlockState(Blocks.RED_CARPET),
 				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_EARTH)),
-				'H', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_ICE)));
+				'H', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_ICE)),
+				'R', new StaticBlockState(Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.EAST)),
+				'T', new StaticBlockState(Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH))
+				);
 	}
 
 	@Override

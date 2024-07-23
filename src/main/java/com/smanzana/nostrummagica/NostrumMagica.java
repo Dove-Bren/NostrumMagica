@@ -38,7 +38,6 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
-import com.smanzana.nostrummagica.listener.DungeonTracker;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy;
 import com.smanzana.nostrummagica.listener.ManaArmorListener;
 import com.smanzana.nostrummagica.listener.PlayerListener;
@@ -61,7 +60,6 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import com.smanzana.nostrummagica.util.Entities;
-import com.smanzana.nostrummagica.world.NostrumKeyRegistry;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 import com.smanzana.petcommand.api.PetFuncs;
@@ -119,7 +117,6 @@ public class NostrumMagica {
 	public static PlayerStatListener statListener;
 	public static MagicEffectProxy magicEffectProxy;
 	public static ManaArmorListener manaArmorListener;
-	public static DungeonTracker dungeonTracker;
 	
 	// Better way to do this?
 	private static SpellCooldownTracker server_spellCooldownTracker;
@@ -129,7 +126,6 @@ public class NostrumMagica {
 	private static SpellRegistry spellRegistry;
 	private static NostrumDimensionMapper serverDimensionMapper;
 	private static PetSoulRegistry petSoulRegistry;
-	private static NostrumKeyRegistry worldKeys;
 	private static PlayerStatTracker playerStats;
 
 	public static boolean initFinished = false;
@@ -149,7 +145,6 @@ public class NostrumMagica {
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
 		statListener = new PlayerStatListener();
-		dungeonTracker = DistExecutor.safeRunForDist(() -> DungeonTracker.Client::new, () -> DungeonTracker::new);;
 
 		NostrumMagica.creativeTab = new ItemGroup(MODID) {
 			@Override
@@ -739,17 +734,6 @@ public class NostrumMagica {
 		return petSoulRegistry;
 	}
 
-	public NostrumKeyRegistry getWorldKeys() {
-		if (worldKeys == null) {
-			if (proxy.isServer()) {
-				throw new RuntimeException("Accessing WorldKeys before a world has been loaded!");
-			} else {
-				worldKeys = new NostrumKeyRegistry();
-			}
-		}
-		return worldKeys;
-	}
-	
 	public PlayerStatTracker getPlayerStats() {
 		if (playerStats == null) {
 			if (proxy.isServer()) {
@@ -759,10 +743,6 @@ public class NostrumMagica {
 			}
 		}
 		return playerStats;
-	}
-
-	public DungeonTracker getDungeonTracker() {
-		return dungeonTracker;
 	}
 
 	/**
@@ -801,11 +781,6 @@ public class NostrumMagica {
 				PetSoulRegistry.DATA_NAME);
 	}
 
-	private void initWorldKeys(World world) {
-		worldKeys = (NostrumKeyRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(NostrumKeyRegistry::new,
-				NostrumKeyRegistry.DATA_NAME);
-	}
-	
 	private void initPlayerStats(World world) {
 		playerStats = (PlayerStatTracker) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PlayerStatTracker::new,
 				PlayerStatTracker.DATA_NAME);
@@ -836,7 +811,6 @@ public class NostrumMagica {
 			initSpellRegistry(world);
 			getDimensionMapper(world);
 			initPetSoulRegistry(world);
-			initWorldKeys(world);
 			initPlayerStats(world);
 		}
 	}

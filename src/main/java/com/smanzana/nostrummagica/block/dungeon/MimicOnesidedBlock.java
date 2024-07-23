@@ -5,8 +5,8 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.block.IDirectionalBlock;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.IDirectionalBlock;
 import com.smanzana.nostrummagica.tile.DelayLoadedMimicBlockTileEntity;
 
 import net.minecraft.block.Block;

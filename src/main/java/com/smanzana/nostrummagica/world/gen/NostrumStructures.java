@@ -6,9 +6,9 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.DimensionUtils;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.DragonStructure;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.PlantBossStructure;
-import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructure.PortalStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
@@ -17,7 +17,6 @@ import net.minecraft.world.gen.FlatGenerationSettings;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.structure.IStructurePieceType;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
@@ -55,7 +54,6 @@ public class NostrumStructures {
 	@SubscribeEvent
 	public static void registerStructures(RegistryEvent.Register<Structure<?>> event) {
 		CUSTOM_SEPARATION_SETTINGS.clear();
-		registerStructurePieceTypes();
 		
 		Structure<NoFeatureConfig> structure;
 		StructureFeature<?, ?> configured;
@@ -74,6 +72,8 @@ public class NostrumStructures {
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
 		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 48, 0x2cc3005e);
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
+
+		MinecraftForge.EVENT_BUS.addListener(NostrumStructures::loadWorld);
 	}
 	
 	private static void registerStructure(RegistryEvent.Register<Structure<?>> event, Structure<?> structure, StructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName, int min, int max, int rand) {
@@ -98,16 +98,7 @@ public class NostrumStructures {
 		FlatGenerationSettings.STRUCTURES.put(structure, config);
 	}
 	
-	//@SubscribeEvent Imagine.
-	//public static void registerStructurePieceTypes(RegistryEvent.Register<IStructurePieceType> event) {
-	protected static void registerStructurePieceTypes() {
-		//event.getRegistry().register(NostrumDungeonStructure.DungeonPieceSerializer.instance);
-		IStructurePieceType.register(NostrumDungeonStructure.DungeonPieceSerializer.instance, NostrumDungeonStructure.DungeonPieceSerializer.PIECE_ID);
-		
-		MinecraftForge.EVENT_BUS.addListener(NostrumStructures::loadWorld);
-	}
-
-	//@SubscribeEvent subscribed to listener in #registerStructurePieceTypes as a hack because we can't mix busses
+	//@SubscribeEvent subscribed to listener in #registerStructures as a hack because we can't mix busses
 	public static void loadWorld(WorldEvent.Load event) {
 		if(event.getWorld() instanceof ServerWorld && DimensionUtils.IsOverworld((ServerWorld)event.getWorld())) {
 			final ServerWorld serverWorld = (ServerWorld)event.getWorld();

@@ -2,14 +2,16 @@ package com.smanzana.nostrummagica.tile;
 
 import java.util.UUID;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.tile.IUniqueBlueprintTileEntity;
+import com.smanzana.autodungeons.tile.IWorldKeyHolder;
+import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Inventories;
-import com.smanzana.nostrummagica.world.NostrumWorldKey;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,14 +42,14 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	private static final String NBT_COLOR = "color";
 	
 	private final Inventory inventory;
-	private NostrumWorldKey lockKey;
+	private WorldKey lockKey;
 	private DyeColor color;
 	private int ticksExisted;
 	
 	public LockedChestTileEntity() {
 		super(NostrumTileEntities.LockedChestEntityType);
 		inventory = new Inventory(27);
-		lockKey = new NostrumWorldKey();
+		lockKey = new WorldKey();
 		color = DyeColor.RED;
 	}
 	
@@ -75,7 +77,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 			return;
 		
 		Inventories.deserializeInventory(inventory, nbt.get(NBT_INV));
-		lockKey = NostrumWorldKey.fromNBT(nbt.getCompound(NBT_LOCK));
+		lockKey = WorldKey.fromNBT(nbt.getCompound(NBT_LOCK));
 		try {
 			color = DyeColor.valueOf(nbt.getString(NBT_COLOR).toUpperCase());
 		} catch (Exception e) {
@@ -106,7 +108,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		if (world != null && !world.isRemote()) {
 			if (ticksExisted % 20 == 0) {
 				boolean worldUnlockable = world.getBlockState(pos).get(LockedChestBlock.UNLOCKABLE);
-				boolean tileUnlockable = NostrumMagica.instance.getWorldKeys().hasKey(lockKey); 
+				boolean tileUnlockable = AutoDungeons.GetWorldKeys().hasKey(lockKey); 
 				if (worldUnlockable != tileUnlockable) {
 					world.setBlockState(pos, world.getBlockState(pos).with(LockedChestBlock.UNLOCKABLE, tileUnlockable), 3);
 				}
@@ -116,7 +118,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	
 	public void attemptUnlock(PlayerEntity player) {
 		if (player.isCreative()
-				|| NostrumMagica.instance.getWorldKeys().consumeKey(lockKey)
+				|| AutoDungeons.GetWorldKeys().consumeKey(lockKey)
 				) {
 			unlock();
 		} else {
@@ -223,12 +225,12 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public NostrumWorldKey getWorldKey() {
+	public WorldKey getWorldKey() {
 		return this.lockKey;
 	}
 
 	@Override
-	public void setWorldKey(NostrumWorldKey key) {
+	public void setWorldKey(WorldKey key) {
 		this.lockKey = key;
 		this.dirty();
 	}
@@ -249,7 +251,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		// will want unique-per-room keys?
 		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
 		// that's wrong?
-		final NostrumWorldKey newKey = this.lockKey.mutateWithID(roomID);
+		final WorldKey newKey = this.lockKey.mutateWithID(roomID);
 		if (isWorldGen) {
 			this.lockKey = newKey;
 		} else {
@@ -257,7 +259,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
-	public static final boolean LockChest(World world, BlockPos pos, NostrumWorldKey key) {
+	public static final boolean LockChest(World world, BlockPos pos, WorldKey key) {
 		TileEntity te = world.getTileEntity(pos);
 		if (te instanceof ChestTileEntity) {
 			ChestTileEntity chest = (ChestTileEntity) te;
