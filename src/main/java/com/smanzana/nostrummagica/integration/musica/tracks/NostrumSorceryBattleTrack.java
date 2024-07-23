@@ -2,9 +2,7 @@ package com.smanzana.nostrummagica.integration.musica.tracks;
 
 import com.smanzana.musica.music.IMusicTrack;
 import com.smanzana.musica.music.MusicSound;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
-import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
@@ -34,7 +32,7 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 			return false;
 		}
 		
-		EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.TARGETED); 
+		EffectData data = null;//NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.TARGETED); 
 		
 		return data != null && data.getCount() > 0; // Clients stick with a non-null data with all 0's when it's over
 	}

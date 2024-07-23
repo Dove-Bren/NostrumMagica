@@ -123,7 +123,6 @@ public class MagicEffectProxy {
 		CONTINGENCY_HEALTH(true), // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_MANA(true), // Just visual. Actual effects are in trigger instance
 		CONTINGENCY_FOOD(true), // Just visual. Actual effects are in trigger instance
-		TARGETED, // Can key many things off. As of writing, used for battle music
 		;
 		
 		public final boolean isPublic; // Whether other entities should know about this effect data for the entity
@@ -186,41 +185,6 @@ public class MagicEffectProxy {
 	
 	public void applyOnFoodEffect(LivingEntity entity, double startTicks, int duration) {
 		apply(SpecialEffect.CONTINGENCY_FOOD, new EffectData().amt(0).count(duration), entity);
-	}
-	
-	public void setTargetted(LivingEntity entity) {
-//		final int start = entity.ticksExisted;
-//		final RegistryKey<World> dimension = entity.getEntityWorld().getDimensionKey();
-//		apply(SpecialEffect.TARGETED, new EffectData().count(start).amt(/*dimension.getId()*/ 0), entity);
-//		NostrumMagica.playerListener.registerTimer((type, ent, junk) -> {
-//			boolean remove = false;
-//			
-//			// Find what the current data is
-//			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.TARGETED);
-//			if (data != null && (int) data.getAmt() == dimension.getId() && data.getCount() == start && !entity.world.isRemote()) {
-//				// Most recent is still us. Check if we should cancel
-//				if (entity.world != null && entity.isAlive()) {
-//					if (Entities.GetEntities((ServerWorld) entity.world, (e) -> {
-//						return e != null
-//								&& e instanceof MobEntity
-//								&& ((MobEntity) e).getAttackTarget() != null
-//								&& ((MobEntity) e).getAttackTarget().equals(entity)
-//								&& entity.getDistanceSq(e) < 400;
-//					}).isEmpty()) {
-//						NostrumMagica.magicEffectProxy.remove(SpecialEffect.TARGETED, entity);
-//						remove = true;
-//					} else {
-//						// Check again
-//					}
-//				}
-//			} else {
-//				remove = true;
-//			}
-//			
-//			return remove;
-//		}, 20 * 5, 1);
-		int unused;
-		// The above doesn't work anymore as dimensions don't have int IDs
 	}
 	
 	public void remove(SpecialEffect effect, LivingEntity entity) {
@@ -348,12 +312,6 @@ public class MagicEffectProxy {
 		}
 	}
 	
-	protected void applyTargetted(LivingEntity ent) {
-		if (getData(ent, SpecialEffect.TARGETED) == null) {
-			setTargetted(ent);
-		}
-	}
-	
 	@SubscribeEvent
 	public void onAttackStart(LivingAttackEvent e) {
 		if (e.getEntity().world.isRemote) {
@@ -365,10 +323,6 @@ public class MagicEffectProxy {
 		}
 		
 		applyMagicDamageBuffs(e.getEntityLiving(), e.getSource(), e.getAmount());
-		
-		if (e.getSource().getTrueSource() != null && e.getSource().getTrueSource() instanceof LivingEntity) {
-			applyTargetted(e.getEntityLiving());
-		}
 	}
 	
 	@SubscribeEvent
