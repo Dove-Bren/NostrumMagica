@@ -70,13 +70,27 @@ public class NostrumEquipmentSets {
 	private static final UUID SET_UUID_ENDER_ADEPT = UUID.fromString("e0587390-70dc-4f5c-a8fb-43843d23da3d");
 	private static final UUID SET_UUID_ENDER_MASTER = UUID.fromString("d1b8b185-1b88-4444-ae01-1d9aea11db80");
 	
-	@ObjectHolder(ID_MAGICARMOR_PHYSICAL) public static MagicArmorSet physicalMagicArmor;
-	@ObjectHolder(ID_MAGICARMOR_FIRE) public static MagicArmorSet fireMagicArmor;
-	@ObjectHolder(ID_MAGICARMOR_ICE) public static MagicArmorSet iceMagicArmor;
-	@ObjectHolder(ID_MAGICARMOR_EARTH) public static MagicArmorSet earthMagicArmor;
-	@ObjectHolder(ID_MAGICARMOR_WIND) public static MagicArmorSet windMagicArmor;
-	@ObjectHolder(ID_MAGICARMOR_LIGHTNING) public static MagicArmorSet lightningMagicArmor;
-	@ObjectHolder(ID_MAGICARMOR_ENDER) public static MagicArmorSet enderMagicArmor;
+	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_NOVICE) public static ElementalArmorSet physicalNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_ADEPT) public static ElementalArmorSet physicalAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_MASTER) public static ElementalArmorSet physicalMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_FIRE_NOVICE) public static ElementalArmorSet fireNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_FIRE_ADEPT) public static ElementalArmorSet fireAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_FIRE_MASTER) public static ElementalArmorSet fireMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_ICE_NOVICE) public static ElementalArmorSet iceNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_ICE_ADEPT) public static ElementalArmorSet iceAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_ICE_MASTER) public static ElementalArmorSet iceMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_EARTH_NOVICE) public static ElementalArmorSet earthNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_EARTH_ADEPT) public static ElementalArmorSet earthAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_EARTH_MASTER) public static ElementalArmorSet earthMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_WIND_NOVICE) public static ElementalArmorSet windNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_WIND_ADEPT) public static ElementalArmorSet windAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_WIND_MASTER) public static ElementalArmorSet windMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_LIGHTNING_NOVICE) public static ElementalArmorSet lightningNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_LIGHTNING_ADEPT) public static ElementalArmorSet lightningAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_LIGHTNING_MASTER) public static ElementalArmorSet lightningMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_ENDER_NOVICE) public static ElementalArmorSet enderNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_ENDER_ADEPT) public static ElementalArmorSet enderAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_ENDER_MASTER) public static ElementalArmorSet enderMasterArmor;
 	
 	@SubscribeEvent
 	public static void registerSets(RegistryEvent.Register<EquipmentSet> event) {
@@ -112,8 +126,8 @@ public class NostrumEquipmentSets {
 		
 	}
 	
-	protected static final MagicArmorSet makeSet(String ID, UUID uuid, EMagicElement element, ElementalArmor.Type type, boolean flight, Consumer<LivingEntity> tick) {
-		MagicArmorSet set = new MagicArmorSet(uuid, element, type, flight, tick);
+	protected static final ElementalArmorSet makeSet(String ID, UUID uuid, EMagicElement element, ElementalArmor.Type type, boolean flight, Consumer<LivingEntity> tick) {
+		ElementalArmorSet set = new ElementalArmorSet(uuid, element, type, flight, tick);
 		set.setRegistryName(NostrumMagica.Loc(ID));
 		return set;
 	}

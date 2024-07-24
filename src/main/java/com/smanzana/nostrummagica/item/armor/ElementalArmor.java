@@ -332,7 +332,7 @@ public class ElementalArmor extends ArmorItem
 
 	public static final double CalcMagicSetReductTotal(EMagicElement armorElement, Type type, int setCount,
 			EMagicElement targetElement) {
-		if (setCount < 2 || setCount > 4) {
+		if (setCount < 1 || setCount > 4) {
 			return 0;
 		}
 
@@ -490,7 +490,9 @@ public class ElementalArmor extends ArmorItem
 			break;
 		}
 
-		return setCount * (total / 4);
+		// This has the effect of making 2 be like 1/4, 3 being 2/4, and 4 being 4/4
+		final int mult = (setCount == 4 ? 4 : setCount - 1);
+		return mult * (total / 4);
 	}
 
 	private static double calcArmorMagicBoost(EquipmentSlotType slot, EMagicElement element, Type type, int setCount) {
