@@ -38,6 +38,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
+import com.smanzana.nostrummagica.listener.ItemSetListener;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy;
 import com.smanzana.nostrummagica.listener.ManaArmorListener;
 import com.smanzana.nostrummagica.listener.PlayerListener;
@@ -117,6 +118,7 @@ public class NostrumMagica {
 	public static PlayerStatListener statListener;
 	public static MagicEffectProxy magicEffectProxy;
 	public static ManaArmorListener manaArmorListener;
+	public static ItemSetListener itemSetListener;
 	
 	// Better way to do this?
 	private static SpellCooldownTracker server_spellCooldownTracker;
@@ -145,6 +147,7 @@ public class NostrumMagica {
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
 		statListener = new PlayerStatListener();
+		itemSetListener = new ItemSetListener();
 
 		NostrumMagica.creativeTab = new ItemGroup(MODID) {
 			@Override

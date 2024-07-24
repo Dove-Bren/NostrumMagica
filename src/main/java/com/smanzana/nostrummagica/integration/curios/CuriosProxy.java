@@ -24,7 +24,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
@@ -327,7 +326,7 @@ public class CuriosProxy {
 		registerCurioResearch();
 	}
 	
-	public IInventory getCurios(PlayerEntity player) {
+	public CurioInventoryWrapper getCurios(PlayerEntity player) {
 		if (!enabled) {
 			return null;
 		}
