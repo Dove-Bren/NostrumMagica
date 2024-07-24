@@ -18,7 +18,7 @@ import com.smanzana.nostrummagica.item.SpellPlate;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -203,15 +203,15 @@ public class PortingUtil {
 				}
 				
 				for (int i = 0; i < 4; i++) {
-					if (i < 3 && !MagicArmor.isArmorElement(element)) {
+					if (i < 3 && !ElementalArmor.isArmorElement(element)) {
 						continue;
 					}
 					
 					id = "nostrummagica:armor_" + slot.name().toLowerCase() + "_" + element.name().toLowerCase() + (i + 1);
-					final MagicArmor.Type type = MagicArmor.Type.values()[i];
+					final ElementalArmor.Type type = ElementalArmor.Type.values()[i];
 					
 					submap = new HashMap<>();
-					submap.put(0, MagicArmor.get(element, slot, type));
+					submap.put(0, ElementalArmor.get(element, slot, type));
 					ItemMap1_12_2.put(id, submap);
 				}
 			}

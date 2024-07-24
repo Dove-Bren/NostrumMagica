@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -165,7 +165,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	public ActionResultType onItemUse(ItemUseContext context) {
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(context.getPlayer());
 		final ItemStack held = context.getItem();
-		final boolean hasBonus = MagicArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, MagicArmor.Type.MASTER) == 4;
+		final boolean hasBonus = ElementalArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, ElementalArmor.Type.MASTER) == 4;
 		final boolean canUpgrade = attr != null && attr.hasSkill(NostrumSkills.Earth_Weapon);
 		final int manaCost = 20;
 		

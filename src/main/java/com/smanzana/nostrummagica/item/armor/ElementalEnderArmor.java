@@ -5,7 +5,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 
-public class MagicEnderArmor extends MagicArmor {
+public class ElementalEnderArmor extends ElementalArmor {
 
 	public static final String ID_PREFIX = "armor_ender_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
@@ -24,7 +24,7 @@ public class MagicEnderArmor extends MagicArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public MagicEnderArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalEnderArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.ENDER, slot, type, properties);
 	}
 	

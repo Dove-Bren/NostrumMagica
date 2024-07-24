@@ -4,8 +4,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
-import com.smanzana.nostrummagica.item.armor.MagicFireArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalFireArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.LivingEntity;
@@ -82,37 +82,37 @@ public class NostrumEquipmentSets {
 	public static void registerSets(RegistryEvent.Register<EquipmentSet> event) {
 		final IForgeRegistry<EquipmentSet> registry = event.getRegistry();
 		
-		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_NOVICE, SET_UUID_PHYSICAL_NOVICE, EMagicElement.PHYSICAL, MagicArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_ADEPT, SET_UUID_PHYSICAL_ADEPT, EMagicElement.PHYSICAL, MagicArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_MASTER, SET_UUID_PHYSICAL_MASTER, EMagicElement.PHYSICAL, MagicArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_NOVICE, SET_UUID_PHYSICAL_NOVICE, EMagicElement.PHYSICAL, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_ADEPT, SET_UUID_PHYSICAL_ADEPT, EMagicElement.PHYSICAL, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_MASTER, SET_UUID_PHYSICAL_MASTER, EMagicElement.PHYSICAL, ElementalArmor.Type.MASTER, true, null));
 
-		registry.register(makeSet(ID_MAGICARMOR_FIRE_NOVICE, SET_UUID_FIRE_NOVICE, EMagicElement.FIRE, MagicArmor.Type.NOVICE, false, (e) -> MagicFireArmor.onFullSetTick(e, MagicArmor.Type.NOVICE)));
-		registry.register(makeSet(ID_MAGICARMOR_FIRE_ADEPT, SET_UUID_FIRE_ADEPT, EMagicElement.FIRE, MagicArmor.Type.ADEPT, false, (e) -> MagicFireArmor.onFullSetTick(e, MagicArmor.Type.ADEPT)));
-		registry.register(makeSet(ID_MAGICARMOR_FIRE_MASTER, SET_UUID_FIRE_MASTER, EMagicElement.FIRE, MagicArmor.Type.MASTER, true, (e) -> MagicFireArmor.onFullSetTick(e, MagicArmor.Type.MASTER)));
+		registry.register(makeSet(ID_MAGICARMOR_FIRE_NOVICE, SET_UUID_FIRE_NOVICE, EMagicElement.FIRE, ElementalArmor.Type.NOVICE, false, (e) -> ElementalFireArmor.onFullSetTick(e, ElementalArmor.Type.NOVICE)));
+		registry.register(makeSet(ID_MAGICARMOR_FIRE_ADEPT, SET_UUID_FIRE_ADEPT, EMagicElement.FIRE, ElementalArmor.Type.ADEPT, false, (e) -> ElementalFireArmor.onFullSetTick(e, ElementalArmor.Type.ADEPT)));
+		registry.register(makeSet(ID_MAGICARMOR_FIRE_MASTER, SET_UUID_FIRE_MASTER, EMagicElement.FIRE, ElementalArmor.Type.MASTER, true, (e) -> ElementalFireArmor.onFullSetTick(e, ElementalArmor.Type.MASTER)));
 
-		registry.register(makeSet(ID_MAGICARMOR_ICE_NOVICE, SET_UUID_ICE_NOVICE, EMagicElement.ICE, MagicArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_ICE_ADEPT, SET_UUID_ICE_ADEPT, EMagicElement.ICE, MagicArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_ICE_MASTER, SET_UUID_ICE_MASTER, EMagicElement.ICE, MagicArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_ICE_NOVICE, SET_UUID_ICE_NOVICE, EMagicElement.ICE, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_ICE_ADEPT, SET_UUID_ICE_ADEPT, EMagicElement.ICE, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_ICE_MASTER, SET_UUID_ICE_MASTER, EMagicElement.ICE, ElementalArmor.Type.MASTER, true, null));
 
-		registry.register(makeSet(ID_MAGICARMOR_EARTH_NOVICE, SET_UUID_EARTH_NOVICE, EMagicElement.EARTH, MagicArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_EARTH_ADEPT, SET_UUID_EARTH_ADEPT, EMagicElement.EARTH, MagicArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_EARTH_MASTER, SET_UUID_EARTH_MASTER, EMagicElement.EARTH, MagicArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_EARTH_NOVICE, SET_UUID_EARTH_NOVICE, EMagicElement.EARTH, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_EARTH_ADEPT, SET_UUID_EARTH_ADEPT, EMagicElement.EARTH, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_EARTH_MASTER, SET_UUID_EARTH_MASTER, EMagicElement.EARTH, ElementalArmor.Type.MASTER, true, null));
 
-		registry.register(makeSet(ID_MAGICARMOR_WIND_NOVICE, SET_UUID_WIND_NOVICE, EMagicElement.WIND, MagicArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_WIND_ADEPT, SET_UUID_WIND_ADEPT, EMagicElement.WIND, MagicArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_WIND_MASTER, SET_UUID_WIND_MASTER, EMagicElement.WIND, MagicArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_WIND_NOVICE, SET_UUID_WIND_NOVICE, EMagicElement.WIND, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_WIND_ADEPT, SET_UUID_WIND_ADEPT, EMagicElement.WIND, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_WIND_MASTER, SET_UUID_WIND_MASTER, EMagicElement.WIND, ElementalArmor.Type.MASTER, true, null));
 
-		registry.register(makeSet(ID_MAGICARMOR_LIGHTNING_NOVICE, SET_UUID_LIGHTNING_NOVICE, EMagicElement.LIGHTNING, MagicArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_LIGHTNING_ADEPT, SET_UUID_LIGHTNING_ADEPT, EMagicElement.LIGHTNING, MagicArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_LIGHTNING_MASTER, SET_UUID_LIGHTNING_MASTER, EMagicElement.LIGHTNING, MagicArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_LIGHTNING_NOVICE, SET_UUID_LIGHTNING_NOVICE, EMagicElement.LIGHTNING, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_LIGHTNING_ADEPT, SET_UUID_LIGHTNING_ADEPT, EMagicElement.LIGHTNING, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_LIGHTNING_MASTER, SET_UUID_LIGHTNING_MASTER, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER, true, null));
 
-		registry.register(makeSet(ID_MAGICARMOR_ENDER_NOVICE, SET_UUID_ENDER_NOVICE, EMagicElement.ENDER, MagicArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_ENDER_ADEPT, SET_UUID_ENDER_ADEPT, EMagicElement.ENDER, MagicArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_ENDER_MASTER, SET_UUID_ENDER_MASTER, EMagicElement.ENDER, MagicArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_ENDER_NOVICE, SET_UUID_ENDER_NOVICE, EMagicElement.ENDER, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_ENDER_ADEPT, SET_UUID_ENDER_ADEPT, EMagicElement.ENDER, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_ENDER_MASTER, SET_UUID_ENDER_MASTER, EMagicElement.ENDER, ElementalArmor.Type.MASTER, true, null));
 		
 	}
 	
-	protected static final MagicArmorSet makeSet(String ID, UUID uuid, EMagicElement element, MagicArmor.Type type, boolean flight, Consumer<LivingEntity> tick) {
+	protected static final MagicArmorSet makeSet(String ID, UUID uuid, EMagicElement element, ElementalArmor.Type type, boolean flight, Consumer<LivingEntity> tick) {
 		MagicArmorSet set = new MagicArmorSet(uuid, element, type, flight, tick);
 		set.setRegistryName(NostrumMagica.Loc(ID));
 		return set;

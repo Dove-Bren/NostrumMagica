@@ -28,7 +28,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class MagicIceArmor extends MagicArmor {
+public class ElementalIceArmor extends ElementalArmor {
 
 	public static final String ID_PREFIX = "armor_ice_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
@@ -47,7 +47,7 @@ public class MagicIceArmor extends MagicArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public MagicIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.ICE, slot, type, properties);
 		if (slot == EquipmentSlotType.CHEST) {
 			MinecraftForge.EVENT_BUS.register(this);
@@ -62,7 +62,7 @@ public class MagicIceArmor extends MagicArmor {
 			// Add an upgraded copy of true chestplates
 			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.MASTER) {
 				ItemStack stack = new ItemStack(this);
-				MagicArmor.SetHasWingUpgrade(stack, true);
+				ElementalArmor.SetHasWingUpgrade(stack, true);
 				items.add(stack);
 			}
 		}
@@ -79,7 +79,7 @@ public class MagicIceArmor extends MagicArmor {
 				&& event.getSource().getTrueSource() instanceof LivingEntity) {
 			// If shooter has full blizzard set...
 			final LivingEntity thrower = (LivingEntity) event.getSource().getTrueSource();
-			final int blizzardCount = MagicArmor.GetSetCount(thrower, EMagicElement.ICE, Type.MASTER);
+			final int blizzardCount = ElementalArmor.GetSetCount(thrower, EMagicElement.ICE, Type.MASTER);
 			if (blizzardCount == 4) {
 				// Either 'freeze' enemy, or heal ally
 				@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(thrower);

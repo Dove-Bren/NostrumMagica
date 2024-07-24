@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
@@ -79,7 +79,7 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 		// -1f - 1f (sin)
 		final float livingJitterMod = MathHelper.sin(3.1415f * 2 * livingJitterPerc);
 		
-		final float wingFlapPerc = MagicArmor.GetWingFlap((LivingEntity) entityIn, ageInTicks - (int) ageInTicks);
+		final float wingFlapPerc = ElementalArmor.GetWingFlap((LivingEntity) entityIn, ageInTicks - (int) ageInTicks);
 		final float wingFlapMod = MathHelper.sin(3.1415f * 2 * wingFlapPerc);
 		
 		rightWing.rotateAngleX = rightWing.rotateAngleZ = 0;

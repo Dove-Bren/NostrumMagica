@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
@@ -63,7 +63,7 @@ public class FrostbiteEffect extends Effect {
 		}
 		
 		// If entity has blizzard set, heal instead of harm
-		final int blizzardCount = MagicArmor.GetSetCount(entity, EMagicElement.ICE, MagicArmor.Type.MASTER);
+		final int blizzardCount = ElementalArmor.GetSetCount(entity, EMagicElement.ICE, ElementalArmor.Type.MASTER);
 		if (blizzardCount == 4) {
 			entity.heal(1);
 			if (!entity.world.isRemote) {

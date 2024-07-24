@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.Random;
 
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.block.Block;
@@ -69,7 +69,7 @@ public class MysticSnowLayerBlock extends Block {
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		final int blizzardPieces = MagicArmor.GetSetCount(player, EMagicElement.ICE, MagicArmor.Type.MASTER);
+		final int blizzardPieces = ElementalArmor.GetSetCount(player, EMagicElement.ICE, ElementalArmor.Type.MASTER);
 		if (blizzardPieces == 4) {
 			player.addItemStackToInventory(new ItemStack(Items.SNOWBALL));
 			worldIn.removeBlock(pos, false);

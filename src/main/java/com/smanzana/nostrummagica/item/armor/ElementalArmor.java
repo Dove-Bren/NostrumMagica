@@ -112,7 +112,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class MagicArmor extends ArmorItem
+public class ElementalArmor extends ArmorItem
 		implements IReactiveEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
 
 	public static enum Type {
@@ -514,7 +514,7 @@ public class MagicArmor extends ArmorItem
 	@OnlyIn(Dist.CLIENT)
 	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels;
 
-	public MagicArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
+	public ElementalArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
 		super(ArmorMaterial.IRON, slot, builder.maxDamage(calcArmorDurability(slot, element, type)));
 
 		this.type = type;
@@ -612,8 +612,8 @@ public class MagicArmor extends ArmorItem
 		return !offense && NostrumMagica.rand.nextFloat() <= chancePer * (float) (Math.min(2, type.scale) + 1);
 	}
 
-	public static MagicArmor get(EMagicElement element, EquipmentSlotType slot, Type type) {
-		MagicArmor armor = null;
+	public static ElementalArmor get(EMagicElement element, EquipmentSlotType slot, Type type) {
+		ElementalArmor armor = null;
 
 		switch (element) {
 		case EARTH:
@@ -1045,7 +1045,7 @@ public class MagicArmor extends ArmorItem
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
-		if (!(stack.getItem() instanceof MagicArmor)) {
+		if (!(stack.getItem() instanceof ElementalArmor)) {
 			return null;
 		}
 
@@ -1080,11 +1080,11 @@ public class MagicArmor extends ArmorItem
 			for (EquipmentSlotType slot : new EquipmentSlotType[] { EquipmentSlotType.HEAD, EquipmentSlotType.CHEST,
 					EquipmentSlotType.LEGS, EquipmentSlotType.FEET }) {
 				ItemStack inSlot = entity.getItemStackFromSlot(slot);
-				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof MagicArmor)) {
+				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof ElementalArmor)) {
 					continue;
 				}
 
-				MagicArmor item = (MagicArmor) inSlot.getItem();
+				ElementalArmor item = (ElementalArmor) inSlot.getItem();
 				if (item.getElement() == element && item.getType() == type) {
 					count++;
 				}
@@ -1094,7 +1094,7 @@ public class MagicArmor extends ArmorItem
 		return count;
 	}
 
-	public static int GetSetPieces(LivingEntity entity, MagicArmor armor) {
+	public static int GetSetPieces(LivingEntity entity, ElementalArmor armor) {
 		final EMagicElement myElem = armor.getElement();
 		final Type myType = armor.getType();
 		return GetSetCount(entity, myElem, myType);
@@ -1119,8 +1119,8 @@ public class MagicArmor extends ArmorItem
 		}
 	}
 
-	public static List<MagicArmor> getAll() {
-		List<MagicArmor> list = new LinkedList<>();
+	public static List<ElementalArmor> getAll() {
+		List<ElementalArmor> list = new LinkedList<>();
 
 		for (EMagicElement element : EMagicElement.values()) {
 			for (EquipmentSlotType slot : EquipmentSlotType.values())
@@ -1281,7 +1281,7 @@ public class MagicArmor extends ArmorItem
 			}
 
 			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (!inSlot.isEmpty() && inSlot.getItem() instanceof MagicArmor) {
+			if (!inSlot.isEmpty() && inSlot.getItem() instanceof ElementalArmor) {
 				return true;
 			}
 		}
@@ -1317,11 +1317,11 @@ public class MagicArmor extends ArmorItem
 
 			@Nonnull
 			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof MagicArmor)) {
+			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof ElementalArmor)) {
 				continue;
 			}
 
-			MagicArmor armorType = (MagicArmor) inSlot.getItem();
+			ElementalArmor armorType = (ElementalArmor) inSlot.getItem();
 			final Type inSlotType = armorType.getType();
 			final EMagicElement inSlotElement = armorType.getElement();
 			if (inSlotType != type || inSlotElement != element) {
@@ -1436,7 +1436,7 @@ public class MagicArmor extends ArmorItem
 			}
 		}
 
-		if (MagicArmor.GetHasWingUpgrade(stack)) {
+		if (ElementalArmor.GetHasWingUpgrade(stack)) {
 			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").mergeStyle(TextFormatting.GOLD));
 		}
 	}
@@ -1458,7 +1458,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected static boolean HasElytra(LivingEntity entity) {
-		MagicArmor piece = getChestPiece(entity);
+		ElementalArmor piece = getChestPiece(entity);
 		if (piece == null) {
 			return false;
 		}
@@ -1466,13 +1466,13 @@ public class MagicArmor extends ArmorItem
 		return piece.hasElytra(entity);
 	}
 
-	protected static @Nullable MagicArmor getChestPiece(LivingEntity entity) {
+	protected static @Nullable ElementalArmor getChestPiece(LivingEntity entity) {
 		ItemStack chestpiece = entity.getItemStackFromSlot(EquipmentSlotType.CHEST);
-		if (chestpiece.isEmpty() || !(chestpiece.getItem() instanceof MagicArmor)) {
+		if (chestpiece.isEmpty() || !(chestpiece.getItem() instanceof ElementalArmor)) {
 			return null;
 		}
 
-		return (MagicArmor) chestpiece.getItem();
+		return (ElementalArmor) chestpiece.getItem();
 	}
 
 	private static final int EARTH_SCAN_RANGE_XZ = 21;
@@ -1510,7 +1510,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected static boolean HasManaJump(LivingEntity entity) {
-		MagicArmor piece = getChestPiece(entity);
+		ElementalArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasManaJump(entity);
 	}
 
@@ -1527,7 +1527,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected static boolean HasWindTornado(LivingEntity entity) {
-		MagicArmor piece = getChestPiece(entity);
+		ElementalArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasWindTornado(entity);
 	}
 
@@ -1544,7 +1544,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected static boolean HasEnderDash(LivingEntity entity) {
-		MagicArmor piece = getChestPiece(entity);
+		ElementalArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasEnderDash(entity);
 	}
 
@@ -1554,7 +1554,7 @@ public class MagicArmor extends ArmorItem
 					|| element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
 			if (!hasRightElement) {
 				ItemStack chest = entity.getItemStackFromSlot(EquipmentSlotType.CHEST);
-				hasRightElement = MagicArmor.GetHasWingUpgrade(chest);
+				hasRightElement = ElementalArmor.GetHasWingUpgrade(chest);
 			}
 			if (hasRightElement) {
 				// Check if full set is available and if we have enough mana
@@ -1570,7 +1570,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	protected static boolean HasDragonFlight(LivingEntity entity) {
-		MagicArmor piece = getChestPiece(entity);
+		ElementalArmor piece = getChestPiece(entity);
 		return piece == null ? false : piece.hasDragonFlight(entity);
 	}
 
@@ -1997,8 +1997,8 @@ public class MagicArmor extends ArmorItem
 	}
 
 	public static final boolean GetHasWingUpgrade(ItemStack stack) {
-		return !stack.isEmpty() && stack.getItem() instanceof MagicArmor
-				&& ((MagicArmor) stack.getItem()).getEquipmentSlot() == EquipmentSlotType.CHEST && stack.hasTag()
+		return !stack.isEmpty() && stack.getItem() instanceof ElementalArmor
+				&& ((ElementalArmor) stack.getItem()).getEquipmentSlot() == EquipmentSlotType.CHEST && stack.hasTag()
 				&& stack.getTag().getBoolean(NBT_WING_UPGRADE);
 	}
 
@@ -2139,11 +2139,11 @@ public class MagicArmor extends ArmorItem
 
 	public static final void HandleStateUpdate(ArmorState state, LivingEntity ent, boolean data) {
 		ItemStack chest = ent.getItemStackFromSlot(EquipmentSlotType.CHEST);
-		if (chest.isEmpty() || !(chest.getItem() instanceof MagicArmor)) {
+		if (chest.isEmpty() || !(chest.getItem() instanceof ElementalArmor)) {
 			return;
 		}
 
-		final MagicArmor armor = (MagicArmor) chest.getItem();
+		final ElementalArmor armor = (ElementalArmor) chest.getItem();
 
 		switch (state) {
 		case FLYING:
@@ -2154,7 +2154,7 @@ public class MagicArmor extends ArmorItem
 		case JUMP:
 			// Deduct mana
 			if (!ent.world.isRemote) {
-				MagicArmor.consumeManaJump(ent);
+				ElementalArmor.consumeManaJump(ent);
 			}
 			break;
 		case ENDER_DASH_BACK:
@@ -2176,7 +2176,7 @@ public class MagicArmor extends ArmorItem
 					final Vector3d fakeLook = new Vector3d(realLook.x, 0, realLook.z);
 					Vector3d dir = fakeLook.scale(-1);
 					if (DoEnderDash(ent, dir)) {
-						MagicArmor.consumeEnderDash(ent);
+						ElementalArmor.consumeEnderDash(ent);
 					} else {
 						if (ent instanceof PlayerEntity) {
 							NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
@@ -2292,7 +2292,7 @@ public class MagicArmor extends ArmorItem
 			// Deduct mana
 			if (data) {
 				if (!ent.world.isRemote) {
-					MagicArmor.consumeDragonFlight(ent);
+					ElementalArmor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
 						if (ent instanceof PlayerEntity) {
@@ -2308,7 +2308,7 @@ public class MagicArmor extends ArmorItem
 		case WIND_JUMP_WHIRLWIND:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
 				PlayerEntity playerIn = (PlayerEntity) ent;
-				MagicArmor.consumeWindJumpWhirlwind(ent);
+				ElementalArmor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
 				RayTraceResult mop = RayTrace.raytrace(playerIn.world, playerIn,
 						playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist,
@@ -2334,7 +2334,7 @@ public class MagicArmor extends ArmorItem
 		}
 
 		LivingEntity ent = event.getEntityLiving();
-		MagicArmor armor = getChestPiece(ent);
+		ElementalArmor armor = getChestPiece(ent);
 		if (armor != null && armor.getType() == Type.MASTER && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			Vector3d motion = ent.getMotion();
@@ -2351,7 +2351,7 @@ public class MagicArmor extends ArmorItem
 
 		LivingEntity ent = event.getEntityLiving();
 
-		MagicArmor armor = getChestPiece(ent);
+		ElementalArmor armor = getChestPiece(ent);
 		if (armor != null && armor.getType() == Type.MASTER && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
 			final float amt = (float) (armor.jumpBoost / .1f);
@@ -2363,14 +2363,14 @@ public class MagicArmor extends ArmorItem
 	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
 		final boolean flying = player.isElytraFlying();
 		// Maybe should have an interface?
-		if (MagicArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.MASTER) == 4
-				|| MagicArmor.GetSetCount(player, EMagicElement.EARTH, Type.MASTER) == 4
-				|| MagicArmor.GetSetCount(player, EMagicElement.FIRE, Type.MASTER) == 4
-				|| MagicArmor.GetSetCount(player, EMagicElement.ENDER, Type.MASTER) == 4
-				|| (MagicArmor.GetHasWingUpgrade(stack)
-						&& (MagicArmor.GetSetCount(player, EMagicElement.ICE, Type.MASTER) == 4
-								|| MagicArmor.GetSetCount(player, EMagicElement.WIND, Type.MASTER) == 4
-								|| MagicArmor.GetSetCount(player, EMagicElement.LIGHTNING, Type.MASTER) == 4)
+		if (ElementalArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.MASTER) == 4
+				|| ElementalArmor.GetSetCount(player, EMagicElement.EARTH, Type.MASTER) == 4
+				|| ElementalArmor.GetSetCount(player, EMagicElement.FIRE, Type.MASTER) == 4
+				|| ElementalArmor.GetSetCount(player, EMagicElement.ENDER, Type.MASTER) == 4
+				|| (ElementalArmor.GetHasWingUpgrade(stack)
+						&& (ElementalArmor.GetSetCount(player, EMagicElement.ICE, Type.MASTER) == 4
+								|| ElementalArmor.GetSetCount(player, EMagicElement.WIND, Type.MASTER) == 4
+								|| ElementalArmor.GetSetCount(player, EMagicElement.LIGHTNING, Type.MASTER) == 4)
 
 				)) {
 			if (flying) {

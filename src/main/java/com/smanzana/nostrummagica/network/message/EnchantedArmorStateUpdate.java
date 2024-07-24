@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.network.message;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import net.minecraft.entity.LivingEntity;
@@ -24,7 +24,7 @@ public class EnchantedArmorStateUpdate {
 				? (LivingEntity) NostrumMagica.instance.proxy.getPlayer().world.getEntityByID(message.entityID)
 						: ctx.get().getSender());
 		if (ent != null) {
-			MagicArmor.HandleStateUpdate(message.state, ent, message.data);
+			ElementalArmor.HandleStateUpdate(message.state, ent, message.data);
 			if (ctx.get().getDirection().getReceptionSide().isServer()) {
 				// Bounce this update to everyone else
 				EnchantedArmorStateUpdate bouncedMessage = new EnchantedArmorStateUpdate(message.state, message.data, ent.getEntityId());

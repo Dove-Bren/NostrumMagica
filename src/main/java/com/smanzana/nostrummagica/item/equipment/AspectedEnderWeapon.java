@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.entity.EnderRodBallEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -191,7 +191,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	
 	protected void consumeBall(LivingEntity caster, EnderRodBallEntity ball) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4;
+		final boolean hasBonus = ElementalArmor.GetSetCount(caster, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4;
 		final boolean hasShield = attr != null && attr.hasSkill(NostrumSkills.Ender_Weapon);
 		if (hasBonus) {
 			int hurtCount = 0;
@@ -244,7 +244,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	protected boolean dislocateEntity(LivingEntity caster, LivingEntity target) {
 		@Nullable EnderRodBallEntity ball = findNearestBall(caster);
 		if (ball != null) {
-			final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4;
+			final boolean hasBonus = ElementalArmor.GetSetCount(caster, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4;
 			
 			teleportEntity(caster, target, ball.getPositionVec());
 			consumeBall(caster, ball);

@@ -34,7 +34,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 import com.smanzana.nostrummagica.item.equipment.RuneBag;
@@ -555,7 +555,7 @@ public class PlayerListener {
 		if (event.getSource().isFireDamage()) {
 			
 			// lava set ignores fire damage (but not lava). True lava set ignores lava as well
-			final boolean lavaSet = MagicArmor.GetSetCount(living, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
+			final boolean lavaSet = ElementalArmor.GetSetCount(living, EMagicElement.FIRE, ElementalArmor.Type.MASTER) == 4;
 			final boolean isLava = event.getSource() == DamageSource.LAVA || event.getSource().getDamageType().equalsIgnoreCase("lava");
 			if (lavaSet) {
 				final int manaCost = 1; // / 4
@@ -1028,7 +1028,7 @@ public class PlayerListener {
 			PortalBlock.serverTick();
 			TeleportRuneTileEntity.tickChargeMap();
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
-				MagicArmor.ServerWorldTick(world);
+				ElementalArmor.ServerWorldTick(world);
 			}
 		} else if (event.phase == Phase.END) {
 			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
@@ -1212,7 +1212,7 @@ public class PlayerListener {
 		
 		LivingEntity living = (LivingEntity) e.getEntity();
 		
-		final boolean hasLightningSet = MagicArmor.GetSetCount(living, EMagicElement.LIGHTNING, MagicArmor.Type.MASTER) == 4;
+		final boolean hasLightningSet = ElementalArmor.GetSetCount(living, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER) == 4;
 		if (hasLightningSet) {
 			// Alternate between buff and attack modes
 			EffectInstance boostEffect = living.getActivePotionEffect(NostrumEffects.lightningCharge);
@@ -1280,11 +1280,11 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (MagicArmor.GetSetCount(player, EMagicElement.EARTH, MagicArmor.Type.MASTER) != 4) {
+		if (ElementalArmor.GetSetCount(player, EMagicElement.EARTH, ElementalArmor.Type.MASTER) != 4) {
 			return;
 		}
 		
-		if (MagicArmor.DoEarthDig(player.world, player, e.getPos(), e.getFace())) {
+		if (ElementalArmor.DoEarthDig(player.world, player, e.getPos(), e.getFace())) {
 			attr.addMana(-20);
 			NostrumMagica.instance.proxy.sendMana(player);
 			e.setCanceled(true);

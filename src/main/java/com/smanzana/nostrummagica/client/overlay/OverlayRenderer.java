@@ -42,7 +42,7 @@ import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
@@ -1366,11 +1366,11 @@ public class OverlayRenderer extends AbstractGui {
 		if (event.getPlayer() != mc.player) {
 			// For other players, possibly do armor render ticks
 			for (@Nonnull ItemStack equipStack : event.getPlayer().getArmorInventoryList()) {
-				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof MagicArmor)) {
+				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof ElementalArmor)) {
 					continue;
 				}
 				
-				((MagicArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().world, event.getPlayer());
+				((ElementalArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().world, event.getPlayer());
 			}
 		}
 	}

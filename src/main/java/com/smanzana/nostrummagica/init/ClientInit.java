@@ -94,7 +94,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedPhysicalWeapon;
@@ -213,7 +213,7 @@ public class ClientInit {
 		
 		event.enqueueWork(ClientInit::registerItemModelProperties);
 		
-    	MagicArmor.ClientInit();
+    	ElementalArmor.ClientInit();
     	
     	ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
 		proxy.initKeybinds();

@@ -11,7 +11,7 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public class MagicFireArmor extends MagicArmor {
+public class ElementalFireArmor extends ElementalArmor {
 
 	public static final String ID_PREFIX = "armor_fire_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
@@ -30,11 +30,11 @@ public class MagicFireArmor extends MagicArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public MagicFireArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalFireArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.FIRE, slot, type, properties);
 	}
 	
-	public static final void onFullSetTick(LivingEntity entity, MagicArmor.Type type) {
+	public static final void onFullSetTick(LivingEntity entity, ElementalArmor.Type type) {
 		// Fire prevents fire.
 		// Level 1(0) reduces fire time (25% reduction by 50% of the time reducing by
 		// another tick)

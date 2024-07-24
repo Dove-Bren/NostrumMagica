@@ -36,7 +36,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.IEnchantableItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -597,7 +597,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4) {
+			if (ElementalArmor.GetSetCount(entity, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4) {
 				// has full ender set
 				efficiency += 1f;
 				log.addGlobalModifier(LABEL_BLINK_MOD_ENDERSET, +1f, ESpellLogModifierType.BONUS_SCALE);
@@ -1385,7 +1385,7 @@ public class SpellAction {
 				}
 			}
 			
-			if (MagicArmor.GetSetCount(entity, EMagicElement.ENDER, MagicArmor.Type.MASTER) == 4) {
+			if (ElementalArmor.GetSetCount(entity, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4) {
 				// has full ender set
 				radius *= 2.0;
 			}

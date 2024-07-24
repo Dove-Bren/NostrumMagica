@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -150,7 +150,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	
 	protected boolean castOn(LivingEntity caster, LivingEntity target) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-		final boolean hasBonus = MagicArmor.GetSetCount(caster, EMagicElement.FIRE, MagicArmor.Type.MASTER) == 4;
+		final boolean hasBonus = ElementalArmor.GetSetCount(caster, EMagicElement.FIRE, ElementalArmor.Type.MASTER) == 4;
 		final boolean hasSkill = attr.hasSkill(NostrumSkills.Fire_Weapon);
 		
 		if (hasBonus) {

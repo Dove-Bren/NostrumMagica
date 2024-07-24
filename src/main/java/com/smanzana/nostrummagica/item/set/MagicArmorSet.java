@@ -15,7 +15,7 @@ import com.smanzana.autodungeons.util.NetUtils;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
-import com.smanzana.nostrummagica.item.armor.MagicArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.LivingEntity;
@@ -34,11 +34,11 @@ public class MagicArmorSet extends EquipmentSet {
 			.MakeHasElytraModifier(ARMOR_ELYTRA_ID, false);
 
 	protected final EMagicElement element;
-	protected final MagicArmor.Type type;
+	protected final ElementalArmor.Type type;
 	protected final List<Multimap<Attribute, AttributeModifier>> setBonuses;
 	protected @Nullable Consumer<LivingEntity> fullTickFunc;
 	
-	public MagicArmorSet(UUID baseID, EMagicElement element, MagicArmor.Type type, boolean hasFlying, Consumer<LivingEntity> fullTickFunc) {
+	public MagicArmorSet(UUID baseID, EMagicElement element, ElementalArmor.Type type, boolean hasFlying, Consumer<LivingEntity> fullTickFunc) {
 		this.element = element;
 		this.type = type;
 		this.fullTickFunc = fullTickFunc;
@@ -50,7 +50,7 @@ public class MagicArmorSet extends EquipmentSet {
 		return 4;
 	}
 	
-	protected List<Multimap<Attribute, AttributeModifier>> makeSetBonuses(UUID baseID, EMagicElement element, MagicArmor.Type type, boolean hasFlying) {
+	protected List<Multimap<Attribute, AttributeModifier>> makeSetBonuses(UUID baseID, EMagicElement element, ElementalArmor.Type type, boolean hasFlying) {
 		List<Multimap<Attribute, AttributeModifier>> ret = new ArrayList<>();
 		
 		final UUID reducID = NetUtils.CombineUUIDs(baseID, MUTATE_REDUC);
@@ -59,7 +59,7 @@ public class MagicArmorSet extends EquipmentSet {
 		for (int i = 0; i < getFullSetCount(); i++) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = new ImmutableMultimap.Builder<>();
 			for (EMagicElement targElem : EMagicElement.values()) {
-				final double amt = MagicArmor.CalcMagicSetReductTotal(element, type, i + 1, targElem);
+				final double amt = ElementalArmor.CalcMagicSetReductTotal(element, type, i + 1, targElem);
 				if (amt == 0) {
 					continue;
 				}
@@ -68,7 +68,7 @@ public class MagicArmorSet extends EquipmentSet {
 						new AttributeModifier(reducID, "Magic Reduction (Set)", amt, AttributeModifier.Operation.ADDITION));
 			}
 			
-			final double potency = MagicArmor.CalcArmorMagicBoostTotal(element, type, i + 1);
+			final double potency = ElementalArmor.CalcArmorMagicBoostTotal(element, type, i + 1);
 			if (potency != 0.0) {
 				builder.put(NostrumAttributes.magicPotency, 
 						new AttributeModifier(potencyID, "Magic Potency (Set)", potency, AttributeModifier.Operation.ADDITION));
@@ -84,10 +84,10 @@ public class MagicArmorSet extends EquipmentSet {
 		return ret;
 	}
 	
-	protected static final Map<EMagicElement, Double> makeReducMap(EMagicElement element, MagicArmor.Type type) {
+	protected static final Map<EMagicElement, Double> makeReducMap(EMagicElement element, ElementalArmor.Type type) {
 		Map<EMagicElement, Double> vals = new HashMap<>(); // not enum because we don't want entries for typs that aren't represented
 		for (EMagicElement targElem : EMagicElement.values()) {
-			final double total = MagicArmor.CalcMagicSetReductTotal(element, type, 4, targElem);
+			final double total = ElementalArmor.CalcMagicSetReductTotal(element, type, 4, targElem);
 			if (total != 0) {
 				vals.put(targElem, total);
 			}
@@ -111,9 +111,9 @@ public class MagicArmorSet extends EquipmentSet {
 	@Override
 	public boolean isSetItem(ItemStack stack) {
 		return !stack.isEmpty()
-				&& stack.getItem() instanceof MagicArmor
-				&& ((MagicArmor) stack.getItem()).getElement() == this.element
-				&& ((MagicArmor) stack.getItem()).getType() == this.type
+				&& stack.getItem() instanceof ElementalArmor
+				&& ((ElementalArmor) stack.getItem()).getElement() == this.element
+				&& ((ElementalArmor) stack.getItem()).getType() == this.type
 				;
 	}
 }
