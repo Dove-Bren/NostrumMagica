@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
@@ -57,6 +58,10 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void AddElytraModifier(Multimap<Attribute, AttributeModifier> map, AttributeModifier modifier) {
+		map.put(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
+	}
+	
+	public static final void AddElytraModifier(ImmutableMultimap.Builder<Attribute, AttributeModifier> map, AttributeModifier modifier) {
 		map.put(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
 	}
 	

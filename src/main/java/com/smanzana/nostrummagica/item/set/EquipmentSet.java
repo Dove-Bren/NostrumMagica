@@ -1,8 +1,9 @@
-package com.smanzana.nostrummagica.inventory;
+package com.smanzana.nostrummagica.item.set;
 
 import java.util.Map;
 
 import com.google.common.collect.Multimap;
+import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;

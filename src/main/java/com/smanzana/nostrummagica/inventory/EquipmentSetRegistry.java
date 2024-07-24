@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.inventory;
 import java.util.Collection;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.item.set.EquipmentSet;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;

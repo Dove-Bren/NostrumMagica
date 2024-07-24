@@ -1,9 +1,15 @@
 package com.smanzana.nostrummagica.item.armor;
 
+import java.lang.reflect.Field;
+
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class MagicFireArmor extends MagicArmor {
 
@@ -26,6 +32,48 @@ public class MagicFireArmor extends MagicArmor {
 		
 	public MagicFireArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.FIRE, slot, type, properties);
+	}
+	
+	public static final void onFullSetTick(LivingEntity entity, MagicArmor.Type type) {
+		// Fire prevents fire.
+		// Level 1(0) reduces fire time (25% reduction by 50% of the time reducing by
+		// another tick)
+		// Level 2(1) halves fire time
+		// Level 3 prevents fire all-together
+		if (type == Type.MASTER) {
+			if (entity.isBurning()) {
+				entity.extinguish();
+			}
+		} else {
+			if (type == Type.ADEPT || NostrumMagica.rand.nextBoolean()) {
+				try {
+					Field fireField = ObfuscationReflectionHelper.findField(Entity.class,
+							"field_190534_ay");
+					fireField.setAccessible(true);
+
+					int val = fireField.getInt(entity);
+
+					if (val > 0) {
+						// On fire so decrease
+
+						// Decrease every other 20 so damage ticks aren't doubled.
+						// Do this by checking if divisible by 40 (true every 2 %20).
+						// (We skip odds to get to evens to simplify logic)
+						if (val % 2 == 0) {
+							if (val % 20 != 0 || val % 40 == 0) {
+								fireField.setInt(entity, val - 1);
+							}
+						} else {
+							; // Skip so that next tick is even
+						}
+					}
+
+					fireField.setAccessible(false);
+				} catch (Exception e) {
+					; // This will happen every tick, so don't log
+				}
+			}
+		}
 	}
 	
 }

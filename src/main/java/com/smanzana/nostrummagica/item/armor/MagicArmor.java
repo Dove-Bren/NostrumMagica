@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.item.armor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -35,7 +34,6 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaEntityEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
 import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.item.IElytraRenderer;
 import com.smanzana.nostrummagica.item.IReactiveEquipment;
@@ -51,7 +49,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.util.DimensionUtils;
-import com.smanzana.nostrummagica.util.NonNullEnumMap;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.RayTrace;
 
@@ -113,7 +110,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class MagicArmor extends ArmorItem
@@ -200,27 +196,6 @@ public class MagicArmor extends ArmorItem
 	// UUID.fromString("B1459204-0E61-4716-A129-61666D432E0D"),
 	// UUID.fromString("3F7D236D-1118-6524-3375-34814505B28E"),
 	// UUID.fromString("4A632266-F4E1-2E67-7836-64FD783B7A50")};
-
-	// UUIDs for set-based modifiers.
-	// Each corresponds to a slot that's adding its bonus
-	private static final UUID[] SET_MODIFIERS = new UUID[] { UUID.fromString("29F29D77-7DC5-4B68-970F-853633662A72"),
-			UUID.fromString("A84E2267-7D48-4943-9C1C-25A022E85930"),
-			UUID.fromString("D48816AD-B00D-4098-B686-2FC24436CD56"),
-			UUID.fromString("104C2D3C-3987-4D56-9727-FFBEE388F6AF") };
-
-	// UUIDs for magic potency modifiers
-	private static final UUID[] ARMOR_MAGICPOT_MODS = new UUID[] {
-			UUID.fromString("85c5a784-4ee6-4e2d-ae1b-dd6d006ab724"),
-			UUID.fromString("12fd1eae-bb2f-4e80-89db-38bef660c664"),
-			UUID.fromString("3eea62eb-b9c1-4859-a4d6-35e2edbd4c49"),
-			UUID.fromString("471dd1cf-9ba1-44ce-bba9-3cf9315d784c") };
-
-	// UUID and modifiers for turning on elytra flying capability
-	private static final UUID ARMOR_ELYTRA_ID = UUID.fromString("146B0D42-6A18-11EE-8C99-0242AC120002");
-	private static final AttributeModifier ARMOR_ELYTRA_MODIFIER = NostrumElytraWrapper
-			.MakeHasElytraModifier(ARMOR_ELYTRA_ID, true);
-	private static final AttributeModifier ARMOR_NO_ELYTRA_MODIFIER = NostrumElytraWrapper
-			.MakeHasElytraModifier(ARMOR_ELYTRA_ID, false);
 
 	private static int calcArmor(EquipmentSlotType slot, EMagicElement element, Type type) {
 
@@ -355,7 +330,7 @@ public class MagicArmor extends ArmorItem
 		return (type == Type.NOVICE ? .1 : (type == Type.ADEPT ? .15 : .25));
 	}
 
-	private static final double calcMagicSetReductTotal(EMagicElement armorElement, int setCount,
+	public static final double CalcMagicSetReductTotal(EMagicElement armorElement, Type type, int setCount,
 			EMagicElement targetElement) {
 		if (setCount < 1 || setCount > 4) {
 			return 0;
@@ -421,9 +396,9 @@ public class MagicArmor extends ArmorItem
 		return reduc;
 	}
 
-	private static final double calcMagicSetReduct(EquipmentSlotType slot, EMagicElement armorElement, int setCount,
+	private static final double calcMagicSetReduct(EquipmentSlotType slot, EMagicElement armorElement, Type type, int setCount,
 			EMagicElement targetElement) {
-		return calcMagicSetReductTotal(armorElement, setCount, targetElement) / setCount; // split evenly amonst all
+		return CalcMagicSetReductTotal(armorElement, type, setCount, targetElement) / setCount; // split evenly amonst all
 																							// [setCount] pieces.
 		// COULD make different pieces make up bigger chunks of the pie but ehh
 	}
@@ -493,7 +468,7 @@ public class MagicArmor extends ArmorItem
 		return 0;
 	}
 
-	private static double calcArmorMagicBoostTotal(EMagicElement element, int setCount) {
+	public static double CalcArmorMagicBoostTotal(EMagicElement element, Type type, int setCount) {
 		if (setCount < 1 || setCount > 4) {
 			return 0;
 		}
@@ -515,11 +490,11 @@ public class MagicArmor extends ArmorItem
 			break;
 		}
 
-		return total;
+		return setCount * (total / 4);
 	}
 
-	private static double calcArmorMagicBoost(EquipmentSlotType slot, EMagicElement element, int setCount) {
-		return calcArmorMagicBoostTotal(element, setCount) / 4;
+	private static double calcArmorMagicBoost(EquipmentSlotType slot, EMagicElement element, Type type, int setCount) {
+		return CalcArmorMagicBoostTotal(element, type, setCount) / setCount;
 	}
 	
 	private static int calcArmorToughness(EquipmentSlotType slot, EMagicElement element, Type type) {
@@ -1299,38 +1274,6 @@ public class MagicArmor extends ArmorItem
 		}
 	}
 
-	// hacky little map to avoid thrashing attributes every tick
-	protected static final Map<LivingEntity, Map<EquipmentSlotType, ItemStack>> LastEquipState = new HashMap<>();
-
-	protected static Map<EquipmentSlotType, ItemStack> GetLastTickState(LivingEntity entity) {
-		Map<EquipmentSlotType, ItemStack> map = LastEquipState.get(entity);
-		if (map == null) {
-			map = new NonNullEnumMap<>(EquipmentSlotType.class, ItemStack.EMPTY);
-			LastEquipState.put(entity, map);
-		}
-		return map;
-	}
-
-	protected static boolean EntityChangedEquipment(LivingEntity entity) {
-		Map<EquipmentSlotType, ItemStack> map = GetLastTickState(entity);
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			if (slot.getSlotType() != Group.ARMOR) {
-				continue;
-			}
-
-			@Nonnull
-			final ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			@Nonnull
-			final ItemStack lastTick = map.get(slot);
-
-			// Same check Vanilla uses to apply attributes
-			if (!ItemStack.areItemStacksEqual(inSlot, lastTick)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public static final boolean EntityHasEnchantedArmor(LivingEntity entity) {
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			if (slot.getSlotType() != Group.ARMOR) {
@@ -1346,150 +1289,12 @@ public class MagicArmor extends ArmorItem
 		return false;
 	}
 
-	protected static void UpdateEntity(LivingEntity entity) {
-
-		if (!entity.isAlive()) {
-			LastEquipState.remove(entity);
-			return;
-		}
-
-		// Only do any of this if they have a piece of enchanted armor (or they used to)
-		if (!LastEquipState.containsKey(entity) && !EntityHasEnchantedArmor(entity)) {
-			return;
-		}
-
-		// Check and change attributes
-		if (EntityChangedEquipment(entity)) {
-			// Figure out attributes and set.
-			// Also capture current armor status and cache it.
-			Map<EquipmentSlotType, ItemStack> cacheMap = new EnumMap<>(EquipmentSlotType.class);
-			Multimap<Attribute, AttributeModifier> attribMap = HashMultimap.<Attribute, AttributeModifier>create();
-
-			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-				if (slot.getSlotType() != Group.ARMOR) {
-					continue;
-				}
-
-				ItemStack inSlot = entity.getItemStackFromSlot(slot);
-				final int setCount;
-				final @Nullable EMagicElement armorElem;
-				if (!inSlot.isEmpty()) {
-					inSlot = inSlot.copy();
-
-					if (inSlot.getItem() instanceof MagicArmor) {
-						MagicArmor armorType = (MagicArmor) inSlot.getItem();
-						setCount = GetSetPieces(entity, armorType);
-						armorElem = armorType.getElement();
-					} else {
-						setCount = 0;
-						armorElem = null;
-					}
-				} else {
-					setCount = 0;
-					armorElem = null;
-				}
-
-				// Figure out how much this SHOULD be giving
-				// Important to do this even with 0 to remove previous bonuses
-				for (EMagicElement elem : EMagicElement.values()) {
-					final double reduct = (setCount > 0 && armorElem != null)
-							? calcMagicSetReduct(slot, armorElem, setCount, elem)
-							: 0;
-					attribMap.put(NostrumAttributes.GetReduceAttribute(elem),
-							new AttributeModifier(SET_MODIFIERS[slot.getIndex()], "Magic Reduction (Set)", reduct,
-									AttributeModifier.Operation.ADDITION));
-				}
-				final double boost = (setCount > 0 && armorElem != null)
-						? calcArmorMagicBoost(slot, armorElem, setCount)
-						: 0;
-				attribMap.put(NostrumAttributes.magicPotency,
-						new AttributeModifier(ARMOR_MAGICPOT_MODS[slot.getIndex()], "Magic Potency (Set)", boost,
-								AttributeModifier.Operation.ADDITION));
-
-				if (slot == EquipmentSlotType.CHEST) {
-					boolean has = (inSlot.getItem() instanceof MagicArmor)
-							? ((MagicArmor) inSlot.getItem()).hasElytra(entity)
-							: false;
-					NostrumElytraWrapper.AddElytraModifier(attribMap,
-							has ? ARMOR_ELYTRA_MODIFIER : ARMOR_NO_ELYTRA_MODIFIER);
-				}
-
-				// Add captured value to map
-				cacheMap.put(slot, inSlot);
-			}
-
-			// Update attributes
-			entity.getAttributeManager().reapplyModifiers(attribMap);
-
-			// Create and save new map
-			LastEquipState.put(entity, cacheMap);
-		}
-
-		// Check for world-changing full set bonuses
-		// Note: Cheat and just look at helm. if helm isn't right, full set isn't set
-		// anyways
-		@Nonnull
-		ItemStack helm = entity.getItemStackFromSlot(EquipmentSlotType.HEAD);
-		if (!helm.isEmpty() && helm.getItem() instanceof MagicArmor) {
-			MagicArmor type = (MagicArmor) helm.getItem();
-			final int setCount = GetSetPieces(entity, type);
-			if (setCount == 4) {
-				// Full set!
-				final EMagicElement element = type.getElement();
-
-				if (element == EMagicElement.FIRE) {
-					// Fire prevents fire.
-					// Level 1(0) reduces fire time (25% reduction by 50% of the time reducing by
-					// another tick)
-					// Level 2(1) halves fire time
-					// Level 3 prevents fire all-together
-					if (type.getType() == Type.MASTER) {
-						if (entity.isBurning()) {
-							entity.extinguish();
-						}
-					} else {
-						if (type.getType() == Type.ADEPT || NostrumMagica.rand.nextBoolean()) {
-							try {
-								Field fireField = ObfuscationReflectionHelper.findField(Entity.class,
-										"field_190534_ay");
-								fireField.setAccessible(true);
-
-								int val = fireField.getInt(entity);
-
-								if (val > 0) {
-									// On fire so decrease
-
-									// Decrease every other 20 so damage ticks aren't doubled.
-									// Do this by checking if divisible by 40 (true every 2 %20).
-									// (We skip odds to get to evens to simplify logic)
-									if (val % 2 == 0) {
-										if (val % 20 != 0 || val % 40 == 0) {
-											fireField.setInt(entity, val - 1);
-										}
-									} else {
-										; // Skip so that next tick is even
-									}
-								}
-
-								fireField.setAccessible(false);
-							} catch (Exception e) {
-								; // This will happen every tick, so don't log
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	// Updates all entities' current set bonuses (or lack there-of) from enchanted
 	// armor
 	public static void ServerWorldTick(ServerWorld world) {
 		world.getEntities().forEach((ent) -> {
 			if (ent instanceof LivingEntity) {
 				LivingEntity living = (LivingEntity) ent;
-				UpdateEntity(living);
-
 				if (living.isElytraFlying() && living.isSneaking() && living instanceof ServerPlayerEntity) {
 					((ServerPlayerEntity) living).stopFallFlying();
 				}
@@ -1524,7 +1329,7 @@ public class MagicArmor extends ArmorItem
 			}
 
 			for (EMagicElement elem : EMagicElement.values()) {
-				final double reduct = calcMagicSetReduct(slot, element, setCount, elem);
+				final double reduct = calcMagicSetReduct(slot, element, inSlotType, setCount, elem);
 				if (reduct != 0) {
 					final MagicReductionAttribute inst = NostrumAttributes.GetReduceAttribute(elem);
 					Double cur = map.get(inst);
@@ -1538,7 +1343,7 @@ public class MagicArmor extends ArmorItem
 				}
 			}
 
-			final double boost = calcArmorMagicBoost(slot, element, setCount);
+			final double boost = calcArmorMagicBoost(slot, element, inSlotType, setCount);
 			if (boost != 0) {
 				final MagicPotencyAttribute inst = NostrumAttributes.magicPotency;
 				Double cur = map.get(inst);
@@ -1584,10 +1389,10 @@ public class MagicArmor extends ArmorItem
 				if (showFull) {
 					// Show total
 					for (EMagicElement targElem : EMagicElement.values()) {
-						final double reduc = calcMagicSetReductTotal(element, 4, targElem);
+						final double reduc = CalcMagicSetReductTotal(element, type, 4, targElem);
 						setMapInst.put(NostrumAttributes.GetReduceAttribute(targElem), reduc);
 					}
-					final double boost = calcArmorMagicBoostTotal(element, 4);
+					final double boost = CalcArmorMagicBoostTotal(element, type, 4);
 					setMapInst.put(NostrumAttributes.magicPotency, boost);
 				} else {
 					// Show current
@@ -1635,11 +1440,6 @@ public class MagicArmor extends ArmorItem
 			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").mergeStyle(TextFormatting.GOLD));
 		}
 	}
-
-//	@Override
-//	public boolean isElytraFlying(LivingEntity entity, ItemStack stack) {
-//		return ArmorCheckFlying(entity);
-//	}
 
 	@OnlyIn(Dist.CLIENT)
 	@Override

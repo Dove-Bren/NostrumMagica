@@ -116,7 +116,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> player.getAttribute(attribute).getValue() + "%"), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f%%", player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
 				y += yPer;
 			}
 			
@@ -134,7 +134,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> "" + player.getAttribute(attribute).getValue()), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f", (float) player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
 				y += yPer;
 			}
 		}

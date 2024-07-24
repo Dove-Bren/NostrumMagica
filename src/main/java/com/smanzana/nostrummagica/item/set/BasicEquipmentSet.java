@@ -1,13 +1,17 @@
-package com.smanzana.nostrummagica.inventory;
+package com.smanzana.nostrummagica.item.set;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
@@ -17,12 +21,26 @@ import net.minecraft.item.ItemStack;
 
 public class BasicEquipmentSet extends EquipmentSet {
 
-	private final Set<Item> setItems;
-	private final List<Multimap<Attribute, AttributeModifier>> setBonuses;
+	private final List<Supplier<Item>> setItemSuppliers;
+	private final Set<Item> setItemsComputed;
+	protected final List<Multimap<Attribute, AttributeModifier>> setBonuses;
 	
-	protected BasicEquipmentSet(Set<Item> setItems, List<Multimap<Attribute, AttributeModifier>> setBonuses) {
-		this.setItems = setItems;
+	private boolean computedItems;
+	
+	protected BasicEquipmentSet(List<Supplier<Item>> setItems, List<Multimap<Attribute, AttributeModifier>> setBonuses) {
+		this.setItemSuppliers = setItems;
 		this.setBonuses = setBonuses;
+		this.setItemsComputed = new HashSet<>(); // empty any needs computing
+	}
+	
+	protected Set<Item> getSetItems() {
+		if (!computedItems) {
+			computedItems = true;
+			for (Supplier<Item> supp : setItemSuppliers) {
+				setItemsComputed.add(supp.get());
+			}
+		}
+		return this.setItemsComputed;
 	}
 	
 	@Override
@@ -33,7 +51,7 @@ public class BasicEquipmentSet extends EquipmentSet {
 
 	@Override
 	public boolean isSetItem(ItemStack stack) {
-		return !stack.isEmpty() && setItems.contains(stack.getItem());
+		return !stack.isEmpty() && getSetItems().contains(stack.getItem());
 	}
 
 	@Override
@@ -41,13 +59,22 @@ public class BasicEquipmentSet extends EquipmentSet {
 		;
 	}
 	
+	public int getSetItemCount() {
+		return getSetItems().size();
+	}
+	
+	public int getCurrentSetCount(LivingEntity entity) {
+		return NostrumMagica.itemSetListener.getSetCount(entity, this);
+	}
+	
 	public static class Builder {
 		
-		private final Set<Item> items;
-		private final List<Multimap<Attribute, AttributeModifier>> bonuses;
+		protected final List<Supplier<Item>> items;
+		protected final List<Multimap<Attribute, AttributeModifier>> bonuses;
 		
-		public Builder(Item ... items) {
-			this.items = Sets.newHashSet(items);
+		@SafeVarargs
+		public Builder(Supplier<Item> ... items) {
+			this.items = ImmutableList.copyOf(items);
 			this.bonuses = new ArrayList<>();
 		}
 		
