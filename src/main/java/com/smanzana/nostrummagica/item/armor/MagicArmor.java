@@ -332,7 +332,7 @@ public class MagicArmor extends ArmorItem
 
 	public static final double CalcMagicSetReductTotal(EMagicElement armorElement, Type type, int setCount,
 			EMagicElement targetElement) {
-		if (setCount < 1 || setCount > 4) {
+		if (setCount < 2 || setCount > 4) {
 			return 0;
 		}
 
@@ -469,7 +469,7 @@ public class MagicArmor extends ArmorItem
 	}
 
 	public static double CalcArmorMagicBoostTotal(EMagicElement element, Type type, int setCount) {
-		if (setCount < 1 || setCount > 4) {
+		if (setCount < 2 || setCount > 4) {
 			return 0;
 		}
 
