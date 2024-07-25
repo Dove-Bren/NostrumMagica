@@ -53,7 +53,6 @@ import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
-import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -1445,12 +1444,6 @@ public class PlayerListener {
 			final int globalCooldown = SpellCasting.CalculateGlobalSpellCooldown(event.getCastResult());
 			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().world).setSpellCooldown((PlayerEntity) event.getCaster(), event.getSpell(), cooldown);
 			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().world).setGlobalCooldown((PlayerEntity) event.getCaster(), globalCooldown);
-			
-			// and xp
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getCaster());
-			for (SpellEffectPart effect : event.getSpell().getSpellEffectParts()) {
-				attr.addElementXP(effect.getElement(), effect.getElementCount());
-			}
 		}
 	}
 	

@@ -55,6 +55,7 @@ public class ElementalArmorSet extends EquipmentSet {
 		
 		final UUID reducID = NetUtils.CombineUUIDs(baseID, MUTATE_REDUC);
 		final UUID potencyID = NetUtils.CombineUUIDs(baseID, MUTATE_POTENCY);
+		final UUID xpID = NetUtils.CombineUUIDs(baseID, MUTATE_POTENCY);
 		
 		for (int i = 0; i < getFullSetCount(); i++) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = new ImmutableMultimap.Builder<>();
@@ -76,6 +77,7 @@ public class ElementalArmorSet extends EquipmentSet {
 			
 			if (i == getFullSetCount() - 1) {
 				NostrumElytraWrapper.AddElytraModifier(builder, hasFlying ? ARMOR_ELYTRA_MODIFIER : ARMOR_NO_ELYTRA_MODIFIER);
+				builder.put(NostrumAttributes.GetXPAttribute(element), new AttributeModifier(xpID, "Elemental XP Bonus (Set)", 100, AttributeModifier.Operation.ADDITION));
 			}
 			
 			ret.add(builder.build());

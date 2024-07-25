@@ -121,6 +121,9 @@ public class SpellCasting {
 		summary.addCostRate(att.getManaCostModifier());
 		summary.addCostRate(-(float) entity.getAttribute(NostrumAttributes.manaCost).getValue() / 100f);
 		
+		// Add xp bonuses
+		summary.addXPRate((float) entity.getAttribute(NostrumAttributes.xpBonus).getValue() / 100f);
+		
 		// Add tome enchancements
 		if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
 			((ISpellCastingTool) tool.getItem()).onStartCastFromTool(entity, summary, tool);
@@ -276,6 +279,20 @@ public class SpellCasting {
 			}
 			
 			att.addXP(xp);
+			
+			for (SpellEffectPart effect : spell.getSpellEffectParts()) {
+				final double attribute = entity.getAttributeValue(NostrumAttributes.GetXPAttribute(effect.getElement())) / 100.0;
+				int elemXP = effect.getElementCount();
+				if (attribute > 0) {
+					elemXP += (int) attribute;
+					float partial = (float) (attribute - (int) attribute);
+					if (partial > 0) {
+						 elemXP += (NostrumMagica.rand.nextFloat() < partial ? 1 : 0);
+					}
+				}
+				
+				att.addElementXP(effect.getElement(), elemXP);
+			}
 		
 			if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
 				((ISpellCastingTool) tool.getItem()).onFinishCastFromTool(entity, summary, tool);
