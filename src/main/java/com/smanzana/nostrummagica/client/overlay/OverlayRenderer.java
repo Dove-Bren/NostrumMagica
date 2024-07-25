@@ -20,6 +20,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.IPrintableAttribute;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -98,7 +99,6 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -1223,23 +1223,17 @@ public class OverlayRenderer extends AbstractGui {
 			if (attribs != null && !attribs.isEmpty()) {
 				for (Entry<Attribute, AttributeModifier> entry : attribs.entries()) {
 					AttributeModifier modifier = entry.getValue();
-					double val = modifier.getAmount();
-					if (val == 0) {
-						continue;
-					}
-
-					// Formatting here copied from Vanilla
-					if (val > 0) {
-						lines.add((new TranslationTextComponent("attribute.modifier.plus." + modifier.getOperation().getId(),
-								ItemStack.DECIMALFORMAT.format(val),
-								new TranslationTextComponent(entry.getKey().getAttributeName())))
-										.mergeStyle(TextFormatting.BLUE));
+					
+					if (entry.getKey() instanceof IPrintableAttribute) {
+						ITextComponent line = ((IPrintableAttribute) entry.getKey()).formatModifier(modifier);
+						if (line != null) {
+							lines.add(line);
+						}
 					} else {
-						val = -val;
-						lines.add((new TranslationTextComponent("attribute.modifier.take." + modifier.getOperation().getId(),
-								ItemStack.DECIMALFORMAT.format(val),
-								new TranslationTextComponent(entry.getKey().getAttributeName())))
-										.mergeStyle(TextFormatting.RED));
+						ITextComponent line = IPrintableAttribute.formatAttributeValueVanilla(entry.getKey(), modifier);
+						if (line != null) {
+							lines.add(line);
+						}
 					}
 				}
 			}

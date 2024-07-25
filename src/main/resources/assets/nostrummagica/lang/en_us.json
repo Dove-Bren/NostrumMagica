@@ -584,6 +584,12 @@
 	"attribute.nostrummagica.elemxp_bonus_ender.name.desc": "Increases the amount of ender skill XP gained from spells",
 	"attribute.nostrummagica.elemxp_bonus_all.name": "Elemental XP Bonus",
 	"attribute.nostrummagica.elemxp_bonus_all.name.desc": "Increases the amount of elemental skill XP gained from spells",
+	"attribute.perc.modifier.plus.0": "+%s%% %s",
+	"attribute.perc.modifier.plus.1": "x%s%% %s",
+	"attribute.perc.modifier.plus.2": "x%s%% %s",
+	"attribute.perc.modifier.take.0": "-%s%% %s",
+	"attribute.perc.modifier.take.1": "x%s%% %s",
+	"attribute.perc.modifier.take.2": "x%s%% %s",
 
     "config.nostrummagica.display": "Display Options",
     "config.nostrummagica.display.display_bar": "Mana Bar",

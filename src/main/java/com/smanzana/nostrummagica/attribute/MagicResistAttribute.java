@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.attribute;
 
+import com.smanzana.nostrummagica.attribute.IPrintableAttribute.IPercentageAttribute;
+
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 
-public class MagicResistAttribute extends RangedAttribute {
+public class MagicResistAttribute extends RangedAttribute implements IPercentageAttribute {
 	
 	public static final String ID = "magic_resist";
 	
@@ -10,5 +12,4 @@ public class MagicResistAttribute extends RangedAttribute {
 		super(name, 0, -100.0D, 100.0D);
 		this.setShouldWatch(true);
 	}
-
 }

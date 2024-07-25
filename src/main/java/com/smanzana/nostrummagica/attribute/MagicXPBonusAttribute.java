@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.attribute;
 
+import com.smanzana.nostrummagica.attribute.IPrintableAttribute.IPercentageAttribute;
+
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 
-public class MagicXPBonusAttribute extends RangedAttribute {
+public class MagicXPBonusAttribute extends RangedAttribute implements IPercentageAttribute {
 	
 	public static final String ID = "magicxp_bonus";
 	
@@ -10,5 +12,4 @@ public class MagicXPBonusAttribute extends RangedAttribute {
 		super(name, 0, -100.0D, 500.0D);
 		this.setShouldWatch(true);
 	}
-
 }
