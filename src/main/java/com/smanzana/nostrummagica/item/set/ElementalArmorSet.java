@@ -73,7 +73,13 @@ public class ElementalArmorSet extends EquipmentSet {
 				}
 				
 				builder.put(NostrumAttributes.GetReduceAttribute(targElem), 
-						new AttributeModifier(reducID, "Magic Reduction (Set)", amt, AttributeModifier.Operation.ADDITION));
+						new AttributeModifier(reducID, "Spell Damage Reduction (Set)", amt, AttributeModifier.Operation.ADDITION));
+			}
+			
+			final double totalAll = ElementalArmor.CalcMagicSetReductTotal(element, type, 4, null);
+			if (totalAll != 0) {
+				builder.put(NostrumAttributes.reduceAll, 
+						new AttributeModifier(reducID, "Spell Damage Reduction (Set)", totalAll, AttributeModifier.Operation.ADDITION));
 			}
 			
 			final double potency = ElementalArmor.CalcArmorMagicBoostTotal(element, type, i + 1);

@@ -325,7 +325,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	public static final double CalcMagicSetReductTotal(EMagicElement armorElement, Type type, int setCount,
-			EMagicElement targetElement) {
+			@Nullable EMagicElement targetElement) {
 		if (setCount < 1 || setCount > 4) {
 			return 0;
 		}
@@ -339,9 +339,9 @@ public class ElementalArmor extends ArmorItem
 		// Lightning will resist 3 lightning (total 4)
 		// Ice will resist .5 in all
 		final double[] setTotalFire = { 0, .5, 1, 2 };
-		final double[] setTotalEarth = { 0, .125, .25, 1 };
+		final double[] setTotalEarth = { 0, .125, .25, .5 };
 		final double[] setTotalEarthBonus = { 0, 0, 0, .5 };
-		final double[] setTotalEnder = { 0, 1, 3, 5 };
+		final double[] setTotalEnder = { 0, 1, 3, 5.5 };
 		final double[] setTotalEnderBonus = { 0, -.1, -.3, -.5 };
 
 		final double[] setTotalWind = { 0, 0, 0, 1 };
@@ -360,14 +360,18 @@ public class ElementalArmor extends ArmorItem
 		} else if (armorElement == EMagicElement.EARTH) {
 			if (targetElement == EMagicElement.EARTH) {
 				reduc = setTotalEarth[setCount - 1];
-			} else {
+			} else if (targetElement == null) {
 				reduc = setTotalEarthBonus[setCount - 1];
+			} else {
+				reduc = 0;
 			}
 		} else if (armorElement == EMagicElement.ENDER) {
 			if (targetElement == EMagicElement.ENDER) {
 				reduc = setTotalEnder[setCount - 1];
-			} else {
+			} else if (targetElement == null) {
 				reduc = setTotalEnderBonus[setCount - 1];
+			} else {
+				reduc = 0;
 			}
 		} else if (armorElement == EMagicElement.WIND) {
 			if (targetElement == EMagicElement.WIND) {
@@ -382,7 +386,11 @@ public class ElementalArmor extends ArmorItem
 				reduc = 0;
 			}
 		} else if (armorElement == EMagicElement.ICE) {
-			reduc = setTotalIce[setCount - 1];
+			if (targetElement == null) {
+				reduc = setTotalIce[setCount - 1];
+			} else {
+				reduc = 0;
+			}
 		} else {
 			reduc = 0;
 		}
