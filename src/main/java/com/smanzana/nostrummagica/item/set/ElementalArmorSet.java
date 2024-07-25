@@ -23,7 +23,7 @@ import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 
-public class MagicArmorSet extends EquipmentSet {
+public class ElementalArmorSet extends EquipmentSet {
 	
 	private static final UUID MUTATE_REDUC = UUID.fromString("5fc9f1f2-e6e6-4941-af54-5441e38bf257");
 	private static final UUID MUTATE_POTENCY = UUID.fromString("22068d8c-c0f5-4ad7-a44e-1d50ab3e41b6");
@@ -38,7 +38,7 @@ public class MagicArmorSet extends EquipmentSet {
 	protected final List<Multimap<Attribute, AttributeModifier>> setBonuses;
 	protected @Nullable Consumer<LivingEntity> fullTickFunc;
 	
-	public MagicArmorSet(UUID baseID, EMagicElement element, ElementalArmor.Type type, boolean hasFlying, Consumer<LivingEntity> fullTickFunc) {
+	public ElementalArmorSet(UUID baseID, EMagicElement element, ElementalArmor.Type type, boolean hasFlying, Consumer<LivingEntity> fullTickFunc) {
 		this.element = element;
 		this.type = type;
 		this.fullTickFunc = fullTickFunc;

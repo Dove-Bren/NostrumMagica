@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 
 import net.minecraft.entity.LivingEntity;
@@ -43,9 +43,13 @@ public class BasicEquipmentSet extends EquipmentSet {
 		return this.setItemsComputed;
 	}
 	
+	protected int getUniqueItemCount(Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
+		return setItems.values().stream().filter(i -> !i.isEmpty()).map(i -> i.getItem()).collect(Collectors.toSet()).size();
+	}
+	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
-		final int idx = Math.min(setBonuses.size() - 1, setItems.size() - 1);
+		final int idx = Math.min(setBonuses.size() - 1, getUniqueItemCount(setItems) - 1);
 		return setBonuses.get(idx);
 	}
 
@@ -61,10 +65,6 @@ public class BasicEquipmentSet extends EquipmentSet {
 	
 	public int getSetItemCount() {
 		return getSetItems().size();
-	}
-	
-	public int getCurrentSetCount(LivingEntity entity) {
-		return NostrumMagica.itemSetListener.getSetCount(entity, this);
 	}
 	
 	public static class Builder {

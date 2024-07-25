@@ -47,6 +47,7 @@ public class NostrumEquipmentSets {
 	private static final String ID_MAGICARMOR_ENDER_NOVICE = ID_MAGICARMOR_ENDER + ".novice";
 	private static final String ID_MAGICARMOR_ENDER_ADEPT = ID_MAGICARMOR_ENDER + ".adept";
 	private static final String ID_MAGICARMOR_ENDER_MASTER = ID_MAGICARMOR_ENDER + ".master";
+	private static final String ID_MAGEARMOR = "magearmor";
 	
 	private static final UUID SET_UUID_PHYSICAL_NOVICE = UUID.fromString("7164440b-20da-4b04-9e3f-491515ff57d8");
 	private static final UUID SET_UUID_PHYSICAL_ADEPT = UUID.fromString("2bf205b7-ec52-40d5-bf91-ec94b665139f");
@@ -69,6 +70,7 @@ public class NostrumEquipmentSets {
 	private static final UUID SET_UUID_ENDER_NOVICE = UUID.fromString("23ea65fa-34f8-41c7-9865-0744b22209b7");
 	private static final UUID SET_UUID_ENDER_ADEPT = UUID.fromString("e0587390-70dc-4f5c-a8fb-43843d23da3d");
 	private static final UUID SET_UUID_ENDER_MASTER = UUID.fromString("d1b8b185-1b88-4444-ae01-1d9aea11db80");
+	private static final UUID SET_UUID_MAGE = UUID.fromString("bd077649-e7dc-406f-874d-98fbc1404c6b");
 	
 	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_NOVICE) public static ElementalArmorSet physicalNoviceArmor;
 	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_ADEPT) public static ElementalArmorSet physicalAdeptArmor;
@@ -91,6 +93,7 @@ public class NostrumEquipmentSets {
 	@ObjectHolder(ID_MAGICARMOR_ENDER_NOVICE) public static ElementalArmorSet enderNoviceArmor;
 	@ObjectHolder(ID_MAGICARMOR_ENDER_ADEPT) public static ElementalArmorSet enderAdeptArmor;
 	@ObjectHolder(ID_MAGICARMOR_ENDER_MASTER) public static ElementalArmorSet enderMasterArmor;
+	@ObjectHolder(ID_MAGEARMOR) public static BasicEquipmentSet mageArmor;
 	
 	@SubscribeEvent
 	public static void registerSets(RegistryEvent.Register<EquipmentSet> event) {
@@ -123,6 +126,8 @@ public class NostrumEquipmentSets {
 		registry.register(makeSet(ID_MAGICARMOR_ENDER_NOVICE, SET_UUID_ENDER_NOVICE, EMagicElement.ENDER, ElementalArmor.Type.NOVICE, false, null));
 		registry.register(makeSet(ID_MAGICARMOR_ENDER_ADEPT, SET_UUID_ENDER_ADEPT, EMagicElement.ENDER, ElementalArmor.Type.ADEPT, false, null));
 		registry.register(makeSet(ID_MAGICARMOR_ENDER_MASTER, SET_UUID_ENDER_MASTER, EMagicElement.ENDER, ElementalArmor.Type.MASTER, true, null));
+		
+		registry.register(MageArmorSet.Build(SET_UUID_MAGE).setRegistryName(NostrumMagica.Loc(ID_MAGEARMOR)));
 		
 	}
 	

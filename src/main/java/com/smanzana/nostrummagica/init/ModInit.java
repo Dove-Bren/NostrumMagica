@@ -59,7 +59,7 @@ import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
-import com.smanzana.nostrummagica.item.armor.MagicArmorBase;
+import com.smanzana.nostrummagica.item.armor.MageArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 import com.smanzana.nostrummagica.loot.NostrumLoot;
@@ -960,6 +960,46 @@ public class ModInit {
 						},
 				new ResearchRequirement("mystic_spelltable"),
 				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mysticSpellTable))));
+		
+		// Rituals for mage armor
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+			if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
+				continue;
+			}
+			
+			final Item base;
+			final Item outcome;
+			switch (slot) {
+			case CHEST:
+				base = Items.GOLDEN_CHESTPLATE;
+				outcome = NostrumItems.mageArmorChest;
+				break;
+			case FEET:
+				base = Items.GOLDEN_BOOTS;
+				outcome = NostrumItems.mageArmorFeet;
+				break;
+			case HEAD:
+				base = Items.GOLDEN_HELMET;
+				outcome = NostrumItems.mageArmorHelm;
+				break;
+			case LEGS:
+			default:
+				base = Items.GOLDEN_LEGGINGS;
+				outcome = NostrumItems.mageArmorLegs;
+				break;
+			}
+			
+			registry.register(RitualRecipe.createTier3(
+					"mage_armor", new ItemStack(outcome), null,
+					new ReagentType[] { ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.GINSENG, ReagentType.SPIDER_SILK },
+					Ingredient.fromItems(base),
+					new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
+							Ingredient.fromTag(Tags.Items.LEATHER),
+							Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+							Ingredient.fromTag(NostrumTags.Items.CrystalSmall)
+							},
+					new ResearchRequirement("enchanted_armor"), new OutcomeSpawnItem(new ItemStack(outcome))));
+		}
 
 		// Rituals for base the magic armors
 		for (EMagicElement elem : EMagicElement.values()) {
@@ -989,7 +1029,7 @@ public class ModInit {
 					regName = "spawn_enchanted_armor_" + elem.name().toLowerCase() + "_" + slot.name().toLowerCase() + "_" + type.name().toLowerCase();
 					research = "enchanted_armor";
 					if (type == ElementalArmor.Type.NOVICE) {
-						input = Ingredient.fromItems(MagicArmorBase.get(slot));
+						input = Ingredient.fromItems(MageArmor.get(slot));
 					} else {
 						input = Ingredient.fromItems(ElementalArmor.get(elem, slot, type.getPrev()));
 					}
@@ -1780,6 +1820,7 @@ public class ModInit {
 						new ItemStack(AspectedWeapon.get(EMagicElement.WIND, AspectedWeapon.Type.MASTER)));
 
 		NostrumResearch.startBuilding().hiddenParent("rituals").tier(EMagicTier.KANI)
+				.reference("ritual::mage_armor", "ritual.mage_armor.name")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true,
 						new ItemStack(ElementalArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, ElementalArmor.Type.MASTER)));

@@ -191,10 +191,10 @@ public class PortingUtil {
 		}
 		ItemMap1_12_2.put(id, submap);
 		
-		AddNameTransform1_12_2("nostrummagica:magichelmbase", NostrumItems.magicArmorBaseHelm);
-		AddNameTransform1_12_2("nostrummagica:magicchestbase", NostrumItems.magicArmorBaseChest);
-		AddNameTransform1_12_2("nostrummagica:magicleggingsbase", NostrumItems.magicArmorBaseLegs);
-		AddNameTransform1_12_2("nostrummagica:magicfeetbase", NostrumItems.magicArmorBaseFeet);
+		AddNameTransform1_12_2("nostrummagica:magichelmbase", NostrumItems.mageArmorHelm);
+		AddNameTransform1_12_2("nostrummagica:magicchestbase", NostrumItems.mageArmorChest);
+		AddNameTransform1_12_2("nostrummagica:magicleggingsbase", NostrumItems.mageArmorLegs);
+		AddNameTransform1_12_2("nostrummagica:magicfeetbase", NostrumItems.mageArmorFeet);
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
