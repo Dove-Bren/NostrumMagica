@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.item.set;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Multimap;
@@ -17,7 +19,9 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 
 	public abstract Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems);
 	
-	public abstract boolean isSetItem(ItemStack stack, IInventorySlotKey<LivingEntity> slot);
+	public abstract boolean isSetItem(ItemStack stack);
+	
+	public abstract boolean isSetItemValid(ItemStack stack, IInventorySlotKey<LivingEntity> slot);
 	
 	public abstract void setTick(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems);
 	
@@ -27,6 +31,14 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 	
 	public ITextComponent getDescription() {
 		return new TranslationTextComponent("set." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath() + ".desc");
+	}
+	
+	public abstract Multimap<Attribute, AttributeModifier> getFullSetBonuses();
+	
+	public abstract int getFullSetCount();
+
+	public List<ITextComponent> getExtraBonuses(int setCount) {
+		return new ArrayList<>();
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import javax.annotation.Nonnull;
@@ -13,6 +14,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
@@ -38,6 +40,7 @@ import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.inventory.EquipmentSetRegistry;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
@@ -45,6 +48,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
+import com.smanzana.nostrummagica.item.set.EquipmentSet;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -62,6 +66,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
@@ -73,6 +78,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -88,6 +95,10 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -97,6 +108,7 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class OverlayRenderer extends AbstractGui {
@@ -1152,6 +1164,92 @@ public class OverlayRenderer extends AbstractGui {
 	public void toggleHUD() {
 		this.HUDToggle = !this.HUDToggle;
 		this.fadeInReagents();
+	}
+	
+	private static ItemStack EquipmentSetCacheKey = ItemStack.EMPTY;
+	private static List<EquipmentSet> EquipmentSetCacheSets = new ArrayList<>();
+	
+	protected @Nullable List<EquipmentSet> GetSetsForItem(ItemStack stack) {
+		if (ItemStack.areItemStacksEqual(stack, EquipmentSetCacheKey)) {
+			return EquipmentSetCacheSets;
+		}
+		
+		EquipmentSetCacheSets = new ArrayList<>();
+		for (EquipmentSet set : EquipmentSetRegistry.GetAllSets()) {
+			if (set.isSetItem(stack)) {
+				EquipmentSetCacheSets.add(set);
+			}
+		}
+		
+		EquipmentSetCacheKey = stack.copy();
+		return EquipmentSetCacheSets;
+	}
+	
+	@SubscribeEvent
+	public void onTooltipConstruct(ItemTooltipEvent event) {
+		// if a set item, insert set text
+		List<EquipmentSet> sets = GetSetsForItem(event.getItemStack());
+		if (!sets.isEmpty()) {
+			final Minecraft mc = Minecraft.getInstance();
+			final PlayerEntity player = mc.player;
+			
+			List<ITextComponent> lines = event.getToolTip();
+			for (EquipmentSet set : sets) {
+				lines.addAll(1, makeSetLines(event.getItemStack(), player, set));
+			}
+		}
+	}
+	
+	protected List<ITextComponent> makeSetLines(ItemStack stack, PlayerEntity player, EquipmentSet set) {
+		List<ITextComponent> lines = new ArrayList<>();
+		final boolean showFull = Screen.hasShiftDown();
+		final int count = NostrumMagica.itemSetListener.getActiveSetCount(player, set);
+		final int maxCount = set.getFullSetCount();
+		final String countStr = (showFull ? " (Complete)" : String.format(" (%d/%d)", count, maxCount));
+		
+		lines.add(set.getName().deepCopy().mergeStyle(TextFormatting.DARK_PURPLE)
+				.append(new StringTextComponent(countStr).mergeStyle((showFull || count >= maxCount) ? TextFormatting.GOLD : TextFormatting.DARK_AQUA)));
+
+		// If player is wearing the set, display bonuses
+		if (showFull || NostrumMagica.itemSetListener.getCurrentSets(player).contains(set)) {
+			final Multimap<Attribute, AttributeModifier> attribs;
+			if (showFull) {
+				attribs = set.getFullSetBonuses();
+			} else {
+				// Show current
+				attribs = NostrumMagica.itemSetListener.getActiveSetBonus(player, set);
+			}
+
+			if (attribs != null && !attribs.isEmpty()) {
+				for (Entry<Attribute, AttributeModifier> entry : attribs.entries()) {
+					AttributeModifier modifier = entry.getValue();
+					double val = modifier.getAmount();
+					if (val == 0) {
+						continue;
+					}
+
+					// Formatting here copied from Vanilla
+					if (val > 0) {
+						lines.add((new TranslationTextComponent("attribute.modifier.plus." + modifier.getOperation().getId(),
+								ItemStack.DECIMALFORMAT.format(val),
+								new TranslationTextComponent(entry.getKey().getAttributeName())))
+										.mergeStyle(TextFormatting.BLUE));
+					} else {
+						val = -val;
+						lines.add((new TranslationTextComponent("attribute.modifier.take." + modifier.getOperation().getId(),
+								ItemStack.DECIMALFORMAT.format(val),
+								new TranslationTextComponent(entry.getKey().getAttributeName())))
+										.mergeStyle(TextFormatting.RED));
+					}
+				}
+			}
+			
+			List<ITextComponent> extras = set.getExtraBonuses(showFull ? maxCount : count);
+			if (extras != null && !extras.isEmpty()) {
+				extras.forEach(t -> lines.add(t.deepCopy().mergeStyle(TextFormatting.GOLD)));
+			}
+		}
+		return lines;
 	}
 	
 	private void renderLoreIcon(MatrixStack matrixStackIn, Boolean loreIsDeep) {

@@ -18,13 +18,16 @@ import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.TextUtils;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
 
 public class ElementalArmorSet extends EquipmentSet {
 	
@@ -49,7 +52,8 @@ public class ElementalArmorSet extends EquipmentSet {
 		this.setBonuses = makeSetBonuses(baseID, element, type, hasFlying);
 	}
 	
-	protected final int getFullSetCount() {
+	@Override
+	public int getFullSetCount() {
 		return 4;
 	}
 	
@@ -112,22 +116,42 @@ public class ElementalArmorSet extends EquipmentSet {
 		final int idx = Math.min(setBonuses.size() - 1, setItems.size() - 1);
 		return setBonuses.get(idx);
 	}
+	
+	@Override
+	public Multimap<Attribute, AttributeModifier> getFullSetBonuses() {
+		return setBonuses.get(getFullSetCount() - 1);
+	}
 
 	@Override
-	public boolean isSetItem(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
+	public boolean isSetItem(ItemStack stack) {
 		return !stack.isEmpty()
 				&& stack.getItem() instanceof ElementalArmor
 				&& ((ElementalArmor) stack.getItem()).getElement() == this.element
 				&& ((ElementalArmor) stack.getItem()).getType() == this.type
-				&& isValidSlot(stack.getItem(), slot)
 				;
 	}
 	
-	protected boolean isValidSlot(Item item, IInventorySlotKey<LivingEntity> slot) {
+	@Override
+	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
+		if (stack.isEmpty()) {
+			return false;
+		}
+		
+		Item item = stack.getItem();
 		if (slot instanceof EquipmentSlotKey) {
 			return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getEquipmentSlot();
 		}
 		// else just guess? Could hardcode inventory numbers here
 		return false;
+	}
+	
+	@Override
+	public List<ITextComponent> getExtraBonuses(int setCount) {
+		final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
+				+ this.getRegistryName().getPath() + ".extra";
+		if (I18n.hasKey(extraKey)) {
+			return TextUtils.GetTranslatedList(extraKey);
+		}
+		return super.getExtraBonuses(setCount);
 	}
 }

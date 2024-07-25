@@ -49,7 +49,14 @@ public class BasicEquipmentSet extends EquipmentSet {
 		return setItems.values().stream().filter(i -> !i.isEmpty()).map(i -> i.getItem()).collect(Collectors.toSet()).size();
 	}
 	
-	protected boolean isValidSlot(Item item, IInventorySlotKey<LivingEntity> slot) {
+	@Override
+	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
+		if (stack.isEmpty()) {
+			return false;
+		}
+		
+		Item item = stack.getItem();
+		
 		// If item is armor, make sure it's in right slot
 		if (item instanceof ArmorItem) {
 			if (slot instanceof EquipmentSlotKey) {
@@ -69,16 +76,22 @@ public class BasicEquipmentSet extends EquipmentSet {
 	}
 
 	@Override
-	public boolean isSetItem(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
-		return !stack.isEmpty() && getSetItems().contains(stack.getItem()) && isValidSlot(stack.getItem(), slot);
+	public boolean isSetItem(ItemStack stack) {
+		return !stack.isEmpty() && getSetItems().contains(stack.getItem());
 	}
 
 	@Override
 	public void setTick(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
 		;
 	}
-	
-	public int getSetItemCount() {
+
+	@Override
+	public Multimap<Attribute, AttributeModifier> getFullSetBonuses() {
+		return setBonuses.get(getFullSetCount() - 1);
+	}
+
+	@Override
+	public int getFullSetCount() {
 		return getSetItems().size();
 	}
 	

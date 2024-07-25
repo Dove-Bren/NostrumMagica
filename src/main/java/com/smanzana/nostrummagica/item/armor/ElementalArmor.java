@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -20,8 +19,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
-import com.smanzana.nostrummagica.attribute.MagicPotencyAttribute;
-import com.smanzana.nostrummagica.attribute.MagicReductionAttribute;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -61,9 +58,7 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.block.SaplingBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -95,7 +90,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -396,13 +390,6 @@ public class ElementalArmor extends ArmorItem
 		return reduc;
 	}
 
-	private static final double calcMagicSetReduct(EquipmentSlotType slot, EMagicElement armorElement, Type type, int setCount,
-			EMagicElement targetElement) {
-		return CalcMagicSetReductTotal(armorElement, type, setCount, targetElement) / setCount; // split evenly amonst all
-																							// [setCount] pieces.
-		// COULD make different pieces make up bigger chunks of the pie but ehh
-	}
-
 	private static int calcArmorDurability(EquipmentSlotType slot, EMagicElement element, Type type) {
 		float mod = 1f;
 		switch (element) {
@@ -495,10 +482,6 @@ public class ElementalArmor extends ArmorItem
 		return mult * (total / 4);
 	}
 
-	private static double calcArmorMagicBoost(EquipmentSlotType slot, EMagicElement element, Type type, int setCount) {
-		return CalcArmorMagicBoostTotal(element, type, setCount) / setCount;
-	}
-	
 	private static int calcArmorToughness(EquipmentSlotType slot, EMagicElement element, Type type) {
 		return type.ordinal() + 2;
 	}
@@ -1304,140 +1287,11 @@ public class ElementalArmor extends ArmorItem
 		});
 	}
 
-	public static Map<Attribute, Double> FindCurrentSetBonus(@Nullable Map<Attribute, Double> map, LivingEntity entity,
-			EMagicElement element, Type type) {
-		if (map == null) {
-			map = new HashMap<>();
-		}
-
-		final int setCount = GetSetCount(entity, element, type);
-
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			if (slot.getSlotType() != Group.ARMOR) {
-				continue;
-			}
-
-			@Nonnull
-			ItemStack inSlot = entity.getItemStackFromSlot(slot);
-			if (inSlot.isEmpty() || !(inSlot.getItem() instanceof ElementalArmor)) {
-				continue;
-			}
-
-			ElementalArmor armorType = (ElementalArmor) inSlot.getItem();
-			final Type inSlotType = armorType.getType();
-			final EMagicElement inSlotElement = armorType.getElement();
-			if (inSlotType != type || inSlotElement != element) {
-				continue;
-			}
-
-			for (EMagicElement elem : EMagicElement.values()) {
-				final double reduct = calcMagicSetReduct(slot, element, inSlotType, setCount, elem);
-				if (reduct != 0) {
-					final MagicReductionAttribute inst = NostrumAttributes.GetReduceAttribute(elem);
-					Double cur = map.get(inst);
-					if (cur == null) {
-						cur = 0.0;
-					}
-
-					cur = cur + reduct;
-
-					map.put(inst, cur);
-				}
-			}
-
-			final double boost = calcArmorMagicBoost(slot, element, inSlotType, setCount);
-			if (boost != 0) {
-				final MagicPotencyAttribute inst = NostrumAttributes.magicPotency;
-				Double cur = map.get(inst);
-				if (cur == null) {
-					cur = 0.0;
-				}
-
-				cur = cur + boost;
-
-				map.put(inst, cur);
-			}
-		}
-
-		return map;
-	}
-
-	private Map<Attribute, Double> setMapInst = new HashMap<>();
-
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		final boolean showFull = Screen.hasShiftDown();
-		final @Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-		final int setCount = this.getSetPieces(player);
-
-		final String setName = I18n.format("item.nostrummagica.armor.set." + element.name().toLowerCase() + "."
-				+ type.name().toLowerCase() + ".name", new Object[0]);
-		if (showFull) {
-			tooltip.add(new TranslationTextComponent("info.armor.set_total", setName, TextFormatting.DARK_PURPLE,
-					TextFormatting.RESET));
-		} else {
-
-			final String countFormat = "" + (setCount == 4 ? TextFormatting.GOLD : TextFormatting.YELLOW);
-			tooltip.add(new TranslationTextComponent("info.armor.set_status", setName, setCount, countFormat,
-					"" + TextFormatting.RESET));
-		}
-
-		if (player != null) {
-
-			synchronized (setMapInst) {
-				setMapInst.clear();
-
-				if (showFull) {
-					// Show total
-					for (EMagicElement targElem : EMagicElement.values()) {
-						final double reduc = CalcMagicSetReductTotal(element, type, 4, targElem);
-						setMapInst.put(NostrumAttributes.GetReduceAttribute(targElem), reduc);
-					}
-					final double boost = CalcArmorMagicBoostTotal(element, type, 4);
-					setMapInst.put(NostrumAttributes.magicPotency, boost);
-				} else {
-					// Show current
-					FindCurrentSetBonus(setMapInst, player, element, type); // puts into setMapInst
-				}
-
-				if (!setMapInst.isEmpty()) {
-					for (Entry<Attribute, Double> entry : setMapInst.entrySet()) {
-						Double val = entry.getValue();
-						if (val == null || val == 0) {
-							continue;
-						}
-
-						// Formatting here copied from Vanilla
-						if (val > 0) {
-							tooltip.add((new TranslationTextComponent("attribute.modifier.plus.0",
-									ItemStack.DECIMALFORMAT.format(val),
-									new TranslationTextComponent(entry.getKey().getAttributeName())))
-											.mergeStyle(TextFormatting.BLUE));
-						} else {
-							val = -val;
-							tooltip.add((new TranslationTextComponent("attribute.modifier.take.0",
-									ItemStack.DECIMALFORMAT.format(val),
-									new TranslationTextComponent(entry.getKey().getAttributeName())))
-											.mergeStyle(TextFormatting.RED));
-						}
-					}
-				}
-			}
-
-			// Also show special bonuses
-			// TODO make this a bit more... extensible?
-			if (showFull || setCount == 4) {
-				final String key = "info.armor.set_bonus." + element.name().toLowerCase() + "."
-						+ type.name().toLowerCase();
-				if (I18n.hasKey(key)) {
-					final String full = I18n.format(key, new Object[0]);
-					for (String line : full.split("\\|"))
-						tooltip.add(new StringTextComponent(line).mergeStyle(TextFormatting.DARK_PURPLE));
-				}
-			}
-		}
-
+		super.addInformation(stack, worldIn, tooltip, flagIn);
+		
 		if (ElementalArmor.GetHasWingUpgrade(stack)) {
 			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").mergeStyle(TextFormatting.GOLD));
 		}

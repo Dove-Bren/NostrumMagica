@@ -74,16 +74,16 @@ public class MageArmorSet extends BasicEquipmentSet {
 				"XP Boost (Mage Set)", (double) xpBoost, AttributeModifier.Operation.ADDITION));
 		}
 		
+		if (regen != 0) {
+			builder.put(NostrumAttributes.manaRegen, new AttributeModifier(modifierID,
+				"Mana Regen (Mage Set)", (double) regen, AttributeModifier.Operation.ADDITION));
+		}
+		
 		if (reduc != 0) {
 			for (EMagicElement elem : EMagicElement.values()) {
 				builder.put(NostrumAttributes.GetReduceAttribute(elem), new AttributeModifier(modifierID,
 					"Magic Reduction (Mage Set)", (double) reduc, AttributeModifier.Operation.ADDITION));
 			}
-		}
-		
-		if (regen != 0) {
-			builder.put(NostrumAttributes.manaRegen, new AttributeModifier(modifierID,
-				"Mana Regen (Mage Set)", (double) regen, AttributeModifier.Operation.ADDITION));
 		}
 		
 		return builder.build();

@@ -271,26 +271,6 @@
     "item.nostrummagica.hookshot_strong": "Grand Hookshot",
     "item.nostrummagica.hookshot_claw": "Clawshot",
 
-    "item.nostrummagica.armor.set.physical.novice.name": "Sturdy",
-    "item.nostrummagica.armor.set.physical.adept.name": "Reinforced",
-    "item.nostrummagica.armor.set.physical.master.name": "Deep Metal",
-
-    "item.nostrummagica.armor.set.fire.novice.name": "Spark",
-    "item.nostrummagica.armor.set.fire.adept.name": "Fire",
-    "item.nostrummagica.armor.set.fire.master.name": "Lava",
-
-    "item.nostrummagica.armor.set.earth.novice.name": "Rock",
-    "item.nostrummagica.armor.set.earth.adept.name": "Earth",
-    "item.nostrummagica.armor.set.earth.master.name": "Tremor",
-
-    "item.nostrummagica.armor.set.ender.novice.name": "Endermite",
-    "item.nostrummagica.armor.set.ender.adept.name": "Enderman",
-    "item.nostrummagica.armor.set.ender.master.name": "Ender",
-
-    "item.nostrummagica.armor.set.ice.master.name": "Blizzard",
-    "item.nostrummagica.armor.set.lightning.master.name": "Storm",
-    "item.nostrummagica.armor.set.wind.master.name": "Hurricane",
-
     "item.nostrummagica.modifiers.dragonslot.body": "When on body:",
     "item.nostrummagica.modifiers.dragonslot.helm": "When on helm:",
 
@@ -320,6 +300,38 @@
 	"item.nostrummagica.copy_wand": "Copy Wand",
 	"item.nostrummagica.research_scroll_unlock": "Magic Transcript",
 	"item.nostrummagica.research_scroll_unlock.desc": "Unlocks the %1$s research",
+
+    "set.nostrummagica.magic_armor.physical.novice.name": "Sturdy Set",
+    "set.nostrummagica.magic_armor.physical.adept.name": "Reinforced Set",
+    "set.nostrummagica.magic_armor.physical.master.name": "Deep Metal Set",
+
+    "set.nostrummagica.magic_armor.fire.novice.name": "Spark Set",
+    "set.nostrummagica.magic_armor.fire.adept.name": "Fire Set",
+    "set.nostrummagica.magic_armor.fire.master.name": "Lava Set",
+
+    "set.nostrummagica.magic_armor.earth.novice.name": "Rock Set",
+    "set.nostrummagica.magic_armor.earth.adept.name": "Earth Set",
+    "set.nostrummagica.magic_armor.earth.master.name": "Tremor Set",
+
+    "set.nostrummagica.magic_armor.ender.novice.name": "Endermite Set",
+    "set.nostrummagica.magic_armor.ender.adept.name": "Enderman Set",
+    "set.nostrummagica.magic_armor.ender.master.name": "Ender Set",
+
+    "set.nostrummagica.magic_armor.ice.master.name": "Blizzard Set",
+    "set.nostrummagica.magic_armor.lightning.master.name": "Storm Set",
+    "set.nostrummagica.magic_armor.wind.master.name": "Hurricane Set",
+	
+	"set.nostrummagica.magearmor.name": "Novice Mage Set",
+
+    "set.nostrummagica.magic_armor.fire.novice.extra": "Reduced Flame Duration",
+    "set.nostrummagica.magic_armor.fire.adept.extra": "Halved Flame Duration",
+    "set.nostrummagica.magic_armor.fire.master.extra": "Lava Immunity|Dragon Gliding|Mana Jump",
+    "set.nostrummagica.magic_armor.earth.master.extra": "Growth Aura|Shatter Punch|Dragon Gliding|Mana Jump",
+    "set.nostrummagica.magic_armor.ender.master.extra": "Teleport Boost|Ender Dash|Dragon Gliding|Mana Jump",
+    "set.nostrummagica.magic_armor.physical.master.extra": "Dragon Gliding|Mana Jump",
+    "set.nostrummagica.magic_armor.ice.master.extra": "Snow Traveler|Blizzard Caller|Elytra Gliding|Mana Jump",
+    "set.nostrummagica.magic_armor.lightning.master.extra": "Lightning Channeling|Elytra Gliding|Mana Jump",
+    "set.nostrummagica.magic_armor.wind.master.extra": "Swift Sprint|Tornado Caller|Elytra Gliding|Mana Jump",
 	
 	"curios.identifier.pendant": "Pendant",
 
@@ -705,19 +717,6 @@
 	"mastery.novice.name": "Novice",
 	"mastery.adept.name": "Adept",
 	"mastery.master.name": "Master",
-
-    "info.armor.set_status": "%1$s Set Bonus %3$s(%2$d/4)%4$s",
-    "info.armor.set_total": "%1$s Set Bonus %2$s(Complete)%3$s",
-
-    "info.armor.set_bonus.fire.novice": "Reduced Flame Duration",
-    "info.armor.set_bonus.fire.adept": "Halved Flame Duration",
-    "info.armor.set_bonus.fire.master": "Lava Immunity|Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.earth.master": "Growth Aura|Shatter Punch|Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.ender.master": "Teleport Boost|Ender Dash|Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.physical.master": "Dragon Gliding|Mana Jump",
-    "info.armor.set_bonus.ice.master": "Snow Traveler|Blizzard Caller|Elytra Gliding|Mana Jump",
-    "info.armor.set_bonus.lightning.master": "Lightning Channeling|Elytra Gliding|Mana Jump",
-    "info.armor.set_bonus.wind.master": "Swift Sprint|Tornado Caller|Elytra Gliding|Mana Jump",
 
     "info.armor.wing_upgrade": "Dragon Wing Upgrade",
 

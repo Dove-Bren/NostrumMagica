@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.function.BiFunction;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
@@ -34,20 +35,30 @@ import net.minecraftforge.fml.LogicalSidedProvider;
 
 public class ItemSetListener {
 	
+	private static final class SetState {
+		public final Map<IInventorySlotKey<LivingEntity>, ItemStack> items;
+		public Multimap<Attribute, AttributeModifier> attributes;
+		
+		public SetState() {
+			this.items = new HashMap<>();
+			this.attributes = HashMultimap.create();
+		}
+	}
+	
 	private static final class EquipmentState {
 		public final Map<IInventorySlotKey<LivingEntity>, ItemStack> equipment;
-		public final Map<EquipmentSet, Map<IInventorySlotKey<LivingEntity>, ItemStack>> setItems;
+		public final Map<EquipmentSet, SetState> sets;
 		public final Multimap<Attribute, AttributeModifier> attributes;
 		
 		public EquipmentState() {
 			equipment = new HashMap<>();
-			setItems = new HashMap<>();
+			sets = new HashMap<>();
 			attributes = ArrayListMultimap.create();
 		}
 		
 		protected void setFrom(LivingEntity entity) {
 			equipment.clear();
-			setItems.clear();
+			sets.clear();
 			this.attributes.clear();
 			
 			// Scan inventory and record all equipment stacks
@@ -56,9 +67,9 @@ public class ItemSetListener {
 					equipment.put(slot, stack);
 					
 					for (EquipmentSet set : EquipmentSetRegistry.GetAllSets()) {
-						if (set.isSetItem(stack, slot)) {
-							setItems.computeIfAbsent(set, r -> new HashMap<>())
-								.put(slot, stack);
+						if (set.isSetItem(stack) && set.isSetItemValid(stack, slot)) {
+							sets.computeIfAbsent(set, r -> new SetState())
+								.items.put(slot, stack);
 						}
 					}
 				}
@@ -66,8 +77,11 @@ public class ItemSetListener {
 			});
 			
 			// Calculate set bonuses for all active sets
-			for (Entry<EquipmentSet, Map<IInventorySlotKey<LivingEntity>, ItemStack>> entry : setItems.entrySet()) {
-				this.attributes.putAll(entry.getKey().getSetBonuses(entity, entry.getValue()));
+			for (Entry<EquipmentSet, SetState> entry : sets.entrySet()) {
+				Multimap<Attribute, AttributeModifier> setAttribs = entry.getKey().getSetBonuses(entity, entry.getValue().items);
+				this.attributes.putAll(setAttribs);
+				entry.getValue().attributes.clear();
+				entry.getValue().attributes.putAll(setAttribs);
 			}
 		}
 	}
@@ -147,8 +161,8 @@ public class ItemSetListener {
 		}
 
 		EquipmentState state = getLastTickState(entity);
-		for (Entry<EquipmentSet, Map<IInventorySlotKey<LivingEntity>, ItemStack>> entry : state.setItems.entrySet()) {
-			this.onEntitySetTick(entity, entry.getKey(), entry.getValue());
+		for (Entry<EquipmentSet, SetState> entry : state.sets.entrySet()) {
+			this.onEntitySetTick(entity, entry.getKey(), entry.getValue().items);
 		}
 	}
 	
@@ -173,15 +187,23 @@ public class ItemSetListener {
 	
 	public Collection<EquipmentSet> getCurrentSets(LivingEntity entity) {
 		EquipmentState state = getLastTickState(entity);
-		return state.setItems.keySet();
+		return state.sets.keySet();
 	}
 	
-	public int getSetCount(LivingEntity entity, EquipmentSet set) {
+	public int getActiveSetCount(LivingEntity entity, EquipmentSet set) {
 		EquipmentState state = getLastTickState(entity);
-		if (state.setItems.containsKey(set)) {
-			return state.setItems.get(set).size();
+		if (state.sets.containsKey(set)) {
+			return state.sets.get(set).items.size();
 		}
 		return 0;
+	}
+	
+	public Multimap<Attribute, AttributeModifier> getActiveSetBonus(LivingEntity entity, EquipmentSet set) {
+		EquipmentState state = getLastTickState(entity);
+		if (state.sets.containsKey(set)) {
+			return state.sets.get(set).attributes;
+		}
+		return null;
 	}
 	
 }
