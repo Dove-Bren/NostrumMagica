@@ -281,7 +281,9 @@ public class SpellCasting {
 			att.addXP(xp);
 			
 			for (SpellEffectPart effect : spell.getSpellEffectParts()) {
-				final double attribute = entity.getAttributeValue(NostrumAttributes.GetXPAttribute(effect.getElement())) / 100.0;
+				final double attribute = (entity.getAttributeValue(NostrumAttributes.GetXPAttribute(effect.getElement()))
+						+ entity.getAttributeValue(NostrumAttributes.xpAllElements))
+						/ 100.0;
 				int elemXP = effect.getElementCount();
 				if (attribute > 0) {
 					elemXP += (int) attribute;

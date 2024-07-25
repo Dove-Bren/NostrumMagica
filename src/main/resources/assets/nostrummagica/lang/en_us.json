@@ -556,6 +556,8 @@
     "attribute.nostrummagica.magic_reduct_lightning.name.desc": "Flat reduction of lightning-aspected magical damage",
     "attribute.nostrummagica.magic_reduct_physical.name": "Physical Magic Reduction",
     "attribute.nostrummagica.magic_reduct_physical.name.desc": "Flat reduction of physically-aspected magical damage",
+    "attribute.nostrummagica.magic_reduct_all.name": "Spell Damage Reduction",
+    "attribute.nostrummagica.magic_reduct_all.name.desc": "Flat reduction of magical damage of any element",
     "attribute.nostrummagica.magic_potency.name": "Magic Potency",
     "attribute.nostrummagica.magic_potency.name.desc": "Bonus to potency of spells including outoging spell damage, healing, and effects",
     "attribute.nostrummagica.mana_regen.name": "Mana Regen",
@@ -580,6 +582,8 @@
 	"attribute.nostrummagica.elemxp_bonus_lightnin g.name.desc": "Increases the amount of lightning skill XP gained from spells",
 	"attribute.nostrummagica.elemxp_bonus_ender.name": "Ender XP Bonus",
 	"attribute.nostrummagica.elemxp_bonus_ender.name.desc": "Increases the amount of ender skill XP gained from spells",
+	"attribute.nostrummagica.elemxp_bonus_all.name": "Elemental XP Bonus",
+	"attribute.nostrummagica.elemxp_bonus_all.name.desc": "Increases the amount of elemental skill XP gained from spells",
 
     "config.nostrummagica.display": "Display Options",
     "config.nostrummagica.display.display_bar": "Mana Bar",

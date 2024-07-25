@@ -9,7 +9,6 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -80,10 +79,8 @@ public class MageArmorSet extends BasicEquipmentSet {
 		}
 		
 		if (reduc != 0) {
-			for (EMagicElement elem : EMagicElement.values()) {
-				builder.put(NostrumAttributes.GetReduceAttribute(elem), new AttributeModifier(modifierID,
+			builder.put(NostrumAttributes.reduceAll, new AttributeModifier(modifierID,
 					"Magic Reduction (Mage Set)", (double) reduc, AttributeModifier.Operation.ADDITION));
-			}
 		}
 		
 		return builder.build();

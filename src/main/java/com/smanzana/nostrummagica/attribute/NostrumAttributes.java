@@ -45,6 +45,7 @@ public class NostrumAttributes {
 	@ObjectHolder(ID_REDUCE_ICE) public static MagicReductionAttribute reduceIce;
 	@ObjectHolder(ID_REDUCE_LIGHTNING) public static MagicReductionAttribute reduceLightning;
 	@ObjectHolder(ID_REDUCE_WIND) public static MagicReductionAttribute reduceWind;
+	@ObjectHolder(AllMagicReductionAttribute.ID) public static AllMagicReductionAttribute reduceAll;
 	@ObjectHolder(MagicDamageAttribute.ID) public static MagicDamageAttribute magicDamage;
 	@ObjectHolder(ManaCostReductionAttribute.ID) public static ManaCostReductionAttribute manaCost;
 	@ObjectHolder(MagicXPBonusAttribute.ID) public static MagicXPBonusAttribute xpBonus;
@@ -55,6 +56,7 @@ public class NostrumAttributes {
 	@ObjectHolder(ID_XP_ICE) public static ElementXPBonusAttribute xpIce;
 	@ObjectHolder(ID_XP_LIGHTNING) public static ElementXPBonusAttribute xpLightning;
 	@ObjectHolder(ID_XP_WIND) public static ElementXPBonusAttribute xpWind;
+	@ObjectHolder(AllElementXPBonusAttribute.ID) public static AllElementXPBonusAttribute xpAllElements;
 	
 	protected static final String makeName(String base) {
 		return "attribute.nostrummagica." + base + ".name";
@@ -76,6 +78,8 @@ public class NostrumAttributes {
 		makeAndRegister(registry, MagicDamageAttribute::new, MagicDamageAttribute.ID);
 		makeAndRegister(registry, ManaCostReductionAttribute::new, ManaCostReductionAttribute.ID);
 		makeAndRegister(registry, MagicXPBonusAttribute::new, MagicXPBonusAttribute.ID);
+		makeAndRegister(registry, AllElementXPBonusAttribute::new, AllElementXPBonusAttribute.ID);
+		makeAndRegister(registry, AllMagicReductionAttribute::new, AllMagicReductionAttribute.ID);
 		
 		for (EMagicElement elem : EMagicElement.values()) {
 			final String REDUC_ID = MagicReductionAttribute.ID_PREFIX + elem.name().toLowerCase();
@@ -94,6 +98,8 @@ public class NostrumAttributes {
 			event.add(type, magicDamage);
 			event.add(type, manaCost);
 			event.add(type, xpBonus);
+			event.add(type, xpAllElements);
+			event.add(type, reduceAll);
 			for (EMagicElement elem : EMagicElement.values()) {
 				event.add(type, GetReduceAttribute(elem));
 				event.add(type, GetXPAttribute(elem));

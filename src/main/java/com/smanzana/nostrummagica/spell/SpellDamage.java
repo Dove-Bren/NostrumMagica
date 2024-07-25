@@ -338,9 +338,10 @@ public class SpellDamage {
 		}
 		
 		// Apply armor reductions
-		attr = target.getAttribute(NostrumAttributes.GetReduceAttribute(element));
-		if (attr != null && attr.getValue() != 0.0D) {
-			damage.finalFlat("FlatReducAttribute_" + element.getName(), (float) -attr.getValue());
+		final double reducAttrib = target.getAttributeValue(NostrumAttributes.GetReduceAttribute(element))
+				+ target.getAttributeValue(NostrumAttributes.reduceAll);
+		if (attr != null && reducAttrib != 0.0D) {
+			damage.finalFlat("FlatReducAttribute_" + element.getName(), (float) -reducAttrib);
 		}
 		
 		return damage.calc();
