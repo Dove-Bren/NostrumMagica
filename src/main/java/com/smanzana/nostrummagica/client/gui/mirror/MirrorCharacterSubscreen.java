@@ -112,7 +112,9 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			Attribute[] list = {
 					NostrumAttributes.magicPotency,
 					NostrumAttributes.manaRegen,
-					NostrumAttributes.magicResist
+					NostrumAttributes.manaCost,
+					NostrumAttributes.magicResist,
+					NostrumAttributes.magicDamage,
 			};
 			
 			for (Attribute attribute : list) {

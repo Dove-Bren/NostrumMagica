@@ -555,7 +555,9 @@
     "attribute.nostrummagica.mana_regen.name": "Mana Regen",
     "attribute.nostrummagica.mana_regen.name.desc": "Bonus to mana regen",
 	"attribute.nostrummagica.magic_damage.name": "Magic Damage",
-	"attribute.nostrummagica.magic_damage.desc": "Bonus to inflicting magic damage",
+	"attribute.nostrummagica.magic_damage.name.desc": "Bonus to inflicting magic damage",
+	"attribute.nostrummagica.mana_cost_reduction.name": "Mana Cost Reduction",
+	"attribute.nostrummagica.mana_cost_reduction.name.desc": "Discount on mana cost when casting spells",
 
     "config.nostrummagica.display": "Display Options",
     "config.nostrummagica.display.display_bar": "Mana Bar",

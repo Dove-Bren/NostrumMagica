@@ -7,10 +7,11 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.Validate;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
@@ -171,8 +172,6 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		}
 		
 		if (this.manaBonus != 0) attr.addManaBonus(this.attribID, this.manaBonus);
-		if (this.manaRegenModifier != 0) attr.addManaRegenModifier(this.attribID, this.manaRegenModifier);
-		if (this.manaCostModifier != 0) attr.addManaCostModifier(this.attribID, this.manaCostModifier);
 		
 		if (entity instanceof ServerPlayerEntity) {
 			NetworkHandler.sendTo(
@@ -189,8 +188,6 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		}
 		
 		attr.removeManaBonus(this.attribID);
-		attr.removeManaRegenModifier(this.attribID);
-		attr.removeManaCostModifier(this.attribID);
 		
 		if (entity instanceof ServerPlayerEntity) {
 			NetworkHandler.sendTo(
@@ -216,12 +213,26 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	
 	@Override
 	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
-		summary.addEfficiency(this.castEfficiency);
+		;
 	}
 
 	@Override
 	public Multimap<Attribute,AttributeModifier> getEquippedAttributeModifiers(ItemStack stack) {
-		return HashMultimap.create();
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+
+		if (manaCostModifier != 0f) {
+			builder.put(NostrumAttributes.manaCost, new AttributeModifier(this.attribID, "Mana Cost Reduc (Curio)", -manaCostModifier * 100, AttributeModifier.Operation.ADDITION));
+		}
+		
+		if (manaRegenModifier != 0f) {
+			builder.put(NostrumAttributes.manaRegen, new AttributeModifier(this.attribID, "Mana Regen (Curio)", manaRegenModifier * 100, AttributeModifier.Operation.ADDITION));
+		}
+
+		if (castEfficiency != 0f) {
+			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(this.attribID, "Potency (Curio)", this.castEfficiency * 100, AttributeModifier.Operation.ADDITION));
+		}
+		
+		return builder.build();
 	}
 
 	@OnlyIn(Dist.CLIENT)

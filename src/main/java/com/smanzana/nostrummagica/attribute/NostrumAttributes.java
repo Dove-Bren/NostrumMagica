@@ -38,6 +38,7 @@ public class NostrumAttributes {
 	@ObjectHolder(ID_REDUCE_LIGHTNING) public static MagicReductionAttribute reduceLightning;
 	@ObjectHolder(ID_REDUCE_WIND) public static MagicReductionAttribute reduceWind;
 	@ObjectHolder(MagicDamageAttribute.ID) public static MagicDamageAttribute magicDamage;
+	@ObjectHolder(ManaCostReductionAttribute.ID) public static ManaCostReductionAttribute manaCost;
 	
 	protected static final String makeName(String base) {
 		return "attribute.nostrummagica." + base + ".name";
@@ -57,6 +58,7 @@ public class NostrumAttributes {
 		makeAndRegister(registry, MagicPotencyAttribute::new, MagicPotencyAttribute.ID);
 		makeAndRegister(registry, ManaRegenAttribute::new, ManaRegenAttribute.ID);
 		makeAndRegister(registry, MagicDamageAttribute::new, MagicDamageAttribute.ID);
+		makeAndRegister(registry, ManaCostReductionAttribute::new, ManaCostReductionAttribute.ID);
 		
 		for (EMagicElement elem : EMagicElement.values()) {
 			final String ID = MagicReductionAttribute.ID_PREFIX + elem.name().toLowerCase();
@@ -71,6 +73,7 @@ public class NostrumAttributes {
 			event.add(type, magicPotency);
 			event.add(type, manaRegen);
 			event.add(type, magicDamage);
+			event.add(type, manaCost);
 			for (EMagicElement elem : EMagicElement.values()) {
 				event.add(type, GetReduceAttribute(elem));
 			}

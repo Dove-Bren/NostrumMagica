@@ -117,8 +117,9 @@ public class SpellCasting {
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);
 		
-		// Add the player's personal bonuses
+		// Add cost reduction
 		summary.addCostRate(att.getManaCostModifier());
+		summary.addCostRate(-(float) entity.getAttribute(NostrumAttributes.manaCost).getValue() / 100f);
 		
 		// Add tome enchancements
 		if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
@@ -132,7 +133,7 @@ public class SpellCasting {
 			// Cap enhancements at 80% LRC
 			float lrc = summary.getReagentCost();
 			if (lrc < .2f)
-				summary.addCostRate(.2f - lrc); // Add however much we need to get to .2
+				summary.addReagentCost(.2f - lrc); // Add however much we need to get to .2
 		}
 		
 		// Visit an equipped spell armor
