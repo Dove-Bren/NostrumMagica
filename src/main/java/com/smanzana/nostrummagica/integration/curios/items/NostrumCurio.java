@@ -1,7 +1,11 @@
 package com.smanzana.nostrummagica.integration.curios.items;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -54,6 +58,8 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	public static final String ID_RING_SILVER = "ring_silver";
 	public static final String ID_RING_SILVER_TRUE = "ring_silver_true";
 	public static final String ID_RING_SILVER_CORRUPTED = "ring_silver_corrupted";
+	public static final String ID_RING_MYSTIC = "ring_mystic";
+	public static final String ID_RING_MAGE = "ring_mage";
 
 	private boolean requiresMagic; // To equip
 	
@@ -62,12 +68,14 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	private float manaCostModifier;
 	private float castEfficiency;
 	private UUID attribID;
+	private final Map<Supplier<Attribute>, AttributeModifier> modifiers;
 	
 	private final String desckey;
 	
 	public NostrumCurio(Item.Properties builder, String descKey) {
 		super(builder);
 		this.desckey = descKey;
+		this.modifiers = new HashMap<>();
 	}
 	
 	public NostrumCurio requiresMagic() {
@@ -100,6 +108,11 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 
 	public NostrumCurio castEfficiency(float castEfficiency) {
 		this.castEfficiency = castEfficiency;
+		return this;
+	}
+	
+	public NostrumCurio attribute(Supplier<Attribute> attribute, AttributeModifier modifier) {
+		this.modifiers.put(attribute, modifier);
 		return this;
 	}
 	
@@ -219,6 +232,13 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	@Override
 	public Multimap<Attribute,AttributeModifier> getEquippedAttributeModifiers(ItemStack stack) {
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		
+		for (Entry<Supplier<Attribute>, AttributeModifier> entry : modifiers.entrySet()) {
+			final Attribute attribute = entry.getKey().get();
+			if (attribute != null) {
+				builder.put(attribute, entry.getValue());
+			}
+		}
 
 		if (manaCostModifier != 0f) {
 			builder.put(NostrumAttributes.manaCost, new AttributeModifier(this.attribID, "Mana Cost Reduc (Curio)", -manaCostModifier * 100, AttributeModifier.Operation.ADDITION));

@@ -240,6 +240,8 @@
     "item.nostrummagica.ring_silver_true": "True Silver Ring",
     "item.nostrummagica.ring_gold_corrupted": "Corrupted Gold Ring",
     "item.nostrummagica.ring_silver_corrupted": "Corrupted Silver Ring",
+    "item.nostrummagica.ring_mystic": "Mystic's Ring",
+    "item.nostrummagica.ring_mage": "Mage's Ring",
     "item.nostrummagica.float_guard": "Charm of Stability",
     "item.nostrummagica.float_guard.desc": "Guards against levitation and|rooted status effects while worn",
     "item.nostrummagica.dragon_wing_pendant": "Dragonwing Pendant",

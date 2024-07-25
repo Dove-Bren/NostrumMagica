@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.item.armor;
 
 import java.util.UUID;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
@@ -30,9 +29,43 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	public static final String ID_CHEST = ID_PREFIX + "chest";
 	public static final String ID_LEGS = ID_PREFIX + "legs";
 	public static final String ID_FEET = ID_PREFIX + "feet";
+	
+	protected Multimap<Attribute, AttributeModifier> attributes;
 
 	public MageArmor(EquipmentSlotType slot, Item.Properties properties) {
 		super(ArmorMaterial.LEATHER, slot, properties.maxDamage(250));
+	}
+	
+	protected Multimap<Attribute, AttributeModifier> makeAttributes() {
+		final int armor;
+		final float potency = 2.5f;
+		switch (slot) {
+		case CHEST:
+			armor = 6;
+			break;
+		case FEET:
+			armor = 3;
+			break;
+		case HEAD:
+			armor = 3;
+			break;
+		case LEGS:
+			armor = 5;
+			break;
+		case MAINHAND:
+		case OFFHAND:
+		default:
+			armor = 0;
+			break;
+		
+		}
+		
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		builder.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[this.slot.getIndex()],
+				"Armor modifier", (double) armor, AttributeModifier.Operation.ADDITION));
+		builder.put(NostrumAttributes.magicPotency, new AttributeModifier(ARMOR_MODIFIERS[this.slot.getIndex()],
+				"Magic Potency", (double) potency, AttributeModifier.Operation.ADDITION));
+		return builder.build();
 	}
 	
 //	public String getModelID() {
@@ -51,42 +84,14 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
-
 		if (equipmentSlot == this.slot) {
-			final int armor;
-			final int potency = 5;
-			switch (slot) {
-			case CHEST:
-				armor = 6;
-				break;
-			case FEET:
-				armor = 3;
-				break;
-			case HEAD:
-				armor = 3;
-				break;
-			case LEGS:
-				armor = 5;
-				break;
-			case MAINHAND:
-			case OFFHAND:
-			default:
-				armor = 0;
-				break;
-			
+			if (attributes == null) {
+				attributes = this.makeAttributes();
 			}
-			
-			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-			builder.putAll(multimap);
-			builder.put(Attributes.ARMOR, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()],
-					"Armor modifier", (double) armor, AttributeModifier.Operation.ADDITION));
-			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(ARMOR_MODIFIERS[equipmentSlot.getIndex()],
-					"Magic Potency", (double) potency, AttributeModifier.Operation.ADDITION));
-			multimap = builder.build();
+			return attributes;
 		}
-
-		return multimap;
+		
+		return ImmutableMultimap.of();
 	}
 	
 	@Override

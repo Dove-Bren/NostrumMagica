@@ -40,8 +40,8 @@ public class MageArmorSet extends BasicEquipmentSet {
 				() -> NostrumItems.mageArmorChest,
 				() -> NostrumItems.mageArmorLegs,
 				() -> NostrumItems.mageArmorFeet,
-				() -> NostrumCurios.ringCorruptedSilver,
-				() -> NostrumCurios.ringCorruptedGold
+				() -> NostrumCurios.ringMage,
+				() -> NostrumCurios.ringMystic
 			};
 		return (MageArmorSet) (new Builder(items)
 				.addBonus(MakeBonus(1, modifierID))
@@ -58,7 +58,7 @@ public class MageArmorSet extends BasicEquipmentSet {
 		
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		
-		final double potency = new int[]{0, 5, 5, 10, 10, 20}[pieces-1];
+		final double potency = new int[]{0, 5, 5, 10, 10, 15}[pieces-1];
 		final double xpBoost = new int[]{0, 0, 5, 5, 10, 15}[pieces-1];
 		final double reduc = new float[]{0, 0, .5f, .5f, 1f, 1f}[pieces-1];
 		final double regen = new float[]{0, 5, 5, 10, 20, 30}[pieces-1];

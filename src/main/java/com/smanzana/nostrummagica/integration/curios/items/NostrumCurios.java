@@ -3,8 +3,10 @@ package com.smanzana.nostrummagica.integration.curios.items;
 import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -30,6 +32,8 @@ public class NostrumCurios {
 	@ObjectHolder(NostrumCurio.ID_RING_SILVER) public static NostrumCurio ringSilver;
 	@ObjectHolder(NostrumCurio.ID_RING_SILVER_TRUE) public static NostrumCurio ringTrueSilver;
 	@ObjectHolder(NostrumCurio.ID_RING_SILVER_CORRUPTED) public static NostrumCurio ringCorruptedSilver;
+	@ObjectHolder(NostrumCurio.ID_RING_MYSTIC) public static NostrumCurio ringMystic;
+	@ObjectHolder(NostrumCurio.ID_RING_MAGE) public static NostrumCurio ringMage;
 	@ObjectHolder(FloatGuardItem.ID) public static FloatGuardItem floatGuard;
 	@ObjectHolder(DragonWingPendantItem.ID) public static DragonWingPendantItem dragonWingPendant;
 	
@@ -46,6 +50,8 @@ public class NostrumCurios {
 	private static final UUID attrIDRingSilver = UUID.fromString("E78127C4-711C-11EE-B962-0242AC120002");
 	private static final UUID attrIDRingTrueSilver = UUID.fromString("E78129EA-711C-11EE-B962-0242AC120002");
 	private static final UUID attrIDRingCorruptedSilver = UUID.fromString("3E862EE8-711D-11EE-B962-0242AC120002");
+	private static final UUID attrIDRingMystic = UUID.fromString("527667bf-2244-4057-a480-85fb28489e6b");
+	private static final UUID attrIDRingMage = UUID.fromString("4e823af7-2faa-4e4e-9ee7-b1cf1240cf04");
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
@@ -148,6 +154,20 @@ public class NostrumCurios {
 				.castEfficiency(.10f)
 				.setRegistryName(NostrumCurio.ID_RING_SILVER_CORRUPTED));
 		
+		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RING_MYSTIC)
+				.attrID(attrIDRingMystic)
+				.requiresMagic()
+				.attribute(() -> NostrumAttributes.xpAllElements, new AttributeModifier(attrIDRingMystic, "Mystic Ring", 10.0, AttributeModifier.Operation.ADDITION))
+				.setRegistryName(NostrumCurio.ID_RING_MYSTIC)
+				);
+		
+		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RING_MAGE)
+				.attrID(attrIDRingMage)
+				.requiresMagic()
+				.manaRegenModifier(.10f)
+				.setRegistryName(NostrumCurio.ID_RING_MAGE)
+				);
+		
 		registry.register(new FloatGuardItem().setRegistryName(FloatGuardItem.ID));
 		registry.register(new DragonWingPendantItem().setRegistryName(DragonWingPendantItem.ID));
 	}
@@ -168,6 +188,8 @@ public class NostrumCurios {
 		LoreRegistry.instance().register(ringCorruptedSilver);
 		LoreRegistry.instance().register(floatGuard);
 		LoreRegistry.instance().register(dragonWingPendant);
+		LoreRegistry.instance().register(ringMystic);
+		LoreRegistry.instance().register(ringMage);
 	}
 	
 }
