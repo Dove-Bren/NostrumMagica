@@ -11,11 +11,13 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -47,6 +49,19 @@ public class BasicEquipmentSet extends EquipmentSet {
 		return setItems.values().stream().filter(i -> !i.isEmpty()).map(i -> i.getItem()).collect(Collectors.toSet()).size();
 	}
 	
+	protected boolean isValidSlot(Item item, IInventorySlotKey<LivingEntity> slot) {
+		// If item is armor, make sure it's in right slot
+		if (item instanceof ArmorItem) {
+			if (slot instanceof EquipmentSlotKey) {
+				return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getEquipmentSlot();
+			}
+			// else just guess? Could hardcode inventory numbers here
+			return false;
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
 		final int idx = Math.min(setBonuses.size() - 1, getUniqueItemCount(setItems) - 1);
@@ -54,8 +69,8 @@ public class BasicEquipmentSet extends EquipmentSet {
 	}
 
 	@Override
-	public boolean isSetItem(ItemStack stack) {
-		return !stack.isEmpty() && getSetItems().contains(stack.getItem());
+	public boolean isSetItem(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
+		return !stack.isEmpty() && getSetItems().contains(stack.getItem()) && isValidSlot(stack.getItem(), slot);
 	}
 
 	@Override

@@ -56,7 +56,7 @@ public class ItemSetListener {
 					equipment.put(slot, stack);
 					
 					for (EquipmentSet set : EquipmentSetRegistry.GetAllSets()) {
-						if (set.isSetItem(stack)) {
+						if (set.isSetItem(stack, slot)) {
 							setItems.computeIfAbsent(set, r -> new HashMap<>())
 								.put(slot, stack);
 						}

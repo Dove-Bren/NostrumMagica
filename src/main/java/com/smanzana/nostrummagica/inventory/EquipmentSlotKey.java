@@ -38,5 +38,9 @@ public class EquipmentSlotKey implements IInventorySlotKey<LivingEntity> {
 	public int hashCode() {
 		return Objects.hash(slot);
 	}
+	
+	public EquipmentSlotType getSlotType() {
+		return this.slot;
+	}
 
 }
