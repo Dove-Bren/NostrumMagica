@@ -32,6 +32,8 @@ public class BasicEquipmentSet extends EquipmentSet {
 	private final Set<Item> setItemsComputed;
 	protected final List<Multimap<Attribute, AttributeModifier>> setBonuses;
 	
+	protected boolean requireUniqueItems = true;
+	
 	private boolean computedItems;
 	
 	protected BasicEquipmentSet(List<Supplier<Item>> setItems, List<Multimap<Attribute, AttributeModifier>> setBonuses) {
@@ -51,7 +53,11 @@ public class BasicEquipmentSet extends EquipmentSet {
 	}
 	
 	protected int getUniqueItemCount(Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems) {
-		return setItems.values().stream().filter(i -> !i.isEmpty()).map(i -> i.getItem()).collect(Collectors.toSet()).size();
+		if (requireUniqueItems) {
+			return setItems.values().stream().filter(i -> !i.isEmpty()).map(i -> i.getItem()).collect(Collectors.toSet()).size();
+		} else {
+			return setItems.size();
+		}
 	}
 	
 	protected boolean itemIsWeaponOrTool(Item item) {
@@ -62,12 +68,17 @@ public class BasicEquipmentSet extends EquipmentSet {
 	}
 	
 	@Override
-	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot) {
+	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> existingItems) {
 		if (stack.isEmpty()) {
 			return false;
 		}
 		
 		Item item = stack.getItem();
+		
+		// If unique items are required, check that first
+		if (requireUniqueItems && existingItems.values().stream().filter(i -> !i.isEmpty()).map(s -> s.getItem()).filter(i -> i == item).findAny().isPresent()) {
+			return false;
+		}
 		
 		// If item is armor, make sure it's in right slot
 		if (item instanceof ArmorItem) {

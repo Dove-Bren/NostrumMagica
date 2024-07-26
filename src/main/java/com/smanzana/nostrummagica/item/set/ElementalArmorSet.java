@@ -136,7 +136,7 @@ public class ElementalArmorSet extends EquipmentSet {
 	}
 	
 	@Override
-	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot) {
+	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> existingItems) {
 		if (stack.isEmpty()) {
 			return false;
 		}

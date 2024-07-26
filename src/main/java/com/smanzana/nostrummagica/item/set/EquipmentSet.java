@@ -23,7 +23,7 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 	
 	public abstract boolean isSetItem(ItemStack stack);
 	
-	public abstract boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot);
+	public abstract boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> existingItems);
 	
 	public abstract void setTick(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems);
 	

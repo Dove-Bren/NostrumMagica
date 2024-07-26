@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.tasks.KoidTask;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
+import com.smanzana.nostrummagica.item.set.NostrumEquipmentSets;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -145,9 +146,12 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         return false;
     }
 
-    public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner)
-    {
-        return target != this;
+    @Override
+    public boolean canAttack(LivingEntity target) {
+        return target != this
+        		&& target != null
+        		&& target.isAlive()
+        		&& NostrumMagica.itemSetListener.getActiveSetCount(target, NostrumEquipmentSets.koidSet) < 3;
     }
 
     public boolean canBeLeashedTo(PlayerEntity player)

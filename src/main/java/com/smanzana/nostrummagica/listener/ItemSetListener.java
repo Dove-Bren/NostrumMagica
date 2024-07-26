@@ -67,7 +67,9 @@ public class ItemSetListener {
 					equipment.put(slot, stack);
 					
 					for (EquipmentSet set : EquipmentSetRegistry.GetAllSets()) {
-						if (set.isSetItem(stack) && set.isSetItemValid(stack, slot)) {
+						final Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> existing =
+								sets.containsKey(set) ? sets.get(set).items : new HashMap<>();
+						if (set.isSetItem(stack) && set.isSetItemValid(stack, slot, existing)) {
 							sets.computeIfAbsent(set, r -> new SetState())
 								.items.put(slot, stack);
 						}
