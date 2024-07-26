@@ -59,7 +59,7 @@ public class NostrumCurios {
 	private static final UUID attrIDRingMage = UUID.fromString("4e823af7-2faa-4e4e-9ee7-b1cf1240cf04");
 	private static final UUID attrIDRingKoid = UUID.fromString("fea6bb8e-c94d-4336-a369-0fa8d9532d26");
 	private static final UUID attrIDRingGolem = UUID.fromString("fd3f32c6-5bca-46cc-8aea-cd8b755942b0");
-	//private static final UUID attrIDNeckKoid = UUID.fromString("56c51fc2-63eb-427f-bbdf-2f1129e8f251");
+	private static final UUID attrIDNeckKoid = UUID.fromString("56c51fc2-63eb-427f-bbdf-2f1129e8f251");
 	private static final UUID attrIDBeltGolem = UUID.fromString("cbdf56ed-85f2-41b1-b050-25a482bf1663");
 	
 	public static Item.Properties PropBase() {
@@ -173,20 +173,23 @@ public class NostrumCurios {
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RING_MAGE)
 				.attrID(attrIDRingMage)
 				.requiresMagic()
-				.manaRegenModifier(.10f)
+				.manaRegenModifier(.25f)
 				.setRegistryName(NostrumCurio.ID_RING_MAGE)
 				);
 		
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RING_KOID)
 				.attrID(attrIDRingKoid)
 				.requiresMagic()
-				.castEfficiency(.05f)
-				.manaRegenModifier(.10f)
+				.attribute(() -> NostrumAttributes.magicDamage, new AttributeModifier(attrIDRingKoid, "Koid Ring", 10.0, AttributeModifier.Operation.ADDITION))
+				.manaRegenModifier(.20f)
 				.setRegistryName(NostrumCurio.ID_RING_KOID)
 				);
 		
 		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_NECK_KOID)
+				.attrID(attrIDNeckKoid)
 				.requiresMagic()
+				.attribute(() -> NostrumAttributes.magicDamage, new AttributeModifier(attrIDNeckKoid, "Koid Necklace", 15.0, AttributeModifier.Operation.ADDITION))
+				.manaBonus(25)
 				.setRegistryName(NostrumCurio.ID_NECK_KOID)
 				);
 		
@@ -202,7 +205,8 @@ public class NostrumCurios {
 				.attrID(attrIDBeltGolem)
 				.requiresMagic()
 				.attribute(() -> NostrumAttributes.reduceAll, new AttributeModifier(attrIDBeltGolem, "Golem Belt", 0.25, AttributeModifier.Operation.ADDITION))
-				.attribute(() -> Attributes.MOVEMENT_SPEED, new AttributeModifier(attrIDBeltGolem, "Golem Belt", -0.05, AttributeModifier.Operation.MULTIPLY_BASE))
+				.attribute(() -> Attributes.MOVEMENT_SPEED, new AttributeModifier(attrIDBeltGolem, "Golem Belt", -0.075, AttributeModifier.Operation.MULTIPLY_BASE))
+				.attribute(() -> Attributes.ATTACK_DAMAGE, new AttributeModifier(attrIDBeltGolem, "Golem Belt", 1, AttributeModifier.Operation.ADDITION))
 				.setRegistryName(NostrumCurio.ID_BELT_GOLEM)
 				);
 		

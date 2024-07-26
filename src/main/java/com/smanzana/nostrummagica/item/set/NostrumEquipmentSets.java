@@ -2,13 +2,20 @@ package com.smanzana.nostrummagica.item.set;
 
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
+import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalFireArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -48,6 +55,8 @@ public class NostrumEquipmentSets {
 	private static final String ID_MAGICARMOR_ENDER_ADEPT = ID_MAGICARMOR_ENDER + ".adept";
 	private static final String ID_MAGICARMOR_ENDER_MASTER = ID_MAGICARMOR_ENDER + ".master";
 	private static final String ID_MAGEARMOR = "magearmor";
+	private static final String ID_KOID = "koid";
+	private static final String ID_GOLEM = "golem";
 	
 	private static final UUID SET_UUID_PHYSICAL_NOVICE = UUID.fromString("7164440b-20da-4b04-9e3f-491515ff57d8");
 	private static final UUID SET_UUID_PHYSICAL_ADEPT = UUID.fromString("2bf205b7-ec52-40d5-bf91-ec94b665139f");
@@ -71,6 +80,8 @@ public class NostrumEquipmentSets {
 	private static final UUID SET_UUID_ENDER_ADEPT = UUID.fromString("e0587390-70dc-4f5c-a8fb-43843d23da3d");
 	private static final UUID SET_UUID_ENDER_MASTER = UUID.fromString("d1b8b185-1b88-4444-ae01-1d9aea11db80");
 	private static final UUID SET_UUID_MAGE = UUID.fromString("bd077649-e7dc-406f-874d-98fbc1404c6b");
+	private static final UUID SET_UUID_KOID = UUID.fromString("e168a2bd-1f68-48f6-b5d4-5b6eafb3243e");
+	private static final UUID SET_UUID_GOLEM = UUID.fromString("724dccca-56bd-48f3-ab8f-5b6653a275c5");
 	
 	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_NOVICE) public static ElementalArmorSet physicalNoviceArmor;
 	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_ADEPT) public static ElementalArmorSet physicalAdeptArmor;
@@ -94,6 +105,8 @@ public class NostrumEquipmentSets {
 	@ObjectHolder(ID_MAGICARMOR_ENDER_ADEPT) public static ElementalArmorSet enderAdeptArmor;
 	@ObjectHolder(ID_MAGICARMOR_ENDER_MASTER) public static ElementalArmorSet enderMasterArmor;
 	@ObjectHolder(ID_MAGEARMOR) public static BasicEquipmentSet mageArmor;
+	@ObjectHolder(ID_KOID) public static BasicEquipmentSet koidSet;
+	@ObjectHolder(ID_GOLEM) public static BasicEquipmentSet golem;
 	
 	@SubscribeEvent
 	public static void registerSets(RegistryEvent.Register<EquipmentSet> event) {
@@ -128,6 +141,42 @@ public class NostrumEquipmentSets {
 		registry.register(makeSet(ID_MAGICARMOR_ENDER_MASTER, SET_UUID_ENDER_MASTER, EMagicElement.ENDER, ElementalArmor.Type.MASTER, true, null));
 		
 		registry.register(MageArmorSet.Build(SET_UUID_MAGE).setRegistryName(NostrumMagica.Loc(ID_MAGEARMOR)));
+
+		{
+		@SuppressWarnings("unchecked")
+		Supplier<Item>[] items = new Supplier[]{
+				() -> NostrumItems.koidHelm,
+				() -> NostrumCurios.neckKoid,
+				() -> NostrumCurios.ringKoid,
+			};
+			registry.register(new BasicEquipmentSet.Builder(items)
+				.addEmptyBonus()
+				.addBonus(ImmutableMultimap.of(
+						NostrumAttributes.magicDamage, new AttributeModifier(SET_UUID_KOID, "Koid Set", 10.0, AttributeModifier.Operation.ADDITION),
+						NostrumAttributes.manaRegen, new AttributeModifier(SET_UUID_KOID, "Koid Set", 25.0, AttributeModifier.Operation.ADDITION)
+						))
+				.addLastBonus()
+				.build().setRegistryName(NostrumMagica.Loc(ID_KOID)));
+		}
+
+		{
+			@SuppressWarnings("unchecked")
+			Supplier<Item>[] items = new Supplier[]{
+					() -> NostrumItems.thanoPendant,
+					() -> NostrumCurios.beltGolem,
+					() -> NostrumCurios.ringGolem,
+				};
+			registry.register(new BasicEquipmentSet.Builder(items)
+				.addEmptyBonus()
+				.addBonus(ImmutableMultimap.of(
+						NostrumAttributes.reduceAll, new AttributeModifier(SET_UUID_GOLEM, "Golem Set", 0.25, AttributeModifier.Operation.ADDITION)
+						))
+				.addBonus(ImmutableMultimap.of(
+						NostrumAttributes.reduceAll, new AttributeModifier(SET_UUID_GOLEM, "Golem Set", 0.5, AttributeModifier.Operation.ADDITION),
+						NostrumAttributes.xpAllElements, new AttributeModifier(SET_UUID_GOLEM, "Golem Set", 20.0, AttributeModifier.Operation.ADDITION)
+						))
+				.build().setRegistryName(NostrumMagica.Loc(ID_GOLEM)));
+		}
 		
 	}
 	

@@ -1241,7 +1241,7 @@ public class OverlayRenderer extends AbstractGui {
 			
 			List<ITextComponent> extras = set.getExtraBonuses(showFull ? maxCount : count);
 			if (extras != null && !extras.isEmpty()) {
-				extras.forEach(t -> lines.add(t.deepCopy().mergeStyle(TextFormatting.GOLD)));
+				extras.forEach(t -> lines.add(t.deepCopy().mergeStyle(TextFormatting.DARK_AQUA)));
 			}
 		}
 		return lines;

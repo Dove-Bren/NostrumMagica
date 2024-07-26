@@ -246,6 +246,7 @@
     "item.nostrummagica.ring_mage": "Mage's Ring",
     "item.nostrummagica.ring_koid": "Koid Ring",
     "item.nostrummagica.necklace_koid": "Koid Amulet",
+    "item.nostrummagica.necklace_koid.desc": "%2$s+25 Mana%1$s",
     "item.nostrummagica.ring_golem": "Golem Ring",
     "item.nostrummagica.belt_golem": "Golem Belt",
     "item.nostrummagica.float_guard": "Charm of Stability",
@@ -330,6 +331,8 @@
     "set.nostrummagica.magic_armor.wind.master.name": "Hurricane Set",
 	
 	"set.nostrummagica.magearmor.name": "Novice Mage Set",
+	"set.nostrummagica.koid.name": "Koid Set",
+	"set.nostrummagica.golem.name": "Golem Set",
 
     "set.nostrummagica.magic_armor.fire.novice.extra": "Reduced Flame Duration",
     "set.nostrummagica.magic_armor.fire.adept.extra": "Halved Flame Duration",
@@ -340,6 +343,7 @@
     "set.nostrummagica.magic_armor.ice.master.extra": "Snow Traveler|Blizzard Caller|Elytra Gliding|Mana Jump",
     "set.nostrummagica.magic_armor.lightning.master.extra": "Lightning Channeling|Elytra Gliding|Mana Jump",
     "set.nostrummagica.magic_armor.wind.master.extra": "Swift Sprint|Tornado Caller|Elytra Gliding|Mana Jump",
+	"set.nostrummagica.koid.extra": "Friend of Koids",
 	
 	"curios.identifier.pendant": "Pendant",
 

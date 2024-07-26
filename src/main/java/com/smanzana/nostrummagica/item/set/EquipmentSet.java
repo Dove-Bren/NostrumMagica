@@ -6,7 +6,9 @@ import java.util.Map;
 
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
+import com.smanzana.nostrummagica.util.TextUtils;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -38,6 +40,11 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 	public abstract int getFullSetCount();
 
 	public List<ITextComponent> getExtraBonuses(int setCount) {
+		final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
+				+ this.getRegistryName().getPath() + ".extra";
+		if (I18n.hasKey(extraKey)) {
+			return TextUtils.GetTranslatedList(extraKey);
+		}
 		return new ArrayList<>();
 	}
 	

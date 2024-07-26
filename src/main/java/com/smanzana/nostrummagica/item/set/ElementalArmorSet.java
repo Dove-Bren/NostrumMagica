@@ -18,9 +18,7 @@ import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -153,11 +151,6 @@ public class ElementalArmorSet extends EquipmentSet {
 	
 	@Override
 	public List<ITextComponent> getExtraBonuses(int setCount) {
-		final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
-				+ this.getRegistryName().getPath() + ".extra";
-		if (I18n.hasKey(extraKey)) {
-			return TextUtils.GetTranslatedList(extraKey);
-		}
 		return super.getExtraBonuses(setCount);
 	}
 }
