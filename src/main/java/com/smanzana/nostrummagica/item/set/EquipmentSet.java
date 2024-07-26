@@ -40,10 +40,12 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 	public abstract int getFullSetCount();
 
 	public List<ITextComponent> getExtraBonuses(int setCount) {
-		final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
-				+ this.getRegistryName().getPath() + ".extra";
-		if (I18n.hasKey(extraKey)) {
-			return TextUtils.GetTranslatedList(extraKey);
+		if (setCount == this.getFullSetCount()) {
+			final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
+					+ this.getRegistryName().getPath() + ".extra";
+			if (I18n.hasKey(extraKey)) {
+				return TextUtils.GetTranslatedList(extraKey);
+			}
 		}
 		return new ArrayList<>();
 	}

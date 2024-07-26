@@ -44,6 +44,63 @@
 					"looting_multiplier": 0.01
 				}
 			]
+		},
+		{
+			"rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "nostrummagica:ring_koid"
+                }
+            ],
+			"conditions": [
+				{
+					"condition": "minecraft:killed_by_player"
+				},
+				{
+					"condition": "minecraft:random_chance_with_looting",
+					"chance": 0.035,
+					"looting_multiplier": 0.025
+				}
+			]
+		},
+		{
+			"rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "nostrummagica:necklace_koid"
+                }
+            ],
+			"conditions": [
+				{
+					"condition": "minecraft:killed_by_player"
+				},
+				{
+					"condition": "minecraft:random_chance_with_looting",
+					"chance": 0.035,
+					"looting_multiplier": 0.025
+				}
+			]
+		},
+		{
+			"rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "nostrummagica:koid_helm"
+                }
+            ],
+			"conditions": [
+				{
+					"condition": "minecraft:killed_by_player"
+				},
+				{
+					"condition": "minecraft:random_chance_with_looting",
+					"chance": 0.025,
+					"looting_multiplier": 0.025
+				}
+			]
 		}
     ]
 }
