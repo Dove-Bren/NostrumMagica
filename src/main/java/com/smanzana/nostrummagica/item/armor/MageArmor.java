@@ -4,13 +4,18 @@ import java.util.UUID;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.model.ModelWitchHat;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -19,6 +24,8 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class MageArmor extends ArmorItem implements ILoreTagged {
 	
@@ -136,5 +143,31 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 		
 		return null;
 	}
+	
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
+		// Make this render the helm invisible, since I can't figure out how to make helmet just not render
+		final boolean isLegSlot = slot == EquipmentSlotType.LEGS;
+		return String.format("%s:textures/models/armor/mage_layer_%d%s.png", NostrumMagica.MODID, (isLegSlot ? 2 : 1), type == null ? "" : String.format("_%s", type));
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private static ModelWitchHat<?> model = null;
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public <A extends BipedModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, A _default) {
+		if (armorSlot == EquipmentSlotType.HEAD && this.slot == armorSlot) {
+			if (model == null) {
+				model = new ModelWitchHat<>(0f);
+			}
+			return (A) model;
+		}
+		return _default;
+	}
+	
+	//
 
 }
