@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.item.armor.ElementalIceArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalLightningArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalPhysicalArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalWindArmor;
+import com.smanzana.nostrummagica.item.armor.KoidHelmet;
 import com.smanzana.nostrummagica.item.equipment.AspectedEarthWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
@@ -297,6 +298,7 @@ public class NostrumItems {
 	@ObjectHolder(CopyWandItem.ID) public static CopyWandItem copyWand;
 	@ObjectHolder(ResearchTranscriptItem.ID) public static ResearchTranscriptItem researchTranscript;
 	@ObjectHolder(SeekingGem.ID) public static SeekingGem seekingGem;
+	@ObjectHolder(KoidHelmet.ID) public static KoidHelmet koidHelm;
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -594,6 +596,7 @@ public class NostrumItems {
     	register(registry, new SpellPatternTome(PropUnstackable().rarity(Rarity.EPIC)).setRegistryName(SpellPatternTome.ID));
     	register(registry, new CopyWandItem().setRegistryName(CopyWandItem.ID));
     	register(registry, new ResearchTranscriptItem(PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(ResearchTranscriptItem.ID));
+    	register(registry, new KoidHelmet(PropEquipment().rarity(Rarity.UNCOMMON)).setRegistryName(KoidHelmet.ID));
     	
     	// Generate and register spell runes
     	{

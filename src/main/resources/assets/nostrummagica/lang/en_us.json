@@ -191,6 +191,8 @@
     "item.nostrummagica.armor_ice_feet_master": "Corrupted Blizzard Boots",
     "item.nostrummagica.armor_lightning_feet_master": "Corrupted Storm Boots",
     "item.nostrummagica.armor_wind_feet_master": "Corrupted Hurricane Boots",
+	
+	"item.nostrummagica.koid_helm": "Koid Helm",
 
     "item.nostrummagica.dragonarmor_body_iron": "Scale Dragon Armor",
     "item.nostrummagica.dragonarmor_body_gold": "Golden Dragon Armor",
@@ -242,6 +244,10 @@
     "item.nostrummagica.ring_silver_corrupted": "Corrupted Silver Ring",
     "item.nostrummagica.ring_mystic": "Mystic's Ring",
     "item.nostrummagica.ring_mage": "Mage's Ring",
+    "item.nostrummagica.ring_koid": "Koid Ring",
+    "item.nostrummagica.necklace_koid": "Koid Amulet",
+    "item.nostrummagica.ring_golem": "Golem Ring",
+    "item.nostrummagica.belt_golem": "Golem Belt",
     "item.nostrummagica.float_guard": "Charm of Stability",
     "item.nostrummagica.float_guard.desc": "Guards against levitation and|rooted status effects while worn",
     "item.nostrummagica.dragon_wing_pendant": "Dragonwing Pendant",

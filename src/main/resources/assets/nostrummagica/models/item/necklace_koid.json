@@ -1,0 +1,7 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "nostrummagica:item/koid_amulet",
+		"layer1": "nostrummagica:item/koid_amulet_overlay"
+    }
+}

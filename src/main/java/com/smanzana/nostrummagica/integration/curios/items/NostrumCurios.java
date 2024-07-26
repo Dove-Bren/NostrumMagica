@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -34,6 +35,10 @@ public class NostrumCurios {
 	@ObjectHolder(NostrumCurio.ID_RING_SILVER_CORRUPTED) public static NostrumCurio ringCorruptedSilver;
 	@ObjectHolder(NostrumCurio.ID_RING_MYSTIC) public static NostrumCurio ringMystic;
 	@ObjectHolder(NostrumCurio.ID_RING_MAGE) public static NostrumCurio ringMage;
+	@ObjectHolder(NostrumCurio.ID_RING_KOID) public static NostrumCurio ringKoid;
+	@ObjectHolder(NostrumCurio.ID_RING_GOLEM) public static NostrumCurio ringGolem;
+	@ObjectHolder(NostrumCurio.ID_NECK_KOID) public static NostrumCurio neckKoid;
+	@ObjectHolder(NostrumCurio.ID_BELT_GOLEM) public static NostrumCurio beltGolem;
 	@ObjectHolder(FloatGuardItem.ID) public static FloatGuardItem floatGuard;
 	@ObjectHolder(DragonWingPendantItem.ID) public static DragonWingPendantItem dragonWingPendant;
 	
@@ -52,6 +57,10 @@ public class NostrumCurios {
 	private static final UUID attrIDRingCorruptedSilver = UUID.fromString("3E862EE8-711D-11EE-B962-0242AC120002");
 	private static final UUID attrIDRingMystic = UUID.fromString("527667bf-2244-4057-a480-85fb28489e6b");
 	private static final UUID attrIDRingMage = UUID.fromString("4e823af7-2faa-4e4e-9ee7-b1cf1240cf04");
+	private static final UUID attrIDRingKoid = UUID.fromString("fea6bb8e-c94d-4336-a369-0fa8d9532d26");
+	private static final UUID attrIDRingGolem = UUID.fromString("fd3f32c6-5bca-46cc-8aea-cd8b755942b0");
+	//private static final UUID attrIDNeckKoid = UUID.fromString("56c51fc2-63eb-427f-bbdf-2f1129e8f251");
+	private static final UUID attrIDBeltGolem = UUID.fromString("cbdf56ed-85f2-41b1-b050-25a482bf1663");
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
@@ -166,6 +175,35 @@ public class NostrumCurios {
 				.requiresMagic()
 				.manaRegenModifier(.10f)
 				.setRegistryName(NostrumCurio.ID_RING_MAGE)
+				);
+		
+		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RING_KOID)
+				.attrID(attrIDRingKoid)
+				.requiresMagic()
+				.castEfficiency(.05f)
+				.manaRegenModifier(.10f)
+				.setRegistryName(NostrumCurio.ID_RING_KOID)
+				);
+		
+		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_NECK_KOID)
+				.requiresMagic()
+				.setRegistryName(NostrumCurio.ID_NECK_KOID)
+				);
+		
+		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_RING_GOLEM)
+				.attrID(attrIDRingGolem)
+				.requiresMagic()
+				.attribute(() -> NostrumAttributes.reduceAll, new AttributeModifier(attrIDRingGolem, "Golem Ring", 0.25, AttributeModifier.Operation.ADDITION))
+				.attribute(() -> Attributes.MOVEMENT_SPEED, new AttributeModifier(attrIDRingGolem, "Golem Ring", -0.05, AttributeModifier.Operation.MULTIPLY_BASE))
+				.setRegistryName(NostrumCurio.ID_RING_GOLEM)
+				);
+		
+		registry.register(new NostrumCurio(PropCurio(), NostrumCurio.ID_BELT_GOLEM)
+				.attrID(attrIDBeltGolem)
+				.requiresMagic()
+				.attribute(() -> NostrumAttributes.reduceAll, new AttributeModifier(attrIDBeltGolem, "Golem Belt", 0.25, AttributeModifier.Operation.ADDITION))
+				.attribute(() -> Attributes.MOVEMENT_SPEED, new AttributeModifier(attrIDBeltGolem, "Golem Belt", -0.05, AttributeModifier.Operation.MULTIPLY_BASE))
+				.setRegistryName(NostrumCurio.ID_BELT_GOLEM)
 				);
 		
 		registry.register(new FloatGuardItem().setRegistryName(FloatGuardItem.ID));

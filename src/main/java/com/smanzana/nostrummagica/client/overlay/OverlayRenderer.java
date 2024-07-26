@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.client.render.effect.CursedFireEffectRenderer;
 import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
+import com.smanzana.nostrummagica.client.render.layer.LayerKoidHelm;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -1440,6 +1441,14 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
+	@SubscribeEvent
+	public void onPlayerRender(RenderPlayerEvent.Pre event) {
+		if (LayerKoidHelm.ShouldRender(event.getPlayer())) {
+			event.getRenderer().getEntityModel().bipedHead.showModel = false;
+			event.getRenderer().getEntityModel().bipedBodyWear.showModel = false;
+		}
+	}
+	
 	private static final Map<PlayerRenderer, Boolean> InjectedSet = new WeakHashMap<>();
 	
 	@SubscribeEvent
@@ -1452,6 +1461,7 @@ public class OverlayRenderer extends AbstractGui {
 			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerManaArmor(event.getRenderer()));
+			event.getRenderer().addLayer(new LayerKoidHelm(event.getRenderer()));
 		}
 
 		Minecraft mc = Minecraft.getInstance();

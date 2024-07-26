@@ -36,6 +36,13 @@ public class ModelRendererBaked extends ModelRenderer {
 		this.modelLocation = modelLocation;
 	}
 	
+	public ModelRendererBaked(ResourceLocation modelLocation) {
+		super(16, 16, 0, 0);
+		this.addBox(0, 0, 0, .1f, .1f, .1f); // Add fake box so that we render something
+		
+		this.modelLocation = modelLocation;
+	}
+	
 	protected IBakedModel loadModel(ResourceLocation location) {
 		return ModelUtils.GetBakedModel(location);
 	}

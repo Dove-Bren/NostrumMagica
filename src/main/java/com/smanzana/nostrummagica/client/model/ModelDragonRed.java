@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.util.MemoryPool;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.Model;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -37,26 +36,6 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		
 		public String getSuffix() {
 			return locSuffix;
-		}
-	}
-	
-	protected static class ModelRendererBakedWithOffset extends ModelRendererBaked {
-		
-		protected float offsetX;
-		protected float offsetY;
-		protected float offsetZ;
-		
-		public ModelRendererBakedWithOffset(Model base, ResourceLocation model) {
-			super(base, model);
-		}
-		
-		// Made public with AT :)
-		@Override
-		public void translateRotate(MatrixStack matrixStackIn) {
-			// Apply offset
-			matrixStackIn.translate(offsetX, offsetY, offsetZ);
-			super.translateRotate(matrixStackIn);
-
 		}
 	}
 	
@@ -109,9 +88,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, part.getLoc());
 			render.setTextureOffset(0, 0); // TODO add texture offsets?
 			// Set offset?
-			render.offsetX = (float) part.getX();
-			render.offsetY = (float) part.getY();
-			render.offsetZ = (float) part.getZ();
+			render.setOffsets((float) part.getX(), (float) part.getY(), (float) part.getZ());
 			//render.setRotationPoint((float) part.getX(), (float) part.getY(), (float) part.getZ());
 			
 			if (part.parent == null) {
@@ -144,9 +121,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
 				ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, loc);
 				render.setTextureOffset(0, 0); // TODO add texture offsets?
-				render.offsetX = (float) part.getX();
-				render.offsetY = (float) part.getY();
-				render.offsetZ = (float) part.getZ();
+				render.setOffsets((float) part.getX(), (float) part.getY(), (float) part.getZ());
 				
 				if (part.parent == null) {
 					NostrumMagica.logger.error("What part is " + part.name() + "   and why isn't it parented?");
@@ -513,8 +488,8 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		ModelRendererBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
 		ModelRendererBakedWithOffset wing_right = renderers.get(EDragonPart.WING_RIGHT);
 
-		backleg_left.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_LEFT.offsetY; 
-		backleg_right.offsetY = (float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_RIGHT.offsetY;
+		backleg_left.setOffsetY((float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_LEFT.offsetY); 
+		backleg_right.setOffsetY((float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_RIGHT.offsetY);
 		if (casting) {
 			stateTime = now - dragon.getLastCastTime();
 			final float progress;
@@ -529,7 +504,8 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			frontleg_left.rotateAngleX = progress * .80f;
 			frontleg_right.rotateAngleX = progress * .8125f;
 			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
-			backleg_left.offsetY = backleg_right.offsetY = progress * -.5f;
+			backleg_left.setOffsetY(progress * -.5f);
+			backleg_right.setOffsetY(progress * -.5f);
 			body.rotateAngleX = progress * -.5f;
 			
 			if (!flying) {
@@ -548,7 +524,8 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			frontleg_left.rotateAngleX = .45f;
 			frontleg_right.rotateAngleX = .45f;
 			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
-			backleg_left.offsetY = backleg_right.offsetY = -.5f;
+			backleg_left.setOffsetY(-.5f);
+			backleg_right.setOffsetY(-.5f);
 		} else if (!flying && dragon.isOnGround()) {
 			frontleg_left.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
 			frontleg_right.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;

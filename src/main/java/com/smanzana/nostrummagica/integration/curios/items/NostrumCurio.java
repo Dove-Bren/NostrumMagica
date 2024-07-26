@@ -60,6 +60,10 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	public static final String ID_RING_SILVER_CORRUPTED = "ring_silver_corrupted";
 	public static final String ID_RING_MYSTIC = "ring_mystic";
 	public static final String ID_RING_MAGE = "ring_mage";
+	public static final String ID_RING_KOID = "ring_koid";
+	public static final String ID_NECK_KOID = "necklace_koid";
+	public static final String ID_BELT_GOLEM = "belt_golem";
+	public static final String ID_RING_GOLEM = "ring_golem";
 
 	private boolean requiresMagic; // To equip
 	

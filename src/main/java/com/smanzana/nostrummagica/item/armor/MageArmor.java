@@ -96,7 +96,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	
 	@Override
 	public String getLoreKey() {
-		return "nostrum_magic_armor";
+		return "nostrum_mage_armor";
 	}
 
 	@Override
