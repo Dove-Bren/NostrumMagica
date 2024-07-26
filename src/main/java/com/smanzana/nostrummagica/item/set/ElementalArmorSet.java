@@ -111,14 +111,14 @@ public class ElementalArmorSet extends EquipmentSet {
 	}
 
 	@Override
-	public void setTick(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
+	public void setTick(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems) {
 		if (fullTickFunc != null && setItems.size() >= getFullSetCount()) {
 			fullTickFunc.accept(entity);
 		}
 	}
 
 	@Override
-	public Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
+	public Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems) {
 		final int idx = Math.min(setBonuses.size() - 1, setItems.size() - 1);
 		return setBonuses.get(idx);
 	}
@@ -138,7 +138,7 @@ public class ElementalArmorSet extends EquipmentSet {
 	}
 	
 	@Override
-	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
+	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot) {
 		if (stack.isEmpty()) {
 			return false;
 		}

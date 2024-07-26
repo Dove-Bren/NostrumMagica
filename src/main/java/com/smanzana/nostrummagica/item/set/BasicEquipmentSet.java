@@ -13,13 +13,18 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
+import com.smanzana.nostrummagica.inventory.PlayerInventorySlotKey;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.BowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
+import net.minecraft.item.ToolItem;
 
 public class BasicEquipmentSet extends EquipmentSet {
 
@@ -45,12 +50,19 @@ public class BasicEquipmentSet extends EquipmentSet {
 		return this.setItemsComputed;
 	}
 	
-	protected int getUniqueItemCount(Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
+	protected int getUniqueItemCount(Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems) {
 		return setItems.values().stream().filter(i -> !i.isEmpty()).map(i -> i.getItem()).collect(Collectors.toSet()).size();
 	}
 	
+	protected boolean itemIsWeaponOrTool(Item item) {
+		return item instanceof SwordItem
+				|| item instanceof ToolItem
+				|| item instanceof BowItem
+				;
+	}
+	
 	@Override
-	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<LivingEntity> slot) {
+	public boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot) {
 		if (stack.isEmpty()) {
 			return false;
 		}
@@ -62,15 +74,24 @@ public class BasicEquipmentSet extends EquipmentSet {
 			if (slot instanceof EquipmentSlotKey) {
 				return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getEquipmentSlot();
 			}
-			// else just guess? Could hardcode inventory numbers here
+			// else just guess? Could hardcode inventory numbers here in case it's a PlayerInventorySlotKey?
 			return false;
 		}
 		
-		return true;
+		// If slot type is equipment slot, always accept non-hands (since this isn't armor so it can't specify).
+		// If it's a tool or weapon, also accept hands.
+		if (slot instanceof EquipmentSlotKey) {
+			return itemIsWeaponOrTool(stack.getItem())
+					|| ((EquipmentSlotKey) slot).getSlotType().getSlotType() == EquipmentSlotType.Group.ARMOR;
+		}
+		
+		// Not just blindly guess if that if it's not a PlayerInventorySlotKey, it's probably something special like
+		// a curio slot or something
+		return (!(slot instanceof PlayerInventorySlotKey));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
+	public Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems) {
 		final int idx = Math.min(setBonuses.size() - 1, getUniqueItemCount(setItems) - 1);
 		return setBonuses.get(idx);
 	}
@@ -81,7 +102,7 @@ public class BasicEquipmentSet extends EquipmentSet {
 	}
 
 	@Override
-	public void setTick(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems) {
+	public void setTick(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems) {
 		;
 	}
 

@@ -17,13 +17,13 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 
-	public abstract Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems);
+	public abstract Multimap<Attribute, AttributeModifier> getSetBonuses(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems);
 	
 	public abstract boolean isSetItem(ItemStack stack);
 	
-	public abstract boolean isSetItemValid(ItemStack stack, IInventorySlotKey<LivingEntity> slot);
+	public abstract boolean isSetItemValid(ItemStack stack, IInventorySlotKey<? extends LivingEntity> slot);
 	
-	public abstract void setTick(LivingEntity entity, Map<IInventorySlotKey<LivingEntity>, ItemStack> setItems);
+	public abstract void setTick(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems);
 	
 	public ITextComponent getName() {
 		return new TranslationTextComponent("set." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath() + ".name");

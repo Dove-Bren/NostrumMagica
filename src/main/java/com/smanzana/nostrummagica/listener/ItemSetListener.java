@@ -36,7 +36,7 @@ import net.minecraftforge.fml.LogicalSidedProvider;
 public class ItemSetListener {
 	
 	private static final class SetState {
-		public final Map<IInventorySlotKey<LivingEntity>, ItemStack> items;
+		public final Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> items;
 		public Multimap<Attribute, AttributeModifier> attributes;
 		
 		public SetState() {
@@ -46,7 +46,7 @@ public class ItemSetListener {
 	}
 	
 	private static final class EquipmentState {
-		public final Map<IInventorySlotKey<LivingEntity>, ItemStack> equipment;
+		public final Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> equipment;
 		public final Map<EquipmentSet, SetState> sets;
 		public final Multimap<Attribute, AttributeModifier> attributes;
 		
@@ -86,7 +86,7 @@ public class ItemSetListener {
 		}
 	}
 	
-	protected static final boolean ScanEntityEquipment(LivingEntity entity, BiFunction<IInventorySlotKey<LivingEntity>, ItemStack, Boolean> action) {
+	protected static final boolean ScanEntityEquipment(LivingEntity entity, BiFunction<IInventorySlotKey<? extends LivingEntity>, ItemStack, Boolean> action) {
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			EquipmentSlotKey key = new EquipmentSlotKey(slot);
 			if (!action.apply(key, entity.getItemStackFromSlot(slot))) {
@@ -144,7 +144,7 @@ public class ItemSetListener {
 		entity.getAttributeManager().reapplyModifiers(state.attributes);
 	}
 	
-	protected void onEntitySetTick(LivingEntity entity, EquipmentSet set, Map<IInventorySlotKey<LivingEntity>, ItemStack> setPieces) {
+	protected void onEntitySetTick(LivingEntity entity, EquipmentSet set, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setPieces) {
 		set.setTick(entity, setPieces);
 	}
 	
