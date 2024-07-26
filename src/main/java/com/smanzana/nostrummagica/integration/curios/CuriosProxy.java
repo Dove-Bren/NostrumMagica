@@ -218,6 +218,16 @@ public class CuriosProxy {
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringCorruptedSilver)));
 		registry.register(recipe);
 		
+		recipe = RitualRecipe.createTier3("ring_mage",
+				new ItemStack(NostrumCurios.ringMage),
+				null,
+				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
+				Ingredient.fromItems(NostrumCurios.ringSilver),
+				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SlabKind), Ingredient.EMPTY, silver},
+				new ResearchRequirement("rings_true"),
+				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringMage)));
+		registry.register(recipe);
+		
 		recipe = RitualRecipe.createTier3("float_guard",
 				new ItemStack(NostrumCurios.floatGuard),
 				EMagicElement.WIND,

@@ -49,5 +49,4 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 		}
 		return new ArrayList<>();
 	}
-	
 }
