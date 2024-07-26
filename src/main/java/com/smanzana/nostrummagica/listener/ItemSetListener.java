@@ -64,14 +64,14 @@ public class ItemSetListener {
 			// Scan inventory and record all equipment stacks
 			ScanEntityEquipment(entity, (slot, stack) -> {
 				if (!stack.isEmpty()) {
-					equipment.put(slot, stack);
+					equipment.put(slot, stack.copy());
 					
 					for (EquipmentSet set : EquipmentSetRegistry.GetAllSets()) {
 						final Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> existing =
 								sets.containsKey(set) ? sets.get(set).items : new HashMap<>();
 						if (set.isSetItem(stack) && set.isSetItemValid(stack, slot, existing)) {
 							sets.computeIfAbsent(set, r -> new SetState())
-								.items.put(slot, stack);
+								.items.put(slot, stack.copy());
 						}
 					}
 				}
@@ -127,6 +127,10 @@ public class ItemSetListener {
 	protected boolean entityChangedEquipment(LivingEntity entity) {
 		EquipmentState lastTickState = getLastTickState(entity);
 		
+		if (entity instanceof PlayerEntity) {
+			entity.fallDistance = 0f;
+		}
+		
 		if (!ScanEntityEquipment(entity, (slot, stack) -> ItemStack.areItemStacksEqual(lastTickState.equipment.getOrDefault(slot, ItemStack.EMPTY), stack))) {
 			return true;
 		}
@@ -150,7 +154,16 @@ public class ItemSetListener {
 		set.setTick(entity, setPieces);
 	}
 	
+	protected boolean canHaveSets(LivingEntity entity) {
+		// For now, just restrict to players to avoid scanning/saving other entities
+		return entity != null && entity instanceof PlayerEntity;
+	}
+	
 	protected void updateEntity(LivingEntity entity) {
+		
+		if (!canHaveSets(entity)) {
+			return;
+		}
 
 		if (!entity.isAlive()) {
 			lastEquipState.remove(entity);
