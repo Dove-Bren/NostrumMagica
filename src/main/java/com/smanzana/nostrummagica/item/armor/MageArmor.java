@@ -152,8 +152,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 		return String.format("%s:textures/models/armor/mage_layer_%d%s.png", NostrumMagica.MODID, (isLegSlot ? 2 : 1), type == null ? "" : String.format("_%s", type));
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	private static ModelWitchHat<?> model = null;
+	private static ModelWitchHat<?> model;
 	
 	@SuppressWarnings("unchecked")
 	@Override

@@ -143,6 +143,10 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			//parent.addWidget(button); Wait to add till after tabs
 			researchButtons.put(research, button);
 			
+			if (research.getTab() == null) {
+				NostrumMagica.logger.error("Research has no tab: " + research.getKey());
+			}
+			
 			if (!tabs.containsKey(research.getTab())) {
 				tabs.put(research.getTab(), new ArrayList<>(32));
 			}

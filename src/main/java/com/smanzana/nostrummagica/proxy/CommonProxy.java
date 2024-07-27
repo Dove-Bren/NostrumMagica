@@ -74,6 +74,7 @@ public class CommonProxy {
     	NetworkHandler.sendTo(
     			new SpellCraftingCapabilitySyncMessage(player, NostrumMagica.getSpellCrafting(player)),
     			player);
+    	sendPlayerStatSync(player);
     }
     
     public void updateEntityEffect(ServerPlayerEntity player, LivingEntity entity, SpecialEffect effectType, EffectData data) {

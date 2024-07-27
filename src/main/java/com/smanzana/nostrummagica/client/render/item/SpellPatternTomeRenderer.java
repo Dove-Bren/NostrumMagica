@@ -20,7 +20,10 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
+@OnlyIn(Dist.CLIENT)
 public class SpellPatternTomeRenderer extends ItemStackTileEntityRenderer {
 	
 	public static final SpellPatternTomeRenderer INSTANCE = new SpellPatternTomeRenderer();

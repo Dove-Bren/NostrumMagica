@@ -67,51 +67,32 @@ public class PlayerStatTracker extends WorldSavedData {
 		if (player.world.isRemote()) {
 			return;
 		}
-		Update(player.getUniqueID(), updater);
-	}
-	
-	public static final void Update(@Nonnull UUID playerID, Consumer<PlayerStats> updater) {
+		
 		PlayerStatTracker tracker = NostrumMagica.instance.getPlayerStats();
-		PlayerStats stats = tracker.get(playerID);
+		PlayerStats stats = tracker.get(player);
 		updater.accept(stats);
-		tracker.update(playerID, stats);
+		tracker.update(player, stats);
 	}
 	
-	public PlayerStats get(@Nonnull PlayerEntity player) {
-		return get(player.getUniqueID());
-	}
-	
-	public @Nonnull PlayerStats get(@Nonnull UUID playerID) {
-		PlayerStats stats = playerTable.get(playerID);
-		if (stats == null) {
-			stats = new PlayerStats();
-			playerTable.put(playerID, stats);
-		}
-		return stats;
+	public @Nonnull PlayerStats get(@Nonnull PlayerEntity player) {
+		return playerTable.computeIfAbsent(player.getUniqueID(), (u) -> new PlayerStats());
 	}
 	
 	public void update(@Nonnull PlayerEntity player, PlayerStats stats) {
 		if (player.world.isRemote()) {
 			return;
 		}
-		update(player.getUniqueID(), stats);
-	}
-	
-	public void update(@Nonnull UUID playerID, PlayerStats stats) {
-		if (!playerTable.containsKey(playerID) || stats != playerTable.get(playerID)) {
-			playerTable.put(playerID, stats);
+		if (!playerTable.containsKey(player.getUniqueID()) || stats != playerTable.get(player.getUniqueID())) {
+			playerTable.put(player.getUniqueID(), stats);
 		}
+		
 		this.markDirty();
+	    NostrumMagica.instance.proxy.sendPlayerStatSync(player);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public void override(@Nonnull PlayerEntity player, PlayerStats stats) {
-		override(player.getUniqueID(), stats);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public void override(@Nonnull UUID playerID, PlayerStats stats) {
-		playerTable.put(playerID, stats);
+		playerTable.put(player.getUniqueID(), stats);
 	}
 	
 }

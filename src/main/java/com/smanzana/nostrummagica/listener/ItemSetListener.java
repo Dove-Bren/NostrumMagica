@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
 
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -28,6 +29,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -127,10 +129,6 @@ public class ItemSetListener {
 	protected boolean entityChangedEquipment(LivingEntity entity) {
 		EquipmentState lastTickState = getLastTickState(entity);
 		
-		if (entity instanceof PlayerEntity) {
-			entity.fallDistance = 0f;
-		}
-		
 		if (!ScanEntityEquipment(entity, (slot, stack) -> ItemStack.areItemStacksEqual(lastTickState.equipment.getOrDefault(slot, ItemStack.EMPTY), stack))) {
 			return true;
 		}
@@ -197,6 +195,25 @@ public class ItemSetListener {
 					}
 				});
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void ClientWorldTick(ClientTickEvent event) {
+		if (event.phase == TickEvent.Phase.END
+				&& !NostrumMagica.instance.proxy.hasIntegratedServer()
+				&& NostrumMagica.instance.proxy.getPlayer() != null
+				&& NostrumMagica.instance.proxy.getPlayer().world != null) {
+			((ClientWorld) NostrumMagica.instance.proxy.getPlayer().world).getAllEntities().forEach((ent) -> {
+				if (ent instanceof LivingEntity) {
+					LivingEntity living = (LivingEntity) ent;
+					updateEntity(living);
+	
+					if (living.isElytraFlying() && living.isSneaking() && living instanceof ServerPlayerEntity) {
+						((ServerPlayerEntity) living).stopFallFlying();
+					}
+				}
+			});
 		}
 	}
 	

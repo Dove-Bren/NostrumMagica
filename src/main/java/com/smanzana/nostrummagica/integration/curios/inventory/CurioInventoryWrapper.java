@@ -9,7 +9,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 
@@ -55,13 +57,29 @@ public class CurioInventoryWrapper implements IInventory {
 		slots = new HashMap<>();
 		flatSlotMap = new HashMap<>();
 		
+		// Slot helper is only available on the server :(
 		ISlotHelper slotHelper = CuriosApi.getSlotHelper();
-		for (String typeID : slotHelper.getSlotTypeIds()) {
-			for (int i = 0; i < slotHelper.getSlotsForType(entity, typeID); i++) {
-				CurioSlotReference key = new CurioSlotReference(typeID, i);
-				final ItemStack stack = empty ? ItemStack.EMPTY : key.getHeldStack(entity);
-				slots.put(key, stack);
-				flatSlotMap.put(flatSlotMap.size(), key);
+		if (slotHelper != null) {
+			for (String typeID : slotHelper.getSlotTypeIds()) {
+				for (int i = 0; i < slotHelper.getSlotsForType(entity, typeID); i++) {
+					CurioSlotReference key = new CurioSlotReference(typeID, i);
+					final ItemStack stack = empty ? ItemStack.EMPTY : key.getHeldStack(entity);
+					slots.put(key, stack);
+					flatSlotMap.put(flatSlotMap.size(), key);
+				}
+			}
+		} else {
+			LazyOptional<ICuriosItemHandler> handler = CuriosApi.getCuriosHelper().getCuriosHandler(entity);
+			if (handler.isPresent()) {
+				handler.resolve().get().getCurios().entrySet().stream()
+					.forEachOrdered((entry) -> {
+						for (int i = 0; i < entry.getValue().getSlots(); i++) {
+							CurioSlotReference key = new CurioSlotReference(entry.getKey(), i);
+							final ItemStack stack = empty ? ItemStack.EMPTY : key.getHeldStack(entity);
+							slots.put(key, stack);
+							flatSlotMap.put(flatSlotMap.size(), key);
+						}
+					});
 			}
 		}
 	}

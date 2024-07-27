@@ -7,7 +7,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.autodungeons.command.CommandReadRoom;
 import com.smanzana.autodungeons.command.CommandSpawnDungeon;
 import com.smanzana.autodungeons.command.CommandWriteRoom;
-import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomLoader.BlueprintReloadListener;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
@@ -2109,8 +2108,5 @@ public class ModInit {
 	
 	public static final void registerDataLoaders(AddReloadListenerEvent event) {
 		// This event is weird because it's for registering listeners of another event
-		
-		// Register data listener for dungeon rooms
-		event.addListener(new BlueprintReloadListener("rooms"));
 	}
 }

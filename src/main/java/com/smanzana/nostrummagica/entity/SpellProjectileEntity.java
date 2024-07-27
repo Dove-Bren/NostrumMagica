@@ -140,7 +140,10 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	public boolean canImpact(Entity entity) {
-		return this.shootingEntity == null || ((!entity.equals(shootingEntity) && !shootingEntity.isRidingOrBeingRiddenBy(entity)));
+		return this.shootingEntity == null || (
+				(!entity.equals(shootingEntity)
+						&& !shootingEntity.isRidingSameEntity(entity)
+						));
 	}
 	
 	protected void doImpact(Entity entity) {

@@ -26,7 +26,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ElementalIceArmor extends ElementalArmor {
 
@@ -50,7 +49,7 @@ public class ElementalIceArmor extends ElementalArmor {
 	public ElementalIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
 		super(EMagicElement.ICE, slot, type, properties);
 		if (slot == EquipmentSlotType.CHEST) {
-			MinecraftForge.EVENT_BUS.register(this);
+			MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::onEntityDamage);
 		}
 	}
 	
@@ -68,7 +67,6 @@ public class ElementalIceArmor extends ElementalArmor {
 		}
 	}
 	
-	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void onEntityDamage(LivingAttackEvent event) {
 		if (event.isCanceled()) {
 			return;

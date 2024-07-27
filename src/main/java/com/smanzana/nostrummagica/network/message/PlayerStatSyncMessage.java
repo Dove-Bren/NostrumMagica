@@ -27,7 +27,7 @@ public class PlayerStatSyncMessage {
 			if (!myID.equals(message.id)) {
 				NostrumMagica.logger.error("Received PlayerStatSync message for a different player: " + message.id);
 			} else {
-				NostrumMagica.instance.getPlayerStats().override(message.id, message.stats);
+				NostrumMagica.instance.getPlayerStats().override(NostrumMagica.instance.proxy.getPlayer(), message.stats);
 			}
 		});
 	}
