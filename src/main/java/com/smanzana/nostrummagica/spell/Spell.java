@@ -650,7 +650,7 @@ public class Spell {
 		}
 		
 		final ISpellLogBuilder logger;
-		if (caster instanceof PlayerEntity) {
+		if (caster instanceof PlayerEntity && NostrumMagica.instance.proxy.hasIntegratedServer()) {
 			SpellLogEntry log = new SpellLogEntry(this, caster);
 			logger = new SpellLogBuilder(log);
 		} else {

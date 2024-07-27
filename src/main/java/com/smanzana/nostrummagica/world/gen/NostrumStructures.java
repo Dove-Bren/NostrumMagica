@@ -58,19 +58,31 @@ public class NostrumStructures {
 		Structure<NoFeatureConfig> structure;
 		StructureFeature<?, ?> configured;
 		
+		// getChunkPosForStructure()
+		// min/max settings are actually:
+		// max is that every MAX x MAX chunk block, there is a spawn attempt
+		// the distance from the exact floor boundary is a MIN x MIN chunk region.
+		// I think the 'average' + 'minimum distance' wording is that average is really
+		// average (spawn attempts every 'average' blocks) and min is min in that if two
+		// regions spawn towards eachother, that would be the distance between? Except it's not. It's
+		// (max-min) ?
+		
 		structure = new PortalStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID), 20, 32, 0x26F1BDCF);
+		// Avg dist: sqrt(24^2 + 24^2) = 543 blocks
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID), 12, 24, 0x26F1BDCF);
 		CONFIGURED_DUNGEON_PORTAL = configured;
 		
 		structure = new DragonStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 20, 48, 0x4558c30e);
+		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 24, 32, 0x4558c30e);
 		CONFIGURED_DUNGEON_DRAGON = configured;
 		
 		structure = new PlantBossStructure();
 		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 48, 0x2cc3005e);
+		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
+		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 38, 0x2cc3005e);
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
 
 		MinecraftForge.EVENT_BUS.addListener(NostrumStructures::loadWorld);
