@@ -25,8 +25,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 /**
@@ -101,14 +103,19 @@ public class SeekingGem extends Item implements ILoreTagged {
 	protected boolean doSeek(World world, PlayerEntity player, ItemStack stack) {
 		// Only do work on client side!
 		if (world.isRemote) {
-			@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, AutoDungeons.GetDungeonTracker().getDungeon(player));
-			if (nearest != null) {
-				NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
+			DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
+			if (dungeon != null) {
+				@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, dungeon);
+				if (nearest != null) {
+					NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
+				} else {
+					NostrumMagicaSounds.CAST_FAIL.playClient(player);
+				}
+				player.getCooldownTracker().setCooldown(stack.getItem(), 20); // Jut client side
+				return nearest != null;
 			} else {
-				NostrumMagicaSounds.CAST_FAIL.playClient(player);
+				player.sendMessage(new StringTextComponent("It doesn't seem to do anything here..."), Util.DUMMY_UUID);
 			}
-			player.getCooldownTracker().setCooldown(stack.getItem(), 20); // Jut client side
-			return nearest != null;
 		}
 		return false;
 	}
