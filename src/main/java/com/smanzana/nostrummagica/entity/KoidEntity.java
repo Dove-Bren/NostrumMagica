@@ -148,9 +148,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 
     @Override
     public boolean canAttack(LivingEntity target) {
-        return target != this
-        		&& target != null
-        		&& target.isAlive()
+        return super.canAttack(target)
         		&& NostrumMagica.itemSetListener.getActiveSetCount(target, NostrumEquipmentSets.koidSet) < 3;
     }
 

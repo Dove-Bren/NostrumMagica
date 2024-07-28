@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.effect;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -124,7 +125,7 @@ public class FrostbiteEffect extends Effect {
 						if (world.isAirBlock(pos)) {
 							BlockState belowState = world.getBlockState(pos.down());
 							if (belowState.getMaterial().blocksMovement()) {
-								world.setBlockState(pos, Blocks.SNOW.getDefaultState());
+								world.setBlockState(pos, NostrumBlocks.mysticSnowLayer.getDefaultState());
 							}
 						}
 					}

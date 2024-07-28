@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.item;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -15,6 +14,6 @@ public interface ISelectionItem {
 	
 	public @Nullable BlockPos getBoundingPos(PlayerEntity player, ItemStack stack);
 
-	public boolean isSelectionValid(ClientPlayerEntity player, ItemStack selectionStack);
+	public boolean isSelectionValid(PlayerEntity player, ItemStack selectionStack);
 	
 }

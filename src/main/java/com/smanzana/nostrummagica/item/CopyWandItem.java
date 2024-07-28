@@ -10,7 +10,6 @@ import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -148,7 +147,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 	}
 
 	@Override
-	public boolean isSelectionValid(ClientPlayerEntity player, ItemStack selectionStack) {
+	public boolean isSelectionValid(PlayerEntity player, ItemStack selectionStack) {
 		final int size = Math.abs(select1.getX() - select2.getX())
 				* Math.abs(select1.getY() - select2.getY())
 				* Math.abs(select1.getZ() - select1.getZ());

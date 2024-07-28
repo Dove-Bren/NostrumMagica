@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.init;
 import java.util.Map;
 
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.mojang.brigadier.CommandDispatcher;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
@@ -78,8 +77,6 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityTrialRenderer;
-import com.smanzana.nostrummagica.command.CommandDebugEffect;
-import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ChakramSpellSaucerEntity;
 import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
@@ -136,7 +133,6 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
@@ -226,9 +222,10 @@ public class ClientInit {
 	// Subscribed to game bus in #clientSetup
 	public static final void registerCommands(RegisterCommandsEvent event) {
 		// Client-only commands
-		final CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
-		CommandInfoScreenGoto.register(dispatcher);
-		CommandDebugEffect.register(dispatcher);
+		// Note: registered in common mod one to show up on server and be valid commands
+//		final CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
+//		CommandInfoScreenGoto.register(dispatcher);
+//		CommandDebugEffect.register(dispatcher);
 	}
 	
 	@SubscribeEvent

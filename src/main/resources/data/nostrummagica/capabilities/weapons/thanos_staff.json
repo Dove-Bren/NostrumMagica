@@ -1,0 +1,10 @@
+{
+    "type": "hoe",
+    "attributes": {
+        "common": {
+            "armor_negation": 0,
+            "impact": 0.3,
+            "max_strikes": 0
+        }
+    }
+}

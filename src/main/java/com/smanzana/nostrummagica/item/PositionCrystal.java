@@ -11,7 +11,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -244,7 +243,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 
 	@Override
-	public boolean isSelectionValid(ClientPlayerEntity player, ItemStack selectionStack) {
+	public boolean isSelectionValid(PlayerEntity player, ItemStack selectionStack) {
 		return true;
 	}
 }

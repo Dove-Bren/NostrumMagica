@@ -82,6 +82,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
@@ -382,6 +383,17 @@ public class ClientProxy extends CommonProxy {
 		final PlayerEntity player = getPlayer();
 		if (player.world.isRemote()) {
 			Minecraft.getInstance().displayGuiScreen(new TomeWorkshopScreen(player));
+		}
+	}
+	
+	public void openLoreLink(String tag) {
+		final Minecraft mc = Minecraft.getInstance();
+		final PlayerEntity player = mc.player;
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null) {
+			player.sendMessage(new StringTextComponent("Could not find magic wrapper for player"), Util.DUMMY_UUID);
+		} else {
+			mc.displayGuiScreen(new InfoScreen(attr, tag));
 		}
 	}
 	

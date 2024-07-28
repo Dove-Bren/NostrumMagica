@@ -24,7 +24,7 @@ public final class ReagentAndRuneTransfer {
 		if (container == player.container) {
 			return false;
 		}
-		if (container instanceof CreativeContainer) {
+		if (player.world.isRemote() && container instanceof CreativeContainer) {
 			return false;
 		}
 		if (container instanceof ReagentBagGui.BagContainer) {

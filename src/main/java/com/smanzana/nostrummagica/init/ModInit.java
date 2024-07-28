@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.command.CommandEnhanceTome;
 import com.smanzana.nostrummagica.command.CommandForceBind;
 import com.smanzana.nostrummagica.command.CommandGiveResearchpoint;
 import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
+import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.command.CommandRandomSpell;
 import com.smanzana.nostrummagica.command.CommandReloadQuests;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
@@ -2068,6 +2069,9 @@ public class ModInit {
 		CommandReloadQuests.register(dispatcher);
 		CommandReloadSkills.register(dispatcher);
 		CommandSetTier.register(dispatcher);
+		
+		// These are client-only, but need to be registered as server ones to work at all.
+		CommandInfoScreenGoto.register(dispatcher);
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

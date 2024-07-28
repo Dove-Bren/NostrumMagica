@@ -1,0 +1,10 @@
+{
+    "type": "shovel",
+    "attributes": {
+        "common": {
+            "armor_negation": 0,
+            "impact": 1.0,
+            "max_strikes": 0
+        }
+    }
+}
