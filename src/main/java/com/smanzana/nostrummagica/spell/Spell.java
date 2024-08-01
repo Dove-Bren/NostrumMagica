@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.criteria.CastSpellCriteriaTrigger;
 import com.smanzana.nostrummagica.effect.ElementalSpellBoostEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.item.ReagentItem;
@@ -42,6 +43,7 @@ import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -662,6 +664,10 @@ public class Spell {
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
 		if (caster instanceof PlayerEntity) {
 			PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> stats.incrStat(PlayerStat.SpellsCast).addStat(PlayerStat.TotalSpellWeight, weight));
+			
+			if (caster instanceof ServerPlayerEntity) {
+				CastSpellCriteriaTrigger.Instance.trigger((ServerPlayerEntity) caster);
+			}
 		}
 	}
 	

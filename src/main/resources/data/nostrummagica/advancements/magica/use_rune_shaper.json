@@ -1,0 +1,30 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:rune_shaper"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.use_rune_shaper.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.use_rune_shaper.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": false,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/use_spell_table",
+	"criteria": {
+		"use_block": {
+			"trigger": "minecraft:item_used_on_block",
+			"conditions": {
+				"location": {
+					"block": {
+						"block": "nostrummagica:rune_shaper"
+					}
+				}
+			}
+		}
+	}
+}
+	

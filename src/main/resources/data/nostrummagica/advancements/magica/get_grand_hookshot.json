@@ -1,0 +1,30 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:hookshot_strong"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.get_grand_hookshot.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.get_grand_hookshot.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": false,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/get_hookshot",
+	"criteria": {
+		"hookshot": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"item": "nostrummagica:hookshot_strong"
+					}
+				]
+			}
+		}
+	}
+}
+	

@@ -1,0 +1,27 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:crystal_small"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.tier_novice.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.tier_novice.description"
+		},
+		"frame": "challenge",
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": true
+	},
+	"parent": "nostrummagica:magica/enter_sorcery_dungeon",
+	"criteria": {
+		"tier": {
+			"trigger": "nostrummagica:tier",
+			"conditions": {
+				"tier": "mani"
+			}
+		}
+	}
+}
+	

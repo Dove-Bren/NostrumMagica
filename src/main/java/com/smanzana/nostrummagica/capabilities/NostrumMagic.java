@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.criteria.TierCriteriaTrigger;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
@@ -208,6 +209,10 @@ public class NostrumMagic implements INostrumMagic {
 			this.unlock();
 		}
 		this.tier = tier;
+		
+		if (this.entity != null && this.entity instanceof ServerPlayerEntity) {
+			TierCriteriaTrigger.Instance.trigger((ServerPlayerEntity) this.entity, tier);
+		}
 	}
 	
 	private void levelup() {

@@ -16,8 +16,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
@@ -101,10 +103,10 @@ public class SeekingGem extends Item implements ILoreTagged {
 	}
 	
 	protected boolean doSeek(World world, PlayerEntity player, ItemStack stack) {
-		// Only do work on client side!
-		if (world.isRemote) {
-			DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
-			if (dungeon != null) {
+		DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
+		if (dungeon != null) {
+			// Only do work on client side!
+			if (world.isRemote) {
 				@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, dungeon);
 				if (nearest != null) {
 					NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
@@ -113,7 +115,11 @@ public class SeekingGem extends Item implements ILoreTagged {
 				}
 				player.getCooldownTracker().setCooldown(stack.getItem(), 20); // Jut client side
 				return nearest != null;
-			} else {
+			}
+			
+			return true;
+		} else {
+			if (world.isRemote) {
 				player.sendMessage(new StringTextComponent("It doesn't seem to do anything here..."), Util.DUMMY_UUID);
 			}
 		}
@@ -124,13 +130,21 @@ public class SeekingGem extends Item implements ILoreTagged {
 	public ActionResultType onItemUse(ItemUseContext context) {
 		final World worldIn = context.getWorld();
 		final PlayerEntity playerIn = context.getPlayer();
-		doSeek(worldIn, playerIn, context.getItem());
+		if (doSeek(worldIn, playerIn, context.getItem())) {
+			if (playerIn instanceof ServerPlayerEntity) {
+				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, context.getItem());
+			}
+		}
 		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		doSeek(worldIn, playerIn, playerIn.getHeldItem(hand));
+		if (doSeek(worldIn, playerIn, playerIn.getHeldItem(hand))) {
+			if (playerIn instanceof ServerPlayerEntity) {
+				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, playerIn.getHeldItem(hand));
+			}
+		}
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
 	}
 

@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
+import com.smanzana.nostrummagica.criteria.CraftSpellCriteriaTrigger;
 import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellRune;
@@ -16,6 +17,7 @@ import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -213,6 +215,10 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 			SpellScroll.setSpell(scroll, spell);
 			this.clearSpellBoard();
 			this.setScrollSlotContents(scroll);
+			
+			if (crafter instanceof ServerPlayerEntity) {
+				CraftSpellCriteriaTrigger.Instance.trigger((ServerPlayerEntity) crafter);
+			}
 		}
 		
 		return spell;

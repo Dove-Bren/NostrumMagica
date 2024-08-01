@@ -1,0 +1,30 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:modification_table"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.use_modification_table.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.use_modification_table.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": false,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/use_magic_mirror",
+	"criteria": {
+		"use_block": {
+			"trigger": "minecraft:item_used_on_block",
+			"conditions": {
+				"location": {
+					"block": {
+						"block": "nostrummagica:modification_table"
+					}
+				}
+			}
+		}
+	}
+}
+	

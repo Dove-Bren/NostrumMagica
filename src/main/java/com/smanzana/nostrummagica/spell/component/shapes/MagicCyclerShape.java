@@ -80,7 +80,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
 				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
 			} else if (hitEnts) {
-				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
+				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, 1f, true);
 			}
 		}
 

@@ -8,12 +8,14 @@ import java.util.Set;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.AltarBlock;
 import com.smanzana.nostrummagica.block.CandleBlock;
+import com.smanzana.nostrummagica.criteria.RitualCriteriaTrigger;
 import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -81,7 +83,7 @@ public class RitualRegistry {
 		for (RitualRecipe ritual : instance().ritualRegistry) {
 			final RitualMatchInfo result = ritual.matches(player, world, pos, element);
 			if (result.matched) {
-					if (ritual.perform(world, player, pos)) {
+				if (ritual.perform(world, player, pos)) {
 					
 					if (!instance().ritualListeners.isEmpty()) {
 						for (IRitualListener listener : instance().ritualListeners) {
@@ -94,6 +96,10 @@ public class RitualRegistry {
 	
 					NostrumMagica.instance.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
 							result.center, result.extras, result.reagents, result.output);
+					
+					if (player instanceof ServerPlayerEntity) {
+						RitualCriteriaTrigger.Instance.trigger((ServerPlayerEntity) player, ritual.getTitleKey());
+					}
 					
 					return true;
 				}

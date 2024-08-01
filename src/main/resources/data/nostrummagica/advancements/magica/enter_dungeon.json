@@ -1,0 +1,28 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:dungeon_block_light"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.enter_dungeon.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.enter_dungeon.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/root",
+	"criteria": {
+		"dungeon": {
+			"trigger": "minecraft:location",
+			"conditions": {
+				"location": {
+					"feature": "nostrummagica:nostrum_dungeons_portal"
+				}
+			}
+		}
+	}
+}
+	

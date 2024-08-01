@@ -1,0 +1,28 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:progression_door"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.enter_sorcery_dungeon.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.enter_sorcery_dungeon.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": true
+	},
+	"parent": "nostrummagica:magica/enter_dungeon",
+	"criteria": {
+		"dimension": {
+			"trigger": "minecraft:location",
+			"conditions": {
+				"location": {
+					"dimension": "nostrummagica:sorcery_dim"
+				}
+			}
+		}
+	}
+}
+	

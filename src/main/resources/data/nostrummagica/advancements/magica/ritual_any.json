@@ -1,0 +1,26 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:nostrum_candle"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.ritual_any.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.ritual_any.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/use_magic_mirror",
+	"criteria": {
+		"ritual": {
+			"trigger": "nostrummagica:ritual",
+			"conditions": {
+				"ritual": ""
+			}
+		}
+	}
+}
+	

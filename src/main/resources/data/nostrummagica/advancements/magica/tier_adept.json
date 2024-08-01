@@ -1,0 +1,27 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:crystal_medium"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.tier_adept.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.tier_adept.description"
+		},
+		"frame": "challenge",
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": true
+	},
+	"parent": "nostrummagica:magica/tier_novice",
+	"criteria": {
+		"tier": {
+			"trigger": "nostrummagica:tier",
+			"conditions": {
+				"tier": "kani"
+			}
+		}
+	}
+}
+	

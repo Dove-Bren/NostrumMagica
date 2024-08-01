@@ -116,7 +116,7 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	public boolean canImpact(Entity entity) {
-		return this.getShooter() == null || ((!entity.equals(getShooter()) && !getShooter().isRidingOrBeingRiddenBy(entity)));
+		return this.getShooter() == null || ((!entity.equals(getShooter()) && !getShooter().isRidingSameEntity(entity)));
 	}
 	
 	@Override

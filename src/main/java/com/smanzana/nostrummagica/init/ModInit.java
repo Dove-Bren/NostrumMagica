@@ -43,6 +43,10 @@ import com.smanzana.nostrummagica.command.CommandUnlock;
 import com.smanzana.nostrummagica.command.CommandUnlockAll;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.criteria.CastSpellCriteriaTrigger;
+import com.smanzana.nostrummagica.criteria.CraftSpellCriteriaTrigger;
+import com.smanzana.nostrummagica.criteria.RitualCriteriaTrigger;
+import com.smanzana.nostrummagica.criteria.TierCriteriaTrigger;
 import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
 import com.smanzana.nostrummagica.entity.KoidEntity;
@@ -134,6 +138,7 @@ import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.enchantment.Enchantment;
@@ -230,6 +235,8 @@ public class ModInit {
 		//NostrumMagica.instance.curios.postInit();
 		//NostrumMagica.instance.enderIO.postInit();
 		NostrumMagica.instance.musica.postInit();
+		
+		event.enqueueWork(ModInit::registerCriteria);
 		
 		NostrumMagica.initFinished = true;
 	}
@@ -2112,5 +2119,12 @@ public class ModInit {
 	
 	public static final void registerDataLoaders(AddReloadListenerEvent event) {
 		// This event is weird because it's for registering listeners of another event
+	}
+	
+	public static void registerCriteria() {
+		CriteriaTriggers.register(TierCriteriaTrigger.Instance);
+		CriteriaTriggers.register(CastSpellCriteriaTrigger.Instance);
+		CriteriaTriggers.register(CraftSpellCriteriaTrigger.Instance);
+		CriteriaTriggers.register(RitualCriteriaTrigger.Instance);
 	}
 }

@@ -113,6 +113,7 @@ public class ParticleWard extends BatchRenderParticle {
 //		GlStateManager.depthMask(false);
 //		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 		RenderSystem.depthMask(false);
+		RenderSystem.enableDepthTest();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		RenderSystem.alphaFunc(GL11.GL_GREATER, 0);

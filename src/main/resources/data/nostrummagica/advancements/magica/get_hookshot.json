@@ -1,0 +1,30 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:hookshot_weak"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.get_hookshot.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.get_hookshot.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/root",
+	"criteria": {
+		"hookshot": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"item": "nostrummagica:hookshot_weak"
+					}
+				]
+			}
+		}
+	}
+}
+	

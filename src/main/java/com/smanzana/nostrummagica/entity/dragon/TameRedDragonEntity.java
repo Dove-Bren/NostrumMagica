@@ -1580,7 +1580,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	
 	@Override
 	public boolean hitByEntity(Entity entityIn) {
-		if (this.isRidingOrBeingRiddenBy(entityIn)) {
+		if (this.isRidingSameEntity(entityIn)) {
 			return true;
 		}
 		
@@ -1592,7 +1592,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		boolean hurt = super.attackEntityFrom(source, amount);
 		
 		if (hurt && source.getTrueSource() != null) {
-			if (this.isRidingOrBeingRiddenBy(source.getTrueSource())) {
+			if (this.isRidingSameEntity(source.getTrueSource())) {
 				hurt = false;
 			}
 		}

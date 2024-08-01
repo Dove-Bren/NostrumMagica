@@ -1,0 +1,58 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:seeking_gem"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.use_seeking_gem.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.use_seeking_gem.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": true
+	},
+	"parent": "nostrummagica:magica/enter_dungeon",
+	"criteria": {
+		"dungeon_portal": {
+			"trigger": "minecraft:location",
+			"conditions": {
+				"location": {
+					"feature": "nostrummagica:nostrum_dungeons_portal"
+				}
+			}
+		},
+		"dungeon_dragon": {
+			"trigger": "minecraft:location",
+			"conditions": {
+				"location": {
+					"feature": "nostrummagica:nostrum_dungeons_dragon"
+				}
+			}
+		},
+		"dungeon_plantboss": {
+			"trigger": "minecraft:location",
+			"conditions": {
+				"location": {
+					"feature": "nostrummagica:nostrum_dungeons_plantboss"
+				}
+			}
+		},
+		"use_gem": {
+			"trigger": "minecraft:consume_item",
+			"conditions": {
+				"item": {
+					"items": [
+						"nostrummagica:seeking_gem"
+					]
+				}
+			}
+		}
+	},
+	"requirements": [
+		[ "use_gem"],
+		[ "dungeon_portal", "dungeon_plantboss", "dungeon_dragon" ]
+	]
+}
+	

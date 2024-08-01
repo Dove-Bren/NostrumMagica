@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
+import com.smanzana.nostrummagica.util.AttributeUtil;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
@@ -338,8 +339,8 @@ public class SpellDamage {
 		}
 		
 		// Apply armor reductions
-		final double reducAttrib = target.getAttributeValue(NostrumAttributes.GetReduceAttribute(element))
-				+ target.getAttributeValue(NostrumAttributes.reduceAll);
+		final double reducAttrib = AttributeUtil.GetAttributeValueSafe(target, NostrumAttributes.GetReduceAttribute(element))
+				+ AttributeUtil.GetAttributeValueSafe(target, NostrumAttributes.reduceAll);
 		if (attr != null && reducAttrib != 0.0D) {
 			damage.finalFlat("FlatReducAttribute_" + element.getName(), (float) -reducAttrib);
 		}

@@ -1,0 +1,27 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:crystal_large"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.tier_master.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.tier_master.description"
+		},
+		"frame": "challenge",
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": true
+	},
+	"parent": "nostrummagica:magica/tier_adept",
+	"criteria": {
+		"tier": {
+			"trigger": "nostrummagica:tier",
+			"conditions": {
+				"tier": "vani"
+			}
+		}
+	}
+}
+	

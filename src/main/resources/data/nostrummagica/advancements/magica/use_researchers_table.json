@@ -1,0 +1,30 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:lore_table"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.use_researchers_table.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.use_researchers_table.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": false,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/root",
+	"criteria": {
+		"use_block": {
+			"trigger": "minecraft:item_used_on_block",
+			"conditions": {
+				"location": {
+					"block": {
+						"block": "nostrummagica:lore_table"
+					}
+				}
+			}
+		}
+	}
+}
+	

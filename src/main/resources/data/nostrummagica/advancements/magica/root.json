@@ -1,0 +1,22 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:spell_scroll"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.magica.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.magica.description"
+		},
+		"background": "nostrummagica:textures/gui/advancements/magica.png",
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": false
+	},
+	"criteria": {
+		"tick": {
+			"trigger": "minecraft:tick"
+		}
+	}
+}

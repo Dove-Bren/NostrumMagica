@@ -1,0 +1,30 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:tome_workshop"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.use_tome_workshop.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.use_tome_workshop.description"
+		},
+		"show_toast": true,
+		"announce_to_chat": false,
+		"hidden": false
+	},
+	"parent": "nostrummagica:magica/use_spell_table",
+	"criteria": {
+		"use_block": {
+			"trigger": "minecraft:item_used_on_block",
+			"conditions": {
+				"location": {
+					"block": {
+						"block": "nostrummagica:tome_workshop"
+					}
+				}
+			}
+		}
+	}
+}
+	

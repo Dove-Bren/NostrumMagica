@@ -1,0 +1,24 @@
+{
+	"display": {
+		"icon": {
+			"item": "nostrummagica:mage_staff"
+		},
+		"title": {
+			"translate": "advancements.nostrummagica.cast_spell.title"
+		},
+		"description": {
+			"translate": "advancements.nostrummagica.cast_spell.description"
+		},
+		"frame": "challenge",
+		"show_toast": true,
+		"announce_to_chat": true,
+		"hidden": true
+	},
+	"parent": "nostrummagica:magica/craft_spell",
+	"criteria": {
+		"craft": {
+			"trigger": "nostrummagica:cast_spell"
+		}
+	}
+}
+	
