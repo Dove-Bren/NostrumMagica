@@ -1,7 +1,8 @@
 package com.smanzana.nostrummagica.item;
 
 import java.util.List;
-import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -23,6 +24,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
@@ -127,7 +129,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 			used = doEarth(playerIn, (ServerWorld) worldIn);
 			break;
 		case ENDER:
-			used = doEnder(playerIn, (ServerWorld) worldIn);
+			used = doEnder((ServerPlayerEntity) playerIn, (ServerWorld) worldIn);
 			break;
 		case FIRE:
 			used = doFire(playerIn, (ServerWorld) worldIn);
@@ -261,17 +263,17 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doEnder(PlayerEntity player, ServerWorld world) { 
-		if (DimensionUtils.IsOverworld(world)) {
-			Optional<BlockPos> posOpt = player.getBedPosition();
+	private boolean doEnder(ServerPlayerEntity player, ServerWorld world) { 
+		if (DimensionUtils.InDimension(player, player.func_241141_L_())) {
+			@Nullable BlockPos posOpt = player.func_241140_K_();
 			BlockPos pos;
-			if (!posOpt.isPresent()) {
+			if (posOpt == null) {
 				pos = world.getSpawnPoint();
 				while (!world.isAirBlock(pos)) {
 					pos = pos.add(0, 2, 0);
 				}
 			} else {
-				pos = posOpt.get();
+				pos = posOpt;
 			}
 			
 			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false, player)) {
