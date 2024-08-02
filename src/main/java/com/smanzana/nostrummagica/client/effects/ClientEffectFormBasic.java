@@ -52,6 +52,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 		
 		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		RenderSystem.disableCull();
+		RenderSystem.enableDepthTest();
 		ClientEffectForm.drawModel(matrixStackIn, model, color, light);
 		RenderSystem.enableCull();
 		matrixStackIn.pop();

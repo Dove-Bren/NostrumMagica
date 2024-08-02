@@ -102,6 +102,7 @@ import net.minecraftforge.event.entity.living.PotionEvent.PotionExpiryEvent;
 import net.minecraftforge.event.entity.living.PotionEvent.PotionRemoveEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
@@ -789,6 +790,30 @@ public class PlayerListener {
 			NostrumMagica.instance.getSpellCooldownTracker(event.getEntityLiving().world)
 				.clearCooldowns((PlayerEntity) event.getEntityLiving());
 		}
+	}
+	
+	@SubscribeEvent
+	public void onPlayerClone(PlayerEvent.Clone event) {
+		if (event.isCanceled() || event.isWasDeath()) {
+			return;
+		}
+		
+		// Could do the math, and then update every cooldown...
+//		final int oldExisted = event.getOriginal().ticksExisted;
+//		final int newExisted = event.getPlayer().ticksExisted;
+		
+		NostrumMagica.instance.getSpellCooldownTracker(event.getPlayer().world)
+			.clearCooldowns(event.getPlayer());
+	}
+	
+	@SubscribeEvent(priority=EventPriority.LOWEST)
+	public void onPlayerDimensionChange(PlayerChangedDimensionEvent event) {
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		NostrumMagica.instance.getSpellCooldownTracker(event.getPlayer().world)
+			.clearCooldowns(event.getPlayer());
 	}
 	
 	@SubscribeEvent

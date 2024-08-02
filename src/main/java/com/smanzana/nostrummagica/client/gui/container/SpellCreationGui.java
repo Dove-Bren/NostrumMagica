@@ -254,8 +254,8 @@ public class SpellCreationGui {
 		
 		@Override
 		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
 			checkScroll();
+			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
 			return ret;
 		}
 		

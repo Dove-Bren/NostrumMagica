@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -20,52 +19,11 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 public class SimpleInventoryWidget extends ParentWidget implements IScrollbarListener {
 	
-	public static class SimpleInventoryContainerlet {
-		
-		protected final int x;
-		protected final int y;
-		protected final int width;
-		protected final int height;
-		protected final ITextComponent title;
-		protected final Rectangle2d invBounds;
-		protected final List<HideableSlot> slots;
-		protected final int spilloverRows;
-		
-		public SimpleInventoryContainerlet(Consumer<Slot> container, IInventory inventory, IHiddenSlotFactory factory, int x, int y, int width, int height) {
-			this(container, inventory, factory, x, y, width, height, StringTextComponent.EMPTY);
-		}
-		
-		public SimpleInventoryContainerlet(Consumer<Slot> container, IInventory inventory, IHiddenSlotFactory factory, int x, int y, int width, int height, ITextComponent title) {
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-			this.title = title;
-			invBounds = MakeBounds(inventory.getSizeInventory(), x, y, width, height);
-			slots = new ArrayList<>(inventory.getSizeInventory());
-			
-			final int cellsPerRow = Math.max(1, invBounds.getWidth() / POS_SLOT_WIDTH);
-			
-			for (int i = 0; i < inventory.getSizeInventory(); i++) {
-				final int slotX = invBounds.getX() + 1 + ((i%cellsPerRow) * POS_SLOT_WIDTH);
-				final int slotY = invBounds.getY() + 1 + ((i/cellsPerRow) * POS_SLOT_WIDTH);
-				HideableSlot slot = factory.apply(inventory, i, slotX, slotY);
-				slots.add(slot);
-				container.accept(slot);
-			}
-			
-			this.spilloverRows = ((inventory.getSizeInventory() + cellsPerRow-1) / cellsPerRow)
-					- (invBounds.getHeight() / POS_SLOT_WIDTH);
-		}
-	}
-
 	public static interface IHiddenSlotFactory {
 		public HideableSlot apply(IInventory inventory, int slotIdx, int x, int y);
 	}
@@ -188,17 +146,6 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	private static final int TEX_SLOT_WIDTH = 18;
 	private static final int TEX_SLOT_HEIGHT = 18;
 	
-	protected static final int POS_SLOTS_HMARGIN = 8;
-	protected static final int POS_SLOTS_TOP_MARGIN = 18;
-	protected static final int POS_SLOTS_BOTTOM_MARGIN = 18;
-	
-	protected static final int POS_SLOT_WIDTH = 18;
-	
-	protected static final int POS_SCROLLBAR_RMARGIN = 6;
-	protected static final int POS_SCROLLBAR_WIDTH = 10;
-	protected static final int POS_SCROLLBAR_TMARGIN = POS_SLOTS_TOP_MARGIN;
-	protected static final int POS_SCROLLBAR_BMARGIN = POS_SLOTS_BOTTOM_MARGIN;
-	
 	protected final SimpleInventoryContainerlet containerlet;
 	protected List<SlotWidget> slotWidgets;
 	protected Rectangle2d guiBounds;
@@ -210,36 +157,6 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		this.slotWidgets = new ArrayList<>(containerlet.slots.size());
 		
 		init(containerlet, gui.getGuiLeft(), gui.getGuiTop());
-	}
-	
-	protected static Rectangle2d MakeBounds(int slotCount, int x, int y, int width, int height) {
-		// Calculate ideal bounds based on width height and position to start
-		int hOffset = x + POS_SLOTS_HMARGIN;
-		int vOffset = y + POS_SLOTS_TOP_MARGIN;
-		int slotsWidth = width - (2 * POS_SLOTS_HMARGIN);
-		int slotsHeight = height - (POS_SLOTS_TOP_MARGIN + POS_SLOTS_BOTTOM_MARGIN);
-		
-		// Figure out how many cells we can actually fit in our width
-		int cellsPerRow = Math.max(1, slotsWidth / POS_SLOT_WIDTH);
-		
-		// See if that means we'll have a scrollbar or not
-		if ( ((slotCount + cellsPerRow - 1) / cellsPerRow) * POS_SLOT_WIDTH > slotsHeight) {
-			// Reduce width to make room for scrollbar
-			slotsWidth -= POS_SCROLLBAR_WIDTH;
-			cellsPerRow = Math.max(1, slotsWidth / POS_SLOT_WIDTH);
-		}
-		
-		// Figure out if that leaves extra space on the side to divy up
-		final int realTakenWidth = cellsPerRow * POS_SLOT_WIDTH;
-		final int leftoverWidth = slotsWidth - realTakenWidth;
-		
-		// Shrink to match the smaller width
-		if (leftoverWidth > 0) {
-			hOffset += (leftoverWidth+1) / 2;
-			slotsWidth -= leftoverWidth;
-		}
-		
-		return new Rectangle2d(hOffset, vOffset, slotsWidth, slotsHeight);
 	}
 	
 	protected void init(SimpleInventoryContainerlet containerlet, int guiLeft, int guiTop) {
@@ -254,10 +171,10 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		
 		if (containerlet.spilloverRows > 0 ) {
 			ScrollbarWidget scrollbar = new ScrollbarWidget(this,
-					guiLeft + containerlet.x + containerlet.width - (POS_SCROLLBAR_WIDTH + POS_SCROLLBAR_RMARGIN),
-					guiTop + containerlet.y + POS_SCROLLBAR_TMARGIN,
-					POS_SCROLLBAR_WIDTH,
-					containerlet.height - (POS_SCROLLBAR_TMARGIN + POS_SCROLLBAR_BMARGIN)
+					guiLeft + containerlet.x + containerlet.width - (SimpleInventoryContainerlet.POS_SCROLLBAR_WIDTH + SimpleInventoryContainerlet.POS_SCROLLBAR_RMARGIN),
+					guiTop + containerlet.y + SimpleInventoryContainerlet.POS_SCROLLBAR_TMARGIN,
+					SimpleInventoryContainerlet.POS_SCROLLBAR_WIDTH,
+					containerlet.height - (SimpleInventoryContainerlet.POS_SCROLLBAR_TMARGIN + SimpleInventoryContainerlet.POS_SCROLLBAR_BMARGIN)
 					);
 			scrollbar.setScrollRate(1f/containerlet.spilloverRows);
 			this.addChild(scrollbar);
@@ -347,7 +264,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	@Override
 	public void handleScroll(float scroll) {
 		if (this.containerlet.spilloverRows > 0) {
-			final int yOffset = (int) Math.round(this.containerlet.spilloverRows * scroll) * POS_SLOT_WIDTH;
+			final int yOffset = (int) Math.round(this.containerlet.spilloverRows * scroll) * SimpleInventoryContainerlet.POS_SLOT_WIDTH;
 			
 			for (SlotWidget widget : this.slotWidgets) {
 				widget.setPosition(widget.getStartingX(), widget.getStartingY() - yOffset);

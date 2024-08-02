@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.SimpleInventoryContainerlet;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer.RuneSlot;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;

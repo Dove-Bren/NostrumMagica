@@ -43,15 +43,13 @@
 			"trigger": "minecraft:consume_item",
 			"conditions": {
 				"item": {
-					"items": [
-						"nostrummagica:seeking_gem"
-					]
+					"item": "nostrummagica:seeking_gem"
 				}
 			}
 		}
 	},
 	"requirements": [
-		[ "use_gem"],
+		[ "use_gem" ],
 		[ "dungeon_portal", "dungeon_plantboss", "dungeon_dragon" ]
 	]
 }
