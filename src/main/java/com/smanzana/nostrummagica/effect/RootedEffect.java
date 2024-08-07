@@ -10,7 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifierManager;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
@@ -24,6 +26,8 @@ public class RootedEffect extends Effect {
 	
 	public RootedEffect() {
 		super(EffectType.HARMFUL, (new Color(100, 60, 25)).getRGB());
+		
+		this.addAttributesModifier(Attributes.MOVEMENT_SPEED, "ceea9fa1-aee7-4fe1-b8e8-e9b8cfc2f762", -.1, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
 	public boolean isReady(int duration, int amp) {
@@ -38,8 +42,10 @@ public class RootedEffect extends Effect {
         }
         
         final Vector3d motion = entity.getMotion();
-        final double y = (motion.y > 0 ? 0 : motion.y);
-        entity.setMotion(0, y, 0);
+        
+        if (motion.y > 0) {
+        	entity.setMotion(0, 0, 0);
+        }
     }
 	
 	@Override

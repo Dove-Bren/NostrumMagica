@@ -644,9 +644,9 @@ public class ModInit {
 
 		// Mastery Orb
 		registry.register(RitualRecipe.createTier3("mastery_orb",
-				new ItemStack(NostrumItems.resourcePendantRight), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				new ItemStack(NostrumItems.thanoPendant), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
-				Ingredient.fromItems(NostrumItems.thanoPendant),
+				Ingredient.fromItems(NostrumItems.resourcePendantRight),
 				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
 						Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
 						Ingredient.fromItems(Items.BLAZE_POWDER),
@@ -655,9 +655,9 @@ public class ModInit {
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.masteryOrb))));
 		
 		registry.register(RitualRecipe.createTier3("mastery_orb",
-				new ItemStack(NostrumItems.resourcePendantLeft), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				new ItemStack(NostrumItems.thanoPendant), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
-				Ingredient.fromItems(NostrumItems.thanoPendant),
+				Ingredient.fromItems(NostrumItems.resourcePendantLeft),
 				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
 						Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
 						Ingredient.fromItems(Items.BLAZE_POWDER),
@@ -1851,6 +1851,7 @@ public class ModInit {
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").hiddenParent("kind_infusion")
 				.hiddenParent("fierce_infusion")
+				.hiddenParent("vani")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true,
 						new ItemStack(ElementalArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, ElementalArmor.Type.MASTER)));
