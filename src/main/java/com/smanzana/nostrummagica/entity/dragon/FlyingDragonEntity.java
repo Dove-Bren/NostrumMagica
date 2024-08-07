@@ -151,9 +151,10 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	}
 	
 	public void startFlying() {
-		if (getFlyState() == FlyState.LANDED) {
-			setFlyState(FlyState.TAKING_OFF);
-		}
+		int unused; // too laggy when flying so trying to turn off for now :(
+//		if (getFlyState() == FlyState.LANDED) {
+//			setFlyState(FlyState.TAKING_OFF);
+//		}
 	}
 	
 	public void startLanding() {

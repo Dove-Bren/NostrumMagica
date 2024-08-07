@@ -644,7 +644,7 @@ public class ModInit {
 
 		// Mastery Orb
 		registry.register(RitualRecipe.createTier3("mastery_orb",
-				new ItemStack(NostrumItems.masteryOrb), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+				new ItemStack(NostrumItems.resourcePendantRight), null, new ReagentType[] { ReagentType.SPIDER_SILK,
 						ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
 				Ingredient.fromItems(NostrumItems.thanoPendant),
 				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
@@ -653,6 +653,28 @@ public class ModInit {
 						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
 				new ResearchRequirement("elemental_trials"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.masteryOrb))));
+		
+		registry.register(RitualRecipe.createTier3("mastery_orb",
+				new ItemStack(NostrumItems.resourcePendantLeft), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+						ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
+				Ingredient.fromItems(NostrumItems.thanoPendant),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
+						Ingredient.fromItems(Items.BLAZE_POWDER),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
+				new ResearchRequirement("elemental_trials"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.masteryOrb))));
+		
+		registry.register(RitualRecipe.createTier3("mastery_orb",
+				new ItemStack(NostrumItems.masteryOrb, 3), null, new ReagentType[] { ReagentType.SPIDER_SILK,
+						ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK },
+				Ingredient.fromItems(NostrumItems.thanoPendant),
+				new Ingredient[] { Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(Tags.Items.ENDER_PEARLS),
+						Ingredient.fromItems(Items.BLAZE_POWDER),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
+				new ResearchRequirement("elemental_trials"),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.masteryOrb, 3))));
 
 		// Spell Tome Creation
 		registry.register(RitualRecipe.createTier3("tome", new ItemStack(NostrumItems.spellTomeNovice), null,
@@ -929,16 +951,11 @@ public class ModInit {
 				new ResearchRequirement("seeking_gems"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.seekingGem))));
 
-		registry.register(RitualRecipe.createTier3("tome_workshop",
+		registry.register(RitualRecipe.createTier2("tome_workshop",
 				new ItemStack(NostrumBlocks.tomeWorkshop), null,
 				new ReagentType[] {
 						ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST },
-				Ingredient.fromTag(ItemTags.ANVIL),
-				new Ingredient[] { Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
-						Ingredient.fromItems(Blocks.CRAFTING_TABLE),
-						Ingredient.fromItems(Items.INK_SAC),
-						Ingredient.fromTag(NostrumTags.Items.CrystalSmall)
-						},
+				Ingredient.fromItems(Blocks.SMITHING_TABLE),
 				new ResearchRequirement("tome_workshop"),
 				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.tomeWorkshop))));
 

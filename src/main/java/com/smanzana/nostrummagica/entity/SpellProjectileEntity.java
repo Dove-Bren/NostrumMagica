@@ -198,7 +198,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 
 	@Override
 	protected void onImpact(RayTraceResult result) {
-		if (world.isRemote())
+		if (world.isRemote() || this.trigger == null)
 			return;
 		
 		if (result.getType() == RayTraceResult.Type.MISS) {
