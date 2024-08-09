@@ -73,6 +73,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -137,6 +138,10 @@ public class SpellAction {
 			this.heals = 0f;
 			affectedPos = null;
 		}
+	}
+	
+	public static interface IEffectPredicate {
+		public boolean test(LivingEntity caster, LivingEntity target, float efficiency);
 	}
 	
 	private static interface SpellEffect {
@@ -528,8 +533,8 @@ public class SpellAction {
 		public int getAmplifier(LivingEntity caster, LivingEntity target, float efficiency);
 	}
 	
-	public static interface IOptionalEffectFilter {
-		public boolean test(LivingEntity caster, LivingEntity target, float efficiency);
+	public static interface IOptionalEffectFilter extends IEffectPredicate {
+		
 	}
 	
 	private static class AmplifiedStatusEffect extends StatusEffect {
@@ -922,6 +927,16 @@ public class SpellAction {
 			entity.hurtResistantTime = 0;
 			
 			entity.setFire((int) Math.ceil((float) duration / 20.0f));
+			
+			@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Inflict)) {
+				// Also bust shields
+				entity.removePotionEffect(NostrumEffects.mysticWater);
+				entity.removePotionEffect(NostrumEffects.physicalShield);
+				entity.removePotionEffect(NostrumEffects.magicShield);
+				entity.removePotionEffect(Effects.ABSORPTION);
+			}
+			
 			resultBuilder.applied |= true;
 			
 			log.generalEffectStart(LABEL_BURN_NAME,
@@ -2109,6 +2124,48 @@ public class SpellAction {
 		
 	}
 	
+	private static class ResetTargetEffect implements SpellEffect {
+		
+		private static final ITextComponent LABEL_TARGET_RESET_NAME = new TranslationTextComponent("spelllog.nostrummagica.target_reset.name");
+		private static final ITextComponent LABEL_TARGET_RESET_DESC = new TranslationTextComponent("spelllog.nostrummagica.target_reset.desc");
+		
+		private final IEffectPredicate predicate;
+		
+		public ResetTargetEffect(IEffectPredicate predicate) {
+			this.predicate = predicate;
+		}
+
+		@Override
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			if (this.predicate == null || this.predicate.test(caster, entity, eff)) {
+				log.generalEffectStart(LABEL_TARGET_RESET_NAME, LABEL_TARGET_RESET_DESC, false);
+				log.generalEffectFinish(0f, 0f);
+				
+				if (entity instanceof MobEntity) {
+					((MobEntity) entity).setAttackTarget(null);
+					((MobEntity) entity).setRevengeTarget(null);
+				}
+			}
+			
+		}
+
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder,
+				ISpellLogBuilder log) {
+			; // do nothing
+		}
+
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
+
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+	}
+	
 	private List<SpellEffect> effects;
 	private TextComponent name;
 	private TextComponent desc;
@@ -2325,6 +2382,11 @@ public class SpellAction {
 	
 	public SpellAction harvest(int level) {
 		effects.add(new HarvestEffect(level));
+		return this;
+	}
+	
+	public SpellAction resetTarget(@Nullable IEffectPredicate predicate) {
+		effects.add(new ResetTargetEffect(predicate));
 		return this;
 	}
 	

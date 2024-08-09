@@ -58,7 +58,7 @@ public class SpellDamage {
 		public final float calc() {
 			final float baseAdj = Math.max(0, base + baseFlat);
 			final float preFin = baseAdj * Math.max(0f, bonusScale) * Math.max(0f, resistScale);
-			final float fin = preFin + finalFlat;
+			final float fin = Math.max(0, preFin + finalFlat);
 			//LogDamage(base, fin, "Result");
 			return fin;
 		}
@@ -128,7 +128,6 @@ public class SpellDamage {
 			log.effectMod(MakeLabel(cause), flat, ESpellLogModifierType.FINAL_FLAT);
 		}
 
-		@SuppressWarnings("unused")
 		private final void finalFlat(Skill skill, float flat) {
 			finalFlatInternal("Skill: " + skill.getName().getString(), flat);
 			log.effectMod(skill, flat, ESpellLogModifierType.FINAL_FLAT);
@@ -245,6 +244,9 @@ public class SpellDamage {
 			
 			if (target.getHeight() < 1.5f || target instanceof EndermanEntity || target instanceof ShadowRedDragonEntity) {
 				light = true;
+			} else if (magic != null && magic.hasSkill(NostrumSkills.Wind_Inflict) && target.getActivePotionEffect(Effects.POISON) != null) {
+				// Poisoned enemies count as light with wind inflict skill
+				light = true;
 			} else {
 				light = false;
 			}
@@ -323,6 +325,12 @@ public class SpellDamage {
 		ModifiableAttributeInstance attr = caster == null ? null : caster.getAttribute(NostrumAttributes.magicDamage);
 		if (attr != null && attr.getValue() != 0.0D) {
 			damage.bonusScale("MagicDamageAttribute", (Math.max(0, Math.min(100, 1f + (float)(attr.getValue() / 100.0)))) - 1f);
+		}
+		
+		// TODO: make into attribute?
+		final @Nullable EffectInstance magicWeakness = caster == null ? null : caster.getActivePotionEffect(NostrumEffects.magicWeakness);
+		if (magicWeakness != null && magicWeakness.getDuration() > 0) {
+			damage.finalFlat(NostrumSkills.Physical_Inflict, -2 * (magicWeakness.getAmplifier() + 1));
 		}
 		
 		// No magic resist for physical; it uses armor value

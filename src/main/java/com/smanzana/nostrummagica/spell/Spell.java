@@ -42,6 +42,7 @@ import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -808,18 +809,82 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().status(Effects.WEAKNESS, duration, amp).name("weakness");
+			return new SpellAction().status(Effects.WEAKNESS, duration, amp)
+					.status(NostrumEffects.magicWeakness, duration, amp, (caster, target, eff) -> {
+						// Only apply with physical inflict skill
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+						if (attr != null && attr.hasSkill(NostrumSkills.Physical_Inflict)) {
+							return true;
+						}
+						return false;
+					}).name("weakness");
 		case EARTH:
-			return new SpellAction().status(NostrumEffects.rooted, duration, amp).name("rooted");
+			return new SpellAction().status(NostrumEffects.rooted, duration, (caster, target, eff) -> {
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Earth_Inflict)) {
+					return amp + 3;
+				} else {
+					return amp;
+				}
+			}).name("rooted");
 		case ENDER:
-			return new SpellAction().status(Effects.BLINDNESS, duration, amp).name("blindness");
+			return new SpellAction().status(Effects.BLINDNESS, duration, amp).status(NostrumEffects.mobBlindness, duration, amp, (caster, target, eff) -> {
+				// With the inflict skill, apply to mobs
+				if (target instanceof MobEntity) {
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+					if (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict)) {
+						return true;
+					}
+				}
+				return false;
+			}).resetTarget((caster, target, eff) -> {
+				// With the inflict skill, reset target to none
+				if (target instanceof MobEntity) {
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+					if (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict)) {
+						return true;
+					}
+				}
+				return false;
+			}).name("blindness");
 		case FIRE:
-			//return new SpellAction().status(Effects.NAUSEA, duration / 2, amp).damage(EMagicElement.FIRE, 1 + (amp / 2)).name("overheat");
-			return new SpellAction().damage(EMagicElement.FIRE, 1f + ((float) amp/2f)).burn(elementCount * 20 * 5).name("burn");
+			// Note: damage is AFTER burn so that if burn takes away shields the damage comes through after
+			return new SpellAction().burn(elementCount * 20 * 5).damage(EMagicElement.FIRE, 1f + ((float) amp/2f)).name("burn");
 		case ICE:
-			return new SpellAction().status(NostrumEffects.frostbite, duration, amp).name("frostbite");
+			return new SpellAction().status(NostrumEffects.frostbite, duration, amp, (caster, target, eff) -> {
+				if (caster == target) {
+					return true;
+				}
+				
+				// With the inflict skill, don't apply frostbite to friendlies
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Inflict)) {
+					return !NostrumMagica.IsSameTeam(caster, target);
+				}
+				return true;
+			}).status(NostrumEffects.manaRegen, duration, amp, (caster, target, eff) -> {
+				if (caster == target) {
+					return false;
+				}
+				
+				// With the inflict skill, apply mana regen to friendlies
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Inflict)) {
+					return NostrumMagica.IsSameTeam(caster, target);
+				}
+				return false;
+			}).name("frostbite");
 		case LIGHTNING:
-			return new SpellAction().status(Effects.SLOWNESS, (int) (duration * .7), amp + 1).name("slowness");
+			return new SpellAction().status(Effects.SLOWNESS, (int) (duration * .7), amp)
+					.status(NostrumEffects.immobilize, 30 + (10 * elementCount) , amp, (caster, target, eff) -> {
+						// Only apply with lightning inflict skill
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+						if (attr != null && attr.hasSkill(NostrumSkills.Lightning_Inflict)) {
+							return true;
+						}
+						return false;
+					})
+					.name("slowness");
 		case WIND:
 			return new SpellAction().status(Effects.POISON, duration, amp).name("poison");
 		}

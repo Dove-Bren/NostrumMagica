@@ -55,6 +55,9 @@ public class NostrumEffects {
 	@ObjectHolder(MysticWaterEffect.ID) public static MysticWaterEffect mysticWater;
 	@ObjectHolder(MysticAirEffect.ID) public static MysticAirEffect mysticAir;
 	@ObjectHolder(CursedFireEffect.ID) public static CursedFireEffect cursedFire;
+	@ObjectHolder(ImmobilizeEffect.ID) public static ImmobilizeEffect immobilize;
+	@ObjectHolder(MagicWeaknessEffect.ID) public static MagicWeaknessEffect magicWeakness;
+	@ObjectHolder(MobBlindnessEffect.ID) public static MobBlindnessEffect mobBlindness;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -101,5 +104,8 @@ public class NostrumEffects {
     	registry.register(new MysticWaterEffect().setRegistryName(MysticWaterEffect.ID));
     	registry.register(new MysticAirEffect().setRegistryName(MysticAirEffect.ID));
     	registry.register(new CursedFireEffect().setRegistryName(CursedFireEffect.ID));
+    	registry.register(new ImmobilizeEffect().setRegistryName(ImmobilizeEffect.ID));
+    	registry.register(new MagicWeaknessEffect().setRegistryName(MagicWeaknessEffect.ID));
+    	registry.register(new MobBlindnessEffect().setRegistryName(MobBlindnessEffect.ID));
     }
 }

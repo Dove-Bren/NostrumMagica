@@ -94,6 +94,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingVisibilityEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.PotionColorCalculationEvent;
@@ -870,6 +871,16 @@ public class PlayerListener {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null && !attr.hasLore(ArcaneWolfEntity.WolfTameLore.instance())) {
 				attr.giveBasicLore(ArcaneWolfEntity.WolfTameLore.instance());
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onEntityVisibilityCheck(LivingVisibilityEvent event) {
+		if (event.getLookingEntity() != null && event.getLookingEntity() instanceof LivingEntity) {
+			final EffectInstance instance = ((LivingEntity) event.getLookingEntity()).getActivePotionEffect(NostrumEffects.mobBlindness);
+			if (instance != null && instance.getDuration() > 0) {
+				event.modifyVisibility(Math.max(0, .2 - (0.1 * instance.getAmplifier())));
 			}
 		}
 	}
