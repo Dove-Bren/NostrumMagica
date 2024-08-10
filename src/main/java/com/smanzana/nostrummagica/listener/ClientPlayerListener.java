@@ -2,7 +2,10 @@ package com.smanzana.nostrummagica.listener;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.PortalBlock;
+import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -14,7 +17,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ClientPlayerListener extends PlayerListener {
 	
+	// Whether jump was or wasn't pressed last frame
 	private boolean jumpPressedLastFrame;
+	
+	// Whether the last false->true jump state transition was cancelled
+	private boolean jumpConsumedThisPress;
+	
+	// Whether this current frame has a jump that was unconsumed
 	private boolean hasJump;
 	
 	public ClientPlayerListener() {
@@ -23,17 +32,26 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	@SubscribeEvent
 	public void onInputUpdate(InputUpdateEvent event) {
-		if (!jumpPressedLastFrame && event.getMovementInput().jump) {
+		final boolean newPress = !jumpPressedLastFrame && event.getMovementInput().jump;
+		jumpPressedLastFrame = event.getMovementInput().jump;
+		// 
+		
+		if (newPress) {
+			jumpConsumedThisPress = false;
 			final PlayerJumpEvent.Pre jumpEvent = new PlayerJumpEvent.Pre(event.getPlayer());
 			MinecraftForge.EVENT_BUS.post(jumpEvent);
 			
 			if (jumpEvent.isConsumed()) {
-				event.getMovementInput().jump = false;
+				jumpConsumedThisPress = true;
 			} else {
 				hasJump = true;
 			}
 		}
-		jumpPressedLastFrame = event.getMovementInput().jump;
+		
+		if (jumpConsumedThisPress) {
+			// Keep eating the jump so that it never appears to transition to on in the regular player loop
+			event.getMovementInput().jump = false;
+		}
 	}
 	
 	@SubscribeEvent
@@ -51,6 +69,25 @@ public class ClientPlayerListener extends PlayerListener {
 				MinecraftForge.EVENT_BUS.post(new PlayerJumpEvent.Post(player));
 			}
 			hasJump = false;
+		}
+	}
+	
+	@SubscribeEvent
+	public void onJumpInput(PlayerJumpEvent.Pre event) {
+		// Evaluate double jump
+		final ClientPlayerEntity player = (ClientPlayerEntity) event.getPlayer();
+		if (!event.isConsumed() && !player.isOnGround()) {
+			final int extraJumps = (int) event.getPlayer().getAttributeValue(NostrumAttributes.bonusJump);
+			if (extraJumps > 0) {
+				final @Nullable IBonusJumpCapability jumps = NostrumMagica.getBonusJump(player);
+				if (jumps != null) {
+					if (jumps.getCount() < extraJumps) {
+						jumps.incrCount();
+						player.jump();
+						event.consume();
+					}
+				}
+			}
 		}
 	}
 }

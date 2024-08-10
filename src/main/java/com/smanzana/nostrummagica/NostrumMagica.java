@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.block.TemporaryTeleportationPortalBlock;
+import com.smanzana.nostrummagica.capabilities.BonusJumpCapabilityProvider;
+import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
@@ -38,6 +40,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
+import com.smanzana.nostrummagica.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.listener.ItemSetListener;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy;
 import com.smanzana.nostrummagica.listener.ManaArmorListener;
@@ -143,7 +146,7 @@ public class NostrumMagica {
 		
 		(new ModConfig()).register();
 		
-		playerListener = new PlayerListener();
+		playerListener = DistExecutor.safeRunForDist(() -> ClientPlayerListener::new, () -> PlayerListener::new);
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
 		statListener = new PlayerStatListener();
@@ -234,6 +237,14 @@ public class NostrumMagica {
 		}
 		
 		return e.getCapability(SpellCraftingCapabilityProvider.CAPABILITY).orElse(null);
+	}
+	
+	public static IBonusJumpCapability getBonusJump(Entity e) {
+		if (e == null) {
+			return null;
+		}
+		
+		return e.getCapability(BonusJumpCapabilityProvider.CAPABILITY).orElse(null);
 	}
 
 	public static ItemStack findTome(PlayerEntity entity, int tomeID) {

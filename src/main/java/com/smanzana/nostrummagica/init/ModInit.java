@@ -9,8 +9,10 @@ import com.smanzana.autodungeons.command.CommandSpawnDungeon;
 import com.smanzana.autodungeons.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.capabilities.BonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
+import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
@@ -254,6 +256,7 @@ public class ModInit {
     	CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
 		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
 		CapabilityManager.INSTANCE.register(ISpellCrafting.class, SpellCraftingCapability.Serializer.INSTANCE, SpellCraftingCapability::new);
+		CapabilityManager.INSTANCE.register(IBonusJumpCapability.class, BonusJumpCapability.Serializer.INSTANCE, BonusJumpCapability::new);
 		new CapabilityHandler();
 	}
 	

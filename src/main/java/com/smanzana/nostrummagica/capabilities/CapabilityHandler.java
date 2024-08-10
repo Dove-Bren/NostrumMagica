@@ -15,6 +15,7 @@ public class CapabilityHandler {
 	public static final ResourceLocation CAPABILITY_MAGIC_LOC = new ResourceLocation(NostrumMagica.MODID, "magicattrib");
 	public static final ResourceLocation CAPABILITY_MANARMOR_LOC = new ResourceLocation(NostrumMagica.MODID, "manaarmorattrib");
 	public static final ResourceLocation CAPABILITY_SPELLCRAFTING_LOC = NostrumMagica.Loc("spellcrafting");
+	public static final ResourceLocation CAPABILITY_BONUSJUMP_LOC = NostrumMagica.Loc("bonusjump");
 	
 	public CapabilityHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -29,6 +30,7 @@ public class CapabilityHandler {
 			event.addCapability(CAPABILITY_MAGIC_LOC, new NostrumMagicAttributeProvider(event.getObject()));
 			event.addCapability(CAPABILITY_MANARMOR_LOC, new ManaArmorAttributeProvider(event.getObject()));
 			event.addCapability(CAPABILITY_SPELLCRAFTING_LOC, new SpellCraftingCapabilityProvider());
+			event.addCapability(CAPABILITY_BONUSJUMP_LOC, new BonusJumpCapabilityProvider());
 		}
 	}
 	
@@ -46,6 +48,10 @@ public class CapabilityHandler {
 			ISpellCrafting crafting = NostrumMagica.getSpellCrafting(event.getOriginal());
 			event.getPlayer().getCapability(SpellCraftingCapabilityProvider.CAPABILITY, null).orElse(null)
 				.copy(crafting);
+			
+			IBonusJumpCapability jump = NostrumMagica.getBonusJump(event.getOriginal());
+			event.getPlayer().getCapability(BonusJumpCapabilityProvider.CAPABILITY, null).orElse(null)
+				.copy(jump);
 		//}
 		//if (!event.getEntityPlayer().world.isRemote)
 		//	NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.getEntityPlayer());

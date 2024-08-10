@@ -57,6 +57,7 @@ public class NostrumAttributes {
 	@ObjectHolder(ID_XP_LIGHTNING) public static ElementXPBonusAttribute xpLightning;
 	@ObjectHolder(ID_XP_WIND) public static ElementXPBonusAttribute xpWind;
 	@ObjectHolder(AllElementXPBonusAttribute.ID) public static AllElementXPBonusAttribute xpAllElements;
+	@ObjectHolder(BonusJumpAttribute.ID) public static BonusJumpAttribute bonusJump;
 	
 	protected static final String makeName(String base) {
 		return "attribute.nostrummagica." + base + ".name";
@@ -80,6 +81,7 @@ public class NostrumAttributes {
 		makeAndRegister(registry, MagicXPBonusAttribute::new, MagicXPBonusAttribute.ID);
 		makeAndRegister(registry, AllElementXPBonusAttribute::new, AllElementXPBonusAttribute.ID);
 		makeAndRegister(registry, AllMagicReductionAttribute::new, AllMagicReductionAttribute.ID);
+		makeAndRegister(registry, BonusJumpAttribute::new, BonusJumpAttribute.ID);
 		
 		for (EMagicElement elem : EMagicElement.values()) {
 			final String REDUC_ID = MagicReductionAttribute.ID_PREFIX + elem.name().toLowerCase();
@@ -103,6 +105,10 @@ public class NostrumAttributes {
 			for (EMagicElement elem : EMagicElement.values()) {
 				event.add(type, GetReduceAttribute(elem));
 				event.add(type, GetXPAttribute(elem));
+			}
+			
+			if (type == EntityType.PLAYER) {
+				event.add(type, bonusJump);
 			}
 		}
 	}
