@@ -884,6 +884,10 @@ public class OverlayRenderer extends AbstractGui {
 		int left_height = 39;
 		ModifiableAttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
         float healthMax = (float)attrMaxHealth.getValue();
+        if (ModConfig.config.displayArmorOverlayOneLine()) {
+        	// Cap to 20 -- one full row
+        	healthMax = Math.min(20f, healthMax);
+        }
         float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 		int healthRows = MathHelper.ceil((healthMax + absorb) / 2.0F / 10.0F);
         int rowHeight = Math.max(10 - (healthRows - 2), 3);

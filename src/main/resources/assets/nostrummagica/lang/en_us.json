@@ -1155,7 +1155,7 @@
     "spelleffect.invisibility.name": "Invisibility",
     "spelleffect.invisibility.desc": "Makes the target invisible.",
     "spelleffect.magicboost.name": "Magic Boost",
-    "spelleffect.magicboost.desc": "Increases the amount of magic damage done by the target.",
+    "spelleffect.magicboost.desc": "Increases the amount of magic damage done by the target by 50%% per level.",
     "spelleffect.dispel.name": "Dispel",
     "spelleffect.dispel.desc": "Removes status effects.",
     "spelleffect.magicresist.name": "Magic Resistance",

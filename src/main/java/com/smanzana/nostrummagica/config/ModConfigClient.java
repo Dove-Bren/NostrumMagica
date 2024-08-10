@@ -18,6 +18,7 @@ public class ModConfigClient {
 		EFFECT_DISPLAY(ModConfig.Category.DISPLAY, "display_effects", true, "Allow cool client effects to be rendered. Turn off to enhance performance"),
 		MIRROR_QUEST_NODE_SPOILERS(ModConfig.Category.DISPLAY, "display_mirror_quest_spoilers", false, "If true, show ALL magic mirror character upgrades regardless of proximity"),
 		ARMOR_DISPLAY(ModConfig.Category.DISPLAY, "overarmor_display", true, "Enable displaying armor overlay when armor is > 20 units"),
+		ARMOR_DISPLAY_ONELINE(ModConfig.Category.DISPLAY, "overarmor_one_line", false, "Expect health to be displayed overlapped on one line (multicolor hearts) instead of using vanilla heart stacking"),
 		DISPLAY_SHIELDS(ModConfig.Category.DISPLAY, "shield_display", true, "Show magical shield overlay on hearts"),
 		DISPLAY_HOOKSHOT_CROSSHAIR(ModConfig.Category.DISPLAY, "hookshot_crosshair", true, "Show special crosshair with the hookshot"),
 		DISPLAY_DRAGON_HEALTHBARS(ModConfig.Category.DISPLAY, "dragon_healthbar", true, "Display special healthbars for dragons"),
@@ -64,6 +65,7 @@ public class ModConfigClient {
 	ForgeConfigSpec.BooleanValue configEffectDisplay;
 	ForgeConfigSpec.BooleanValue configMirrorNodeSpoilers;
 	ForgeConfigSpec.BooleanValue configArmorDisplay;
+	ForgeConfigSpec.BooleanValue configArmorDisplayOneLine;
 	ForgeConfigSpec.BooleanValue configDisplayShields;
 	ForgeConfigSpec.BooleanValue configDisplayHookshotCrosshair;
 	ForgeConfigSpec.EnumValue<ReagentHUDMode> configDisplayReagentMode;
@@ -139,6 +141,10 @@ public class ModConfigClient {
 					.comment(Key.ARMOR_DISPLAY.desc)
 					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
 					.define(Key.ARMOR_DISPLAY.key, true); // Default pulled out
+			configArmorDisplayOneLine = builder
+					.comment(Key.ARMOR_DISPLAY_ONELINE.desc)
+					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?
+					.define(Key.ARMOR_DISPLAY_ONELINE.key, false); // Default pulled out
 			configDisplayShields = builder
 					.comment(Key.DISPLAY_SHIELDS.desc)
 					//.translation("") ? config.nostrummagica.[CATEGORY].[NAME] ?

@@ -486,6 +486,10 @@ public class ModConfig {
 		return client.configArmorDisplay.get();
 	}
 	
+	public boolean displayArmorOverlayOneLine() {
+		return client.configArmorDisplayOneLine.get();
+	}
+	
 //	public int sorceryDimensionIndex() {
 //		return (Integer) common.get(ModConfigCommon.Key.NOSTRUM_DIMENSION_ID);
 //	}
