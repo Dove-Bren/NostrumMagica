@@ -309,6 +309,9 @@
 	"item.nostrummagica.copy_wand": "Copy Wand",
 	"item.nostrummagica.research_scroll_unlock": "Magic Transcript",
 	"item.nostrummagica.research_scroll_unlock.desc": "Unlocks the %1$s research",
+	
+	"item.nostrummagica.gold_mirror": "Gold Mirror",
+	"item.nostrummagica.silver_mirror": "Silver Mirror",
 
     "set.nostrummagica.magic_armor.physical.novice.name": "Sturdy Set",
     "set.nostrummagica.magic_armor.physical.adept.name": "Reinforced Set",
@@ -777,6 +780,8 @@
 	"info.pattern.usage": "Use to learn the %1$s pattern!",
 	"info.research.learn": "You have researched %1$s!",
 	"info.research.already_know": "You already have researched %1$s",
+	"info.heldmirror.set_warning": "You are about to change what the mirror is pointing at. Sneak-use again on the same block to confirm.",
+	"info.gold_mirror.not_loaded": "The remote block can't be reached (unloaded).",
 	
 	"mastery.unknown.name": "Unknown",
 	"mastery.novice.name": "Novice",

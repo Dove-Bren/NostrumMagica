@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
-import com.smanzana.nostrummagica.item.armor.MageArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalEarthArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalEnderArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalFireArmor;
@@ -21,12 +20,14 @@ import com.smanzana.nostrummagica.item.armor.ElementalLightningArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalPhysicalArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalWindArmor;
 import com.smanzana.nostrummagica.item.armor.KoidHelmet;
+import com.smanzana.nostrummagica.item.armor.MageArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedEarthWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedPhysicalWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
+import com.smanzana.nostrummagica.item.equipment.GoldMirrorItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.MageBlade;
 import com.smanzana.nostrummagica.item.equipment.MageStaff;
@@ -299,6 +300,7 @@ public class NostrumItems {
 	@ObjectHolder(ResearchTranscriptItem.ID) public static ResearchTranscriptItem researchTranscript;
 	@ObjectHolder(SeekingGem.ID) public static SeekingGem seekingGem;
 	@ObjectHolder(KoidHelmet.ID) public static KoidHelmet koidHelm;
+	@ObjectHolder(GoldMirrorItem.ID) public static GoldMirrorItem goldMirror;
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -597,6 +599,7 @@ public class NostrumItems {
     	register(registry, new CopyWandItem().setRegistryName(CopyWandItem.ID));
     	register(registry, new ResearchTranscriptItem(PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(ResearchTranscriptItem.ID));
     	register(registry, new KoidHelmet(PropEquipment().rarity(Rarity.UNCOMMON)).setRegistryName(KoidHelmet.ID));
+    	register(registry, new GoldMirrorItem(PropEquipment()).setRegistryName(GoldMirrorItem.ID));
     	
     	// Generate and register spell runes
     	{

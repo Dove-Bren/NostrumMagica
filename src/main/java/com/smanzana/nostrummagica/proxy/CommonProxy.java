@@ -44,8 +44,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -294,5 +297,11 @@ public class CommonProxy {
 
 	public boolean hasIntegratedServer() {
 		return false;
+	}
+	
+	public boolean attemptPlayerInteract(PlayerEntity player, World world, BlockPos pos, Hand hand, BlockRayTraceResult hit) {
+		ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+		return serverPlayer.interactionManager.func_219441_a(serverPlayer, world, ItemStack.EMPTY, hand, hit)
+				!= ActionResultType.PASS;
 	}
 }

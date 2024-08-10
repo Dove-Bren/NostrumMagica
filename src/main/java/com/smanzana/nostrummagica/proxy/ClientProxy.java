@@ -66,19 +66,24 @@ import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
@@ -1044,5 +1049,16 @@ public class ClientProxy extends CommonProxy {
 	
 	public SelectionRenderer getSelectionRenderer() {
 		return this.selectionRenderer;
+	}
+	
+	@Override
+	public boolean attemptPlayerInteract(PlayerEntity player, World world, BlockPos pos, Hand hand, BlockRayTraceResult hit) {
+		if (!player.world.isRemote()) {
+			return super.attemptPlayerInteract(player, world, pos, hand, hit);
+		}
+		
+		final Minecraft mc = Minecraft.getInstance();
+		return mc.playerController.func_217292_a((ClientPlayerEntity) player, (ClientWorld) world, hand, hit)
+				!= ActionResultType.PASS;
 	}
 }

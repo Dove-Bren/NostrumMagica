@@ -21,6 +21,7 @@ import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMes
 import com.smanzana.nostrummagica.network.message.PlayerStatSyncMessage;
 import com.smanzana.nostrummagica.network.message.QuickMoveBagMessage;
 import com.smanzana.nostrummagica.network.message.ReagentBagToggleMessage;
+import com.smanzana.nostrummagica.network.message.RemoteInteractMessage;
 import com.smanzana.nostrummagica.network.message.RuneBagToggleMessage;
 import com.smanzana.nostrummagica.network.message.RuneShaperMessage;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
@@ -123,6 +124,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, WorldPortalTeleportRequestMessage.class, WorldPortalTeleportRequestMessage::encode, WorldPortalTeleportRequestMessage::decode, WorldPortalTeleportRequestMessage::handle);
 		syncChannel.registerMessage(discriminator++, QuickMoveBagMessage.class, QuickMoveBagMessage::encode, QuickMoveBagMessage::decode, QuickMoveBagMessage::handle);
 		syncChannel.registerMessage(discriminator++, RuneShaperMessage.class, RuneShaperMessage::encode, RuneShaperMessage::decode, RuneShaperMessage::handle);
+		syncChannel.registerMessage(discriminator++, RemoteInteractMessage.class, RemoteInteractMessage::encode, RemoteInteractMessage::decode, RemoteInteractMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
