@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.item.IReactiveEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
+import com.smanzana.nostrummagica.listener.PlayerJumpEvent;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate.ArmorState;
@@ -1493,8 +1494,6 @@ public class ElementalArmor extends ArmorItem
 		}
 	}
 
-	private static boolean jumpPressedEarly = false; // For telling whether jump remains pressed or released and pressed
-														// again
 	private static boolean lastTickGround = false; // For checking if the player just jumped this tick
 	private static boolean backPressedEarly = false;
 	private static long lastBackMSecs = -1;
@@ -1557,6 +1556,38 @@ public class ElementalArmor extends ArmorItem
 			NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.EFFECT_TOGGLE, enabled, 0));
 		}
 	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@SubscribeEvent
+	public static void onClientJump(PlayerJumpEvent.Post event) {
+		final ClientPlayerEntity player = (ClientPlayerEntity) event.getPlayer();
+		final boolean flying = ArmorCheckFlying(player);
+		
+		boolean hasJump = true;
+		
+		// Start flying (this logic is meant to match the elytra check)
+		if (!flying && hasJump && !player.isOnGround() && !player.abilities.isFlying && player.isElytraFlying()) {
+			// Does this armor support flying?
+			if (HasElytra(player)) {
+				SetArmorFlying(player, true);
+				SendUpdates(player, null);
+				hasJump = false;
+			}
+		}
+		
+		// Mana jump
+		final double MANA_JUMP_AMT = flying ? .6 : .4;
+		if (hasJump && flying && !player.isOnGround() && !lastTickGround && !player.abilities.isFlying
+				&& player.getMotion().y < MANA_JUMP_AMT) {
+			// Does this armor have mana jump?
+			if (HasManaJump(player)) {
+				consumeManaJump(player);
+				player.setMotion(player.getMotion().add(0, MANA_JUMP_AMT, 0));
+				hasJump = false; // Consumed
+				NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
+			}
+		}
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
@@ -1568,7 +1599,6 @@ public class ElementalArmor extends ArmorItem
 		}
 
 		if (event.phase != TickEvent.Phase.END) {
-			jumpPressedEarly = player.movementInput == null ? false : player.movementInput.jump;
 			backPressedEarly = player.movementInput == null ? false : player.movementInput.backKeyDown;
 			leftPressedEarly = player.movementInput == null ? false : player.movementInput.leftKeyDown;
 			rightPressedEarly = player.movementInput == null ? false : player.movementInput.rightKeyDown;
@@ -1620,31 +1650,6 @@ public class ElementalArmor extends ArmorItem
 			SetArmorFlying(player, false);
 			SendUpdates(player, null);
 			return;
-		}
-
-		boolean hasJump = player.movementInput.jump && !jumpPressedEarly;
-
-		// Start flying (this logic is meant to match the elytra check)
-		if (!flying && hasJump && !player.isOnGround() && !player.abilities.isFlying && player.isElytraFlying()) {
-			// Does this armor support flying?
-			if (HasElytra(player)) {
-				SetArmorFlying(player, true);
-				SendUpdates(player, null);
-				hasJump = false; // Consumed
-			}
-		}
-
-		// Mana jump
-		final double MANA_JUMP_AMT = flying ? .6 : .4;
-		if (hasJump && flying && !player.isOnGround() && !lastTickGround && !player.abilities.isFlying
-				&& player.getMotion().y < MANA_JUMP_AMT) {
-			// Does this armor have mana jump?
-			if (HasManaJump(player)) {
-				consumeManaJump(player);
-				player.setMotion(player.getMotion().add(0, MANA_JUMP_AMT, 0));
-				hasJump = false; // Consumed
-				NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.JUMP, true, 0));
-			}
 		}
 
 		// Dragon flying

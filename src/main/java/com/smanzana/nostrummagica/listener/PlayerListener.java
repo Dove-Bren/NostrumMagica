@@ -57,7 +57,6 @@ import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -84,7 +83,6 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
@@ -1088,17 +1086,6 @@ public class PlayerListener {
 			}
 			updateTrackedEntities();
 			teleportedEntitiesThisTick.clear();
-		}
-	}
-	
-	@SubscribeEvent
-	public void onTick(ClientTickEvent event) {
-		if (event.phase == Phase.START) {
-			final Minecraft mc = Minecraft.getInstance();
-			if (mc.player != null) {
-				PortalBlock.clientTick();
-				//TeleportRune.tick();
-			}
 		}
 	}
 	
