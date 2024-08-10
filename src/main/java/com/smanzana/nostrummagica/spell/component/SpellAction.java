@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,6 +65,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BoneMealItem;
@@ -1248,6 +1250,11 @@ public class SpellAction {
 		}
 		
 		@Override
+		public boolean isHarmful() {
+			return false;
+		}
+		
+		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (caster == null || entity == null)
 				return;
@@ -1669,7 +1676,7 @@ public class SpellAction {
 			}
 			if (count != 0) {
 				for (ItemStack equip : entity.getArmorInventoryList()) {
-					if (equip.isEmpty())
+					if (equip.isEmpty() || !(equip.getItem() instanceof ArmorItem))
 						continue;
 					ItemStacks.damageEquippedArmor(equip, entity, ((ArmorItem) equip.getItem()).getEquipmentSlot(), amount/count);
 				}
@@ -2146,7 +2153,6 @@ public class SpellAction {
 					((MobEntity) entity).setRevengeTarget(null);
 				}
 			}
-			
 		}
 
 		@Override
@@ -2164,6 +2170,117 @@ public class SpellAction {
 		public boolean affectsBlocks() {
 			return false;
 		}
+		
+		@Override
+		public boolean isHarmful() {
+			return true;
+		}
+	}
+	
+	private static class SwapStatusEffect implements SpellEffect {
+		
+		private static final ITextComponent LABEL_SWAP_STATUS_NAME = new TranslationTextComponent("spelllog.nostrummagica.swap_status.name");
+		private static final ITextComponent LABEL_SWAP_STATUS_DESC = new TranslationTextComponent("spelllog.nostrummagica.swap_status.desc");
+		
+		private final IEffectPredicate predicate;
+		
+		public SwapStatusEffect(IEffectPredicate predicate) {
+			this.predicate = predicate;
+		}
+
+		@Override
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			if (this.predicate == null || this.predicate.test(caster, entity, eff)) {
+				log.generalEffectStart(LABEL_SWAP_STATUS_NAME, LABEL_SWAP_STATUS_DESC, false);
+				log.generalEffectFinish(0f, 0f);
+				
+				if (caster != entity) {
+					List<EffectInstance> casterClone = caster.getActivePotionEffects().stream().map(orig -> new EffectInstance(orig.getPotion(), orig.getDuration(), orig.getAmplifier())).collect(Collectors.toList());
+					List<EffectInstance> targetClone = entity.getActivePotionEffects().stream().map(orig -> new EffectInstance(orig.getPotion(), orig.getDuration(), orig.getAmplifier())).collect(Collectors.toList());
+					
+					caster.clearActivePotions();
+					entity.clearActivePotions();
+					
+					casterClone.forEach(inst -> entity.addPotionEffect(inst));
+					targetClone.forEach(inst -> caster.addPotionEffect(inst));
+				}
+			}
+		}
+
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			; // Do nothing
+		}
+
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
+
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+	}
+	
+	private static class DropEquipmentEffect implements SpellEffect {
+		
+		private static final ITextComponent LABEL_DROP_EQUIPMENT_NAME = new TranslationTextComponent("spelllog.nostrummagica.swap_status.name");
+		private static final ITextComponent LABEL_DROP_EQUIPMENT_DESC = new TranslationTextComponent("spelllog.nostrummagica.swap_status.desc");
+		
+		private final IEffectPredicate predicate;
+		private final int pieces;
+		
+		public DropEquipmentEffect(IEffectPredicate predicate, int pieces) {
+			this.predicate = predicate;
+			this.pieces = pieces;
+		}
+
+		@Override
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			if (this.predicate == null || this.predicate.test(caster, entity, eff)) {
+				log.generalEffectStart(LABEL_DROP_EQUIPMENT_NAME, LABEL_DROP_EQUIPMENT_DESC, true);
+				log.generalEffectFinish(0f, 0f);
+				
+				List<EquipmentSlotType> slots = Lists.newArrayList(EquipmentSlotType.values());
+				Collections.shuffle(slots);
+				
+				int left = this.pieces;
+				for (EquipmentSlotType slot : slots) {
+					ItemStack held = entity.getItemStackFromSlot(slot);
+					if (!held.isEmpty()) {
+						entity.entityDropItem(held);
+						entity.setItemStackToSlot(slot, ItemStack.EMPTY);
+						left--;
+						
+						if (left <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			return;
+		}
+
+		@Override
+		public boolean affectsEntities() {
+			return true;
+		}
+
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean isHarmful() {
+			return true;
+		}
+		
 	}
 	
 	private List<SpellEffect> effects;
@@ -2325,6 +2442,11 @@ public class SpellAction {
 		return this;
 	}
 	
+	public SpellAction swapStatus(@Nullable IEffectPredicate predicate) {
+		effects.add(new SwapStatusEffect(predicate));
+		return this;
+	}
+	
 	public SpellAction propel(int level) {
 		effects.add(new PropelEffect(level));
 		return this;
@@ -2387,6 +2509,12 @@ public class SpellAction {
 	
 	public SpellAction resetTarget(@Nullable IEffectPredicate predicate) {
 		effects.add(new ResetTargetEffect(predicate));
+		return this;
+	}
+	
+	public SpellAction dropEquipment(int level, @Nullable IEffectPredicate predicate) {
+		final int pieces = (int) Math.pow(2, level-1); // 1, 2, 4
+		effects.add(new DropEquipmentEffect(predicate, pieces));
 		return this;
 	}
 	

@@ -58,6 +58,7 @@ public class NostrumEffects {
 	@ObjectHolder(ImmobilizeEffect.ID) public static ImmobilizeEffect immobilize;
 	@ObjectHolder(MagicWeaknessEffect.ID) public static MagicWeaknessEffect magicWeakness;
 	@ObjectHolder(MobBlindnessEffect.ID) public static MobBlindnessEffect mobBlindness;
+	@ObjectHolder(BonusJumpEffect.ID) public static BonusJumpEffect bonusJump;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Effect> event) {
@@ -107,5 +108,6 @@ public class NostrumEffects {
     	registry.register(new ImmobilizeEffect().setRegistryName(ImmobilizeEffect.ID));
     	registry.register(new MagicWeaknessEffect().setRegistryName(MagicWeaknessEffect.ID));
     	registry.register(new MobBlindnessEffect().setRegistryName(MobBlindnessEffect.ID));
+    	registry.register(new BonusJumpEffect().setRegistryName(BonusJumpEffect.ID));
     }
 }

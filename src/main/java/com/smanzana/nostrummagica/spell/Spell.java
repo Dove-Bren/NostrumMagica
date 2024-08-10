@@ -922,17 +922,40 @@ public class Spell {
 		case PHYSICAL:
 			return new SpellAction().status(Effects.ABSORPTION, duration * 5, amp).name("lifeboost");
 		case EARTH:
-			return new SpellAction().status(NostrumEffects.physicalShield, duration, amp).name("shield.physical");
+			return new SpellAction().status(NostrumEffects.physicalShield, duration, (caster, target, eff) -> {
+				// With the support skill, give 2 extra levels of shield
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Earth_Support)) {
+					return amp + 2;
+				}
+				return amp;
+			}).name("shield.physical");
 		case ENDER:
 			return new SpellAction().blink(15.0f * elementCount).name("blink");
 		case FIRE:
 			return new SpellAction().status(NostrumEffects.magicBoost, duration, amp).name("magicboost");
 		case ICE:
-			return new SpellAction().status(NostrumEffects.magicShield, duration, amp).name("shield.magic");
+			return new SpellAction().status(NostrumEffects.magicShield, duration, amp)
+			.status(NostrumEffects.manaRegen, duration, 0, (caster, target, eff) -> {
+				// With the support skill, also give mana regen
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Support)) {
+					return true;
+				}
+				return false;
+			}).name("shield.magic");
 		case LIGHTNING:
 			return new SpellAction().pull(5 * elementCount, elementCount).name("pull");
 		case WIND:
-			return new SpellAction().status(Effects.SPEED, duration, amp).name("speed");
+			return new SpellAction().status(Effects.SPEED, duration, amp)
+					.status(Effects.HASTE, duration, amp, (caster, target, eff) -> {
+						// With the support skill, also give haste
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+						if (attr != null && attr.hasSkill(NostrumSkills.Wind_Support)) {
+							return true;
+						}
+						return false;
+					}).name("speed");
 		}
 		
 		return null;
@@ -943,17 +966,48 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().healFood(4 * elementCount).name("food");
+			return new SpellAction().healFood(4 * elementCount).status(NostrumEffects.naturesBlessing, duration * 5, amp, (caster, target, eff) -> {
+				// Only apply with physical growth skill
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Physical_Growth)) {
+					return true;
+				}
+				return false;
+			}).name("food");
 		case EARTH:
 			return new SpellAction().status(Effects.REGENERATION, duration, amp).name("regen");
 		case ENDER:
-			return new SpellAction().swap().name("swap");
+			return new SpellAction().swap().swapStatus((caster, target, eff) -> {
+				// Only apply with ender growth skill
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Ender_Growth)) {
+					return true;
+				}
+				return false;
+			}).name("swap");
 		case FIRE:
-			return new SpellAction().burnArmor(elementCount).name("burnarmor");
+			return new SpellAction().dropEquipment(elementCount, (caster, target, eff) -> {
+				// Only apply with fire growth skill AND if a mob
+				if (target instanceof MobEntity) {
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+					if (attr != null && attr.hasSkill(NostrumSkills.Fire_Growth)) {
+						return true;
+					}
+				}
+				return false;
+			}).burnArmor(elementCount).name("burnarmor"); // burn armor after dropping to not damage things before dropping them
 		case ICE:
 			return new SpellAction().heal(4f * elementCount).name("heal");
 		case LIGHTNING:
-			return new SpellAction().status(Effects.JUMP_BOOST, duration, amp).name("jumpboost");
+			return new SpellAction().status(Effects.JUMP_BOOST, duration, amp)
+					.status(NostrumEffects.bonusJump, duration, 0, (caster, target, eff) -> {
+						// With the growth skill, also give jump boost
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+						if (attr != null && attr.hasSkill(NostrumSkills.Lightning_Growth)) {
+							return true;
+						}
+						return false;
+					}).name("jumpboost");
 		case WIND:
 			return new SpellAction().propel(elementCount).name("propel");
 		}

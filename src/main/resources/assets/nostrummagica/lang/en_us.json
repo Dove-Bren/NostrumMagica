@@ -395,6 +395,7 @@
 	"effect.nostrummagica.immobilize": "Immobilize",
 	"effect.nostrummagica.magic_weakness": "Magic Weakness",
 	"effect.nostrummagica.mob_blindness": "Blindness (Mobs)",
+	"effect.nostrummagica.bonus_jump": "Bonus Jump",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
 
@@ -636,6 +637,8 @@
 	"attribute.nostrummagica.elemxp_bonus_ender.name.desc": "Increases the amount of ender skill XP gained from spells",
 	"attribute.nostrummagica.elemxp_bonus_all.name": "Elemental XP Bonus",
 	"attribute.nostrummagica.elemxp_bonus_all.name.desc": "Increases the amount of elemental skill XP gained from spells",
+	"attribute.nostrummagica.bonus_jump.name": "Bonus Jumps",
+	"attribute.nostrummagica.bonus_jump.name.desc": "Amount of times an entity can jump beyond their first initial jump.",
 	"attribute.perc.modifier.plus.0": "+%s%% %s",
 	"attribute.perc.modifier.plus.1": "x%s%% %s",
 	"attribute.perc.modifier.plus.2": "x%s%% %s",
@@ -1165,13 +1168,13 @@
     "spelleffect.lifeboost.name": "Life Boost",
     "spelleffect.lifeboost.desc": "Grants a temporary boost to maximum health.",
     "spelleffect.shield.physical.name": "Physical Shield",
-    "spelleffect.shield.physical.desc": "Provides a magic shield which absorbs physical damage.",
+    "spelleffect.shield.physical.desc": "Provides a magic shield which absorbs 4 points of physical damage per level.",
     "spelleffect.blink.name": "Blink",
     "spelleffect.blink.desc": "Teleports the target forward.",
     "spelleffect.fireresist.name": "Fire Resistance",
     "spelleffect.fireresist.desc": "Provides immunity to fire damage.",
     "spelleffect.shield.magic.name": "Magic Shield",
-    "spelleffect.shield.magic.desc": "Absorbs magic damage.",
+    "spelleffect.shield.magic.desc": "Absorbs 4 points of spell damage per level.",
     "spelleffect.pull.name": "Pull",
     "spelleffect.pull.desc": "Pulls items and entities closer to the target.",
     "spelleffect.speed.name": "Speed",
@@ -1686,6 +1689,8 @@
 	"skill.nostrummagica.physical.weapon.desc": "Gain magic shielding for 4 points when using the Deep Metal Axe to block while wearing a Deep Metal set.",
 	"skill.nostrummagica.physical.inflict": "Magic Weakness",
 	"skill.nostrummagica.physical.inflict.desc": "Apply magic weakness when applying weakness, also reducing magic damage dealt.",
+	"skill.nostrummagica.physical.growth": "Nature's Blessing",
+	"skill.nostrummagica.physical.growth.desc": "Applies Nature's Blessing when applying the Restore Hunger spell effect.",
 	
 	"skill.nostrummagica.fire.novice": "Fire Novice Training",
 	"skill.nostrummagica.fire.novice.desc": "Boosts potency of fire effects by 20%%.",
@@ -1699,6 +1704,8 @@
 	"skill.nostrummagica.fire.weapon.desc": "Adjusts the Flame Rod's cast effect to affect all entities around the target entity.",
 	"skill.nostrummagica.fire.inflict": "Shield Burn",
 	"skill.nostrummagica.fire.inflict.desc": "When inflicting the burn effect, remove any active magic or physical shield, mystic water, or absorption effects.",
+	"skill.nostrummagica.fire.growth": "Too Hot",
+	"skill.nostrummagica.fire.growth.desc": "Makes mobs (not players) drop their armor instead of damaging it.",
 	
 	"skill.nostrummagica.ice.novice": "Ice Novice Training",
 	"skill.nostrummagica.ice.novice.desc": "Boosts potency of ice effects by 20%%.",
@@ -1712,6 +1719,8 @@
 	"skill.nostrummagica.ice.weapon.desc": "Changes the cloud spawned with the Blizzard Scepter to heal allies.",
 	"skill.nostrummagica.ice.inflict": "Cooling Frost",
 	"skill.nostrummagica.ice.inflict.desc": "Grant allies mana regen instead of frostbite effect in spells.",
+	"skill.nostrummagica.ice.support": "Rejuvinating Shield",
+	"skill.nostrummagica.ice.support.desc": "Apply a mana regen effect when applying the Magic Shield spell effect directly.",
 	
 	"skill.nostrummagica.earth.novice": "Earth Novice Training",
 	"skill.nostrummagica.earth.novice.desc": "Boosts potency of earth effects by 20%%.",
@@ -1725,6 +1734,8 @@
 	"skill.nostrummagica.earth.weapon.desc": "Allows upgrading mines placed with the Earth Pike by sneak-using on an existing mine to mine large areas at once.",
 	"skill.nostrummagica.earth.inflict": "Heavy Roots",
 	"skill.nostrummagica.earth.inflict.desc": "Rooted effect now slows entities in addition to keeping them grounded.",
+	"skill.nostrummagica.earth.support": "Thick Plating",
+	"skill.nostrummagica.earth.support.desc": "Apply 8 extra points of physical shield when applying it directly.",
 	
 	"skill.nostrummagica.wind.novice": "Wind Novice Training",
 	"skill.nostrummagica.wind.novice.desc": "Boosts potency of wind effects by 20%%.",
@@ -1738,6 +1749,8 @@
 	"skill.nostrummagica.wind.weapon.desc": "Allows the wielder to charge and hold the hurricane striker, propelling themselves forward in exchange for mana.",
 	"skill.nostrummagica.wind.inflict": "Sinister Updraft",
 	"skill.nostrummagica.wind.inflict.desc": "Makes any entity affected by poison count as a 'light' entity for wind damage calculation.",
+	"skill.nostrummagica.wind.support": "Fast Hands",
+	"skill.nostrummagica.wind.support.desc": "When applying the swiftness effect directly, also apply the haste effect.",
 	
 	"skill.nostrummagica.lightning.novice": "Lightning Novice Training",
 	"skill.nostrummagica.lightning.novice.desc": "Boosts potency of lightning effects by 20%%.",
@@ -1751,6 +1764,8 @@
 	"skill.nostrummagica.lightning.weapon.desc": "Inflict all nearby enemies with the Magic Rend effect when using a lightning weapon to cast a bolt on yourself.",
 	"skill.nostrummagica.lightning.inflict": "Immobilize",
 	"skill.nostrummagica.lightning.inflict.desc": "Immobilizes entities when inflicting the slow effect on them, completely preventing movement.",
+	"skill.nostrummagica.lightning.growth": "Bonus Jump",
+	"skill.nostrummagica.lightning.growth.desc": "Grants a bonus jump when applying  the Jump Boost effect directly.",
 	
 	"skill.nostrummagica.ender.novice": "Ender Novice Training",
 	"skill.nostrummagica.ender.novice.desc": "Boosts potency of ender effects by 20%%.",
@@ -1764,6 +1779,8 @@
 	"skill.nostrummagica.ender.weapon.desc": "Modifies the ball effect when using the Ender Rod with the Ender armor set to grant 2 points of magic and physical shielding per entity hit when exploding.",
 	"skill.nostrummagica.ender.inflict": "Mob Blindness",
 	"skill.nostrummagica.ender.inflict.desc": "Enhances spell-inflicted blindness to affect mobs as well.",
+	"skill.nostrummagica.ender.growth": "Effect Swap",
+	"skill.nostrummagica.ender.growth.desc": "Swaps status effects with swap targets.",
 	
 	"shapeprop.wall.radius.name": "Radius",
 	"shapeprop.wall.radius.desc": "Radius in blocks of the wall",
@@ -2127,6 +2144,8 @@
 	"spelllog.nostrummagica.summon.desc": "Summon %2$s %1$s Golem(s) for %4$s seconds (%3$s base)",
 	"spelllog.nostrummagica.target_reset.name": "Reset Target",
 	"spelllog.nostrummagica.target_reset.desc": "Resets the mob's target, effectively temporarily halting combat",
+	"spelllog.nostrummagica.swap_status.name": "Swap Effects",
+	"spelllog.nostrummagica.swap_status.desc": "Swaps active status effects with the target",
 	
 	"spelllogstage.start": "Start",
 	
