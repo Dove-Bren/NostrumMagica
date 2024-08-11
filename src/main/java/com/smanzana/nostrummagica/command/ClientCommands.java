@@ -23,13 +23,24 @@ public class ClientCommands {
 	}
 	
 	@SubscribeEvent
-	public void onClientChat(ClientChatEvent event) {
+	public static void onClientChat(ClientChatEvent event) {
 		final String message = event.getOriginalMessage();
-		if (COMMANDS.containsKey(message.toLowerCase())) {
-			final Minecraft mc = Minecraft.getInstance();
-			final PlayerEntity player = mc.player;
-			if (COMMANDS.get(message.toLowerCase()).apply(player, message)) {
-				event.setCanceled(true);
+		if (message.length() > 1 && message.charAt(0) == '/') {
+			// Try to find command name
+			int spaceIdx = message.indexOf(" ");
+			final String cmd;
+			if (spaceIdx > 0) {
+				cmd = message.substring(1, spaceIdx).toLowerCase();
+			} else {
+				cmd = message.substring(1).toLowerCase();
+			}
+			
+			if (COMMANDS.containsKey(cmd)) {
+				final Minecraft mc = Minecraft.getInstance();
+				final PlayerEntity player = mc.player;
+				if (COMMANDS.get(cmd).apply(player, message)) {
+					event.setCanceled(true);
+				}
 			}
 		}
 	}

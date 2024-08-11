@@ -35,7 +35,8 @@ public class CommandInfoScreenGoto {
 	}
 	
 	private static final boolean handleClient(PlayerEntity player, String msg) {
-		final String tag = msg.substring(Command.length() + 1);
+		// expect {/nostrumgoto "Lore::thing"}
+		final String tag = msg.substring(Command.length() + 3, msg.length() - 1);
 		NostrumMagica.instance.proxy.openLoreLink(tag);
 		return true;
 	}
