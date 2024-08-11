@@ -10,7 +10,6 @@ import com.smanzana.nostrummagica.item.equipment.SilverMirrorItem;
 import com.smanzana.nostrummagica.tile.ParadoxMirrorTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
-import com.smanzana.nostrummagica.util.ContainerUtil.NoisySlot;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -73,11 +72,13 @@ public class SilverMirrorGui {
 				}
 			}
 			
-			this.addSlot(new NoisySlot(inventory, 0, GUI_MIRROR_INV_HOFFSET, GUI_MIRROR_INV_VOFFSET, (stack) -> {
+			this.addSlot(new Slot(inventory, 0, GUI_MIRROR_INV_HOFFSET, GUI_MIRROR_INV_VOFFSET));
+			
+			inventory.addListener((inv) -> {
 				if (isServer) {
 					playerInv.player.world.getServer().enqueue(new TickDelayedTask(playerInv.player.world.getServer().getTickCounter(), MirrorContainer.this::onInventoryChange));
 				}
-			}));
+			});
 		}
 		
 		public static final MirrorContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {

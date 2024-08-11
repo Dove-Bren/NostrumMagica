@@ -160,38 +160,31 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 		
 		ParadoxMirrorTileEntity mirror = getTileEntity(worldIn, pos);
 		if (mirror != null) {
-			// If sneaking, try to send item through
-			if (playerIn.isSneaking()) {
-				@Nonnull ItemStack held = playerIn.getHeldItem(hand);
-				if (held.isEmpty()) {
-					return ActionResultType.FAIL;
+			
+			@Nonnull ItemStack held = playerIn.getHeldItem(hand);
+			if (held.isEmpty()) {
+				return ActionResultType.FAIL;
+			}
+			
+			// If we have an item, return true only if item has a position we can use
+			if (held.getItem() instanceof PositionCrystal) {
+				BlockPos heldPos = PositionCrystal.getBlockPosition(held);
+				if (heldPos != null && !heldPos.equals(pos)) {
+					mirror.setLinkedPosition(heldPos);
+					playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.DUMMY_UUID);
 				}
-				
+				return ActionResultType.SUCCESS; // true even if crystal doesn't have position
+			}
+			// else try to send whatever item it is through
+			else {
 				// If we have an item, return true even if mirror is on cooldown
 				if (mirror.tryPushItem(held)) {
 					// Item was pushed! Remove from hand!
 					playerIn.setHeldItem(hand, ItemStack.EMPTY);
+					return ActionResultType.SUCCESS;
 				}
-				return ActionResultType.SUCCESS;
 			}
-			// Else try and set position from held item
-			else {
-				@Nonnull ItemStack held = playerIn.getHeldItem(hand);
-				if (held.isEmpty()) {
-					return ActionResultType.FAIL;
-				}
-				
-				// If we have an item, return true only if item has a position we can use
-				if (held.getItem() instanceof PositionCrystal) {
-					BlockPos heldPos = PositionCrystal.getBlockPosition(held);
-					if (heldPos != null && !heldPos.equals(pos)) {
-						mirror.setLinkedPosition(heldPos);
-						playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.DUMMY_UUID);
-					}
-					return ActionResultType.SUCCESS; // true even if crystal doesn't have position
-				}
-				return ActionResultType.FAIL;
-			}
+			return ActionResultType.FAIL;
 		}
 		
 		return ActionResultType.PASS;

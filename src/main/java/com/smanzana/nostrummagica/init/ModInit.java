@@ -600,7 +600,7 @@ public class ModInit {
 								Ingredient.fromTag(NostrumTags.Items.RuneAny) },
 						new ResearchRequirement("rune_library"), new OutcomeSpawnItem(new ItemStack(NostrumBlocks.runeLibrary))));
 
-		// Rune library
+		// Rune shaper
 		registry.register(RitualRecipe.createTier3("create_rune_shaper", new ItemStack(NostrumBlocks.runeShaper),
 						null, new ReagentType[] { ReagentType.BLACK_PEARL, ReagentType.MANI_DUST,
 								ReagentType.SPIDER_SILK, ReagentType.GINSENG },
@@ -1485,6 +1485,37 @@ public class ModInit {
 								},
 						new ResearchRequirement("paradox_mirrors"),
 						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.paradoxMirror, 2))));
+		
+		// Try to use silver, but use iron if no silver is in the modpack
+		Ingredient silver = NostrumTags.Items.SilverIngot.getAllElements().isEmpty()
+				? Ingredient.fromTag(Tags.Items.INGOTS_IRON)
+				: Ingredient.fromTag(NostrumTags.Items.SilverIngot);
+		
+		registry.register(RitualRecipe.createTier3(
+				"silver_mirror", new ItemStack(NostrumItems.silverMirror), null, new ReagentType[] { ReagentType.MANI_DUST,
+						ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT },
+				Ingredient.fromItems(NostrumBlocks.paradoxMirror),
+				new Ingredient[] {
+						silver,
+						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
+						Ingredient.fromItems(Blocks.HOPPER),
+						silver },
+				new ResearchRequirement("silver_mirror"), new OutcomeSpawnItem(new ItemStack(NostrumItems.silverMirror))));
+		
+		registry.register(RitualRecipe.createTier3(
+				"gold_mirror", new ItemStack(NostrumItems.goldMirror), null, new ReagentType[] { ReagentType.MANI_DUST,
+						ReagentType.CRYSTABLOOM, ReagentType.GRAVE_DUST, ReagentType.MANDRAKE_ROOT },
+				Ingredient.fromItems(NostrumBlocks.paradoxMirror),
+				new Ingredient[] {
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
+						Ingredient.fromTag(NostrumTags.Items.CrystalLarge),
+						Ingredient.fromTag(ItemTags.BUTTONS),
+						Ingredient.fromTag(Tags.Items.INGOTS_GOLD) },
+				new ResearchRequirement("gold_mirror"), new OutcomeSpawnItem(new ItemStack(NostrumItems.goldMirror))));
+		
+		
+		//silver_mirror
+		//gold_mirror
 
 		// Mana Armorer
 		registry
@@ -1935,6 +1966,16 @@ public class ModInit {
 				.tier(EMagicTier.KANI).reference("ritual::paradox_mirror", "ritual.paradox_mirror.name")
 				.build("paradox_mirrors", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 0, true,
 						new ItemStack(NostrumBlocks.paradoxMirror));
+
+		NostrumResearch.startBuilding().parent("paradox_mirrors")
+				.tier(EMagicTier.VANI).reference("ritual::silver_mirror", "ritual.silver_mirror.name")
+				.build("silver_mirror", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 1, true,
+						new ItemStack(NostrumItems.silverMirror));
+
+		NostrumResearch.startBuilding().parent("silver_mirror")
+				.tier(EMagicTier.VANI).reference("ritual::gold_mirror", "ritual.gold_mirror.name")
+				.build("gold_mirror", NostrumResearchTab.TINKERING, Size.NORMAL, 3, 2, true,
+						new ItemStack(NostrumItems.goldMirror));
 
 		NostrumResearch.startBuilding().parent("geogems").hiddenParent("teleportrune").lore(NostrumItems.positionCrystal)
 				.reference("ritual::mystic_anchor", "ritual.mystic_anchor.name")

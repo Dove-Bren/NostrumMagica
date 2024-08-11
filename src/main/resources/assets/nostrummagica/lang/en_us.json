@@ -1517,6 +1517,9 @@
     "ritual.revive_soulbound_pet_dragon.name": "Revive Soulbound Pet",
     "ritual.revive_soulbound_pet_wolf.name": "Revive Soulbound Pet",
     "ritual.spawn_soul_dagger.name": "Construct Soul Dagger",
+	
+    "ritual.silver_mirror.name": "Craft Silver Mirror",
+	"ritual.gold_mirror.name": "Craft Gold Mirror",
 
     "enhancement.lower_reagent_cost.name": "Lower Reagent Cost",
     "enhancement.lower_reagent_cost.desc": "Reduces the amount of reagents used up when casting a spell",
@@ -2093,6 +2096,12 @@
 	"research.rune_shaper.name": "Rune Shaper",
 	"research.rune_shaper.desc": "Adjustments, major and minor",
 	"research.rune_shaper.info": "The Rune Shaper is a powerful crafting block that lets you adjust many different aspects of spell shape runes!|  After putting a spell shape rune that can be adjusted in, you can select how exactly that spell shape will function. The ways to modify it depend on the specific shape.| For example, putting a Ring shape rune in allows you to modify the effect radius of the ring!",
+	"research.silver_mirror.name": "Silver Mirrors",
+	"research.silver_mirror.desc": "Wormhole In My Pocket",
+	"research.silver_mirror.info": "Silver mirrors are like paradox mirrors in that you link them to another paradox mirror to send items. However, these ones fit right in your pocker!|  After linking a silver mirror to a paradox mirror in the world, any items you put into the silver mirror will be sent to the paradox mirror !|  Shift-rightclick a block in the world (twice) to set what your mirror is pointed at.|  Note that you can't send items to a paradox mirror that isn't loaded. If you try to use the silver mirror and the remembered mirror location is either unloaded or doesn't have a mirror anymore, you won't be able to send items.",
+	"research.gold_mirror.name": "Gold Mirrors",
+	"research.gold_mirror.desc": "Expert Button Presser",
+	"research.gold_mirror.info": "Gold mirrors are similar in concept to paradox mirrors except they are used to interact with remote blocks instead of send items!|  Gold mirrors can be linked to virtually any block location. After linking, using the mirror will act as if you right clicked that block!|  Many blocks have some sort of requirement that you are nearby to work. For example, chests will flash open but then close if you are far away. Buttons, the Magic Mirror, etc. are examples of things that can be used remotely.|  The gold mirror won't work if you're not in the same dimension as the remote block location.",
 
     "research.soulbound_pets.name": "Soulbound Pets",
     "research.soulbound_pets.desc": "Always and Forever",
