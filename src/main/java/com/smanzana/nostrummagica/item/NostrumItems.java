@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 import com.smanzana.nostrummagica.item.equipment.RuneBag;
+import com.smanzana.nostrummagica.item.equipment.SilverMirrorItem;
 import com.smanzana.nostrummagica.item.equipment.SoulDagger;
 import com.smanzana.nostrummagica.item.equipment.ThanoPendant;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
@@ -301,6 +302,7 @@ public class NostrumItems {
 	@ObjectHolder(SeekingGem.ID) public static SeekingGem seekingGem;
 	@ObjectHolder(KoidHelmet.ID) public static KoidHelmet koidHelm;
 	@ObjectHolder(GoldMirrorItem.ID) public static GoldMirrorItem goldMirror;
+	@ObjectHolder(SilverMirrorItem.ID) public static SilverMirrorItem silverMirror;
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -600,6 +602,7 @@ public class NostrumItems {
     	register(registry, new ResearchTranscriptItem(PropBase().rarity(Rarity.UNCOMMON)).setRegistryName(ResearchTranscriptItem.ID));
     	register(registry, new KoidHelmet(PropEquipment().rarity(Rarity.UNCOMMON)).setRegistryName(KoidHelmet.ID));
     	register(registry, new GoldMirrorItem(PropEquipment()).setRegistryName(GoldMirrorItem.ID));
+    	register(registry, new SilverMirrorItem(PropEquipment()).setRegistryName(SilverMirrorItem.ID));
     	
     	// Generate and register spell runes
     	{

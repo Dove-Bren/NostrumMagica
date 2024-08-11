@@ -25,6 +25,7 @@ import com.smanzana.nostrummagica.client.gui.container.RedwoodSpellCraftGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneLibraryGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
+import com.smanzana.nostrummagica.client.gui.container.SilverMirrorGui;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
@@ -195,6 +196,7 @@ public class ClientInit {
 		ScreenManager.registerFactory(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
 		ScreenManager.registerFactory(NostrumContainers.RuneLibrary, RuneLibraryGui.Gui::new);
 		ScreenManager.registerFactory(NostrumContainers.Launcher, LauncherBlockGui.LauncherBlockGuiContainer::new);
+		ScreenManager.registerFactory(NostrumContainers.SilverMirror, SilverMirrorGui.MirrorGui::new);
 		
 		// Could probably make this be the default!
 		ISpellCraftPatternRenderer.RegisterRenderer(NostrumSpellCraftPatterns.lightweight, SpellCraftPatternAutoRenderer.INSTANCE);

@@ -128,7 +128,7 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 		if (worldIn.isRemote)
 			return ActionResultType.SUCCESS;
 		
-		if (!canStore(worldIn.getDimensionKey(), pos)) {
+		if (!canStore(worldIn, pos)) {
 			return ActionResultType.FAIL;
 		}
 		
@@ -147,19 +147,18 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
 		
-		if (DimensionUtils.InDimension(playerIn, IPositionHolderItem.getDimension(stack))) {
-			BlockPos pos = IPositionHolderItem.getBlockPosition(stack);
-			if (pos != null) {
-				handleOpen(playerIn, hand, stack);
-				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
-			}
+		RegistryKey<World> dimension = IPositionHolderItem.getDimension(stack);
+		BlockPos pos = IPositionHolderItem.getBlockPosition(stack);
+		if (pos != null && dimension != null) {
+			handleOpen(playerIn, hand, stack);
+			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 		}
 		
 		return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
 	}
 	
-	protected boolean canStore(RegistryKey<World> dimension, BlockPos pos) {
-		return !DimensionUtils.IsSorceryDim(dimension);
+	protected boolean canStore(World world, BlockPos pos) {
+		return !DimensionUtils.IsSorceryDim(world);
 	}
 	
 	protected abstract void handleOpen(PlayerEntity player, Hand hand, ItemStack stack);

@@ -211,7 +211,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		}
 	}
 	
-	protected void receiveAndSpawnItem(@Nonnull ItemStack stack, BlockPos fromPos) {
+	public void receiveAndSpawnItem(@Nonnull ItemStack stack, BlockPos fromPos) {
 		Vector3d spawnLoc = getSpawnLocation();
 		Vector3d spawnVelocity = getSpawnVelocity();
 		ItemEntity entity = new ItemEntity(getWorld(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
