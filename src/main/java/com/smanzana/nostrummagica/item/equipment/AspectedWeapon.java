@@ -326,6 +326,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				item = NostrumItems.enchantedWeaponIceMaster;
 				break;
 			}
+			break;
 		case LIGHTNING:
 			switch (type) {
 			case NOVICE:

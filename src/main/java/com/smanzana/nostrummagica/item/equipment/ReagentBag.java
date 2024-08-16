@@ -1,8 +1,15 @@
 package com.smanzana.nostrummagica.item.equipment;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.client.gui.container.ReagentBagGui;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -10,21 +17,33 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.ritual.AltarRitualLayout;
+import com.smanzana.nostrummagica.ritual.IRitualIngredients;
+import com.smanzana.nostrummagica.ritual.RitualRecipe;
+import com.smanzana.nostrummagica.ritual.RitualRegistry;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.CandleTileEntity;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.util.Inventories.IterableInventoryWrapper;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -210,10 +229,21 @@ public class ReagentBag extends Item implements ILoreTagged {
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 		if (context.getPlayer().isSneaking()) {
+			if (context.getWorld().isRemote()) {
+				return ActionResultType.SUCCESS;
+			}
+			
 			// If sneaking, try and do container fast add.
 			final BlockPos pos = context.getPos();
 			final TileEntity te = context.getWorld().getTileEntity(pos);
 			if (te != null) {
+				
+				// First, check if it's a ritual setup and see about auto-inserting reagents
+				if (autoFillRitual(context.getWorld(), pos, te, context.getPlayer(), context.getItem())) {
+					return ActionResultType.SUCCESS;
+				}
+				
+				// If not that, try to insert into container
 				ItemStack[] contents = getItems(context.getItem());
 				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getWorld().getBlockState(pos), te, context.getFace())) {
 					// Update contents
@@ -349,5 +379,177 @@ public class ReagentBag extends Item implements ILoreTagged {
 	@Override
 	public InfoScreenTabs getTab() {
 		return InfoScreenTabs.INFO_REAGENTS;
+	}
+	
+	protected static final boolean autoFillRitual(World world, BlockPos pos, TileEntity te, PlayerEntity player, ItemStack bag) {
+		if (te instanceof AltarTileEntity && !((AltarTileEntity) te).getItem().isEmpty()) {
+			// Capture current actual layout
+			AltarRitualLayout layout = AltarRitualLayout.Capture(world, pos, EMagicElement.PHYSICAL);
+			if (!layout.hasTierBlocks(1)) { // only for tier 2+ (encoded as 1+)
+				return false;
+			}
+			
+			final IRitualIngredients wrapper = new IRitualIngredients() {
+				@Override
+				public boolean hasTierBlocks(int tier) {
+					return layout.hasTierBlocks(tier);
+				}
+
+				@Override
+				public boolean hasCenterItem(Ingredient ingredient) {
+					return layout.hasCenterItem(ingredient);
+				}
+
+				@Override
+				public boolean hasReagents(Iterable<ReagentType> reagents) {
+					return true; // Actual reason for wrapper: lie about reagents
+				}
+
+				@Override
+				public boolean hasExtraItems(Iterable<Ingredient> ingredients) {
+					return layout.hasExtraItems(ingredients);
+				}
+
+				@Override
+				public boolean hasElement(EMagicElement element) {
+					return true; // lie since we don't know
+				}
+			};
+			
+			// Find all matching rituals
+			List<RitualRecipe> matches = RitualRegistry.instance().getRegisteredRituals().stream()
+					.filter(r -> r.matches(player, world, pos, wrapper))
+					.collect(Collectors.toList());
+			
+			// If only one, easy to figure out what to do.
+			// If multiple, cycle through matching rituals
+			final RitualRecipe match;
+			final List<ItemStack> reagents;
+			if (matches.isEmpty()) {
+				return false;
+			} else if (matches.size() > 1) {
+				// if full reagents aren't already out, give a nice message explaning what's going on
+				if (layout.getReagentItems(world, pos).size() < 4) {
+					player.sendMessage(new StringTextComponent("Matched multiple rituals. Filling for first. Use again to cycle."), Util.DUMMY_UUID);
+					match = matches.get(0);
+				} else {
+					// pull all reagents back to put fresh ones next. Figure out which recipe we're set up for.
+					final IRitualIngredients elementWrapper = new IRitualIngredients() {
+						@Override
+						public boolean hasTierBlocks(int tier) {
+							return layout.hasTierBlocks(tier);
+						}
+
+						@Override
+						public boolean hasCenterItem(Ingredient ingredient) {
+							return layout.hasCenterItem(ingredient);
+						}
+
+						@Override
+						public boolean hasReagents(Iterable<ReagentType> reagents) {
+							return layout.hasReagents(reagents); // actually check reagents but still lie about element
+						}
+
+						@Override
+						public boolean hasExtraItems(Iterable<Ingredient> ingredients) {
+							return layout.hasExtraItems(ingredients);
+						}
+
+						@Override
+						public boolean hasElement(EMagicElement element) {
+							return true; // lie since we don't know
+						}
+					};
+					
+					Iterator<RitualRecipe> it = matches.iterator();
+					RitualRecipe next = null;
+					while (it.hasNext()) {
+						RitualRecipe ritual = it.next();
+						if (ritual.matches(player, world, pos, elementWrapper)) {
+							// found the true match
+							if (it.hasNext()) {
+								next = it.next();
+							}
+						}
+					}
+					if (next == null) {
+						next = matches.get(0);
+					}
+					
+					match = next;
+				}
+					
+				// Eat up reagents
+				AltarRitualLayout.VisitTier2Candles(world, pos, (w, candlePos) -> {
+					BlockState state = world.getBlockState(candlePos);
+					if (state == null || !(state.getBlock() instanceof CandleBlock)) {
+						return;
+					}
+					// Candle TE can exist or not
+					TileEntity candleTE = world.getTileEntity(candlePos);
+					if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
+						ReagentType type = ((CandleTileEntity) candleTE).getReagentType();
+						addItem(bag, ReagentItem.CreateStack(type, 1));
+						CandleBlock.extinguish(world, candlePos, state, false);
+					}
+				});
+				
+				// Just ate up reagents so don't use what's on the layout
+				reagents = new ArrayList<>();
+			} else {
+				// only one
+				match = matches.get(0);
+				reagents = layout.getReagentItems(world, pos);
+			}
+			
+			// Only one matched! What reagents does it need? Try to add them
+			List<ReagentType> requiredTypes = Lists.newArrayList(match.getTypes());
+			
+			// subtract what's already there
+			for (ItemStack reagent : reagents) {
+				if (reagent.isEmpty()) {
+					continue;
+				}
+				
+				ReagentType type = ReagentItem.FindType(reagent);
+				if (type != null) {
+					requiredTypes.remove(type);
+				}
+			}
+			
+			// For remainder, try to add
+			for (ReagentType missing : requiredTypes) {
+				if (removeCount(bag, missing, 1) == 0) {
+					// removed a reagent. Place it
+					boolean[] found = {false};
+					AltarRitualLayout.VisitTier2Candles(world, pos, (w, candlePos) -> {
+						if (!found[0]) {
+							BlockState state = world.getBlockState(candlePos);
+							if (state == null || !(state.getBlock() instanceof CandleBlock)) {
+								return;
+							}
+							// Candle TE can exist or not
+							TileEntity candleTE = world.getTileEntity(candlePos);
+							if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
+								return;
+							}
+							
+							CandleBlock.setReagent(world, candlePos, world.getBlockState(candlePos), missing);
+							found[0] = true;
+						}
+					});
+					
+					if (!found[0]) {
+						// Couldn't find candle, so... drop it?
+						ItemEntity item = new ItemEntity(world, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5, ReagentItem.CreateStack(missing, 1));
+						world.addEntity(item);
+					}
+				}
+			}
+			
+			return true;
+		}
+		
+		return false;
 	}
 }

@@ -236,7 +236,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		return CheckChalk(world, center, CHALK_XS, CHALK_YS);
 	}
 	
-	private static final void VisitTier2Candles(World world, BlockPos center, BiConsumer<World, BlockPos> visitor) {
+	public static final void VisitTier2Candles(World world, BlockPos center, BiConsumer<World, BlockPos> visitor) {
 		final int CANDLE_XS[] = {-2, -2, 2, 2};
 		final int CANDLE_YS[] = {-2, 2, -2, 2};
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
@@ -257,7 +257,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		return reagents;
 	}
 	
-	private static final void VisitTier3Extras(World world, BlockPos center, BiConsumer<World, BlockPos> visitor) {
+	protected static final void VisitTier3Extras(World world, BlockPos center, BiConsumer<World, BlockPos> visitor) {
 		final int ALTAR_XS[] = {-4, 0, 0, 4};
 		final int ALTAR_YS[] = {0, -4, 4, 0};
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
