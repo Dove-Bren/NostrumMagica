@@ -36,6 +36,7 @@ public class ElementalArmorSet extends EquipmentSet {
 			.MakeHasElytraModifier(ARMOR_ELYTRA_ID, true);
 	private static final AttributeModifier ARMOR_NO_ELYTRA_MODIFIER = NostrumElytraWrapper
 			.MakeHasElytraModifier(ARMOR_ELYTRA_ID, false);
+	private static final UUID ARMOR_JUMP_ID = UUID.fromString("6dafa458-54e0-47e9-b055-65542c6cfde2");
 
 	protected final EMagicElement element;
 	protected final ElementalArmor.Type type;
@@ -89,6 +90,10 @@ public class ElementalArmorSet extends EquipmentSet {
 			if (i == getFullSetCount() - 1) {
 				NostrumElytraWrapper.AddElytraModifier(builder, hasFlying ? ARMOR_ELYTRA_MODIFIER : ARMOR_NO_ELYTRA_MODIFIER);
 				builder.put(NostrumAttributes.GetXPAttribute(element), new AttributeModifier(xpID, "Elemental XP Bonus (Set)", 100, AttributeModifier.Operation.ADDITION));
+				
+				if (element == EMagicElement.WIND) {
+					builder.put(NostrumAttributes.bonusJump, new AttributeModifier(ARMOR_JUMP_ID, "Storm Armor Bonus Jump (Set)", 1, AttributeModifier.Operation.ADDITION));
+				}
 			}
 			
 			ret.add(builder.build());
