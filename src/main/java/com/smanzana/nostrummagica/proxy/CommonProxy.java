@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.proxy;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.IPortalBlock;
@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.GuiBook;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -46,7 +45,6 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
@@ -247,7 +245,7 @@ public class CommonProxy {
 	}
 	
 	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
-			ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] types, ItemStack output) {
+			ItemStack center, List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		Set<PlayerEntity> players = new HashSet<>();
 		final double MAX_RANGE_SQR = 2500.0;
 		if (pos != null) {
@@ -261,7 +259,7 @@ public class CommonProxy {
 			SpawnNostrumRitualEffectMessage message = new SpawnNostrumRitualEffectMessage(
 					//int dimension, BlockPos pos, ReagentType[] reagents, ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output
 					world.getDimensionKey(),
-					pos, element, types, center, extras, output
+					pos, element, reagents, center, extras, output
 					);
 			for (PlayerEntity player : players) {
 				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);

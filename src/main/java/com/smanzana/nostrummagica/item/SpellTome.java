@@ -204,7 +204,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return item;
 	}
 	
-	public static ItemStack Create(@Nonnull ItemStack plate, NonNullList<ItemStack> pages) {
+	public static ItemStack Create(@Nonnull ItemStack plate, List<ItemStack> pages) {
 		TomeStyle style = ((SpellPlate) plate.getItem()).getStyle();
 		List<SpellTomeEnhancementWrapper> enhancements = SpellPlate.getEnhancements(plate);
 		

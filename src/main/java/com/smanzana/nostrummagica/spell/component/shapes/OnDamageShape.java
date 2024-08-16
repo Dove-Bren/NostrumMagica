@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
@@ -44,13 +45,15 @@ public class OnDamageShape extends SpellShape {
 
 		private LivingEntity entity;
 		private int duration;
+		private boolean affectCaster;
 		private boolean expired;
 		
-		public OnDamageShapeInstance(ISpellState state, LivingEntity entity, int duration, SpellCharacteristics characteristics) {
+		public OnDamageShapeInstance(ISpellState state, LivingEntity entity, int duration, boolean affectCaster, SpellCharacteristics characteristics) {
 			super(state);
 			this.entity = entity;
 			this.duration = duration == 0 ? 20 : duration;
 			this.expired = false;
+			this.affectCaster = affectCaster;
 		}
 		
 		@Override
@@ -68,7 +71,7 @@ public class OnDamageShape extends SpellShape {
 			if (type == Event.DAMAGED) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
-							Lists.newArrayList(entity),
+							Lists.newArrayList(affectCaster ? getState().getCaster() : entity),
 							null
 							);
 					
@@ -107,6 +110,7 @@ public class OnDamageShape extends SpellShape {
 			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
 	public static final SpellShapeProperty<Integer> DURATION = new IntSpellShapeProperty("delay", 20, 30, 40, 60, 300);
+	public static final SpellShapeProperty<Boolean> AFFECT_ME = new BooleanSpellShapeProperty("affect_me");
 	
 	protected OnDamageShape(String key) {
 		super(key);
@@ -115,7 +119,7 @@ public class OnDamageShape extends SpellShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		baseProperties.addProperty(DURATION);
+		baseProperties.addProperty(DURATION).addProperty(AFFECT_ME);
 	}
 	
 	public OnDamageShape() {
@@ -126,9 +130,13 @@ public class OnDamageShape extends SpellShape {
 		return properties.getValue(DURATION);
 	}
 	
+	protected boolean getAffectCaster(SpellShapeProperties properties) {
+		return properties.getValue(AFFECT_ME);
+	}
+	
 	@Override
 	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		return new OnDamageShapeInstance(state, state.getSelf(), getDurationSecs(params), characteristics);
+		return new OnDamageShapeInstance(state, state.getSelf(), getDurationSecs(params), getAffectCaster(params), characteristics);
 	}
 	
 	@Override

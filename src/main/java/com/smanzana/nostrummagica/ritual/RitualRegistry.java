@@ -5,17 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.AltarBlock;
-import com.smanzana.nostrummagica.block.CandleBlock;
-import com.smanzana.nostrummagica.criteria.RitualCriteriaTrigger;
-import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
-import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spell.EMagicElement;
-
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,8 +32,8 @@ public class RitualRegistry {
 //				.create();
 //	}
 	
-	private List<RitualRecipe> ritualRegistry;
-	private Set<IRitualListener> ritualListeners;
+	private final List<RitualRecipe> ritualRegistry;
+	private final Set<IRitualListener> ritualListeners;
 	
 	private RitualRegistry() {
 		ritualRegistry = new ArrayList<>();
@@ -62,51 +52,10 @@ public class RitualRegistry {
 		ritualListeners.remove(listener);
 	}
 	
-	/**
-	 * Checks the world surrounding the player for any valid ritual setups
-	 * that match
-	 * @param world
-	 * @param pos
-	 * @param player
-	 * @param incantation
-	 * @return
-	 */
-	public static boolean attemptRitual(World world, BlockPos pos, PlayerEntity player, EMagicElement element) {
-		// All rituals have a candle or an altar in the center
-		// For all candles and altars around the player, check if recipes match
-		BlockState state = world.getBlockState(pos);
-		if (state == null ||
-			(!(state.getBlock() instanceof CandleBlock) && !(state.getBlock() instanceof AltarBlock)))
-			return false;
-		
-		// else it's an altar or a candle
-		for (RitualRecipe ritual : instance().ritualRegistry) {
-			final RitualMatchInfo result = ritual.matches(player, world, pos, element);
-			if (result.matched) {
-				if (ritual.perform(world, player, pos)) {
-					
-					if (!instance().ritualListeners.isEmpty()) {
-						for (IRitualListener listener : instance().ritualListeners) {
-							listener.onRitualPerformed(ritual, world, player, pos);
-						}
-					}
-					
-					NostrumMagicaSounds.AMBIENT_WOOSH2.play(world,
-							pos.getX(), pos.getY(), pos.getZ());
-	
-					NostrumMagica.instance.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
-							result.center, result.extras, result.reagents, result.output);
-					
-					if (player instanceof ServerPlayerEntity) {
-						RitualCriteriaTrigger.Instance.trigger((ServerPlayerEntity) player, ritual.getTitleKey());
-					}
-					
-					return true;
-				}
-			}
+	public void fireRitualPerformed(RitualRecipe ritual, World world, PlayerEntity player, BlockPos pos) {
+		for (IRitualListener listener : RitualRegistry.instance().ritualListeners) {
+			listener.onRitualPerformed(ritual, world, player, pos);
 		}
-		
-		return false;
 	}
 
 	public List<RitualRecipe> getRegisteredRituals() {

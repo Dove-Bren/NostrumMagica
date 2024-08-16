@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.ritual.outcome;
 import java.util.List;
 
 import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -21,9 +21,9 @@ public class OutcomeCreateTome implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Take plates and pages from the altars.
-		ItemStack tome = SpellTome.Create(centerItem, otherItems);
+		ItemStack tome = SpellTome.Create(layout.getCenterItem(world, center), layout.getExtraItems(world, center));
 		if (tome.isEmpty())
 			return;
 		

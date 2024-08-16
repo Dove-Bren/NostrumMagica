@@ -3,12 +3,12 @@ package com.smanzana.nostrummagica.ritual.outcome;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 	
 	public static interface ItemModification {
-		public void modify(World world, PlayerEntity player, ItemStack item, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe);
+		public void modify(World world, PlayerEntity player, ItemStack item, List<ItemStack> otherItems, BlockPos center, RitualRecipe recipe);
 	}
 
 	private ItemModification modification;
@@ -33,10 +33,11 @@ public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
 		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		ItemStack centerItem = layout.getCenterItem(world, center);
 		if (recipe.getTier() == 0 || centerItem.isEmpty()) {
 			// enchant item on player
 			ItemStack item = player.getHeldItemMainhand();
@@ -47,7 +48,7 @@ public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 			altar = null;
 		}
 		
-		modification.modify(world, player, centerItem, otherItems, center, recipe);
+		modification.modify(world, player, centerItem, layout.getExtraItems(world, center), center, recipe);
 		if (altar != null) {
 			altar.setItem(centerItem);
 		}

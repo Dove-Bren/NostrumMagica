@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.ritual.RitualRegistry;
+import com.smanzana.nostrummagica.ritual.AltarRitualLayout;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
@@ -136,7 +136,7 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 			if (!(te instanceof CandleTileEntity))
 				return ActionResultType.PASS;
 			
- 			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
+ 			if (AltarRitualLayout.AttemptRitual(worldIn, pos, playerIn, element)) {
  				stack.shrink(1);
  			}
  			
@@ -145,7 +145,7 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 			if (!(te instanceof AltarTileEntity))
 				return ActionResultType.PASS;
 			
-			if (RitualRegistry.attemptRitual(worldIn, pos, playerIn, element)) {
+			if (AltarRitualLayout.AttemptRitual(worldIn, pos, playerIn, element)) {
 				stack.shrink(1);
 			}
 			

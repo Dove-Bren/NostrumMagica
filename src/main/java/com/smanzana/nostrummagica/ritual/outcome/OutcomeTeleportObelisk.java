@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMessage;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
@@ -19,7 +20,6 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -33,9 +33,11 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Teleport the player to the obelisk pointed at by the center item
 		// Must have magic unlocked, maybe?
+		
+		final ItemStack centerItem = layout.getCenterItem(world, center);
 		
 		// Put the geogem back on the altar
 		( (AltarTileEntity) world.getTileEntity(center)).setItem(centerItem);

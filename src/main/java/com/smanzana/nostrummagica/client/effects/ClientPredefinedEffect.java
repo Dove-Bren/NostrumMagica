@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierColor;
@@ -7,14 +9,12 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierF
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierMove;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 
@@ -68,7 +68,7 @@ public class ClientPredefinedEffect {
 		}
 	}
 	
-	public static void SpawnRitualEffect(BlockPos pos, EMagicElement element, ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
+	public static void SpawnRitualEffect(BlockPos pos, EMagicElement element, ItemStack center, @Nullable List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		Minecraft.getInstance().runAsync(() -> {
 			ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
 					new Vector3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),

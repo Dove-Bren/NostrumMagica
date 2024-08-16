@@ -4,15 +4,14 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -27,11 +26,12 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
-		ItemStack tome = ingredients.center;
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
+		ItemStack tome = layout.getCenterItem(world, center);
 		ItemStack scroll = ItemStack.EMPTY;
-		if (ingredients.extras != null && ingredients.extras.size() > 0)
-		for (ItemStack other : ingredients.extras) {
+		List<ItemStack> extras = layout.getExtraItems(world, center);
+		if (extras != null && extras.size() > 0)
+		for (ItemStack other : extras) {
 			if (!other.isEmpty() && other.getItem() instanceof SpellScroll) {
 				scroll = other;
 				break;
@@ -61,12 +61,13 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Take the spell and tome and begin the player binding
 		
 		// Tome has to be center.
-		ItemStack tome = centerItem;
+		ItemStack tome = layout.getCenterItem(world, center);
 		ItemStack scroll = ItemStack.EMPTY;
+		List<ItemStack> otherItems = layout.getExtraItems(world, center);
 		if (otherItems != null && otherItems.size() > 0)
 		for (ItemStack other : otherItems) {
 			if (!other.isEmpty() && other.getItem() instanceof SpellScroll) {
@@ -80,7 +81,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 			return;
 		
 		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
-		altar.setItem(centerItem);
+		altar.setItem(tome); // Re-set tome back into altar
 		
 		if (!SpellTome.startBinding(player, tome, scroll)) {
 			altar = (AltarTileEntity) world.getTileEntity(center.add(4, 0, 0));

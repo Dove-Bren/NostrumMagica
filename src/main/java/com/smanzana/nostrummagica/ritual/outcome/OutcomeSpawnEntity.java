@@ -2,13 +2,13 @@ package com.smanzana.nostrummagica.ritual.outcome;
 
 import java.util.List;
 
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
@@ -31,7 +31,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		if (world.isRemote)
 			return;
 		
@@ -43,7 +43,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 			Vector3d pos = new Vector3d(center.getX() + .5 + Math.cos(angle) * distance,
 					center.getY(),
 					center.getZ() + .5 + Math.sin(angle) * distance);
-			this.factory.spawn(world, pos, player, centerItem);
+			this.factory.spawn(world, pos, player, layout.getCenterItem(world, center));
 		}
 	}
 	

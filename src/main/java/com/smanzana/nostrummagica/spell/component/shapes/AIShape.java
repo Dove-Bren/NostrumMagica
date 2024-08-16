@@ -34,7 +34,12 @@ public class AIShape extends InstantShape {
 		if (state.getCaster() instanceof MobEntity) {
 			target = ((MobEntity) state.getCaster()).getAttackTarget();
 		}
-		return new TriggerData(Lists.newArrayList(target), null);
+		
+		if (target != null) {
+			return new TriggerData(Lists.newArrayList(target), null);
+		} else {
+			return new TriggerData(null, null);
+		}
 	}
 	
 	@Override

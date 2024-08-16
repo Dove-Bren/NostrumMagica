@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.block.AltarBlock;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.ChalkBlock;
 import com.smanzana.nostrummagica.block.ObeliskBlock;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
@@ -15,7 +15,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -28,7 +27,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
 		if (!ObeliskBlock.canSpawnObelisk(world, center.add(0, -1, 0))) {
 			if (!world.isRemote) {
 				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
@@ -39,7 +38,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// All logic contained in obelisk class
 		if (!ObeliskBlock.spawnObelisk(world, center.add(0, -1, 0))) {
 			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);

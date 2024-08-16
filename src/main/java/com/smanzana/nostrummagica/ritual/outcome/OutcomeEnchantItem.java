@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.ritual.outcome;
 import java.util.List;
 
 import com.smanzana.nostrummagica.item.SpellPlate;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
@@ -11,7 +12,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -27,10 +27,11 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
 		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		final ItemStack centerItem = layout.getCenterItem(world, center);
 		if (recipe.getTier() == 0 || centerItem.isEmpty()) {
 			// enchant item on player
 			ItemStack item = player.getHeldItemMainhand();

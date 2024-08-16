@@ -324,6 +324,10 @@ public class Spell {
 				
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
+						if (targ == null) {
+							continue;
+						}
+						
 						log.effect(targ);
 						log.pushModifierStack();
 						

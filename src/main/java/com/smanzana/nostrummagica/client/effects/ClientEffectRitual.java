@@ -1,25 +1,25 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.item.ReagentItem;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
-import com.smanzana.nostrummagica.util.NonNullEnumMap;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
@@ -33,16 +33,14 @@ public class ClientEffectRitual extends ClientEffect {
 	private static final int DURATION_TIER2 = 20 * 6;
 	private static final int DURATION_TIER1 = 20 * 2;
 	
-	private static NonNullEnumMap<ReagentType, ItemStack> itemCache = null;
-	
 	protected EMagicElement element = EMagicElement.PHYSICAL;
 	protected ItemStack center = ItemStack.EMPTY; // Either .empty() or present
-	protected NonNullList<ItemStack> extras = null; // can be null or size 4 with .empty() for blank altars
-	protected ReagentType[] reagents = null; // Either [1] or [4]
+	protected List<ItemStack> extras = null; // can be null or size 4 with .empty() for blank altars
+	protected List<ItemStack> reagents = new ArrayList<>(); // Either size 1 or 4
 	protected ItemStack output = ItemStack.EMPTY; // either .empty() or actual output
 	
 	protected ClientEffectRitual(int duration, Vector3d origin,
-			EMagicElement element, ItemStack center, NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
+			EMagicElement element, ItemStack center, List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		super(origin, null, duration);
 		this.center = center;
 		this.extras = extras;
@@ -58,13 +56,6 @@ public class ClientEffectRitual extends ClientEffect {
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).hideItem(true);
 		}
-		
-		if (itemCache == null) {
-			itemCache = new NonNullEnumMap<>(ReagentType.class, ItemStack.EMPTY);
-			for (ReagentType type : ReagentType.values()) {
-				itemCache.put(type, ReagentItem.CreateStack(type, 1));
-			}
-		}
 	}
 	
 	@Override
@@ -76,20 +67,16 @@ public class ClientEffectRitual extends ClientEffect {
 		}
 	}
 	
-	protected static ItemStack getReagentItem(ReagentType type) {
-		return itemCache.get(type);
-	}
-	
-	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack center, NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
+	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack center, List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		this(DURATION_TIER3, origin, element, center, extras, reagents, output);
 	}
 	
-	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack center, ReagentType[] reagents, ItemStack output) {
+	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack center, List<ItemStack> reagents, ItemStack output) {
 		this(DURATION_TIER2, origin, element, center, null, reagents, output);
 	}
 	
-	public ClientEffectRitual(Vector3d origin, EMagicElement element, ReagentType reagent, ItemStack output) {
-		this(DURATION_TIER1, origin, element, ItemStack.EMPTY, null, new ReagentType[] {reagent}, output);
+	public ClientEffectRitual(Vector3d origin, EMagicElement element, ItemStack reagent, ItemStack output) {
+		this(DURATION_TIER1, origin, element, ItemStack.EMPTY, null, Lists.newArrayList(reagent), output);
 	}
 	
 	/**
@@ -101,9 +88,9 @@ public class ClientEffectRitual extends ClientEffect {
 	 * @param output
 	 * @return
 	 */
-	public static ClientEffectRitual Create(Vector3d origin, EMagicElement element, ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] reagents, ItemStack output) {
+	public static ClientEffectRitual Create(Vector3d origin, EMagicElement element, ItemStack center, @Nullable List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		if (center.isEmpty()) {
-			return new ClientEffectRitual(origin, element, reagents[0], output);
+			return new ClientEffectRitual(origin, element, reagents.get(0), output);
 		} else if (extras == null) {
 			return new ClientEffectRitual(origin, element, center, reagents, output);
 		} else {
@@ -150,9 +137,9 @@ public class ClientEffectRitual extends ClientEffect {
 		}
 	}
 	
-	protected void drawCandleTrail(MatrixStack matrixStackIn, Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, @Nullable ReagentType type) {
+	protected void drawCandleTrail(MatrixStack matrixStackIn, Minecraft mc, float adjProgress, float partialTicks, Vector3d pos, ItemStack reagent) {
 		
-		if (type != null) {
+		if (!reagent.isEmpty()) {
 			final float scale = .75f;
 			final float rotPeriod = .5f;
 			final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
@@ -169,7 +156,7 @@ public class ClientEffectRitual extends ClientEffect {
 //			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderHelper.enableStandardItemLighting();
 			
-			RenderFuncs.RenderWorldItem(getReagentItem(type), matrixStackIn);
+			RenderFuncs.RenderWorldItem(reagent, matrixStackIn);
 			
 			matrixStackIn.pop();
 		}
@@ -251,10 +238,10 @@ public class ClientEffectRitual extends ClientEffect {
 				final double magnitude = Math.sqrt(4 + 4);
 				
 				for (int i = 0; i < 4; i++) {
-					if (i >= reagents.length) {
+					if (i >= reagents.size()) {
 						continue;
 					}
-					final ReagentType type = reagents[i];
+					final ItemStack reagent = reagents.get(i);
 					
 					// X and Z just interpolate to center
 					// Y we'll do a parabola
@@ -270,7 +257,7 @@ public class ClientEffectRitual extends ClientEffect {
 					final double x = Math.cos(angle) * dist;
 					final double z = Math.sin(angle) * dist;
 					
-					drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, new Vector3d(x, y, z), type);
+					drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, new Vector3d(x, y, z), reagent);
 //					drawFloatingItem(mc, adjProgress, partialTicks, new Vector3d(
 //							x,
 //							y,
@@ -320,7 +307,7 @@ public class ClientEffectRitual extends ClientEffect {
 						hDist * 2,
 						hDist * Math.sin(rotYawRad + (i * RadDiff))
 						);
-				drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, pos, null);
+				drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, pos, ItemStack.EMPTY);
 			}
 		}
 	}
@@ -369,7 +356,7 @@ public class ClientEffectRitual extends ClientEffect {
 						hDist * 2,
 						hDist * Math.sin(rotYawRad + (i * RadDiff))
 						);
-				drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, pos, null);
+				drawCandleTrail(matrixStackIn, mc, adjProgress, partialTicks, pos, ItemStack.EMPTY);
 			}
 			if (adjProgress > .5f) {
 				drawRevealCloud(matrixStackIn, mc, adjProgress, partialTicks, Vector3d.ZERO);

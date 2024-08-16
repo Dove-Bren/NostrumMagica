@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.proxy;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -40,7 +42,6 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.integration.jei.NostrumMagicaJEIPlugin;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
@@ -80,7 +81,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -1014,12 +1014,12 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
-			ItemStack center, @Nullable NonNullList<ItemStack> extras, ReagentType[] types, ItemStack output) {
+			ItemStack center, @Nullable List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		if (world.isRemote) {
 			return;
 		}
 		
-		super.playRitualEffect(world, pos, element, center, extras, types, output);
+		super.playRitualEffect(world, pos, element, center, extras, reagents, output);
 	}
 
 	public void doManaWiggle(int wiggleCount) {

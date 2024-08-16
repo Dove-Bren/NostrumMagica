@@ -6,16 +6,14 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.effect.NostrumEffects;
+import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualMatchInfo;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -43,7 +41,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, ItemStack centerItem, NonNullList<ItemStack> otherItems, BlockPos center, RitualRecipe recipe) {
+	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		@Nullable LivingEntity target = findEntity(world, player, center);
 		if (target != null) {
 			// Apply effect to the selected entity
@@ -62,7 +60,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, RitualMatchInfo ingredients) {
+	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
 		if (findEntity(world, player, center) == null) {
 			if (!player.world.isRemote) {
 				player.sendMessage(new TranslationTextComponent("info.transformation.noentity"), Util.DUMMY_UUID);

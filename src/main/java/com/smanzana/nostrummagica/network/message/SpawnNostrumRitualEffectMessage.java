@@ -1,12 +1,12 @@
 package com.smanzana.nostrummagica.network.message;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
@@ -47,13 +47,13 @@ public class SpawnNostrumRitualEffectMessage {
 	private final RegistryKey<World> dimension;
 	private final BlockPos pos;
 	private final EMagicElement element;
-	private final ReagentType[] reagents;
+	private final List<ItemStack> reagents;
 	private final ItemStack center;
-	private final @Nullable NonNullList<ItemStack> extras;
+	private final @Nullable List<ItemStack> extras;
 	private final ItemStack output;
 	
-	public SpawnNostrumRitualEffectMessage(RegistryKey<World> dimension, BlockPos pos, EMagicElement element, ReagentType[] reagents,
-			ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output) {
+	public SpawnNostrumRitualEffectMessage(RegistryKey<World> dimension, BlockPos pos, EMagicElement element, List<ItemStack> reagents,
+			ItemStack center, @Nullable List<ItemStack> extras, ItemStack output) {
 		this.dimension = dimension;
 		this.pos = pos;
 		this.element = element;
@@ -67,9 +67,9 @@ public class SpawnNostrumRitualEffectMessage {
 		final RegistryKey<World> dimID;
 		final BlockPos pos;
 		final EMagicElement element;
-		final ReagentType[] reagents;
+		final List<ItemStack> reagents;
 		final ItemStack center;
-		final @Nullable NonNullList<ItemStack> extras;
+		final @Nullable List<ItemStack> extras;
 		final ItemStack output;
 		
 		dimID = NetUtils.unpackDimension(buf);
@@ -77,9 +77,9 @@ public class SpawnNostrumRitualEffectMessage {
 		element = buf.readEnumValue(EMagicElement.class);
 		
 		final int reagentLen = buf.readVarInt();
-		reagents = new ReagentType[reagentLen];
+		reagents = NonNullList.withSize(reagentLen, ItemStack.EMPTY);
 		for (int i = 0; i < reagentLen; i++) {
-			reagents[i] = buf.readEnumValue(ReagentType.class);
+			reagents.set(i, ItemStack.read(buf.readCompoundTag()));
 		}
 		
 		if (buf.readBoolean()) {
@@ -112,9 +112,9 @@ public class SpawnNostrumRitualEffectMessage {
 		buf.writeBlockPos(msg.pos);
 		buf.writeEnumValue(msg.element);
 		
-		buf.writeVarInt(msg.reagents.length);
-		for (ReagentType reagent : msg.reagents) {
-			buf.writeEnumValue(reagent);
+		buf.writeVarInt(msg.reagents.size());
+		for (ItemStack reagent : msg.reagents) {
+			buf.writeCompoundTag(reagent.serializeNBT());
 		}
 		
 		buf.writeBoolean(!msg.center.isEmpty());
