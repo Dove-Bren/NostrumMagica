@@ -299,4 +299,10 @@ public class AuraShape extends AreaShape {
 		
 		return !ents.isEmpty();
 	}
+	
+	public SpellShapeProperties makeProps(float radius, boolean includeAllies) {
+		return this.getDefaultProperties()
+				.setValue(AFFECT_ALLIES, includeAllies)
+				.setValue(RADIUS, radius);
+	}
 }

@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "1.16.5-1.11.5"
+version = "1.16.5-1.11.6"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
@@ -137,6 +137,20 @@ repositories {
 		name "curios"
         url = "https://maven.theillusivec4.top/"
     }
+	
+	maven {
+        name 'MineColonies'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding'
+        content {
+            includeGroup 'com.minecolonies'
+            includeGroup 'com.ldtteam'
+        }
+    }
+	
+	maven {
+        name 'CurseMaven'
+        url 'https://www.cursemaven.com'
+    }
 }
 
 dependencies {
@@ -162,6 +176,10 @@ dependencies {
 	
 	runtimeOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
 	compileOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
+	
+	compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
+	//runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
+	implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
 }
 
 task sourcesJar(type: Jar) {

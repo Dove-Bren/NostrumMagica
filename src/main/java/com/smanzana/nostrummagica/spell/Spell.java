@@ -833,10 +833,10 @@ public class Spell {
 			}).name("rooted");
 		case ENDER:
 			return new SpellAction().status(Effects.BLINDNESS, duration, amp).status(NostrumEffects.mobBlindness, duration, amp, (caster, target, eff) -> {
-				// With the inflict skill, apply to mobs
+				// With the inflict skill (or if non-player), apply to mobs
 				if (target instanceof MobEntity) {
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-					if (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict)) {
+					if (!(caster instanceof PlayerEntity) || (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict))) {
 						return true;
 					}
 				}
@@ -845,7 +845,7 @@ public class Spell {
 				// With the inflict skill, reset target to none
 				if (target instanceof MobEntity) {
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-					if (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict)) {
+					if (!(caster instanceof PlayerEntity) || (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict))) {
 						return true;
 					}
 				}

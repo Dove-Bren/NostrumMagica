@@ -56,3 +56,10 @@ Immersive & Complex Spellcrafting
 	versionRange="[1.16.5-1.0.0,)"
 	ordering="AFTER"
 	side="BOTH"
+
+[[dependencies.nostrummagica]]
+	modId="minecolonies"
+	mandatory=false
+	versionRange="[1.16.5-1.0.978,)"
+	ordering="AFTER"
+	side="BOTH"

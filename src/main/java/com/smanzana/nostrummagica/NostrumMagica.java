@@ -32,6 +32,7 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosClientProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
+import com.smanzana.nostrummagica.integration.minecolonies.MinecoloniesProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
 import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -110,6 +111,7 @@ public class NostrumMagica {
 	public final AetheriaProxy aetheria;
 	//public final EnderIOProxy enderIO;
 	public final MusicaProxy musica;
+	public final MinecoloniesProxy minecolonies;
 
 	public static ItemGroup creativeTab;
 	public static ItemGroup equipmentTab;
@@ -143,6 +145,7 @@ public class NostrumMagica {
 		aetheria = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
 		//enderIO = DistExecutor.safeRunForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
 		musica = DistExecutor.safeRunForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
+		minecolonies = new MinecoloniesProxy();
 		
 		(new ModConfig()).register();
 		
@@ -203,6 +206,9 @@ public class NostrumMagica {
 //		}
 		if (ModList.get().isLoaded("musica")) {
 			musica.enable();
+		}
+		if (ModList.get().isLoaded("minecolonies")) {
+			minecolonies.enable();
 		}
 
 		MinecraftForge.EVENT_BUS.register(this);
@@ -853,7 +859,7 @@ public class NostrumMagica {
 	}
 
 	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
-		return PetFuncs.IsSameTeam(ent1, ent2);
+		return PetFuncs.IsSameTeam(ent1, ent2) || instance.minecolonies.IsSameColony(ent1, ent2);
 	}
 
 	public static @Nullable LivingEntity resolveLivingEntity(@Nullable Entity entityOrSubEntity) {
