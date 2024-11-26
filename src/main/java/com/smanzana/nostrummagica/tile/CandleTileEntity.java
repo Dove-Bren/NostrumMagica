@@ -11,9 +11,11 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class CandleTileEntity extends TileEntity implements ITickableTileEntity {
+public class CandleTileEntity extends TileEntity implements ITickableTileEntity, IReagentProviderTile {
 	
 	private static final String NBT_TYPE = "type";
 	private static Random rand = new Random();
@@ -112,5 +114,20 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity 
 	
 	protected boolean isEnhanced() {
 		return CandleBlock.IsCandleEnhanced(getWorld(), getPos());
+	}
+
+	@Override
+	public ReagentType getPresentReagentType(TileEntity provider, World world, BlockPos pos) {
+		return this.getReagentType();
+	}
+
+	@Override
+	public boolean consumeReagentType(TileEntity provider, World world, BlockPos pos, ReagentType type) {
+		if (this.getReagentType() == null || (type != null && type != this.getReagentType())) {
+			return false;
+		}
+		
+		CandleBlock.extinguish(world, pos, getBlockState());
+		return true;
 	}
 }

@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.ChalkBlock;
 import com.smanzana.nostrummagica.criteria.RitualCriteriaTrigger;
 import com.smanzana.nostrummagica.item.ReagentItem;
@@ -18,6 +17,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
+import com.smanzana.nostrummagica.tile.IReagentProviderTile;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
@@ -195,8 +195,8 @@ public class AltarRitualLayout implements IRitualLayout {
 	
 	protected static final ItemStack GetReagent(World world, BlockPos pos) {
 		TileEntity te = world.getTileEntity(pos);
-		if (te != null && te instanceof CandleTileEntity) {
-			return ReagentItem.CreateStack(((CandleTileEntity) te).getReagentType(), 1);
+		if (te != null && te instanceof IReagentProviderTile) {
+			return ReagentItem.CreateStack(((IReagentProviderTile) te).getPresentReagentType(te, world, pos), 1);
 		}
 		
 		return ItemStack.EMPTY;
@@ -279,7 +279,10 @@ public class AltarRitualLayout implements IRitualLayout {
 	}
 	
 	protected static final void ClearCandle(World world, BlockPos pos) {
-		CandleBlock.extinguish(world, pos, world.getBlockState(pos));
+		TileEntity te = world.getTileEntity(pos);
+		if (te != null && te instanceof IReagentProviderTile) {
+			((IReagentProviderTile) te).consumeReagentType(te, world, pos, null);
+		}
 	}
 	
 	protected static final void ClearAltar(World world, BlockPos pos) {
