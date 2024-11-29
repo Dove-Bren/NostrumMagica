@@ -195,4 +195,8 @@ public class OnDamageShape extends SpellShape {
 		return true;
 	}
 	
+	public SpellShapeProperties makeProps(int duration, boolean affectMe) {
+		return this.getDefaultProperties().setValue(DURATION, duration).setValue(AFFECT_ME, affectMe);
+	}
+	
 }

@@ -140,4 +140,8 @@ public class DelayShape extends SpellShape {
 		return true;
 	}
 	
+	public SpellShapeProperties makeProps(int delay) {
+		return this.getDefaultProperties().setValue(DELAY, delay);
+	}
+	
 }
