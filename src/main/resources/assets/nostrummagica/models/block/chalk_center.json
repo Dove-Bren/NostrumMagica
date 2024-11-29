@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/chalk_solo",
+    "textures": {
+        "all": "nostrummagica:block/chalk_center"
+    }
+}

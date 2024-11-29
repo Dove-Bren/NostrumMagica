@@ -1,5 +1,55 @@
 {
-    "variants": {
-        "": { "model": "nostrummagica:block/chalk_block" }
+  "multipart": [
+    {
+      "when": {
+        "north": "false", "south": "false", "east": "false", "west": "false"
+      },
+      "apply": {
+        "model": "nostrummagica:block/chalk_solo"
+      }
+    },
+	{
+      "when": { "OR": [
+		  {"north": "true"}, {"south": "true"}, {"east": "true"}, {"west": "true"}
+	  ]},
+      "apply": {
+        "model": "nostrummagica:block/chalk_center"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "nostrummagica:block/chalk_side"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "nostrummagica:block/chalk_side",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "nostrummagica:block/chalk_side",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "nostrummagica:block/chalk_side",
+        "y": 270
+      }
     }
+  ]
 }
