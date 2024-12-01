@@ -233,7 +233,7 @@
     "item.nostrummagica.ribbon_kind": "Kind Ribbon",
     "item.nostrummagica.ribbon_kind.desc": "%3$s+0 Mana|%2$s+150%% Mana Regen%1$s",
     "item.nostrummagica.belt_ender": "Teleporter's Belt",
-    "item.nostrummagica.belt_ender.desc": "Augments teleportation spell's range",
+    "item.nostrummagica.belt_ender.desc": "Augments teleportation spell's range and allows teleport spells to pass through blocks when crouching",
     "item.nostrummagica.belt_lightning": "Storm Belt",
     "item.nostrummagica.belt_lightning.desc": "Amplifies the effect of calling down lightning",
     "item.nostrummagica.ring_gold": "Gold Ring",

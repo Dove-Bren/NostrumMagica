@@ -44,6 +44,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.SpellTeleportation;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmuteResult;
 import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
@@ -80,10 +81,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceContext.BlockMode;
-import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponent;
@@ -587,6 +584,8 @@ public class SpellAction {
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			log.pushModifierStack();
 			
+			boolean hasBelt = false;
+			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for lightning belt
 				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
@@ -597,11 +596,15 @@ public class SpellAction {
 							continue;
 						}
 						
-						efficiency += 1f;
-						log.addGlobalModifier(LABEL_BLINK_MOD_ENDERBELT, +1f, ESpellLogModifierType.BONUS_SCALE);
+						hasBelt = true;
 						break;
 					}
 				}
+			}
+			
+			if (hasBelt) {
+				efficiency += 1f;
+				log.addGlobalModifier(LABEL_BLINK_MOD_ENDERBELT, +1f, ESpellLogModifierType.BONUS_SCALE);
 			}
 			
 			if (ElementalArmor.GetSetCount(entity, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4) {
@@ -612,58 +615,17 @@ public class SpellAction {
 			
 			// Apply efficiency bonus
 			float dist = this.dist * efficiency;
-			
-			Vector3d dest;
 			Vector3d direction = entity.getLookVec().normalize();
 			Vector3d source = entity.getPositionVec();
 			source = source.add(0, entity.getEyeHeight(), 0);
-			BlockPos bpos;
-			Vector3d translation = new Vector3d(direction.x * dist,
-					direction.y * dist,
-					direction.z * dist);
-			
-			// Find ideal dest (vect addition). Can we go there? Then go there.
-			// Else step backwards and raycast forward in 1/5 increments.
-			// See if place we hit is same spot as raycast. If so, fail and do again
-			
-			dest = source.add(translation);
-			bpos = new BlockPos(dest.x, dest.y, dest.z);
-			if (isPassable(entity.world, bpos)
-				&& isPassable(entity.world, bpos.add(0, 1, 0))) {
-					// Whoo! Looks like we can teleport there!
-			} else {
-				int i = 4; // Attempt raytrace from (20% * i * pathlength)
-				Vector3d endpoint = dest;
-				dest = null;
-				Vector3d from;
-				double curDist;
-				while (i >= 0) {
-					if (i == 0) {
-						// optimization
-						from = source;
-					} else {
-						curDist = (.2 * i);
-						from = new Vector3d(translation.x * curDist,
-								translation.y * curDist,
-								translation.z * curDist);
-						from = source.add(from);
-					}
-					
-					RayTraceResult mop = entity.world.rayTraceBlocks(new RayTraceContext(from, endpoint, BlockMode.COLLIDER, FluidMode.NONE, entity));
-					if (mop != null && mop.getHitVec().distanceTo(from) > 0.5) {
-						// We got one
-						BlockPos pos = new BlockPos(mop.getHitVec());
-						if (isPassable(entity.world, pos) && isPassable(entity.world, pos.add(0, 1, 0))) {
-							dest = mop.getHitVec();
-							break;
-						}
-					}
-					
-					i--;
-				}
-			}
+			Vector3d dest = SpellTeleportation.Blink(entity, source, direction, dist, hasBelt && entity.isSneaking());			
 			
 			if (dest != null) {
+				// We are about to put feet at dest, so try to shift down so that eye position matches
+				if (entity.world.isAirBlock(new BlockPos(dest.subtract(0, 1.5, 0)))) {
+					dest = dest.subtract(0, 1.5, 0);
+				}
+				
 				NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, .5 + Math.floor(dest.x), Math.floor(dest.y), .5 + Math.floor(dest.z), caster);
 				if (!event.isCanceled()) {
 					entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
@@ -678,22 +640,6 @@ public class SpellAction {
 					String.format("%.1f", this.dist), String.format("%.1f", dist), String.format("%.1f", source.distanceTo(entity.getPositionVec().add(0, entity.getEyeHeight(), 0)))), false);
 			log.generalEffectFinish(0f, 0f);
 			log.popModifierStack();
-		}
-		
-		private boolean isPassable(World world, BlockPos pos) {
-			if (world.isAirBlock(pos))
-				return true;
-			
-			BlockState state = world.getBlockState(pos);
-			
-			if (state == null)
-				return true;
-			if (state.getMaterial().isLiquid())
-				return true;
-			if (!state.getMaterial().blocksMovement())
-				return true;
-			
-			return false;
 		}
 		
 		@Override
