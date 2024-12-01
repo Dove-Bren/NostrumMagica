@@ -1335,7 +1335,8 @@ public class SpellAction {
 				entity.hurtResistantTime = 0;
 			}
 			
-			double radius = (16 + (32.0 * level)) * efficiency;
+			double radius = (16 * Math.min(1, level)) * efficiency;
+			boolean hasBelt = false;
 			
 			if (caster != null && caster instanceof PlayerEntity) {
 				// Look for ender belt
@@ -1347,10 +1348,14 @@ public class SpellAction {
 							continue;
 						}
 						
-						radius *= 2.0;
+						hasBelt = true;
 						break;
 					}
 				}
+			}
+			
+			if (hasBelt) {
+				radius *= 2.0;
 			}
 			
 			if (ElementalArmor.GetSetCount(entity, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4) {
@@ -1361,21 +1366,26 @@ public class SpellAction {
 			NostrumMagicaSounds.DAMAGE_ENDER.play(entity);
 			
 			for (int i = 0; i < 20; i++) {
-			
-				// Find a random place to teleport
-		        double x = entity.getPosX() + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
-		        double y = entity.getPosY() + (double)(NostrumMagica.rand.nextInt((int) radius) - (int) radius / 2.0);
-		        double z = entity.getPosZ() + (NostrumMagica.rand.nextDouble() - 0.5D) * radius;
-	
-			    // Try to teleport
-		        NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, x, y, z, caster);
-				if (event.isCanceled()) {
-					// Break on a single cancel
-					break;
-				} else {
-					if (entity.attemptTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
-						NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
+				// Pick a random direction to blink in
+				float dirYaw = NostrumMagica.rand.nextFloat() * 360f;
+				float dirPitch = NostrumMagica.rand.nextFloat() * 180f;
+				Vector3d direction = Vector3d.fromPitchYaw(dirPitch, dirYaw);
+				
+				// Blink in that direction
+				Vector3d dest = SpellTeleportation.Blink(entity, entity.getPositionVec().add(0, entity.getEyeHeight(), 0), direction, radius, hasBelt);
+				
+				// Check if far enough
+				if (dest != null && dest.distanceTo(entity.getPositionVec()) > 3) {
+					// Try to teleport
+			        NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, dest.x, dest.y, dest.z, caster);
+					if (event.isCanceled()) {
+						// Break on a single cancel
 						break;
+					} else {
+						if (entity.attemptTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
+							NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
+							break;
+						}
 					}
 				}
 			}
