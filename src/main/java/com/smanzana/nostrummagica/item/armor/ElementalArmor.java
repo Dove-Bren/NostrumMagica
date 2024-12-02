@@ -570,7 +570,7 @@ public class ElementalArmor extends ArmorItem
 		if (offense)
 			return null;
 
-		if (!GetArmorHitEffectsEnabled(user)) {
+		if (!GetArmorEffectsEnabled(user)) {
 			return null;
 		}
 
@@ -1204,7 +1204,7 @@ public class ElementalArmor extends ArmorItem
 	protected void onServerTick(World world, PlayerEntity player, ItemStack stack, int setCount) {
 		if (setCount == 4 && this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
 			if (element == EMagicElement.ICE) {
-				if (player.isOnGround() && !ArmorCheckFlying(player)) {
+				if (player.isOnGround() && !ArmorCheckFlying(player) && GetArmorEffectsEnabled(player)) {
 					final BlockPos pos = player.getPosition();
 					if (world.isAirBlock(pos)) {
 						BlockState belowState = world.getBlockState(pos.down());
@@ -1215,7 +1215,7 @@ public class ElementalArmor extends ArmorItem
 				}
 			} else if (element == EMagicElement.WIND) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-				if (attr != null && attr.getMana() > 0 && player.isSprinting() && !ArmorCheckFlying(player)) {
+				if (attr != null && attr.getMana() > 0 && player.isSprinting() && !ArmorCheckFlying(player) && GetArmorEffectsEnabled(player)) {
 					if (!player.isPotionActive(Effects.SPEED) || player.ticksExisted % 10 == 0) {
 						player.addPotionEffect(new EffectInstance(Effects.SPEED, 20, 0));
 					}
@@ -1243,7 +1243,7 @@ public class ElementalArmor extends ArmorItem
 				}
 			} else if (element == EMagicElement.EARTH) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-				if (attr != null && attr.getMana() >= EARTH_GROW_COST && !ArmorCheckFlying(player)) {
+				if (attr != null && attr.getMana() >= EARTH_GROW_COST && !ArmorCheckFlying(player) && GetArmorEffectsEnabled(player)) {
 					if (player.ticksExisted % 40 == 0) {
 						// Attempt bonemeal
 						if (DoEarthGrow(world, player.getPosition()) != null) {
@@ -1551,8 +1551,8 @@ public class ElementalArmor extends ArmorItem
 			NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.WIND_JUMP_WHIRLWIND, false, 0));
 		} else if (bindingToggleArmorEffect.isPressed()) {
 			NostrumMagicaSounds.UI_TICK.playClient(player);
-			final boolean enabled = !GetArmorHitEffectsEnabled(player);
-			SetArmorHitEffectsEnabled(player, enabled);
+			final boolean enabled = !GetArmorEffectsEnabled(player);
+			SetArmorEffectsEnabled(player, enabled);
 			NetworkHandler.sendToServer(new EnchantedArmorStateUpdate(ArmorState.EFFECT_TOGGLE, enabled, 0));
 		}
 	}
@@ -1838,7 +1838,7 @@ public class ElementalArmor extends ArmorItem
 		return Math.max(0.0f, Math.min(1.0f, (float) (curTicks - flapStartTicks) / WING_FLAP_DURATION));
 	}
 
-	public static final void SetArmorHitEffectsEnabled(LivingEntity ent, boolean enabled) {
+	public static final void SetArmorEffectsEnabled(LivingEntity ent, boolean enabled) {
 		final UUID key = ent.getUniqueID();
 		if (enabled) {
 			ArmorHitEffectMap.put(key, enabled);
@@ -1847,7 +1847,7 @@ public class ElementalArmor extends ArmorItem
 		}
 	}
 
-	public static final boolean GetArmorHitEffectsEnabled(LivingEntity ent) {
+	public static final boolean GetArmorEffectsEnabled(LivingEntity ent) {
 		Boolean val = ArmorHitEffectMap.get(ent.getUniqueID());
 		return (val != null && val.booleanValue());
 	}
@@ -2172,7 +2172,7 @@ public class ElementalArmor extends ArmorItem
 			}
 			break;
 		case EFFECT_TOGGLE:
-			SetArmorHitEffectsEnabled(ent, data);
+			SetArmorEffectsEnabled(ent, data);
 			break;
 		case WIND_JUMP_WHIRLWIND:
 			if (!ent.world.isRemote && armor.hasWindTornado(ent)) {
