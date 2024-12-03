@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
@@ -112,6 +114,11 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			buttons.put(skill, button);
 			
 			categories.computeIfAbsent(skill.getCategory(), (s) -> new ArrayList<>()).add(skill);
+		}
+		
+		// Discover reverse-parent links
+		for (SkillButton button : buttons.values()) {
+			button.linkParent();
 		}
 		
 		// Create category buttons
@@ -274,14 +281,18 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		
 		private SkillState state;
 		
+		private List<SkillButton> childButtons;
+		private @Nullable SkillButton parentButton;
+		
 		public SkillButton(MirrorSkillSubscreen subscreen, Skill skill, int x, int y, int width, int height) {
 			super(x, y, width, height, StringTextComponent.EMPTY);
 			this.subscreen = subscreen;
 			this.skill = skill;
 			this.tooltip = genTooltip();
+			this.childButtons = new ArrayList<>();
 			updateState();
 		}
-		
+
 		protected void updateState() {
 			if (subscreen.attr.hasSkill(skill)) {
 				this.state = SkillState.OWNED;
@@ -289,6 +300,24 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 				this.state = SkillState.AVAILABLE;
 			} else {
 				this.state = SkillState.UNAVAILABLE;
+			}
+		}
+		
+		public void addChild(SkillButton button) {
+			this.childButtons.add(button);
+		}
+		
+		public void linkParent() {
+			assert(parentButton == null); // Else need to clear our parents
+			if (skill.getParentKey() != null) {
+				Skill parent = Skill.lookup(this.skill.getParentKey());
+				if (parent != null) {
+					parentButton = subscreen.buttons.get(parent);
+					
+					if (parentButton != null) {
+						parentButton.addChild(this);
+					}
+				}
 			}
 		}
 		
@@ -317,18 +346,24 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		public void drawTreeLines(MatrixStack matrixStackIn, Minecraft mc) {
-			if (skill.getParentKey() != null) {
-				Skill parent = Skill.lookup(this.skill.getParentKey());
-				if (parent == null)
-					return;
-				
-				SkillButton other = subscreen.buttons.get(parent);
-				if (other != null && !other.isHidden())
-					renderLine(matrixStackIn, other);
+//			if (skill.getParentKey() != null) {
+//				Skill parent = Skill.lookup(this.skill.getParentKey());
+//				if (parent == null)
+//					return;
+//				
+//				SkillButton other = subscreen.buttons.get(parent);
+//				if (other != null && !other.isHidden())
+//					renderLine(matrixStackIn, other, false);
+//			}
+			
+			// Used to have children draw to parent but now will draw to chldren, possible half-faded if child is hidden
+			for (SkillButton child : this.childButtons) {
+				renderLine(matrixStackIn, child, child.isHidden());
 			}
 		}
 		
-		private void renderLine(MatrixStack matrixStackIn, SkillButton other) {
+		@SuppressWarnings("deprecation")
+		private void renderLine(MatrixStack matrixStackIn, SkillButton other, boolean faded) {
 			matrixStackIn.push();
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
@@ -339,11 +374,15 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
+
+			RenderSystem.defaultBlendFunc();
+			RenderSystem.disableAlphaTest();
+			RenderSystem.shadeModel(GL11.GL_SMOOTH);
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-	        buf.pos(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        buf.pos(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.pos(transform, x, y, 0).color(1f, 1f, 1f, faded ? .2f : .6f).endVertex();
+	        buf.pos(transform, other.x, other.y, 0).color(1f, 1f, 1f, faded ? 0f : .6f).endVertex();
 	        Tessellator.getInstance().draw();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
