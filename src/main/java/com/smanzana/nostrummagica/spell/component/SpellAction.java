@@ -817,12 +817,12 @@ public class SpellAction {
 			TransmuteResult<Block> result = Transmutation.GetTransmutationResult(block, level);
 			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
-				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", block.getTranslatedName()), false);
+				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", new TranslationTextComponent(block.getTranslationKey())), false);
 				log.generalEffectFinish(0f, 0f);
 				return;
 			}
 			
-			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", block.getTranslatedName(), result.output.getTranslatedName()), false);
+			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", new TranslationTextComponent(block.getTranslationKey()), new TranslationTextComponent(result.output.getTranslationKey())), false);
 			log.generalEffectFinish(0f, 0f);
 			
 			NostrumMagicaSounds.CAST_CONTINUE.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);

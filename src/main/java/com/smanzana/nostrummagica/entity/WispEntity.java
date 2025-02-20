@@ -215,7 +215,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 			if (perilLoc == null || !perilLoc.equals(getPosition())) {
 				BlockPos.Mutable cursor = new BlockPos.Mutable();
 				cursor.setPos(getPosition());
-				while (world.isAirBlock(cursor)) {
+				while (cursor.getY() > 0 && world.isAirBlock(cursor)) {
 					cursor.move(Direction.DOWN);
 				}
 				
