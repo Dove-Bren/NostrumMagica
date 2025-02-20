@@ -71,6 +71,13 @@ public class DimensionUtils {
 	public static final RegistryKey<World> GetDimKey(String locString) {
 		return GetDimKey(new ResourceLocation(locString));
 	}
+	
+	public static final RegistryKey<World> GetDimKeySafe(String locString) {
+		if (locString == null || locString.isEmpty()) {
+			return World.OVERWORLD;
+		}
+		return GetDimKey(new ResourceLocation(locString));
+	}
 
 	public static boolean SameDimension(@Nonnull Entity a, @Nonnull Entity b) {
 		return SameDimension(a.getEntityWorld(), b.getEntityWorld());

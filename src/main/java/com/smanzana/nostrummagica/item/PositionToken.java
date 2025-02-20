@@ -5,21 +5,16 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.ObeliskBlock;
 import com.smanzana.nostrummagica.block.ObeliskPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -162,44 +157,44 @@ public class PositionToken extends PositionCrystal {
 		return ret;
 	}
 	
-	@Override
-	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
-		if (entityItem.world.isRemote)
-			return false;
-			
-		// check if item is above an obelisk. If so, add this target (if we have one) to it
-		BlockPos storedPos = getBlockPosition(entityItem.getItem());
-		if (storedPos != null) {
-			BlockPos pos = entityItem.getPosition().add(0, -1, 0);
-			if (pos.equals(storedPos))
-				return false;
-			
-			BlockState state = entityItem.world.getBlockState(pos);
-			if (state != null && state.getBlock() instanceof ObeliskBlock && ObeliskBlock.blockIsMaster(state)) {
-				TileEntity ent = entityItem.world.getTileEntity(pos);
-				if (ent != null && ent instanceof ObeliskTileEntity) {
-					ObeliskTileEntity obelisk = ((ObeliskTileEntity) ent);
-					if (obelisk.canAcceptTarget(storedPos)) {
-						if (entityItem.getItem().hasDisplayName()) {
-							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName().getString());
-						} else {
-							obelisk.addTarget(storedPos);
-						}
-						NostrumMagicaSounds.SUCCESS_QUEST.play(
-								entityItem.world,
-								pos.getX(),
-								pos.getY(),
-								pos.getZ()
-								);
-						entityItem.remove();
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
-	}
+//	@Override
+//	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
+//		if (entityItem.world.isRemote)
+//			return false;
+//			
+//		// check if item is above an obelisk. If so, add this target (if we have one) to it
+//		BlockPos storedPos = getBlockPosition(entityItem.getItem());
+//		if (storedPos != null) {
+//			BlockPos pos = entityItem.getPosition().add(0, -1, 0);
+//			if (pos.equals(storedPos))
+//				return false;
+//			
+//			BlockState state = entityItem.world.getBlockState(pos);
+//			if (state != null && state.getBlock() instanceof ObeliskBlock && ObeliskBlock.blockIsMaster(state)) {
+//				TileEntity ent = entityItem.world.getTileEntity(pos);
+//				if (ent != null && ent instanceof ObeliskTileEntity) {
+//					ObeliskTileEntity obelisk = ((ObeliskTileEntity) ent);
+//					if (obelisk.canAcceptTarget(storedPos)) {
+//						if (entityItem.getItem().hasDisplayName()) {
+//							obelisk.addTarget(storedPos, entityItem.getItem().getDisplayName().getString());
+//						} else {
+//							obelisk.addTarget(storedPos);
+//						}
+//						NostrumMagicaSounds.SUCCESS_QUEST.play(
+//								entityItem.world,
+//								pos.getX(),
+//								pos.getY(),
+//								pos.getZ()
+//								);
+//						entityItem.remove();
+//						return true;
+//					}
+//				}
+//			}
+//		}
+//		
+//		return false;
+//	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
