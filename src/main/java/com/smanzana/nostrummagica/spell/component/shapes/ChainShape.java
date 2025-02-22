@@ -18,9 +18,13 @@ import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.IntSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
+import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
+import com.smanzana.nostrummagica.util.WorldUtil;
+import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -29,10 +33,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class ChainShape extends InstantShape {
+public class ChainShape extends InstantShape implements ISelectableShape {
 
 	private static final String ID = "chain";
 	
@@ -46,7 +52,7 @@ public class ChainShape extends InstantShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		this.baseProperties.addProperty(TEAM_LOCK).addProperty(JUMPS);
+		this.baseProperties.addProperty(TEAM_LOCK).addProperty(JUMPS).addProperty(SpellShapeSelector.PROPERTY);
 	}
 	
 	public ChainShape() {
@@ -63,32 +69,27 @@ public class ChainShape extends InstantShape {
 	
 	protected static class ChainTriggerData extends TriggerData {
 
-		private final Map<LivingEntity, List<LivingEntity>> links;
+		private final Map<LivingEntity, List<LivingEntity>> entLinks;
+		private final Map<SpellLocation, List<SpellLocation>> blockLinks;
 		
-		public ChainTriggerData(List<LivingEntity> targets, World world, List<SpellLocation> locations, Map<LivingEntity, List<LivingEntity>> links) {
+		public ChainTriggerData(List<LivingEntity> targets, World world, List<SpellLocation> locations,
+				Map<LivingEntity, List<LivingEntity>> entityLinks,
+				Map<SpellLocation, List<SpellLocation>> blockLinks) {
 			super(targets, locations);
-			this.links = links;
+			this.entLinks = entityLinks;
+			this.blockLinks = blockLinks;
 		}
 		
-		public Map<LivingEntity, List<LivingEntity>> getLinks() {
-			return links;
+		public Map<LivingEntity, List<LivingEntity>> getEntityLinks() {
+			return entLinks;
+		}
+		
+		public Map<SpellLocation, List<SpellLocation>> getBlockLinks() {
+			return blockLinks;
 		}
 	}
 	
-	@Override
-	protected ChainTriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		List<LivingEntity> ret = new ArrayList<>();
-		Map<LivingEntity, List<LivingEntity>> links = new HashMap<>();
-		LivingEntity target = state.getSelf();
-		
-		double radius = 7.0;
-		World world = location.world;
-		if (world == null)
-			world = target.world;
-		
-		int arc = getMaxArcs(params) + 1; // +1 to include center
-		final boolean teamLock = getTeamLock(params);
-		
+	protected void getEntLinks(List<LivingEntity> entsAffected, Map<LivingEntity, List<LivingEntity>> entLinks, LivingEntity target, World world, double radius, int arc, boolean teamLock) {
 		final Set<Entity> seen = new HashSet<>();
 		final List<LivingEntity> next = new ArrayList<>(arc * 2);
 		
@@ -102,7 +103,7 @@ public class ChainShape extends InstantShape {
 			}
 			
 			seen.add(center);
-			ret.add(center); // Assume all entities put in `cur` that haven't been seen yet count in terms of teams, living, etc.
+			entsAffected.add(center); // Assume all entities put in `cur` that haven't been seen yet count in terms of teams, living, etc.
 			arc--;
 			
 			if (arc == 0) {
@@ -154,11 +155,66 @@ public class ChainShape extends InstantShape {
 				
 				// Eligible!
 				next.add(living);
-				links.computeIfAbsent(center, (k) -> new ArrayList<>()).add(living);
+				entLinks.computeIfAbsent(center, (k) -> new ArrayList<>()).add(living);
 			}
 		}
+	}
+	
+	protected boolean blocksAreSimilar(BlockState state, BlockState state2) {
+		return state == state2
+				|| state.getBlock() == state2.getBlock();
+	}
+	
+	protected void getBlockLinks(List<SpellLocation> locsAffected, Map<SpellLocation, List<SpellLocation>> locLinks, SpellLocation location, double radius, int arc) {
+		int[] arcs = {arc};
 		
-		return new ChainTriggerData(ret, world, null, links);
+		
+		WorldUtil.WalkConnectedBlocks(location.world, location.selectedBlockPos, new IBlockWalker() {
+
+			@Override
+			public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance) {
+				return blocksAreSimilar(startState, state);
+			}
+
+			@Override
+			public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount) {
+				final SpellLocation loc = new SpellLocation((World) world, pos);
+				locsAffected.add(loc);
+				locLinks.computeIfAbsent(location, (l) -> new ArrayList<>()).add(loc);
+				
+				if (--arcs[0] <= 0) {
+					return true; // stop walking; all done
+				}
+				
+				return false;
+			}
+			
+		}, arc * arc);
+	}
+	
+	@Override
+	protected ChainTriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+		double radius = 7.0;
+		World world = location.world;
+		if (world == null)
+			world = state.getSelf().getEntityWorld();
+		int arc = getMaxArcs(params) + 1; // +1 to include center
+
+		Map<LivingEntity, List<LivingEntity>> entLinks = new HashMap<>();
+		Map<SpellLocation, List<SpellLocation>> blockLinks = new HashMap<>();
+		List<LivingEntity> entsAffected = new ArrayList<>();
+		List<SpellLocation> locsAffected = new ArrayList<>();
+
+		if (this.affectsEntities(params)) {
+			final LivingEntity firstEnt = state.getSelf(); // Would be cool to know if spell was triggered on an ent, and use that. And if not,
+														// look for closest ent to location (within radius) and use them
+			this.getEntLinks(entsAffected, entLinks, firstEnt, world, radius, arc, getTeamLock(params));
+		}
+		if (this.affectsBlocks(params)) {
+			this.getBlockLinks(locsAffected, blockLinks, location, radius, arc);
+		}
+		
+		return new ChainTriggerData(entsAffected, world, locsAffected, entLinks, blockLinks);
 	}
 
 	@Override
@@ -214,7 +270,7 @@ public class ChainShape extends InstantShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(true, true, false);
+		return new SpellShapeAttributes(true, this.affectsEntities(params), this.affectsBlocks(params));
 	}
 	
 	@Override
@@ -229,7 +285,7 @@ public class ChainShape extends InstantShape {
 						continue;
 					}
 					
-					final List<LivingEntity> affected = data.links.get(source);
+					final List<LivingEntity> affected = data.entLinks.get(source);
 					if (affected != null && affected.contains(target)) {
 						final Vector3d sourcePos = source.func_242282_l(partialTicks).add(0, source.getHeight() / 2, 0);
 						final Vector3d targetPos = target.func_242282_l(partialTicks).add(0, target.getHeight() / 2, 0);
