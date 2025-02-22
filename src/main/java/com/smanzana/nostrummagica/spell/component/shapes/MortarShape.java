@@ -235,7 +235,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public MortarShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public MortarShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(params);
 		final boolean hitEnts = affectsEntities(params);
 		final boolean hitBlocks = affectsBlocks(params);
@@ -274,7 +274,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		boolean noArc = getNoArc(properties);
 		final boolean hitEnts = affectsEntities(properties);
 		final boolean hitBlocks = affectsBlocks(properties);

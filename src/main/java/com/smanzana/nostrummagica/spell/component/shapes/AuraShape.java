@@ -212,7 +212,7 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new AuraTriggerInstance(state, state.getSelf(),
 				getRadius(params),
 				includeAllies(params),
@@ -286,7 +286,7 @@ public class AuraShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float range = this.getRadius(getDefaultProperties());
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		

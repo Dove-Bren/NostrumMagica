@@ -120,7 +120,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	}
 	
 	@Override
-	public MagicCyclerShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public MagicCyclerShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final boolean hitEnts = affectsEntities(params);
 		final boolean hitBlocks = affectsBlocks(params);
 		float duration = this.getDurationSecs(params);
@@ -176,9 +176,9 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		float radius = (float) (CyclerSpellSaucerEntity.CYCLER_RADIUS + .5); // .5 for half the width of the saucer itself
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), (float) radius));
-		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 }

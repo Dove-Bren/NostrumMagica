@@ -69,7 +69,7 @@ public class RingShape extends BurstShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, LivingEntity targetEntity, SpellLocation location, float pitch, float yaw, SpellShapeProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
 			this.spawnShapeEffect(state.getCaster(), null, location, param, characteristics);

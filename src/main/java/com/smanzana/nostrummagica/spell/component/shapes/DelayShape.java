@@ -80,7 +80,7 @@ public class DelayShape extends SpellShape {
 	}
 	
 	@Override
-	public SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public SpellShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new DelayShapeInstance(state, 20 * getDelaySecs(params), characteristics);
 	}
 	
@@ -135,7 +135,7 @@ public class DelayShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		builder.add(new SpellShapePreviewComponent.Ent(state.getSelf()));
 		return true;
 	}

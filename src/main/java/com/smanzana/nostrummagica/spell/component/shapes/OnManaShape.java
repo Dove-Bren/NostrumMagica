@@ -123,7 +123,7 @@ public class OnManaShape extends OnMetricLevelShape {
 	}
 	
 	@Override
-	public ManaShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public ManaShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new ManaShapeInstance(state, state.getCaster(),
 				getLevel(params), getOnAbove(params), 300, params, characteristics);
 	}

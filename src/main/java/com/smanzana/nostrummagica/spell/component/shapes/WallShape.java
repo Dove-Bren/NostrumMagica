@@ -295,8 +295,8 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public WallShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params,
-			SpellCharacteristics characteristics) {
+	public WallShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw,
+			SpellShapeProperties params, SpellCharacteristics characteristics) {
 		// Determine facing based on actual hit position, but use selected pos (where we're looking) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
 		final boolean isLingering = isLingering(params);
@@ -349,7 +349,7 @@ public class WallShape extends AreaShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = wallRadius(properties);
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded

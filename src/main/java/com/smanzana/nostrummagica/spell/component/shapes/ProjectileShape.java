@@ -189,7 +189,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public ProjectileShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public ProjectileShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final boolean hitEnts = affectsEntities(params);
 		final boolean hitBlocks = affectsBlocks(params);
 		final boolean atMax = false; // legacy
@@ -229,7 +229,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final boolean hitEnts = affectsEntities(properties);
 		final boolean hitBlocks = affectsBlocks(properties);
 		final boolean hitAllies = getHitsAllies(properties);

@@ -201,10 +201,10 @@ public class Spell {
 				location = new SpellLocation(targ);
 			}
 			
-			this.shapeInstance = shape.getShape().createInstance(this, location, (targ == null ? -90.0f : targ.rotationPitch),
+			this.shapeInstance = shape.getShape().createInstance(this, targ, location,
+					(targ == null ? -90.0f : targ.rotationPitch),
 					(targ == null ? 0.0f : targ.rotationYaw),
-					shape.getProperties(),
-					spell.getCharacteristics());
+					shape.getProperties(), spell.getCharacteristics());
 			this.shapeInstance.spawn(caster);
 		}
 		
@@ -482,10 +482,10 @@ public class Spell {
 				location = new SpellLocation(targ, this.partialTicks);
 			}
 			
-			shape.getShape().addToPreview(previewBuilder, this, location, (targ == null ? -90.0f : targ.rotationPitch),
+			shape.getShape().addToPreview(previewBuilder, this, targ, location,
+					(targ == null ? -90.0f : targ.rotationPitch),
 					(targ == null ? 0.0f : targ.rotationYaw),
-					shape.getProperties(),
-					this.spell.getCharacteristics());
+					shape.getProperties(), this.spell.getCharacteristics());
 		}
 		
 		@Override

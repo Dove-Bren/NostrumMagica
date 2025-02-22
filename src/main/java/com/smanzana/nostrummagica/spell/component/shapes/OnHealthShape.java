@@ -124,7 +124,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 	}
 	
 	@Override
-	public HealthShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public HealthShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new HealthShapeInstance(state, state.getCaster(),
 				getLevel(params), getOnAbove(params), 300, characteristics, params);
 	}

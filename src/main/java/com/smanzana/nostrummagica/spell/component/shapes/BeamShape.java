@@ -77,7 +77,7 @@ public class BeamShape extends InstantShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final boolean hitsAir = hitsAir(params);
 		// Cast from eyes
 		final Vector3d start = location.shooterPosition;
@@ -152,12 +152,12 @@ public class BeamShape extends InstantShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final Vector3d from = location.shooterPosition;
 		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
 		final Vector3d maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
 		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vector3d.fromPitchYaw(pitch, yaw+90).scale(.1f)), maxDist, 3f));
-		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 
 }

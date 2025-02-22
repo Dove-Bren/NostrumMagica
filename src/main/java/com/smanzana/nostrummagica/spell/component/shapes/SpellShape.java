@@ -152,6 +152,8 @@ public abstract class SpellShape {
 	 * Spawn an instance to perform this spell shape's action.
 	 * For exaple, get ready to spawn a projectile to fly through the air that will eventually 'trigger' the next part of the spell.
 	 * @param state
+	 * @param entity the entity (if any) that the previous components of the spell have directly targetted. Can be null when previous spell stages
+	 * 				 indicate world location hits, rather than entity hits
 	 * @param location
 	 * @param pitch
 	 * @param yaw
@@ -159,7 +161,7 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return
 	 */
-	public abstract SpellShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics);
+	public abstract SpellShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics);
 	
 	/**
 	 * Possibly spawn visual fx for this shape
@@ -251,6 +253,7 @@ public abstract class SpellShape {
 	 * (like a projectile that is spawned and flies) should approximate the behavior.
 	 * @param builder
 	 * @param state
+	 * @param entity TODO
 	 * @param location
 	 * @param pitch
 	 * @param yaw
@@ -258,7 +261,7 @@ public abstract class SpellShape {
 	 * @param characteristics
 	 * @return whether to continue with the spell (return true), or if the spell is expected to fizzle here (return false)
 	 */
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return false;
 	}
 	

@@ -117,8 +117,8 @@ public class ProximityShape extends SpellShape {
 	}
 
 	@Override
-	public ProximityShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params,
-			SpellCharacteristics characteristics) {
+	public ProximityShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw,
+			SpellShapeProperties params, SpellCharacteristics characteristics) {
 		return new ProximityShapeInstance(state, location.world, location.hitPosition,
 				getRange(params), params, characteristics);
 	}
@@ -163,7 +163,7 @@ public class ProximityShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final float radius = getRange(properties);
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), radius/2));
 		return true;

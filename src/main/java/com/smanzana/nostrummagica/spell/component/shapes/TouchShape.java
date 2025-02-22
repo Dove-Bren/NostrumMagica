@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -67,7 +68,7 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	}
 
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float range = getTouchRange(state, params);
 		
 		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, 
@@ -128,8 +129,8 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 	
 	@Override

@@ -151,7 +151,7 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public BubbleSprayShapeInstance createInstance(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	public BubbleSprayShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float rangeMod = getRangeMod(params);
 		final int bubbleCount = getBubbleCount(params);
 		return new BubbleSprayShapeInstance(state, location.world, location.shooterPosition, pitch, yaw, rangeMod, bubbleCount, characteristics);
@@ -214,7 +214,7 @@ public class BubbleSprayShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		return true;
 	}
 	

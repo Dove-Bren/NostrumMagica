@@ -53,7 +53,7 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 	}
 	
 	@Override
-	protected TriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties param, SpellCharacteristics characteristics) {
+	protected TriggerData getTargetData(ISpellState state, LivingEntity targetEntity, SpellLocation location, float pitch, float yaw, SpellShapeProperties param, SpellCharacteristics characteristics) {
 		
 		if (!state.isPreview()) {
 			this.spawnShapeEffect(state.getCaster(), null, location, param, characteristics);
@@ -171,9 +171,9 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		this.addRangeRings(builder, state, location, pitch, yaw, properties, characteristics);
-		return super.addToPreview(builder, state, location, pitch, yaw, properties, characteristics);
+		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 	
 	@Override

@@ -193,7 +193,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 	}
 	
 	@Override
-	protected ChainTriggerData getTargetData(ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
+	protected ChainTriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		double radius = 7.0;
 		World world = location.world;
 		if (world == null)
@@ -206,9 +206,33 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		List<SpellLocation> locsAffected = new ArrayList<>();
 
 		if (this.affectsEntities(params)) {
-			final LivingEntity firstEnt = state.getSelf(); // Would be cool to know if spell was triggered on an ent, and use that. And if not,
-														// look for closest ent to location (within radius) and use them
-			this.getEntLinks(entsAffected, entLinks, firstEnt, world, radius, arc, getTeamLock(params));
+			final LivingEntity firstEnt;
+			if (entity != null) {
+				firstEnt = entity;
+			} else {
+				// Find nearest start entity
+				final Vector3d center = location.hitPosition;
+				List<Entity> entities = world.getEntitiesInAABBexcluding(null, 
+						new AxisAlignedBB(center.getX() - radius,
+									center.getY() - radius,
+									center.getZ() - radius,
+									center.getX() + radius,
+									center.getY() + radius,
+									center.getZ() + radius),
+						(ent) -> {
+							return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
+						});
+				Collections.sort(entities, (a, b) -> {
+					return (int) (a.getDistanceSq(center) - b.getDistanceSq(center));
+				});
+				
+				// First element is shortest distance
+				firstEnt = entities.isEmpty() ? null : (LivingEntity) entities.get(0);
+			}
+			
+			if (firstEnt != null) {
+				this.getEntLinks(entsAffected, entLinks, firstEnt, world, radius, arc, getTeamLock(params));
+			}
 		}
 		if (this.affectsBlocks(params)) {
 			this.getBlockLinks(locsAffected, blockLinks, location, radius, arc);
@@ -274,9 +298,9 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 	}
 	
 	@Override
-	public boolean addToPreview(SpellShapePreview builder, ISpellState state, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		// Add link links between all links that wind up showing up
-		ChainTriggerData data = this.getTargetData(state, location, pitch, yaw, properties, characteristics);
+		ChainTriggerData data = this.getTargetData(state, entity, location, pitch, yaw, properties, characteristics);
 		if (data.targets != null) {
 			final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
 			for (LivingEntity source : data.targets) {
