@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -61,7 +62,7 @@ public class OutcomeRecall implements IRitualOutcome {
 		if (DimensionUtils.InDimension(player, attr.getMarkDimension())) {
 			if (!world.isRemote) {
 				
-				NostrumMagica.attemptTeleport(world, pos, player, true, NostrumMagica.rand.nextInt(4) == 0, player);
+				NostrumMagica.attemptTeleport(new Location(world, pos), player, true, NostrumMagica.rand.nextInt(4) == 0, player);
 				
 //				if (attr.hasEnhancedTeleport()) {
 //					BlockPos portal = TemporaryTeleportationPortal.spawnNearby(world, center.up(), 4, true, pos, 20 * 30);

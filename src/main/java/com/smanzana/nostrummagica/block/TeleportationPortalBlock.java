@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.block;
 
+import com.smanzana.autodungeons.util.DimensionUtils;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TeleportationPortalTileEntity;
+import com.smanzana.nostrummagica.util.Location;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -76,18 +78,18 @@ public class TeleportationPortalBlock extends PortalBlock  {
 		TileEntity te = worldIn.getTileEntity(portalPos);
 		if (te != null && te instanceof TeleportationPortalTileEntity) {
 			TeleportationPortalTileEntity ent = (TeleportationPortalTileEntity) te;
-			BlockPos target = ent.getTarget();
-			if (target != null) {
+			Location target = ent.getTarget();
+			if (target != null && DimensionUtils.InDimension(entityIn, target.getDimension())) {
 				
 				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
 				
-					NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entityIn, target.getX() + .5, target.getY() + .1, target.getZ() + .5, null);
+					NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entityIn, target.getPos().getX() + .5, target.getPos().getY() + .1, target.getPos().getZ() + .5, null);
 					if (!event.isCanceled()) {
-						worldIn.getChunk(target);
+						worldIn.getChunk(target.getPos());
 						
-						entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
-						entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .1;
-						entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
+						entityIn.lastTickPosX = entityIn.prevPosX = target.getPos().getX() + .5;
+						entityIn.lastTickPosY = entityIn.prevPosY = target.getPos().getY() + .1;
+						entityIn.lastTickPosZ = entityIn.prevPosZ = target.getPos().getZ() + .5;
 						if (!worldIn.isRemote) {
 						
 						

@@ -3,14 +3,18 @@ package com.smanzana.nostrummagica.client.gui;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.smanzana.autodungeons.util.DimensionUtils;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity.NostrumObeliskTarget;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
@@ -24,6 +28,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -82,8 +87,8 @@ public class ObeliskScreen extends Screen {
 	private void translateButton(DestinationButton button) {
 		// raw x is getScaled(button.pos.x)
 		// Render x is button.pos.x - te.x SCALED
-		button.x = getScaled(button.pos.getX()) - xOffset;
-		button.y = getScaled(button.pos.getZ()) - yOffset;
+		button.x = getScaled(button.loc.getPos().getX()) - xOffset;
+		button.y = getScaled(button.loc.getPos().getZ()) - yOffset;
 	}
 	
 	@Override
@@ -91,25 +96,65 @@ public class ObeliskScreen extends Screen {
 		if (tileEntity.getTargets().isEmpty())
 			return;
 		
+		// Set initial scale
+		{
+			// How much space do we have to use? If we're drawing the list, we only get 2/3 of space.
+			// Divide answer by 2 because we want the max extent to fix on half of the screen around origin
+			float minScreenSide = Math.min(this.height, this.width * (this.drawList ? (2f/3f) : 1f)) / 2f;
+			
+			// we want furthest vert/horizontal distance to fit on the screen by default
+			float furthestDim = 1; // in blocks
+			for (NostrumObeliskTarget target: tileEntity.getTargets()) {
+				final BlockPos targPos = target.getLocation().getPos();
+				final int xDiff = Math.abs(targPos.getX() - tileEntity.getPos().getX());
+				final int yDiff = Math.abs(targPos.getZ() - tileEntity.getPos().getZ());
+				if (furthestDim < xDiff) {
+					furthestDim = xDiff;
+				}
+				if (furthestDim < yDiff) {
+					furthestDim = yDiff;
+				}
+			}
+			
+			// Ideally furthest fits in 80% of the actual length. 1/.8 = 1.25.
+			// So what scale would make (furthestDim) fit on 80% of screen side length?
+			// xDistOnScreen = xDist / (scale * zoomScaleFactor)
+			// (.8 * minScreenSide) = (furthestDim) / ({ideal scale} * zoomScaleFactor)
+			// .8 * minScreenSide * {ideal scale} * zoomScaleFactor = (furthestDim)
+			// {ideal scale} = (furthestDim) / (.8 * minScreenSide * zoomScaleFactor)
+			final float idealScale = furthestDim / (.8f * minScreenSide * zoomScaleFactor);
+			
+			scale = Math.max(0.01f, Math.min(2.0f, idealScale));
+		}
+		
 		float xDiv = this.drawList ? (2f/3f) : .5f;
 		this.xOffset = getScaled(tileEntity.getPos().getX()) - (int) (this.width * (xDiv));
 		this.yOffset = getScaled(tileEntity.getPos().getZ()) - (this.height / 2);
 		
-		this.centralButton = new DestinationButton(this, 0, 0, tileEntity.getPos(), -1, true, false, "", true);
+		this.centralButton = new DestinationButton(this, 0, 0, new Location(tileEntity.getWorld(), tileEntity.getPos()), -1, true, false, "", true, false, null);
+		
+		final Location selectedLoc = tileEntity.getCurrentTarget();
 		
 		int listY = 0;
 		int index = 0;
 		for (NostrumObeliskTarget target: tileEntity.getTargets()) {
-			boolean valid = tileEntity.canAffordTeleport(target.getPos());
+			boolean valid = tileEntity.canAffordTeleport(target.getLocation());
 			//boolean valid = true; // Would be cool, but need some communication
 			// between the server and client to get a list of actual valid ones,
 			// since the client doesn't have those chunks loaded and returns
 			// null or air blocks when fetching blockstates
 			
+			final boolean selected = selectedLoc != null && selectedLoc.equals(target.getLocation());
+			
+			// Always add list button
 			listButtons.add(
-					new DestinationButton(this, 10, 50 + (listY++ * 20), target.getPos(), index, false, true, target.getTitle(), valid));
-			DestinationButton button = new DestinationButton(this, 0, 0, target.getPos(), index, false, false, target.getTitle(), valid);
-			floatingButtons.add(button);
+					new DestinationButton(this, 10, 50 + (listY++ * 20), target.getLocation(), index, false, true, target.getTitle(), valid, selected, null));
+			
+			// Only add float button if in same dimension
+			if (DimensionUtils.DimEquals(tileEntity.getWorld().getDimensionKey(), target.getLocation().getDimension())) {
+				DestinationButton button = new DestinationButton(this, 0, 0, target.getLocation(), index, false, false, target.getTitle(), valid, selected, this.centralButton);
+				floatingButtons.add(button);
+			}
 			index++;
 		}
 		
@@ -149,7 +194,7 @@ public class ObeliskScreen extends Screen {
 		
 		for (DestinationButton other : floatingButtons)
 		{
-			renderLine(matrixStackIn, centralButton, other);
+			renderLine(matrixStackIn, centralButton, other, partialTicks);
 		}
 		
 		// Do buttons
@@ -300,20 +345,70 @@ public class ObeliskScreen extends Screen {
 		
 	}
 	
-	private void renderLine(MatrixStack matrixStackIn, DestinationButton center, DestinationButton other) {
+	private void renderLine(MatrixStack matrixStackIn, DestinationButton center, DestinationButton other, float partialTicks) {
 		matrixStackIn.push();
 		//GlStateManager.pushLightingAttributes();
 		matrixStackIn.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
+		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		
+		final float red, green, blue, alpha;
+		final int segments;
+		final int highlightInterval;
+		if (other.isSelected) {
+			red = .6f;
+			green = .6f;
+			blue = .7f;
+			alpha = 1f;
+			segments = 20;
+			highlightInterval = 5;
+		} else {
+			red = .3f;
+			green = .3f;
+			blue = .3f;
+			alpha = .8f;
+			segments = 2;
+			highlightInterval = 0;
+		}
+		
+		final int highlightIdxOffset = (int) ((System.currentTimeMillis() / 200) % segments);
+		{
+			// figure out offset based on time to animate
+		}
+		
+		final float diffX = other.x - center.x;
+		final float diffY = other.y - center.y;
+		final float diffPerX = diffX / (segments-1);
+		final float diffPerY = diffY / (segments-1);
+		
+		
 		BufferBuilder buf = Tessellator.getInstance().getBuffer();
 		RenderSystem.enableBlend();
+		RenderSystem.disableTexture();
+		RenderSystem.lineWidth(3f);
+		RenderSystem.enableDepthTest();
         //GlStateManager.disableTexture();
         //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         //GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-        buf.pos(center.x, center.y, 0).color(1f, 1f, 1f, .6f).endVertex();
-        buf.pos(other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        for (int i = 0; i < segments; i++) {
+        	final float X = center.x + (diffPerX * i);
+        	final float Y = center.y + (diffPerY * i);
+        	
+        	final float r, g, b;
+        	if (highlightInterval != 0 && i % highlightInterval == highlightIdxOffset % highlightInterval) {
+        		r = red;
+        		g = green;
+        		b = blue + .3f;
+        	} else {
+        		r = red;
+        		g = green;
+        		b = blue;
+        	}
+        	
+	        buf.pos(transform, X, Y, 0).color(r, g, b, alpha).endVertex();
+        }
         Tessellator.getInstance().draw();
-        //GlStateManager.enableTexture();
+        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
 		
 //        GlStateManager.popAttributes();
@@ -338,25 +433,33 @@ public class ObeliskScreen extends Screen {
 	@OnlyIn(Dist.CLIENT)
     static class DestinationButton extends Button
     {
-        private final BlockPos pos;
+        private final Location loc;
         private final int obeliskIndex;
         private final boolean isListed;
         private final String title;
         private final boolean isCenter;
         private final boolean isValid;
+        private final boolean isSelected;
+        private final @Nullable DestinationButton parentButton;
+        
+        public boolean isHovered;
 
         public DestinationButton(ObeliskScreen screen, int parPosX, int parPosY, 
-              BlockPos pos, int index, boolean isCenter, boolean isListed, String title,
-              boolean isValid) {
+        		Location loc, int index, boolean isCenter, boolean isListed, String title,
+              boolean isValid, boolean isSelected, @Nullable DestinationButton parentButton) {
             super(parPosX, parPosY, 13, 13, StringTextComponent.EMPTY, (b) -> {
             	screen.onDestinationClicked(b);
             });
-            this.pos = pos;
+            this.loc = loc;
             this.obeliskIndex = index;
             this.isListed = isListed;
             this.title = title;
             this.isCenter = isCenter;
             this.isValid = isValid;
+            this.isSelected = isSelected;
+            this.parentButton = parentButton;
+            
+            isHovered = false;
         }
         
         /**
@@ -365,29 +468,55 @@ public class ObeliskScreen extends Screen {
         @Override
         public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
             if (visible) {
+                final Minecraft mc = Minecraft.getInstance();
+                isHovered = parX >= x 
+                        && parY >= y 
+                        && parX < x + width 
+                        && parY < y + height;
                 int textureX = 0;
                 int textureY = TEXT_BACK_HEIGHT;
                 if (isCenter) {
-                	textureX = 2 * TEXT_ICON_LENGTH;
-                } else {
-                	if (parX >= x 
-                      && parY >= y 
-                      && parX < x + width 
-                      && parY < y + height) {
-                		textureX = TEXT_ICON_LENGTH;
-                	}
-                	if (!isValid) {
-                		textureY += TEXT_ICON_LENGTH;
-                	}
+                	textureX += TEXT_ICON_LENGTH;
                 }
                 
-                final Minecraft mc = Minecraft.getInstance();
-                float val = isValid ? 1.0f : .6f;
-                GL11.glColor4f(val, 1.0f, val, val);
+                
+                float alpha, red, green, blue;
+                
+                if (isSelected) {
+                	red = .4f;
+                	green = .6f;
+                	blue = .4f;
+                	alpha = 1f;
+                } else if (isCenter) {
+                	red = .4f;
+                	green = .6f;
+                	blue = .8f;
+                	alpha = 1f;
+                } else if (isValid) {
+                	red = .6f;
+                	green = .2f;
+                	blue = .6f;
+                	alpha = 1f;
+                } else {
+                	red = .8f;
+                	green = .3f;
+                	blue = .35f;
+                	alpha = .8f;
+                }
+                
+                
+                if (isHovered && !isCenter && !isSelected) {
+                	red += .2f;
+                	green += .2f;
+                	blue += .2f;
+                }
+                
+                
                 mc.getTextureManager().bindTexture(background);
                 RenderSystem.enableBlend();
                 RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
-        				textureY, TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT);
+        				textureY, TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+        				red, green, blue, alpha);
                 RenderSystem.disableBlend();
                 
                 if (!isCenter) {
@@ -399,12 +528,32 @@ public class ObeliskScreen extends Screen {
                 	if (isListed) {
                 		// Draw to the right
                 		fonter.drawString(matrixStackIn, title, x + buttonWidth + 5, y + ((buttonWidth - fonter.FONT_HEIGHT + 1) / 2), color);
+                		if (isSelected) {
+	                		matrixStackIn.push();
+	                		matrixStackIn.translate(x + (buttonWidth/2), y + buttonWidth - 1, 0);
+	                		matrixStackIn.scale(.5f, .5f, 1f);
+	                		fonter.drawString(matrixStackIn, "Active", -14, 0, color);
+	                		matrixStackIn.pop();
+                		}
                 	} else {
                 		// Draw above
                 		int xPos = x + (buttonWidth / 2) - (textWidth / 2);
-                		fonter.drawString(matrixStackIn, title, xPos, y - (5 + fonter.FONT_HEIGHT), color);
+                		fonter.drawString(matrixStackIn, title, xPos, y - (2 + fonter.FONT_HEIGHT), color);
+                		
+                		if (isSelected) {
+	                		matrixStackIn.push();
+	                		matrixStackIn.translate(x + (buttonWidth/2), y - 2, 0);
+	                		matrixStackIn.scale(.5f, .5f, 1f);
+	                		fonter.drawString(matrixStackIn, "Active", -14, 0, color);
+	                		matrixStackIn.pop();
+                		}
                 	}
-                	
+                } else {
+                	final String title = "This Obelisk";
+                	FontRenderer fonter = mc.fontRenderer;
+                	int textWidth = fonter.getStringWidth(title);
+                	int xPos = x + (TEXT_ICON_LENGTH / 2) - (textWidth / 2);
+            		fonter.drawString(matrixStackIn, title, xPos, y - (2 + fonter.FONT_HEIGHT), 0xB0B0B0);
                 }
                 
             }

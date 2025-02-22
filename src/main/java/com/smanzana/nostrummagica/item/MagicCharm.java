@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
 import net.minecraft.block.Block;
@@ -276,7 +277,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 				pos = posOpt;
 			}
 			
-			if (NostrumMagica.attemptTeleport(world, pos, player, !player.isSneaking(), false, player)) {
+			if (NostrumMagica.attemptTeleport(new Location(world, pos), player, !player.isSneaking(), false, player)) {
 				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
 				return true;
 			}

@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
+import com.smanzana.nostrummagica.util.Location;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,7 +19,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 		super(NostrumTileEntities.TemporaryPortalTileEntityType);
 	}
 	
-	public TemporaryPortalTileEntity(BlockPos target, long endticks) {
+	public TemporaryPortalTileEntity(Location target, long endticks) {
 		super(NostrumTileEntities.TemporaryPortalTileEntityType, target);
 		this.endticks = endticks;
 		this.markDirty();

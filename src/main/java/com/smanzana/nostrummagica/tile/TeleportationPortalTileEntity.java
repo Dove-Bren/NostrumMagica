@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.block.BlockState;
@@ -13,16 +14,17 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 
-	private static final String NBT_TARGET = "target_pos";
+	private static final String NBT_TARGET_LEGACY = "target_pos";
+	private static final String NBT_TARGET = "target_loc";
 	
-	private BlockPos target;
+	private Location target;
 	
 	protected TeleportationPortalTileEntity(TileEntityType<?> type) {
 		super(type);
@@ -32,20 +34,20 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 		this(NostrumTileEntities.TeleportationPortalTileEntityType);
 	}
 	
-	protected TeleportationPortalTileEntity(TileEntityType<?> type, BlockPos target) {
+	protected TeleportationPortalTileEntity(TileEntityType<?> type, Location target) {
 		this(type);
 		this.setTarget(target);
 	}
 	
-	public TeleportationPortalTileEntity(BlockPos target) {
+	public TeleportationPortalTileEntity(Location target) {
 		this(NostrumTileEntities.TeleportationPortalTileEntityType, target);
 	}
 	
-	public @Nullable BlockPos getTarget() {
+	public @Nullable Location getTarget() {
 		return target;
 	}
 	
-	public void setTarget(@Nullable BlockPos target) {
+	public void setTarget(@Nullable Location target) {
 		this.target = target;
 		this.markDirty();
 		
@@ -85,11 +87,14 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	public void read(BlockState state, CompoundNBT compound) {
 		super.read(state, compound);
 		
-		if (compound.contains(NBT_TARGET, NBT.TAG_LONG)) {
+		if (compound.contains(NBT_TARGET_LEGACY, NBT.TAG_LONG)) {
 			// Legacy!
-			target = WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_TARGET));
+			target = new Location(WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_TARGET_LEGACY)), World.OVERWORLD);
+		} else if (compound.contains(NBT_TARGET_LEGACY)) {
+			// Legacy 2!
+			target = new Location(NBTUtil.readBlockPos(compound.getCompound(NBT_TARGET_LEGACY)), World.OVERWORLD);
 		} else if (compound.contains(NBT_TARGET)) {
-			target = NBTUtil.readBlockPos(compound.getCompound(NBT_TARGET));
+			target = Location.FromNBT(compound.getCompound(NBT_TARGET));
 		} else {
 			target = null;
 		}
@@ -100,7 +105,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 		nbt = super.write(nbt);
 		
 		if (target != null) {
-			nbt.put(NBT_TARGET, NBTUtil.writeBlockPos(target));
+			nbt.put(NBT_TARGET, target.toNBT());
 		}
 		
 		return nbt;

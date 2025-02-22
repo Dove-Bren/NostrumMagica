@@ -138,10 +138,6 @@ public class CommonProxy {
 		return key; // This is the server, silly!
 	}
 	
-	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
-		; // server does nothing
-	}
-	
 	public void setObeliskIndex(BlockPos obeliskPos, int index) {
 		; // server does nothing
 	}

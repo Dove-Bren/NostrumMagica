@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.tile.TemporaryPortalTileEntity;
+import com.smanzana.nostrummagica.util.Location;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -46,12 +47,12 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		return null;
 	}
 	
-	protected static void spawnPortal(World worldIn, BlockPos portalMaster, BlockPos target, int duration) {
+	protected static void spawnPortal(World worldIn, BlockPos portalMaster, Location target, int duration) {
 		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(target, worldIn.getGameTime() + duration);
 		worldIn.setTileEntity(portalMaster, te);
 	}
 	
-	public static void spawn(World world, BlockPos at, BlockPos target, int duration) {
+	public static void spawn(World world, BlockPos at, Location target, int duration) {
 		BlockState state = NostrumBlocks.temporaryTeleportationPortal.getMaster();
 		world.setBlockState(at, state);
 		NostrumBlocks.temporaryTeleportationPortal.createPaired(world, at);
@@ -59,7 +60,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		spawnPortal(world, at, target, duration);
 	}
 	
-	public static BlockPos spawnNearby(World world, BlockPos center, double radius, boolean centerValid, BlockPos target, int duration) {
+	public static BlockPos spawnNearby(World world, BlockPos center, double radius, boolean centerValid, Location target, int duration) {
 		// Find a spot to place it!
 		List<BlockPos> next = new LinkedList<>();
 		Set<BlockPos> seen = new HashSet<>();

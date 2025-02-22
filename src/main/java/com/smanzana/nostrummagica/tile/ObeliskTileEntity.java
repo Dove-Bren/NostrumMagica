@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.PositionToken;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
 import net.minecraft.block.BlockState;
@@ -41,40 +42,34 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	protected static final TicketType<BlockPos> ObeliskChunkLoaderType = TicketType.create("nostrum_obelisk_chunkloader", Comparator.comparingLong(BlockPos::toLong));
 	
 	public static class NostrumObeliskTarget {
-		private static final String NBT_X = "x";
-		private static final String NBT_Y = "y";
-		private static final String NBT_Z = "z";
-		private static final String NBT_DIMENSION = "z";
+		private static final String NBT_LEGACY_X = "x";
+		private static final String NBT_LEGACY_Y = "y";
+		private static final String NBT_LEGACY_Z = "z";
+		private static final String NBT_LEGACY_DIMENSION = "dim";
+		private static final String NBT_LOC = "location";
 		private static final String NBT_TITLE = "title";
 		
-		private RegistryKey<World> dimension;
-		private BlockPos pos;
+		private Location loc;
 		private String title;
 		
-		public NostrumObeliskTarget(World world, BlockPos pos) {
-			this(world.getDimensionKey(), pos, toTitle(pos));
+		public NostrumObeliskTarget(Location location) {
+			this(location, toTitle(location));
 		}
 		
-		public NostrumObeliskTarget(RegistryKey<World> dimension, BlockPos pos) {
-			this(dimension, pos, toTitle(pos));
-		}
-		
-		public NostrumObeliskTarget(World world, BlockPos pos, String title) {
-			this(world.getDimensionKey(), pos, title);
-		}
-		
-		public NostrumObeliskTarget(RegistryKey<World> dimension, BlockPos pos, String title) {
-			this.dimension = dimension;
-			this.pos = pos;
+		public NostrumObeliskTarget(Location location, String title) {
+			this.loc = location;
 			this.title = title;
 		}
 		
-		private static String toTitle(BlockPos pos) {
-			return "(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")";
+		private static String toTitle(Location location) {
+			final String dim = DimensionUtils.IsOverworld(location.getDimension())
+					? ""
+					: ("[" + PositionToken.getDimensionName(location.getDimension()) + "]" );
+			return "(" + location.getPos().getX() + ", " + location.getPos().getY() + ", " + location.getPos().getZ() + ")" + dim;
 		}
 
-		public BlockPos getPos() {
-			return pos;
+		public Location getLocation() {
+			return loc;
 		}
 
 		public String getTitle() {
@@ -83,28 +78,36 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		
 		public CompoundNBT toNBT() {
 			CompoundNBT tag = new CompoundNBT();
-			tag.putInt(NBT_X, pos.getX());
-			tag.putInt(NBT_Y, pos.getY());
-			tag.putInt(NBT_Z, pos.getZ());
 			tag.putString(NBT_TITLE, title);
-			tag.putString(NBT_DIMENSION, dimension.getLocation().toString());
+			tag.put(NBT_LOC, loc.toNBT());
+			
+//			tag.putInt(NBT_X, pos.getX());
+//			tag.putInt(NBT_Y, pos.getY());
+//			tag.putInt(NBT_Z, pos.getZ());
+//			tag.putString(NBT_DIMENSION, dimension.getLocation().toString());
 			return tag;
 		}
 		
 		public static NostrumObeliskTarget fromNBT(CompoundNBT tag) {
-			return new NostrumObeliskTarget(
-					DimensionUtils.GetDimKeySafe(tag.getString(NBT_DIMENSION)),
+			if (tag.contains(NBT_LOC)) {
+				return new NostrumObeliskTarget(Location.FromNBT(tag.getCompound(NBT_LOC)), tag.getString(NBT_TITLE));
+			}
+			
+			// Legacy support
+			return new NostrumObeliskTarget(new Location(
 					new BlockPos(
-							tag.getInt(NBT_X),
-							tag.getInt(NBT_Y),
-							tag.getInt(NBT_Z)
+							tag.getInt(NBT_LEGACY_X),
+							tag.getInt(NBT_LEGACY_Y),
+							tag.getInt(NBT_LEGACY_Z)
 					),
+					DimensionUtils.GetDimKeySafe(tag.getString(NBT_LEGACY_DIMENSION))),
 					tag.getString(NBT_TITLE));
 		}
 	}
 
 	private static final String NBT_MASTER = "master";
 	private static final String NBT_TARGETS = "targets";
+	private static final String NBT_TARGET_INDEX = "targ_idx";
 	//private static final String NBT_TARGET_DIMENSION = "dimension";
 	private static final String NBT_CORNER = "corner";
 	private static final String NBT_ONESIDE_UPGRADED = "pin_upgrade";
@@ -142,7 +145,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	private int aliveCount;
 	
 	// Not persisted. Temporary overrides on target. targetOverrideEnds is based off aliveCount.
-	private BlockPos targetOverride;
+	private Location targetOverride;
 	private int targetOverrideEnd;
 	
 	private boolean isDestructing;
@@ -183,6 +186,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		}
 		
 		nbt.put(NBT_TARGETS, list);
+		nbt.putInt(NBT_TARGET_INDEX, this.targetIndex);
 		nbt.putBoolean(NBT_MASTER, master);
 		if (!master && corner != null) {
 			nbt.putByte(NBT_CORNER, (byte) corner.ordinal());
@@ -210,6 +214,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 				targets.add(NostrumObeliskTarget.fromNBT(tag));
 			}
 		}
+		this.targetIndex = nbt.getInt(NBT_TARGET_INDEX);
 		
 		if (!master) {
 			int ord = nbt.getByte(NBT_CORNER);
@@ -276,22 +281,20 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	public void addTarget(World world, BlockPos pos) {
-		targets.add(new NostrumObeliskTarget(world, pos));
-		forceUpdate();
+		this.addTarget(new Location(world, pos));
 	}
 	
-	public void addTarget(RegistryKey<World> dimension, BlockPos pos) {
-		targets.add(new NostrumObeliskTarget(dimension, pos));
+	public void addTarget(Location location) {
+		targets.add(new NostrumObeliskTarget(location));
 		forceUpdate();
 	}
 	
 	public void addTarget(World world, BlockPos pos, String title) {
-		targets.add(new NostrumObeliskTarget(world, pos, title));
-		forceUpdate();
+		this.addTarget(new Location(world, pos), title);
 	}
 	
-	public void addTarget(RegistryKey<World> dimension, BlockPos pos, String title) {
-		targets.add(new NostrumObeliskTarget(dimension, pos, title));
+	public void addTarget(Location location, String title) {
+		targets.add(new NostrumObeliskTarget(location, title));
 		forceUpdate();
 	}
 	
@@ -299,16 +302,14 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		return targets;
 	}
 	
-	protected boolean isObeliskPos(RegistryKey<World> dimension, BlockPos pos) {
-		if (pos.equals(this.pos) && DimensionUtils.DimEquals(dimension, this.world.getDimensionKey())) {
-			return true;
+	public static final boolean IsObeliskPos(Location location) {
+		final BlockPos pos = location.getPos();
+		final World world = ServerLifecycleHooks.getCurrentServer().getWorld(location.getDimension());
+		
+		if (world.isRemote()) {
+			return false; // can't load random worlds or chunks on client
 		}
 		
-		if (this.world.isRemote) {
-			return true; // assume; can't load random parts of the world
-		}
-		
-		final World world = ServerLifecycleHooks.getCurrentServer().getWorld(dimension);
 		BlockState state = world.getBlockState(pos);
 		if (state != null && state.getBlock() instanceof ObeliskBlock && ObeliskBlock.blockIsMaster(state))
 			return true;
@@ -322,25 +323,26 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		return false;
 	}
 	
-	public boolean canAcceptTarget(RegistryKey<World> dimension, BlockPos pos) {
-		if (DimensionUtils.DimEquals(dimension, this.world.getDimensionKey())) {
+	public boolean canAcceptTarget(Location location) {
+		if (DimensionUtils.DimEquals(location.getDimension(), this.world.getDimensionKey())) {
+			final BlockPos pos = location.getPos();
 			if (pos.equals(this.pos) || pos.equals(this.pos.up())) {
 				return false;
 			}
 		}
 		
-		if (!this.hasDimensionUpgrade() && !DimensionUtils.DimEquals(dimension, this.world.getDimensionKey())) {
+		if (!this.hasDimensionUpgrade() && !DimensionUtils.DimEquals(location.getDimension(), this.world.getDimensionKey())) {
 			return false;
 		}
 		
 		if (!targets.isEmpty())
 		for (NostrumObeliskTarget targPos : targets) {
-			if (DimensionUtils.DimEquals(dimension, targPos.dimension) && pos.equals(targPos.pos))
+			if (targPos.loc.equals(location))
 				return false;
 		}
 		
 		// If not upgraded, make sure destination location is also an obelisk
-		if (!this.hasOnesidedUpgrade() && !isObeliskPos(dimension, pos)) {
+		if (!this.hasOnesidedUpgrade() && !IsObeliskPos(location)) {
 			return false;
 		}
 		
@@ -353,10 +355,11 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		}
 		
 		this.targetIndex = Math.min(targets.size() - 1, index);
+		forceUpdate();
 		refreshPortal();
 	}
 	
-	public @Nullable BlockPos getCurrentTarget() {
+	public @Nullable Location getCurrentTarget() {
 		if (targetOverride != null) {
 			return targetOverride;
 		}
@@ -365,7 +368,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			return null;
 		}
 		
-		return targets.get(Math.min(targets.size() - 1, targetIndex)).getPos();
+		return targets.get(Math.min(targets.size() - 1, targetIndex)).getLocation();
 	}
 	
 	public boolean hasOverride() {
@@ -393,7 +396,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	protected void refreshPortal() {
-		@Nullable BlockPos target;
+		@Nullable Location target;
 		boolean valid;
 		if (this.targetOverride != null) {
 			valid = true;
@@ -417,7 +420,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 				|| !ObeliskBlock.blockIsMaster(state));
 	}
 	
-	public void setOverride(BlockPos override, int durationTicks) {
+	public void setOverride(Location override, int durationTicks) {
 		this.targetOverride = override;
 		this.targetOverrideEnd = this.aliveCount + durationTicks;
 		this.refreshPortal();
@@ -513,20 +516,20 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		
 	}
 	
-	private BlockPos getMasterPos() {
-		if (this.corner != null)
-		switch (this.corner) {
-		case NE:
-			return pos.add(-ObeliskBlock.TILE_OFFSETH, 1, -ObeliskBlock.TILE_OFFSETH);
-		case NW:
-			return pos.add(ObeliskBlock.TILE_OFFSETH, 1, -ObeliskBlock.TILE_OFFSETH);
-		case SE:
-			return pos.add(-ObeliskBlock.TILE_OFFSETH, 1, ObeliskBlock.TILE_OFFSETH);
-		case SW:
-			return pos.add(ObeliskBlock.TILE_OFFSETH, 1, ObeliskBlock.TILE_OFFSETH);
-		}
-		return pos;
-	};
+//	private BlockPos getMasterPos() {
+//		if (this.corner != null)
+//		switch (this.corner) {
+//		case NE:
+//			return pos.add(-ObeliskBlock.TILE_OFFSETH, 1, -ObeliskBlock.TILE_OFFSETH);
+//		case NW:
+//			return pos.add(ObeliskBlock.TILE_OFFSETH, 1, -ObeliskBlock.TILE_OFFSETH);
+//		case SE:
+//			return pos.add(-ObeliskBlock.TILE_OFFSETH, 1, ObeliskBlock.TILE_OFFSETH);
+//		case SW:
+//			return pos.add(ObeliskBlock.TILE_OFFSETH, 1, ObeliskBlock.TILE_OFFSETH);
+//		}
+//		return pos;
+//	};
 	
 //	protected int getAetherCost(BlockPos destination) {
 //		if (this.targetOverride != null && destination == this.targetOverride) {
@@ -542,7 +545,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 //		return (int) Math.round(AetherPerBlock * dist);
 //	}
 	
-	public boolean canAffordTeleport(BlockPos destination) {
+	public boolean canAffordTeleport(Location destination) {
 		return true;
 		//return this.compWrapper.check(getAetherCost(destination));
 	}
@@ -553,7 +556,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	 * @param destination
 	 * @return
 	 */
-	public boolean deductForTeleport(BlockPos destination) {
+	public boolean deductForTeleport(Location destination) {
 		return true;
 		//return this.compWrapper.checkAndWithdraw(getAetherCost(destination));
 	}
@@ -581,7 +584,8 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	protected boolean isDimensionUpgradeItem(ItemStack stack) {
-		return !stack.isEmpty() && stack.getItem() == NostrumItems.seekingGem;
+		return false; // Portals aren't set up for dimensional teleportation yet. So disable this here.
+		//return !stack.isEmpty() && stack.getItem() == NostrumItems.seekingGem;
 	}
 	
 	protected boolean canIntakeItem(ItemStack stack) {
@@ -593,7 +597,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		if (item instanceof PositionToken) {
 			final BlockPos storedPos = PositionToken.getBlockPosition(stack);
 			final RegistryKey<World> storedDim = PositionToken.getDimension(stack);
-			if (canAcceptTarget(storedDim, storedPos)) {
+			if (canAcceptTarget(new Location(storedPos, storedDim))) {
 				return true;
 			}
 		}
@@ -615,11 +619,12 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		if (item instanceof PositionToken) {
 			final BlockPos storedPos = PositionToken.getBlockPosition(stack);
 			final RegistryKey<World> storedDim = PositionToken.getDimension(stack);
+			final Location storedLoc = new Location(storedPos, storedDim);
 			
 			if (stack.hasDisplayName()) {
-				addTarget(storedDim, storedPos, stack.getDisplayName().getString());
+				addTarget(storedLoc, stack.getDisplayName().getString());
 			} else {
-				addTarget(storedDim, storedPos);
+				addTarget(storedLoc);
 			}
 			NostrumMagicaSounds.SUCCESS_QUEST.play(
 					world,

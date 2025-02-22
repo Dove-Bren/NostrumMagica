@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
+import com.smanzana.nostrummagica.util.Location;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,13 +18,13 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	}
 	
 	@Override
-	public @Nullable BlockPos getTarget() {
+	public @Nullable Location getTarget() {
 		// Defer to obelisk below us
 		TileEntity te = world.getTileEntity(pos.down());
 		if (te != null && te instanceof ObeliskTileEntity) {
-			BlockPos target = ((ObeliskTileEntity) te).getCurrentTarget();
+			Location target = ((ObeliskTileEntity) te).getCurrentTarget();
 			if (target != null) {
-				target = target.up(); // we 'target' the actual obelisk but don't want to tele them there!
+				target = new Location(target.getPos().up(), target.getDimension()); // we 'target' the actual obelisk but don't want to tele them there!
 			}
 			return target;
 		}

@@ -49,7 +49,6 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.BladeCastMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.ObeliskSelectMessage;
-import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.message.StatRequestMessage;
 import com.smanzana.nostrummagica.network.message.WorldPortalTeleportRequestMessage;
@@ -413,14 +412,6 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public String getTranslation(String key) {
 		return I18n.format(key, new Object[0]).trim();
-	}
-	
-	@Override
-	public void requestObeliskTransportation(BlockPos origin, BlockPos target) {
-		// Send a request to the server
-		NetworkHandler.sendToServer(
-				new ObeliskTeleportationRequestMessage(origin, target)
-				);
 	}
 	
 	@Override

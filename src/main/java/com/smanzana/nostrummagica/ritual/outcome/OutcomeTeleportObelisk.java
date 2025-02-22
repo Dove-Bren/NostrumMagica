@@ -8,12 +8,12 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.PositionCrystal;
-import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.entity.item.ItemEntity;
@@ -56,6 +56,8 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		}
 		
 		if (!world.isRemote) {
+			final BlockPos to = pos.up();
+			final Location dest = new Location(world, to);
 			if (attr.hasEnhancedTeleport()) {
 				TileEntity te = world.getTileEntity(pos);
 				if (te == null || !(te instanceof ObeliskTileEntity)) {
@@ -65,12 +67,29 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				}
 				
 				ObeliskTileEntity obelisk = (ObeliskTileEntity) te;
-				BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, center.up(), 4, true, pos.up(), 20 * 30);
+				BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, center.up(), 4, true, dest, 20 * 30);
 				if (portal != null) {
-					obelisk.setOverride(portal, 20 * 30);
+					obelisk.setOverride(new Location(world, portal), 20 * 30);
 				}
 			} else {
-				ObeliskTeleportationRequestMessage.serverDoRequest(world, player, null, pos);
+				// Validate obelisks
+				if (ObeliskTileEntity.IsObeliskPos(dest)) {
+					player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.DUMMY_UUID);
+					return;
+				}
+				
+				BlockPos targ = null;
+				for (BlockPos attempt : new BlockPos[]{to, to.up(), to.north(), to.north().east(), to.north().west(), to.east(), to.west(), to.south(), to.south().east(), to.south().west()}) {
+					if (player.attemptTeleport(attempt.getX() + .5, attempt.getY() + 1, attempt.getZ() + .5, false)) {
+						targ = attempt;
+						break;
+					}
+				}
+				if (targ != null) {
+					//doEffects(world, to);
+				} else {
+					player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"), Util.DUMMY_UUID);
+				}
 			}
 			
 			if (NostrumMagica.rand.nextInt(10) == 0) {

@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.network.message.ManaArmorSyncMessage;
 import com.smanzana.nostrummagica.network.message.ManaMessage;
 import com.smanzana.nostrummagica.network.message.ModifyMessage;
 import com.smanzana.nostrummagica.network.message.ObeliskSelectMessage;
-import com.smanzana.nostrummagica.network.message.ObeliskTeleportationRequestMessage;
 import com.smanzana.nostrummagica.network.message.PlayerStatSyncMessage;
 import com.smanzana.nostrummagica.network.message.QuickMoveBagMessage;
 import com.smanzana.nostrummagica.network.message.ReagentBagToggleMessage;
@@ -93,7 +92,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellTomeIncrementMessage.class, SpellTomeIncrementMessage::encode, SpellTomeIncrementMessage::decode, SpellTomeIncrementMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellCraftMessage.class, SpellCraftMessage::encode, SpellCraftMessage::decode, SpellCraftMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellDebugMessage.class, SpellDebugMessage::encode, SpellDebugMessage::decode, SpellDebugMessage::handle);
-		syncChannel.registerMessage(discriminator++, ObeliskTeleportationRequestMessage.class, ObeliskTeleportationRequestMessage::encode, ObeliskTeleportationRequestMessage::decode, ObeliskTeleportationRequestMessage::handle);
+		//syncChannel.registerMessage(discriminator++, ObeliskTeleportationRequestMessage.class, ObeliskTeleportationRequestMessage::encode, ObeliskTeleportationRequestMessage::decode, ObeliskTeleportationRequestMessage::handle);
 		syncChannel.registerMessage(discriminator++, ObeliskSelectMessage.class, ObeliskSelectMessage::encode, ObeliskSelectMessage::decode, ObeliskSelectMessage::handle);
 		syncChannel.registerMessage(discriminator++, ClientUpdateQuestMessage.class, ClientUpdateQuestMessage::encode, ClientUpdateQuestMessage::decode, ClientUpdateQuestMessage::handle);
 		syncChannel.registerMessage(discriminator++, StatRequestMessage.class, StatRequestMessage::encode, StatRequestMessage::decode, StatRequestMessage::handle);

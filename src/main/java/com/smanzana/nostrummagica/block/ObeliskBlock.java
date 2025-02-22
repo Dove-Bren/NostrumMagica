@@ -2,14 +2,11 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.Random;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity.Corner;
-import com.smanzana.nostrummagica.tile.ObeliskTileEntity.NostrumObeliskTarget;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -316,46 +313,4 @@ public class ObeliskBlock extends Block {
 			}
 		}
 	}
-
-	public static boolean isValidTarget(World world, @Nullable BlockPos from, BlockPos to) {
-		if (from != null) {
-			BlockState state = world.getBlockState(from);
-			if (state == null
-					|| !(state.getBlock() instanceof ObeliskBlock)
-					|| !blockIsMaster(state))
-				return false;
-			
-			TileEntity te = world.getTileEntity(from);
-			if (te == null || !(te instanceof ObeliskTileEntity))
-				return false;
-			
-			ObeliskTileEntity ent = (ObeliskTileEntity) te;
-			if (ent.getTargets() == null || ent.getTargets().isEmpty())
-				return false;
-			
-			boolean found = false;
-			for (NostrumObeliskTarget targ : ent.getTargets()) {
-				if (targ.getPos().getX() == to.getX()
-						&& targ.getPos().getY() == to.getY()
-						&& targ.getPos().getZ() == to.getZ()) {
-					found = true;
-					break;
-				}
-			}
-			
-			if (!found) {
-				return false;
-			}
-		}
-		
-		// Load it?
-		BlockState state = world.getBlockState(to);
-		if (state == null
-				|| !(state.getBlock() instanceof ObeliskBlock)
-				|| !blockIsMaster(state))
-			return false;
-		
-		return true;
-	}
-	
 }

@@ -65,6 +65,7 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import com.smanzana.nostrummagica.util.Entities;
+import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 import com.smanzana.petcommand.api.PetFuncs;
@@ -97,6 +98,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(NostrumMagica.MODID)
@@ -943,20 +945,22 @@ public class NostrumMagica {
 		return event;
 	}
 
-	public static boolean attemptTeleport(World world, BlockPos target, PlayerEntity player, boolean allowPortal,
+	public static boolean attemptTeleport(Location target, PlayerEntity player, boolean allowPortal,
 			boolean spawnBristle, @Nullable LivingEntity causingEntity) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		boolean success = false;
 
 		if (allowPortal && attr != null && attr.hasEnhancedTeleport()) {
-			BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, player.getPosition().up(), 4, true,
+			BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(player.getEntityWorld(), player.getPosition().up(), 4, true,
 					target, 20 * 30);
 			if (portal != null) {
-				TemporaryTeleportationPortalBlock.spawnNearby(world, target, 4, true, portal, 20 * 30);
+				final World targetWorld = ServerLifecycleHooks.getCurrentServer().getWorld(target.getDimension());
+				final Location localPortalPos = new Location(player.getEntityWorld(), portal);
+				TemporaryTeleportationPortalBlock.spawnNearby(targetWorld, target.getPos(), 4, true, localPortalPos, 20 * 30);
 				success = true;
 			}
 		} else {
-			NostrumTeleportEvent event = fireTeleportAttemptEvent(player, target.getX() + .5, target.getY() + .1, target.getZ() + .5, causingEntity);
+			NostrumTeleportEvent event = fireTeleportAttemptEvent(player, target.getPos().getX() + .5, target.getPos().getY() + .1, target.getPos().getZ() + .5, causingEntity);
 			if (!event.isCanceled()) {
 				event.getEntity().setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 				success = true;
@@ -967,15 +971,16 @@ public class NostrumMagica {
 		}
 
 		if (success && spawnBristle) {
+			final World targetWorld = ServerLifecycleHooks.getCurrentServer().getWorld(target.getDimension());
 			float dist = 2 + NostrumMagica.rand.nextFloat() * 2;
 			float dir = NostrumMagica.rand.nextFloat();
 			double dirD = dir * 2 * Math.PI;
 			double dx = Math.cos(dirD) * dist;
 			double dz = Math.sin(dirD) * dist;
-			ItemEntity drop = new ItemEntity(world, target.getX() + .5 + dx, target.getY() + 2, target.getZ() + .5 + dz,
+			ItemEntity drop = new ItemEntity(targetWorld, target.getPos().getX() + .5 + dx, target.getPos().getY() + 2, target.getPos().getZ() + .5 + dz,
 					new ItemStack(NostrumItems.resourceEnderBristle));
-			world.addEntity(drop);
-			NostrumMagicaSounds.CAST_FAIL.play(world, target.getX() + .5, target.getY() + 2, target.getZ() + .5);
+			targetWorld.addEntity(drop);
+			NostrumMagicaSounds.CAST_FAIL.play(targetWorld, target.getPos().getX() + .5, target.getPos().getY() + 2, target.getPos().getZ() + .5);
 		}
 
 		return success;
