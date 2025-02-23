@@ -122,7 +122,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
     }
 
 	@Override
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// +10% potency
 		//summary.addEfficiency(.1f);
 	}

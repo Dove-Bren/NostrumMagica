@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -112,7 +113,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
     }
 
 	@Override
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -5% mana cost
 		summary.addCostRate(-.05f);
 //		stack.damageItem(1, caster);

@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
@@ -164,7 +165,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
     }
 
 	@Override
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
 		//summary.addEfficiency(.2f);

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.item;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
 import net.minecraft.entity.LivingEntity;
@@ -20,16 +21,16 @@ import net.minecraft.item.ItemStack;
  */
 public interface ISpellEquipment {
 
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack);
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack);
 	
-	public static void ApplyAll(LivingEntity entity, SpellCastSummary summary) {
+	public static void ApplyAll(LivingEntity entity, Spell spell, SpellCastSummary summary) {
 		// Visit an equipped spell armor
 		for (ItemStack equip : entity.getEquipmentAndArmor()) {
 			if (equip.isEmpty())
 				continue;
 			if (equip.getItem() instanceof ISpellEquipment) {
 				ISpellEquipment armor = (ISpellEquipment) equip.getItem();
-				armor.apply(entity, summary, equip);
+				armor.apply(entity, spell, summary, equip);
 			}
 		}
 		
@@ -46,7 +47,7 @@ public interface ISpellEquipment {
 					
 					if (equip.getItem() instanceof ISpellEquipment) {
 						ISpellEquipment armor = (ISpellEquipment) equip.getItem();
-						armor.apply(entity, summary, equip);
+						armor.apply(entity, spell, summary, equip);
 					}
 				}
 			}

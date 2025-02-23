@@ -140,7 +140,7 @@ public class SpellCasting {
 		}
 		
 		// Visit an equipped spell armor
-		ISpellEquipment.ApplyAll(entity, summary);
+		ISpellEquipment.ApplyAll(entity, spell, summary);
 		
 		// Add skill bonuses
 		boolean hasMasterElem = false;
@@ -338,6 +338,11 @@ public class SpellCasting {
 		return CalculateGlobalSpellCooldown(result.spell, result.caster, result.summary);
 	}
 	
+	public static final boolean CalculateSpellReagentFree(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
+		int spellWeight = CalculateEffectiveSpellWeight(spell, caster, summary);
+		return spellWeight <= 0;
+	}
+	
 	private static final Map<ReagentType, Integer> NoReagentCost;
 	static { NoReagentCost = new EnumMap<>(ReagentType.class); for (ReagentType t : ReagentType.values()) NoReagentCost.put(t, 0); }
 	
@@ -349,8 +354,7 @@ public class SpellCasting {
 	 */
 	private static final Map<ReagentType, Integer> CalculateRequiredReagents(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
 		// If weight is reduced to 0, no reagents needed. Otherwise, all reagents needed.
-		int spellWeight = CalculateEffectiveSpellWeight(spell, caster, summary);
-		if (spellWeight <= 0) {
+		if (CalculateSpellReagentFree(spell, caster, summary)) {
 			return NoReagentCost;
 		} else {
 			Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

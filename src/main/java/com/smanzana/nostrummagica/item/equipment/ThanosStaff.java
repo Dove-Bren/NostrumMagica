@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
@@ -98,7 +99,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
     }
 
 	@Override
-	public void apply(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
+	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -5% reagent cost, +15% potency
 		summary.addReagentCost(-.05f);
 		summary.addEfficiency(.15f);
