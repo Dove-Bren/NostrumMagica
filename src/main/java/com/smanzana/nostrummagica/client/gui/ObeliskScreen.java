@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.gui;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -43,6 +43,9 @@ public class ObeliskScreen extends Screen {
 	protected static final int TEXT_WHOLE_WIDTH = 256;
 	protected static final int TEXT_WHOLE_HEIGHT = 256;
 	protected static final int TEXT_ICON_LENGTH = 14;
+	protected static final int TEXT_REMOVE_BUTT_HOFFSET = 70;
+	protected static final int TEXT_REMOVE_BUTT_VOFFSET = 64;
+	protected static final int TEXT_REMOVE_BUTT_LENT = 14;
 	
 	private static final String NO_DEST_KEY = "info.obelisk.none";
 
@@ -55,6 +58,7 @@ public class ObeliskScreen extends Screen {
 	private DestinationButton centralButton;
 	private List<DestinationButton> floatingButtons;
 	private List<DestinationButton> listButtons;
+	private List<RemoveButton> listRemoveButtons;
 	private boolean drawList;
 	
 	private double mouseClickX;
@@ -70,8 +74,9 @@ public class ObeliskScreen extends Screen {
 		drawList = ModConfig.config.getObeliskList();
 		
 		errorString = I18n.format(NO_DEST_KEY, new Object[0]);
-		this.floatingButtons = new LinkedList<>();
-		this.listButtons = new LinkedList<>();
+		this.floatingButtons = new ArrayList<>();
+		this.listButtons = new ArrayList<>();
+		this.listRemoveButtons = new ArrayList<>();
 		this.scale = 1.0f;
 		mc = Minecraft.getInstance();
 	}
@@ -148,7 +153,10 @@ public class ObeliskScreen extends Screen {
 			
 			// Always add list button
 			listButtons.add(
-					new DestinationButton(this, 10, 50 + (listY++ * 20), target.getLocation(), index, false, true, target.getTitle(), valid, selected, null));
+					new DestinationButton(this, 10, 50 + (listY * 20), target.getLocation(), index, false, true, target.getTitle(), valid, selected, null));
+			listRemoveButtons.add(
+					new RemoveButton(this, (this.width / 3) - 16, 50 + (listY * 20), index));
+			listY++;
 			
 			// Only add float button if in same dimension
 			if (DimensionUtils.DimEquals(tileEntity.getWorld().getDimensionKey(), target.getLocation().getDimension())) {
@@ -161,8 +169,12 @@ public class ObeliskScreen extends Screen {
 		this.addButton(centralButton);
 		for (Widget w : floatingButtons) addButton(w);
 		for (Widget w : listButtons) addButton(w);
+		for (Widget w : listRemoveButtons) addButton(w);
 		
 		for (DestinationButton butt : listButtons) {
+			butt.visible = drawList;
+		}
+		for (RemoveButton butt : listRemoveButtons) {
 			butt.visible = drawList;
 		}
 		
@@ -231,6 +243,10 @@ public class ObeliskScreen extends Screen {
 			butt.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
+		for (RemoveButton butt : listRemoveButtons) {
+			butt.render(matrixStackIn, mouseX, mouseY, partialTicks);
+		}
+		
 	}
 	
 	@Override
@@ -292,6 +308,9 @@ public class ObeliskScreen extends Screen {
 				// click the list button
 				drawList = !drawList;
 				for (DestinationButton butt : listButtons) {
+					butt.visible = drawList;
+				}
+				for (RemoveButton butt : listRemoveButtons) {
 					butt.visible = drawList;
 				}
 				centralButton.playDownSound(this.mc.getSoundHandler());
@@ -428,6 +447,36 @@ public class ObeliskScreen extends Screen {
 		
 		NostrumMagica.instance.proxy.setObeliskIndex(tileEntity.getPos(), butt.obeliskIndex);
 		Minecraft.getInstance().displayGuiScreen(null);
+	}
+	
+	protected void onRemoveClicked(RemoveButton button) {
+		NostrumMagica.instance.proxy.removeObeliskIndex(tileEntity.getPos(), button.obeliskIndex);
+		Minecraft.getInstance().displayGuiScreen(null);
+	}
+	
+	static class RemoveButton extends Button {
+		private final int obeliskIndex;
+		
+		public RemoveButton(ObeliskScreen screen, int x, int y, int index) {
+			super(x, y, 13, 13, StringTextComponent.EMPTY, (b) -> {
+				screen.onRemoveClicked((RemoveButton) b);
+			});
+			this.obeliskIndex = index;		
+		}
+		
+		@Override
+		public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+			final Minecraft mc = Minecraft.getInstance();
+			final float sat = (this.isHovered() ? 1f : .8f);
+			
+			mc.getTextureManager().bindTexture(background);
+            RenderSystem.enableBlend();
+            RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStack, x, y,
+            		TEXT_REMOVE_BUTT_HOFFSET, TEXT_REMOVE_BUTT_VOFFSET,
+            		TEXT_REMOVE_BUTT_LENT, TEXT_REMOVE_BUTT_LENT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
+    				sat, sat, sat, alpha);
+            RenderSystem.disableBlend();
+		}
 	}
 	
 	@OnlyIn(Dist.CLIENT)

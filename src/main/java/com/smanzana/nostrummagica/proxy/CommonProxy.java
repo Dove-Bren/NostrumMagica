@@ -142,6 +142,10 @@ public class CommonProxy {
 		; // server does nothing
 	}
 	
+	public void removeObeliskIndex(BlockPos obeliskPos, int index) {
+		; // server does nothing
+	}
+	
 	public void requestStats(LivingEntity entity) {
 		;
 	}

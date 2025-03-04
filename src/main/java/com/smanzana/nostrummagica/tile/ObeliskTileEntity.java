@@ -31,6 +31,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
@@ -373,6 +374,35 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	
 	public boolean hasOverride() {
 		return this.targetOverride != null;
+	}
+
+	public void removeTargetIndex(int index) {
+		if (index >= targets.size()) {
+			return;
+		}
+		
+		if (index == this.targetIndex) {
+			this.targetIndex = 0;
+		}
+		
+		NostrumObeliskTarget removed = targets.remove(index);
+		if (removed == null) {
+			return;
+		}
+		
+		ItemStack item = new ItemStack(NostrumItems.positionToken);
+		PositionToken.setPosition(item, removed.loc.getDimension(), removed.loc.getPos());
+		if (!removed.title.isEmpty() && !removed.title.startsWith("(")) {
+			item.setDisplayName(new StringTextComponent(removed.title));
+		}
+		spawnItem(item);
+		
+	}
+	
+	protected void spawnItem(ItemStack stack) {
+		// Spawn a little offset from center so we don't just reabsorb anything
+		final BlockPos pos = this.getPos();
+		this.world.addEntity(new ItemEntity(world, pos.getX() - 1, pos.getY() + 1, pos.getZ() + .5, stack));
 	}
 	
 	public void setOnesidedUpgraded(boolean upgraded) {

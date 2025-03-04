@@ -48,6 +48,7 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.BladeCastMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
+import com.smanzana.nostrummagica.network.message.ObeliskRemoveMessage;
 import com.smanzana.nostrummagica.network.message.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.message.StatRequestMessage;
@@ -420,6 +421,12 @@ public class ClientProxy extends CommonProxy {
 		NetworkHandler.sendToServer(
 				new ObeliskSelectMessage(obeliskPos, index)
 				);
+	}
+	
+	@Override
+	public void removeObeliskIndex(BlockPos obeliskPos, int index) {
+		// Send a request to the server
+		NetworkHandler.sendToServer(new ObeliskRemoveMessage(obeliskPos, index));
 	}
 	
 	@Override
